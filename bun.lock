@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "unstory",
+      "name": "campusloop",
       "dependencies": {
         "@opennextjs/cloudflare": "^1.19.9",
         "next": "16.2.6",

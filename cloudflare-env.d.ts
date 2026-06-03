@@ -5,7 +5,7 @@ interface __BaseEnv_CloudflareEnv {
 	IMAGES: ImagesBinding;
 	ASSETS: Fetcher;
 	NEXTJS_ENV: string;
-	WORKER_SELF_REFERENCE: Fetcher /* unstory */;
+	WORKER_SELF_REFERENCE: Fetcher /* campusloop */;
 }
 declare namespace Cloudflare {
 	interface Env extends __BaseEnv_CloudflareEnv {}

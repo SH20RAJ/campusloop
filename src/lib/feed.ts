@@ -147,3 +147,16 @@ export async function getPollFeed(institutionId: string, scope: "campus" | "glob
 		.orderBy(desc(posts.createdAt))
 		.limit(40);
 }
+
+export async function getVisibleProfilePosts(profileId: string) {
+	const db = getDb();
+
+	return db
+		.select(feedSelect())
+		.from(posts)
+		.innerJoin(userProfiles, eq(posts.authorId, userProfiles.id))
+		.innerJoin(institutions, eq(posts.institutionId, institutions.id))
+		.where(and(published, eq(posts.authorId, profileId), eq(posts.isAnonymous, false)))
+		.orderBy(desc(posts.createdAt))
+		.limit(30);
+}

@@ -4,6 +4,7 @@ import type { FeedPost } from "@/lib/feed";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { ReportForm } from "@/components/app/report-form";
 
 import { votePostAction } from "@/app/app/(main)/post/actions";
 
@@ -95,9 +96,7 @@ export function PostCard({ post }: { post: FeedPost }) {
 						<Link href={`/app/post/${post.id}`}>{post.commentCount} comments</Link>
 					</Button>
 				</div>
-				<Button size="sm" variant="ghost" className="h-8 rounded-full text-muted-foreground" disabled>
-					Report
-				</Button>
+				<ReportForm targetType="POST" targetId={post.id} />
 			</CardFooter>
 		</Card>
 	);

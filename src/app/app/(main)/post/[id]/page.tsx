@@ -4,8 +4,10 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { ReportForm } from "@/components/app/report-form";
 import { requireCompletedProfile } from "@/lib/auth";
 import { getPostDetail } from "@/lib/post-detail";
+import { blockUserAction } from "@/app/app/(main)/safety/actions";
 
 import { addCommentAction, deleteCommentAction, deletePostAction, votePollAction, votePostAction } from "../actions";
 
@@ -98,6 +100,15 @@ export default async function PostDetailPage({
 							</Button>
 						</form>
 						<span className="text-sm text-muted-foreground">{detail.comments.length} comments</span>
+						<ReportForm targetType="POST" targetId={detail.post.id} />
+						{!detail.post.isAnonymous && detail.post.authorId !== profile.id ? (
+							<form action={blockUserAction}>
+								<input type="hidden" name="blockedUserId" value={detail.post.authorId} />
+								<Button size="sm" variant="ghost" className="rounded-full text-muted-foreground">
+									Block user
+								</Button>
+							</form>
+						) : null}
 					</div>
 
 					{detail.post.type === "POLL" ? (
@@ -176,6 +187,15 @@ export default async function PostDetailPage({
 												<input type="hidden" name="commentId" value={comment.id} />
 												<Button size="sm" variant="ghost" className="rounded-full text-muted-foreground">
 													Delete
+												</Button>
+											</form>
+										) : null}
+										<ReportForm targetType="COMMENT" targetId={comment.id} label="Report" />
+										{!comment.isAnonymous && comment.authorId !== profile.id ? (
+											<form action={blockUserAction}>
+												<input type="hidden" name="blockedUserId" value={comment.authorId} />
+												<Button size="sm" variant="ghost" className="rounded-full text-muted-foreground">
+													Block
 												</Button>
 											</form>
 										) : null}

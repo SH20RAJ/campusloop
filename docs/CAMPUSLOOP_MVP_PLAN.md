@@ -12,12 +12,13 @@
 
 ## Database Approach Chosen
 
-Use Prisma ORM because the project has no existing ORM and the MVP needs a broad relational schema, migrations, idempotent seeding, typed queries, and Studio for inspection.
+Use Drizzle ORM because the project has no existing ORM and the MVP needs a broad relational schema, migrations, idempotent seeding, typed queries, and a lightweight setup that fits a Next.js/Cloudflare-oriented app better than heavier Node-only ORM assumptions.
 
 Implementation details:
 
-- Add Prisma schema under `prisma/schema.prisma`.
-- Add a generated Prisma client helper under `src/lib/db.ts`.
+- Add Drizzle schema under `src/db/schema.ts`.
+- Add a Drizzle database helper under `src/db/index.ts`.
+- Use PostgreSQL through `postgres-js` for local development, migrations, and seed scripts.
 - Read the existing `DATABASE_URL` when present, with local compatibility for the currently detected `DB_URL` key.
 - Add seed logic that parses `src/lib/colleges.csv`, normalizes website domains, inserts institutions, and inserts imported website domains idempotently.
 - Add scripts for `db:generate`, `db:migrate`, `db:push`, `db:studio`, and `db:seed`.

@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 
+import { votePostAction } from "@/app/app/(main)/post/actions";
+
 const typeLabels: Record<FeedPost["type"], string> = {
 	NORMAL: "Post",
 	ANONYMOUS: "Anonymous",
@@ -75,12 +77,20 @@ export function PostCard({ post }: { post: FeedPost }) {
 			</CardContent>
 			<CardFooter className="flex items-center justify-between border-t bg-slate-50/70 px-4 py-3">
 				<div className="flex items-center gap-2">
-					<Button size="sm" variant="outline" className="h-8 rounded-full" disabled>
-						↑ {post.voteScore}
-					</Button>
-					<Button size="sm" variant="outline" className="h-8 rounded-full" disabled>
-						↓
-					</Button>
+					<form action={votePostAction}>
+						<input type="hidden" name="postId" value={post.id} />
+						<input type="hidden" name="value" value="1" />
+						<Button size="sm" variant="outline" className="h-8 rounded-full">
+							↑ {post.voteScore}
+						</Button>
+					</form>
+					<form action={votePostAction}>
+						<input type="hidden" name="postId" value={post.id} />
+						<input type="hidden" name="value" value="-1" />
+						<Button size="sm" variant="outline" className="h-8 rounded-full">
+							↓
+						</Button>
+					</form>
 					<Button asChild size="sm" variant="ghost" className="h-8 rounded-full">
 						<Link href={`/app/post/${post.id}`}>{post.commentCount} comments</Link>
 					</Button>

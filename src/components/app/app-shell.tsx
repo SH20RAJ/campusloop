@@ -8,7 +8,6 @@ import {
 	Globe02Icon,
 	Home01Icon,
 	PlusSignIcon,
-	Settings02Icon,
 	Shield01Icon,
 	UserCircleIcon,
 } from "@hugeicons/core-free-icons";

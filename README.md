@@ -1,47 +1,99 @@
-# OpenNext Starter
+# CampusLoop
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+CampusLoop is a campus-first social app built with Next.js App Router, Stack Auth, Drizzle ORM, and PostgreSQL. The MVP includes authenticated onboarding, institution matching from the imported colleges dataset, campus/global/confession/poll feeds, post detail interactions, reporting, blocking, moderator review tools, and a public landing page.
 
-## Getting Started
+## Stack
 
-Read the documentation at https://opennext.js.org/cloudflare.
+- Next.js 16, React 19, TypeScript, Tailwind CSS 4
+- Stack Auth for sign-in, sign-up, sessions, and user account UI
+- Drizzle ORM with PostgreSQL via `postgres`
+- Bun for package scripts
+- OpenNext for Cloudflare deployment
 
-## Develop
+## Setup
 
-Run the Next.js development server:
-
-```bash
-npm run dev
-# or similar package manager command
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-## Preview
-
-Preview the application locally on the Cloudflare runtime:
+Install dependencies:
 
 ```bash
-npm run preview
-# or similar package manager command
+bun install
 ```
 
-## Deploy
-
-Deploy the application to Cloudflare:
+Create a local env file:
 
 ```bash
-npm run deploy
-# or similar package manager command
+cp .env.example .env.local
 ```
 
-## Learn More
+Fill in the Stack Auth keys and database URL. `DATABASE_URL` is preferred, while `DB_URL` is supported for compatibility with existing local config.
 
-To learn more about Next.js, take a look at the following resources:
+Push the schema and seed the colleges dataset:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+bun run db:push
+bun run db:seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Start the app:
+
+```bash
+bun run dev
+```
+
+Open `http://localhost:3000`.
+
+## Scripts
+
+- `bun run dev` - run Next.js locally
+- `bun run build` - production Next.js build
+- `bun run lint` - ESLint flat-config check
+- `bunx tsc --noEmit` - TypeScript check
+- `bun run db:generate` - generate Drizzle migrations
+- `bun run db:migrate` - run Drizzle migrations
+- `bun run db:push` - push schema directly to the database
+- `bun run db:seed` - import `src/lib/colleges.csv`
+- `bun run db:studio` - open Drizzle Studio
+- `bun run preview` - build and preview on the OpenNext Cloudflare runtime
+- `bun run deploy` - build and deploy through OpenNext Cloudflare
+
+## Auth Flow
+
+- Public routes: `/`, `/sign-in`, `/sign-up`, `/handler/[...stack]`
+- App routes require a Stack Auth user.
+- New authenticated users are sent to `/app/onboarding`.
+- Completed users land on `/app/campus`.
+- Moderator routes require a `MODERATOR` or `ADMIN` profile role.
+
+Server auth redirects are handled locally with Next `redirect()` so OAuth callbacks are not invoked from a non-browser server context.
+
+## Data Model
+
+The Drizzle schema lives in `src/db/schema.ts`. Core tables include:
+
+- `userProfiles`
+- `institutions`
+- `institutionDomains`
+- `posts`
+- `comments`
+- `pollOptions`
+- `pollVotes`
+- `votes`
+- `reports`
+- `blocks`
+- `moderationActions`
+- `institutionRequests`
+
+The seed script is idempotent and imports college records plus normalized website domains from `src/lib/colleges.csv`.
+
+## Safety Model
+
+Anonymous posts and comments hide public identity while retaining the private author profile ID for moderation. Rule-based pre-checks can block or route risky content for review. Users can report posts, comments, and profiles, block other users, and moderators can review reports in `/app/admin`.
+
+## Verification
+
+Current repo checks:
+
+```bash
+bun run lint
+bunx tsc --noEmit
+bun run build
+```

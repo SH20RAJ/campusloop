@@ -8,7 +8,7 @@
 - Styling/UI: Tailwind CSS 4, shadcn/ui components, Radix/Base UI primitives, Hugeicons.
 - Auth: Stack Auth is already installed and wired with `StackProvider`, `StackTheme`, `StackClientApp`, and `StackServerApp`.
 - Data source: `src/lib/colleges.csv` with Aishe code, name, state, district, website, establishment year, location, and slug.
-- Database/ORM: no ORM or database client currently exists in the repo.
+- Database/ORM: Drizzle ORM with PostgreSQL, configured through `drizzle.config.ts`, `src/db/schema.ts`, and `src/db/index.ts`.
 
 ## Database Approach Chosen
 

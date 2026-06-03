@@ -10,7 +10,13 @@ export async function getCurrentUser() {
 }
 
 export async function requireCurrentUser() {
-	return stackServerApp.getUser({ or: "redirect" });
+	const user = await stackServerApp.getUser();
+
+	if (!user) {
+		redirect("/sign-in");
+	}
+
+	return user;
 }
 
 export async function getProfileByUserId(userId: string) {

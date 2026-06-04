@@ -1,6 +1,7 @@
 import { SignUp } from "@stackframe/stack";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import { getCurrentUser } from "@/lib/auth";
 
@@ -18,7 +19,9 @@ export default async function SignUpPage() {
 					CampusLoop
 				</Link>
 				<div className="rounded-2xl border bg-background/92 p-4 shadow-xl shadow-black/5 backdrop-blur">
-					<SignUp automaticRedirect fullPage={false} />
+					<Suspense fallback={<AuthFallback />}>
+						<SignUp automaticRedirect fullPage={false} />
+					</Suspense>
 				</div>
 				<p className="mt-6 text-center text-sm text-muted-foreground">
 					Already verified?{" "}
@@ -28,5 +31,18 @@ export default async function SignUpPage() {
 				</p>
 			</div>
 		</main>
+	);
+}
+
+function AuthFallback() {
+	return (
+		<div className="space-y-4 p-3">
+			<div className="mx-auto h-6 w-32 rounded bg-muted" />
+			<div className="space-y-2">
+				<div className="h-9 rounded bg-muted" />
+				<div className="h-9 rounded bg-muted" />
+			</div>
+			<div className="h-9 rounded bg-muted" />
+		</div>
 	);
 }

@@ -29,7 +29,7 @@ export default async function LandingPage() {
                 href="/sign-up"
                 className="rounded-lg bg-primary h-9 px-4 flex items-center text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/95 transition-colors"
               >
-                Get Started
+                Join Loop
               </Link>
             </>
           )}
@@ -40,16 +40,16 @@ export default async function LandingPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-6 pt-32 pb-24 max-w-5xl mx-auto space-y-24">
         <div className="space-y-6 max-w-3xl text-center">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-xs font-semibold text-primary animate-pulse mx-auto">
-            <Sparkles className="h-3.5 w-3.5" /> Now Live for All Indian Colleges
+            <Sparkles className="h-3.5 w-3.5" /> Live and spicy across Indian campuses
           </div>
           
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl leading-tight">
-            The real social layer <br />
-            for <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">college life.</span>
+            Spill the tea. <br />
+            Keep it anon. <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">No cap.</span>
           </h1>
           
           <p className="mx-auto max-w-[40rem] text-sm md:text-base text-muted-foreground leading-relaxed">
-            CampusLoop is a verified, student-only platform for your campus: share confessions, vote on live polls, discover students, and matchmaking — safely locked within your university.
+            CampusLoop is the ultimate gatekept social layer. Share wild confessions, drop spicy live polls, lock in campus matches, and keep up with campus gossip—100% verified for students.
           </p>
           
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row pt-4">
@@ -80,9 +80,9 @@ export default async function LandingPage() {
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Verified Network</h3>
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Gatekept & Verified</h3>
               <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                Only whitelisted college emails allowed. No spam, no outside noise. Strictly students.
+                Only whitelisted college emails allowed. No boomers, no bots. Strictly student vibes.
               </p>
             </div>
           </div>
@@ -92,9 +92,9 @@ export default async function LandingPage() {
               <Lock className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Safe Anonymity</h3>
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Spill Without Regret</h3>
               <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                Speak freely. Post confessions and join discussions anonymously with advanced slurs & safety filtering.
+                Got tea? Post confessions anonymously. Slurs and doxxing are auto-filtered, so the vibe check is always immaculate.
               </p>
             </div>
           </div>
@@ -104,9 +104,9 @@ export default async function LandingPage() {
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Campus Matches</h3>
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Campus Crushes</h3>
               <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                Swipe right on students in your college. When there is a mutual swipe, chat opens up instantly.
+                Swipe right on student cards in your college. If they swipe back, you match. Instant DM unlock, zero awkwardness.
               </p>
             </div>
           </div>
@@ -117,17 +117,17 @@ export default async function LandingPage() {
           {/* Section 1: Discussion & Polls */}
           <div className="grid gap-8 md:grid-cols-2 items-center">
             <div className="space-y-4 text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Interactive Community</span>
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Polls, Questions, & Discussions</h2>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary">immaculate vibes</span>
+              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Drop spicy polls & ask dumb questions</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Stay updated with everything happening around your college. Launch dynamic, multi-option polls to vote on campus opinions, ask for academic advice, or join confession threads. Everything stays localized to your university environment.
+                Stay updated with everything happening around your college. Launch dynamic, multi-option polls to check campus opinions, ask for academic cheat codes, or join confession threads. Everything stays localized to your college loop.
               </p>
               <div className="flex items-center gap-6 pt-2">
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <BarChart2 className="h-4 w-4 text-primary" /> Live vote progress bars
+                  <BarChart2 className="h-4 w-4 text-primary" /> Live vote trackers
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <MessageCircle className="h-4 w-4 text-primary" /> Nested comment feeds
+                  <MessageCircle className="h-4 w-4 text-primary" /> Real-time comment threads
                 </span>
               </div>
             </div>
@@ -179,8 +179,8 @@ export default async function LandingPage() {
             </div>
 
             <div className="space-y-4 text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Absolute Safety</span>
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Student-Only Moderation</h2>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary">safety is chief</span>
+              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">No creepy profiles allowed</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 CampusLoop is designed for students, by design. All posts are automatically scanned on creation to prevent doxxing, phone leaks, or harassment. Posts receiving 5 or more student flags are automatically hidden from the feed pending moderator resolution.
               </p>
@@ -198,9 +198,9 @@ export default async function LandingPage() {
 
         {/* Bottom CTA */}
         <div className="w-full rounded-2xl border border-border bg-card p-8 md:p-12 text-center space-y-6 shadow-sm">
-          <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight">Ready to join your real campus?</h2>
+          <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight">Stop lurking, start posting</h2>
           <p className="text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Verify your identity with your official college email domain. Connect with classmates, share confessions, and find matches safely.
+            Get in here. Verify with your college email and join the loop. Connect with classmates, share confessions, and find matches safely.
           </p>
           <div className="pt-2">
             {user ? (

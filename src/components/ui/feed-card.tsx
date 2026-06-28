@@ -7,6 +7,7 @@ import Link from "next/link";
 import { FeedPost } from "@/hooks/use-feed";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
+import { cn } from "@/lib/utils";
 
 interface FeedCardProps {
   post: FeedPost;
@@ -78,27 +79,42 @@ export function FeedCard({ post }: FeedCardProps) {
           </div>
         </div>
         
-        <div className="relative">
-          <button 
-            onClick={() => setShowMenu(!showMenu)}
-            className="rounded-md p-2 hover:bg-muted text-muted-foreground transition-colors"
-          >
-            <MoreHorizontal className="h-5 w-5" />
-          </button>
-          
-          {showMenu && (
-            <div className="absolute right-0 mt-2 w-32 rounded-md border border-border bg-popover text-popover-foreground shadow-lg z-20 py-1 animate-in fade-in slide-in-from-top-1">
-              <button
-                onClick={() => {
-                  setShowMenu(false);
-                  setShowReport(true);
-                }}
-                className="w-full text-left px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-muted transition-colors cursor-pointer"
-              >
-                Report Post
-              </button>
-            </div>
+        <div className="flex items-center gap-2">
+          {post.type !== "NORMAL" && (
+            <span className={cn(
+              "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
+              post.type === "CONFESSION" && "bg-pink-500/10 text-pink-500 border-pink-500/20",
+              post.type === "POLL" && "bg-blue-500/10 text-blue-500 border-blue-500/20",
+              post.type === "QUESTION" && "bg-orange-500/10 text-orange-500 border-orange-500/20"
+            )}>
+              {post.type === "CONFESSION" && "🤫 Confession"}
+              {post.type === "POLL" && "📊 Poll"}
+              {post.type === "QUESTION" && "❓ Question"}
+            </span>
           )}
+
+          <div className="relative">
+            <button 
+              onClick={() => setShowMenu(!showMenu)}
+              className="rounded-md p-2 hover:bg-muted text-muted-foreground transition-colors"
+            >
+              <MoreHorizontal className="h-5 w-5" />
+            </button>
+            
+            {showMenu && (
+              <div className="absolute right-0 mt-2 w-32 rounded-md border border-border bg-popover text-popover-foreground shadow-lg z-20 py-1 animate-in fade-in slide-in-from-top-1">
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    setShowReport(true);
+                  }}
+                  className="w-full text-left px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-muted transition-colors cursor-pointer"
+                >
+                  Report Post
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

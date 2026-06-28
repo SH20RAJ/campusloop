@@ -34,6 +34,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Post body cannot be empty" }, { status: 400 });
     }
 
+    // Safety Checks (Doxxing / Personal info detection)
+    const phoneRegex = /(\+?\d{1,4}[-.\s]?)?\(?\d{3,4}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
+    const emailRegex = /[\w\.-]+@[\w\.-]+\.\w+/g;
+    
+    // Slur blocklist (examples)
+    const blocklist = ["slur1", "slur2", "offensiveword"]; // Replace with actual words if needed
+    const lowerBody = body.toLowerCase();
+    
+    const containsPhone = phoneRegex.test(body);
+    const containsEmail = emailRegex.test(body);
+    const containsBlockedWord = blocklist.some(word => lowerBody.includes(word));
+
+    if (containsPhone || containsEmail) {
+      return NextResponse.json({ 
+        error: "Post blocked: Sharing phone numbers or email addresses is not allowed to prevent doxxing." 
+      }, { status: 400 });
+    }
+
+    if (containsBlockedWord) {
+      return NextResponse.json({ 
+        error: "Post blocked: Contains words that violate our community safety guidelines." 
+      }, { status: 400 });
+    }
+
     // Insert post
     const [newPost] = await db.insert(posts).values({
       authorId: profile.id,

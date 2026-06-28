@@ -5,7 +5,7 @@ import { eq, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { LayoutDashboard, School, ShieldAlert, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, School, ShieldAlert, ArrowLeft, Users } from "lucide-react";
 
 export default async function AdminLayout({
   children,
@@ -75,6 +75,10 @@ export default async function AdminLayout({
               <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
               Dashboard
             </Link>
+            <Link href="/admin/users" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              Users
+            </Link>
             <Link href="/admin/colleges" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
               <School className="h-4 w-4 text-muted-foreground" />
               Colleges
@@ -105,6 +109,7 @@ export default async function AdminLayout({
           </h1>
           <nav className="flex gap-4">
             <Link href="/admin" className="text-xs font-semibold hover:text-primary">Dashboard</Link>
+            <Link href="/admin/users" className="text-xs font-semibold hover:text-primary">Users</Link>
             <Link href="/admin/colleges" className="text-xs font-semibold hover:text-primary">Colleges</Link>
             <Link href="/admin/reports" className="text-xs font-semibold hover:text-primary">Reports</Link>
           </nav>

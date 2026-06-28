@@ -5,7 +5,7 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and } from "drizzle-orm";
 
 interface RouteParams {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function POST(req: Request, { params }: RouteParams) {
@@ -15,6 +15,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const db = getDb();
     const profile = await db.query.userProfiles.findFirst({
       where: eq(userProfiles.userId, user.id),
@@ -33,7 +34,7 @@ export async function POST(req: Request, { params }: RouteParams) {
     // Check if vote already exists
     const existingVote = await db.query.votes.findFirst({
       where: and(
-        eq(votes.postId, params.id),
+        eq(votes.postId, id),
         eq(votes.userId, profile.id)
       )
     });
@@ -52,7 +53,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       if (value !== 0) {
         // Insert new vote
         await db.insert(votes).values({
-          postId: params.id,
+          postId: id,
           userId: profile.id,
           value,
         });

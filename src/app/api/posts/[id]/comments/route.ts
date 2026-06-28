@@ -5,7 +5,7 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and, desc } from "drizzle-orm";
 
 interface RouteParams {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function GET(req: Request, { params }: RouteParams) {
@@ -15,10 +15,11 @@ export async function GET(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const db = getDb();
     const postComments = await db.query.comments.findMany({
       where: and(
-        eq(comments.postId, params.id),
+        eq(comments.postId, id),
         eq(comments.status, "PUBLISHED")
       ),
       orderBy: [desc(comments.createdAt)],
@@ -41,6 +42,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const db = getDb();
     const profile = await db.query.userProfiles.findFirst({
       where: eq(userProfiles.userId, user.id),
@@ -57,7 +59,7 @@ export async function POST(req: Request, { params }: RouteParams) {
     }
 
     const [newComment] = await db.insert(comments).values({
-      postId: params.id,
+      postId: id,
       authorId: profile.id,
       body,
       isAnonymous: isAnonymous || false,

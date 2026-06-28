@@ -8,16 +8,18 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { Metadata } from "next";
 
 interface PostPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
+  const { id } = await params;
   return {
-    title: `Post ${params.id} | CampusLoop`,
+    title: `Post ${id} | CampusLoop`,
   };
 }
 
 export default async function PostDetailPage({ params }: PostPageProps) {
+  const { id } = await params;
   const user = await hexclaveServerApp.getUser();
   if (!user) {
     redirect("/sign-in");
@@ -34,7 +36,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   }
 
   const rawPost = await db.query.posts.findFirst({
-    where: eq(posts.id, params.id),
+    where: eq(posts.id, id),
     with: {
       author: true,
       institution: true,
@@ -64,7 +66,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   return (
     <main className="space-y-6">
       <FeedCard post={post as any} />
-      <PostComments postId={params.id} />
+      <PostComments postId={id} />
     </main>
   );
 }

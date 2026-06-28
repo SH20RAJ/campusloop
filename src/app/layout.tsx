@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { StackProvider, StackTheme } from "@stackframe/stack";
-import { stackServerApp } from "@/stack/server";
+import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -33,11 +33,11 @@ export default function RootLayout({
 				<link rel="icon" href="/favicon.svg" type="image/svg+xml"></link>
 			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<StackProvider app={stackServerApp}>
-					<StackTheme>
+				<HexclaveProvider app={hexclaveServerApp}>
+					<HexclaveTheme>
 						{children}
-					</StackTheme>
-				</StackProvider>
+					</HexclaveTheme>
+				</HexclaveProvider>
 			</body>
 		</html>
 	);

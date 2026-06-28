@@ -19,6 +19,7 @@
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.6.0",
+		"@hexclave/next": "^1.0.36",
 		"@hugeicons/core-free-icons": "^4.2.0",
 		"@hugeicons/react": "^1.1.6",
 		"@opennextjs/cloudflare": "^1.19.9",

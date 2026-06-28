@@ -42,9 +42,9 @@ export function CollegesTable({ initialColleges }: { initialColleges: any[] }) {
   }
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto border rounded-lg bg-card">
       <table className="w-full text-left text-sm text-muted-foreground">
-        <thead className="bg-white/5 text-xs uppercase text-white">
+        <thead className="bg-muted text-xs uppercase text-foreground">
           <tr>
             <th className="px-6 py-4">College Name</th>
             <th className="px-6 py-4">Location</th>
@@ -54,15 +54,15 @@ export function CollegesTable({ initialColleges }: { initialColleges: any[] }) {
         </thead>
         <tbody>
           {initialColleges.map((college) => (
-            <tr key={college.id} className="border-b border-white/10 hover:bg-white/5">
-              <td className="px-6 py-4 font-medium text-white">{college.name}</td>
+            <tr key={college.id} className="border-b border-border hover:bg-muted/50">
+              <td className="px-6 py-4 font-medium text-foreground">{college.name}</td>
               <td className="px-6 py-4">{college.district || college.state}, {college.country}</td>
               <td className="px-6 py-4">
                 <div className="flex flex-wrap gap-2">
                   {college.domains?.map((d: any) => (
-                    <span key={d.id} className="flex items-center gap-1 rounded-full bg-primary/20 px-2 py-1 text-xs text-primary">
+                    <span key={d.id} className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs text-secondary-foreground border">
                       @{d.domain}
-                      <button onClick={() => handleRemoveDomain(d.id)} className="hover:text-white" disabled={isLoading}>
+                      <button onClick={() => handleRemoveDomain(d.id)} className="hover:text-foreground ml-1" disabled={isLoading}>
                         &times;
                       </button>
                     </span>
@@ -75,13 +75,13 @@ export function CollegesTable({ initialColleges }: { initialColleges: any[] }) {
                         placeholder="e.g. mit.edu"
                         value={newDomain}
                         onChange={(e) => setNewDomain(e.target.value)}
-                        className="rounded border border-white/20 bg-black px-2 py-1 text-xs text-white outline-none"
+                        className="rounded border border-input bg-transparent px-2 py-1 text-xs text-foreground outline-none focus:ring-1 focus:ring-ring"
                       />
                       <button onClick={() => handleAddDomain(college.id)} disabled={isLoading} className="text-xs font-semibold text-primary">Save</button>
                       <button onClick={() => setActiveInstId(null)} className="text-xs text-muted-foreground">Cancel</button>
                     </div>
                   ) : (
-                    <button onClick={() => setActiveInstId(college.id)} className="flex items-center gap-1 rounded-full border border-white/20 px-2 py-1 text-xs hover:bg-white/10">
+                    <button onClick={() => setActiveInstId(college.id)} className="flex items-center gap-1 rounded-full border border-input px-2.5 py-0.5 text-xs text-foreground hover:bg-muted">
                       <PlusIcon className="h-3 w-3" /> Add Domain
                     </button>
                   )}

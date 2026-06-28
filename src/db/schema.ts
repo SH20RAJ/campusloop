@@ -565,5 +565,39 @@ export type NewCommunity = typeof communities.$inferInsert;
 export type CommunityMember = typeof communityMembers.$inferSelect;
 export type NewCommunityMember = typeof communityMembers.$inferInsert;
 
+export const notifications = pgTable(
+	"notifications",
+	{
+		id: id(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		type: text("type").notNull(),
+		actorId: text("actor_id")
+			.notNull()
+			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		referenceId: text("reference_id"),
+		isRead: boolean("is_read").default(false).notNull(),
+		createdAt,
+	},
+	(table) => [
+		index("notifications_user_idx").on(table.userId),
+	]
+);
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+	user: one(userProfiles, {
+		fields: [notifications.userId],
+		references: [userProfiles.id],
+	}),
+	actor: one(userProfiles, {
+		fields: [notifications.actorId],
+		references: [userProfiles.id],
+	}),
+}));
+
+export type Notification = typeof notifications.$inferSelect;
+export type NewNotification = typeof notifications.$inferInsert;
+
 
 

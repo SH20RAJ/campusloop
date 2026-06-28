@@ -23,6 +23,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const genderFilter = searchParams.get("gender") || "ALL"; // MALE, FEMALE, ALL
     const collegeFilter = searchParams.get("college") || "CAMPUS"; // CAMPUS, GLOBAL
+    const targetInstitutionId = searchParams.get("targetInstitutionId"); // specific institution id
 
     // Find all target IDs the user has swiped on
     const swiped = await db
@@ -39,6 +40,8 @@ export async function GET(req: Request) {
 
     if (collegeFilter === "CAMPUS") {
       conditions.push(eq(userProfiles.institutionId, profile.institutionId));
+    } else if (targetInstitutionId && targetInstitutionId !== "ALL") {
+      conditions.push(eq(userProfiles.institutionId, targetInstitutionId));
     }
 
     if (genderFilter === "MALE" || genderFilter === "FEMALE") {
@@ -48,6 +51,9 @@ export async function GET(req: Request) {
     const candidates = await db.query.userProfiles.findMany({
       where: and(...conditions.filter(Boolean)),
       limit: 20,
+      with: {
+        institution: true,
+      }
     });
 
     return NextResponse.json(candidates);

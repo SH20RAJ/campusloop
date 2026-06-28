@@ -7,6 +7,7 @@ import { FeedCard } from "@/components/ui/feed-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sparkles, HelpCircle, Heart, Flame, School, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { FeedSkeleton } from "@/components/ui/skeleton-card";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -125,10 +126,7 @@ export function DiscoverFeed() {
       {/* Feed List */}
       <div className="flex flex-col px-4 pt-6 pb-24 gap-6">
         {feedLoading ? (
-          <>
-            <Skeleton className="h-32 w-full rounded-xl" />
-            <Skeleton className="h-32 w-full rounded-xl" />
-          </>
+          <FeedSkeleton />
         ) : filteredFeed && filteredFeed.length > 0 ? (
           filteredFeed.map((post) => (
             <FeedCard key={post.id} post={post} />

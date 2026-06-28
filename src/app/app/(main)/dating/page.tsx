@@ -3,8 +3,7 @@
 import { useState } from "react";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserProfile } from "@/db/schema";
-import { Heart, X, MessageCircle, Sparkles, Filter, MapPin } from "lucide-react";
+import { Heart, X, MessageCircle, Sparkles, Filter, MapPin, School } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -16,15 +15,18 @@ const fetcher = (url: string) => fetch(url).then((res) => {
 type MatchResult = {
   matched: boolean;
   conversationId?: string;
-  matchedUser?: UserProfile;
+  matchedUser?: any;
 };
 
 export default function DatingPage() {
   const [gender, setGender] = useState<"ALL" | "MALE" | "FEMALE">("ALL");
   const [collegeScope, setCollegeScope] = useState<"CAMPUS" | "GLOBAL">("CAMPUS");
+  const [targetCollegeId, setTargetCollegeId] = useState<string>("ALL");
 
-  const { data: candidates, error, isLoading, mutate } = useSWR<UserProfile[]>(
-    `/api/dating/profiles?gender=${gender}&college=${collegeScope}`,
+  const { data: colleges } = useSWR<any[]>("/api/colleges", fetcher);
+
+  const { data: candidates, error, isLoading, mutate } = useSWR<any[]>(
+    `/api/dating/profiles?gender=${gender}&college=${collegeScope}&targetInstitutionId=${targetCollegeId}`,
     fetcher
   );
 
@@ -112,7 +114,7 @@ export default function DatingPage() {
             <span className="text-muted-foreground">Search Scope</span>
             <div className="flex gap-1 bg-muted p-0.5 rounded-lg border border-border">
               <button
-                onClick={() => { setCollegeScope("CAMPUS"); setCurrentIndex(0); }}
+                onClick={() => { setCollegeScope("CAMPUS"); setTargetCollegeId("ALL"); setCurrentIndex(0); }}
                 className={`px-2 py-1 rounded-md font-medium transition-colors cursor-pointer ${
                   collegeScope === "CAMPUS" 
                     ? "bg-background text-foreground shadow-sm font-semibold" 
@@ -133,6 +135,23 @@ export default function DatingPage() {
               </button>
             </div>
           </div>
+
+          {/* Specific College Selection Dropdown (Only for global) */}
+          {collegeScope === "GLOBAL" && (
+            <div className="flex items-center justify-between text-xs pt-1 border-t border-border/50">
+              <span className="text-muted-foreground">College</span>
+              <select
+                value={targetCollegeId}
+                onChange={(e) => { setTargetCollegeId(e.target.value); setCurrentIndex(0); }}
+                className="rounded border border-border bg-background px-2 py-1 text-xs text-foreground outline-none max-w-[200px]"
+              >
+                <option value="ALL">All Colleges</option>
+                {colleges?.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
@@ -141,13 +160,13 @@ export default function DatingPage() {
         {isLoading ? (
           <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
             <div className="space-y-4">
-              <Skeleton className="h-44 w-full rounded-xl" />
-              <Skeleton className="h-6 w-3/4 rounded" />
-              <Skeleton className="h-4 w-1/2 rounded" />
+              <Skeleton className="h-44 w-full rounded-xl animate-pulse" />
+              <Skeleton className="h-6 w-3/4 rounded animate-pulse" />
+              <Skeleton className="h-4 w-1/2 rounded animate-pulse" />
             </div>
             <div className="flex gap-4 justify-center">
-              <Skeleton className="h-10 w-10 rounded-full" />
-              <Skeleton className="h-10 w-10 rounded-full" />
+              <Skeleton className="h-10 w-10 rounded-full animate-pulse" />
+              <Skeleton className="h-10 w-10 rounded-full animate-pulse" />
             </div>
           </div>
         ) : error ? (
@@ -160,7 +179,7 @@ export default function DatingPage() {
             <div className="relative flex-1 bg-muted/20 flex flex-col items-center justify-center p-6">
               {/* Simulated Distance Badge */}
               <div className="absolute top-4 right-4 bg-muted px-2.5 py-1 rounded-full text-[10px] font-semibold text-foreground flex items-center gap-1 border border-border">
-                <MapPin className="h-3 w-3 text-primary" />
+                <MapPin className="h-3 w-3 text-primary animate-bounce" />
                 {collegeScope === "CAMPUS" ? "On Campus" : "India"}
               </div>
 
@@ -169,7 +188,14 @@ export default function DatingPage() {
                 <AvatarFallback className="text-3xl">{currentCandidate.displayName[0]}</AvatarFallback>
               </Avatar>
               <h3 className="text-lg font-bold text-foreground">{currentCandidate.displayName}</h3>
-              <p className="text-xs text-muted-foreground">@{currentCandidate.username}</p>
+              
+              {/* Render candidate's institution name */}
+              <p className="text-xs text-primary font-semibold flex items-center gap-1 mt-0.5">
+                <School className="h-3.5 w-3.5" />
+                {currentCandidate.institution?.name || "Verified Student"}
+              </p>
+              
+              <p className="text-[10px] text-muted-foreground mt-0.5">@{currentCandidate.username}</p>
             </div>
 
             {/* Candidate Bio / Info */}
@@ -184,14 +210,14 @@ export default function DatingPage() {
               <button
                 onClick={() => handleSwipe("PASS")}
                 disabled={actionLoading}
-                className="flex items-center justify-center h-11 w-11 rounded-full border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all active:scale-95 cursor-pointer"
+                className="flex items-center justify-center h-11 w-11 rounded-full border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all active:scale-95 cursor-pointer animate-in slide-in-from-left-2"
               >
                 <X className="h-4 w-4" />
               </button>
               <button
                 onClick={() => handleSwipe("LIKE")}
                 disabled={actionLoading}
-                className="flex items-center justify-center h-11 w-11 rounded-full bg-primary text-primary-foreground hover:bg-primary/95 shadow-md transition-all active:scale-95 cursor-pointer"
+                className="flex items-center justify-center h-11 w-11 rounded-full bg-primary text-primary-foreground hover:bg-primary/95 shadow-md transition-all active:scale-95 cursor-pointer animate-in slide-in-from-right-2"
               >
                 <Heart className="h-4 w-4 fill-primary-foreground" />
               </button>
@@ -200,7 +226,7 @@ export default function DatingPage() {
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
             <div className="h-14 w-14 bg-muted rounded-full flex items-center justify-center text-muted-foreground border border-border">
-              <Sparkles className="h-6 w-6 opacity-40 text-primary" />
+              <Sparkles className="h-6 w-6 opacity-40 text-primary animate-spin" />
             </div>
             <div>
               <h4 className="font-semibold text-foreground text-sm">That's everyone!</h4>
@@ -223,11 +249,11 @@ export default function DatingPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/95 backdrop-blur-md animate-in fade-in">
           <div className="relative w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl text-center space-y-6 flex flex-col items-center animate-in zoom-in-95">
             <div className="space-y-1">
-              <span className="text-xs font-bold tracking-widest text-primary uppercase">It's a Match!</span>
+              <span className="text-xs font-bold tracking-widest text-primary uppercase animate-pulse">It's a Match!</span>
               <h3 className="text-xl font-bold text-foreground">You and {swipeResult.matchedUser.displayName} liked each other!</h3>
             </div>
 
-            <div className="flex items-center gap-4 py-4">
+            <div className="flex items-center gap-4 py-4 animate-bounce">
               <Avatar className="h-20 w-20 border-2 border-primary shadow-lg">
                 <AvatarFallback className="text-xl">Me</AvatarFallback>
               </Avatar>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { votes, userProfiles } from "@/db/schema";
+import { votes, userProfiles, posts, notifications } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and } from "drizzle-orm";
 
@@ -57,6 +57,21 @@ export async function POST(req: Request, { params }: RouteParams) {
           userId: profile.id,
           value,
         });
+
+        // Trigger notification if it's an upvote
+        if (value === 1) {
+          const targetPost = await db.query.posts.findFirst({
+            where: eq(posts.id, id),
+          });
+          if (targetPost && targetPost.authorId !== profile.id) {
+            await db.insert(notifications).values({
+              userId: targetPost.authorId,
+              type: "LIKE",
+              actorId: profile.id,
+              referenceId: id,
+            });
+          }
+        }
         return NextResponse.json({ message: "Vote cast", userVote: value });
       }
     }

@@ -5,7 +5,8 @@ import {
   userProfiles, 
   conversations, 
   conversationParticipants, 
-  messages 
+  messages,
+  notifications
 } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and } from "drizzle-orm";
@@ -59,6 +60,12 @@ export async function POST(req: Request) {
         await db.insert(conversationParticipants).values([
           { conversationId: newConv.id, userId: profile.id },
           { conversationId: newConv.id, userId: targetId }
+        ]);
+
+        // Insert notifications
+        await db.insert(notifications).values([
+          { userId: profile.id, type: "MATCH", actorId: targetId, referenceId: newConv.id },
+          { userId: targetId, type: "MATCH", actorId: profile.id, referenceId: newConv.id }
         ]);
 
         // Send match greeting

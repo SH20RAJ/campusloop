@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { comments, userProfiles } from "@/db/schema";
+import { comments, userProfiles, posts, notifications } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and, desc } from "drizzle-orm";
 
@@ -65,6 +65,19 @@ export async function POST(req: Request, { params }: RouteParams) {
       isAnonymous: isAnonymous || false,
       status: "PUBLISHED",
     }).returning();
+
+    // Trigger notification
+    const targetPost = await db.query.posts.findFirst({
+      where: eq(posts.id, id),
+    });
+    if (targetPost && targetPost.authorId !== profile.id) {
+      await db.insert(notifications).values({
+        userId: targetPost.authorId,
+        type: "COMMENT",
+        actorId: profile.id,
+        referenceId: id,
+      });
+    }
 
     return NextResponse.json(newComment, { status: 201 });
   } catch (error) {

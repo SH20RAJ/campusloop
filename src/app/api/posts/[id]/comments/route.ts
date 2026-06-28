@@ -1,0 +1,72 @@
+import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { comments, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { eq, and, desc } from "drizzle-orm";
+
+interface RouteParams {
+  params: { id: string };
+}
+
+export async function GET(req: Request, { params }: RouteParams) {
+  try {
+    const user = await hexclaveServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const db = getDb();
+    const postComments = await db.query.comments.findMany({
+      where: and(
+        eq(comments.postId, params.id),
+        eq(comments.status, "PUBLISHED")
+      ),
+      orderBy: [desc(comments.createdAt)],
+      with: {
+        author: true,
+      },
+    });
+
+    return NextResponse.json(postComments);
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request, { params }: RouteParams) {
+  try {
+    const user = await hexclaveServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const db = getDb();
+    const profile = await db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, user.id),
+    });
+
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
+    }
+
+    const { body, isAnonymous } = (await req.json()) as { body: string; isAnonymous?: boolean };
+
+    if (!body || body.trim().length === 0) {
+      return NextResponse.json({ error: "Comment cannot be empty" }, { status: 400 });
+    }
+
+    const [newComment] = await db.insert(comments).values({
+      postId: params.id,
+      authorId: profile.id,
+      body,
+      isAnonymous: isAnonymous || false,
+      status: "PUBLISHED",
+    }).returning();
+
+    return NextResponse.json(newComment, { status: 201 });
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    return NextResponse.json({ error: "Failed to create comment" }, { status: 500 });
+  }
+}

@@ -1,8 +1,10 @@
 import { getDb } from "@/db";
-import { posts } from "@/db/schema";
+import { posts, userProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
+import { PostComments } from "./post-comments";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { Metadata } from "next";
 
 interface PostPageProps {
@@ -16,28 +18,53 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 }
 
 export default async function PostDetailPage({ params }: PostPageProps) {
+  const user = await hexclaveServerApp.getUser();
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   const db = getDb();
   
-  const post = await db.query.posts.findFirst({
+  const profile = await db.query.userProfiles.findFirst({
+    where: eq(userProfiles.userId, user.id),
+  });
+
+  if (!profile) {
+    redirect("/app/onboarding");
+  }
+
+  const rawPost = await db.query.posts.findFirst({
     where: eq(posts.id, params.id),
     with: {
       author: true,
       institution: true,
+      votes: true,
+      comments: true,
     }
   });
 
-  if (!post) {
+  if (!rawPost) {
     notFound();
   }
 
+  // Format post to match FeedPost type required by FeedCard
+  const votesCount = rawPost.votes.reduce((acc, vote) => acc + vote.value, 0);
+  const commentsCount = rawPost.comments.length;
+  const userVote = rawPost.votes.find(v => v.userId === profile.id)?.value || 0;
+
+  const post = {
+    ...rawPost,
+    votesCount,
+    commentsCount,
+    userVote,
+    votes: undefined,
+    comments: undefined,
+  };
+
   return (
-    <main className="mx-auto flex w-full max-w-md flex-col min-h-screen px-4 pt-6 pb-32">
+    <main className="space-y-6">
       <FeedCard post={post as any} />
-      
-      <div className="mt-8 rounded-3xl bg-black/20 p-6 backdrop-blur-md">
-        <h3 className="mb-4 text-lg font-semibold text-white">Comments</h3>
-        <p className="text-sm text-muted-foreground">Comments coming soon...</p>
-      </div>
+      <PostComments postId={params.id} />
     </main>
   );
 }

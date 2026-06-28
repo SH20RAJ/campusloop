@@ -1,23 +1,60 @@
 "use client";
 
-import { Post, UserProfile, Institution } from "@/db/schema";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import { FeedPost } from "@/hooks/use-feed";
 
 interface FeedCardProps {
-  post: Post & {
-    author: UserProfile;
-    institution: Institution;
-  };
+  post: FeedPost;
 }
 
 export function FeedCard({ post }: FeedCardProps) {
-  // If the post is anonymous, we hide the author profile
+  const [userVote, setUserVote] = useState(post.userVote);
+  const [votesCount, setVotesCount] = useState(post.votesCount);
+  const [isLoading, setIsLoading] = useState(false);
+
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author.displayName;
   const authorHandle = post.isAnonymous ? "anonymous" : post.author.username;
   const avatarFallback = post.isAnonymous ? "A" : post.author.displayName[0];
   const avatarUrl = post.isAnonymous ? "" : post.author.avatarUrl;
+
+  async function handleVote() {
+    if (isLoading) return;
+    
+    // Optimistic Update
+    const isUpvoted = userVote === 1;
+    const newValue = isUpvoted ? 0 : 1;
+    const newCount = isUpvoted ? votesCount - 1 : votesCount + 1;
+
+    setUserVote(newValue);
+    setVotesCount(newCount);
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(`/api/posts/${post.id}/vote`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value: newValue }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to cast vote");
+      }
+      
+      const data = await res.json() as { userVote: number };
+      // Sync state with server response just in case
+      setUserVote(data.userVote);
+    } catch (error) {
+      console.error(error);
+      // Revert on error
+      setUserVote(userVote);
+      setVotesCount(votesCount);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:border-border/80 transition-colors">
@@ -56,14 +93,20 @@ export function FeedCard({ post }: FeedCardProps) {
 
       {/* Actions */}
       <div className="flex items-center gap-6 px-6 py-4 border-t border-border mt-4 text-muted-foreground">
-        <button className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm">
-          <Heart className="h-4 w-4" />
-          <span>1.2k</span>
+        <button 
+          onClick={handleVote}
+          disabled={isLoading}
+          className={`flex items-center gap-1.5 transition-colors text-sm ${userVote === 1 ? "text-red-500 hover:text-red-600" : "hover:text-foreground"}`}
+        >
+          <Heart className={`h-4 w-4 ${userVote === 1 ? "fill-red-500" : ""}`} />
+          <span>{votesCount}</span>
         </button>
-        <button className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm">
+        
+        <Link href={`/app/post/${post.id}`} className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm">
           <MessageCircle className="h-4 w-4" />
-          <span>124</span>
-        </button>
+          <span>{post.commentsCount || 0}</span>
+        </Link>
+
         <button className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm">
           <Share2 className="h-4 w-4" />
           <span>Share</span>

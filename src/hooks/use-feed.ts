@@ -1,9 +1,12 @@
 import useSWR from "swr";
 import { Post, UserProfile, Institution } from "@/db/schema";
 
-type FeedPost = Post & {
+export type FeedPost = Post & {
   author: UserProfile;
   institution: Institution;
+  votesCount: number;
+  commentsCount: number;
+  userVote: number;
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => {

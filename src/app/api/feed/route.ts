@@ -35,14 +35,36 @@ export async function GET(req: Request) {
       conditions.push(eq(posts.type, type));
     }
 
-    const feed = await db.query.posts.findMany({
+    const rawFeed = await db.query.posts.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
       orderBy: [desc(posts.createdAt)],
       limit: 20,
       with: {
         author: true,
         institution: true,
+        votes: true,
+        comments: {
+          where: eq(posts.status, "PUBLISHED") // Assumes comments status check if needed
+        },
       }
+    });
+
+    // Map to include counts and user's vote state
+    const feed = rawFeed.map(post => {
+      const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
+      const commentsCount = post.comments.length;
+      const userVoteObj = post.votes.find(v => v.userId === profile.id);
+      const userVote = userVoteObj ? userVoteObj.value : 0;
+
+      return {
+        ...post,
+        votesCount,
+        commentsCount,
+        userVote,
+        // Omit raw array elements to keep payload light
+        votes: undefined,
+        comments: undefined,
+      };
     });
 
     return NextResponse.json(feed);

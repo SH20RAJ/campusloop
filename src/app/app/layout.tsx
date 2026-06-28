@@ -47,7 +47,10 @@ export default async function AppRootLayout({
   }
 
   const email = user.primaryEmail;
-  const domain = email?.split("@")[1]?.toLowerCase();
+  if (!email) {
+    redirect("/invalid-email");
+  }
+  const domain = email.split("@")[1]?.toLowerCase();
 
   if (!domain) {
     redirect("/invalid-email");

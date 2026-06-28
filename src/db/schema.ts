@@ -382,6 +382,78 @@ export const votesRelations = relations(votes, ({ one }) => ({
 	}),
 }));
 
+export const conversations = pgTable(
+	"conversations",
+	{
+		id: id(),
+		createdAt,
+		updatedAt,
+	}
+);
+
+export const conversationParticipants = pgTable(
+	"conversation_participants",
+	{
+		id: id(),
+		conversationId: text("conversation_id")
+			.notNull()
+			.references(() => conversations.id, { onDelete: "cascade" }),
+		userId: text("user_id")
+			.notNull()
+			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		createdAt,
+	},
+	(table) => [
+		uniqueIndex("conversation_participants_user_conv_idx").on(table.userId, table.conversationId),
+	]
+);
+
+export const messages = pgTable(
+	"messages",
+	{
+		id: id(),
+		conversationId: text("conversation_id")
+			.notNull()
+			.references(() => conversations.id, { onDelete: "cascade" }),
+		senderId: text("sender_id")
+			.notNull()
+			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		body: text("body").notNull(),
+		createdAt,
+		updatedAt,
+	},
+	(table) => [
+		index("messages_conversation_created_idx").on(table.conversationId, table.createdAt),
+	]
+);
+
+export const conversationsRelations = relations(conversations, ({ many }) => ({
+	participants: many(conversationParticipants),
+	messages: many(messages),
+}));
+
+export const conversationParticipantsRelations = relations(conversationParticipants, ({ one }) => ({
+	conversation: one(conversations, {
+		fields: [conversationParticipants.conversationId],
+		references: [conversations.id],
+	}),
+	user: one(userProfiles, {
+		fields: [conversationParticipants.userId],
+		references: [userProfiles.id],
+	}),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+	conversation: one(conversations, {
+		fields: [messages.conversationId],
+		references: [conversations.id],
+	}),
+	sender: one(userProfiles, {
+		fields: [messages.senderId],
+		references: [userProfiles.id],
+	}),
+}));
+
 export type Institution = typeof institutions.$inferSelect;
 export type NewInstitution = typeof institutions.$inferInsert;
 export type UserProfile = typeof userProfiles.$inferSelect;
@@ -390,3 +462,10 @@ export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
 export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
+export type Conversation = typeof conversations.$inferSelect;
+export type NewConversation = typeof conversations.$inferInsert;
+export type ConversationParticipant = typeof conversationParticipants.$inferSelect;
+export type NewConversationParticipant = typeof conversationParticipants.$inferInsert;
+export type Message = typeof messages.$inferSelect;
+export type NewMessage = typeof messages.$inferInsert;
+

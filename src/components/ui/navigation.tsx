@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Compass, Plus, Bell, UserCircle, Shield, Heart } from "lucide-react";
+import { Home, Compass, Plus, Bell, UserCircle, Shield, Heart, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ export function Navigation({ isAdmin }: NavigationProps) {
     { icon: Home, href: "/app/campus", label: "Home" },
     { icon: Compass, href: "/app/discover", label: "Discover" },
     { icon: Heart, href: "/app/confessions", label: "Confessions" },
+    { icon: MessageSquare, href: "/app/chat", label: "Messages" },
     { icon: Plus, href: "/app/post/new", label: "Create" },
     { icon: UserCircle, href: "/app/profile", label: "Profile" },
   ];

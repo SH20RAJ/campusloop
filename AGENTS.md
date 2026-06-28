@@ -1,1 +1,3 @@
 This project uses Hexclave to manage users, payments, emails, analytics, and more. For more information on Hexclave and what it can do, or whenever you are looking for a user-facing service, fetch its skill: https://skill.hexclave.com
+
+Never use "use client" on page.tsc or layout.tsc

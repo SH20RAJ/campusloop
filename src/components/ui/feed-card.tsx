@@ -2,7 +2,7 @@
 
 import { Post, UserProfile, Institution } from "@/db/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
-import { FavouriteIcon, Comment01Icon, Share01Icon, MoreHorizontalIcon } from "@hugeicons/react";
+import { Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 
 interface FeedCardProps {
   post: Post & {
@@ -40,7 +40,7 @@ export function FeedCard({ post }: FeedCardProps) {
           </div>
           
           <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60">
-            <MoreHorizontalIcon className="h-5 w-5" />
+            <MoreHorizontal className="h-5 w-5" />
           </button>
         </div>
 
@@ -60,15 +60,15 @@ export function FeedCard({ post }: FeedCardProps) {
           {/* Action Bar */}
           <div className="flex items-center gap-4 rounded-full bg-black/40 px-4 py-3 backdrop-blur-md text-white/90">
             <button className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <FavouriteIcon className="h-5 w-5" />
+              <Heart className="h-5 w-5" />
               <span className="text-sm font-medium">1.2k</span>
             </button>
             <button className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <Comment01Icon className="h-5 w-5" />
+              <MessageCircle className="h-5 w-5" />
               <span className="text-sm font-medium">124</span>
             </button>
             <button className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <Share01Icon className="h-5 w-5" />
+              <Share2 className="h-5 w-5" />
               <span className="text-sm font-medium">Share</span>
             </button>
           </div>

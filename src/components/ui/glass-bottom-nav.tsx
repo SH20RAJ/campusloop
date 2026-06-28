@@ -1,16 +1,16 @@
 "use client";
 
-import { Home01Icon, Compass03Icon, PlusSignIcon, Notification01Icon, UserCircleIcon } from "@hugeicons/react";
+import { Home, Compass, Plus, Bell, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { icon: Home01Icon, href: "/app/campus", label: "Home" },
-  { icon: Compass03Icon, href: "/app/discover", label: "Discover" },
-  { icon: PlusSignIcon, href: "/app/post/new", label: "Create" },
-  { icon: Notification01Icon, href: "/app/notifications", label: "Notifications" },
-  { icon: UserCircleIcon, href: "/app/profile", label: "Profile" },
+  { icon: Home, href: "/app/campus", label: "Home" },
+  { icon: Compass, href: "/app/discover", label: "Discover" },
+  { icon: Plus, href: "/app/post/new", label: "Create" },
+  { icon: Bell, href: "/app/notifications", label: "Notifications" },
+  { icon: UserCircle, href: "/app/profile", label: "Profile" },
 ];
 
 export function GlassBottomNav() {

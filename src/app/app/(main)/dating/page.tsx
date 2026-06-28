@@ -7,9 +7,9 @@ import { Heart, X, MessageCircle, Sparkles, Filter, MapPin, School } from "lucid
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const fetcher = (url: string) => fetch(url).then((res) => {
+const fetcher = (url: string): Promise<any> => fetch(url).then((res) => {
   if (!res.ok) throw new Error("Failed to fetch");
-  return res.json() as Promise<any>;
+  return res.json();
 });
 
 type MatchResult = {

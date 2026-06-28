@@ -9,7 +9,7 @@ import { Sparkles, HelpCircle, Heart, Flame, School, ArrowUpRight } from "lucide
 import Link from "next/link";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
 
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+const fetcher = (url: string): Promise<any[]> => fetch(url).then(res => res.json());
 
 export function DiscoverFeed() {
   const [activeTab, setActiveTab] = useState<"TRENDING" | "CONFESSION" | "QUESTION">("TRENDING");

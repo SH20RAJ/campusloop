@@ -454,6 +454,37 @@ export const messagesRelations = relations(messages, ({ one }) => ({
 	}),
 }));
 
+export const swipeDirectionEnum = pgEnum("swipe_direction", ["LIKE", "PASS"]);
+
+export const swipes = pgTable(
+	"swipes",
+	{
+		id: id(),
+		swiperId: text("swiper_id")
+			.notNull()
+			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		targetId: text("target_id")
+			.notNull()
+			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		direction: swipeDirectionEnum("direction").notNull(),
+		createdAt,
+	},
+	(table) => [
+		uniqueIndex("swipes_swiper_target_idx").on(table.swiperId, table.targetId),
+	]
+);
+
+export const swipesRelations = relations(swipes, ({ one }) => ({
+	swiper: one(userProfiles, {
+		fields: [swipes.swiperId],
+		references: [userProfiles.id],
+	}),
+	target: one(userProfiles, {
+		fields: [swipes.targetId],
+		references: [userProfiles.id],
+	}),
+}));
+
 export type Institution = typeof institutions.$inferSelect;
 export type NewInstitution = typeof institutions.$inferInsert;
 export type UserProfile = typeof userProfiles.$inferSelect;
@@ -468,4 +499,7 @@ export type ConversationParticipant = typeof conversationParticipants.$inferSele
 export type NewConversationParticipant = typeof conversationParticipants.$inferInsert;
 export type Message = typeof messages.$inferSelect;
 export type NewMessage = typeof messages.$inferInsert;
+export type Swipe = typeof swipes.$inferSelect;
+export type NewSwipe = typeof swipes.$inferInsert;
+
 

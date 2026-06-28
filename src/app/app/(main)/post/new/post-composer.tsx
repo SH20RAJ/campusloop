@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PlusIcon, Trash2Icon } from "lucide-react";
+import { PlusIcon, Trash2Icon, Bold, Italic, List, Heading2 } from "lucide-react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 export function PostComposer() {
   const router = useRouter();
@@ -12,14 +14,30 @@ export function PostComposer() {
   const [postType, setPostType] = useState("NORMAL");
   const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
 
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: "",
+    editorProps: {
+      attributes: {
+        class: "min-h-[140px] w-full rounded-b-lg border border-input bg-transparent px-4 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring outline-none prose prose-sm dark:prose-invert max-w-none",
+      },
+    },
+  });
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
+    const body = editor?.getText() || "";
     const formData = new FormData(e.currentTarget);
-    const body = formData.get("body") as string;
     const isAnonymous = formData.get("isAnonymous") === "on";
+
+    if (!body.trim()) {
+      setError("Post body cannot be empty");
+      setIsLoading(false);
+      return;
+    }
 
     // Validate poll options if type is POLL
     let options: string[] = [];
@@ -78,14 +96,49 @@ export function PostComposer() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <textarea
-          name="body"
-          placeholder="What's happening on campus?"
-          required
-          rows={4}
-          className="flex min-h-[120px] w-full rounded-lg border border-input bg-transparent px-4 py-3 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-        />
+      <div className="flex flex-col">
+        {editor && (
+          <div className="flex items-center gap-1 border border-input border-b-0 rounded-t-lg bg-muted/30 px-3 py-1.5">
+            <button
+              type="button"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              className={`p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer ${
+                editor.isActive("bold") ? "bg-muted text-foreground" : ""
+              }`}
+            >
+              <Bold className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              className={`p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer ${
+                editor.isActive("italic") ? "bg-muted text-foreground" : ""
+              }`}
+            >
+              <Italic className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+              className={`p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer ${
+                editor.isActive("heading", { level: 2 }) ? "bg-muted text-foreground" : ""
+              }`}
+            >
+              <Heading2 className="h-4 w-4" />
+            </button>
+            <div className="w-[1px] h-4 bg-border mx-1" />
+            <button
+              type="button"
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              className={`p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer ${
+                editor.isActive("bulletList") ? "bg-muted text-foreground" : ""
+              }`}
+            >
+              <List className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+        <EditorContent editor={editor} />
       </div>
 
       <div className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3 shadow-sm">
@@ -113,7 +166,7 @@ export function PostComposer() {
               <button 
                 type="button" 
                 onClick={addPollOption}
-                className="flex items-center gap-1 text-xs text-primary font-medium hover:underline"
+                className="flex items-center gap-1 text-xs text-primary font-medium hover:underline cursor-pointer"
               >
                 <PlusIcon className="h-3.5 w-3.5" /> Add Option
               </button>
@@ -135,7 +188,7 @@ export function PostComposer() {
                   <button
                     type="button"
                     onClick={() => removePollOption(index)}
-                    className="p-2 text-muted-foreground hover:text-destructive transition-colors"
+                    className="p-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
                   >
                     <Trash2Icon className="h-4 w-4" />
                   </button>
@@ -165,7 +218,7 @@ export function PostComposer() {
       <button
         type="submit"
         disabled={isLoading}
-        className="flex w-full items-center justify-center rounded-lg bg-primary h-10 px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex w-full items-center justify-center rounded-lg bg-primary h-10 px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         {isLoading ? "Posting..." : "Post"}
       </button>

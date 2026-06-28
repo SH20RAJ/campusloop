@@ -7,6 +7,7 @@ import { FeedCard } from "@/components/ui/feed-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, School, Shield, User } from "lucide-react";
 import { Metadata } from "next";
+import { EditProfileDialog } from "./edit-profile-dialog";
 
 export const metadata: Metadata = {
   title: "Profile | CampusLoop",
@@ -72,19 +73,24 @@ export default async function ProfilePage() {
               <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center justify-center sm:justify-start gap-1">
                 {profile.displayName}
                 {profile.role === "ADMIN" && (
-                  <Shield className="h-4.5 w-4.5 text-red-500 fill-red-500/10" title="Admin User" />
+                  <span title="Admin User">
+                    <Shield className="h-4 w-4 text-red-500 fill-red-500/10" />
+                  </span>
                 )}
               </h2>
               <p className="text-sm text-muted-foreground">@{profile.username}</p>
             </div>
           </div>
           
-          <a
-            href="/handler/sign-out"
-            className="flex items-center gap-2 rounded-lg border border-input h-9 px-4 text-sm font-semibold hover:bg-muted text-destructive hover:text-red-600 transition-colors cursor-pointer"
-          >
-            <LogOut className="h-4 w-4" /> Sign Out
-          </a>
+          <div className="flex items-center gap-2">
+            <EditProfileDialog initialDisplayName={profile.displayName} initialBio={profile.bio} />
+            <a
+              href="/handler/sign-out"
+              className="flex items-center gap-2 rounded-lg border border-input h-9 px-4 text-sm font-semibold hover:bg-muted text-destructive hover:text-red-600 transition-colors cursor-pointer"
+            >
+              <LogOut className="h-4 w-4" /> Sign Out
+            </a>
+          </div>
         </div>
 
         {profile.bio && (

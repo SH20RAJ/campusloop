@@ -157,9 +157,9 @@ export function ChatDashboard({ currentUserId }: { currentUserId: string }) {
                       <p className="text-[11px] truncate leading-normal">
                         {conv.lastMessage ? conv.lastMessage.body : "No messages yet"}
                       </p>
-                    </div>
                   </button>
-                ))}
+                );
+              })}
               {conversations?.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground gap-2">
                   <MessageSquareIcon className="h-8 w-8 opacity-40" />

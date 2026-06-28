@@ -69,6 +69,7 @@ export function ChatPane({ conversationId, otherParticipant, currentUserId }: Ch
         onboardingCompleted: true,
         role: "STUDENT",
         status: "ACTIVE",
+        gender: "ALL",
         createdAt: new Date(),
         updatedAt: new Date(),
       }

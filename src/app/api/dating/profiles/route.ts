@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles, swipes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, and, ne, notInArray } from "drizzle-orm";
+import { eq, and, ne, notInArray, SQL } from "drizzle-orm";
 
 export async function GET(req: Request) {
   try {
@@ -20,6 +20,10 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const genderFilter = searchParams.get("gender") || "ALL"; // MALE, FEMALE, ALL
+    const collegeFilter = searchParams.get("college") || "CAMPUS"; // CAMPUS, GLOBAL
+
     // Find all target IDs the user has swiped on
     const swiped = await db
       .select({ id: swipes.targetId })
@@ -28,13 +32,21 @@ export async function GET(req: Request) {
 
     const swipedIds = swiped.map(s => s.id);
 
-    // Fetch other students at the same college who have not been swiped yet
+    const conditions: (SQL | undefined)[] = [
+      ne(userProfiles.id, profile.id), // Exclude self
+      swipedIds.length > 0 ? notInArray(userProfiles.id, swipedIds) : undefined
+    ];
+
+    if (collegeFilter === "CAMPUS") {
+      conditions.push(eq(userProfiles.institutionId, profile.institutionId));
+    }
+
+    if (genderFilter === "MALE" || genderFilter === "FEMALE") {
+      conditions.push(eq(userProfiles.gender, genderFilter));
+    }
+
     const candidates = await db.query.userProfiles.findMany({
-      where: and(
-        eq(userProfiles.institutionId, profile.institutionId),
-        ne(userProfiles.id, profile.id), // Exclude self
-        swipedIds.length > 0 ? notInArray(userProfiles.id, swipedIds) : undefined
-      ),
+      where: and(...conditions.filter(Boolean)),
       limit: 20,
     });
 

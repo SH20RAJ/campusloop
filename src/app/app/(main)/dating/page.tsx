@@ -4,7 +4,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@/db/schema";
-import { Heart, X, MessageCircle, Sparkles } from "lucide-react";
+import { Heart, X, MessageCircle, Sparkles, Filter, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -20,8 +20,11 @@ type MatchResult = {
 };
 
 export default function DatingPage() {
+  const [gender, setGender] = useState<"ALL" | "MALE" | "FEMALE">("ALL");
+  const [collegeScope, setCollegeScope] = useState<"CAMPUS" | "GLOBAL">("CAMPUS");
+
   const { data: candidates, error, isLoading, mutate } = useSWR<UserProfile[]>(
-    "/api/dating/profiles",
+    `/api/dating/profiles?gender=${gender}&college=${collegeScope}`,
     fetcher
   );
 
@@ -68,79 +71,141 @@ export default function DatingPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 space-y-6">
+    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 space-y-6 max-w-md mx-auto">
       {/* Title */}
       <div className="text-center space-y-1">
         <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center justify-center gap-1.5">
           <Sparkles className="h-5 w-5 text-primary animate-pulse" /> Campus Matches
         </h2>
-        <p className="text-sm text-muted-foreground">Swipe right to match and start a chat session.</p>
+        <p className="text-xs text-muted-foreground">Swipe right to match and start a private chat.</p>
+      </div>
+
+      {/* Filter Options */}
+      <div className="w-full bg-card rounded-xl border border-border p-4 space-y-3 shadow-sm">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+          <Filter className="h-3 w-3" /> Matching Preferences
+        </span>
+        
+        <div className="flex flex-col gap-2">
+          {/* Gender Filter */}
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Show me</span>
+            <div className="flex gap-1 bg-muted p-0.5 rounded-lg border border-border">
+              {(["ALL", "MALE", "FEMALE"] as const).map((g) => (
+                <button
+                  key={g}
+                  onClick={() => { setGender(g); setCurrentIndex(0); }}
+                  className={`px-2 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                    gender === g 
+                      ? "bg-background text-foreground shadow-sm font-semibold" 
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {g === "ALL" ? "Everyone" : g === "MALE" ? "Men" : "Women"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* College Scope Filter */}
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Search Scope</span>
+            <div className="flex gap-1 bg-muted p-0.5 rounded-lg border border-border">
+              <button
+                onClick={() => { setCollegeScope("CAMPUS"); setCurrentIndex(0); }}
+                className={`px-2 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                  collegeScope === "CAMPUS" 
+                    ? "bg-background text-foreground shadow-sm font-semibold" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                My College
+              </button>
+              <button
+                onClick={() => { setCollegeScope("GLOBAL"); setCurrentIndex(0); }}
+                className={`px-2 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                  collegeScope === "GLOBAL" 
+                    ? "bg-background text-foreground shadow-sm font-semibold" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Global
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Card Arena */}
-      <div className="relative w-full max-w-sm aspect-[3/4] rounded-2xl border border-border bg-card shadow-lg flex flex-col justify-between overflow-hidden">
+      <div className="relative w-full aspect-[3/4] rounded-2xl border border-border bg-card shadow-lg flex flex-col justify-between overflow-hidden">
         {isLoading ? (
           <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
             <div className="space-y-4">
-              <Skeleton className="h-48 w-full rounded-xl" />
+              <Skeleton className="h-44 w-full rounded-xl" />
               <Skeleton className="h-6 w-3/4 rounded" />
               <Skeleton className="h-4 w-1/2 rounded" />
             </div>
             <div className="flex gap-4 justify-center">
-              <Skeleton className="h-12 w-12 rounded-full" />
-              <Skeleton className="h-12 w-12 rounded-full" />
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <Skeleton className="h-10 w-10 rounded-full" />
             </div>
           </div>
         ) : error ? (
-          <div className="flex-1 flex items-center justify-center text-center p-6 text-destructive">
+          <div className="flex-1 flex items-center justify-center text-center p-6 text-destructive text-xs">
             Failed to load candidates.
           </div>
         ) : currentCandidate ? (
           <>
             {/* Candidate Header / Pic */}
-            <div className="relative flex-1 bg-gradient-to-b from-primary/5 to-primary/10 flex flex-col items-center justify-center p-6">
-              <Avatar className="h-32 w-32 border-4 border-background shadow-xl mb-4">
+            <div className="relative flex-1 bg-muted/20 flex flex-col items-center justify-center p-6">
+              {/* Simulated Distance Badge */}
+              <div className="absolute top-4 right-4 bg-muted px-2.5 py-1 rounded-full text-[10px] font-semibold text-foreground flex items-center gap-1 border border-border">
+                <MapPin className="h-3 w-3 text-primary" />
+                {collegeScope === "CAMPUS" ? "On Campus" : "India"}
+              </div>
+
+              <Avatar className="h-28 w-28 border-4 border-background shadow-xl mb-4">
                 <AvatarImage src={currentCandidate.avatarUrl || ""} />
                 <AvatarFallback className="text-3xl">{currentCandidate.displayName[0]}</AvatarFallback>
               </Avatar>
-              <h3 className="text-xl font-bold text-foreground">{currentCandidate.displayName}</h3>
+              <h3 className="text-lg font-bold text-foreground">{currentCandidate.displayName}</h3>
               <p className="text-xs text-muted-foreground">@{currentCandidate.username}</p>
             </div>
 
             {/* Candidate Bio / Info */}
             <div className="px-6 py-4 border-t border-border space-y-3 bg-card shrink-0">
-              <p className="text-sm text-foreground/90 leading-relaxed text-center italic">
+              <p className="text-xs text-foreground/90 leading-relaxed text-center italic">
                 "{currentCandidate.bio || "Hey! I'm using CampusLoop."}"
               </p>
             </div>
 
             {/* Swipe Action Buttons */}
-            <div className="flex items-center justify-center gap-6 py-6 border-t border-border bg-card shrink-0">
+            <div className="flex items-center justify-center gap-6 py-5 border-t border-border bg-card shrink-0">
               <button
                 onClick={() => handleSwipe("PASS")}
                 disabled={actionLoading}
-                className="flex items-center justify-center h-12 w-12 rounded-full border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all active:scale-95 cursor-pointer"
+                className="flex items-center justify-center h-11 w-11 rounded-full border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all active:scale-95 cursor-pointer"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
               <button
                 onClick={() => handleSwipe("LIKE")}
                 disabled={actionLoading}
-                className="flex items-center justify-center h-12 w-12 rounded-full bg-primary text-primary-foreground hover:bg-primary/95 shadow-md transition-all active:scale-95 cursor-pointer"
+                className="flex items-center justify-center h-11 w-11 rounded-full bg-primary text-primary-foreground hover:bg-primary/95 shadow-md transition-all active:scale-95 cursor-pointer"
               >
-                <Heart className="h-5 w-5 fill-primary-foreground" />
+                <Heart className="h-4 w-4 fill-primary-foreground" />
               </button>
             </div>
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
-            <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center text-muted-foreground">
-              <Sparkles className="h-8 w-8 opacity-40" />
+            <div className="h-14 w-14 bg-muted rounded-full flex items-center justify-center text-muted-foreground border border-border">
+              <Sparkles className="h-6 w-6 opacity-40 text-primary" />
             </div>
             <div>
-              <h4 className="font-semibold text-foreground">That's everyone!</h4>
-              <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
-                You've swiped on all candidate students in your college.
+              <h4 className="font-semibold text-foreground text-sm">That's everyone!</h4>
+              <p className="text-xs text-muted-foreground mt-1 max-w-[200px] mx-auto">
+                No more candidates matching these settings. Try changing filters or reset.
               </p>
             </div>
             <button 

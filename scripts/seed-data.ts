@@ -226,15 +226,15 @@ async function main() {
 
   console.log("Seeding student profiles...");
   const profileList = [
-    { id: "prof_aarav", displayName: "Aarav Sharma", username: "aarav_sharma", bio: "Web Developer & Biryani enthusiast. Let's code!", college: iitb.id },
-    { id: "prof_sneha", displayName: "Sneha Patel", username: "sneha_patel", bio: "IIT Bombay CSE. Coffee and UI design is my life.", college: iitb.id },
-    { id: "prof_rohan", displayName: "Rohan Verma", username: "rohan_verma", bio: "Machine Learning geek. Gym & Anime lover.", college: iitb.id },
-    { id: "prof_ananya", displayName: "Ananya Iyer", username: "ananya_iyer", bio: "Electrical Engineering. Looking for someone to study with.", college: iitb.id },
-    { id: "prof_vikram", displayName: "Vikram Singh", username: "vikram_singh", bio: "Aerospace major. Space is cool, match with me!", college: iitb.id },
-    { id: "prof_kabir", displayName: "Kabir Malhotra", username: "kabir_m", bio: "IITB '27. Musician. Jamming is my therapy.", college: iitb.id },
-    { id: "prof_aditi", displayName: "Aditi Rao", username: "aditi_rao", bio: "Design student. Pixel perfect layouts make me happy.", college: iitb.id },
-    { id: "prof_priya", displayName: "Priya Sharma", username: "priya_sharma", bio: "Chemistry major. Let's discover some elements.", college: iitb.id },
-    { id: "prof_btech_user", displayName: "BIT Student", username: "bit_student", bio: "BIT Mesra student. Tech and life.", college: bitm.id }
+    { id: "prof_aarav", displayName: "Aarav Sharma", username: "aarav_sharma", bio: "Web Developer & Biryani enthusiast. Let's code!", college: iitb.id, gender: "MALE" },
+    { id: "prof_sneha", displayName: "Sneha Patel", username: "sneha_patel", bio: "IIT Bombay CSE. Coffee and UI design is my life.", college: iitb.id, gender: "FEMALE" },
+    { id: "prof_rohan", displayName: "Rohan Verma", username: "rohan_verma", bio: "Machine Learning geek. Gym & Anime lover.", college: iitb.id, gender: "MALE" },
+    { id: "prof_ananya", displayName: "Ananya Iyer", username: "ananya_iyer", bio: "Electrical Engineering. Looking for someone to study with.", college: iitb.id, gender: "FEMALE" },
+    { id: "prof_vikram", displayName: "Vikram Singh", username: "vikram_singh", bio: "Aerospace major. Space is cool, match with me!", college: iitb.id, gender: "MALE" },
+    { id: "prof_kabir", displayName: "Kabir Malhotra", username: "kabir_m", bio: "IITB '27. Musician. Jamming is my therapy.", college: iitb.id, gender: "MALE" },
+    { id: "prof_aditi", displayName: "Aditi Rao", username: "aditi_rao", bio: "Design student. Pixel perfect layouts make me happy.", college: iitb.id, gender: "FEMALE" },
+    { id: "prof_priya", displayName: "Priya Sharma", username: "priya_sharma", bio: "Chemistry major. Let's discover some elements.", college: iitb.id, gender: "FEMALE" },
+    { id: "prof_btech_user", displayName: "BIT Student", username: "bit_student", bio: "BIT Mesra student. Tech and life.", college: bitm.id, gender: "MALE" }
   ];
 
   for (const prof of profileList) {
@@ -246,6 +246,7 @@ async function main() {
       avatarUrl: `https://api.dicebear.com/7.x/adventurer/svg?seed=${prof.username}`,
       institutionId: prof.college,
       bio: prof.bio,
+      gender: prof.gender,
       onboardingCompleted: true,
       role: "STUDENT",
       status: "ACTIVE",

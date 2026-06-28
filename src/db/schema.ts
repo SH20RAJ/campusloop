@@ -122,6 +122,7 @@ export const userProfiles = pgTable(
 		branch: text("branch"),
 		year: integer("year"),
 		bio: text("bio"),
+		gender: text("gender").default("MALE"),
 		interests: jsonb("interests").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
 		onboardingCompleted: boolean("onboarding_completed").default(false).notNull(),
 		role: userRoleEnum("role").default("STUDENT").notNull(),

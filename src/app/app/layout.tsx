@@ -38,7 +38,7 @@ export default async function AppRootLayout({
     }
   }
 
-  const profile = await db.query.userProfiles.findFirst({
+  let profile = await db.query.userProfiles.findFirst({
     where: eq(userProfiles.userId, user.id),
   });
 
@@ -59,6 +59,29 @@ export default async function AppRootLayout({
 
   if (!whitelistedDomain) {
     redirect("/invalid-email");
+  }
+
+  // Auto-create student profile if it doesn't exist
+  if (!profile) {
+    const rawUsername = email.split("@")[0] || "student";
+    // Sanitize and append part of UUID to ensure uniqueness
+    const username = rawUsername.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase() + "_" + user.id.slice(-4);
+    
+    // Capitalize parts of email username for displayName
+    const displayName = rawUsername
+      .split(/[\._\-]/)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+
+    await db.insert(userProfiles).values({
+      userId: user.id,
+      username,
+      displayName,
+      institutionId: whitelistedDomain.institutionId,
+      onboardingCompleted: true,
+      role: "STUDENT",
+      status: "ACTIVE",
+    });
   }
 
   return <>{children}</>;

@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, ShieldCheck, Lock, Flame, Sparkles, MessageCircle } from "lucide-react";
+import { ArrowRight, ShieldCheck, Lock, Flame, Sparkles, MessageCircle, BarChart2, ShieldAlert } from "lucide-react";
+import { hexclaveServerApp } from "@/hexclave/server";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const user = await hexclaveServerApp.getUser();
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* Navbar */}
@@ -10,22 +13,33 @@ export default function LandingPage() {
           <Flame className="h-5 w-5 text-primary" /> CampusLoop
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/sign-in" className="text-xs font-semibold hover:text-primary transition-colors">
-            Sign In
-          </Link>
-          <Link
-            href="/sign-up"
-            className="rounded-lg bg-primary h-9 px-4 flex items-center text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/95 transition-colors"
-          >
-            Get Started
-          </Link>
+          {user ? (
+            <Link
+              href="/app/campus"
+              className="rounded-lg bg-primary h-9 px-4 flex items-center text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/95 transition-colors"
+            >
+              Go to Feeds
+            </Link>
+          ) : (
+            <>
+              <Link href="/sign-in" className="text-xs font-semibold hover:text-primary transition-colors">
+                Sign In
+              </Link>
+              <Link
+                href="/sign-up"
+                className="rounded-lg bg-primary h-9 px-4 flex items-center text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/95 transition-colors"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
       {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 text-center pt-32 pb-16 max-w-5xl mx-auto space-y-16">
-        <div className="space-y-6 max-w-3xl">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-xs font-semibold text-primary animate-pulse">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 pt-32 pb-24 max-w-5xl mx-auto space-y-24">
+        <div className="space-y-6 max-w-3xl text-center">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-xs font-semibold text-primary animate-pulse mx-auto">
             <Sparkles className="h-3.5 w-3.5" /> Now Live for All Indian Colleges
           </div>
           
@@ -39,17 +53,27 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row pt-4">
-            <Link
-              href="/sign-up"
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary/95 transition-all w-full sm:w-auto"
-            >
-              Verify with College Email
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+            {user ? (
+              <Link
+                href="/app/campus"
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary/95 transition-all w-full sm:w-auto"
+              >
+                Go to Feeds
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            ) : (
+              <Link
+                href="/sign-up"
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary/95 transition-all w-full sm:w-auto"
+              >
+                Verify with College Email
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            )}
           </div>
         </div>
 
-        {/* Feature Cards Grid */}
+        {/* Feature Highlights Grid */}
         <div className="grid gap-6 md:grid-cols-3 w-full">
           <div className="rounded-xl border border-border bg-card p-6 text-left space-y-4 shadow-sm hover:border-border/80 transition-colors">
             <div className="rounded-lg bg-primary/10 p-2.5 text-primary border border-primary/10 w-fit">
@@ -88,9 +112,120 @@ export default function LandingPage() {
           </div>
         </div>
 
+        {/* Detailed Marketing Sections */}
+        <div className="w-full space-y-20 border-t border-border pt-20">
+          {/* Section 1: Discussion & Polls */}
+          <div className="grid gap-8 md:grid-cols-2 items-center">
+            <div className="space-y-4 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Interactive Community</span>
+              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Polls, Questions, & Discussions</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Stay updated with everything happening around your college. Launch dynamic, multi-option polls to vote on campus opinions, ask for academic advice, or join confession threads. Everything stays localized to your university environment.
+              </p>
+              <div className="flex items-center gap-6 pt-2">
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <BarChart2 className="h-4 w-4 text-primary" /> Live vote progress bars
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <MessageCircle className="h-4 w-4 text-primary" /> Nested comment feeds
+                </span>
+              </div>
+            </div>
+            <div className="rounded-xl border border-border bg-card/50 p-6 space-y-4">
+              <div className="flex items-center justify-between text-xs text-muted-foreground border-b border-border pb-3">
+                <span>📊 Poll of the day</span>
+                <span className="font-semibold text-foreground">IIT Bombay</span>
+              </div>
+              <p className="text-sm font-semibold text-foreground text-left">Are you attending the college coding hackathon next week?</p>
+              <div className="space-y-2">
+                <div className="relative border border-border rounded-lg p-2.5 text-xs font-semibold text-foreground text-left overflow-hidden bg-muted/30">
+                  <div className="absolute inset-0 bg-primary/10 w-[74%] h-full" />
+                  <span className="relative z-10 flex justify-between"><span>Yes, team registered!</span><span>74%</span></span>
+                </div>
+                <div className="relative border border-border rounded-lg p-2.5 text-xs font-semibold text-foreground text-left overflow-hidden bg-muted/30">
+                  <div className="absolute inset-0 bg-primary/10 w-[26%] h-full" />
+                  <span className="relative z-10 flex justify-between"><span>No, just watching.</span><span>26%</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Privacy & Verification */}
+          <div className="grid gap-8 md:grid-cols-2 items-center">
+            <div className="rounded-xl border border-border bg-card/50 p-6 space-y-4 order-last md:order-first">
+              <div className="flex items-center gap-3 border-b border-border pb-4">
+                <div className="h-8 w-8 rounded bg-destructive/10 text-destructive flex items-center justify-center border border-destructive/20 font-bold text-xs">
+                  <ShieldAlert className="h-4.5 w-4.5" />
+                </div>
+                <div className="text-left">
+                  <p className="text-xs font-bold text-foreground">Community Safeguards</p>
+                  <p className="text-[10px] text-muted-foreground">Automatic telemetry & filter actions</p>
+                </div>
+              </div>
+              <div className="space-y-2 text-left">
+                <div className="flex justify-between items-center text-xs border border-border p-2 rounded bg-muted/10">
+                  <span className="text-muted-foreground">Slur & Profanity Filter</span>
+                  <span className="text-green-500 font-semibold">Active</span>
+                </div>
+                <div className="flex justify-between items-center text-xs border border-border p-2 rounded bg-muted/10">
+                  <span className="text-muted-foreground">Doxxed Phone/Email Detection</span>
+                  <span className="text-green-500 font-semibold">Active</span>
+                </div>
+                <div className="flex justify-between items-center text-xs border border-border p-2 rounded bg-muted/10">
+                  <span className="text-muted-foreground">Moderator Flags (5 = Hide)</span>
+                  <span className="text-green-500 font-semibold">Active</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Absolute Safety</span>
+              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Student-Only Moderation</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                CampusLoop is designed for students, by design. All posts are automatically scanned on creation to prevent doxxing, phone leaks, or harassment. Posts receiving 5 or more student flags are automatically hidden from the feed pending moderator resolution.
+              </p>
+              <div className="flex items-center gap-6 pt-2">
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Lock className="h-4 w-4 text-primary" /> Identity Masking
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <ShieldCheck className="h-4 w-4 text-primary" /> Automated filters
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="w-full rounded-2xl border border-border bg-card p-8 md:p-12 text-center space-y-6 shadow-sm">
+          <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight">Ready to join your real campus?</h2>
+          <p className="text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Verify your identity with your official college email domain. Connect with classmates, share confessions, and find matches safely.
+          </p>
+          <div className="pt-2">
+            {user ? (
+              <Link
+                href="/app/campus"
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary/95 transition-all w-full sm:w-auto"
+              >
+                Enter CampusLoop
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            ) : (
+              <Link
+                href="/sign-up"
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary/95 transition-all w-full sm:w-auto"
+              >
+                Sign Up with Student Email
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            )}
+          </div>
+        </div>
+
         {/* Footer */}
         <footer className="border-t border-border pt-8 w-full text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} CampusLoop. Built with pure Tailwind & Shadcn.
+          © {new Date().getFullYear()} CampusLoop. Built with pure Tailwind & Shadcn. All rights reserved.
         </footer>
       </main>
     </div>

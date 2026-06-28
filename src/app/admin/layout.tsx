@@ -5,7 +5,7 @@ import { eq, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { LayoutDashboard, School, ShieldAlert, ArrowLeft, Users } from "lucide-react";
+import { LayoutDashboard, School, ShieldAlert, ArrowLeft, Users, FileText, MessageSquare } from "lucide-react";
 
 export default async function AdminLayout({
   children,
@@ -71,23 +71,31 @@ export default async function AdminLayout({
           </div>
           
           <nav className="space-y-1">
-            <Link href="/admin" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
+            <Link href="/admin" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
               <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
               Dashboard
             </Link>
-            <Link href="/admin/users" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
+            <Link href="/admin/users" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
               <Users className="h-4 w-4 text-muted-foreground" />
               Users
             </Link>
-            <Link href="/admin/colleges" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
+            <Link href="/admin/posts" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              Posts
+            </Link>
+            <Link href="/admin/comments" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              Comments
+            </Link>
+            <Link href="/admin/colleges" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
               <School className="h-4 w-4 text-muted-foreground" />
               Colleges
             </Link>
-            <Link href="/admin/reports" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
+            <Link href="/admin/reports" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
               <ShieldAlert className="h-4 w-4 text-muted-foreground" />
               Reports
             </Link>
-            <Link href="/app/campus" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/app/campus" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="h-4 w-4" />
               Exit Admin
             </Link>
@@ -109,9 +117,8 @@ export default async function AdminLayout({
           </h1>
           <nav className="flex gap-4">
             <Link href="/admin" className="text-xs font-semibold hover:text-primary">Dashboard</Link>
-            <Link href="/admin/users" className="text-xs font-semibold hover:text-primary">Users</Link>
-            <Link href="/admin/colleges" className="text-xs font-semibold hover:text-primary">Colleges</Link>
-            <Link href="/admin/reports" className="text-xs font-semibold hover:text-primary">Reports</Link>
+            <Link href="/admin/posts" className="text-xs font-semibold hover:text-primary">Posts</Link>
+            <Link href="/admin/comments" className="text-xs font-semibold hover:text-primary">Comments</Link>
           </nav>
         </header>
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { posts, userProfiles } from "@/db/schema";
+import { posts, userProfiles, pollOptions } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq } from "drizzle-orm";
 
@@ -21,12 +21,13 @@ export async function POST(req: Request) {
     }
 
     const data = await req.json();
-    const { body, type, scope, isAnonymous, title } = data as {
+    const { body, type, scope, isAnonymous, title, options } = data as {
       body: string;
       type?: "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
       scope?: "CAMPUS" | "GLOBAL";
       isAnonymous?: boolean;
       title?: string;
+      options?: string[];
     };
 
     if (!body || body.trim().length === 0) {
@@ -45,6 +46,19 @@ export async function POST(req: Request) {
       status: "PUBLISHED", // Assuming no auto-hide logic for now
       riskScore: 0,
     }).returning();
+
+    // If type is POLL, insert options
+    if (type === "POLL" && options && options.length > 0) {
+      const optionsToInsert = options
+        .filter(opt => opt.trim().length > 0)
+        .map(opt => ({
+          postId: newPost.id,
+          text: opt,
+        }));
+      if (optionsToInsert.length > 0) {
+        await db.insert(pollOptions).values(optionsToInsert);
+      }
+    }
 
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {

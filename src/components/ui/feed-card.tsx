@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FeedPost } from "@/hooks/use-feed";
+import { PollCard } from "./poll-card";
 
 interface FeedCardProps {
   post: FeedPost;
@@ -86,6 +87,9 @@ export function FeedCard({ post }: FeedCardProps) {
             {post.body}
           </p>
         </Link>
+        {post.type === "POLL" && (
+          <PollCard post={post} />
+        )}
         {post.title && (
           <p className="mt-3 text-xs font-semibold text-primary">#{post.title.replace(/\s+/g, '')}</p>
         )}

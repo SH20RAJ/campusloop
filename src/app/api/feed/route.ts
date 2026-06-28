@@ -43,9 +43,12 @@ export async function GET(req: Request) {
         author: true,
         institution: true,
         votes: true,
-        comments: {
-          where: eq(posts.status, "PUBLISHED") // Assumes comments status check if needed
-        },
+        comments: true,
+        pollOptions: {
+          with: {
+            votes: true,
+          }
+        }
       }
     });
 
@@ -56,12 +59,29 @@ export async function GET(req: Request) {
       const userVoteObj = post.votes.find(v => v.userId === profile.id);
       const userVote = userVoteObj ? userVoteObj.value : 0;
 
+      // Format poll options if type is POLL
+      const formattedPollOptions = post.pollOptions?.map(opt => {
+        const optVotesCount = opt.votes.length;
+        const userVoted = opt.votes.some(v => v.userId === profile.id);
+        return {
+          id: opt.id,
+          text: opt.text,
+          votesCount: optVotesCount,
+          userVoted,
+        };
+      });
+
+      const hasVotedPoll = formattedPollOptions?.some(opt => opt.userVoted) || false;
+      const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
+
       return {
         ...post,
         votesCount,
         commentsCount,
         userVote,
-        // Omit raw array elements to keep payload light
+        pollOptions: formattedPollOptions,
+        hasVotedPoll,
+        totalPollVotes,
         votes: undefined,
         comments: undefined,
       };

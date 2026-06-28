@@ -42,6 +42,11 @@ export default async function PostDetailPage({ params }: PostPageProps) {
       institution: true,
       votes: true,
       comments: true,
+      pollOptions: {
+        with: {
+          votes: true,
+        }
+      }
     }
   });
 
@@ -54,11 +59,29 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   const commentsCount = rawPost.comments.length;
   const userVote = rawPost.votes.find(v => v.userId === profile.id)?.value || 0;
 
+  // Format poll options if type is POLL
+  const formattedPollOptions = rawPost.pollOptions?.map(opt => {
+    const optVotesCount = opt.votes.length;
+    const userVoted = opt.votes.some(v => v.userId === profile.id);
+    return {
+      id: opt.id,
+      text: opt.text,
+      votesCount: optVotesCount,
+      userVoted,
+    };
+  });
+
+  const hasVotedPoll = formattedPollOptions?.some(opt => opt.userVoted) || false;
+  const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
+
   const post = {
     ...rawPost,
     votesCount,
     commentsCount,
     userVote,
+    pollOptions: formattedPollOptions,
+    hasVotedPoll,
+    totalPollVotes,
     votes: undefined,
     comments: undefined,
   };

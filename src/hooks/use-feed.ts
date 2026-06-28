@@ -7,6 +7,14 @@ export type FeedPost = Post & {
   votesCount: number;
   commentsCount: number;
   userVote: number;
+  pollOptions?: {
+    id: string;
+    text: string;
+    votesCount: number;
+    userVoted: boolean;
+  }[];
+  hasVotedPoll?: boolean;
+  totalPollVotes?: number;
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => {

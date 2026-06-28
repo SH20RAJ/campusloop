@@ -3,6 +3,7 @@
 import { Post, UserProfile, Institution } from "@/db/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 
 interface FeedCardProps {
   post: Post & {
@@ -12,68 +13,61 @@ interface FeedCardProps {
 }
 
 export function FeedCard({ post }: FeedCardProps) {
-  // If there's an image, we'd use it. For now we use a generic gradient or image placeholder.
-  // The design calls for large image-based cards with glassmorphism overlays.
+  // If the post is anonymous, we hide the author profile
+  const authorName = post.isAnonymous ? "Anonymous Student" : post.author.displayName;
+  const authorHandle = post.isAnonymous ? "anonymous" : post.author.username;
+  const avatarFallback = post.isAnonymous ? "A" : post.author.displayName[0];
+  const avatarUrl = post.isAnonymous ? "" : post.author.avatarUrl;
+
   return (
-    <div className="relative w-full overflow-hidden rounded-[32px] bg-card shadow-lg mb-6">
-      {/* Background Image Placeholder */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 dark:from-primary/10 dark:to-background z-0" />
-      
-      {/* Content Container */}
-      <div className="relative z-10 p-4 min-h-[400px] flex flex-col justify-between">
+    <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:border-border/80 transition-colors">
+      {/* Header */}
+      <div className="flex items-center justify-between p-6 pb-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10 border">
+            <AvatarImage src={avatarUrl || ""} />
+            <AvatarFallback>{avatarFallback}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold flex items-center gap-1">
+              {authorName}
+              {!post.isAnonymous && <span className="text-blue-500 text-xs">●</span>}
+            </span>
+            <span className="text-xs text-muted-foreground">@{authorHandle} • {post.institution.name}</span>
+          </div>
+        </div>
         
-        {/* Top Header - Glassmorphism */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 rounded-full bg-black/40 px-3 py-2 backdrop-blur-md">
-            <Avatar className="h-10 w-10 border border-white/20">
-              <AvatarImage src={post.author.avatarUrl || ""} />
-              <AvatarFallback>{post.author.displayName[0]}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-white">
-                {post.author.displayName}
-                {/* Verified icon placeholder */}
-                <span className="text-blue-400 ml-1">●</span>
-              </span>
-              <span className="text-xs text-white/70">@{post.author.username}</span>
-            </div>
-          </div>
-          
-          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60">
-            <MoreHorizontal className="h-5 w-5" />
-          </button>
-        </div>
+        <button className="rounded-md p-2 hover:bg-muted text-muted-foreground transition-colors">
+          <MoreHorizontal className="h-5 w-5" />
+        </button>
+      </div>
 
-        {/* Bottom Content - Overlaid text and actions */}
-        <div className="mt-auto flex flex-col gap-4">
-          
-          {/* Post Text */}
-          <div className="rounded-3xl bg-black/40 p-4 backdrop-blur-md">
-            <p className="text-sm text-white md:text-base line-clamp-3">
-              {post.body}
-            </p>
-            {post.title && (
-              <p className="mt-2 text-xs font-semibold text-primary">#{post.title.replace(/\s+/g, '')}</p>
-            )}
-          </div>
+      {/* Content */}
+      <div className="px-6 py-2">
+        <Link href={`/app/post/${post.id}`}>
+          <p className="text-sm md:text-base leading-relaxed text-foreground whitespace-pre-wrap hover:underline">
+            {post.body}
+          </p>
+        </Link>
+        {post.title && (
+          <p className="mt-3 text-xs font-semibold text-primary">#{post.title.replace(/\s+/g, '')}</p>
+        )}
+      </div>
 
-          {/* Action Bar */}
-          <div className="flex items-center gap-4 rounded-full bg-black/40 px-4 py-3 backdrop-blur-md text-white/90">
-            <button className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <Heart className="h-5 w-5" />
-              <span className="text-sm font-medium">1.2k</span>
-            </button>
-            <button className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <MessageCircle className="h-5 w-5" />
-              <span className="text-sm font-medium">124</span>
-            </button>
-            <button className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <Share2 className="h-5 w-5" />
-              <span className="text-sm font-medium">Share</span>
-            </button>
-          </div>
-
-        </div>
+      {/* Actions */}
+      <div className="flex items-center gap-6 px-6 py-4 border-t border-border mt-4 text-muted-foreground">
+        <button className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm">
+          <Heart className="h-4 w-4" />
+          <span>1.2k</span>
+        </button>
+        <button className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm">
+          <MessageCircle className="h-4 w-4" />
+          <span>124</span>
+        </button>
+        <button className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm">
+          <Share2 className="h-4 w-4" />
+          <span>Share</span>
+        </button>
       </div>
     </div>
   );

@@ -21,13 +21,14 @@ export async function POST(req: Request) {
     }
 
     const data = await req.json();
-    const { body, type, scope, isAnonymous, title, options } = data as {
+    const { body, type, scope, isAnonymous, title, options, communityId } = data as {
       body: string;
       type?: "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
       scope?: "CAMPUS" | "GLOBAL";
       isAnonymous?: boolean;
       title?: string;
       options?: string[];
+      communityId?: string;
     };
 
     if (!body || body.trim().length === 0) {
@@ -67,6 +68,7 @@ export async function POST(req: Request) {
       scope: scope || "CAMPUS",
       isAnonymous: isAnonymous || false,
       title: title || null,
+      communityId: communityId || null,
       status: "PUBLISHED", // Assuming no auto-hide logic for now
       riskScore: 0,
     }).returning();

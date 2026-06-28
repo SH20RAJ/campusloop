@@ -154,6 +154,7 @@ export const posts = pgTable(
 		isAnonymous: boolean("is_anonymous").default(false).notNull(),
 		status: contentStatusEnum("status").default("PUBLISHED").notNull(),
 		riskScore: integer("risk_score").default(0).notNull(),
+		communityId: text("community_id"),
 		createdAt,
 		updatedAt,
 	},
@@ -336,6 +337,10 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 	comments: many(comments),
 	pollOptions: many(pollOptions),
 	votes: many(votes),
+	community: one(communities, {
+		fields: [posts.communityId],
+		references: [communities.id],
+	}),
 }));
 
 export const commentsRelations = relations(comments, ({ one }) => ({
@@ -486,6 +491,59 @@ export const swipesRelations = relations(swipes, ({ one }) => ({
 	}),
 }));
 
+export const communities = pgTable(
+	"communities",
+	{
+		id: id(),
+		name: text("name").notNull(),
+		description: text("description"),
+		creatorId: text("creator_id")
+			.notNull()
+			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		createdAt,
+	},
+	(table) => [
+		uniqueIndex("communities_name_idx").on(table.name),
+	]
+);
+
+export const communityMembers = pgTable(
+	"community_members",
+	{
+		id: id(),
+		communityId: text("community_id")
+			.notNull()
+			.references(() => communities.id, { onDelete: "cascade" }),
+		userId: text("user_id")
+			.notNull()
+			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		createdAt,
+	},
+	(table) => [
+		uniqueIndex("community_members_join_idx").on(table.communityId, table.userId),
+	]
+);
+
+export const communitiesRelations = relations(communities, ({ one, many }) => ({
+	creator: one(userProfiles, {
+		fields: [communities.creatorId],
+		references: [userProfiles.id],
+	}),
+	members: many(communityMembers),
+	posts: many(posts),
+}));
+
+export const communityMembersRelations = relations(communityMembers, ({ one }) => ({
+	community: one(communities, {
+		fields: [communityMembers.communityId],
+		references: [communities.id],
+	}),
+	user: one(userProfiles, {
+		fields: [communityMembers.userId],
+		references: [userProfiles.id],
+	}),
+}));
+
 export type Institution = typeof institutions.$inferSelect;
 export type NewInstitution = typeof institutions.$inferInsert;
 export type UserProfile = typeof userProfiles.$inferSelect;
@@ -502,5 +560,10 @@ export type Message = typeof messages.$inferSelect;
 export type NewMessage = typeof messages.$inferInsert;
 export type Swipe = typeof swipes.$inferSelect;
 export type NewSwipe = typeof swipes.$inferInsert;
+export type Community = typeof communities.$inferSelect;
+export type NewCommunity = typeof communities.$inferInsert;
+export type CommunityMember = typeof communityMembers.$inferSelect;
+export type NewCommunityMember = typeof communityMembers.$inferInsert;
+
 
 

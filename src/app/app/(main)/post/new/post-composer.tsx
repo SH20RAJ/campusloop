@@ -6,7 +6,7 @@ import { PlusIcon, Trash2Icon, Bold, Italic, List, Heading2 } from "lucide-react
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
-export function PostComposer() {
+export function PostComposer({ communityId }: { communityId?: string }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +60,7 @@ export function PostComposer() {
           isAnonymous,
           scope: "CAMPUS",
           options: postType === "POLL" ? options : undefined,
+          communityId,
         }),
       });
 

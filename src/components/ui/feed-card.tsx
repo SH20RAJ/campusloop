@@ -75,7 +75,9 @@ export function FeedCard({ post }: FeedCardProps) {
               {authorName}
               {!post.isAnonymous && <span className="text-blue-500 text-xs">●</span>}
             </span>
-            <span className="text-xs text-muted-foreground">@{authorHandle} • {post.institution.name}</span>
+            <span className="text-xs text-muted-foreground">
+              @{authorHandle} • <Link href={`/college/${post.institutionId}`} className="hover:text-primary transition-colors hover:underline">{post.institution.name}</Link>
+            </span>
           </div>
         </div>
         

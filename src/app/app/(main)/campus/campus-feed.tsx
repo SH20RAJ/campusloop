@@ -3,8 +3,9 @@
 import { useFeed, useStories } from "@/hooks/use-feed";
 import { FeedCard } from "@/components/ui/feed-card";
 import { StoryRing } from "@/components/ui/story-ring";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Flame } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FeedSkeleton } from "@/components/ui/skeleton-card";
 
 export function CampusFeed() {
   const { feed, isLoading: feedLoading } = useFeed();
@@ -34,10 +35,7 @@ export function CampusFeed() {
       {/* Main Feed */}
       <div className="flex flex-col px-4 pt-4 pb-16 gap-6">
         {feedLoading ? (
-          <>
-            <Skeleton className="h-44 w-full rounded-xl" />
-            <Skeleton className="h-44 w-full rounded-xl" />
-          </>
+          <FeedSkeleton />
         ) : feed && feed.length > 0 ? (
           feed.map((post) => (
             <FeedCard key={post.id} post={post} />

@@ -6,6 +6,7 @@ import { Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FeedPost } from "@/hooks/use-feed";
 import { PollCard } from "./poll-card";
+import { ReportDialog } from "./report-dialog";
 
 interface FeedCardProps {
   post: FeedPost;
@@ -15,6 +16,8 @@ export function FeedCard({ post }: FeedCardProps) {
   const [userVote, setUserVote] = useState(post.userVote);
   const [votesCount, setVotesCount] = useState(post.votesCount);
   const [isLoading, setIsLoading] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author.displayName;
   const authorHandle = post.isAnonymous ? "anonymous" : post.author.username;
@@ -75,9 +78,28 @@ export function FeedCard({ post }: FeedCardProps) {
           </div>
         </div>
         
-        <button className="rounded-md p-2 hover:bg-muted text-muted-foreground transition-colors">
-          <MoreHorizontal className="h-5 w-5" />
-        </button>
+        <div className="relative">
+          <button 
+            onClick={() => setShowMenu(!showMenu)}
+            className="rounded-md p-2 hover:bg-muted text-muted-foreground transition-colors"
+          >
+            <MoreHorizontal className="h-5 w-5" />
+          </button>
+          
+          {showMenu && (
+            <div className="absolute right-0 mt-2 w-32 rounded-md border border-border bg-popover text-popover-foreground shadow-lg z-20 py-1 animate-in fade-in slide-in-from-top-1">
+              <button
+                onClick={() => {
+                  setShowMenu(false);
+                  setShowReport(true);
+                }}
+                className="w-full text-left px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-muted transition-colors cursor-pointer"
+              >
+                Report Post
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Content */}
@@ -116,6 +138,8 @@ export function FeedCard({ post }: FeedCardProps) {
           <span>Share</span>
         </button>
       </div>
+
+      <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
     </div>
   );
 }

@@ -27,7 +27,7 @@ export async function GET(req: Request) {
     }
 
     // Build conditions
-    const conditions = [];
+    const conditions = [eq(posts.status, "PUBLISHED")];
     if (scope === "CAMPUS") {
       conditions.push(eq(posts.institutionId, profile.institutionId));
     }

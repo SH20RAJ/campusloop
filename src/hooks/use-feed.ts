@@ -6,10 +6,19 @@ type FeedPost = Post & {
   institution: Institution;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then((res) => {
+  if (!res.ok) throw new Error("Failed to fetch");
+  return res.json() as Promise<any>;
+});
 
-export function useFeed() {
-  const { data, error, isLoading, mutate } = useSWR<FeedPost[]>("/api/feed", fetcher);
+export function useFeed(scope: "CAMPUS" | "GLOBAL" = "CAMPUS", type?: string) {
+  const url = new URL("/api/feed", typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+  url.searchParams.set("scope", scope);
+  if (type) {
+    url.searchParams.set("type", type);
+  }
+
+  const { data, error, isLoading, mutate } = useSWR<FeedPost[]>(url.toString(), fetcher);
 
   return {
     feed: data,

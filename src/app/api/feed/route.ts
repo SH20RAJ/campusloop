@@ -1,13 +1,42 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { desc } from "drizzle-orm";
-import { posts } from "@/db/schema";
+import { desc, eq, and } from "drizzle-orm";
+import { posts, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 export async function GET(req: Request) {
-  const db = getDb();
-  
   try {
+    const user = await hexclaveServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const scope = searchParams.get("scope") as "CAMPUS" | "GLOBAL" | null;
+    const type = searchParams.get("type") as "NORMAL" | "CONFESSION" | "POLL" | "QUESTION" | null;
+
+    const db = getDb();
+    
+    // Get user's profile to know their institution
+    const profile = await db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, user.id),
+    });
+
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
+    }
+
+    // Build conditions
+    const conditions = [];
+    if (scope === "CAMPUS") {
+      conditions.push(eq(posts.institutionId, profile.institutionId));
+    }
+    if (type) {
+      conditions.push(eq(posts.type, type));
+    }
+
     const feed = await db.query.posts.findMany({
+      where: conditions.length > 0 ? and(...conditions) : undefined,
       orderBy: [desc(posts.createdAt)],
       limit: 20,
       with: {

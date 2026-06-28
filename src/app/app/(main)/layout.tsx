@@ -1,10 +1,30 @@
 import { GlassBottomNav } from "@/components/ui/glass-bottom-nav";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { getDb } from "@/db";
+import { userProfiles } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
 
-export default function MainLayout({
+export default async function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = await hexclaveServerApp.getUser();
+  
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const db = getDb();
+  const profile = await db.query.userProfiles.findFirst({
+    where: eq(userProfiles.userId, user.id),
+  });
+
+  if (!profile || !profile.onboardingCompleted) {
+    redirect("/app/onboarding");
+  }
+
   return (
     <div className="relative min-h-screen bg-background pb-24">
       {/* 

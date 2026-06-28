@@ -157,6 +157,7 @@ export function ChatDashboard({ currentUserId }: { currentUserId: string }) {
                       <p className="text-[11px] truncate leading-normal">
                         {conv.lastMessage ? conv.lastMessage.body : "No messages yet"}
                       </p>
+                    </div>
                   </button>
                 );
               })}

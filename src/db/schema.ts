@@ -323,6 +323,7 @@ export const userProfilesRelations = relations(userProfiles, ({ one, many }) => 
 	comments: many(comments),
 	votes: many(votes),
 	pollVotes: many(pollVotes),
+	stories: many(stories),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -598,6 +599,35 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 
 export type Notification = typeof notifications.$inferSelect;
 export type NewNotification = typeof notifications.$inferInsert;
+
+export const stories = pgTable(
+	"stories",
+	{
+		id: id(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		mediaUrl: text("media_url"),
+		text: text("text"),
+		backgroundColor: text("background_color"),
+		createdAt,
+		expiresAt: timestamp("expires_at", { withTimezone: true, mode: "date" }).notNull(),
+	},
+	(table) => [
+		index("stories_user_idx").on(table.userId),
+		index("stories_expires_idx").on(table.expiresAt),
+	]
+);
+
+export const storiesRelations = relations(stories, ({ one }) => ({
+	user: one(userProfiles, {
+		fields: [stories.userId],
+		references: [userProfiles.id],
+	}),
+}));
+
+export type Story = typeof stories.$inferSelect;
+export type NewStory = typeof stories.$inferInsert;
 
 
 

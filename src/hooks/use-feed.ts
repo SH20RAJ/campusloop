@@ -22,29 +22,24 @@ const fetcher = (url: string) => fetch(url).then((res) => {
   return res.json() as Promise<any>;
 });
 
-export function useFeed(scope: "CAMPUS" | "GLOBAL" = "CAMPUS", type?: string) {
+export function useFeed(
+  scope: "CAMPUS" | "GLOBAL" = "CAMPUS",
+  type?: string,
+  sort?: string,
+  visibility?: string,
+) {
   const url = new URL("/api/feed", typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
   url.searchParams.set("scope", scope);
-  if (type) {
-    url.searchParams.set("type", type);
-  }
+  if (type && type !== "ALL") url.searchParams.set("type", type);
+  if (sort) url.searchParams.set("sort", sort);
+  if (visibility && visibility !== "all") url.searchParams.set("visibility", visibility);
 
   const { data, error, isLoading, mutate } = useSWR<FeedPost[]>(url.toString(), fetcher);
 
-  return {
-    feed: data,
-    isLoading,
-    isError: error,
-    mutate,
-  };
+  return { feed: data, isLoading, isError: error, mutate };
 }
 
 export function useStories() {
-  const { data, error, isLoading } = useSWR<UserProfile[]>("/api/stories", fetcher);
-
-  return {
-    stories: data,
-    isLoading,
-    isError: error,
-  };
+  const { data, error, isLoading, mutate } = useSWR<any[]>("/api/stories", fetcher);
+  return { stories: data, isLoading, isError: error, mutate };
 }

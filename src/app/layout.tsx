@@ -1,44 +1,64 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
-});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-	title: "CampusLoop",
-	description: "Verified student-only campus social network.",
+  title: {
+    default: "CampusLoop — Your Verified Campus Social Network",
+    template: "%s — CampusLoop",
+  },
+  description:
+    "Join your real campus. Speak freely. Stay safe. CampusLoop is the verified student-only social network gatekept by college email. Share confessions, drop polls, and connect with students across Indian colleges.",
+  keywords: [
+    "campus social network",
+    "college confessions",
+    "anonymous posting",
+    "student community",
+    "college polls",
+    "campus matches",
+    "verified student",
+    "Indian college students",
+    "campus gossip",
+    "college dating",
+  ],
+  icons: { icon: "/favicon.svg" },
+  openGraph: {
+    title: "CampusLoop — Your Verified Campus Social Network",
+    description:
+      "Join your real campus. Speak freely. Stay safe. Meet students like you.",
+    type: "website",
+    locale: "en_IN",
+    siteName: "CampusLoop",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CampusLoop — Your Verified Campus Social Network",
+    description:
+      "Join your real campus. Speak freely. Stay safe. Meet students like you.",
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
-	children,
+  children,
 }: Readonly<{
-	children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-	return (
-		<html lang="en" className={cn("font-sans", geist.variable)}>
-			<head>
-				<link rel="icon" href="/favicon.svg" type="image/svg+xml"></link>
-			</head>
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<HexclaveProvider app={hexclaveServerApp}>
-					<HexclaveTheme>
-						{children}
-					</HexclaveTheme>
-				</HexclaveProvider>
-			</body>
-		</html>
-	);
+  return (
+    <html lang="en" className={cn("font-sans", geist.variable)}>
+      <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      </head>
+      <body className="antialiased">
+        <HexclaveProvider app={hexclaveServerApp}>
+          <HexclaveTheme>{children}</HexclaveTheme>
+        </HexclaveProvider>
+      </body>
+    </html>
+  );
 }

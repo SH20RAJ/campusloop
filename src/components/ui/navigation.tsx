@@ -60,10 +60,6 @@ export function Navigation({ isAdmin }: NavigationProps) {
             })}
           </nav>
         </div>
-
-        <div className="px-3 py-2 text-xs text-muted-foreground border-t border-border pt-4">
-          CampusLoop MVP • pure shadcn
-        </div>
       </aside>
 
       {/* Mobile Bottom Navigation Bar */}

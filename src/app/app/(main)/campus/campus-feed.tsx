@@ -242,7 +242,7 @@ export function CampusFeed() {
             ))}
           </div>
         ) : (
-          <StoryRing users={stories || []} mutateStories={mutateStories} />
+          <StoryRing users={stories || []} />
         )}
       </div>
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { desc, eq, and } from "drizzle-orm";
-import { posts, userProfiles } from "@/db/schema";
+import { desc, eq, and, sql, SQL } from "drizzle-orm";
+import { posts, userProfiles, comments, votes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 
 export async function GET(req: Request) {
@@ -13,11 +13,12 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const scope = searchParams.get("scope") as "CAMPUS" | "GLOBAL" | null;
-    const type = searchParams.get("type") as "NORMAL" | "CONFESSION" | "POLL" | "QUESTION" | null;
+    const type = searchParams.get("type") as string | null;
+    const sort = searchParams.get("sort") as "latest" | "trending" | "top_voted" | "most_discussed" | null;
+    const visibility = searchParams.get("visibility") as "all" | "anonymous" | "public" | null;
 
     const db = getDb();
     
-    // Get user's profile to know their institution
     const profile = await db.query.userProfiles.findFirst({
       where: eq(userProfiles.userId, user.id),
     });
@@ -27,17 +28,48 @@ export async function GET(req: Request) {
     }
 
     // Build conditions
-    const conditions = [eq(posts.status, "PUBLISHED")];
+    const conditions: SQL[] = [eq(posts.status, "PUBLISHED")];
     if (scope === "CAMPUS") {
       conditions.push(eq(posts.institutionId, profile.institutionId));
     }
-    if (type) {
-      conditions.push(eq(posts.type, type));
+    if (type && type !== "ALL" && type !== "all") {
+      conditions.push(eq(posts.type, type as any));
+    }
+    if (visibility === "anonymous") {
+      conditions.push(eq(posts.isAnonymous, true));
+    } else if (visibility === "public") {
+      conditions.push(eq(posts.isAnonymous, false));
+    }
+
+    // Trending score: votes + comments
+    const trendingSql = sql<number>`
+      coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id}), 0)
+      +
+      coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)
+    `;
+
+    // Top Voted score
+    const votesCountSql = sql<number>`
+      coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id}), 0)
+    `;
+
+    // Most Discussed score
+    const commentsCountSql = sql<number>`
+      coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)
+    `;
+
+    let orderClauses = [desc(posts.createdAt)];
+    if (sort === "trending") {
+      orderClauses = [desc(trendingSql), desc(posts.createdAt)];
+    } else if (sort === "top_voted") {
+      orderClauses = [desc(votesCountSql), desc(posts.createdAt)];
+    } else if (sort === "most_discussed") {
+      orderClauses = [desc(commentsCountSql), desc(posts.createdAt)];
     }
 
     const rawFeed = await db.query.posts.findMany({
-      where: conditions.length > 0 ? and(...conditions) : undefined,
-      orderBy: [desc(posts.createdAt)],
+      where: and(...conditions),
+      orderBy: orderClauses,
       limit: 20,
       with: {
         author: true,
@@ -45,30 +77,21 @@ export async function GET(req: Request) {
         votes: true,
         comments: true,
         pollOptions: {
-          with: {
-            votes: true,
-          }
-        }
-      }
+          with: { votes: true },
+        },
+      },
     });
 
-    // Map to include counts and user's vote state
     const feed = rawFeed.map(post => {
       const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
       const commentsCount = post.comments.length;
       const userVoteObj = post.votes.find(v => v.userId === profile.id);
       const userVote = userVoteObj ? userVoteObj.value : 0;
 
-      // Format poll options if type is POLL
       const formattedPollOptions = post.pollOptions?.map(opt => {
         const optVotesCount = opt.votes.length;
         const userVoted = opt.votes.some(v => v.userId === profile.id);
-        return {
-          id: opt.id,
-          text: opt.text,
-          votesCount: optVotesCount,
-          userVoted,
-        };
+        return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
       });
 
       const hasVotedPoll = formattedPollOptions?.some(opt => opt.userVoted) || false;

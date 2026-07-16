@@ -90,10 +90,13 @@ export default async function LandingPage() {
             <GraduationCap className="h-5 w-5 text-primary" />
             <span>CampusLoop</span>
           </Link>
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center gap-2">
             {isAuthenticated ? (
               <Link href="/app/campus">
-                <Button size="sm">Go to Feeds</Button>
+                <Button size="sm" className="gap-1.5">
+                  <GraduationCap className="h-3.5 w-3.5" />
+                  My Campus
+                </Button>
               </Link>
             ) : (
               <>
@@ -421,7 +424,8 @@ export default async function LandingPage() {
                   {isAuthenticated ? (
                     <Link href="/app/campus">
                       <Button size="lg" className="h-11 gap-2 px-6 text-sm">
-                        Enter CampusLoop
+                        <GraduationCap className="h-4 w-4" />
+                        Enter My Campus
                         <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>

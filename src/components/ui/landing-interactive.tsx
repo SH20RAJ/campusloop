@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { 
   Heart, 
   MessageCircle, 
@@ -9,15 +9,15 @@ import {
   Lock, 
   ShieldAlert, 
   ChevronDown,
-  ThumbsUp,
-  Smile,
-  Flame,
-  Zap,
-  ArrowRight
+  ArrowRight,
+  ShieldCheck,
+  Eye,
+  EyeOff,
+  Sparkle
 } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+import { cn } from "@/lib/utils";
 
 export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boolean }) {
   // Feed teaser state
@@ -32,6 +32,17 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
 
   // FAQ Accordion states
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  // Privacy Simulator state
+  const [simInput, setSimInput] = useState("");
+  const [censoredText, setCensoredText] = useState("");
+  const [doxxType, setDoxxType] = useState<string | null>(null);
+  const [hashValue, setHashValue] = useState("");
+
+  // Spotlight mouse track coordinates
+  const [coords1, setCoords1] = useState({ x: 0, y: 0 });
+  const [coords2, setCoords2] = useState({ x: 0, y: 0 });
+  const [coords3, setCoords3] = useState({ x: 0, y: 0 });
 
   const mockProfiles = [
     { name: "Aria, 21", college: "IIT Delhi", bio: "Economics major. Caffeinated 24/7. Let's debate canteen Maggi.", avatar: "👩‍💻" },
@@ -62,6 +73,46 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
 
   const totalPollVotes = pollVotes.reduce((a, b) => a + b, 0);
 
+  // Real-time privacy screening logic simulator
+  useEffect(() => {
+    if (!simInput) {
+      setCensoredText("");
+      setDoxxType(null);
+      setHashValue("");
+      return;
+    }
+
+    let text = simInput;
+    let detected: string | null = null;
+
+    // Scan for 10 digit phone numbers
+    const phoneRegex = /\b\d{10}\b/g;
+    if (phoneRegex.test(text)) {
+      text = text.replace(phoneRegex, "[REDACTED PHONE NUMBER]");
+      detected = "Phone Number";
+    }
+
+    // Scan for student email patterns
+    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+    if (emailRegex.test(text)) {
+      text = text.replace(emailRegex, "[REDACTED STUDENT EMAIL]");
+      detected = "Student Email";
+    }
+
+    // Simple hash generator simulation
+    let hash = 0;
+    for (let i = 0; i < simInput.length; i++) {
+      const char = simInput.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash |= 0;
+    }
+    const hex = Math.abs(hash).toString(16).padEnd(8, "f");
+
+    setCensoredText(text);
+    setDoxxType(detected);
+    setHashValue(`anon_${hex}`);
+  }, [simInput]);
+
   const faqs = [
     {
       q: "How does the email verification protect my privacy?",
@@ -82,11 +133,11 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
   ];
 
   return (
-    <div className="space-y-24">
+    <div className="space-y-24 pt-4">
       {/* ─── CTA Buttons for Hero ─── */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-200">
         {isAuthenticated ? (
-          <Link href="/app/campus">
+          <Link href="/app">
             <button className="relative group overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-orange-500 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:scale-102 active:scale-98 transition-all cursor-pointer">
               <span className="relative z-10 flex items-center gap-2">
                 Enter My Feed
@@ -117,60 +168,74 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
 
       {/* ─── Interactive Interactive Showcase (Feeds & Dating Swiper) ─── */}
       <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-4">
-        {/* Mock Feed Card */}
-        <div className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
-          <div className="absolute -left-6 -top-6 h-16 w-16 rounded-full bg-primary/10 blur-xl" />
-          <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="h-6 w-6 rounded bg-primary/20 text-[10px] font-bold text-primary flex items-center justify-center">
-                🙊
+        {/* Mock Feed Card with Mouse Spotlight */}
+        <div 
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            setCoords1({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+          }}
+          style={{
+            "--mouse-x": `${coords1.x}px`,
+            "--mouse-y": `${coords1.y}px`
+          } as React.CSSProperties}
+          className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl group border border-border/40 bg-[radial-gradient(400px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(244,63,94,0.06),transparent_80%)]"
+        >
+          {/* Border beam effect */}
+          <div className="absolute inset-0 border border-transparent group-hover:border-primary/10 rounded-3xl transition-colors duration-300 pointer-events-none" />
+          
+          <div>
+            <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded bg-primary/20 text-[10px] font-bold text-primary flex items-center justify-center">
+                  🙊
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold tracking-wide uppercase text-muted-foreground">Anonymous Confession</p>
+                  <p className="text-[8px] text-muted-foreground/60">3 mins ago • Birla Institute of Technology</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] font-bold tracking-wide uppercase text-muted-foreground">Anonymous Confession</p>
-                <p className="text-[8px] text-muted-foreground/60">3 mins ago • Birla Institute of Technology</p>
-              </div>
+              <span className="rounded bg-rose-500/10 px-2 py-0.5 text-[8px] font-bold text-rose-500">
+                Spicy
+              </span>
             </div>
-            <span className="rounded bg-rose-500/10 px-2 py-0.5 text-[8px] font-bold text-rose-500">
-              Spicy
-            </span>
-          </div>
 
-          <p className="text-sm font-medium leading-relaxed text-foreground/90">
-            "To the senior who helped me find the mechanical lab yesterday while I was looking completely lost... you are literally a lifesaver. Pls comment if you see this, I owe you a chai ☕😭"
-          </p>
+            <p className="text-sm font-medium leading-relaxed text-foreground/90">
+              "To the senior who helped me find the mechanical lab yesterday while I was looking completely lost... you are literally a lifesaver. Pls comment if you see this, I owe you a chai ☕😭"
+            </p>
 
-          {/* Interactive Poll inside feed */}
-          <div className="mt-4 space-y-2 border border-border/40 rounded-2xl p-4 bg-muted/10">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Campus Pulse Poll</p>
-            <p className="text-xs font-semibold text-foreground">Is canteen coffee better than campus Nescafe?</p>
-            <div className="space-y-1.5 pt-1">
-              {[
-                "Yes, canteen coffee hits different",
-                "No, Nescafe is elite",
-                "Both are battery water tbh"
-              ].map((opt, idx) => {
-                const count = pollVotes[idx];
-                const pct = totalPollVotes > 0 ? Math.round((count / totalPollVotes) * 100) : 0;
-                return (
-                  <button
-                    key={idx}
-                    disabled={pollVoted !== null}
-                    onClick={() => handleVotePoll(idx)}
-                    className="w-full relative overflow-hidden rounded-xl border border-border/40 py-2 px-3 text-left text-xs font-semibold hover:bg-muted/40 transition-colors disabled:hover:bg-transparent cursor-pointer"
-                  >
-                    {pollVoted !== null && (
-                      <div 
-                        className="absolute inset-y-0 left-0 bg-primary/10 transition-all duration-500" 
-                        style={{ width: `${pct}%` }} 
-                      />
-                    )}
-                    <div className="relative flex justify-between">
-                      <span>{opt}</span>
-                      {pollVoted !== null && <span className="text-primary">{pct}%</span>}
-                    </div>
-                  </button>
-                );
-              })}
+            {/* Interactive Poll inside feed */}
+            <div className="mt-4 space-y-2 border border-border/40 rounded-2xl p-4 bg-muted/10">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Campus Pulse Poll</p>
+              <p className="text-xs font-semibold text-foreground">Is canteen coffee better than campus Nescafe?</p>
+              <div className="space-y-1.5 pt-1">
+                {[
+                  "Yes, canteen coffee hits different",
+                  "No, Nescafe is elite",
+                  "Both are battery water tbh"
+                ].map((opt, idx) => {
+                  const count = pollVotes[idx];
+                  const pct = totalPollVotes > 0 ? Math.round((count / totalPollVotes) * 100) : 0;
+                  return (
+                    <button
+                      key={idx}
+                      disabled={pollVoted !== null}
+                      onClick={() => handleVotePoll(idx)}
+                      className="w-full relative overflow-hidden rounded-xl border border-border/40 py-2 px-3 text-left text-xs font-semibold hover:bg-muted/40 transition-colors disabled:hover:bg-transparent cursor-pointer"
+                    >
+                      {pollVoted !== null && (
+                        <div 
+                          className="absolute inset-y-0 left-0 bg-primary/10 transition-all duration-500" 
+                          style={{ width: `${pct}%` }} 
+                        />
+                      )}
+                      <div className="relative flex justify-between">
+                        <span>{opt}</span>
+                        {pollVoted !== null && <span className="text-primary">{pct}%</span>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -195,9 +260,19 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
           </div>
         </div>
 
-        {/* Mock Match Card */}
-        <div className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl min-h-[380px]">
-          <div className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-orange-500/10 blur-xl" />
+        {/* Mock Match Card with Mouse Spotlight */}
+        <div 
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            setCoords2({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+          }}
+          style={{
+            "--mouse-x": `${coords2.x}px`,
+            "--mouse-y": `${coords2.y}px`
+          } as React.CSSProperties}
+          className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl group border border-border/40 min-h-[380px] bg-[radial-gradient(400px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(249,115,22,0.06),transparent_80%)]"
+        >
+          <div className="absolute inset-0 border border-transparent group-hover:border-primary/10 rounded-3xl transition-colors duration-300 pointer-events-none" />
           
           <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-4">
             <div className="flex items-center gap-2">
@@ -262,7 +337,7 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
                 </button>
                 <button
                   onClick={() => handleSwipe(true)}
-                  className="h-12 w-12 rounded-full bg-gradient-to-tr from-primary to-orange-500 text-white shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-90"
+                  className="h-12 w-12 rounded-full bg-gradient-to-tr from-primary to-orange-500 text-white shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95"
                   title="Swipe Right / Like"
                 >
                   ❤
@@ -270,6 +345,97 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* ─── NEW COMPONENT: Interactive Privacy & Safety Shield Simulator ─── */}
+      <div className="max-w-4xl mx-auto px-4 mt-24">
+        <div 
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            setCoords3({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+          }}
+          style={{
+            "--mouse-x": `${coords3.x}px`,
+            "--mouse-y": `${coords3.y}px`
+          } as React.CSSProperties}
+          className="glass-card-dark rounded-3xl p-8 relative overflow-hidden shadow-xl border border-border/40 bg-[radial-gradient(600px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(16,185,129,0.05),transparent_80%)] grid md:grid-cols-5 gap-8 items-center"
+        >
+          {/* Header & Details */}
+          <div className="md:col-span-2 space-y-4">
+            <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <h3 className="text-xl font-black tracking-tight text-foreground">
+              Verify Our <br />
+              <span className="text-emerald-500">Privacy Shield</span>
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              We separate student identity from content entirely. Use this interactive console to see how our Edge worker processes, sanitizes, and hashes data instantly before it hits the database.
+            </p>
+            <div className="space-y-2 pt-2 text-[10px] font-semibold text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                Doxx & Slur auto-censoring
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                SHA-256 separation hash
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                Zero trace back to verified email
+              </div>
+            </div>
+          </div>
+
+          {/* Live Simulator Console */}
+          <div className="md:col-span-3 space-y-4 bg-black/45 border border-border/45 rounded-2xl p-5 font-mono text-xs">
+            <div className="flex items-center justify-between border-b border-border/20 pb-2">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase">CampusLoop Core v1.4</span>
+              <span className="flex items-center gap-1.5 text-[9px] font-bold text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+                ONLINE
+              </span>
+            </div>
+
+            {/* Input area */}
+            <div className="space-y-1.5">
+              <span className="text-[9px] font-bold text-muted-foreground uppercase">1. Write a Test Post</span>
+              <textarea
+                value={simInput}
+                onChange={(e) => setSimInput(e.target.value)}
+                placeholder="Type a phone (9876543210) or email (test@edu.in) to check..."
+                className="w-full h-16 rounded-lg bg-muted/20 border border-border/30 px-3 py-2 text-[11px] text-foreground focus:outline-none focus:border-emerald-500/50 resize-none font-mono placeholder:text-muted-foreground/50"
+              />
+            </div>
+
+            {/* Output area */}
+            <div className="space-y-2 border-t border-border/10 pt-3">
+              <div className="flex items-center justify-between text-[10px]">
+                <span className="text-muted-foreground">2. Processed Output:</span>
+                {doxxType ? (
+                  <span className="text-amber-500 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <ShieldAlert className="h-3 w-3" />
+                    Censored: {doxxType}
+                  </span>
+                ) : simInput ? (
+                  <span className="text-emerald-500 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                    Safe to post
+                  </span>
+                ) : null}
+              </div>
+              
+              <div className="min-h-12 bg-muted/10 border border-border/20 rounded-lg p-3 text-[11px] text-foreground/80 break-words">
+                {censoredText || <span className="text-muted-foreground/30 italic">No output yet...</span>}
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] pt-1">
+                <span className="text-muted-foreground">3. Hash Signature:</span>
+                <span className="text-primary font-bold">{hashValue || "anon_undefined"}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -23,6 +23,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import type { UserProfile } from "@/db/schema";
 
 interface NavigationProps {
@@ -35,7 +36,7 @@ const navGroups = [
   {
     label: "Social",
     items: [
-      { icon: Home, href: "/app/campus", label: "Campus Feed", color: "text-rose-500 hover:bg-rose-500/10" },
+      { icon: Home, href: "/app", label: "Campus Feed", color: "text-rose-500 hover:bg-rose-500/10" },
       { icon: Compass, href: "/app/discover", label: "Discover", color: "text-blue-500 hover:bg-blue-500/10" },
       { icon: Heart, href: "/app/confessions", label: "Confessions", color: "text-pink-500 hover:bg-pink-500/10" },
     ],
@@ -65,7 +66,7 @@ const adminGroup = {
 };
 
 const mobileItems = [
-  { icon: Home, href: "/app/campus", label: "Home" },
+  { icon: Home, href: "/app", label: "Home" },
   { icon: Compass, href: "/app/discover", label: "Discover" },
   { icon: Plus, href: "/app/post/new", label: "" },
   { icon: Sparkles, href: "/app/dating", label: "Dating" },
@@ -120,7 +121,7 @@ export function Navigation({ profile, collegeName = "Your College", isAdmin }: N
             collapsed ? "justify-center h-16" : "justify-between h-16"
           )}
         >
-          <Link href="/app/campus" className="flex items-center gap-2.5">
+          <Link href="/app" className="flex items-center gap-2.5">
             <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-orange-500 text-xs font-bold text-white shadow-md shadow-primary/20">
               CL
               <div className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-green-500 border border-background animate-ping" />
@@ -273,6 +274,8 @@ export function Navigation({ profile, collegeName = "Your College", isAdmin }: N
                   Settings
                 </Link>
                 
+                <ThemeToggle className="h-7 w-7 rounded-lg border-none bg-transparent hover:bg-muted/50" />
+
                 <Link
                   href="/handler/sign-out"
                   className="flex items-center gap-1.5 text-muted-foreground hover:text-destructive font-semibold transition-colors animate-in"
@@ -283,11 +286,14 @@ export function Navigation({ profile, collegeName = "Your College", isAdmin }: N
               </div>
             </div>
           ) : (
-            <Link href="/app/post/new">
-              <Button size="icon" className="h-10 w-10 rounded-xl bg-gradient-to-tr from-primary to-orange-500 shadow-md cursor-pointer">
-                <Plus className="h-5 w-5 text-white" />
-              </Button>
-            </Link>
+            <div className="flex flex-col items-center gap-2.5">
+              <ThemeToggle className="h-9 w-9" />
+              <Link href="/app/post/new">
+                <Button size="icon" className="h-10 w-10 rounded-xl bg-gradient-to-tr from-primary to-orange-500 shadow-md cursor-pointer">
+                  <Plus className="h-5 w-5 text-white" />
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
       </aside>

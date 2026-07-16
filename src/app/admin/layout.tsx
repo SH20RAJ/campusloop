@@ -95,7 +95,7 @@ export default async function AdminLayout({
               <ShieldAlert className="h-4 w-4 text-muted-foreground" />
               Reports
             </Link>
-            <Link href="/app/campus" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/app" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="h-4 w-4" />
               Exit Admin
             </Link>

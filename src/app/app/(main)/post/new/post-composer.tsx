@@ -69,7 +69,7 @@ export function PostComposer({ communityId }: { communityId?: string }) {
         throw new Error(data.error || "Failed to create post");
       }
 
-      router.push("/app/campus");
+      router.push("/app");
       router.refresh();
     } catch (err: any) {
       setError(err.message);

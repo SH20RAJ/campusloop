@@ -59,5 +59,5 @@ export async function completeOnboarding(formData: FormData) {
     throw error;
   }
 
-  redirect("/app/campus");
+  redirect("/app");
 }

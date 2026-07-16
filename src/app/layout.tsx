@@ -53,6 +53,19 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", outfit.variable)}>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.getItem('cl_theme') === 'dark' || (!localStorage.getItem('cl_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (_) {}
+            `
+          }}
+        />
       </head>
       <body className="antialiased">
         <HexclaveProvider app={hexclaveServerApp}>

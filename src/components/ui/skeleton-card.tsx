@@ -4,7 +4,7 @@ export function FeedSkeleton() {
   return (
     <div className="space-y-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="rounded-xl border border-border bg-card p-6 space-y-4 animate-pulse">
+        <div key={i} className="rounded-xl border border-border bg-card p-6 space-y-4">
           <div className="flex items-center gap-3">
             <Skeleton className="h-10 w-10 rounded-full" />
             <div className="space-y-1.5 flex-1">
@@ -29,7 +29,7 @@ export function FeedSkeleton() {
 
 export function ChatSkeleton() {
   return (
-    <div className="space-y-4 animate-pulse">
+    <div className="space-y-4">
       {[1, 2, 3, 4].map((i) => (
         <div key={i} className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card">
           <Skeleton className="h-12 w-12 rounded-full" />
@@ -48,7 +48,7 @@ export function ChatSkeleton() {
 
 export function CommunitySkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 animate-pulse">
+    <div className="grid gap-4 sm:grid-cols-2">
       {[1, 2, 3, 4].map((i) => (
         <div key={i} className="rounded-xl border border-border bg-card p-5 space-y-4">
           <div className="space-y-2">

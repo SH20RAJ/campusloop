@@ -18,7 +18,7 @@ export default async function OnboardingPage() {
   });
 
   if (profile?.onboardingCompleted) {
-    redirect("/app/campus");
+    redirect("/app");
   }
 
   return (

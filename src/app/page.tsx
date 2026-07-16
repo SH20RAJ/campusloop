@@ -1,28 +1,20 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import {
-  ArrowRight,
-  ShieldCheck,
-  Lock,
-  Sparkles,
-  Zap,
-  Mail,
-  Compass,
-  MessageCircle,
-  Ban,
-  EyeOff,
-  Flag,
-  GraduationCap,
+import { 
+  ShieldCheck, 
+  Lock, 
+  Sparkles, 
+  Zap, 
+  MessageCircle, 
+  Heart, 
+  HelpCircle, 
+  Users, 
+  ShieldAlert,
+  ArrowRight
 } from "lucide-react";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { Button } from "@/components/ui/button";
-import { Particles } from "@/components/ui/particles";
-import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
-import { BlurFade } from "@/components/ui/blur-fade";
-import { MagicCard } from "@/components/ui/magic-card";
-import { BorderBeam } from "@/components/ui/border-beam";
-import { NumberTicker } from "@/components/ui/number-ticker";
-import { AnimatedList, AnimatedListItem } from "@/components/ui/animated-list";
+import { LandingInteractive } from "@/components/ui/landing-interactive";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export const metadata: Metadata = {
   title: "CampusLoop — Your Verified Campus Social Network",
@@ -62,6 +54,11 @@ export default async function LandingPage() {
   const user = await hexclaveServerApp.getUser();
   const isAuthenticated = !!user;
 
+  const mockColleges = [
+    "IIT Delhi", "BIT Mesra", "BITS Pilani", "NIT Trichy", "Delhi University", 
+    "IIT Bombay", "SRM Chennai", "VIT Vellore", "IIT Kharagpur", "RV College"
+  ];
+
   return (
     <>
       <script
@@ -80,440 +77,185 @@ export default async function LandingPage() {
         }}
       />
 
-      <div className="flex min-h-screen flex-col bg-background text-foreground">
-        {/* ─── Navbar ─── */}
-        <header className="fixed top-0 right-0 left-0 z-50 flex h-14 items-center justify-between border-b border-border bg-background/80 px-6 backdrop-blur-md lg:px-12">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm font-semibold tracking-tight"
-          >
-            <GraduationCap className="h-5 w-5 text-primary" />
-            <span>CampusLoop</span>
+      <div className="flex min-h-screen flex-col bg-background text-foreground bg-grid-pattern relative overflow-x-hidden">
+        {/* Glow blur backgrounds */}
+        <div className="absolute top-[-10%] left-[5%] right-[5%] h-[600px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+        <div className="absolute top-[40%] right-[-10%] h-[400px] w-[400px] rounded-full bg-orange-500/5 blur-3xl pointer-events-none" />
+
+        {/* ─── Header / Navbar ─── */}
+        <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/70 px-6 backdrop-blur-md lg:px-16">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-primary to-orange-500 text-[10px] font-bold text-white shadow-sm shadow-primary/20">
+              CL
+            </div>
+            <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-extrabold tracking-tight text-transparent">
+              CampusLoop
+            </span>
           </Link>
-          <nav className="flex items-center gap-2">
+
+          <div className="flex items-center gap-3">
+            <ThemeToggle className="border-border/60 bg-background/50" />
             {isAuthenticated ? (
-              <Link href="/app/campus">
-                <Button size="sm" className="gap-1.5">
-                  <GraduationCap className="h-3.5 w-3.5" />
-                  My Campus
-                </Button>
+              <Link href="/app">
+                <button className="rounded-xl bg-primary/10 border border-primary/25 px-4.5 py-1.5 text-xs font-bold text-primary hover:bg-primary/20 transition-all cursor-pointer">
+                  Go to Feeds
+                </button>
               </Link>
             ) : (
               <>
                 <Link href="/sign-in">
-                  <Button variant="ghost" size="sm">
+                  <button className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                     Sign In
-                  </Button>
+                  </button>
                 </Link>
                 <Link href="/sign-up">
-                  <Button size="sm">Join with College Email</Button>
+                  <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
+                    Join Now
+                  </button>
                 </Link>
               </>
             )}
-          </nav>
+          </div>
         </header>
 
-        <main className="flex-1">
-          {/* ─── Hero ─── */}
-          <section className="relative flex flex-col items-center px-6 pt-36 pb-20 text-center lg:px-8">
-            <Particles
-              className="absolute inset-0 -z-10"
-              quantity={80}
-              color="#c07a3c"
-              size={0.5}
-              staticity={30}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-            >
-              <div className="absolute top-[-10%] left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
-              <div className="absolute top-[20%] right-[-10%] h-[300px] w-[300px] rounded-full bg-orange-400/5 blur-[100px]" />
-            </div>
+        {/* ─── Hero Section ─── */}
+        <section className="pt-32 pb-16 px-6 text-center max-w-4xl mx-auto space-y-6">
+          {/* Live Indicator capsule */}
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[10px] font-extrabold text-primary uppercase tracking-wider animate-pulse">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            Live Vibe Checker Active
+          </div>
 
-            <BlurFade delay={0}>
-              <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1 text-xs font-medium">
-                <Sparkles className="h-3.5 w-3.5" />
-                <AnimatedShinyText shimmerWidth={120}>
-                  Trusted by students across Indian campuses
-                </AnimatedShinyText>
-              </div>
-            </BlurFade>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.08] text-foreground">
+            Your Campus. <br />
+            <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">
+              Uncensored & Connected.
+            </span>
+          </h2>
 
-            <BlurFade delay={0.15}>
-              <h1 className="max-w-3xl text-balance text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl">
-                The verified social layer
-                <br />
-                for your campus.
-              </h1>
-            </BlurFade>
+          <p className="text-sm sm:text-base text-muted-foreground font-medium max-w-2xl mx-auto leading-relaxed">
+            Welcome to the social layer built exclusively for college students. 
+            Speak freely via anonymous confessions, vote on local drama, join hobby circles, and swipe to match with verified peers inside your lecture halls.
+          </p>
 
-            <BlurFade delay={0.3}>
-              <p className="mt-5 max-w-xl text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">
-                CampusLoop is the trusted student-only network. Share anonymous
-                confessions, drop live polls, swipe to meet people — all
-                gatekept by your{" "}
-                <span className="font-medium text-foreground">
-                  college email
+          {/* Render interactive buttons and feed teaser widgets */}
+          <LandingInteractive isAuthenticated={isAuthenticated} />
+        </section>
+
+        {/* ─── Infinite College Marquee ─── */}
+        <section className="py-8 bg-muted/5 border-t border-b border-border/40 select-none overflow-hidden relative">
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+          
+          <div className="relative flex w-full overflow-x-hidden">
+            <div className="flex shrink-0 gap-8 min-w-full justify-around animate-marquee [--duration:25s]">
+              {mockColleges.map((uni) => (
+                <span key={uni} className="text-xs font-bold text-muted-foreground/60 tracking-wider flex items-center gap-2 uppercase">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-ping" />
+                  {uni} Verified
                 </span>
-                . No bots. No randoms. Just real students.
-              </p>
-            </BlurFade>
-
-            <BlurFade delay={0.45}>
-              <div className="mt-6 flex items-center gap-5 text-xs text-muted-foreground">
-                {[
-                  { icon: ShieldCheck, label: "Verified" },
-                  { icon: Zap, label: "Live polls" },
-                  { icon: Sparkles, label: "Swipe & match" },
-                ].map((p) => (
-                  <span
-                    key={p.label}
-                    className="flex items-center gap-1.5 font-medium"
-                  >
-                    <p.icon className="h-4 w-4 text-primary" />
-                    {p.label}
-                  </span>
-                ))}
-              </div>
-            </BlurFade>
-
-            <BlurFade delay={0.55}>
-              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
-                {isAuthenticated ? (
-                  <Link href="/app/campus">
-                    <Button size="lg" className="h-11 gap-2 px-6 text-sm">
-                      Go to Feeds
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link href="/sign-up">
-                    <Button size="lg" className="h-11 gap-2 px-6 text-sm">
-                      Verify with College Email
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </BlurFade>
-          </section>
-
-          {/* ─── Features (Magic Cards) ─── */}
-          <section className="mx-auto max-w-6xl px-6 pb-20 pt-4 lg:px-8">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                {
-                  icon: ShieldCheck,
-                  title: "Gatekept & Verified",
-                  desc: "Only whitelisted college emails get in. No bots, no randoms — strictly verified students.",
-                },
-                {
-                  icon: Lock,
-                  title: "Anonymous Confessions",
-                  desc: "Spill the tea without consequences. Hidden from students, accountable to safety.",
-                },
-                {
-                  icon: Sparkles,
-                  title: "Campus Crushes",
-                  desc: "Swipe to discover students at your college. Mutual like? Instant DM unlock.",
-                },
-                {
-                  icon: Zap,
-                  title: "Live Polls",
-                  desc: "Drop polls, ask questions, start debates. Real-time results in your campus loop.",
-                },
-              ].map((f) => {
-                const Icon = f.icon;
-                return (
-                  <MagicCard
-                    key={f.title}
-                    mode="orb"
-                    glowFrom="#c07a3c"
-                    glowTo="#d4954a"
-                    glowSize={300}
-                    glowBlur={40}
-                    glowOpacity={0.15}
-                    className="rounded-xl p-5"
-                  >
-                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-primary/10 bg-primary/5 text-primary">
-                      <Icon className="h-4.5 w-4.5" />
-                    </div>
-                    <h3 className="text-sm font-semibold text-foreground">
-                      {f.title}
-                    </h3>
-                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                      {f.desc}
-                    </p>
-                    <BorderBeam
-                      size={40}
-                      duration={8}
-                      colorFrom="#c07a3c"
-                      colorTo="#d4954a"
-                      borderWidth={1}
-                    />
-                  </MagicCard>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* ─── How It Works (Animated List) ─── */}
-          <section className="mx-auto max-w-5xl px-6 pb-20 lg:px-8">
-            <BlurFade>
-              <div className="mb-10 text-center">
-                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  How it works
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Three steps to join your campus loop.
-                </p>
-              </div>
-            </BlurFade>
-
-            <AnimatedList delay={2000}>
-              {[
-                {
-                  icon: Mail,
-                  step: "01",
-                  title: "Verify with your college email",
-                  desc: "Sign up using your .ac.in or institution email. We auto-detect your college and place you in your campus community.",
-                },
-                {
-                  icon: Compass,
-                  step: "02",
-                  title: "Explore your campus feed",
-                  desc: "See posts, confessions, and polls from students at your college. Upvote, comment, or post anonymously.",
-                },
-                {
-                  icon: MessageCircle,
-                  step: "03",
-                  title: "Connect beyond the feed",
-                  desc: "Join communities, swipe to match, or DM after a mutual like. Your campus world in one place.",
-                },
-              ].map((s) => {
-                const Icon = s.icon;
-                return (
-                  <AnimatedListItem key={s.step}>
-                    <div className="flex items-start gap-4 rounded-xl border border-border bg-card p-5 text-left">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/5 text-primary ring-1 ring-primary/10">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
-                          Step {s.step}
-                        </span>
-                        <h3 className="text-sm font-semibold text-foreground">
-                          {s.title}
-                        </h3>
-                        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                          {s.desc}
-                        </p>
-                      </div>
-                    </div>
-                  </AnimatedListItem>
-                );
-              })}
-            </AnimatedList>
-          </section>
-
-          {/* ─── Stats (Number Ticker) ─── */}
-          <section className="mx-auto max-w-4xl px-6 pb-20 lg:px-8">
-            <BlurFade>
-              <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-4">
-                {[
-                  { value: 500, suffix: "+", label: "Colleges onboarded" },
-                  { value: 50000, suffix: "+", label: "Verified students" },
-                  {
-                    value: 100000,
-                    suffix: "+",
-                    label: "Posts & confessions",
-                  },
-                  { value: 10000, suffix: "+", label: "Matches made" },
-                ].map((s) => (
-                  <div
-                    key={s.label}
-                    className="flex flex-col items-center justify-center bg-card px-4 py-8 text-center"
-                  >
-                    <span className="text-2xl font-bold tracking-tight text-foreground">
-                      <NumberTicker value={s.value} />
-                      {s.suffix}
-                    </span>
-                    <span className="mt-1 text-xs text-muted-foreground">
-                      {s.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </BlurFade>
-          </section>
-
-          {/* ─── Safety Section (Magic Cards) ─── */}
-          <section className="mx-auto max-w-5xl px-6 pb-20 lg:px-8">
-            <div className="grid gap-8 items-center md:grid-cols-2">
-              <div>
-                <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
-                  Built-in safety
-                </span>
-                <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-                  Anonymous to students.
-                  <br />
-                  Accountable to safety.
-                </h2>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  Every post is scanned on creation to block phone numbers,
-                  emails, slurs, and harassment. Your identity stays hidden from
-                  other students but is privately stored for moderation.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                {[
-                  { icon: Ban, label: "Slur & Profanity Filter" },
-                  { icon: EyeOff, label: "Doxxing Prevention" },
-                  { icon: Flag, label: "5 Reports = Auto-Hide" },
-                  { icon: ShieldCheck, label: "Moderator Review" },
-                ].map((s) => {
-                  const Icon = s.icon;
-                  return (
-                    <MagicCard
-                      key={s.label}
-                      mode="orb"
-                      glowFrom="#c07a3c"
-                      glowTo="#d4954a"
-                      glowSize={200}
-                      glowBlur={30}
-                      glowOpacity={0.1}
-                      className="rounded-lg px-4 py-3"
-                    >
-                      <div className="relative z-40 flex items-center justify-between text-sm">
-                        <span className="flex items-center gap-2 text-foreground">
-                          <Icon className="h-4 w-4 text-primary" />
-                          {s.label}
-                        </span>
-                        <span className="text-xs font-semibold text-emerald-500">
-                          Active
-                        </span>
-                      </div>
-                    </MagicCard>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* ─── CTA ─── */}
-          <section className="mx-auto max-w-5xl px-6 pb-20 lg:px-8">
-            <BlurFade>
-              <div className="relative overflow-hidden rounded-xl border border-border bg-card px-8 py-12 text-center shadow-sm md:px-16 md:py-16">
-                <BorderBeam
-                  size={120}
-                  duration={10}
-                  colorFrom="#c07a3c"
-                  colorTo="#d4954a"
-                />
-                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  Stop lurking, start posting.
-                </h2>
-                <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
-                  Verify with your college email and join the loop. Connect with
-                  classmates, share confessions, and find your people — all in a
-                  space built for students, by design.
-                </p>
-                <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                  {isAuthenticated ? (
-                    <Link href="/app/campus">
-                      <Button size="lg" className="h-11 gap-2 px-6 text-sm">
-                        <GraduationCap className="h-4 w-4" />
-                        Enter My Campus
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                  ) : (
-                    <>
-                      <Link href="/sign-up">
-                        <Button size="lg" className="h-11 gap-2 px-6 text-sm">
-                          Sign Up with Student Email
-                          <ArrowRight className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                      <Link href="/sign-in">
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className="h-11 px-6 text-sm"
-                        >
-                          I already have an account
-                        </Button>
-                      </Link>
-                    </>
-                  )}
-                </div>
-              </div>
-            </BlurFade>
-          </section>
-        </main>
-
-        {/* ─── Footer ─── */}
-        <footer className="border-t border-border">
-          <div className="mx-auto max-w-6xl px-6 py-12 lg:px-8">
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              <div>
-                <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-                  <GraduationCap className="h-5 w-5 text-primary" />
-                  <span>CampusLoop</span>
-                </div>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  The verified social layer for college life. Built for
-                  students, by design.
-                </p>
-              </div>
-              {[
-                {
-                  label: "Product",
-                  items: [
-                    { href: "/sign-up", label: "Sign Up" },
-                    { href: "/sign-in", label: "Sign In" },
-                  ],
-                },
-                {
-                  label: "Safety",
-                  items: [
-                    { href: "#", label: "Community Guidelines" },
-                    { href: "#", label: "Privacy" },
-                  ],
-                },
-                {
-                  label: "Company",
-                  items: [
-                    { href: "#", label: "About" },
-                    { href: "#", label: "Contact" },
-                  ],
-                },
-              ].map((g) => (
-                <div key={g.label}>
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-                    {g.label}
-                  </span>
-                  <ul className="mt-3 space-y-2">
-                    {g.items.map((item) => (
-                      <li key={item.label}>
-                        <Link
-                          href={item.href}
-                          className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               ))}
             </div>
-            <div className="mt-10 border-t border-border pt-6 text-center text-[11px] text-muted-foreground">
-              &copy; {new Date().getFullYear()} CampusLoop. All rights reserved.
+            <div className="flex shrink-0 gap-8 min-w-full justify-around animate-marquee [--duration:25s]" aria-hidden>
+              {mockColleges.map((uni) => (
+                <span key={uni} className="text-xs font-bold text-muted-foreground/60 tracking-wider flex items-center gap-2 uppercase">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary/40" />
+                  {uni} Verified
+                </span>
+              ))}
             </div>
           </div>
+        </section>
+
+        {/* ─── Core Pillars Section ─── */}
+        <section className="py-24 px-6 max-w-5xl mx-auto space-y-16">
+          <div className="text-center space-y-3">
+            <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
+              Built for students. Safe by design.
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium max-w-xl mx-auto">
+              Our safety layer scans and protects identities automatically, ensuring your campus experience stays raw but respectful.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Pillar 1 */}
+            <div className="glass-card rounded-2xl p-6 space-y-4 hover:border-primary/25 transition-all group">
+              <div className="h-10 w-10 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center transition-transform group-hover:scale-105">
+                <MessageCircle className="h-5 w-5" />
+              </div>
+              <h4 className="text-sm font-extrabold text-foreground">Anonymous Confessions</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Spill the tea or ask genuine, awkward questions. Safe automated keyword screening filters out target doxxing.
+              </p>
+            </div>
+
+            {/* Pillar 2 */}
+            <div className="glass-card rounded-2xl p-6 space-y-4 hover:border-primary/25 transition-all group">
+              <div className="h-10 w-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center transition-transform group-hover:scale-105">
+                <Heart className="h-5 w-5" />
+              </div>
+              <h4 className="text-sm font-extrabold text-foreground">Campus Dating Swiper</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Swipe on real profiles at your college. Zero catfishing. Direct encrypted DMs automatically spin up upon a mutual right-swipe.
+              </p>
+            </div>
+
+            {/* Pillar 3 */}
+            <div className="glass-card rounded-2xl p-6 space-y-4 hover:border-primary/25 transition-all group">
+              <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center transition-transform group-hover:scale-105">
+                <HelpCircle className="h-5 w-5" />
+              </div>
+              <h4 className="text-sm font-extrabold text-foreground">Interactive Campus Polls</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Launch structured polls. Gauge campus sentiments on classes, canteen menus, or festival updates in seconds.
+              </p>
+            </div>
+
+            {/* Pillar 4 */}
+            <div className="glass-card rounded-2xl p-6 space-y-4 hover:border-primary/25 transition-all group">
+              <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center transition-transform group-hover:scale-105">
+                <Users className="h-5 w-5" />
+              </div>
+              <h4 className="text-sm font-extrabold text-foreground">Hobby Communities</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Start or join custom communities. Host game lobbies, study groups, coding clubs, or music jams with absolute ease.
+              </p>
+            </div>
+
+            {/* Pillar 5 */}
+            <div className="glass-card rounded-2xl p-6 space-y-4 hover:border-primary/25 transition-all group">
+              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center transition-transform group-hover:scale-105">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <h4 className="text-sm font-extrabold text-foreground">Email Gatekeeping</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Only students with verified .edu or official college domains are allowed in. Outsiders and spammers are blocked by default.
+              </p>
+            </div>
+
+            {/* Pillar 6 */}
+            <div className="glass-card rounded-2xl p-6 space-y-4 hover:border-primary/25 transition-all group">
+              <div className="h-10 w-10 rounded-xl bg-violet-500/10 text-violet-500 flex items-center justify-center transition-transform group-hover:scale-105">
+                <Lock className="h-5 w-5" />
+              </div>
+              <h4 className="text-sm font-extrabold text-foreground">Full Privacy Hash</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Confessions are cryptographically separated from account info. Speak your heart without leaving trace signatures.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Footer ─── */}
+        <footer className="border-t border-border/80 bg-muted/15 py-12 px-6 text-center text-xs font-semibold text-muted-foreground space-y-4 mt-16">
+          <div className="flex justify-center gap-6">
+            <Link href="/" className="hover:text-foreground transition-colors">About</Link>
+            <Link href="/" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+            <Link href="/" className="hover:text-foreground transition-colors">Safety Guidelines</Link>
+            <Link href="/" className="hover:text-foreground transition-colors">Contact</Link>
+          </div>
+          <p>© {new Date().getFullYear()} CampusLoop. Made with ☕ by verified students for the student network.</p>
         </footer>
       </div>
     </>

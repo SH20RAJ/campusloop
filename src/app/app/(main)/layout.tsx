@@ -13,7 +13,7 @@ export default async function MainLayout({
   const user = await hexclaveServerApp.getUser();
   
   if (!user) {
-    redirect("/sign-in");
+    redirect("/join");
   }
 
   const db = getDb();

@@ -22,7 +22,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   const { id } = await params;
   const user = await hexclaveServerApp.getUser();
   if (!user) {
-    redirect("/sign-in");
+    redirect("/join");
   }
 
   const db = getDb();

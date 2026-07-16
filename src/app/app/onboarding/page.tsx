@@ -9,7 +9,7 @@ export default async function OnboardingPage() {
   const user = await hexclaveServerApp.getUser();
   
   if (!user) {
-    redirect("/sign-in");
+    redirect("/join");
   }
 
   const db = getDb();

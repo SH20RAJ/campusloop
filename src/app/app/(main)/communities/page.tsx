@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default async function CommunitiesPage() {
   const user = await hexclaveServerApp.getUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/join");
 
   const db = getDb();
   const profile = await db.query.userProfiles.findFirst({

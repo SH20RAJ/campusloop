@@ -148,7 +148,7 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
           </Link>
         ) : (
           <>
-            <Link href="/sign-up">
+            <Link href="/join?mode=signup">
               <button className="relative group overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-orange-500 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:scale-102 active:scale-98 transition-all cursor-pointer">
                 <span className="relative z-10 flex items-center gap-2">
                   Verify Student Email
@@ -157,7 +157,7 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse" />
               </button>
             </Link>
-            <Link href="/sign-in">
+            <Link href="/join?mode=signin">
               <button className="rounded-2xl border border-border bg-card/45 backdrop-blur px-8 py-3.5 text-sm font-bold text-foreground hover:bg-muted/40 hover:text-foreground transition-all cursor-pointer">
                 Sign In
               </button>

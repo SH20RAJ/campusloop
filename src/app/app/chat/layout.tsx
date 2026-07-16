@@ -11,7 +11,7 @@ export default async function ChatLayout({
   children: React.ReactNode;
 }) {
   const user = await hexclaveServerApp.getUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/join");
 
   const db = getDb();
   const profile = await db.query.userProfiles.findFirst({

@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CommunityDetailPage({ params }: PageProps) {
   const { id } = await params;
   const user = await hexclaveServerApp.getUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/join");
 
   const db = getDb();
   const profile = await db.query.userProfiles.findFirst({

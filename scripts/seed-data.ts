@@ -16,7 +16,10 @@ import {
   conversations,
   conversationParticipants,
   messages,
-  swipes
+  swipes,
+  communities,
+  communityMembers,
+  stories
 } from "../src/db/schema";
 import { loadLocalEnv } from "../src/lib/load-env";
 
@@ -87,6 +90,9 @@ async function main() {
   const db = drizzle(client);
 
   console.log("Cleaning database...");
+  await db.delete(stories);
+  await db.delete(communityMembers);
+  await db.delete(communities);
   await db.delete(swipes);
   await db.delete(messages);
   await db.delete(conversationParticipants);
@@ -173,13 +179,9 @@ async function main() {
     await db.insert(institutionDomains).values(batch).onConflictDoNothing();
   }
 
-  // Find dynamic IDs of seeded IIT Bombay and BIT Mesra
-  // Note: Standard domain for IIT Bombay is usually iitb.ac.in.
-  // Standard domain for BIT Mesra is bitmesra.ac.in.
   let iitb = institutionsToInsert.find(i => i.websiteDomain === "iitb.ac.in");
   let bitm = institutionsToInsert.find(i => i.websiteDomain === "bitmesra.ac.in");
 
-  // Fallback if not found in CSV
   if (!iitb) {
     console.log("IIT Bombay domain not found in CSV, seeding fallback...");
     const fallbackId = "inst_iitb_fallback";
@@ -254,7 +256,6 @@ async function main() {
   }
 
   console.log("Seeding posts...");
-  // Post 1: Normal
   const [post1] = await db.insert(posts).values({
     id: "post_1",
     authorId: "prof_aarav",
@@ -264,7 +265,6 @@ async function main() {
     status: "PUBLISHED",
   }).returning();
 
-  // Post 2: Confession
   const [post2] = await db.insert(posts).values({
     id: "post_2",
     authorId: "prof_sneha",
@@ -275,7 +275,6 @@ async function main() {
     status: "PUBLISHED",
   }).returning();
 
-  // Post 3: Poll
   const [post3] = await db.insert(posts).values({
     id: "post_3",
     authorId: "prof_rohan",
@@ -285,7 +284,6 @@ async function main() {
     status: "PUBLISHED",
   }).returning();
 
-  // Post 4: Question
   const [post4] = await db.insert(posts).values({
     id: "post_4",
     authorId: "prof_ananya",
@@ -297,11 +295,12 @@ async function main() {
   }).returning();
 
   console.log("Seeding poll options & votes...");
-  const opt1 = await db.insert(pollOptions).values({ id: "opt_1", postId: "post_3", text: "Next.js (App Router)" }).returning();
-  const opt2 = await db.insert(pollOptions).values({ id: "opt_2", postId: "post_3", text: "Vite + React SPA" }).returning();
-  const opt3 = await db.insert(pollOptions).values({ id: "opt_3", postId: "post_3", text: "Astro" }).returning();
+  await db.insert(pollOptions).values([
+    { id: "opt_1", postId: "post_3", text: "Next.js (App Router)" },
+    { id: "opt_2", postId: "post_3", text: "Vite + React SPA" },
+    { id: "opt_3", postId: "post_3", text: "Astro" }
+  ]);
 
-  // Cast poll votes
   await db.insert(pollVotes).values([
     { postId: "post_3", optionId: "opt_1", userId: "prof_sneha" },
     { postId: "post_3", optionId: "opt_1", userId: "prof_aarav" },
@@ -345,6 +344,34 @@ async function main() {
   await db.insert(swipes).values([
     { swiperId: "prof_sneha", targetId: "prof_aarav", direction: "LIKE" },
     { swiperId: "prof_rohan", targetId: "prof_aarav", direction: "PASS" },
+  ]);
+
+  console.log("Seeding communities...");
+  await db.insert(communities).values([
+    { id: "comm_coding", name: "Coders Club", description: "All things coding, algorithms, and tech hacks.", creatorId: "prof_aarav" },
+    { id: "comm_music", name: "Music Jams", description: "Find bands, share playlists, and jam together.", creatorId: "prof_kabir" },
+    { id: "comm_anime", name: "Anime Otakus", description: "Manga discussions, anime reviews, and watch parties.", creatorId: "prof_rohan" }
+  ]);
+
+  await db.insert(communityMembers).values([
+    { communityId: "comm_coding", userId: "prof_aarav" },
+    { communityId: "comm_coding", userId: "prof_sneha" },
+    { communityId: "comm_coding", userId: "prof_rohan" },
+    { communityId: "comm_music", userId: "prof_kabir" },
+    { communityId: "comm_music", userId: "prof_aditi" },
+    { communityId: "comm_anime", userId: "prof_rohan" },
+    { communityId: "comm_anime", userId: "prof_vikram" }
+  ]);
+
+  console.log("Seeding active stories...");
+  const storyExpiry = new Date();
+  storyExpiry.setHours(storyExpiry.getHours() + 20);
+
+  await db.insert(stories).values([
+    { id: "story_1", userId: "prof_aarav", text: "Working on a compiler in Rust 🦀", backgroundColor: "from-violet-600 to-indigo-600", expiresAt: storyExpiry },
+    { id: "story_2", userId: "prof_sneha", text: "Coffee hits different at 2 AM ☕️💤", backgroundColor: "from-orange-500 to-rose-500", expiresAt: storyExpiry },
+    { id: "story_3", userId: "prof_kabir", text: "New track dropping tonight! 🎸🔥", backgroundColor: "from-pink-500 to-purple-600", expiresAt: storyExpiry },
+    { id: "story_4", userId: "prof_aditi", text: "Finished the UI design mocks!", backgroundColor: "from-emerald-500 to-teal-700", expiresAt: storyExpiry }
   ]);
 
   await client.end();

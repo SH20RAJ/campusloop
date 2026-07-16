@@ -11,7 +11,7 @@ export default async function AppRootLayout({
 }) {
   const user = await hexclaveServerApp.getUser();
   if (!user) {
-    redirect("/sign-in");
+    redirect("/join");
   }
 
   const db = getDb();

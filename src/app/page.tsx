@@ -103,12 +103,12 @@ export default async function LandingPage() {
               </Link>
             ) : (
               <>
-                <Link href="/sign-in">
+                <Link href="/join?mode=signin">
                   <button className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                     Sign In
                   </button>
                 </Link>
-                <Link href="/sign-up">
+                <Link href="/join?mode=signup">
                   <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
                     Join Now
                   </button>

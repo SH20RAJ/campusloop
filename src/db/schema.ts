@@ -175,6 +175,8 @@ export const comments = pgTable(
 		authorId: text("author_id")
 			.notNull()
 			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		parentId: text("parent_id")
+			.references((): any => comments.id, { onDelete: "cascade" }),
 		body: text("body").notNull(),
 		isAnonymous: boolean("is_anonymous").default(false).notNull(),
 		status: contentStatusEnum("status").default("PUBLISHED").notNull(),
@@ -344,7 +346,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 	}),
 }));
 
-export const commentsRelations = relations(comments, ({ one }) => ({
+export const commentsRelations = relations(comments, ({ one, many }) => ({
 	post: one(posts, {
 		fields: [comments.postId],
 		references: [posts.id],
@@ -352,6 +354,14 @@ export const commentsRelations = relations(comments, ({ one }) => ({
 	author: one(userProfiles, {
 		fields: [comments.authorId],
 		references: [userProfiles.id],
+	}),
+	parent: one(comments, {
+		fields: [comments.parentId],
+		references: [comments.id],
+		relationName: "comment_replies",
+	}),
+	replies: many(comments, {
+		relationName: "comment_replies",
 	}),
 }));
 

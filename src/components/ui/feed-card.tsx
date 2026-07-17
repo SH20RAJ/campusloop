@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
-import { Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreHorizontal, Lock, BarChart3, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { FeedPost } from "@/hooks/use-feed";
 import { PollCard } from "./poll-card";
@@ -66,17 +66,39 @@ export function FeedCard({ post }: FeedCardProps) {
       {/* Header */}
       <div className="flex items-center justify-between p-6 pb-4">
         <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 border">
-            <AvatarImage src={avatarUrl || ""} />
-            <AvatarFallback>{avatarFallback}</AvatarFallback>
-          </Avatar>
+          {!post.isAnonymous ? (
+            <Link href={`/app/profile?id=${post.authorId}`}>
+              <Avatar className="h-10 w-10 border hover:opacity-85 transition-opacity cursor-pointer">
+                <AvatarImage src={avatarUrl || ""} />
+                <AvatarFallback>{avatarFallback}</AvatarFallback>
+              </Avatar>
+            </Link>
+          ) : (
+            <Avatar className="h-10 w-10 border">
+              <AvatarImage src={avatarUrl || ""} />
+              <AvatarFallback>{avatarFallback}</AvatarFallback>
+            </Avatar>
+          )}
           <div className="flex flex-col">
             <span className="text-sm font-semibold flex items-center gap-1">
-              {authorName}
+              {!post.isAnonymous ? (
+                <Link href={`/app/profile?id=${post.authorId}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
+                  {authorName}
+                </Link>
+              ) : (
+                authorName
+              )}
               {!post.isAnonymous && <span className="text-blue-500 text-xs">●</span>}
             </span>
             <span className="text-xs text-muted-foreground">
-              @{authorHandle} • <Link href={`/college/${post.institutionId}`} className="hover:text-primary transition-colors hover:underline">{post.institution.name}</Link>
+              {!post.isAnonymous ? (
+                <Link href={`/app/profile?id=${post.authorId}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
+                  @{authorHandle}
+                </Link>
+              ) : (
+                `@${authorHandle}`
+              )}
+              {" "}• <Link href={`/college/${post.institutionId}`} className="hover:text-primary transition-colors hover:underline">{post.institution.name}</Link>
             </span>
           </div>
         </div>
@@ -84,14 +106,29 @@ export function FeedCard({ post }: FeedCardProps) {
         <div className="flex items-center gap-2">
           {post.type !== "NORMAL" && (
             <span className={cn(
-              "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
+              "text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1",
               post.type === "CONFESSION" && "bg-pink-500/10 text-pink-500 border-pink-500/20",
               post.type === "POLL" && "bg-blue-500/10 text-blue-500 border-blue-500/20",
               post.type === "QUESTION" && "bg-orange-500/10 text-orange-500 border-orange-500/20"
             )}>
-              {post.type === "CONFESSION" && "🤫 Confession"}
-              {post.type === "POLL" && "📊 Poll"}
-              {post.type === "QUESTION" && "❓ Question"}
+              {post.type === "CONFESSION" && (
+                <>
+                  <Lock className="h-2.5 w-2.5" />
+                  <span>Confession</span>
+                </>
+              )}
+              {post.type === "POLL" && (
+                <>
+                  <BarChart3 className="h-2.5 w-2.5" />
+                  <span>Poll</span>
+                </>
+              )}
+              {post.type === "QUESTION" && (
+                <>
+                  <HelpCircle className="h-2.5 w-2.5" />
+                  <span>Question</span>
+                </>
+              )}
             </span>
           )}
 

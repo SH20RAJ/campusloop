@@ -5,30 +5,49 @@ import { redirect } from "next/navigation";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { FeedCard } from "@/components/ui/feed-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, School, Shield, User } from "lucide-react";
+import { LogOut, School, Shield, User, MessageSquare } from "lucide-react";
 import { Metadata } from "next";
 import { EditProfileDialog } from "./edit-profile-dialog";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Profile | CampusLoop",
 };
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ id?: string }>;
+}) {
+  const resolvedParams = await searchParams;
+  const targetId = resolvedParams.id;
+
   const user = await hexclaveServerApp.getUser();
   if (!user) {
     redirect("/join");
   }
 
   const db = getDb();
-  const profile = await db.query.userProfiles.findFirst({
+  const currentProfile = await db.query.userProfiles.findFirst({
     where: eq(userProfiles.userId, user.id),
+  });
+
+  if (!currentProfile) {
+    redirect("/app/onboarding");
+  }
+
+  const profileId = targetId || currentProfile.id;
+  const isOwnProfile = profileId === currentProfile.id;
+
+  const profile = await db.query.userProfiles.findFirst({
+    where: eq(userProfiles.id, profileId),
     with: {
       institution: true,
     }
   });
 
   if (!profile) {
-    redirect("/app/onboarding");
+    redirect("/app");
   }
 
   // Fetch posts written by this user
@@ -47,7 +66,7 @@ export default async function ProfilePage() {
   const formattedPosts = userPosts.map(post => {
     const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
     const commentsCount = post.comments.length;
-    const userVote = post.votes.find(v => v.userId === profile.id)?.value || 0;
+    const userVote = post.votes.find(v => v.userId === currentProfile.id)?.value || 0;
 
     return {
       ...post,
@@ -62,12 +81,12 @@ export default async function ProfilePage() {
   return (
     <main className="space-y-6">
       {/* Profile Card Header */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-6">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left justify-between">
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Avatar className="h-16 w-16 border">
+            <Avatar className="h-16 w-16 border border-border/80 shadow-sm">
               <AvatarImage src={profile.avatarUrl || ""} />
-              <AvatarFallback className="text-xl">{profile.displayName[0]}</AvatarFallback>
+              <AvatarFallback className="text-xl bg-primary/10 text-primary">{profile.displayName[0]}</AvatarFallback>
             </Avatar>
             <div>
               <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center justify-center sm:justify-start gap-1">
@@ -78,23 +97,34 @@ export default async function ProfilePage() {
                   </span>
                 )}
               </h2>
-              <p className="text-sm text-muted-foreground">@{profile.username}</p>
+              <p className="text-xs text-muted-foreground">@{profile.username}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
-            <EditProfileDialog initialDisplayName={profile.displayName} initialBio={profile.bio} />
-            <a
-              href="/handler/sign-out"
-              className="flex items-center gap-2 rounded-lg border border-input h-9 px-4 text-sm font-semibold hover:bg-muted text-destructive hover:text-red-600 transition-colors cursor-pointer"
-            >
-              <LogOut className="h-4 w-4" /> Sign Out
-            </a>
+            {isOwnProfile ? (
+              <>
+                <EditProfileDialog initialDisplayName={profile.displayName} initialBio={profile.bio} />
+                <a
+                  href="/handler/sign-out"
+                  className="flex items-center gap-2 rounded-xl border border-input h-9 px-4 text-xs font-bold hover:bg-muted text-destructive hover:text-red-600 transition-colors cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" /> Sign Out
+                </a>
+              </>
+            ) : (
+              <Link
+                href={`/app/chat?userId=${profile.id}`}
+                className="flex items-center gap-2 rounded-xl bg-primary text-white h-9 px-4 text-xs font-bold hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer"
+              >
+                <MessageSquare className="h-4 w-4" /> Message
+              </Link>
+            )}
           </div>
         </div>
 
         {profile.bio && (
-          <p className="text-sm text-foreground/90 border-t border-border pt-4 italic">
+          <p className="text-sm text-foreground/90 border-t border-border/40 pt-4 italic">
             "{profile.bio}"
           </p>
         )}
@@ -111,15 +141,17 @@ export default async function ProfilePage() {
 
       {/* User's Posts Feed */}
       <div className="space-y-4">
-        <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Your Posts</h3>
+        <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
+          {isOwnProfile ? "Your Posts" : `${profile.displayName}'s Posts`}
+        </h3>
         
-        <div className="space-y-6">
+        <div className="space-y-4">
           {formattedPosts.map((post) => (
             <FeedCard key={post.id} post={post as any} />
           ))}
           {formattedPosts.length === 0 && (
-            <div className="text-center py-12 border border-dashed rounded-xl border-border bg-card text-muted-foreground text-sm">
-              You haven't posted anything yet.
+            <div className="text-center py-12 border border-dashed rounded-2xl border-border bg-card text-muted-foreground text-xs font-semibold">
+              {isOwnProfile ? "You haven't posted anything yet." : "This user hasn't posted anything yet."}
             </div>
           )}
         </div>

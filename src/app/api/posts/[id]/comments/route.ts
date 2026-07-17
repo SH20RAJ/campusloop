@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { comments, userProfiles, posts, notifications } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, asc } from "drizzle-orm";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -22,7 +22,7 @@ export async function GET(req: Request, { params }: RouteParams) {
         eq(comments.postId, id),
         eq(comments.status, "PUBLISHED")
       ),
-      orderBy: [desc(comments.createdAt)],
+      orderBy: [asc(comments.createdAt)],
       with: {
         author: true,
       },
@@ -52,7 +52,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
 
-    const { body, isAnonymous } = (await req.json()) as { body: string; isAnonymous?: boolean };
+    const { body, isAnonymous, parentId } = (await req.json()) as { body: string; isAnonymous?: boolean; parentId?: string };
 
     if (!body || body.trim().length === 0) {
       return NextResponse.json({ error: "Comment cannot be empty" }, { status: 400 });
@@ -61,22 +61,39 @@ export async function POST(req: Request, { params }: RouteParams) {
     const [newComment] = await db.insert(comments).values({
       postId: id,
       authorId: profile.id,
+      parentId: parentId || null,
       body,
       isAnonymous: isAnonymous || false,
       status: "PUBLISHED",
     }).returning();
 
     // Trigger notification
-    const targetPost = await db.query.posts.findFirst({
-      where: eq(posts.id, id),
-    });
-    if (targetPost && targetPost.authorId !== profile.id) {
-      await db.insert(notifications).values({
-        userId: targetPost.authorId,
-        type: "COMMENT",
-        actorId: profile.id,
-        referenceId: id,
+    if (parentId) {
+      // Notify parent comment author
+      const parentComment = await db.query.comments.findFirst({
+        where: eq(comments.id, parentId),
       });
+      if (parentComment && parentComment.authorId !== profile.id) {
+        await db.insert(notifications).values({
+          userId: parentComment.authorId,
+          type: "REPLY",
+          actorId: profile.id,
+          referenceId: id,
+        });
+      }
+    } else {
+      // Notify post author
+      const targetPost = await db.query.posts.findFirst({
+        where: eq(posts.id, id),
+      });
+      if (targetPost && targetPost.authorId !== profile.id) {
+        await db.insert(notifications).values({
+          userId: targetPost.authorId,
+          type: "COMMENT",
+          actorId: profile.id,
+          referenceId: id,
+        });
+      }
     }
 
     return NextResponse.json(newComment, { status: 201 });

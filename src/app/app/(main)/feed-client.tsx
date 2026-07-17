@@ -260,7 +260,7 @@ export function FeedClient() {
               onClick={() => {
                 const college = profile?.institution?.name?.split(",")[0] || "campus";
                 const username = profile?.username || "student";
-                const inviteText = `yo, ${college} is going crazy on CampusLoop right now. verified students only, join before the tea gets cold: https://campusloop.shraj.workers.dev/join?invite=${username} 🔥`;
+                const inviteText = `yo, ${college} is going crazy on CampusLoop right now. verified students only, join before the tea gets cold: https://campusloop.space/join?invite=${username} 🔥`;
                 navigator.clipboard.writeText(inviteText);
                 toast.success("Copied to clipboard! Share it in your college WhatsApp group chat 🚀");
               }}

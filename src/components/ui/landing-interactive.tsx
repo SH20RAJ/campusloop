@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { 
   Heart, 
   MessageCircle, 
@@ -11,108 +11,109 @@ import {
   ChevronDown,
   ArrowRight,
   ShieldCheck,
-  Eye,
-  EyeOff,
-  Sparkle
+  Zap,
+  Globe,
+  Award,
+  Send,
+  AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boolean }) {
-  // Feed teaser state
-  const [votes, setVotes] = useState(142);
-  const [hasVoted, setHasVoted] = useState(false);
-  const [pollVoted, setPollVoted] = useState<number | null>(null);
-  const [pollVotes, setPollVotes] = useState([45, 12, 18]);
+  // --- 1. LP Points Accumulator State ---
+  const [points, setPoints] = useState(10);
+  const [floaters, setFloaters] = useState<{ id: number; text: string }[]>([]);
+  const rankTitle = points >= 100 ? "Campus Legend 🔥" : points >= 40 ? "Campus Talker 👑" : "Loop Starter ⚡";
+  const badgeColor = points >= 100 
+    ? "border-rose-500 bg-rose-500/10 text-rose-500" 
+    : points >= 40 
+    ? "border-violet-500 bg-violet-500/10 text-violet-500" 
+    : "border-primary/20 bg-primary/5 text-primary";
 
-  // Swipe states
+  const addPoints = (amount: number, label: string) => {
+    setPoints(prev => prev + amount);
+    const id = Date.now();
+    setFloaters(prev => [...prev, { id, text: `+${amount} LP (${label})` }]);
+    setTimeout(() => {
+      setFloaters(prev => prev.filter(f => f.id !== id));
+    }, 1500);
+
+    // Dynamic thresholds notifications
+    if (points < 40 && points + amount >= 40) {
+      toast.success("Rank Upgraded to: Campus Talker 👑!");
+    } else if (points < 100 && points + amount >= 100) {
+      toast.success("Rank Upgraded to: Campus Legend 🔥!");
+    }
+  };
+
+  // --- 2. Live Confession Moderator State ---
+  const [confessionInput, setConfessionInput] = useState("");
+  const [censorType, setCensorType] = useState<string | null>(null);
+  const [cryptHash, setCryptHash] = useState("anon_undefined");
+
+  useEffect(() => {
+    if (!confessionInput) {
+      setCensorType(null);
+      setCryptHash("anon_undefined");
+      return;
+    }
+
+    let detected: string | null = null;
+    if (/\b\d{10}\b/g.test(confessionInput)) {
+      detected = "Phone Number";
+    } else if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g.test(confessionInput)) {
+      detected = "Student Email";
+    }
+
+    // Generate simulated database hash
+    let hash = 0;
+    for (let i = 0; i < confessionInput.length; i++) {
+      hash = (hash << 5) - hash + confessionInput.charCodeAt(i);
+      hash |= 0;
+    }
+    const hex = Math.abs(hash).toString(16).padEnd(8, "f");
+
+    setCensorType(detected);
+    setCryptHash(`anon_${hex}`);
+  }, [confessionInput]);
+
+  // --- 3. Vanity Link State ---
+  const [claimInput, setClaimInput] = useState("");
+  const [isCopied, setIsCopied] = useState(false);
+
+  const cleanClaimHandle = claimInput.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase();
+
+  const handleClaim = () => {
+    if (!cleanClaimHandle) return;
+    const shareLink = `https://campusloop.space/@${cleanClaimHandle}`;
+    navigator.clipboard.writeText(shareLink);
+    toast.success(`Vanity Link Copied: ${shareLink} 🚀`);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  // --- 4. Micro-Swipe Dating State ---
   const [swipeIdx, setSwipeIdx] = useState(0);
   const [matched, setMatched] = useState(false);
-
-  // FAQ Accordion states
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  // Privacy Simulator state
-  const [simInput, setSimInput] = useState("");
-  const [censoredText, setCensoredText] = useState("");
-  const [doxxType, setDoxxType] = useState<string | null>(null);
-  const [hashValue, setHashValue] = useState("");
-
-  // Spotlight mouse track coordinates
-  const [coords1, setCoords1] = useState({ x: 0, y: 0 });
-  const [coords2, setCoords2] = useState({ x: 0, y: 0 });
-  const [coords3, setCoords3] = useState({ x: 0, y: 0 });
-
   const mockProfiles = [
     { name: "Aria, 21", college: "IIT Delhi", bio: "Economics major. Caffeinated 24/7. Let's debate canteen Maggi.", avatar: "👩‍💻" },
     { name: "Kabir, 22", college: "BIT Mesra", bio: "Guitarist & Dev. Looking for someone to attend fusion night with.", avatar: "🎸" },
     { name: "Priya, 20", college: "BITS Pilani", bio: "Design student. Can help you fix your UI, but not your life.", avatar: "🎨" }
   ];
 
-  const handleVotePoll = (idx: number) => {
-    if (pollVoted !== null) return;
-    setPollVoted(idx);
-    const copy = [...pollVotes];
-    copy[idx] += 1;
-    setPollVotes(copy);
-  };
-
-  const handleSwipe = (like: boolean) => {
-    if (like && swipeIdx === 0) {
+  const handleSwipe = (liked: boolean) => {
+    if (liked && swipeIdx === 0) {
       setMatched(true);
     } else {
-      setSwipeIdx((prev) => (prev + 1) % mockProfiles.length);
+      setSwipeIdx(prev => (prev + 1) % mockProfiles.length);
     }
   };
 
-  const resetSwipe = () => {
-    setMatched(false);
-    setSwipeIdx(0);
-  };
-
-  const totalPollVotes = pollVotes.reduce((a, b) => a + b, 0);
-
-  // Real-time privacy screening logic simulator
-  useEffect(() => {
-    if (!simInput) {
-      setCensoredText("");
-      setDoxxType(null);
-      setHashValue("");
-      return;
-    }
-
-    let text = simInput;
-    let detected: string | null = null;
-
-    // Scan for 10 digit phone numbers
-    const phoneRegex = /\b\d{10}\b/g;
-    if (phoneRegex.test(text)) {
-      text = text.replace(phoneRegex, "[REDACTED PHONE NUMBER]");
-      detected = "Phone Number";
-    }
-
-    // Scan for student email patterns
-    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-    if (emailRegex.test(text)) {
-      text = text.replace(emailRegex, "[REDACTED STUDENT EMAIL]");
-      detected = "Student Email";
-    }
-
-    // Simple hash generator simulation
-    let hash = 0;
-    for (let i = 0; i < simInput.length; i++) {
-      const char = simInput.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash |= 0;
-    }
-    const hex = Math.abs(hash).toString(16).padEnd(8, "f");
-
-    setCensoredText(text);
-    setDoxxType(detected);
-    setHashValue(`anon_${hex}`);
-  }, [simInput]);
-
+  // --- 5. FAQ Accordion States ---
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const faqs = [
     {
       q: "How does the email verification protect my privacy?",
@@ -133,8 +134,8 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
   ];
 
   return (
-    <div className="space-y-24 pt-4">
-      {/* ─── CTA Buttons for Hero ─── */}
+    <div className="space-y-20 pt-4">
+      {/* ─── Hero CTA Buttons ─── */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-200">
         {isAuthenticated ? (
           <Link href="/app">
@@ -166,277 +167,238 @@ export function LandingInteractive({ isAuthenticated }: { isAuthenticated: boole
         )}
       </div>
 
-      {/* ─── Interactive Interactive Showcase (Feeds & Dating Swiper) ─── */}
-      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-4">
-        {/* Mock Feed Card with Mouse Spotlight */}
-        <div 
-          onMouseMove={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            setCoords1({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-          }}
-          style={{
-            "--mouse-x": `${coords1.x}px`,
-            "--mouse-y": `${coords1.y}px`
-          } as React.CSSProperties}
-          className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl group border border-border/40 bg-[radial-gradient(400px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(244,63,94,0.06),transparent_80%)]"
-        >
-          {/* Border beam effect */}
+      {/* ─── Hero Showcase Grid: 4+ new components ─── */}
+      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-4 mt-8">
+        
+        {/* Component 1: Interactive Loop Points & Rank Accumulator */}
+        <div className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl group border border-border/40 min-h-[350px]">
           <div className="absolute inset-0 border border-transparent group-hover:border-primary/10 rounded-3xl transition-colors duration-300 pointer-events-none" />
           
-          <div>
-            <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-4">
-              <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded bg-primary/20 text-[10px] font-bold text-primary flex items-center justify-center">
-                  🙊
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold tracking-wide uppercase text-muted-foreground">Anonymous Confession</p>
-                  <p className="text-[8px] text-muted-foreground/60">3 mins ago • Birla Institute of Technology</p>
-                </div>
-              </div>
-              <span className="rounded bg-rose-500/10 px-2 py-0.5 text-[8px] font-bold text-rose-500">
-                Spicy
+          <div className="space-y-4 relative z-10">
+            <div className="flex items-center justify-between border-b border-border/30 pb-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">1. Gamified Vibe Dashboard</span>
+              <span className="text-[9px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Award className="h-3 w-3" /> Live Vibe Check
               </span>
             </div>
 
-            <p className="text-sm font-medium leading-relaxed text-foreground/90">
-              "To the senior who helped me find the mechanical lab yesterday while I was looking completely lost... you are literally a lifesaver. Pls comment if you see this, I owe you a chai ☕😭"
-            </p>
+            {/* Simulated Profile Vibe Indicator */}
+            <div className="flex items-center gap-4 bg-muted/20 border border-border/45 rounded-2xl p-4 relative">
+              <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center text-xl shrink-0">
+                🎓
+              </div>
+              <div className="flex-1 space-y-1">
+                <p className="text-xs font-black text-foreground">You (Mock Classmate)</p>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${badgeColor}`}>
+                    {rankTitle}
+                  </span>
+                  <span className="text-[10px] font-bold text-muted-foreground">{points} LP</span>
+                </div>
+              </div>
+              
+              {/* Floating indicators overflow container */}
+              <div className="absolute right-4 top-2 pointer-events-none">
+                {floaters.map(f => (
+                  <div key={f.id} className="text-[10px] font-black text-primary animate-bounce pr-2">
+                    {f.text}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            {/* Interactive Poll inside feed */}
-            <div className="mt-4 space-y-2 border border-border/40 rounded-2xl p-4 bg-muted/10">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Campus Pulse Poll</p>
-              <p className="text-xs font-semibold text-foreground">Is canteen coffee better than campus Nescafe?</p>
-              <div className="space-y-1.5 pt-1">
-                {[
-                  "Yes, canteen coffee hits different",
-                  "No, Nescafe is elite",
-                  "Both are battery water tbh"
-                ].map((opt, idx) => {
-                  const count = pollVotes[idx];
-                  const pct = totalPollVotes > 0 ? Math.round((count / totalPollVotes) * 100) : 0;
-                  return (
-                    <button
-                      key={idx}
-                      disabled={pollVoted !== null}
-                      onClick={() => handleVotePoll(idx)}
-                      className="w-full relative overflow-hidden rounded-xl border border-border/40 py-2 px-3 text-left text-xs font-semibold hover:bg-muted/40 transition-colors disabled:hover:bg-transparent cursor-pointer"
-                    >
-                      {pollVoted !== null && (
-                        <div 
-                          className="absolute inset-y-0 left-0 bg-primary/10 transition-all duration-500" 
-                          style={{ width: `${pct}%` }} 
-                        />
-                      )}
-                      <div className="relative flex justify-between">
-                        <span>{opt}</span>
-                        {pollVoted !== null && <span className="text-primary">{pct}%</span>}
-                      </div>
-                    </button>
-                  );
-                })}
+            {/* Actions grid to earn points */}
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <button 
+                onClick={() => addPoints(5, "Spill Confession")}
+                className="rounded-xl border border-border/60 py-2.5 px-3 text-left text-xs font-semibold hover:bg-muted/40 transition-colors cursor-pointer"
+              >
+                🤫 Spill Tea <span className="text-primary font-bold float-right">+5</span>
+              </button>
+              <button 
+                onClick={() => addPoints(20, "Invite Group Chat")}
+                className="rounded-xl border border-border/60 py-2.5 px-3 text-left text-xs font-semibold hover:bg-muted/40 transition-colors cursor-pointer"
+              >
+                👥 Invite Friends <span className="text-primary font-bold float-right">+20</span>
+              </button>
+              <button 
+                onClick={() => addPoints(2, "Vote in Poll")}
+                className="rounded-xl border border-border/60 py-2.5 px-3 text-left text-xs font-semibold hover:bg-muted/40 transition-colors cursor-pointer"
+              >
+                📊 Cast Vote <span className="text-primary font-bold float-right">+2</span>
+              </button>
+              <button 
+                onClick={() => addPoints(10, "Story React")}
+                className="rounded-xl border border-border/60 py-2.5 px-3 text-left text-xs font-semibold hover:bg-muted/40 transition-colors cursor-pointer"
+              >
+                🔥 React Story <span className="text-primary font-bold float-right">+10</span>
+              </button>
+            </div>
+          </div>
+          <p className="text-[9px] text-muted-foreground/60 font-semibold pt-4">Points trigger dynamic Vibe rank upgrades inside the local campus system.</p>
+        </div>
+
+        {/* Component 2: Confession Live Moderator / Cryptographical Sandbox */}
+        <div className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl group border border-border/40 min-h-[350px]">
+          <div className="absolute inset-0 border border-transparent group-hover:border-primary/10 rounded-3xl transition-colors duration-300 pointer-events-none" />
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-border/30 pb-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">2. Safe Confessions Sandbox</span>
+              {censorType ? (
+                <span className="text-[9px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" /> Auto Censored
+                </span>
+              ) : confessionInput ? (
+                <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                  🟢 Approved
+                </span>
+              ) : (
+                <span className="text-[9px] font-bold text-muted-foreground">Awaiting Input</span>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <textarea
+                value={confessionInput}
+                onChange={(e) => setConfessionInput(e.target.value)}
+                placeholder="Type phone (9876543210) or email (test@college.edu) to test the security filter..."
+                className="w-full h-20 rounded-xl bg-muted/20 border border-border/30 px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none font-mono placeholder:text-muted-foreground/40 font-semibold"
+              />
+
+              <div className="bg-muted/15 rounded-xl p-3 border border-border/20 font-mono text-[10px] space-y-1">
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Processed String:</span>
+                  <span className="text-foreground font-semibold truncate max-w-[200px]">
+                    {confessionInput ? confessionInput.replace(/\b\d{10}\b/g, "[REDACTED]").replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, "[REDACTED]") : "No input"}
+                  </span>
+                </div>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Database Anon Key:</span>
+                  <span className="text-primary font-bold">{cryptHash}</span>
+                </div>
               </div>
             </div>
           </div>
-
-          <div className="flex items-center gap-4 mt-5 pt-3 border-t border-border/30 text-xs font-semibold">
-            <button 
-              onClick={() => {
-                setVotes(prev => hasVoted ? prev - 1 : prev + 1);
-                setHasVoted(!hasVoted);
-              }}
-              className={cn(
-                "flex items-center gap-1.5 cursor-pointer transition-colors px-2.5 py-1 rounded-full",
-                hasVoted ? "bg-rose-500/10 text-rose-500" : "text-muted-foreground hover:text-rose-500"
-              )}
-            >
-              <Heart className={cn("h-4 w-4", hasVoted && "fill-rose-500")} />
-              <span>{votes}</span>
-            </button>
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <MessageCircle className="h-4 w-4" />
-              <span>18 comments</span>
-            </div>
-          </div>
+          <p className="text-[9px] text-muted-foreground/60 font-semibold pt-4">Confessions pass through automatic regex screening at the Cloudflare worker boundary.</p>
         </div>
 
-        {/* Mock Match Card with Mouse Spotlight */}
-        <div 
-          onMouseMove={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            setCoords2({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-          }}
-          style={{
-            "--mouse-x": `${coords2.x}px`,
-            "--mouse-y": `${coords2.y}px`
-          } as React.CSSProperties}
-          className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl group border border-border/40 min-h-[380px] bg-[radial-gradient(400px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(249,115,22,0.06),transparent_80%)]"
-        >
+        {/* Component 3: Dynamic Vanity Username Claim Preview */}
+        <div className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl group border border-border/40 min-h-[350px]">
           <div className="absolute inset-0 border border-transparent group-hover:border-primary/10 rounded-3xl transition-colors duration-300 pointer-events-none" />
           
-          <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-orange-500 animate-pulse" />
-              <p className="text-[10px] font-bold tracking-wide uppercase text-muted-foreground">Campus Matches Deck</p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-border/30 pb-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">3. Vanity Link Claimer</span>
+              <span className="text-[9px] font-bold text-violet-400 bg-violet-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Globe className="h-3 w-3" /> Unique Link
+              </span>
             </div>
+
+            <div className="space-y-3.5 bg-muted/20 border border-border/45 rounded-2xl p-4">
+              <div className="space-y-1">
+                <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Choose Handle</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-xs text-muted-foreground font-bold">@</span>
+                  <input
+                    type="text"
+                    placeholder="aarav_sharma"
+                    value={claimInput}
+                    onChange={(e) => setClaimInput(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-background pl-7 pr-4 py-2 text-xs font-semibold focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* URL preview */}
+              <div className="rounded-xl bg-card p-3 border border-border/30 font-mono text-[10px] text-center break-words select-all">
+                campusloop.space/@{cleanClaimHandle || "your_handle"}
+              </div>
+
+              <button
+                onClick={handleClaim}
+                disabled={!cleanClaimHandle}
+                className="w-full rounded-xl bg-primary text-white h-9 text-xs font-bold hover:opacity-90 shadow-md shadow-primary/15 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isCopied ? "Claimed Link!" : "Claim My Vanity URL"}
+              </button>
+            </div>
+          </div>
+          <p className="text-[9px] text-muted-foreground/60 font-semibold pt-4">Direct vanity URLs serve high-virality invitation cards to campus guests.</p>
+        </div>
+
+        {/* Component 4: Micro-Swipe Matches Tinder Deck */}
+        <div className="glass-card-dark rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl group border border-border/40 min-h-[350px]">
+          <div className="absolute inset-0 border border-transparent group-hover:border-primary/10 rounded-3xl transition-colors duration-300 pointer-events-none" />
+          
+          <div className="flex items-center justify-between border-b border-border/30 pb-3 mb-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">4. Campus Match swiper</span>
             <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[8px] font-bold text-emerald-500 flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
-              1.2k Active
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" /> Match Vibe
             </span>
           </div>
 
           {matched ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 animate-in zoom-in-95">
               <div className="flex -space-x-4">
-                <div className="h-14 w-14 rounded-full bg-gradient-to-tr from-primary to-orange-500 flex items-center justify-center text-2xl border-4 border-card shadow-lg">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-primary to-orange-500 flex items-center justify-center text-2xl border-4 border-card shadow-lg">
                   👩‍💻
                 </div>
-                <div className="h-14 w-14 rounded-full bg-primary flex items-center justify-center text-white text-sm font-extrabold border-4 border-card shadow-lg">
+                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white text-xs font-extrabold border-4 border-card shadow-lg">
                   YOU
                 </div>
               </div>
               <div className="space-y-1">
-                <h4 className="text-base font-extrabold text-foreground">It's a Campus Match! 🎉</h4>
-                <p className="text-xs text-muted-foreground max-w-[220px]">
-                  Aria liked you back! A secure, encrypted chat room has been created.
+                <h4 className="text-xs font-extrabold text-foreground">It's a Campus Match! 🎉</h4>
+                <p className="text-[10px] text-muted-foreground max-w-[200px]">
+                  Aria liked you back! Mutual chat unlocked.
                 </p>
               </div>
               <button
-                onClick={resetSwipe}
-                className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white shadow-md cursor-pointer hover:opacity-95"
+                onClick={() => setMatched(false)}
+                className="rounded-xl bg-primary px-3 py-1.5 text-[10px] font-bold text-white shadow-md cursor-pointer hover:opacity-95"
               >
-                Try Swiping Again
+                Keep Swiping
               </button>
             </div>
           ) : (
             <div className="flex-1 flex flex-col justify-between">
               {/* Profile details */}
-              <div className="space-y-4">
+              <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-2xl bg-muted/60 border border-border/40 flex items-center justify-center text-2xl shadow-sm">
+                  <div className="h-10 w-10 rounded-xl bg-muted/65 border border-border/40 flex items-center justify-center text-xl shadow-sm">
                     {mockProfiles[swipeIdx].avatar}
                   </div>
                   <div>
-                    <h4 className="text-sm font-extrabold text-foreground">{mockProfiles[swipeIdx].name}</h4>
-                    <p className="text-[10px] font-medium text-primary uppercase">{mockProfiles[swipeIdx].college}</p>
+                    <h4 className="text-xs font-extrabold text-foreground">{mockProfiles[swipeIdx].name}</h4>
+                    <p className="text-[9px] font-medium text-primary uppercase">{mockProfiles[swipeIdx].college}</p>
                   </div>
                 </div>
-                <p className="text-xs font-medium italic text-muted-foreground/90 bg-muted/20 border border-border/40 rounded-xl p-3">
+                <p className="text-[11px] font-medium italic text-muted-foreground bg-muted/20 border border-border/40 rounded-xl p-3">
                   "{mockProfiles[swipeIdx].bio}"
                 </p>
               </div>
 
               {/* Swipe Action Buttons */}
-              <div className="flex justify-center gap-4 mt-6">
+              <div className="flex justify-center gap-4 pt-4">
                 <button
                   onClick={() => handleSwipe(false)}
-                  className="h-12 w-12 rounded-full border border-border/60 hover:bg-muted/40 text-muted-foreground hover:text-foreground flex items-center justify-center cursor-pointer transition-transform active:scale-90"
-                  title="Swipe Left / Skip"
+                  className="h-10 w-10 rounded-full border border-border/60 hover:bg-muted/40 text-muted-foreground hover:text-foreground flex items-center justify-center cursor-pointer transition-transform active:scale-90"
                 >
                   ✕
                 </button>
                 <button
                   onClick={() => handleSwipe(true)}
-                  className="h-12 w-12 rounded-full bg-gradient-to-tr from-primary to-orange-500 text-white shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95"
-                  title="Swipe Right / Like"
+                  className="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-orange-500 text-white shadow-md flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95"
                 >
                   ❤
                 </button>
               </div>
             </div>
           )}
+          <p className="text-[9px] text-muted-foreground/60 font-semibold pt-4">Matches are strictly verified college students from your local region.</p>
         </div>
-      </div>
 
-      {/* ─── NEW COMPONENT: Interactive Privacy & Safety Shield Simulator ─── */}
-      <div className="max-w-4xl mx-auto px-4 mt-24">
-        <div 
-          onMouseMove={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            setCoords3({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-          }}
-          style={{
-            "--mouse-x": `${coords3.x}px`,
-            "--mouse-y": `${coords3.y}px`
-          } as React.CSSProperties}
-          className="glass-card-dark rounded-3xl p-8 relative overflow-hidden shadow-xl border border-border/40 bg-[radial-gradient(600px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(16,185,129,0.05),transparent_80%)] grid md:grid-cols-5 gap-8 items-center"
-        >
-          {/* Header & Details */}
-          <div className="md:col-span-2 space-y-4">
-            <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <h3 className="text-xl font-black tracking-tight text-foreground">
-              Verify Our <br />
-              <span className="text-emerald-500">Privacy Shield</span>
-            </h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              We separate student identity from content entirely. Use this interactive console to see how our Edge worker processes, sanitizes, and hashes data instantly before it hits the database.
-            </p>
-            <div className="space-y-2 pt-2 text-[10px] font-semibold text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                Doxx & Slur auto-censoring
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                SHA-256 separation hash
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                Zero trace back to verified email
-              </div>
-            </div>
-          </div>
-
-          {/* Live Simulator Console */}
-          <div className="md:col-span-3 space-y-4 bg-black/45 border border-border/45 rounded-2xl p-5 font-mono text-xs">
-            <div className="flex items-center justify-between border-b border-border/20 pb-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase">CampusLoop Core v1.4</span>
-              <span className="flex items-center gap-1.5 text-[9px] font-bold text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-                ONLINE
-              </span>
-            </div>
-
-            {/* Input area */}
-            <div className="space-y-1.5">
-              <span className="text-[9px] font-bold text-muted-foreground uppercase">1. Write a Test Post</span>
-              <textarea
-                value={simInput}
-                onChange={(e) => setSimInput(e.target.value)}
-                placeholder="Type a phone (9876543210) or email (test@edu.in) to check..."
-                className="w-full h-16 rounded-lg bg-muted/20 border border-border/30 px-3 py-2 text-[11px] text-foreground focus:outline-none focus:border-emerald-500/50 resize-none font-mono placeholder:text-muted-foreground/50"
-              />
-            </div>
-
-            {/* Output area */}
-            <div className="space-y-2 border-t border-border/10 pt-3">
-              <div className="flex items-center justify-between text-[10px]">
-                <span className="text-muted-foreground">2. Processed Output:</span>
-                {doxxType ? (
-                  <span className="text-amber-500 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded flex items-center gap-1">
-                    <ShieldAlert className="h-3 w-3" />
-                    Censored: {doxxType}
-                  </span>
-                ) : simInput ? (
-                  <span className="text-emerald-500 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">
-                    Safe to post
-                  </span>
-                ) : null}
-              </div>
-              
-              <div className="min-h-12 bg-muted/10 border border-border/20 rounded-lg p-3 text-[11px] text-foreground/80 break-words">
-                {censoredText || <span className="text-muted-foreground/30 italic">No output yet...</span>}
-              </div>
-
-              <div className="flex items-center justify-between text-[10px] pt-1">
-                <span className="text-muted-foreground">3. Hash Signature:</span>
-                <span className="text-primary font-bold">{hashValue || "anon_undefined"}</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* ─── Frequently Asked Questions Accordions ─── */}

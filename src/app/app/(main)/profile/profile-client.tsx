@@ -45,7 +45,7 @@ export function ProfileClientView({
   function handleShareVibe() {
     const college = profile.institution?.name?.split(",")[0] || "Campus";
     const rank = points >= 501 ? "🔥 Campus Legend" : points >= 151 ? "👑 Campus Talker" : points >= 51 ? "⚡ Loop Starter" : "Campus Newbie";
-    const shareText = `⚡️ My CampusLoop Vibe Card:\n• Campus: ${college}\n• Rank: ${rank}\n• Loop Points: ${points} LP 👑\n• Referrals: ${profile.referralCount || 0}\n\nJoin the tea party: https://campusloop.shraj.workers.dev/join?invite=${profile.username} 🔥`;
+    const shareText = `⚡️ My CampusLoop Vibe Card:\n• Campus: ${college}\n• Rank: ${rank}\n• Loop Points: ${points} LP 👑\n• Referrals: ${profile.referralCount || 0}\n\nJoin the tea party: https://campusloop.space/join?invite=${profile.username} 🔥`;
     
     navigator.clipboard.writeText(shareText);
     toast.success("Vibe Card copied! Share it on your Instagram story or WhatsApp status to invite friends 🚀");

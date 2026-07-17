@@ -2,7 +2,7 @@
 
 CampusLoop is the **ultimate social layer built exclusively for college students**. Speak freely via anonymous confessions, vote on local drama, join custom hobby communities, swipe to match on verified profiles, and build your social presence — all gatekept securely by your official student email.
 
-🌐 **Production Link:** [https://campusloop.shraj.workers.dev](https://campusloop.shraj.workers.dev)
+🌐 **Production Link:** [https://campusloop.space](https://campusloop.space)
 
 ---
 
@@ -28,7 +28,7 @@ CampusLoop is the **ultimate social layer built exclusively for college students
 - **Customization**: Support for multiple gradients, typography alignments (Left/Center/Right), and Gen-Z stickers (maximum 3 to keep it clean).
 
 ### 4. 🔗 Dynamic Vanity URLs (`/@username`)
-- **Vanity URL routing**: Students get beautiful vanity URLs directly at the root level: `campusloop.shraj.workers.dev/@username`.
+- **Vanity URL routing**: Students get beautiful vanity URLs directly at the root level: `campusloop.space/@username`.
 - **High-Virality Conversion**: Non-logged-in visitors landing on a user's vanity link see a premium locked teaser card encouraging them to register with their college email to unlock private chats and posts.
 
 ### 5. 💬 Instant Messaging & Swiping

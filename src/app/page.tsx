@@ -247,10 +247,10 @@ export default async function LandingPage() {
         {/* ─── Footer ─── */}
         <footer className="border-t border-border/80 bg-muted/15 py-12 px-6 text-center text-xs font-semibold text-muted-foreground space-y-4 mt-16">
           <div className="flex justify-center gap-6">
-            <Link href="/" className="hover:text-foreground transition-colors">About</Link>
-            <Link href="/" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link href="/" className="hover:text-foreground transition-colors">Safety Guidelines</Link>
-            <Link href="/" className="hover:text-foreground transition-colors">Contact</Link>
+            <Link href="/about" className="hover:text-foreground transition-colors">About</Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+            <Link href="/safety" className="hover:text-foreground transition-colors">Safety Guidelines</Link>
+            <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
           </div>
           <p>© {new Date().getFullYear()} CampusLoop. Made with <Heart className="inline h-3.5 w-3.5 mx-1 text-primary align-middle" fill="currentColor" /> by verified students for the student network.</p>
         </footer>

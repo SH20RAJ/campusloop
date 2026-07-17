@@ -1,7 +1,8 @@
 import { getDb } from "@/db";
-import { communities, communityMembers, posts, userProfiles } from "@/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { communities, posts, userProfiles } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
+import { FeedPost } from "@/hooks/use-feed";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { FeedCard } from "@/components/ui/feed-card";
 import { PostComposer } from "../../post/new/post-composer";
@@ -63,6 +64,9 @@ export default async function CommunityDetailPage({ params }: PageProps) {
       institution: true,
       votes: true,
       comments: true,
+      pollOptions: {
+        with: { votes: true }
+      }
     }
   });
 
@@ -71,11 +75,23 @@ export default async function CommunityDetailPage({ params }: PageProps) {
     const commentsCount = post.comments.length;
     const userVote = post.votes.find(v => v.userId === profile.id)?.value || 0;
 
+    const formattedPollOptions = post.pollOptions?.map(opt => {
+      const optVotesCount = opt.votes.length;
+      const userVoted = opt.votes.some(v => v.userId === profile.id);
+      return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
+    });
+
+    const hasVotedPoll = formattedPollOptions?.some(opt => opt.userVoted) || false;
+    const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
+
     return {
       ...post,
       votesCount,
       commentsCount,
       userVote,
+      pollOptions: formattedPollOptions,
+      hasVotedPoll,
+      totalPollVotes,
       votes: undefined,
       comments: undefined,
     };
@@ -133,7 +149,7 @@ export default async function CommunityDetailPage({ params }: PageProps) {
         
         <div className="space-y-6">
           {formattedPosts.map((post) => (
-            <FeedCard key={post.id} post={post as any} />
+            <FeedCard key={post.id} post={post as FeedPost} />
           ))}
           {formattedPosts.length === 0 && (
             <div className="text-center py-16 border border-dashed rounded-xl border-border bg-card text-muted-foreground text-sm">

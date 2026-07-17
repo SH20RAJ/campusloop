@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { Metadata } from "next";
 import { ProfileClientView } from "./profile-client";
+import { FeedPost } from "@/hooks/use-feed";
 
 export const metadata: Metadata = {
   title: "Profile | CampusLoop",
@@ -57,6 +58,9 @@ export default async function ProfilePage({
       institution: true,
       votes: true,
       comments: true,
+      pollOptions: {
+        with: { votes: true }
+      }
     }
   });
 
@@ -66,11 +70,23 @@ export default async function ProfilePage({
     const commentsCount = post.comments.length;
     const userVote = post.votes.find(v => v.userId === currentProfile.id)?.value || 0;
 
+    const formattedPollOptions = post.pollOptions?.map(opt => {
+      const optVotesCount = opt.votes.length;
+      const userVoted = opt.votes.some(v => v.userId === currentProfile.id);
+      return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
+    });
+
+    const hasVotedPoll = formattedPollOptions?.some(opt => opt.userVoted) || false;
+    const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
+
     return {
       ...post,
       votesCount,
       commentsCount,
       userVote,
+      pollOptions: formattedPollOptions,
+      hasVotedPoll,
+      totalPollVotes,
       votes: undefined,
       comments: undefined,
     };
@@ -79,7 +95,7 @@ export default async function ProfilePage({
   return (
     <ProfileClientView 
       profile={profile}
-      formattedPosts={formattedPosts as any[]}
+      formattedPosts={formattedPosts as FeedPost[]}
       isOwnProfile={isOwnProfile}
       currentProfileId={currentProfile.id}
     />

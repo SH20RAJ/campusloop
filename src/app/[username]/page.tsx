@@ -9,6 +9,7 @@ import { Navigation } from "@/components/ui/navigation";
 import Link from "next/link";
 import { Lock, School } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FeedPost } from "@/hooks/use-feed";
 
 interface VanityProfileProps {
   params: Promise<{ username: string }>;
@@ -64,6 +65,9 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
       institution: true,
       votes: true,
       comments: true,
+      pollOptions: {
+        with: { votes: true }
+      }
     }
   });
 
@@ -82,11 +86,23 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
         const commentsCount = post.comments.length;
         const userVote = post.votes.find(v => v.userId === currentProfile.id)?.value || 0;
 
+        const formattedPollOptions = post.pollOptions?.map(opt => {
+          const optVotesCount = opt.votes.length;
+          const userVoted = opt.votes.some(v => v.userId === currentProfile.id);
+          return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
+        });
+
+        const hasVotedPoll = formattedPollOptions?.some(opt => opt.userVoted) || false;
+        const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
+
         return {
           ...post,
           votesCount,
           commentsCount,
           userVote,
+          pollOptions: formattedPollOptions,
+          hasVotedPoll,
+          totalPollVotes,
           votes: undefined,
           comments: undefined,
         };
@@ -108,7 +124,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
             <main className="flex-1 w-full max-w-2xl px-0 py-0 pb-28 md:pb-0 mx-auto min-h-screen">
               <ProfileClientView 
                 profile={profile}
-                formattedPosts={formattedPosts as any[]}
+                formattedPosts={formattedPosts as FeedPost[]}
                 isOwnProfile={isOwnProfile}
                 currentProfileId={currentProfile.id}
               />

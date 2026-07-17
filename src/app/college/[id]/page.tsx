@@ -1,11 +1,12 @@
 import { getDb } from "@/db";
-import { institutions, posts } from "@/db/schema";
+import { institutions, posts, userProfiles } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
-import { FeedPost } from "@/hooks/use-feed";
 import { School, MapPin, Globe, Calendar, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { FeedPost } from "@/hooks/use-feed";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -36,6 +37,17 @@ export default async function CollegePage({ params }: PageProps) {
     notFound();
   }
 
+  const user = await hexclaveServerApp.getUser().catch(() => null);
+  let currentProfile: typeof userProfiles.$inferSelect | null = null;
+  if (user) {
+    const found = await db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, user.id),
+    });
+    if (found) {
+      currentProfile = found;
+    }
+  }
+
   // Fetch posts from this college
   const collegePosts = await db.query.posts.findMany({
     where: eq(posts.institutionId, college.id),
@@ -45,18 +57,34 @@ export default async function CollegePage({ params }: PageProps) {
       institution: true,
       votes: true,
       comments: true,
+      pollOptions: {
+        with: { votes: true }
+      }
     }
   });
 
   const formattedPosts = collegePosts.map(post => {
     const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
     const commentsCount = post.comments.length;
+    const userVote = currentProfile ? (post.votes.find(v => v.userId === currentProfile.id)?.value || 0) : 0;
+
+    const formattedPollOptions = post.pollOptions?.map(opt => {
+      const optVotesCount = opt.votes.length;
+      const userVoted = currentProfile ? opt.votes.some(v => v.userId === currentProfile.id) : false;
+      return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
+    });
+
+    const hasVotedPoll = formattedPollOptions?.some(opt => opt.userVoted) || false;
+    const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
 
     return {
       ...post,
       votesCount,
       commentsCount,
-      userVote: 0,
+      userVote,
+      pollOptions: formattedPollOptions,
+      hasVotedPoll,
+      totalPollVotes,
       votes: undefined,
       comments: undefined,
     };

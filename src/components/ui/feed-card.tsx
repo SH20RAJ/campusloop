@@ -8,6 +8,7 @@ import { FeedPost } from "@/hooks/use-feed";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface FeedCardProps {
   post: FeedPost;
@@ -73,7 +74,7 @@ export function FeedCard({ post }: FeedCardProps) {
     }
 
     navigator.clipboard.writeText(shareText);
-    alert("Share card copied to clipboard! Paste it in your WhatsApp group or Instagram story to spread the word 🚀");
+    toast.success("Share link copied! Paste it in your WhatsApp group or Instagram story to spread the word 🚀");
   }
 
   return (

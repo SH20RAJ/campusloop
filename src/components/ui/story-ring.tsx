@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { cn } from "@/lib/utils";
 import { Plus, X, ChevronLeft, ChevronRight, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface Story {
   id: string;
@@ -154,8 +155,7 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
       setComposeOpen(false);
       mutateStories();
     } catch (err) {
-      console.error(err);
-      alert("Failed to post story. Vibe check failed.");
+      toast.error("Failed to post story. Vibe check failed.");
     } finally {
       setIsPosting(false);
     }

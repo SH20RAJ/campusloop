@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Send, Sparkles, Layout, Type, AlignLeft, AlignCenter, AlignRight, Check, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 interface StoryCreatorProps {
   profile: any;
@@ -47,7 +48,7 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
       if (selectedStickers.length < 3) {
         setSelectedStickers(prev => [...prev, sticker]);
       } else {
-        alert("Maximum 3 stickers allowed! Keep it clean.");
+        toast.warning("Maximum 3 stickers allowed! Keep it clean.");
       }
     }
   }

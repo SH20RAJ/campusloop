@@ -6,6 +6,8 @@ import { FeedCard } from "@/components/ui/feed-card";
 import { PostComments } from "./post-comments";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -87,9 +89,22 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   };
 
   return (
-    <main className="space-y-6">
-      <FeedCard post={post as any} />
-      <PostComments postId={id} />
+    <main className="min-h-screen bg-background text-foreground pb-20">
+      {/* Header with back button */}
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/40 px-4 py-4 flex items-center gap-3">
+        <Link href="/app" className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/80 hover:bg-muted transition-colors cursor-pointer shrink-0">
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+        <div>
+          <h2 className="text-sm font-black uppercase tracking-wider text-foreground">Post Details</h2>
+          <p className="text-[10px] text-muted-foreground font-semibold">Join the discussion</p>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-6">
+        <FeedCard post={post as any} />
+        <PostComments postId={id} />
+      </div>
     </main>
   );
 }

@@ -4,6 +4,7 @@ import "./globals.css";
 import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -79,7 +80,10 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <HexclaveProvider app={hexclaveServerApp}>
-          <HexclaveTheme>{children}</HexclaveTheme>
+          <HexclaveTheme>
+            {children}
+            <Toaster position="top-center" richColors />
+          </HexclaveTheme>
         </HexclaveProvider>
       </body>
     </html>

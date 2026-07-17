@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import useSWR from "swr";
+import { toast } from "sonner";
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -261,7 +262,7 @@ export function FeedClient() {
                 const username = profile?.username || "student";
                 const inviteText = `yo, ${college} is going crazy on CampusLoop right now. verified students only, join before the tea gets cold: https://campusloop.shraj.workers.dev/join?invite=${username} 🔥`;
                 navigator.clipboard.writeText(inviteText);
-                alert("Copied to clipboard! Share it in your college WhatsApp group chat 🚀");
+                toast.success("Copied to clipboard! Share it in your college WhatsApp group chat 🚀");
               }}
               className="rounded-xl bg-primary text-white text-[10px] font-bold px-3 py-1.5 hover:opacity-90 active:scale-95 shadow-md shadow-primary/15 transition-all shrink-0 cursor-pointer flex items-center gap-1"
             >

@@ -6,6 +6,7 @@ import { LogOut, School, Shield, User, MessageSquare, Users, Sparkles, Share2, A
 import Link from "next/link";
 import { FeedCard } from "@/components/ui/feed-card";
 import { EditProfileDialog } from "./edit-profile-dialog";
+import { toast } from "sonner";
 
 interface ProfileClientViewProps {
   profile: any;
@@ -47,7 +48,7 @@ export function ProfileClientView({
     const shareText = `⚡️ My CampusLoop Vibe Card:\n• Campus: ${college}\n• Rank: ${rank}\n• Loop Points: ${points} LP 👑\n• Referrals: ${profile.referralCount || 0}\n\nJoin the tea party: https://campusloop.shraj.workers.dev/join?invite=${profile.username} 🔥`;
     
     navigator.clipboard.writeText(shareText);
-    alert("Vibe card copied to clipboard! Paste it on your Instagram story or WhatsApp status to invite friends 🚀");
+    toast.success("Vibe Card copied! Share it on your Instagram story or WhatsApp status to invite friends 🚀");
   }
 
   return (

@@ -17,6 +17,11 @@ export function JoinForm() {
     } else {
       setMode("signin");
     }
+
+    const invite = searchParams.get("invite");
+    if (invite) {
+      document.cookie = `cl_referred_by=${encodeURIComponent(invite)}; path=/; max-age=604800; SameSite=Lax`;
+    }
   }, [searchParams]);
 
   return (
@@ -24,8 +29,8 @@ export function JoinForm() {
       {/* Brand Header */}
       <div className="flex flex-col items-center text-center space-y-2">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-orange-500 text-xs font-bold text-white shadow-sm">
-            CL
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-black shadow-md shadow-primary/5">
+            <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
           </div>
           <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-lg font-extrabold tracking-tight text-transparent">
             CampusLoop

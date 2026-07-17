@@ -126,8 +126,8 @@ export function Navigation({ profile, collegeName = "Your College", isAdmin }: N
           )}
         >
           <Link href="/app" className="flex items-center gap-2.5">
-            <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-orange-500 text-xs font-bold text-white shadow-md shadow-primary/20">
-              CL
+            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-black shadow-md shadow-primary/5">
+              <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
               <div className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-green-500 border border-background animate-ping" />
             </div>
             {!collapsed && (

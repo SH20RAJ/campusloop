@@ -85,8 +85,8 @@ export default async function LandingPage() {
         {/* ─── Header / Navbar ─── */}
         <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/70 px-6 backdrop-blur-md lg:px-16">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-primary to-orange-500 text-[10px] font-bold text-white shadow-sm shadow-primary/20">
-              CL
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md shadow-primary/5">
+              <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
             </div>
             <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-extrabold tracking-tight text-transparent">
               CampusLoop

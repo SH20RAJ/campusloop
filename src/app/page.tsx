@@ -4,13 +4,10 @@ import {
   ShieldCheck, 
   Lock, 
   Sparkles, 
-  Zap, 
   MessageCircle, 
   Heart, 
   HelpCircle, 
-  Users, 
-  ShieldAlert,
-  ArrowRight
+  Users
 } from "lucide-react";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { LandingInteractive } from "@/components/ui/landing-interactive";

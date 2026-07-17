@@ -33,7 +33,7 @@ export async function GET(req: Request) {
       conditions.push(eq(posts.institutionId, profile.institutionId));
     }
     if (type && type !== "ALL" && type !== "all") {
-      conditions.push(eq(posts.type, type as any));
+      conditions.push(eq(posts.type, type as (typeof posts.type.enumValues)[number]));
     }
     if (visibility === "anonymous") {
       conditions.push(eq(posts.isAnonymous, true));

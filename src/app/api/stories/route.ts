@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { stories, userProfiles } from "@/db/schema";
+import { stories, userProfiles, type Story, type UserProfile } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, gt } from "drizzle-orm";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {
@@ -22,7 +22,14 @@ export async function GET(req: Request) {
     });
 
     // Group stories by user profile
-    const userStoriesMap = new Map<string, any>();
+    type StoryPayload = Pick<
+      Story,
+      "id" | "mediaUrl" | "text" | "backgroundColor" | "createdAt" | "expiresAt"
+    >;
+    const userStoriesMap = new Map<
+      string,
+      UserProfile & { stories: StoryPayload[] }
+    >();
     for (const story of activeStories) {
       if (!userStoriesMap.has(story.userId)) {
         userStoriesMap.set(story.userId, {

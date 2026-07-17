@@ -18,7 +18,15 @@ import Link from "next/link";
 import useSWR from "swr";
 import { toast } from "sonner";
 
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+interface MyProfile {
+  displayName: string;
+  username: string;
+  avatarUrl: string | null;
+  institution?: { name: string } | null;
+}
+
+const fetcher = <T,>(url: string): Promise<T> =>
+  fetch(url).then((r) => r.json() as Promise<T>);
 
 export function FeedClient() {
   const [showFilters, setShowFilters] = useState(false);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
@@ -13,7 +13,7 @@ interface Story {
   id: string;
   mediaUrl: string | null;
   text: string | null;
-  backgroundColor: string;
+  backgroundColor: string | null;
   createdAt: string;
   expiresAt: string;
 }
@@ -26,15 +26,23 @@ interface UserWithStories {
   stories: Story[];
 }
 
-interface StoryRingProps {
-  users: UserWithStories[];
-  mutateStories: () => any;
+interface MyProfile {
+  id: string;
+  displayName: string;
+  username: string;
+  avatarUrl: string | null;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json() as Promise<any>;
-});
+interface StoryRingProps {
+  users: UserWithStories[];
+  mutateStories: () => void;
+}
+
+const fetcher = <T,>(url: string): Promise<T> =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch");
+    return res.json() as Promise<T>;
+  });
 
 const GRADIENTS = [
   { id: "purple-indigo", class: "bg-gradient-to-tr from-violet-600 to-indigo-600", label: "Classic Indigo" },
@@ -45,9 +53,9 @@ const GRADIENTS = [
 ];
 
 export function StoryRing({ users, mutateStories }: StoryRingProps) {
-  const { data: profile } = useSWR<any>("/api/profile/me", fetcher);
+  const { data: profile } = useSWR<MyProfile>("/api/profile/me", fetcher);
   const router = useRouter();
-  
+
   // Compose Story state
   const [composeOpen, setComposeOpen] = useState(false);
   const [storyText, setStoryText] = useState("");
@@ -60,10 +68,50 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
   const progressTimer = useRef<NodeJS.Timeout | null>(null);
   const [progress, setProgress] = useState(0);
 
+  const handleClosePlayback = useCallback(() => {
+    setActiveUserIdx(null);
+    setActiveStoryIdx(0);
+    setProgress(0);
+    if (progressTimer.current) clearInterval(progressTimer.current);
+  }, []);
+
+  const handleNextStory = useCallback(() => {
+    if (activeUserIdx === null) return;
+    const currentUser = users[activeUserIdx];
+
+    if (activeStoryIdx + 1 < currentUser.stories.length) {
+      setActiveStoryIdx((prev) => prev + 1);
+    } else if (activeUserIdx + 1 < users.length) {
+      // Go to next user
+      setActiveUserIdx(activeUserIdx + 1);
+      setActiveStoryIdx(0);
+    } else {
+      // All stories finished
+      handleClosePlayback();
+    }
+  }, [activeUserIdx, activeStoryIdx, users, handleClosePlayback]);
+
+  const handlePrevStory = useCallback(() => {
+    if (activeUserIdx === null) return;
+
+    if (activeStoryIdx > 0) {
+      setActiveStoryIdx((prev) => prev - 1);
+    } else if (activeUserIdx > 0) {
+      // Go to previous user
+      const prevUserIdx = activeUserIdx - 1;
+      setActiveUserIdx(prevUserIdx);
+      // Start at last story of previous user
+      setActiveStoryIdx(users[prevUserIdx].stories.length - 1);
+    } else {
+      // Already at first story of first user, reset progress
+      setProgress(0);
+    }
+  }, [activeUserIdx, activeStoryIdx, users]);
+
   // Auto-advance stories
   useEffect(() => {
     if (activeUserIdx === null) return;
-    
+
     const currentUser = users[activeUserIdx];
     if (!currentUser || !currentUser.stories[activeStoryIdx]) return;
 
@@ -73,14 +121,7 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
     const step = (interval / duration) * 100;
 
     const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          handleNextStory();
-          return 100;
-        }
-        return prev + step;
-      });
+      setProgress((prev) => (prev >= 100 ? 100 : prev + step));
     }, interval);
 
     progressTimer.current = timer;
@@ -90,49 +131,12 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
     };
   }, [activeUserIdx, activeStoryIdx, users]);
 
-  const handleNextStory = () => {
-    if (activeUserIdx === null) return;
-    const currentUser = users[activeUserIdx];
-    
-    if (activeStoryIdx + 1 < currentUser.stories.length) {
-      setActiveStoryIdx((prev) => prev + 1);
-    } else {
-      // Go to next user
-      if (activeUserIdx + 1 < users.length) {
-        setActiveUserIdx(activeUserIdx + 1);
-        setActiveStoryIdx(0);
-      } else {
-        // All stories finished
-        handleClosePlayback();
-      }
+  // Advance when the current story's progress completes
+  useEffect(() => {
+    if (progress >= 100 && activeUserIdx !== null) {
+      handleNextStory();
     }
-  };
-
-  const handlePrevStory = () => {
-    if (activeUserIdx === null) return;
-    
-    if (activeStoryIdx > 0) {
-      setActiveStoryIdx((prev) => prev - 1);
-    } else {
-      // Go to previous user
-      if (activeUserIdx > 0) {
-        const prevUserIdx = activeUserIdx - 1;
-        setActiveUserIdx(prevUserIdx);
-        // Start at last story of previous user
-        setActiveStoryIdx(users[prevUserIdx].stories.length - 1);
-      } else {
-        // Already at first story of first user, reset progress
-        setProgress(0);
-      }
-    }
-  };
-
-  const handleClosePlayback = () => {
-    setActiveUserIdx(null);
-    setActiveStoryIdx(0);
-    setProgress(0);
-    if (progressTimer.current) clearInterval(progressTimer.current);
-  };
+  }, [progress, activeUserIdx, handleNextStory]);
 
   const handlePostStory = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,7 +158,7 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
       setStoryText("");
       setComposeOpen(false);
       mutateStories();
-    } catch (err) {
+    } catch {
       toast.error("Failed to post story. Vibe check failed.");
     } finally {
       setIsPosting(false);
@@ -392,7 +396,7 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
                     <div>
                       <p className="text-xs font-extrabold">{users[activeUserIdx].displayName}</p>
                       <p className="text-[9px] text-white/70">
-                        @{users[activeUserIdx].username} • {new Date(users[activeUserIdx].stories[activeStoryIdx]?.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        @{users[activeUserIdx].username} • {new Date(users[activeUserIdx].stories[activeStoryIdx]?.createdAt ?? "2026-01-01T00:00:00Z").toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>

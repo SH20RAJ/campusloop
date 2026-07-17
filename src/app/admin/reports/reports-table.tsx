@@ -5,7 +5,17 @@ import { useRouter } from "next/navigation";
 import { keepPost, deletePost } from "./actions";
 import { CheckIcon, Trash2Icon } from "lucide-react";
 
-export function ReportsTable({ initialReports }: { initialReports: any[] }) {
+interface ReportRow {
+  id: string;
+  reason: string;
+  details: string | null;
+  postId: string;
+  postBody: string;
+  authorDisplayName: string;
+  authorUsername: string;
+}
+
+export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -15,8 +25,8 @@ export function ReportsTable({ initialReports }: { initialReports: any[] }) {
     try {
       await keepPost(postId);
       router.refresh();
-    } catch (e: any) {
-      alert(e.message || "Failed to resolve report");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to resolve report");
     }
     setIsLoading(false);
   }
@@ -27,8 +37,8 @@ export function ReportsTable({ initialReports }: { initialReports: any[] }) {
     try {
       await deletePost(postId);
       router.refresh();
-    } catch (e: any) {
-      alert(e.message || "Failed to remove post");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to remove post");
     }
     setIsLoading(false);
   }

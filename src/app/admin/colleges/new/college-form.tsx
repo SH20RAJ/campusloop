@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createCollege } from "../actions";
 
 export function CollegeForm() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");

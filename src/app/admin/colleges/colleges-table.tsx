@@ -5,7 +5,16 @@ import { useRouter } from "next/navigation";
 import { deleteCollege, addDomain, removeDomain } from "./actions";
 import { Trash2Icon, PlusIcon } from "lucide-react";
 
-export function CollegesTable({ initialColleges }: { initialColleges: any[] }) {
+interface CollegeRow {
+  id: string;
+  name: string;
+  district: string | null;
+  state: string | null;
+  country: string;
+  domains?: { id: string; domain: string }[];
+}
+
+export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow[] }) {
   const router = useRouter();
   const [newDomain, setNewDomain] = useState("");
   const [activeInstId, setActiveInstId] = useState<string | null>(null);
@@ -27,8 +36,8 @@ export function CollegesTable({ initialColleges }: { initialColleges: any[] }) {
       setNewDomain("");
       setActiveInstId(null);
       router.refresh();
-    } catch (e: any) {
-      alert(e.message || "Failed to add domain");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to add domain");
     }
     setIsLoading(false);
   }
@@ -59,7 +68,7 @@ export function CollegesTable({ initialColleges }: { initialColleges: any[] }) {
               <td className="px-6 py-4">{college.district || college.state}, {college.country}</td>
               <td className="px-6 py-4">
                 <div className="flex flex-wrap gap-2">
-                  {college.domains?.map((d: any) => (
+                  {college.domains?.map((d) => (
                     <span key={d.id} className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs text-secondary-foreground border">
                       @{d.domain}
                       <button onClick={() => handleRemoveDomain(d.id)} className="hover:text-foreground ml-1" disabled={isLoading}>

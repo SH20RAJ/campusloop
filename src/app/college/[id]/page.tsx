@@ -111,7 +111,7 @@ export default async function CollegePage({ params }: PageProps) {
           
           <div className="space-y-6">
             {formattedPosts.map((post) => (
-              <FeedCard key={post.id} post={post as any} />
+              <FeedCard key={post.id} post={post as FeedPost} />
             ))}
             {formattedPosts.length === 0 && (
               <div className="text-center py-16 border border-dashed rounded-xl border-border bg-card text-muted-foreground text-sm">

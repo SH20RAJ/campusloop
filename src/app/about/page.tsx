@@ -1,5 +1,6 @@
-import { AboutClient } from "./about-client";
 import { Metadata } from "next";
+
+import { AboutClient } from "@/components/about-client";
 
 export const metadata: Metadata = {
   title: "About Us | CampusLoop",

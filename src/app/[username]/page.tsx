@@ -7,7 +7,7 @@ import { Metadata } from "next";
 import { ProfileClientView } from "../app/(main)/profile/profile-client";
 import { Navigation } from "@/components/ui/navigation";
 import Link from "next/link";
-import { Sparkles, MessageSquare, Lock, School } from "lucide-react";
+import { Lock, School } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface VanityProfileProps {

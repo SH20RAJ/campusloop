@@ -23,8 +23,8 @@ export function CreateCommunityDialog() {
       setIsOpen(false);
       router.push(`/app/communities/${newComm.id}`);
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Failed to create community");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create community");
     } finally {
       setIsLoading(false);
     }

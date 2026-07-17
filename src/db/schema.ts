@@ -9,6 +9,7 @@ import {
 	text,
 	timestamp,
 	uniqueIndex,
+	type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { randomUUID } from "node:crypto";
 
@@ -129,7 +130,7 @@ export const userProfiles = pgTable(
 		role: userRoleEnum("role").default("STUDENT").notNull(),
 		status: userStatusEnum("status").default("ACTIVE").notNull(),
 		referralCount: integer("referral_count").default(0).notNull(),
-		referredById: text("referred_by_id").references((): any => userProfiles.id, { onDelete: "set null" }),
+		referredById: text("referred_by_id").references((): AnyPgColumn => userProfiles.id, { onDelete: "set null" }),
 		points: integer("points").default(0).notNull(),
 		createdAt,
 		updatedAt,
@@ -180,7 +181,7 @@ export const comments = pgTable(
 			.notNull()
 			.references(() => userProfiles.id, { onDelete: "cascade" }),
 		parentId: text("parent_id")
-			.references((): any => comments.id, { onDelete: "cascade" }),
+			.references((): AnyPgColumn => comments.id, { onDelete: "cascade" }),
 		body: text("body").notNull(),
 		isAnonymous: boolean("is_anonymous").default(false).notNull(),
 		status: contentStatusEnum("status").default("PUBLISHED").notNull(),

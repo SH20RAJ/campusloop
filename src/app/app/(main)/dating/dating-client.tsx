@@ -7,15 +7,28 @@ import { Heart, X, MessageCircle, Sparkles, Filter, MapPin, School } from "lucid
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const fetcher = (url: string): Promise<any> => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json();
-});
+const fetcher = <T,>(url: string): Promise<T> =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch");
+    return res.json() as Promise<T>;
+  });
+
+type Candidate = {
+  id: string;
+  displayName: string;
+  username: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  institution?: { name: string } | null;
+};
 
 type MatchResult = {
   matched: boolean;
   conversationId?: string;
-  matchedUser?: any;
+  matchedUser?: {
+    displayName: string;
+    avatarUrl: string | null;
+  };
 };
 
 export function DatingClient() {

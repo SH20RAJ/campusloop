@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { conversations, conversationParticipants, userProfiles, messages } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {

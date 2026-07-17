@@ -17,10 +17,11 @@ export type FeedPost = Post & {
   totalPollVotes?: number;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json() as Promise<any>;
-});
+const fetcher = <T,>(url: string): Promise<T> =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch");
+    return res.json() as Promise<T>;
+  });
 
 export function useFeed(
   scope: "CAMPUS" | "GLOBAL" = "CAMPUS",
@@ -39,7 +40,22 @@ export function useFeed(
   return { feed: data, isLoading, isError: error, mutate };
 }
 
+export interface StoryGroupUser {
+  id: string;
+  displayName: string;
+  username: string;
+  avatarUrl: string | null;
+  stories: {
+    id: string;
+    mediaUrl: string | null;
+    text: string | null;
+    backgroundColor: string | null;
+    createdAt: string;
+    expiresAt: string;
+  }[];
+}
+
 export function useStories() {
-  const { data, error, isLoading, mutate } = useSWR<any[]>("/api/stories", fetcher);
+  const { data, error, isLoading, mutate } = useSWR<StoryGroupUser[]>("/api/stories", fetcher);
   return { stories: data, isLoading, isError: error, mutate };
 }

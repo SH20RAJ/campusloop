@@ -4,7 +4,6 @@ import { getDb } from "@/db";
 import { communities, communityMembers, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and } from "drizzle-orm";
-import { redirect } from "next/navigation";
 
 export async function createCommunity(name: string, description: string) {
   const user = await hexclaveServerApp.getUser();

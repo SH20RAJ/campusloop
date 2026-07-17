@@ -32,6 +32,12 @@
 			"service": "campusloop"
 		}
 	],
+	"routes": [
+		{
+			"pattern": "campusloop.space",
+			"custom_domain": true
+		}
+	],
 	"observability": {
 		"enabled": true
 	},

@@ -289,6 +289,12 @@
   .animate-marquee {
     animation: marquee var(--duration, 30s) linear infinite;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+      animation: none;
+    }
+  }
   
   @keyframes marquee {
     from {

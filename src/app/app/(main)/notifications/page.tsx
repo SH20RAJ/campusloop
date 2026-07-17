@@ -3,7 +3,7 @@ import { notifications, userProfiles } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { Bell, Heart, MessageSquare, Sparkles, User, ArrowRight } from "lucide-react";
+import { Bell, Heart, MessageSquare, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
 

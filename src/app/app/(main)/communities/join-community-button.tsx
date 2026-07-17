@@ -20,8 +20,8 @@ export function JoinCommunityButton({ communityId, initialIsMember }: JoinButton
       const res = await joinCommunity(communityId);
       setIsMember(res.joined);
       router.refresh();
-    } catch (e: any) {
-      alert(e.message || "Action failed");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Action failed");
     } finally {
       setIsLoading(false);
     }

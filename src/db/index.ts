@@ -14,10 +14,19 @@ function getDatabaseUrl() {
 }
 
 function createClient() {
-	return postgres(getDatabaseUrl(), {
+	const options: postgres.Options = {
 		max: 10,
 		prepare: false,
-	});
+	};
+
+	// Cloudflare Workers' node:tls shim does not support rejectUnauthorized.
+	// Passing an empty object to ssl options triggers a secure TLS connection
+	// without passing any unsupported rejectUnauthorized parameters.
+	if ("Cloudflare" in globalThis) {
+		options.ssl = {};
+	}
+
+	return postgres(getDatabaseUrl(), options);
 }
 
 const globalForDb = globalThis as typeof globalThis & {

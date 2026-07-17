@@ -15,8 +15,8 @@ export function AdminLoginForm() {
     const formData = new FormData(e.currentTarget);
     try {
       await loginWithPasskey(formData);
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setIsLoading(false);
     }
   }

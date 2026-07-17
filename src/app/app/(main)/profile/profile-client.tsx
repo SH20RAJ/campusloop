@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, School, Shield, User, MessageSquare, Users, Sparkles, Share2, Award, Zap, HelpCircle } from "lucide-react";
+import { LogOut, School, Shield, User, MessageSquare, Users, Sparkles, Share2, Award, Zap } from "lucide-react";
 import Link from "next/link";
 import { FeedCard } from "@/components/ui/feed-card";
 import { EditProfileDialog } from "./edit-profile-dialog";

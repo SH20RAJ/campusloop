@@ -5,8 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { updateUserRole, updateUserStatus } from "./actions";
 import { SearchIcon, ChevronLeft, ChevronRight } from "lucide-react";
 
+interface UserRow {
+  id: string;
+  displayName: string;
+  username: string;
+  role: "STUDENT" | "MODERATOR" | "ADMIN";
+  status: "ACTIVE" | "SUSPENDED" | "BANNED";
+  institution?: { name: string } | null;
+}
+
 interface UsersTableProps {
-  initialUsers: any[];
+  initialUsers: UserRow[];
   page: number;
   totalPages: number;
 }
@@ -40,8 +49,8 @@ export function UsersTable({ initialUsers, page, totalPages }: UsersTableProps) 
     try {
       await updateUserRole(profileId, role);
       router.refresh();
-    } catch (e: any) {
-      alert(e.message || "Failed to update role");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to update role");
     } finally {
       setIsLoading(null);
     }
@@ -52,8 +61,8 @@ export function UsersTable({ initialUsers, page, totalPages }: UsersTableProps) 
     try {
       await updateUserStatus(profileId, status);
       router.refresh();
-    } catch (e: any) {
-      alert(e.message || "Failed to update status");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to update status");
     } finally {
       setIsLoading(null);
     }
@@ -109,7 +118,7 @@ export function UsersTable({ initialUsers, page, totalPages }: UsersTableProps) 
                     <select
                       value={p.role}
                       disabled={isLoading === p.id}
-                      onChange={(e) => handleRoleChange(p.id, e.target.value as any)}
+                      onChange={(e) => handleRoleChange(p.id, e.target.value as UserRow["role"])}
                       className="rounded border border-border bg-background px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
                     >
                       <option value="STUDENT">Student</option>
@@ -121,7 +130,7 @@ export function UsersTable({ initialUsers, page, totalPages }: UsersTableProps) 
                     <select
                       value={p.status}
                       disabled={isLoading === p.id}
-                      onChange={(e) => handleStatusChange(p.id, e.target.value as any)}
+                      onChange={(e) => handleStatusChange(p.id, e.target.value as UserRow["status"])}
                       className="rounded border border-border bg-background px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
                     >
                       <option value="ACTIVE">Active</option>

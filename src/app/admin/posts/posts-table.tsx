@@ -5,8 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { deletePost } from "./actions";
 import { SearchIcon, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 
+interface PostRow {
+  id: string;
+  body: string;
+  type: string;
+  isAnonymous: boolean;
+  createdAt: string | Date;
+  author?: { displayName: string; username: string } | null;
+}
+
 interface PostsTableProps {
-  initialPosts: any[];
+  initialPosts: PostRow[];
   page: number;
   totalPages: number;
 }
@@ -41,8 +50,8 @@ export function PostsTable({ initialPosts, page, totalPages }: PostsTableProps) 
     try {
       await deletePost(postId);
       router.refresh();
-    } catch (e: any) {
-      alert(e.message || "Failed to delete post");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to delete post");
     } finally {
       setActionLoading(null);
     }

@@ -5,8 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { deleteComment } from "./actions";
 import { SearchIcon, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 
+interface CommentRow {
+  id: string;
+  body: string;
+  isAnonymous: boolean;
+  createdAt: string | Date;
+  author?: { displayName: string; username: string } | null;
+  post?: { body: string } | null;
+}
+
 interface CommentsTableProps {
-  initialComments: any[];
+  initialComments: CommentRow[];
   page: number;
   totalPages: number;
 }
@@ -41,8 +50,8 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
     try {
       await deleteComment(commentId);
       router.refresh();
-    } catch (e: any) {
-      alert(e.message || "Failed to delete comment");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to delete comment");
     } finally {
       setActionLoading(null);
     }

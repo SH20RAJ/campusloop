@@ -26,6 +26,28 @@ export function FeedCard({ post }: FeedCardProps) {
   const avatarFallback = post.isAnonymous ? "A" : post.author.displayName[0];
   const avatarUrl = post.isAnonymous ? "" : post.author.avatarUrl;
 
+  function renderPostBody(body: string) {
+    const parts = body.split(/(#[a-zA-Z0-9_]+)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith("#")) {
+        const tag = part.slice(1);
+        return (
+          <Link
+            key={index}
+            href={`/app/hashtag/${tag}`}
+            className="text-primary font-bold hover:underline cursor-pointer relative z-10"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            {part}
+          </Link>
+        );
+      }
+      return part;
+    });
+  }
+
   async function handleVote() {
     if (isLoading) return;
     
@@ -177,14 +199,20 @@ export function FeedCard({ post }: FeedCardProps) {
       <div className="px-6 py-2">
         <Link href={`/app/post/${post.id}`}>
           <p className="text-sm md:text-base leading-relaxed text-foreground whitespace-pre-wrap hover:underline">
-            {post.body}
+            {renderPostBody(post.body)}
           </p>
         </Link>
         {post.type === "POLL" && (
           <PollCard post={post} />
         )}
         {post.title && (
-          <p className="mt-3 text-xs font-semibold text-primary">#{post.title.replace(/\s+/g, '')}</p>
+          <Link
+            href={`/app/hashtag/${post.title.replace(/\s+/g, '')}`}
+            className="mt-3 inline-block text-xs font-semibold text-primary hover:underline cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            #{post.title.replace(/\s+/g, '')}
+          </Link>
         )}
       </div>
 

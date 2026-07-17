@@ -45,3 +45,36 @@ export async function updateUserStatus(profileId: string, status: "ACTIVE" | "SU
     .set({ status, updatedAt: new Date() })
     .where(eq(userProfiles.id, profileId));
 }
+
+export async function deleteUserProfile(profileId: string) {
+  const db = await verifyAdmin();
+
+  await db
+    .delete(userProfiles)
+    .where(eq(userProfiles.id, profileId));
+}
+
+import { randomUUID } from "crypto";
+
+export async function createUserProfile(data: {
+  username: string;
+  displayName: string;
+  institutionId: string;
+  role: "STUDENT" | "MODERATOR" | "ADMIN";
+  status: "ACTIVE" | "SUSPENDED" | "BANNED";
+}) {
+  const db = await verifyAdmin();
+
+  const userId = `mock_${randomUUID()}`;
+
+  await db.insert(userProfiles).values({
+    userId,
+    username: data.username,
+    displayName: data.displayName,
+    institutionId: data.institutionId,
+    role: data.role,
+    status: data.status,
+    onboardingCompleted: true,
+  });
+}
+

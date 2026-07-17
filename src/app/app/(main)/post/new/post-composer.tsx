@@ -71,8 +71,8 @@ export function PostComposer({ communityId }: { communityId?: string }) {
 
       router.push("/app");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An error occurred");
       setIsLoading(false);
     }
   }
@@ -141,6 +141,36 @@ export function PostComposer({ communityId }: { communityId?: string }) {
         )}
         <EditorContent editor={editor} />
       </div>
+
+      {/* Suggested Hashtags */}
+      <div className="space-y-1.5 px-1">
+        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Trending Hashtags</span>
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            "#LateNightTea",
+            "#Confessions",
+            "#ExamStress",
+            "#LibraryVibes",
+            "#HostelLife",
+            "#CampusMatches"
+          ].map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => {
+                if (editor) {
+                  editor.commands.focus();
+                  editor.commands.insertContent(`${tag} `);
+                }
+              }}
+              className="rounded-full bg-muted/65 hover:bg-primary/10 border border-border/80 hover:border-primary/20 text-muted-foreground hover:text-primary px-3 py-1 text-[10.5px] font-semibold transition-all active:scale-95 cursor-pointer"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      </div>
+
 
       <div className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3 shadow-sm">
         <label htmlFor="type" className="text-sm font-medium text-foreground">Post Type</label>

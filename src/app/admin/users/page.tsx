@@ -1,5 +1,5 @@
 import { getDb } from "@/db";
-import { userProfiles } from "@/db/schema";
+import { userProfiles, institutions } from "@/db/schema";
 import { desc, or, ilike, sql } from "drizzle-orm";
 import { UsersTable } from "./users-table";
 import { Metadata } from "next";
@@ -49,6 +49,11 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
     }
   });
 
+  // Fetch colleges list for user creation
+  const collegesList = await db.query.institutions.findMany({
+    orderBy: [desc(institutions.name)],
+  });
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
@@ -60,6 +65,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
         initialUsers={users} 
         page={page} 
         totalPages={totalPages} 
+        institutions={collegesList}
       />
     </div>
   );

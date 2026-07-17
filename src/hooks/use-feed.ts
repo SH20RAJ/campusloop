@@ -1,4 +1,5 @@
 import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import { Post, UserProfile, Institution } from "@/db/schema";
 
 export type FeedPost = Post & {
@@ -28,16 +29,42 @@ export function useFeed(
   type?: string,
   sort?: string,
   visibility?: string,
+  hashtag?: string,
 ) {
-  const url = new URL("/api/feed", typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
-  url.searchParams.set("scope", scope);
-  if (type && type !== "ALL") url.searchParams.set("type", type);
-  if (sort) url.searchParams.set("sort", sort);
-  if (visibility && visibility !== "all") url.searchParams.set("visibility", visibility);
+  const getKey = (pageIndex: number, previousPageData: FeedPost[] | null) => {
+    if (previousPageData && !previousPageData.length) return null;
 
-  const { data, error, isLoading, mutate } = useSWR<FeedPost[]>(url.toString(), fetcher);
+    const url = new URL("/api/feed", typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+    url.searchParams.set("scope", scope);
+    if (type && type !== "ALL") url.searchParams.set("type", type);
+    if (sort) url.searchParams.set("sort", sort);
+    if (visibility && visibility !== "all") url.searchParams.set("visibility", visibility);
+    if (hashtag) url.searchParams.set("hashtag", hashtag);
+    url.searchParams.set("page", String(pageIndex + 1));
+    url.searchParams.set("limit", "10");
 
-  return { feed: data, isLoading, isError: error, mutate };
+    return url.toString();
+  };
+
+  const { data, error, size, setSize, isLoading, mutate } = useSWRInfinite<FeedPost[]>(
+    getKey,
+    fetcher
+  );
+
+  const feed = data ? data.flat() : undefined;
+  const isReachingEnd = data && data[data.length - 1]?.length < 10;
+  const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+
+  return {
+    feed,
+    isLoading,
+    isLoadingMore,
+    isReachingEnd,
+    isError: error,
+    size,
+    setSize,
+    mutate,
+  };
 }
 
 export interface StoryGroupUser {

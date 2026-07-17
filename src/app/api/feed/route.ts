@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { desc, eq, and, sql, SQL } from "drizzle-orm";
-import { posts, userProfiles, comments, votes } from "@/db/schema";
+import { posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 
 export async function GET(req: Request) {
@@ -16,6 +16,10 @@ export async function GET(req: Request) {
     const type = searchParams.get("type") as string | null;
     const sort = searchParams.get("sort") as "latest" | "trending" | "top_voted" | "most_discussed" | null;
     const visibility = searchParams.get("visibility") as "all" | "anonymous" | "public" | null;
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
+    const offset = (page - 1) * limit;
+    const hashtag = searchParams.get("hashtag");
 
     const db = getDb();
     
@@ -40,22 +44,25 @@ export async function GET(req: Request) {
     } else if (visibility === "public") {
       conditions.push(eq(posts.isAnonymous, false));
     }
+    if (hashtag) {
+      conditions.push(sql`${posts.body} ILIKE ${`%#${hashtag}%`}`);
+    }
 
     // Trending score: votes + comments
     const trendingSql = sql<number>`
-      coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id}), 0)
+      coalesce((select sum(value)::int from votes where post_id = posts.id), 0)
       +
-      coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)
+      coalesce((select count(*)::int from comments where post_id = posts.id and status = 'PUBLISHED'), 0)
     `;
 
     // Top Voted score
     const votesCountSql = sql<number>`
-      coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id}), 0)
+      coalesce((select sum(value)::int from votes where post_id = posts.id), 0)
     `;
 
     // Most Discussed score
     const commentsCountSql = sql<number>`
-      coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)
+      coalesce((select count(*)::int from comments where post_id = posts.id and status = 'PUBLISHED'), 0)
     `;
 
     let orderClauses = [desc(posts.createdAt)];
@@ -70,7 +77,8 @@ export async function GET(req: Request) {
     const rawFeed = await db.query.posts.findMany({
       where: and(...conditions),
       orderBy: orderClauses,
-      limit: 20,
+      limit,
+      offset,
       with: {
         author: true,
         institution: true,

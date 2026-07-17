@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFeed, useStories } from "@/hooks/use-feed";
 import { FeedCard } from "@/components/ui/feed-card";
 import { StoryRing } from "@/components/ui/story-ring";
@@ -37,9 +37,36 @@ export function FeedClient() {
   const [sort, setSort] = useState<string>("latest");
   const [visibility, setVisibility] = useState<string>("all");
 
-  const { feed, isLoading: feedLoading } = useFeed(scope, type, sort, visibility);
+  const { 
+    feed, 
+    isLoading: feedLoading, 
+    isLoadingMore, 
+    isReachingEnd, 
+    size, 
+    setSize 
+  } = useFeed(scope, type, sort, visibility);
+  
   const { stories, mutate: mutateStories, isLoading: storiesLoading } = useStories();
-  const { data: profile } = useSWR<any>("/api/profile/me", fetcher);
+  const { data: profile } = useSWR<MyProfile>("/api/profile/me", fetcher);
+
+  // Infinite scroll trigger ref and observer
+  const [loadMoreRef, setLoadMoreRef] = useState<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!loadMoreRef || isReachingEnd || isLoadingMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setSize((s) => s + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(loadMoreRef);
+    return () => observer.disconnect();
+  }, [loadMoreRef, isReachingEnd, isLoadingMore, setSize]);
 
   const activeFiltersCount = 
     (scope !== "GLOBAL" ? 1 : 0) + 
@@ -282,12 +309,30 @@ export function FeedClient() {
 
       {/* ─── Main Feed List ─── */}
       <div className="flex flex-col px-4 pt-4 gap-4.5">
-        {feedLoading ? (
+        {feedLoading && size === 1 ? (
           <FeedSkeleton />
         ) : feed && feed.length > 0 ? (
-          feed.map((post) => (
-            <FeedCard key={post.id} post={post} />
-          ))
+          <>
+            {feed.map((post) => (
+              <FeedCard key={post.id} post={post} />
+            ))}
+            
+            {/* Load more trigger anchor */}
+            {!isReachingEnd && (
+              <div 
+                ref={setLoadMoreRef} 
+                className="flex items-center justify-center py-8 text-xs font-bold text-muted-foreground/80"
+              >
+                <span className="animate-pulse">Loading more posts...</span>
+              </div>
+            )}
+
+            {isReachingEnd && (
+              <div className="text-center py-10 text-[11px] font-bold text-muted-foreground/50 select-none">
+                You've looped through all posts! 🎉
+              </div>
+            )}
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center glass-card-dark rounded-3xl p-6 border border-border/40 my-4 mx-2">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 mb-4">

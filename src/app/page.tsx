@@ -23,9 +23,16 @@ import {
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Your Campus, Verified",
+  metadataBase: new URL("https://campusloop.space"),
+  title: {
+    default: "CampusLoop | Your Campus, Verified & Unfiltered",
+    template: "%s | CampusLoop"
+  },
   description:
-    "CampusLoop is the verified social network for Indian colleges. Sign up with your college email to confess anonymously, run campus polls, match, and chat.",
+    "CampusLoop is the verified student-only social network for Indian colleges. Sign up with your college email address to share anonymous confessions, settle canteen debates, swipe to match, and chat with classmates safely.",
+  applicationName: "CampusLoop",
+  authors: [{ name: "CampusLoop Team", url: "https://campusloop.space/about" }],
+  generator: "Next.js",
   keywords: [
     "campus social network",
     "college confessions",
@@ -34,23 +41,71 @@ export const metadata: Metadata = {
     "college dating",
     "campus match",
     "Indian colleges",
+    "engineering college confessions",
+    "medical college network",
+    "college matchmaking",
+    "student discussion forum",
+    "IIT confessions",
+    "BITS confessions",
+    "NIT confessions"
   ],
+  referrer: "origin-when-cross-origin",
+  creator: "CampusLoop Inc.",
+  publisher: "CampusLoop Inc.",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://campusloop.space",
+    types: {
+      "application/rss+xml": "https://campusloop.space/feed.xml",
+    },
+  },
   openGraph: {
-    title: "CampusLoop: Your Campus, Verified",
+    title: "CampusLoop | Your Campus, Verified & Unfiltered",
     description:
-      "The verified social network for Indian colleges. Confess anonymously, run campus polls, match, and chat.",
+      "The verified student-only social network for Indian colleges. Confess anonymously, run campus polls, match, and chat safely with classmates.",
     url: "https://campusloop.space",
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "CampusLoop: Your Campus, Verified",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CampusLoop: Your Campus, Verified",
+    title: "CampusLoop | Your Campus, Verified & Unfiltered",
     description:
-      "The verified social network for Indian colleges. Confess anonymously, run campus polls, match, and chat.",
+      "The verified student-only social network for Indian colleges. Confess anonymously, run campus polls, match, and chat safely with classmates.",
+    creator: "@campusloop",
+    images: ["/logo.png"],
   },
-  robots: { index: true, follow: true },
+  verification: {
+    google: "google-site-verification-id",
+  },
+  category: "social networking",
+  classification: "Student Community Platform",
 };
 
 const COLLEGES = [

@@ -57,6 +57,7 @@ export function ChatPane({ conversationId, otherParticipant, currentUserId }: Ch
       sender: {
         id: currentUserId,
         displayName: "Me",
+        officialName: "Me",
         username: "me",
         avatarUrl: "",
         userId: "",
@@ -70,6 +71,9 @@ export function ChatPane({ conversationId, otherParticipant, currentUserId }: Ch
         role: "STUDENT",
         status: "ACTIVE",
         gender: "ALL",
+        referralCount: 0,
+        referredById: null,
+        points: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       }

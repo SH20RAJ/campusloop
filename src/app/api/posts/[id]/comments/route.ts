@@ -67,6 +67,11 @@ export async function POST(req: Request, { params }: RouteParams) {
       status: "PUBLISHED",
     }).returning();
 
+    // Award +2 points
+    await db.update(userProfiles)
+      .set({ points: (profile.points || 0) + 2 })
+      .where(eq(userProfiles.id, profile.id));
+
     // Trigger notification
     if (parentId) {
       // Notify parent comment author

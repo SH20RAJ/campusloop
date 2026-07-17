@@ -61,6 +61,21 @@ export function FeedCard({ post }: FeedCardProps) {
     }
   }
 
+  function handleShare() {
+    const postUrl = `${window.location.origin}/app/post/${post.id}`;
+    let shareText = "";
+    if (post.type === "CONFESSION") {
+      shareText = `🤫 Anonymous Confession on CampusLoop:\n"${post.body.slice(0, 100)}${post.body.length > 100 ? "..." : ""}"\n\nRead the full tea at: ${postUrl}`;
+    } else if (post.type === "POLL") {
+      shareText = `📊 Campus Poll on CampusLoop:\n"${post.body.slice(0, 100)}${post.body.length > 100 ? "..." : ""}"\n\nCast your vote at: ${postUrl}`;
+    } else {
+      shareText = `🔥 Hot topic on CampusLoop:\n"${post.body.slice(0, 100)}${post.body.length > 100 ? "..." : ""}"\n\nJoin the discussion at: ${postUrl}`;
+    }
+
+    navigator.clipboard.writeText(shareText);
+    alert("Share card copied to clipboard! Paste it in your WhatsApp group or Instagram story to spread the word 🚀");
+  }
+
   return (
     <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:border-border/80 transition-colors">
       {/* Header */}
@@ -188,7 +203,10 @@ export function FeedCard({ post }: FeedCardProps) {
           <span>{post.commentsCount || 0}</span>
         </Link>
 
-        <button className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm">
+        <button 
+          onClick={handleShare}
+          className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm cursor-pointer"
+        >
           <Share2 className="h-4 w-4" />
           <span>Share</span>
         </button>

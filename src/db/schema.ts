@@ -114,6 +114,7 @@ export const userProfiles = pgTable(
 		userId: text("user_id").notNull(),
 		username: text("username").notNull(),
 		displayName: text("display_name").notNull(),
+		officialName: text("official_name"),
 		avatarUrl: text("avatar_url"),
 		institutionId: text("institution_id")
 			.notNull()
@@ -127,6 +128,9 @@ export const userProfiles = pgTable(
 		onboardingCompleted: boolean("onboarding_completed").default(false).notNull(),
 		role: userRoleEnum("role").default("STUDENT").notNull(),
 		status: userStatusEnum("status").default("ACTIVE").notNull(),
+		referralCount: integer("referral_count").default(0).notNull(),
+		referredById: text("referred_by_id").references((): any => userProfiles.id, { onDelete: "set null" }),
+		points: integer("points").default(0).notNull(),
 		createdAt,
 		updatedAt,
 	},

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import useSWR from "swr";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { cn } from "@/lib/utils";
 import { Plus, X, ChevronLeft, ChevronRight, Send, Loader2 } from "lucide-react";
@@ -44,6 +45,7 @@ const GRADIENTS = [
 
 export function StoryRing({ users, mutateStories }: StoryRingProps) {
   const { data: profile } = useSWR<any>("/api/profile/me", fetcher);
+  const router = useRouter();
   
   // Compose Story state
   const [composeOpen, setComposeOpen] = useState(false);
@@ -175,7 +177,7 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
                   setActiveUserIdx(myIdx);
                   setActiveStoryIdx(0);
                 } else {
-                  setComposeOpen(true);
+                  router.push("/app/stories/new");
                 }
               }}
               className="rounded-full bg-background p-[2px] cursor-pointer outline-none relative"
@@ -405,8 +407,14 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
               </div>
 
               {/* Center Area: Text Content */}
-              <div className="flex-1 flex items-center justify-center text-center px-4">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight leading-relaxed max-w-[280px] break-words whitespace-pre-wrap select-text drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]">
+              <div className={cn(
+                "flex-1 flex flex-col justify-center px-4 relative z-10",
+                !(users[activeUserIdx].stories[activeStoryIdx]?.backgroundColor || "").includes("text-") && "items-center text-center",
+                (users[activeUserIdx].stories[activeStoryIdx]?.backgroundColor || "").includes("text-left") && "items-start text-left",
+                (users[activeUserIdx].stories[activeStoryIdx]?.backgroundColor || "").includes("text-right") && "items-end text-right",
+                (users[activeUserIdx].stories[activeStoryIdx]?.backgroundColor || "").includes("text-center") && "items-center text-center"
+              )}>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight leading-relaxed max-w-[285px] break-words whitespace-pre-wrap select-text drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]">
                   {users[activeUserIdx].stories[activeStoryIdx]?.text || ""}
                 </h2>
               </div>

@@ -80,6 +80,7 @@ export default async function AppRootLayout({
       userId: user.id,
       username,
       displayName,
+      officialName: displayName,
       institutionId: whitelistedDomain.institutionId,
       onboardingCompleted: true,
       role: "STUDENT",

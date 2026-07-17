@@ -59,7 +59,6 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    // Insert post
     const [newPost] = await db.insert(posts).values({
       authorId: profile.id,
       institutionId: profile.institutionId,
@@ -72,6 +71,11 @@ export async function POST(req: Request) {
       status: "PUBLISHED", // Assuming no auto-hide logic for now
       riskScore: 0,
     }).returning();
+
+    // Award +5 points
+    await db.update(userProfiles)
+      .set({ points: (profile.points || 0) + 5 })
+      .where(eq(userProfiles.id, profile.id));
 
     // If type is POLL, insert options
     if (type === "POLL" && options && options.length > 0) {

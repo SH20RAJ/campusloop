@@ -50,9 +50,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", outfit.variable)}>
+    <html lang="en" className={cn("font-sans", outfit.variable)} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#f97316" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -63,6 +67,12 @@ export default function RootLayout({
                   document.documentElement.classList.remove('dark');
                 }
               } catch (_) {}
+              
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+                });
+              }
             `
           }}
         />

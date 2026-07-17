@@ -333,7 +333,7 @@ export function VerifyDemo() {
           <>
             <ShieldCheck className="size-3.5 text-primary" />
             <span className="font-medium text-primary">
-              {domain} is a campus domain. An OTP would land in your inbox now.
+              {domain} is a campus domain. An OTP would land in your inbox now go to /join.
             </span>
           </>
         )}

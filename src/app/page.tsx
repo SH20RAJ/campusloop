@@ -13,6 +13,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/landing/reveal";
 import { HeroPreview } from "@/components/landing/hero-preview";
+import { Marquee } from "@/components/ui/marquee";
 import {
   ConfessionDemo,
   MatchDemo,
@@ -207,24 +208,25 @@ export default async function LandingPage() {
         </section>
 
         {/* College marquee */}
-        <section className="overflow-hidden border-y border-border/60 py-10">
-          <p className="pb-6 text-center text-sm font-medium text-muted-foreground">
-            Students are looping in from
-          </p>
+        <section className="overflow-hidden border-y border-border/60 py-8 bg-muted/5">
+          <div className="pb-5 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 flex flex-col sm:flex-row items-center justify-center gap-x-2.5 gap-y-1 px-6">
+            <span>Colleges Enrolled: <strong className="text-primary font-extrabold text-sm tracking-normal">1,350+</strong> and adding more</span>
+            <span className="hidden sm:inline-block text-muted-foreground/30">•</span>
+            <span>Request your college by emailing <a href="mailto:mail@campusloop.space" className="text-primary hover:underline font-extrabold lowercase tracking-normal">mail@campusloop.space</a></span>
+          </div>
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-background to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-background to-transparent" />
-            <div className="flex w-max animate-marquee gap-14 [--duration:45s]">
-              {[...COLLEGES, ...COLLEGES].map((name, i) => (
+            <Marquee pauseOnHover className="[--duration:30s] [--gap:3rem]">
+              {COLLEGES.map((name) => (
                 <span
-                  key={`${name}-${i}`}
-                  aria-hidden={i >= COLLEGES.length}
-                  className="whitespace-nowrap text-lg font-semibold text-muted-foreground/60"
+                  key={name}
+                  className="whitespace-nowrap text-lg font-semibold text-muted-foreground/50 transition-colors hover:text-primary cursor-default px-4"
                 >
                   {name}
                 </span>
               ))}
-            </div>
+            </Marquee>
           </div>
         </section>
 

@@ -103,7 +103,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
 
       <div className="p-4 space-y-6">
         <FeedCard post={post as any} />
-        <PostComments postId={id} />
+        <PostComments postId={id} currentUser={profile} />
       </div>
     </main>
   );

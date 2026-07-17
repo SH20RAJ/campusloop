@@ -18,7 +18,7 @@ const fetcher = (url: string) => fetch(url).then((res) => {
   return res.json() as Promise<CommentWithAuthor[]>;
 });
 
-export function PostComments({ postId }: { postId: string }) {
+export function PostComments({ postId, currentUser }: { postId: string; currentUser: UserProfile }) {
   const { data: comments, error, isLoading, mutate } = useSWR<CommentWithAuthor[]>(
     `/api/posts/${postId}/comments`,
     fetcher
@@ -58,8 +58,8 @@ export function PostComments({ postId }: { postId: string }) {
 
       setBody("");
       mutate();
-    } catch (err: any) {
-      setSubmitError(err.message || "An error occurred");
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -91,8 +91,8 @@ export function PostComments({ postId }: { postId: string }) {
       setReplyBody("");
       setReplyingToId(null);
       mutate();
-    } catch (err: any) {
-      setReplyError(err.message || "An error occurred");
+    } catch (err: unknown) {
+      setReplyError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsReplying(false);
     }
@@ -107,172 +107,222 @@ export function PostComments({ postId }: { postId: string }) {
   return (
     <div className="space-y-6">
       {/* Root Comment Form */}
-      <form onSubmit={handleRootSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <textarea
-          placeholder="Share your thoughts..."
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          required
-          rows={3}
-          className="flex min-h-[70px] w-full rounded-xl border border-border/80 bg-transparent px-3.5 py-2.5 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none font-medium leading-relaxed"
-        />
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <input 
-              id="anon-comment"
-              type="checkbox"
-              checked={isAnonymous}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="h-4 w-4 rounded border-border/80 text-primary focus:ring-ring cursor-pointer"
+      <form onSubmit={handleRootSubmit} className="space-y-3.5 rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/20">
+        <div className="flex gap-3 items-start">
+          <Avatar className="h-9 w-9 border shrink-0">
+            {isAnonymous ? (
+              <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
+                <Lock className="h-3.5 w-3.5" />
+              </AvatarFallback>
+            ) : (
+              <>
+                <AvatarImage src={currentUser.avatarUrl || ""} />
+                <AvatarFallback className="text-xs bg-primary/10 text-primary font-bold">
+                  {currentUser.displayName[0].toUpperCase()}
+                </AvatarFallback>
+              </>
+            )}
+          </Avatar>
+          
+          <div className="flex-1 min-w-0">
+            <textarea
+              placeholder={isAnonymous ? "Share anonymously..." : "Share your thoughts..."}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              required
+              rows={2}
+              className="w-full bg-muted/20 hover:bg-muted/40 focus:bg-background border border-border/60 focus:border-primary/45 rounded-xl px-4 py-3 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/20 resize-none font-medium leading-relaxed transition-all shadow-2xs"
             />
-            <label htmlFor="anon-comment" className="text-xs font-bold text-muted-foreground select-none cursor-pointer flex items-center gap-1">
-              <Lock className="h-3 w-3" /> Comment Anonymously
-            </label>
           </div>
+        </div>
+
+        <div className="flex items-center justify-between pl-12">
+          {/* Anonymity Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setIsAnonymous(!isAnonymous)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-bold transition-all cursor-pointer select-none",
+              isAnonymous 
+                ? "bg-primary/10 border-primary/25 text-primary shadow-2xs" 
+                : "bg-background border-border/80 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            )}
+          >
+            {isAnonymous ? (
+              <>
+                <Lock className="h-3 w-3 text-primary animate-[pulse_2s_infinite]" />
+                <span>Posting Anonymously</span>
+              </>
+            ) : (
+              <>
+                <Lock className="h-3 w-3" />
+                <span>Go Anonymous</span>
+              </>
+            )}
+          </button>
 
           <button
             type="submit"
             disabled={isSubmitting || !body.trim()}
-            className="rounded-xl bg-primary text-white h-8.5 px-4 text-xs font-bold shadow-md shadow-primary/10 hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer"
+            className="rounded-xl bg-primary text-white h-8 px-4 text-xs font-bold shadow-md shadow-primary/10 hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
           >
             {isSubmitting ? "Posting..." : "Comment"}
           </button>
         </div>
 
         {submitError && (
-          <p className="text-xs text-destructive font-bold">{submitError}</p>
+          <p className="text-[10px] text-destructive font-bold pl-12">{submitError}</p>
         )}
       </form>
 
       {/* Comments List */}
       <div className="space-y-5">
-        <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+        <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5 border-b border-border/30 pb-2">
           <MessageSquare className="h-4 w-4 text-muted-foreground" /> Discussions ({comments?.length || 0})
         </h3>
 
         {isLoading ? (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-              <div className="flex items-center gap-2.5">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <Skeleton className="h-3 w-24 rounded" />
+            <div className="flex gap-3 items-start">
+              <Skeleton className="h-8.5 w-8.5 rounded-full shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-10 w-2/3 rounded-2xl" />
               </div>
-              <Skeleton className="h-3.5 w-3/4 rounded pl-10" />
             </div>
-            <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-              <div className="flex items-center gap-2.5">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <Skeleton className="h-3 w-24 rounded" />
+            <div className="flex gap-3 items-start">
+              <Skeleton className="h-8.5 w-8.5 rounded-full shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-10 w-1/2 rounded-2xl" />
               </div>
-              <Skeleton className="h-3.5 w-3/4 rounded pl-10" />
             </div>
           </div>
         ) : error ? (
           <p className="text-xs font-bold text-destructive">Failed to load comments.</p>
         ) : rootComments.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {rootComments.map((comment) => {
               const rootDisplayName = comment.isAnonymous ? "Anonymous Student" : comment.author.displayName;
               const rootHandle = comment.isAnonymous ? "anonymous" : comment.author.username;
-              const rootFallback = comment.isAnonymous ? "A" : comment.author.displayName[0];
+              const rootFallback = comment.isAnonymous ? "A" : comment.author.displayName[0].toUpperCase();
               const rootAvatar = comment.isAnonymous ? "" : comment.author.avatarUrl;
               const replies = getRepliesFor(comment.id);
 
               return (
-                <div key={comment.id} className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
-                  {/* Root Comment Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      {!comment.isAnonymous ? (
-                        <Link href={`/app/profile/${rootHandle}`}>
-                          <Avatar className="h-8 w-8 border hover:opacity-85 transition-opacity cursor-pointer">
-                            <AvatarImage src={rootAvatar || ""} />
-                            <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{rootFallback}</AvatarFallback>
-                          </Avatar>
-                        </Link>
-                      ) : (
-                        <Avatar className="h-8 w-8 border">
+                <div key={comment.id} className="space-y-2">
+                  {/* Root Comment Container */}
+                  <div className="flex gap-3 items-start group">
+                    {/* Avatar */}
+                    {!comment.isAnonymous ? (
+                      <Link href={`/app/profile/${rootHandle}`} className="shrink-0">
+                        <Avatar className="h-8.5 w-8.5 border hover:opacity-85 transition-opacity cursor-pointer">
                           <AvatarImage src={rootAvatar || ""} />
-                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{rootFallback}</AvatarFallback>
+                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">{rootFallback}</AvatarFallback>
                         </Avatar>
-                      )}
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-foreground flex items-center gap-1">
+                      </Link>
+                    ) : (
+                      <Avatar className="h-8.5 w-8.5 border shrink-0">
+                        <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
+                          <Lock className="h-3.5 w-3.5" />
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+
+                    {/* Bubble Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="inline-block rounded-2xl rounded-tl-none bg-muted/30 border border-border/20 px-4 py-2.5 shadow-2xs">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           {!comment.isAnonymous ? (
-                            <Link href={`/app/profile/${rootHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
+                            <Link href={`/app/profile/${rootHandle}`} className="text-xs font-bold text-foreground hover:text-primary transition-colors hover:underline cursor-pointer">
                               {rootDisplayName}
                             </Link>
                           ) : (
-                            rootDisplayName
+                            <span className="text-xs font-bold text-foreground">
+                              {rootDisplayName}
+                            </span>
                           )}
-                          {!comment.isAnonymous && <span className="text-blue-500 text-[9px]">●</span>}
+                          {!comment.isAnonymous && <span className="text-blue-500 text-[8px]">●</span>}
+                          <span className="text-[9px] font-medium text-muted-foreground/75">@{rootHandle}</span>
+                        </div>
+                        
+                        <p className="text-xs leading-relaxed text-foreground font-medium mt-1 select-text break-words whitespace-pre-wrap">
+                          {comment.body}
+                        </p>
+                      </div>
+
+                      {/* Action buttons under bubble */}
+                      <div className="flex items-center gap-4 pl-1 mt-1 text-[10px] font-bold text-muted-foreground/75">
+                        <span className="cursor-default select-none font-medium">
+                          {new Date(comment.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                         </span>
-                        <span className="text-[10px] text-muted-foreground">@{rootHandle}</span>
+                        
+                        <button
+                          onClick={() => {
+                            setReplyingToId(comment.id);
+                            setReplyBody("");
+                            setReplyIsAnon(false);
+                          }}
+                          className="hover:text-primary hover:underline transition-all cursor-pointer font-bold flex items-center gap-0.5"
+                        >
+                          <Reply className="h-2.5 w-2.5" />
+                          <span>Reply</span>
+                        </button>
                       </div>
                     </div>
-
-                    <button
-                      onClick={() => {
-                        setReplyingToId(comment.id);
-                        setReplyBody("");
-                        setReplyIsAnon(false);
-                      }}
-                      className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                    >
-                      <Reply className="h-3 w-3" />
-                      <span>Reply</span>
-                    </button>
                   </div>
-
-                  {/* Body */}
-                  <p className="text-xs leading-relaxed text-foreground font-medium pl-10.5">
-                    {comment.body}
-                  </p>
 
                   {/* Replies List */}
                   {replies.length > 0 && (
-                    <div className="pl-6 border-l-2 border-border/50 ml-4.5 mt-3 space-y-3.5">
+                    <div className="pl-4 ml-4.5 border-l border-border/30 space-y-3.5 mt-2">
                       {replies.map((reply) => {
                         const replyDisplayName = reply.isAnonymous ? "Anonymous Student" : reply.author.displayName;
                         const replyHandle = reply.isAnonymous ? "anonymous" : reply.author.username;
-                        const replyFallback = reply.isAnonymous ? "A" : reply.author.displayName[0];
+                        const replyFallback = reply.isAnonymous ? "A" : reply.author.displayName[0].toUpperCase();
                         const replyAvatar = reply.isAnonymous ? "" : reply.author.avatarUrl;
 
                         return (
-                          <div key={reply.id} className="space-y-1.5">
-                            <div className="flex items-center gap-2">
-                              <CornerDownRight className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
-                              {!reply.isAnonymous ? (
-                                <Link href={`/app/profile/${replyHandle}`}>
-                                  <Avatar className="h-6.5 w-6.5 border hover:opacity-85 transition-opacity cursor-pointer">
-                                    <AvatarImage src={replyAvatar || ""} />
-                                    <AvatarFallback className="text-[8px] bg-primary/10 text-primary">{replyFallback}</AvatarFallback>
-                                  </Avatar>
-                                </Link>
-                              ) : (
-                                <Avatar className="h-6.5 w-6.5 border">
+                          <div key={reply.id} className="flex gap-2.5 items-start group">
+                            {/* Avatar */}
+                            {!reply.isAnonymous ? (
+                              <Link href={`/app/profile/${replyHandle}`} className="shrink-0">
+                                <Avatar className="h-7 w-7 border hover:opacity-85 transition-opacity cursor-pointer">
                                   <AvatarImage src={replyAvatar || ""} />
-                                  <AvatarFallback className="text-[8px] bg-primary/10 text-primary">{replyFallback}</AvatarFallback>
+                                  <AvatarFallback className="text-[9px] bg-primary/10 text-primary font-bold">{replyFallback}</AvatarFallback>
                                 </Avatar>
-                              )}
-                              <div className="flex flex-col min-w-0">
-                                <span className="text-[11px] font-bold text-foreground flex items-center gap-0.5 truncate">
+                              </Link>
+                            ) : (
+                              <Avatar className="h-7 w-7 border shrink-0">
+                                <AvatarFallback className="text-[9px] bg-primary/10 text-primary font-bold">
+                                  <Lock className="h-3 w-3" />
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+
+                            {/* Bubble */}
+                            <div className="flex-1 min-w-0">
+                              <div className="inline-block rounded-2xl rounded-tl-none bg-muted/20 border border-border/15 px-3.5 py-2 shadow-2xs">
+                                <div className="flex items-center gap-1.5 flex-wrap">
                                   {!reply.isAnonymous ? (
-                                    <Link href={`/app/profile/${replyHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
+                                    <Link href={`/app/profile/${replyHandle}`} className="text-[11px] font-bold text-foreground hover:text-primary transition-colors hover:underline cursor-pointer">
                                       {replyDisplayName}
                                     </Link>
                                   ) : (
-                                    replyDisplayName
+                                    <span className="text-[11px] font-bold text-foreground">
+                                      {replyDisplayName}
+                                    </span>
                                   )}
-                                  {!reply.isAnonymous && <span className="text-blue-500 text-[8px]">●</span>}
+                                  {!reply.isAnonymous && <span className="text-blue-500 text-[7px]">●</span>}
+                                  <span className="text-[8.5px] font-medium text-muted-foreground/75">@{replyHandle}</span>
+                                </div>
+                                <p className="text-[11px] leading-relaxed text-foreground font-medium mt-0.5 select-text break-words whitespace-pre-wrap">
+                                  {reply.body}
+                                </p>
+                              </div>
+                              <div className="pl-1 mt-0.5 text-[9px] font-bold text-muted-foreground/75">
+                                <span className="cursor-default select-none font-medium">
+                                  {new Date(reply.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                                 </span>
-                                <span className="text-[9px] text-muted-foreground truncate">@{replyHandle}</span>
                               </div>
                             </div>
-                            <p className="text-xs leading-relaxed text-foreground font-medium pl-12">
-                              {reply.body}
-                            </p>
                           </div>
                         );
                       })}
@@ -281,52 +331,80 @@ export function PostComments({ postId }: { postId: string }) {
 
                   {/* Inline Reply Composer Form */}
                   {replyingToId === comment.id && (
-                    <div className="pl-6 border-l-2 border-primary/20 ml-4.5 mt-3 animate-in slide-in-from-top-1 duration-200">
-                      <form onSubmit={(e) => handleReplySubmit(e, comment.id)} className="space-y-3 bg-muted/30 border border-border/80 rounded-xl p-3">
+                    <div className="pl-4 ml-4.5 border-l border-primary/20 mt-2.5 animate-in slide-in-from-top-1 duration-200">
+                      <form onSubmit={(e) => handleReplySubmit(e, comment.id)} className="space-y-2.5 bg-muted/20 border border-border/50 rounded-xl p-3.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-primary flex items-center gap-1">
-                            <CornerDownRight className="h-3 w-3" /> Replying to @{rootHandle}
+                          <span className="text-[9px] font-bold text-primary flex items-center gap-1">
+                            <CornerDownRight className="h-2.5 w-2.5" /> Replying to @{rootHandle}
                           </span>
                           <button
                             type="button"
                             onClick={() => setReplyingToId(null)}
-                            className="h-5 w-5 hover:bg-muted rounded flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                            className="h-5 w-5 hover:bg-muted rounded flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
                           >
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
-                        <textarea
-                          placeholder="Type your reply..."
-                          value={replyBody}
-                          onChange={(e) => setReplyBody(e.target.value)}
-                          required
-                          rows={2}
-                          className="flex min-h-[40px] w-full rounded-lg border border-border bg-background px-3 py-2 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none font-medium leading-relaxed"
-                        />
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <input 
-                              id={`anon-reply-${comment.id}`}
-                              type="checkbox"
-                              checked={replyIsAnon}
-                              onChange={(e) => setReplyIsAnon(e.target.checked)}
-                              className="h-3.5 w-3.5 rounded border-border/80 text-primary focus:ring-ring cursor-pointer"
-                            />
-                            <label htmlFor={`anon-reply-${comment.id}`} className="text-[10px] font-bold text-muted-foreground select-none cursor-pointer flex items-center gap-0.5">
-                              <Lock className="h-2.5 w-2.5" /> Reply Anonymously
-                            </label>
-                          </div>
+                        
+                        <div className="flex gap-2.5 items-start">
+                          <Avatar className="h-7 w-7 border shrink-0">
+                            {replyIsAnon ? (
+                              <AvatarFallback className="text-[9px] bg-primary/10 text-primary font-bold">
+                                <Lock className="h-3 w-3" />
+                              </AvatarFallback>
+                            ) : (
+                              <>
+                                <AvatarImage src={currentUser.avatarUrl || ""} />
+                                <AvatarFallback className="text-[9px] bg-primary/10 text-primary font-bold">
+                                  {currentUser.displayName[0].toUpperCase()}
+                                </AvatarFallback>
+                              </>
+                            )}
+                          </Avatar>
+                          <textarea
+                            placeholder="Type your reply..."
+                            value={replyBody}
+                            onChange={(e) => setReplyBody(e.target.value)}
+                            required
+                            rows={1}
+                            className="flex min-h-[32px] w-full rounded-lg border border-border bg-background px-3 py-1.5 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none font-medium leading-relaxed"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between pl-9.5">
+                          <button
+                            type="button"
+                            onClick={() => setReplyIsAnon(!replyIsAnon)}
+                            className={cn(
+                              "flex items-center gap-1 px-2.5 py-1 rounded-md border text-[9px] font-bold transition-all cursor-pointer select-none",
+                              replyIsAnon 
+                                ? "bg-primary/10 border-primary/20 text-primary" 
+                                : "bg-background border-border/80 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            )}
+                          >
+                            {replyIsAnon ? (
+                              <>
+                                <Lock className="h-2.5 w-2.5 text-primary animate-[pulse_2s_infinite]" />
+                                <span>Anonymously</span>
+                              </>
+                            ) : (
+                              <>
+                                <Lock className="h-2.5 w-2.5" />
+                                <span>Go Anonymous</span>
+                              </>
+                            )}
+                          </button>
 
                           <button
                             type="submit"
                             disabled={isReplying || !replyBody.trim()}
-                            className="rounded-lg bg-primary text-white h-7.5 px-3.5 text-[10px] font-bold shadow-sm hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer"
+                            className="rounded-lg bg-primary text-white h-7 px-3 text-[10px] font-bold shadow-sm hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer"
                           >
                             {isReplying ? "Replying..." : "Post"}
                           </button>
                         </div>
                         {replyError && (
-                          <p className="text-[10px] text-destructive font-bold">{replyError}</p>
+                          <p className="text-[9px] text-destructive font-bold pl-9.5">{replyError}</p>
                         )}
                       </form>
                     </div>

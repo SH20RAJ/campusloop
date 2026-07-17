@@ -37,57 +37,129 @@ export function ConfessionDemo() {
     .replace(EMAIL_RE, "[removed]");
   const hadPii = scrubbed !== text;
 
+  const presets = [
+    {
+      label: "Crush contact",
+      text: "Lost my heart to the senior in library. Call me at 9876543210 if you see this!",
+    },
+    {
+      label: "Lost item email",
+      text: "Found keychains at canteen. Email me at sneakypeek@iitb.ac.in to get them.",
+    },
+    {
+      label: "Clean confession",
+      text: "Samosa prices in the canteen are rising faster than our BTech placements. Unacceptable!",
+    },
+  ];
+
   return (
-    <div className="space-y-3">
-      <div className="space-y-1.5">
-        <label
-          htmlFor="confession-demo"
-          className="text-sm font-medium text-foreground"
-        >
-          Try the filter. Type a phone number or email.
-        </label>
-        <Input
-          id="confession-demo"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="call me on 9876543210 after the fest"
-          className="bg-background"
-        />
+    <div className="grid gap-6 md:grid-cols-5 items-start mt-2">
+      {/* Interactive Input Area */}
+      <div className="md:col-span-3 space-y-4">
+        <div className="space-y-2">
+          <label
+            htmlFor="confession-demo"
+            className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+          >
+            Write a mock confession
+          </label>
+          <textarea
+            id="confession-demo"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Type anything... e.g. call me on 9876543210 or email sneakypeek@iitb.ac.in"
+            rows={3}
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all resize-none shadow-sm"
+          />
+        </div>
+
+        {/* Presets */}
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Or click a demo preset:</p>
+          <div className="flex flex-wrap gap-2">
+            {presets.map((preset) => (
+              <button
+                key={preset.label}
+                onClick={() => setText(preset.text)}
+                className="rounded-lg border border-border bg-background hover:bg-muted/50 hover:border-primary/30 px-3 py-1.5 text-xs font-medium transition-all cursor-pointer text-muted-foreground hover:text-foreground"
+              >
+                {preset.label}
+              </button>
+            ))}
+            {text && (
+              <button
+                onClick={() => setText("")}
+                className="rounded-lg border border-transparent bg-red-500/10 hover:bg-red-500/20 text-red-500 px-3 py-1.5 text-xs font-medium transition-all cursor-pointer"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="rounded-lg bg-background p-3 font-mono text-xs leading-relaxed ring-1 ring-foreground/10">
-        {text ? (
-          <span className="text-foreground">{scrubbed}</span>
-        ) : (
-          <span className="text-muted-foreground">
-            Your words appear here exactly as they would be stored.
-          </span>
-        )}
-      </div>
+      {/* Live Preview Card */}
+      <div className="md:col-span-2 space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Live Feed Preview
+        </p>
+        <div className="relative overflow-hidden rounded-xl border border-border bg-card p-4 shadow-sm transition-all duration-300 ring-1 ring-primary/5 hover:border-primary/20">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-3 border-b border-border/40">
+            <div className="flex items-center gap-2">
+              <div className="size-7 rounded-full bg-gradient-to-br from-primary via-accent to-secondary flex items-center justify-center text-[10px] font-mono font-bold text-white shadow-sm">
+                {text ? anonKey(text).slice(5, 7).toUpperCase() : "??"}
+              </div>
+              <div>
+                <p className="text-xs font-mono font-bold text-foreground">
+                  {text ? anonKey(text) : "anon_user"}
+                </p>
+                <p className="text-[9px] text-muted-foreground">Verified Student</p>
+              </div>
+            </div>
+            <Badge className="bg-primary/10 text-primary border-none text-[9px] px-1.5 py-0">
+              Just Now
+            </Badge>
+          </div>
 
-      <div aria-live="polite" className="flex h-5 items-center gap-1.5 text-xs">
-        {!text ? (
-          <span className="text-muted-foreground">
-            Nothing typed yet. The filter runs as you type.
-          </span>
-        ) : hadPii ? (
-          <>
-            <ShieldAlert className="size-3.5 text-primary" />
-            <span className="font-medium text-primary">
-              Personal details stripped before anything saves.
+          {/* Body */}
+          <div className="py-4 min-h-[70px]">
+            {text ? (
+              <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                {scrubbed}
+              </p>
+            ) : (
+              <p className="text-sm italic text-muted-foreground/80">
+                Your words appear here exactly as they would be stored... try typing phone numbers or emails to see the auto-scrubbing.
+              </p>
+            )}
+          </div>
+
+          {/* Security Alert Badge */}
+          <div className="flex items-center justify-between pt-3 border-t border-border/40 text-[10px]">
+            <div className="flex items-center gap-1.5">
+              {!text ? (
+                <>
+                  <ShieldCheck className="size-3.5 text-muted-foreground/60" />
+                  <span className="text-muted-foreground">Idle</span>
+                </>
+              ) : hadPii ? (
+                <>
+                  <ShieldAlert className="size-3.5 text-amber-500 animate-pulse" />
+                  <span className="font-semibold text-amber-500">PII Redacted</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="size-3.5 text-emerald-500" />
+                  <span className="font-semibold text-emerald-500">Clean post</span>
+                </>
+              )}
+            </div>
+            <span className="text-[9px] font-mono text-muted-foreground/75">
+              {text ? `${text.length} chars` : ""}
             </span>
-          </>
-        ) : (
-          <>
-            <ShieldCheck className="size-3.5 text-primary" />
-            <span className="font-medium text-primary">
-              Clean. It posts as
-            </span>
-            <span className="font-mono font-semibold text-primary">
-              {anonKey(text)}
-            </span>
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );

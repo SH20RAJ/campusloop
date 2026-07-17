@@ -9,12 +9,16 @@ import { Toaster } from "sonner";
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://campusloop.space"),
   title: {
-    default: "CampusLoop — Your Verified Campus Social Network",
-    template: "%s — CampusLoop",
+    default: "CampusLoop | Your Verified Campus Social Network",
+    template: "%s | CampusLoop",
   },
   description:
     "Join your real campus. Speak freely. Stay safe. CampusLoop is the verified student-only social network gatekept by college email. Share confessions, drop polls, and connect with students across Indian colleges.",
+  applicationName: "CampusLoop",
+  authors: [{ name: "CampusLoop Team", url: "https://campusloop.space/about" }],
+  generator: "Next.js",
   keywords: [
     "campus social network",
     "college confessions",
@@ -27,22 +31,64 @@ export const metadata: Metadata = {
     "campus gossip",
     "college dating",
   ],
-  icons: { icon: "/favicon.svg" },
+  referrer: "origin-when-cross-origin",
+  creator: "CampusLoop Inc.",
+  publisher: "CampusLoop Inc.",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/logo.png",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://campusloop.space",
+    types: {
+      "application/rss+xml": "https://campusloop.space/feed.xml",
+    },
+  },
   openGraph: {
-    title: "CampusLoop — Your Verified Campus Social Network",
+    title: "CampusLoop | Your Verified Campus Social Network",
     description:
-      "Join your real campus. Speak freely. Stay safe. Meet students like you.",
-    type: "website",
-    locale: "en_IN",
+      "Join your real campus. Speak freely. Stay safe. Meet students like you. Share confessions, run polls, and connect securely.",
+    url: "https://campusloop.space",
     siteName: "CampusLoop",
+    locale: "en_IN",
+    type: "website",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "CampusLoop Logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CampusLoop — Your Verified Campus Social Network",
+    title: "CampusLoop | Your Verified Campus Social Network",
     description:
-      "Join your real campus. Speak freely. Stay safe. Meet students like you.",
+      "Join your real campus. Speak freely. Stay safe. Meet students like you. Share confessions, run polls, and connect securely.",
+    creator: "@campusloop",
+    images: ["/logo.png"],
   },
-  robots: { index: true, follow: true },
+  category: "social networking",
+  classification: "Student Community Platform",
 };
 
 export default function RootLayout({

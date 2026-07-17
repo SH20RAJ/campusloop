@@ -14,7 +14,7 @@ function getDatabaseUrl() {
 }
 
 function createClient() {
-	const options: postgres.Options = {
+	const options: postgres.Options<never> = {
 		max: 10,
 		prepare: false,
 	};

@@ -204,7 +204,7 @@ async function main() {
     iitbId = fallbackId;
   }
 
-  if (!bitm) {
+  if (!bitmId) {
     console.log("BIT Mesra domain not found in CSV, seeding fallback...");
     const fallbackId = "inst_bitm_fallback";
     await db.insert(institutions).values({
@@ -236,7 +236,7 @@ async function main() {
     { id: "prof_kabir", displayName: "Kabir Malhotra", username: "kabir_m", bio: "IITB '27. Musician. Jamming is my therapy.", college: iitbId, gender: "MALE", referralCount: 0, referredById: "prof_sneha" },
     { id: "prof_aditi", displayName: "Aditi Rao", username: "aditi_rao", bio: "Design student. Pixel perfect layouts make me happy.", college: iitbId, gender: "FEMALE", referralCount: 0, referredById: "prof_sneha" },
     { id: "prof_priya", displayName: "Priya Sharma", username: "priya_sharma", bio: "Chemistry major. Let's discover some elements.", college: iitbId, gender: "FEMALE", referralCount: 0, referredById: "prof_rohan" },
-    { id: "prof_btech_user", displayName: "BIT Student", username: "bit_student", bio: "BIT Mesra student. Tech and life.", college: bitm.id, gender: "MALE", referralCount: 0, referredById: null },
+    { id: "prof_btech_user", displayName: "BIT Student", username: "bit_student", bio: "BIT Mesra student. Tech and life.", college: bitmId, gender: "MALE", referralCount: 0, referredById: null },
     { id: "prof_ishaan", displayName: "Ishaan Sen", username: "ishaan_sen", bio: "Football & Coffee", college: iitbId, gender: "MALE", referralCount: 0, referredById: "prof_aarav" },
     { id: "prof_meera", displayName: "Meera Nair", username: "meera_nair", bio: "Classical dancer & developer", college: iitbId, gender: "FEMALE", referralCount: 0, referredById: "prof_aarav" },
     { id: "prof_dev", displayName: "Dev Dixit", username: "dev_dixit", bio: "Android Developer", college: iitbId, gender: "MALE", referralCount: 0, referredById: "prof_aarav" },

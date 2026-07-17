@@ -37,14 +37,17 @@ export async function GET() {
           stories: [],
         });
       }
-      userStoriesMap.get(story.userId).stories.push({
-        id: story.id,
-        mediaUrl: story.mediaUrl,
-        text: story.text,
-        backgroundColor: story.backgroundColor,
-        createdAt: story.createdAt,
-        expiresAt: story.expiresAt,
-      });
+      const userStories = userStoriesMap.get(story.userId);
+      if (userStories) {
+        userStories.stories.push({
+          id: story.id,
+          mediaUrl: story.mediaUrl,
+          text: story.text,
+          backgroundColor: story.backgroundColor,
+          createdAt: story.createdAt,
+          expiresAt: story.expiresAt,
+        });
+      }
     }
 
     const result = Array.from(userStoriesMap.values());

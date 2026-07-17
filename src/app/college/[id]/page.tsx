@@ -3,6 +3,7 @@ import { institutions, posts } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
+import { FeedPost } from "@/hooks/use-feed";
 import { School, MapPin, Globe, Calendar, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 

@@ -10,7 +10,14 @@ export const metadata: Metadata = {
   title: "Messages | CampusLoop",
 };
 
-export default async function ChatPage() {
+export default async function ChatPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ userId?: string }>;
+}) {
+  const resolvedParams = await searchParams;
+  const targetUserId = resolvedParams.userId;
+
   const user = await hexclaveServerApp.getUser();
   if (!user) redirect("/join");
 
@@ -21,5 +28,5 @@ export default async function ChatPage() {
 
   if (!profile) redirect("/app/onboarding");
 
-  return <ChatDashboard currentUserId={profile.id} />;
+  return <ChatDashboard currentUserId={profile.id} targetUserId={targetUserId} />;
 }

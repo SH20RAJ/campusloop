@@ -185,7 +185,7 @@ export function PostComments({ postId }: { postId: string }) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       {!comment.isAnonymous ? (
-                        <Link href={`/app/profile?id=${comment.authorId}`}>
+                        <Link href={`/app/profile/${rootHandle}`}>
                           <Avatar className="h-8 w-8 border hover:opacity-85 transition-opacity cursor-pointer">
                             <AvatarImage src={rootAvatar || ""} />
                             <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{rootFallback}</AvatarFallback>
@@ -200,7 +200,7 @@ export function PostComments({ postId }: { postId: string }) {
                       <div className="flex flex-col">
                         <span className="text-xs font-bold text-foreground flex items-center gap-1">
                           {!comment.isAnonymous ? (
-                            <Link href={`/app/profile?id=${comment.authorId}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
+                            <Link href={`/app/profile/${rootHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
                               {rootDisplayName}
                             </Link>
                           ) : (
@@ -244,7 +244,7 @@ export function PostComments({ postId }: { postId: string }) {
                             <div className="flex items-center gap-2">
                               <CornerDownRight className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
                               {!reply.isAnonymous ? (
-                                <Link href={`/app/profile?id=${reply.authorId}`}>
+                                <Link href={`/app/profile/${replyHandle}`}>
                                   <Avatar className="h-6.5 w-6.5 border hover:opacity-85 transition-opacity cursor-pointer">
                                     <AvatarImage src={replyAvatar || ""} />
                                     <AvatarFallback className="text-[8px] bg-primary/10 text-primary">{replyFallback}</AvatarFallback>
@@ -259,7 +259,7 @@ export function PostComments({ postId }: { postId: string }) {
                               <div className="flex flex-col min-w-0">
                                 <span className="text-[11px] font-bold text-foreground flex items-center gap-0.5 truncate">
                                   {!reply.isAnonymous ? (
-                                    <Link href={`/app/profile?id=${reply.authorId}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
+                                    <Link href={`/app/profile/${replyHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
                                       {replyDisplayName}
                                     </Link>
                                   ) : (

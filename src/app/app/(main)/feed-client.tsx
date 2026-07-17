@@ -23,7 +23,7 @@ export function FeedClient() {
   const [showFilters, setShowFilters] = useState(false);
   
   // Dashboard state
-  const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("CAMPUS");
+  const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
   const [type, setType] = useState<string>("ALL");
   const [sort, setSort] = useState<string>("latest");
   const [visibility, setVisibility] = useState<string>("all");
@@ -33,13 +33,13 @@ export function FeedClient() {
   const { data: profile } = useSWR<any>("/api/profile/me", fetcher);
 
   const activeFiltersCount = 
-    (scope !== "CAMPUS" ? 1 : 0) + 
+    (scope !== "GLOBAL" ? 1 : 0) + 
     (type !== "ALL" ? 1 : 0) + 
     (sort !== "latest" ? 1 : 0) + 
     (visibility !== "all" ? 1 : 0);
 
   const resetFilters = () => {
-    setScope("CAMPUS");
+    setScope("GLOBAL");
     setType("ALL");
     setSort("latest");
     setVisibility("all");

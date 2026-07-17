@@ -1,22 +1,25 @@
 import { getDb } from "@/db";
 import { posts, userProfiles } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { Metadata } from "next";
-import { ProfileClientView } from "./profile-client";
+import { ProfileClientView } from "../profile-client";
 
-export const metadata: Metadata = {
-  title: "Profile | CampusLoop",
-};
+interface ProfileDetailProps {
+  params: Promise<{ username: string }>;
+}
 
-export default async function ProfilePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ id?: string }>;
-}) {
-  const resolvedParams = await searchParams;
-  const targetId = resolvedParams.id;
+export async function generateMetadata({ params }: ProfileDetailProps): Promise<Metadata> {
+  const { username } = await params;
+  return {
+    title: `@${username} | CampusLoop`,
+    description: `View @${username}'s student profile, posts, and campus activities on CampusLoop.`,
+  };
+}
+
+export default async function ProfileDetailPage({ params }: ProfileDetailProps) {
+  const { username } = await params;
 
   const user = await hexclaveServerApp.getUser();
   if (!user) {
@@ -24,29 +27,27 @@ export default async function ProfilePage({
   }
 
   const db = getDb();
-  
-  if (targetId) {
-    const targetProfile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.id, targetId),
-    });
-    if (targetProfile) {
-      redirect(`/app/profile/${targetProfile.username}`);
-    }
-  }
-
   const currentProfile = await db.query.userProfiles.findFirst({
     where: eq(userProfiles.userId, user.id),
-    with: {
-      institution: true,
-    }
   });
 
   if (!currentProfile) {
     redirect("/app/onboarding");
   }
 
-  const profile = currentProfile;
-  const isOwnProfile = true;
+  // Look up profile by username
+  const profile = await db.query.userProfiles.findFirst({
+    where: eq(userProfiles.username, username),
+    with: {
+      institution: true,
+    }
+  });
+
+  if (!profile) {
+    notFound();
+  }
+
+  const isOwnProfile = profile.id === currentProfile.id;
 
   // Fetch posts written by this user
   const userPosts = await db.query.posts.findMany({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatPane } from "./chat-pane";
@@ -24,7 +24,13 @@ const fetcher = (url: string) => fetch(url).then((res) => {
   return res.json() as Promise<any>;
 });
 
-export function ChatDashboard({ currentUserId }: { currentUserId: string }) {
+export function ChatDashboard({ 
+  currentUserId,
+  targetUserId
+}: { 
+  currentUserId: string;
+  targetUserId?: string;
+}) {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
@@ -38,6 +44,19 @@ export function ChatDashboard({ currentUserId }: { currentUserId: string }) {
 
   const activeConv = conversations?.find(c => c.id === activeConversationId);
   const activeParticipant = activeConv ? activeConv.otherParticipant : null;
+
+  // Auto-start or select conversation with targetUserId on mount
+  useEffect(() => {
+    if (!targetUserId || !conversations) return;
+
+    const existing = conversations.find(c => c.otherParticipant.id === targetUserId);
+    if (existing) {
+      setActiveConversationId(existing.id);
+    } else {
+      // Find if we are already in the process of starting one, or run it
+      startConversation(targetUserId);
+    }
+  }, [targetUserId, conversations]);
 
   async function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
     const query = e.target.value;

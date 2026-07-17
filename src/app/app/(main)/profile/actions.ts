@@ -4,6 +4,7 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export async function updateProfile(
   displayName: string,
@@ -46,4 +47,7 @@ export async function updateProfile(
       updatedAt: new Date()
     })
     .where(eq(userProfiles.userId, user.id));
+
+  revalidatePath("/app/profile");
+  revalidatePath("/app");
 }

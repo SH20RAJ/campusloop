@@ -74,6 +74,7 @@
 	--animate-shiny-text: shiny-text 8s infinite;
 	--animate-marquee: marquee var(--duration) infinite linear;
 	--animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+	--animate-loading-progress: loading-progress 1.5s infinite ease-in-out;
   @keyframes shiny-text {
   0%, 90%, 100% {
     background-position: calc(-100% - var(--shiny-width)) 0;}
@@ -89,6 +90,14 @@
     transform: translateY(0);}
   to {
     transform: translateY(calc(-100% - var(--gap)));}}
+  @keyframes loading-progress {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(250%);
+    }
+  }
   --animate-gradient: gradient 8s linear infinite;
   --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
   --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;

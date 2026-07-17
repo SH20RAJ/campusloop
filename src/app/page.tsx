@@ -255,7 +255,7 @@ export default async function LandingPage() {
             <Link href="/" className="hover:text-foreground transition-colors">Safety Guidelines</Link>
             <Link href="/" className="hover:text-foreground transition-colors">Contact</Link>
           </div>
-          <p>© {new Date().getFullYear()} CampusLoop. Made with ☕ by verified students for the student network.</p>
+          <p>© {new Date().getFullYear()} CampusLoop. Made with <Heart className="inline h-3.5 w-3.5 mx-1 text-primary align-middle" fill="currentColor" /> by verified students for the student network.</p>
         </footer>
       </div>
     </>

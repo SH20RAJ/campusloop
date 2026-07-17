@@ -17,6 +17,10 @@ import {
   ChevronRight,
   Settings,
   Zap,
+  Flame,
+  Ghost,
+  BookOpen,
+  Coffee,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -74,11 +78,11 @@ const mobileItems = [
 ];
 
 const VIBES = [
-  { emoji: "🔥", label: "Hustling", class: "bg-orange-500/10 text-orange-500 border-orange-500/25" },
-  { emoji: "😴", label: "Lurking", class: "bg-blue-500/10 text-blue-500 border-blue-500/25" },
-  { emoji: "💬", label: "Yapping", class: "bg-pink-500/10 text-pink-500 border-pink-500/25" },
-  { emoji: "📚", label: "Studying", class: "bg-emerald-500/10 text-emerald-500 border-emerald-500/25" },
-  { emoji: "☕", label: "Caffeinated", class: "bg-amber-500/10 text-amber-500 border-amber-500/25" },
+  { icon: Flame, label: "Hustling", class: "bg-orange-500/10 text-orange-500 border-orange-500/25" },
+  { icon: Ghost, label: "Lurking", class: "bg-blue-500/10 text-blue-500 border-blue-500/25" },
+  { icon: MessageSquare, label: "Yapping", class: "bg-pink-500/10 text-pink-500 border-pink-500/25" },
+  { icon: BookOpen, label: "Studying", class: "bg-emerald-500/10 text-emerald-500 border-emerald-500/25" },
+  { icon: Coffee, label: "Caffeinated", class: "bg-amber-500/10 text-amber-500 border-amber-500/25" },
 ];
 
 export function Navigation({ profile, collegeName = "Your College", isAdmin }: NavigationProps) {
@@ -156,59 +160,60 @@ export function Navigation({ profile, collegeName = "Your College", isAdmin }: N
 
         {/* User Digital Student ID Badge */}
         {profile && !collapsed ? (
-          <div className="mx-4 mt-4 relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card to-muted/20 p-4 shadow-sm group">
-            <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-primary/5 blur-xl group-hover:bg-primary/10 transition-colors" />
-            
-            <div className="flex items-start gap-3">
-              <Avatar className="h-11 w-11 shrink-0 border-2 border-background shadow-md">
+          <div className="mx-4 mt-5 relative overflow-hidden group">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10 shrink-0 border border-border shadow-sm">
                 <AvatarImage src={profile?.avatarUrl || ""} />
-                <AvatarFallback className="text-sm font-bold bg-primary/10 text-primary">
+                <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary">
                   {profile?.displayName?.[0] || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <p className="truncate text-xs font-bold text-foreground">
                     {profile?.displayName || "Student"}
                   </p>
                   {isAdmin && (
-                    <span className="rounded bg-destructive/10 px-1 py-0.5 text-[8px] font-bold text-destructive">
+                    <span className="rounded bg-destructive/10 px-1 py-0.5 text-[8px] font-bold text-destructive shrink-0">
                       Staff
                     </span>
                   )}
                 </div>
-                <p className="truncate text-[10px] text-muted-foreground font-medium flex items-center gap-1 mt-0.5">
+                <p className="truncate text-[9px] text-muted-foreground font-semibold flex items-center gap-0.5 mt-0.5">
                   <Zap className="h-2.5 w-2.5 text-primary shrink-0" />
-                  {collegeName}
+                  {collegeName.split(",")[0]}
                 </p>
               </div>
             </div>
 
-            <div className="mt-3.5 flex items-center justify-between border-t border-border/60 pt-3">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
+            <div className="mt-2.5 flex items-center justify-between border-t border-border/40 pt-2.5">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">
                 My Vibe
               </span>
               <button
                 onClick={changeVibe}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-all active:scale-95 cursor-pointer shadow-sm",
+                  "flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-semibold transition-all active:scale-95 cursor-pointer shadow-sm",
                   currentVibe.class
                 )}
               >
-                <span>{currentVibe.emoji}</span>
+                <currentVibe.icon className="h-2.5 w-2.5" />
                 <span>{currentVibe.label}</span>
               </button>
             </div>
           </div>
         ) : collapsed && profile ? (
-          <div className="mx-auto mt-4 flex flex-col items-center gap-2">
+          <div className="mx-auto mt-5 flex flex-col items-center gap-2">
             <button onClick={changeVibe} className="relative cursor-pointer group">
-              <Avatar className="h-9 w-9 border-2 border-primary/20 shadow-sm transition-transform group-hover:scale-105">
+              <Avatar className="h-9 w-9 border border-primary/20 shadow-sm transition-transform group-hover:scale-105">
                 <AvatarImage src={profile?.avatarUrl || ""} />
                 <AvatarFallback className="text-xs bg-primary/10 text-primary">{profile?.displayName?.[0] || "U"}</AvatarFallback>
               </Avatar>
-              <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border border-border text-[9px] shadow-sm">
-                {currentVibe.emoji}
+              <span className={cn(
+                "absolute -bottom-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-card border border-border shadow-sm",
+                currentVibe.class
+              )}>
+                <currentVibe.icon className="h-2.5 w-2.5" />
               </span>
             </button>
           </div>
@@ -235,14 +240,14 @@ export function Navigation({ profile, collegeName = "Your College", isAdmin }: N
                         "group flex items-center gap-3.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all",
                         collapsed && "justify-center px-0 rounded-2xl h-11 w-11 mx-auto",
                         isActive
-                          ? "bg-primary text-primary-foreground shadow-md shadow-primary/10"
-                          : cn("text-muted-foreground hover:text-foreground", item.color)
+                          ? "bg-primary/10 text-primary shadow-sm"
+                          : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
                       )}
                     >
                       <Icon
                         className={cn(
                           "h-4 w-4 shrink-0 transition-transform group-hover:scale-110",
-                          isActive && "text-primary-foreground"
+                          isActive && "text-primary"
                         )}
                       />
                       {!collapsed && <span>{item.label}</span>}

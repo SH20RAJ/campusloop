@@ -255,6 +255,7 @@ async function main() {
       id: prof.id,
       userId: randomUUID(),
       displayName: prof.displayName,
+      officialName: prof.displayName,
       username: prof.username,
       avatarUrl: `https://api.dicebear.com/7.x/adventurer/svg?seed=${prof.username}`,
       institutionId: prof.college,

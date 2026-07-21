@@ -71,7 +71,7 @@ export function ProfileClientView({
         </div>
       </div>
 
-      <main className="space-y-6">
+      <main className="space-y-6 px-4 md:px-6 py-6">
         {/* Profile Header */}
         <div className="border-b border-border/40 pb-6">
           <div className="space-y-4">

@@ -1,8 +1,9 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, School, Shield, User, MessageSquare, Users, Sparkles, Share2, Award, Zap } from "lucide-react";
+import { LogOut, School, Shield, User, MessageSquare, Users, Sparkles, Share2, Award, Zap, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
 import { EditProfileDialog } from "./edit-profile-dialog";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ export function ProfileClientView({
   formattedPosts,
   isOwnProfile,
 }: ProfileClientViewProps) {
+  const router = useRouter();
   const points = profile.points || 0;
   
   // Calculate Rank
@@ -51,176 +53,184 @@ export function ProfileClientView({
   }
 
   return (
-    <main className="space-y-6">
-      {/* Profile Card Header */}
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm space-y-6">
-        {/* Glow accent */}
-        <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+    <>
+      {/* Navbar */}
+      <div className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex items-center justify-between h-14 px-4 md:px-6">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="text-xs font-semibold hidden sm:inline">Back</span>
+          </button>
+          
+          <h1 className="text-sm font-bold text-foreground">Profile</h1>
+          
+          <div className="w-8" />
+        </div>
+      </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left justify-between">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Avatar className="h-20 w-20 border border-border/80 shadow-md">
-              <AvatarImage src={profile.avatarUrl || ""} />
-              <AvatarFallback className="text-2xl bg-primary/10 text-primary font-bold">
-                {profile.displayName[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="space-y-1">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center sm:justify-start">
-                <h2 className="text-xl font-black tracking-tight text-foreground flex items-center justify-center sm:justify-start gap-1">
-                  {profile.displayName}
-                  {profile.role === "ADMIN" && (
-                    <span title="Admin User">
-                      <Shield className="h-4 w-4 text-red-500 fill-red-500/10" />
-                    </span>
+      <main className="space-y-6">
+        {/* Profile Header */}
+        <div className="border-b border-border/40 pb-6">
+          <div className="space-y-4">
+            {/* Avatar + Name + Badge */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
+                <Avatar className="h-16 w-16 border border-border/50">
+                  <AvatarImage src={profile.avatarUrl || ""} />
+                  <AvatarFallback className="text-xl bg-primary/10 text-primary font-bold">
+                    {profile.displayName[0]}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div className="pt-1">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-foreground">
+                      {profile.displayName}
+                    </h2>
+                    {profile.role === "ADMIN" && (
+                      <Shield className="h-4 w-4 text-red-500" />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground font-medium mt-0.5">@{profile.username}</p>
+                  {profile.officialName && (
+                    <p className="text-[8px] text-muted-foreground/70 mt-1">Official: {profile.officialName}</p>
                   )}
-                </h2>
-                <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${badgeColor} self-center`}>
-                  {badgeIcon}
-                  {badgeTitle}
-                </span>
+                  <div className={`inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full border mt-2 ${badgeColor}`}>
+                    {badgeIcon}
+                    {badgeTitle}
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 text-xs text-muted-foreground font-semibold justify-center sm:justify-start">
-                <span>@{profile.username}</span>
-                {profile.officialName && (
+
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2">
+                {isOwnProfile ? (
                   <>
-                    <span className="hidden sm:inline text-muted-foreground/45">•</span>
-                    <span className="text-[9px] bg-muted text-muted-foreground px-2 py-0.5 rounded-md border border-border" title="Name verified from official email ID">
-                      Official: {profile.officialName}
-                    </span>
+                    <EditProfileDialog 
+                      initialDisplayName={profile.displayName} 
+                      initialBio={profile.bio} 
+                      initialUsername={profile.username}
+                      initialAvatarUrl={profile.avatarUrl}
+                    />
+                    <a
+                      href="/handler/sign-out"
+                      className="flex items-center justify-center gap-1 rounded-lg border border-border/50 h-8 px-3 text-[10px] font-semibold text-destructive hover:bg-destructive/5 transition-colors cursor-pointer"
+                    >
+                      <LogOut className="h-3.5 w-3.5" />
+                      <span>Sign Out</span>
+                    </a>
                   </>
+                ) : (
+                  <Link
+                    href={`/app/chat?userId=${profile.id}`}
+                    className="flex items-center justify-center gap-1 rounded-lg bg-primary text-white h-8 px-3 text-[10px] font-semibold hover:bg-primary/90 transition-colors cursor-pointer"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" />
+                    <span>Message</span>
+                  </Link>
                 )}
               </div>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {isOwnProfile ? (
-              <>
-                <EditProfileDialog 
-                  initialDisplayName={profile.displayName} 
-                  initialBio={profile.bio} 
-                  initialUsername={profile.username}
-                  initialAvatarUrl={profile.avatarUrl}
-                />
-                <a
-                  href="/handler/sign-out"
-                  className="flex items-center gap-2 rounded-xl border border-input h-9 px-4 text-xs font-bold hover:bg-muted text-destructive hover:text-red-600 transition-colors cursor-pointer"
-                >
-                  <LogOut className="h-4 w-4" /> Sign Out
-                </a>
-              </>
-            ) : (
-              <Link
-                href={`/app/chat?userId=${profile.id}`}
-                className="flex items-center gap-2 rounded-xl bg-primary text-white h-9 px-4 text-xs font-bold hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer"
+
+            {/* Bio */}
+            {profile.bio && (
+              <p className="text-sm text-foreground/80 font-medium">
+                {profile.bio}
+              </p>
+            )}
+
+            {/* Info Grid */}
+            <div className="grid grid-cols-3 gap-4 pt-2">
+              <div className="flex flex-col gap-1">
+                <p className="text-[9px] text-muted-foreground font-semibold uppercase">College</p>
+                <p className="text-xs text-foreground font-medium truncate">{profile.institution?.name?.split(",")[0] || "N/A"}</p>
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-[9px] text-muted-foreground font-semibold uppercase">Role</p>
+                <p className="text-xs text-foreground font-medium">{profile.role === "ADMIN" ? "Admin" : "Student"}</p>
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-[9px] text-muted-foreground font-semibold uppercase">Referrals</p>
+                <p className="text-xs text-foreground font-bold">{profile.referralCount || 0}</p>
+              </div>
+            </div>
+
+            {/* Share Button */}
+            {isOwnProfile && (
+              <button
+                onClick={handleShareVibe}
+                className="w-full text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors py-2"
               >
-                <MessageSquare className="h-4 w-4" /> Message
-              </Link>
+                ↗ Share Vibe Card
+              </button>
             )}
           </div>
         </div>
 
-        {profile.bio && (
-          <p className="text-sm text-foreground/90 border-t border-border/40 pt-4 font-medium italic">
-            "{profile.bio}"
-          </p>
-        )}
-
-        <div className="grid gap-3 pt-2 text-xs text-muted-foreground sm:grid-cols-3 border-t border-border/40">
-          <span className="flex items-center gap-1.5 font-medium">
-            <School className="h-4 w-4 shrink-0 text-muted-foreground/60" /> {profile.institution?.name}
-          </span>
-          <span className="flex items-center gap-1.5 font-medium">
-            <User className="h-4 w-4 shrink-0 text-muted-foreground/60" /> {profile.role === "ADMIN" ? "Administrator" : "Student Member"}
-          </span>
-          <span className="flex items-center gap-1.5 font-medium">
-            <Users className="h-4 w-4 shrink-0 text-primary" />
-            <span><strong className="text-foreground">{profile.referralCount || 0}</strong> Referrals</span>
-          </span>
-        </div>
-
+        {/* Gamification Section */}
         {isOwnProfile && (
-          <div className="flex justify-end pt-1">
-            <button
-              onClick={handleShareVibe}
-              className="flex items-center gap-1 text-[10px] font-extrabold text-primary hover:underline cursor-pointer"
-            >
-              <Share2 className="h-3 w-3" /> Share Vibe Card
-            </button>
+          <div className="border-b border-border/40 pb-6 space-y-4">
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">Vibe Points: <span className="text-primary">{points} LP</span></h3>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-border/40 bg-card p-3">
+                <p className="text-[9px] text-muted-foreground font-semibold uppercase mb-2">Earn Points</p>
+                <div className="space-y-1 text-[9px]">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Referral</span>
+                    <span className="text-primary font-semibold">+20 LP</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Post</span>
+                    <span className="text-primary font-semibold">+5 LP</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Comment</span>
+                    <span className="text-primary font-semibold">+2 LP</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Vote</span>
+                    <span className="text-primary font-semibold">+1 LP</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-border/40 bg-card p-3">
+                <p className="text-[9px] text-muted-foreground font-semibold uppercase mb-2">Your Rank</p>
+                <div className="flex items-center gap-2">
+                  {badgeIcon}
+                  <div>
+                    <p className="text-xs font-bold text-foreground">{badgeTitle}</p>
+                    <p className="text-[8px] text-muted-foreground">{points} LP earned</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
-      </div>
 
-      {/* Gamification Vibe Points (Breakdown Card) */}
-      {isOwnProfile && (
-        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 shadow-sm space-y-4 relative overflow-hidden">
-          <div className="absolute right-[-10%] bottom-[-20%] h-36 w-36 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
+        {/* Posts Section */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
+            {isOwnProfile ? "Your Posts" : `Posts`}
+          </h3>
           
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
-              <Sparkles className="h-4 w-4 text-primary animate-pulse" /> Gamification & Vibe Points
-            </h3>
-            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full border bg-primary/10 text-primary border-primary/20">
-              Badge: {badgeTitle}
-            </span>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 relative z-10">
-            {/* Points card */}
-            <div className="rounded-xl border border-border bg-card p-4 flex flex-col justify-between shadow-sm">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase">Total Vibe Balance</span>
-                <p className="text-3xl font-black text-foreground">{points} <span className="text-primary text-xl font-bold">LP</span></p>
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-3 font-semibold leading-relaxed">
-                Collect Loop Points (LP) by creating posts, replying to comments, voting on polls, and inviting classmates!
-              </p>
+          {formattedPosts.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground text-xs font-medium">
+              {isOwnProfile ? "No posts yet" : "No posts"}
             </div>
-
-            {/* How to earn card */}
-            <div className="rounded-xl border border-border bg-card p-4 space-y-2.5 shadow-sm">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase">How to earn points</span>
-              <ul className="space-y-1.5 text-xs text-foreground font-bold">
-                <li className="flex justify-between border-b border-border/40 pb-1">
-                  <span className="text-muted-foreground font-semibold">Classmate Invite Referral</span>
-                  <span className="text-primary">+20 LP</span>
-                </li>
-                <li className="flex justify-between border-b border-border/40 pb-1">
-                  <span className="text-muted-foreground font-semibold">Drop a Post / Confession</span>
-                  <span className="text-primary">+5 LP</span>
-                </li>
-                <li className="flex justify-between border-b border-border/40 pb-1">
-                  <span className="text-muted-foreground font-semibold">Reply / Write Comment</span>
-                  <span className="text-primary">+2 LP</span>
-                </li>
-                <li className="flex justify-between pb-0">
-                  <span className="text-muted-foreground font-semibold">Vote on Poll / Heart Post</span>
-                  <span className="text-primary">+1 LP</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* User's Posts Feed */}
-      <div className="space-y-4">
-        <h3 className="text-xs font-black text-foreground uppercase tracking-wider">
-          {isOwnProfile ? "Your Posts" : `${profile.displayName}'s Posts`}
-        </h3>
-        
-        <div className="space-y-4">
-          {formattedPosts.map((post) => (
-            <FeedCard key={post.id} post={post as any} />
-          ))}
-          {formattedPosts.length === 0 && (
-            <div className="text-center py-12 border border-dashed rounded-2xl border-border bg-card text-muted-foreground text-xs font-semibold">
-              {isOwnProfile ? "You haven't posted anything yet." : "This user hasn't posted anything yet."}
+          ) : (
+            <div className="space-y-3">
+              {formattedPosts.map((post) => (
+                <FeedCard key={post.id} post={post as any} />
+              ))}
             </div>
           )}
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

@@ -89,39 +89,42 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
         </div>
 
         {/* Bottom Actions Area */}
-        <div className="space-y-4 pt-4 border-t border-border/60">
-          <Link href="/app/post/new">
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold py-2 rounded-xl text-xs cursor-pointer shadow-xs border-none">
-              Create Post
+        <div className="space-y-3 pt-4 border-t border-border/60">
+          <Link href="/app/post/new" className="block">
+            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/95 font-bold py-2.5 rounded-xl text-xs cursor-pointer shadow-sm hover:shadow-md border-none transition-all duration-200">
+              ✨ Create Post
             </Button>
           </Link>
 
           {profile && (
-            <div className="flex items-center justify-between gap-2 px-2">
-              <Link href="/app/profile" className="flex items-center gap-2.5 min-w-0">
-                <Avatar className="h-8 w-8 shrink-0 border border-border">
-                  <AvatarImage src={profile.avatarUrl || ""} />
-                  <AvatarFallback className="text-[10px] font-bold bg-muted text-muted-foreground">
-                    {profile.displayName[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0">
-                  <p className="truncate text-xs font-bold text-foreground">{profile.displayName}</p>
-                  <p className="truncate text-[9.5px] text-muted-foreground">@{profile.username}</p>
+            <Link href="/app/profile" className="block group">
+              <div className="flex items-center justify-between gap-2.5 px-3 py-3 rounded-xl bg-muted/40 hover:bg-muted/70 transition-colors duration-200 border border-border/50 hover:border-border">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Avatar className="h-9 w-9 shrink-0 border border-border/50 group-hover:border-primary/50 transition-colors">
+                    <AvatarImage src={profile.avatarUrl || ""} />
+                    <AvatarFallback className="text-[10px] font-bold bg-primary/20 text-primary">
+                      {profile.displayName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-bold text-foreground">{profile.displayName}</p>
+                    <p className="truncate text-[9px] text-muted-foreground">@{profile.username}</p>
+                  </div>
                 </div>
-              </Link>
-              
-              <div className="flex items-center gap-1.5 shrink-0">
-                <ThemeToggle className="h-7 w-7 rounded-lg border-none bg-transparent hover:bg-muted" />
-                <Link
-                  href="/handler/sign-out"
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-muted transition-colors cursor-pointer"
-                  title="Sign out"
-                >
-                  <LogOut className="h-4 w-4" />
-                </Link>
+                
+                <div className="flex items-center gap-1 shrink-0">
+                  <ThemeToggle className="h-7 w-7 rounded-lg border-none bg-transparent hover:bg-background transition-colors" />
+                  <Link
+                    href="/handler/sign-out"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200 cursor-pointer"
+                    title="Sign out"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Link>
+                </div>
               </div>
-            </div>
+            </Link>
           )}
         </div>
       </aside>

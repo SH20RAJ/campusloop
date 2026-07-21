@@ -93,11 +93,10 @@ export default async function ProfilePage({
   });
 
   return (
-    <ProfileClientView 
+    <ProfileClientView
       profile={profile}
       formattedPosts={formattedPosts as FeedPost[]}
       isOwnProfile={isOwnProfile}
-      currentProfileId={currentProfile.id}
     />
   );
 }

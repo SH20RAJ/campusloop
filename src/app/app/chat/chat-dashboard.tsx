@@ -19,10 +19,11 @@ type ConversationWithDetail = {
   } | null;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json() as Promise<any>;
-});
+const fetcher = <T,>(url: string): Promise<T> =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch");
+    return res.json() as Promise<T>;
+  });
 
 export function ChatDashboard({ 
   currentUserId,

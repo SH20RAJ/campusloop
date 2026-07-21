@@ -36,9 +36,9 @@ export function DatingClient() {
   const [collegeScope, setCollegeScope] = useState<"CAMPUS" | "GLOBAL">("CAMPUS");
   const [targetCollegeId, setTargetCollegeId] = useState<string>("ALL");
 
-  const { data: colleges } = useSWR<any[]>("/api/colleges", fetcher);
+  const { data: colleges } = useSWR<{ id: string; name: string }[]>("/api/colleges", fetcher);
 
-  const { data: candidates, error, isLoading, mutate } = useSWR<any[]>(
+  const { data: candidates, error, isLoading, mutate } = useSWR<Candidate[]>(
     `/api/dating/profiles?gender=${gender}&college=${collegeScope}&targetInstitutionId=${targetCollegeId}`,
     fetcher
   );

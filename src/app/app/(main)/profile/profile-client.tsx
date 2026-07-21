@@ -6,19 +6,19 @@ import Link from "next/link";
 import { FeedCard } from "@/components/ui/feed-card";
 import { EditProfileDialog } from "./edit-profile-dialog";
 import { toast } from "sonner";
+import type { FeedPost } from "@/hooks/use-feed";
+import type { UserProfile, Institution } from "@/db/schema";
 
 interface ProfileClientViewProps {
-  profile: any;
-  formattedPosts: any[];
+  profile: UserProfile & { institution?: Institution | null };
+  formattedPosts: FeedPost[];
   isOwnProfile: boolean;
-  currentProfileId: string;
 }
 
 export function ProfileClientView({
   profile,
   formattedPosts,
   isOwnProfile,
-  currentProfileId,
 }: ProfileClientViewProps) {
   const points = profile.points || 0;
   

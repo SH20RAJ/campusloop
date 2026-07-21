@@ -2,7 +2,7 @@
 
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
-import { userProfiles, institutionDomains } from "@/db/schema";
+import { userProfiles, institutionDomains, type UserProfile } from "@/db/schema";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";

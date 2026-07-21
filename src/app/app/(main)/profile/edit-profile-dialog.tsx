@@ -36,8 +36,8 @@ export function EditProfileDialog({
       await updateProfile(displayName, bio, username, avatarUrl);
       setIsOpen(false);
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Failed to update profile");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update profile");
     } finally {
       setIsLoading(false);
     }

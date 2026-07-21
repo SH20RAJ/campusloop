@@ -15,8 +15,8 @@ export function OnboardingForm() {
     const formData = new FormData(e.currentTarget);
     try {
       await completeOnboarding(formData);
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
       setIsLoading(false);
     }
   }

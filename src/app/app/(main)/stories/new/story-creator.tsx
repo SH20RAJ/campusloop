@@ -9,7 +9,10 @@ import { ArrowLeft, Send, Sparkles, Layout, Type, AlignLeft, AlignCenter, AlignR
 import { toast } from "sonner";
 
 interface StoryCreatorProps {
-  profile: any;
+  profile: {
+    displayName: string;
+    avatarUrl: string | null;
+  };
 }
 
 const GRADIENTS = [
@@ -81,8 +84,8 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
 
       router.push("/app");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setIsPosting(false);
     }
   }

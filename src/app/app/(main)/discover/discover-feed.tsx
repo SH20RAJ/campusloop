@@ -21,7 +21,7 @@ export function DiscoverFeed() {
   const { feed, isLoading: feedLoading } = useFeed("GLOBAL", feedType);
 
   // Fetch dynamic colleges list
-  const { data: colleges, isLoading: collegesLoading } = useSWR<any[]>("/api/colleges", fetcher);
+  const { data: colleges, isLoading: collegesLoading } = useSWR<{ id: string; name: string }[]>("/api/colleges", fetcher);
 
   // Filter feed locally if college selected
   const filteredFeed = feed?.filter(post => 

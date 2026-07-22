@@ -89,7 +89,7 @@ export async function GET(req: Request) {
       orderClauses = [desc(commentsCountSql), desc(posts.createdAt)];
     }
 
-    const rawFeed = await db.query.posts.findMany({
+    let rawFeed = await db.query.posts.findMany({
       where: and(...conditions),
       orderBy: orderClauses,
       limit,
@@ -105,6 +105,36 @@ export async function GET(req: Request) {
         },
       },
     });
+
+    // If campus scope returns fewer posts than limit, backfill with global posts
+    if (scope === "CAMPUS" && rawFeed.length < limit) {
+      const existingIds = new Set(rawFeed.map((p) => p.id));
+      const globalConditions = conditions.filter((c) => c !== eq(posts.institutionId, profile.institutionId));
+      const needed = limit - rawFeed.length;
+      
+      const extraFeed = await db.query.posts.findMany({
+        where: and(...globalConditions),
+        orderBy: orderClauses,
+        limit: needed * 2,
+        with: {
+          author: true,
+          institution: true,
+          community: true,
+          votes: true,
+          comments: true,
+          pollOptions: {
+            with: { votes: true },
+          },
+        },
+      });
+
+      for (const extra of extraFeed) {
+        if (!existingIds.has(extra.id) && rawFeed.length < limit) {
+          rawFeed.push(extra);
+          existingIds.add(extra.id);
+        }
+      }
+    }
 
     const feed = rawFeed.map(post => {
       const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);

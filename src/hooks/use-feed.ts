@@ -56,7 +56,7 @@ export function useFeed(
   const feed = rawFeed
     ? Array.from(new Map(rawFeed.map((post) => [post.id, post])).values())
     : undefined;
-  const isReachingEnd = data && (data[data.length - 1]?.length < 12 || data[data.length - 1]?.length === 0);
+  const isReachingEnd = data && data[data.length - 1]?.length === 0;
   const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
 
   return {

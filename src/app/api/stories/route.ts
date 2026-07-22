@@ -4,6 +4,8 @@ import { stories, userProfiles, type Story, type UserProfile } from "@/db/schema
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, gt } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const user = await hexclaveServerApp.getUser();

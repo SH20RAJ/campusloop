@@ -15,7 +15,9 @@ function getDatabaseUrl() {
 
 function createClient() {
 	const options: postgres.Options<never> = {
-		max: 10,
+		max: "Cloudflare" in globalThis ? 1 : 5,
+		idle_timeout: 15,
+		connect_timeout: 10,
 		prepare: false,
 	};
 

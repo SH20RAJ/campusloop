@@ -4,6 +4,8 @@ import { desc, eq, and, sql, SQL } from "drizzle-orm";
 import { posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   try {
     const user = await hexclaveServerApp.getUser();

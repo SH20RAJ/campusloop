@@ -3,6 +3,8 @@ import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
 import { desc, ilike, or, eq, and, sql } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   try {
     const db = getDb();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import useSWR from "swr";
 import { useFeed } from "@/hooks/use-feed";
@@ -67,11 +67,37 @@ export function DiscoverFeed() {
   const searchRef = useRef<HTMLInputElement>(null);
 
   const feedType = activeTab === "TRENDING" ? undefined : activeTab;
-  const { feed, isLoading: feedLoading } = useFeed("GLOBAL", feedType);
+  const { 
+    feed, 
+    isLoading: feedLoading, 
+    isLoadingMore, 
+    isReachingEnd, 
+    setSize 
+  } = useFeed("GLOBAL", feedType);
+
   const { data: colleges, isLoading: collegesLoading } = useSWR<College[]>(
     "/api/colleges?limit=50",
     fetcher
   );
+
+  // Infinite scroll trigger ref and observer
+  const [loadMoreRef, setLoadMoreRef] = useState<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!loadMoreRef || isReachingEnd || isLoadingMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setSize((s) => s + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(loadMoreRef);
+    return () => observer.disconnect();
+  }, [loadMoreRef, isReachingEnd, isLoadingMore, setSize]);
 
   const filteredFeed = feed?.filter((post) =>
     selectedCollegeId ? post.institutionId === selectedCollegeId : true
@@ -372,7 +398,24 @@ export function DiscoverFeed() {
               </motion.div>
             ))}
           </AnimatePresence>
-        ) : (
+        ) : null}
+
+        {filteredFeed && filteredFeed.length > 0 && !isReachingEnd && (
+          <div
+            ref={setLoadMoreRef}
+            className="flex items-center justify-center py-8 text-xs font-bold text-muted-foreground/80"
+          >
+            <span className="animate-pulse">Loading more posts...</span>
+          </div>
+        )}
+
+        {filteredFeed && filteredFeed.length > 0 && isReachingEnd && (
+          <div className="text-center py-10 text-[11px] font-bold text-muted-foreground/50 select-none">
+            You&apos;ve reached the end of the loop! 🎉
+          </div>
+        )}
+
+        {(!filteredFeed || filteredFeed.length === 0) && !feedLoading && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

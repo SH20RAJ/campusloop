@@ -5,6 +5,12 @@ import { useFeed, useStories } from "@/hooks/use-feed";
 import { FeedCard } from "@/components/ui/feed-card";
 import { StoryRing } from "@/components/ui/story-ring";
 import {
+  InlineCommunitiesWidget,
+  InlineDatingWidget,
+  InlineHashtagsWidget,
+  InlineReferralWidget,
+} from "@/components/ui/inline-feed-widgets";
+import {
   Sparkles,
   Plus,
   Globe,
@@ -284,8 +290,14 @@ export function FeedClient() {
           <FeedSkeleton />
         ) : feed && feed.length > 0 ? (
           <>
-            {feed.map((post) => (
-              <FeedCard key={post.id} post={post} currentUserId={profile?.id} />
+            {feed.map((post, idx) => (
+              <div key={post.id} className="space-y-4.5">
+                <FeedCard post={post} currentUserId={profile?.id} />
+                {idx === 2 && <InlineCommunitiesWidget />}
+                {idx === 6 && <InlineDatingWidget />}
+                {idx === 10 && <InlineHashtagsWidget />}
+                {idx === 14 && <InlineReferralWidget />}
+              </div>
             ))}
             
             {/* Load more trigger anchor */}

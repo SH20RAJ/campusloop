@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import type { UserProfile } from "@/db/schema";
+import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 
 interface NavigationProps {
   profile?: UserProfile;
@@ -82,12 +83,14 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                       : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
-                  <Icon
-                    className={cn(
-                      "h-4.5 w-4.5 shrink-0 transition-transform duration-300 group-hover:scale-125 group-hover:-translate-y-0.5 group-active:scale-90",
-                      isActive ? "text-foreground stroke-[2.5]" : "text-muted-foreground group-hover:text-foreground"
-                    )}
-                  />
+                  <AnimateIcon animateOnHover>
+                    <Icon
+                      className={cn(
+                        "h-4.5 w-4.5 shrink-0 transition-transform duration-300 group-hover:scale-125 group-hover:-translate-y-0.5 group-active:scale-90",
+                        isActive ? "text-foreground stroke-[2.5]" : "text-muted-foreground group-hover:text-foreground"
+                      )}
+                    />
+                  </AnimateIcon>
                   <span>{item.label}</span>
                 </Link>
               );

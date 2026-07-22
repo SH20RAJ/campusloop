@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CornerDownRight, MessageSquare, Lock, X, Reply } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 type CommentWithAuthor = Comment & {
   author: UserProfile;
@@ -50,7 +51,12 @@ function CommentItem({
   const avatarUrl = isAnon ? "" : comment.author.avatarUrl;
 
   return (
-    <div className={cn("flex gap-2.5 items-start", depth > 0 && "ml-8 pl-3 border-l border-border/30")}>
+    <motion.div
+      initial={{ opacity: 0, y: -10, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 350, damping: 25 }}
+      className={cn("flex gap-2.5 items-start", depth > 0 && "ml-8 pl-3 border-l border-border/30")}
+    >
       <div className="shrink-0">
         {!isAnon ? (
           <Link href={`/@${handle}`}>
@@ -164,7 +170,7 @@ function CommentItem({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -291,13 +297,14 @@ export function PostComments({ postId, currentUser }: { postId: string; currentU
               )}
             </button>
 
-            <button
+            <motion.button
               type="submit"
               disabled={isSubmitting || !body.trim()}
-              className="rounded-lg bg-primary text-white h-7 px-4 text-[10px] font-bold shadow-sm hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer"
+              whileTap={{ scale: 0.94 }}
+              className="rounded-lg bg-primary text-white h-7 px-4 text-[10px] font-bold shadow-xs hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? "Posting..." : "Comment"}
-            </button>
+            </motion.button>
           </div>
           {submitError && (
             <p className="text-[10px] text-destructive font-bold">{submitError}</p>

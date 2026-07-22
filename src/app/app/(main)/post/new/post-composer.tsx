@@ -25,6 +25,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface Community {
   id: string;
@@ -340,20 +341,33 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
       )}
 
       {/* Submit Button */}
-      <button
+      <motion.button
         type="submit"
         disabled={isLoading}
-        className="w-full rounded-2xl bg-primary text-white h-11 text-xs font-extrabold shadow-md shadow-primary/20 hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+        whileTap={{ scale: 0.96 }}
+        className="w-full rounded-2xl bg-primary text-white h-11 text-xs font-bold shadow-sm hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 active:scale-98"
       >
         {isLoading ? (
-          <span>Publishing to Campus Loop...</span>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="flex items-center gap-2"
+          >
+            <Sparkles className="size-4 animate-spin text-white" />
+            <span>Publishing to Campus Loop...</span>
+          </motion.div>
         ) : (
           <>
             <span>Publish Post (+5 LP)</span>
-            <ArrowRight className="size-4" />
+            <motion.div
+              whileHover={{ x: 4 }}
+              transition={{ type: "spring", stiffness: 400 }}
+            >
+              <ArrowRight className="size-4" />
+            </motion.div>
           </>
         )}
-      </button>
+      </motion.button>
     </form>
   );
 }

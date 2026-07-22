@@ -76,10 +76,15 @@ export function DiscoverFeed() {
     setSize 
   } = useFeed("GLOBAL", feedType);
 
-  const { data: colleges, isLoading: collegesLoading } = useSWR<College[]>(
+  const { data: rawColleges, isLoading: collegesLoading } = useSWR<{ colleges: College[] } | College[]>(
     "/api/colleges?limit=50",
     fetcher
   );
+
+  const colleges = useMemo(() => {
+    if (Array.isArray(rawColleges)) return rawColleges;
+    return rawColleges?.colleges || [];
+  }, [rawColleges]);
 
   // Infinite scroll trigger ref and observer
   const [loadMoreRef, setLoadMoreRef] = useState<HTMLDivElement | null>(null);

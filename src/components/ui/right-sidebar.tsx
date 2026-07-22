@@ -18,6 +18,7 @@ interface MyProfile {
 
 interface College {
   id: string;
+  slug?: string | null;
   name: string;
   state: string | null;
   district: string | null;
@@ -28,7 +29,11 @@ const fetcher = <T,>(url: string): Promise<T> =>
 
 export function RightSidebar() {
   const { data: profile } = useSWR<MyProfile>("/api/profile/me", fetcher);
-  const { data: colleges } = useSWR<College[]>("/api/colleges?limit=5", fetcher);
+  const { data: collegeData } = useSWR<{ colleges: College[] } | College[]>("/api/colleges?limit=5", fetcher);
+
+  const colleges = Array.isArray(collegeData)
+    ? collegeData
+    : (collegeData?.colleges || []);
 
   const points = profile?.points || 0;
   const referrals = profile?.referralCount || 0;
@@ -63,7 +68,7 @@ export function RightSidebar() {
           {colleges?.slice(0, 4).map((college, idx) => (
             <Link
               key={college.id}
-              href={`/college/${college.id}`}
+              href={`/college/${college.slug || college.id}`}
               className="flex items-center gap-2.5 rounded-xl border border-border/40 bg-muted/20 px-3 py-2.5 hover:bg-muted/40 hover:border-primary/15 transition-all group"
             >
               <span className="text-[10px] font-black text-muted-foreground/40 w-4 text-center">{idx + 1}</span>

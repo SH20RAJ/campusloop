@@ -33,9 +33,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
 
+    const userInstId = profile.institutionId || "";
+
     // Build conditions
     const conditions: SQL[] = [eq(posts.status, "PUBLISHED")];
-    if (scope === "CAMPUS") {
+    if (scope === "CAMPUS" && profile.institutionId) {
       conditions.push(eq(posts.institutionId, profile.institutionId));
     }
     if (type && type !== "ALL" && type !== "all") {
@@ -56,7 +58,7 @@ export async function GET(req: Request) {
       +
       coalesce((select count(*)::int from comments where post_id = posts.id and status = 'PUBLISHED'), 0) * 6
       +
-      case when posts.institution_id = ${profile.institutionId} then 35 else 0 end
+      case when posts.institution_id = ${userInstId} then 35 else 0 end
       +
       case when posts.community_id is not null then 20 else 0 end
       +

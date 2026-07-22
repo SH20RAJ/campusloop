@@ -3,18 +3,24 @@ import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
 import { desc } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const db = getDb();
     const list = await db.query.institutions.findMany({
+      columns: {
+        id: true,
+        slug: true,
+      },
       orderBy: [desc(institutions.createdAt)],
-      limit: 5000,
+      limit: 1500,
     });
 
-    let urls = "";
-    for (const item of list) {
-      const slugOrId = item.slug || item.id;
-      urls += `
+    const urls = list
+      .map((item) => {
+        const slugOrId = item.slug || item.id;
+        return `
   <url>
     <loc>https://campusloop.space/app/college/${slugOrId}</loc>
     <changefreq>daily</changefreq>
@@ -25,7 +31,8 @@ export async function GET() {
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>`;
-    }
+      })
+      .join("");
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}
@@ -39,8 +46,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Colleges sitemap error:", error);
-    return new NextResponse("<urlset></urlset>", {
-      headers: { "Content-Type": "application/xml" },
-    });
+    return new NextResponse(
+      `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>`,
+      { headers: { "Content-Type": "application/xml" } }
+    );
   }
 }

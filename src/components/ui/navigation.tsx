@@ -76,13 +76,18 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-4 rounded-xl px-4 py-3 text-xs font-bold transition-colors",
+                    "group flex items-center gap-4 rounded-xl px-4 py-3 text-xs font-bold transition-all duration-200",
                     isActive
-                      ? "bg-muted text-foreground"
+                      ? "bg-muted text-foreground shadow-xs"
                       : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
-                  <Icon className={cn("h-4.5 w-4.5 shrink-0", isActive ? "text-foreground" : "text-muted-foreground")} />
+                  <Icon
+                    className={cn(
+                      "h-4.5 w-4.5 shrink-0 transition-transform duration-300 group-hover:scale-125 group-hover:-translate-y-0.5 group-active:scale-90",
+                      isActive ? "text-foreground stroke-[2.5]" : "text-muted-foreground group-hover:text-foreground"
+                    )}
+                  />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -151,11 +156,11 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full py-1 relative",
+                "group flex flex-col items-center justify-center flex-1 h-full py-1 relative",
                 isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Icon className="h-4.5 w-4.5" />
+              <Icon className="h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-125 group-active:scale-90" />
               <span className="mt-0.5 text-[8.5px] font-bold">{item.label}</span>
               {isActive && (
                 <div className="absolute bottom-1 size-1 rounded-full bg-foreground" />

@@ -21,7 +21,7 @@ import Link from "next/link";
 import { FeedPost } from "@/hooks/use-feed";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
-import { cn } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { deletePost } from "@/app/app/(main)/post/actions";
 
@@ -44,7 +44,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author.displayName;
   const authorHandle = post.isAnonymous ? "anonymous" : post.author.username;
   const avatarFallback = post.isAnonymous ? "A" : post.author.displayName[0];
-  const avatarUrl = post.isAnonymous ? "" : post.author.avatarUrl;
+  const avatarUrl = post.isAnonymous ? "" : getAvatarUrl(post.author.avatarUrl, post.author.username);
 
   function renderPostBody(body: string) {
     const parts = body.split(/(#[a-zA-Z0-9_]+)/g);

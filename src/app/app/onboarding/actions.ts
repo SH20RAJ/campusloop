@@ -67,6 +67,7 @@ export async function completeOnboarding(formData: FormData) {
       username,
       displayName,
       officialName,
+      avatarUrl: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`,
       institutionId: whitelistedDomain.institutionId,
       referredById: referrerId,
       onboardingCompleted: true,

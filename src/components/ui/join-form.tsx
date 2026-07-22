@@ -5,7 +5,8 @@ import { SignIn, SignUp } from "@hexclave/next";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { UserPlus } from "lucide-react";
+import { Sparkles, ShieldCheck, UserPlus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface ReferrerProfile {
   id: string;
@@ -54,71 +55,82 @@ export function JoinForm() {
   }, [searchParams]);
 
   return (
-    <div className="w-full max-w-md space-y-6">
-      {/* Brand Header */}
-      <div className="flex flex-col items-center text-center space-y-2">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-black shadow-md shadow-primary/5">
-            <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
+    <div className="w-full max-w-sm space-y-5 animate-in fade-in zoom-in-95 duration-300">
+      {/* Hero Badge & Brand Header */}
+      <div className="flex flex-col items-center text-center space-y-3">
+        <Badge
+          variant="outline"
+          className="rounded-full border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary backdrop-blur-md gap-1.5 shadow-xs"
+        >
+          <Sparkles className="size-3.5 fill-primary text-primary" />
+          <span>Verified Student Network</span>
+        </Badge>
+
+        <Link href="/" className="inline-flex items-center gap-2 group">
+          <div className="flex size-9 items-center justify-center overflow-hidden rounded-xl bg-black border border-white/20 shadow-md transition-transform group-hover:scale-105">
+            <img src="/logo.png" alt="CampusLoop" className="size-full object-cover scale-110" />
           </div>
-          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-lg font-extrabold tracking-tight text-transparent">
+          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-xl font-black tracking-tight text-transparent">
             CampusLoop
           </span>
         </Link>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          {mode === "signin" ? "Welcome back to the loop" : "Create your student passport"}
-        </h2>
-        <p className="text-xs text-muted-foreground max-w-xs">
-          {mode === "signin" 
-            ? "Sign in to view your campus feed and connect with peers."
-            : "Verify your college email to access confessions, polls, and matches."}
+
+        <h1 className="text-xl md:text-2xl font-black tracking-tight text-foreground leading-tight">
+          {mode === "signin" ? "Welcome Back to Loop" : "Join Your Campus Feed"}
+        </h1>
+
+        <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
+          {mode === "signin"
+            ? "Sign in with your verified college credentials."
+            : "Connect with classmates, confessions, polls & campus matchmaking."}
         </p>
       </div>
 
-      {/* Referrer Card */}
+      {/* Referrer Invitation Card */}
       {searchParams.get("invite") && (
-        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 shadow-sm animate-in fade-in slide-in-from-top-2">
+        <div className="rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-card to-card p-3.5 shadow-xs">
           {isLoadingReferrer ? (
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-muted/60 shimmer-effect" />
-              <div className="space-y-2 flex-1">
-                <div className="h-3 w-24 bg-muted/60 rounded shimmer-effect" />
-                <div className="h-2.5 w-32 bg-muted/40 rounded shimmer-effect" />
+              <div className="size-8 rounded-full bg-muted animate-pulse" />
+              <div className="space-y-1.5 flex-1">
+                <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+                <div className="h-2 w-28 bg-muted/60 rounded animate-pulse" />
               </div>
             </div>
           ) : referrerProfile ? (
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-orange-500/20 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
-                {referrerProfile.displayName?.[0] || "?"}
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs shrink-0">
+                {referrerProfile.displayName?.[0] || "S"}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-foreground truncate">
-                  You were invited by <span className="text-primary">@{referrerProfile.username}</span>
+                  Invited by <span className="text-primary">@{referrerProfile.username}</span>
                 </p>
-                <p className="text-[11px] text-muted-foreground truncate">
-                  {referrerProfile.displayName}
-                  {referrerProfile.institution?.name ? ` • ${referrerProfile.institution.name}` : ""}
+                <p className="text-[10px] text-muted-foreground truncate">
+                  {referrerProfile.institution?.name ? referrerProfile.institution.name.split(",")[0] : "Verified Student"}
                 </p>
               </div>
-              <UserPlus className="h-4 w-4 text-primary shrink-0" />
+              <UserPlus className="size-4 text-primary shrink-0" />
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground text-center">
-              You were invited by a CampusLoop student
+            <p className="text-xs text-muted-foreground text-center font-medium">
+              🎁 Special Invitation Access Active
             </p>
           )}
         </div>
       )}
 
-      {/* Card Wrapper */}
-      <div className="rounded-[28px] border border-border/80 bg-card p-6 shadow-xl relative overflow-hidden">
-        {/* Toggle Switcher */}
-        <div className="flex rounded-xl bg-muted p-0.5 border border-border/50 text-xs font-bold mb-6">
+      {/* Minimal Elevate Card */}
+      <div className="rounded-3xl border border-border/60 bg-card/90 p-5 shadow-xl backdrop-blur-xl relative space-y-4">
+        {/* Minimal Mode Switcher */}
+        <div className="grid grid-cols-2 rounded-xl bg-muted/50 p-1 text-xs font-bold border border-border/40">
           <button
             onClick={() => setMode("signin")}
             className={cn(
-              "flex-1 py-2 rounded-lg transition-all cursor-pointer",
-              mode === "signin" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+              "py-1.5 rounded-lg transition-all cursor-pointer text-center",
+              mode === "signin"
+                ? "bg-background text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             Sign In
@@ -126,31 +138,40 @@ export function JoinForm() {
           <button
             onClick={() => setMode("signup")}
             className={cn(
-              "flex-1 py-2 rounded-lg transition-all cursor-pointer",
-              mode === "signup" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+              "py-1.5 rounded-lg transition-all cursor-pointer text-center",
+              mode === "signup"
+                ? "bg-background text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             Create Account
           </button>
         </div>
 
-        {/* Form rendering */}
-        <div className="min-h-[300px] flex flex-col justify-center animate-in fade-in duration-300">
-          {mode === "signin" ? (
-            <SignIn />
-          ) : (
-            <SignUp />
-          )}
+        {/* Auth Form Container */}
+        <div className="min-h-[260px] flex flex-col justify-center">
+          {mode === "signin" ? <SignIn /> : <SignUp />}
         </div>
       </div>
 
-      {/* Footer link */}
-      <p className="text-center text-xs text-muted-foreground">
-        By joining, you agree to our{" "}
-        <Link href="/" className="hover:text-foreground underline">Terms of Service</Link>
-        {" "}and{" "}
-        <Link href="/" className="hover:text-foreground underline">Safety Guidelines</Link>.
-      </p>
+      {/* Trust Footer */}
+      <div className="space-y-2 text-center">
+        <div className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <ShieldCheck className="size-3.5 text-emerald-500" />
+          <span>Strictly Verified College Domains</span>
+        </div>
+
+        <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
+          By joining, you accept our{" "}
+          <Link href="/privacy" className="underline hover:text-foreground">
+            Privacy Policy
+          </Link>{" "}
+          &{" "}
+          <Link href="/safety" className="underline hover:text-foreground">
+            Safety Standards
+          </Link>.
+        </p>
+      </div>
     </div>
   );
 }

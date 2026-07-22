@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { cn } from "@/lib/utils";
-import { Plus, X, ChevronLeft, ChevronRight, Send, Loader2 } from "lucide-react";
+import { Plus, X, ChevronLeft, ChevronRight, Send, Loader2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -423,9 +423,56 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
                 </h2>
               </div>
 
-              {/* Bottom Area: Label */}
-              <div className="text-[10px] text-center text-white/40 tracking-widest font-bold uppercase select-none">
-                CAMPUSLOOP STORY
+              {/* Bottom Area: Reply & Action Buttons */}
+              <div className="w-full space-y-2 z-20">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder={`Reply to ${users[activeUserIdx].displayName.split(" ")[0]}...`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                        const val = e.currentTarget.value.trim();
+                        e.currentTarget.value = "";
+                        toast.success(`Reply sent to @${users[activeUserIdx].username}!`);
+                        router.push(`/app/chat?userId=${users[activeUserIdx].id}`);
+                      }
+                    }}
+                    className="flex-1 h-9 rounded-full border border-white/30 bg-black/40 px-3.5 text-xs text-white placeholder:text-white/60 outline-none focus:border-white/60 focus:bg-black/60 backdrop-blur-md transition-all"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toast.success(`Sent ❤️ to @${users[activeUserIdx].username}!`);
+                    }}
+                    className="h-9 w-9 rounded-full border border-white/30 bg-black/40 hover:bg-rose-500 hover:border-rose-400 flex items-center justify-center text-white backdrop-blur-md transition-all cursor-pointer active:scale-90"
+                    title="Like Story"
+                  >
+                    <Heart className="size-4" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const currentStoryId = users[activeUserIdx].stories[activeStoryIdx]?.id;
+                      if (currentStoryId) {
+                        const link = `https://campusloop.space/app/story/${currentStoryId}`;
+                        navigator.clipboard.writeText(link);
+                        toast.success("Story link copied to clipboard!");
+                      }
+                    }}
+                    className="h-9 w-9 rounded-full border border-white/30 bg-black/40 hover:bg-black/60 flex items-center justify-center text-white backdrop-blur-md transition-all cursor-pointer active:scale-90"
+                    title="Share Story"
+                  >
+                    <Send className="size-3.5" />
+                  </button>
+                </div>
+
+                <div className="text-[9px] text-center text-white/40 tracking-widest font-bold uppercase select-none">
+                  CAMPUSLOOP STORY
+                </div>
               </div>
             </div>
 

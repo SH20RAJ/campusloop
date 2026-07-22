@@ -57,7 +57,7 @@ export default function CollegesClient() {
       try {
         const url = new URL("/api/colleges", window.location.origin);
         url.searchParams.set("page", String(page));
-        url.searchParams.set("limit", "12");
+        url.searchParams.set("limit", "120");
         if (search.trim()) url.searchParams.set("q", search.trim());
         if (selectedState !== "ALL") url.searchParams.set("state", selectedState);
 

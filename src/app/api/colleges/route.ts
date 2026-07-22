@@ -63,3 +63,50 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+export async function POST(request: Request) {
+  try {
+    const db = getDb();
+    const body = (await request.json()) as {
+      name?: string;
+      state?: string;
+      district?: string;
+      website?: string;
+    };
+    const { name, state, district, website } = body;
+
+    if (!name || !name.trim()) {
+      return NextResponse.json({ error: "College name is required" }, { status: 400 });
+    }
+
+    const cleanName = name.trim();
+    const slug = cleanName
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80);
+
+    const aisheCode = `CUSTOM_${Date.now().toString().slice(-8)}`;
+
+    const [newCollege] = await db
+      .insert(institutions)
+      .values({
+        aisheCode,
+        name: cleanName,
+        slug,
+        state: state?.trim() || "India",
+        district: district?.trim() || null,
+        website: website?.trim() || null,
+        country: "India",
+        source: "user_added",
+      })
+      .returning();
+
+    return NextResponse.json(newCollege);
+  } catch (error) {
+    console.error("Failed to add college:", error);
+    return NextResponse.json({ error: "Failed to add college" }, { status: 500 });
+  }
+}
+

@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import { Flame, ArrowUpRight, Award, UserPlus, Sparkles, Trophy } from "lucide-react";
+import { Flame, ArrowUpRight, UserPlus, Sparkles, Trophy } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getCloutTier } from "@/lib/gamification";

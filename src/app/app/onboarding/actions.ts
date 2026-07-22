@@ -2,7 +2,7 @@
 
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
-import { userProfiles, institutionDomains, type UserProfile } from "@/db/schema";
+import { userProfiles, institutionDomains } from "@/db/schema";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
@@ -44,7 +44,7 @@ export async function completeOnboarding(formData: FormData) {
   const cookieStore = await cookies();
   const referredByUsername = cookieStore.get("cl_referred_by")?.value;
   let referrerId: string | null = null;
-  let referrerProfile: any = null;
+  let referrerProfile = null;
 
   if (referredByUsername) {
     referrerProfile = await db.query.userProfiles.findFirst({
@@ -77,13 +77,13 @@ export async function completeOnboarding(formData: FormData) {
     if (referrerProfile) {
       await db.update(userProfiles)
         .set({ 
-          referralCount: referrerProfile.referralCount + 1,
+          referralCount: (referrerProfile.referralCount || 0) + 1,
           points: (referrerProfile.points || 0) + 20
         })
         .where(eq(userProfiles.id, referrerProfile.id));
     }
-  } catch (error: any) {
-    if (error.code === '23505') { // Postgres unique violation
+  } catch (error: unknown) {
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code?: string }).code === '23505') {
       throw new Error("Username already taken");
     }
     throw error;

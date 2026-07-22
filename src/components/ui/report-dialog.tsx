@@ -40,8 +40,8 @@ export function ReportDialog({ postId, isOpen, onClose }: ReportDialogProps) {
         setDetails("");
         onClose();
       }, 1500);
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsLoading(false);
     }

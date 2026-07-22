@@ -1,5 +1,4 @@
 import { ShieldAlertIcon } from "lucide-react";
-import Link from "next/link";
 
 export default function InvalidEmailPage() {
   return (

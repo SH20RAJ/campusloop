@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Sparkles, TrendingUp, DollarSign, Users, Award, Shield, ChevronRight, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Sparkles, TrendingUp, DollarSign, Users, ChevronRight, ChevronLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const SLIDES = [

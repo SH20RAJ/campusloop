@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { X, Heart, Send, Share2, ChevronLeft, ChevronRight, School, MessageSquare } from "lucide-react";
+import { X, Heart, Send, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -27,10 +27,9 @@ interface StoryViewerClientProps {
   currentUserId: string;
 }
 
-export function StoryViewerClient({ story, currentUserId }: StoryViewerClientProps) {
+export function StoryViewerClient({ story }: StoryViewerClientProps) {
   const router = useRouter();
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(12);
   const [replyText, setReplyText] = useState("");
   const [isReplying, setIsReplying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -58,10 +57,8 @@ export function StoryViewerClient({ story, currentUserId }: StoryViewerClientPro
   function handleLike() {
     if (liked) {
       setLiked(false);
-      setLikeCount((prev) => prev - 1);
     } else {
       setLiked(true);
-      setLikeCount((prev) => prev + 1);
       toast.success(`Sent ❤️ to @${story.author.username}`);
     }
   }

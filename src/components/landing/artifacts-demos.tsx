@@ -945,6 +945,7 @@ function ArtifactCard({
           )}
         >
           <motion.div
+            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
             animate={(isHovered ? artifact.iconHover : artifact.iconRest) as any}
             className="flex items-center justify-center"
           >

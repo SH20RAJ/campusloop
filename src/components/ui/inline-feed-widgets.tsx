@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Flame, Hash, Gift, ArrowRight, Check, Heart, Sparkles, UserPlus } from "lucide-react";
+import { Users, Hash, Gift, ArrowRight, Check, Heart, Sparkles, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";

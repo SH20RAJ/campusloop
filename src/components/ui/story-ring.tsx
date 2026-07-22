@@ -431,7 +431,6 @@ export function StoryRing({ users, mutateStories }: StoryRingProps) {
                     placeholder={`Reply to ${users[activeUserIdx].displayName.split(" ")[0]}...`}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && e.currentTarget.value.trim()) {
-                        const val = e.currentTarget.value.trim();
                         e.currentTarget.value = "";
                         toast.success(`Reply sent to @${users[activeUserIdx].username}!`);
                         router.push(`/app/chat?userId=${users[activeUserIdx].id}`);

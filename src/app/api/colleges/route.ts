@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
-import { desc, ilike, or, eq, and, sql } from "drizzle-orm";
+import { desc, ilike, or, eq, and } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 

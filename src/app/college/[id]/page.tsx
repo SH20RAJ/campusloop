@@ -5,10 +5,9 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
+export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: `College Hub | CampusLoop`,
+    title: `College Hub`,
     description: `Explore student discussions and campus hub on CampusLoop.`,
   };
 }

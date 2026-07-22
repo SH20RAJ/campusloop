@@ -28,6 +28,8 @@ import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 
 import { motion, AnimatePresence } from "framer-motion";
 
+import { ShareStoryModal } from "./share-story-modal";
+
 interface FeedCardProps {
   post: FeedPost;
   currentUserId?: string;
@@ -40,6 +42,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showRepostModal, setShowRepostModal] = useState(false);
+  const [showShareStoryModal, setShowShareStoryModal] = useState(false);
   const [quoteThoughts, setQuoteThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -115,18 +118,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
   }
 
   function handleShare() {
-    const postUrl = `${window.location.origin}/app/post/${post.id}`;
-    let shareText = "";
-    if (post.type === "CONFESSION") {
-      shareText = `🤫 Anonymous Confession on CampusLoop:\n"${post.body.slice(0, 100)}${post.body.length > 100 ? "..." : ""}"\n\nRead the full tea at: ${postUrl}`;
-    } else if (post.type === "POLL") {
-      shareText = `📊 Campus Poll on CampusLoop:\n"${post.body.slice(0, 100)}${post.body.length > 100 ? "..." : ""}"\n\nCast your vote at: ${postUrl}`;
-    } else {
-      shareText = `🔥 Hot topic on CampusLoop:\n"${post.body.slice(0, 100)}${post.body.length > 100 ? "..." : ""}"\n\nJoin the discussion at: ${postUrl}`;
-    }
-
-    navigator.clipboard.writeText(shareText);
-    toast.success("Share link copied! Paste it in your WhatsApp group or Instagram story 🚀");
+    setShowShareStoryModal(true);
   }
 
   async function handleExecuteRepost(withCommentary: boolean) {
@@ -460,6 +452,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
       )}
 
       <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
+      <ShareStoryModal post={post} isOpen={showShareStoryModal} onClose={() => setShowShareStoryModal(false)} />
     </div>
   );
 }

@@ -176,7 +176,7 @@ export function FeedClient() {
           {/* Sort links */}
           <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground shrink-0">
             {[
-              { id: "for_you", label: "✨ For You" },
+              { id: "for_you", label: "🔥 For You" },
               { id: "latest", label: "Latest" },
               { id: "trending", label: "Trending" },
               { id: "top_voted", label: "Top Voted" },

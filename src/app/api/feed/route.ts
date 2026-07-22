@@ -110,13 +110,13 @@ export async function GET(req: Request) {
       },
     });
 
-    // Infinite Feed Guarantee: If page/offset runs out of strict posts, backfill with randomly shuffled posts
+    // Infinite Feed Guarantee: If page/offset runs out of strict posts, backfill with active filter condition matching posts
     if (rawFeed.length < limit) {
       const existingIds = new Set(rawFeed.map((p) => p.id));
       const needed = limit - rawFeed.length;
       
       const extraFeed = await db.query.posts.findMany({
-        where: eq(posts.status, "PUBLISHED"),
+        where: and(...conditions),
         orderBy: [sql`random()`],
         limit: needed * 3,
         with: {

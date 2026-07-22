@@ -48,6 +48,17 @@ export async function GET(req: Request) {
       conditions.push(sql`${posts.body} ILIKE ${`%#${hashtag}%`}`);
     }
 
+    // For You score: campus match + community match + engagement velocity
+    const forYouSql = sql<number>`
+      coalesce((select sum(value)::int from votes where post_id = posts.id), 0) * 4
+      +
+      coalesce((select count(*)::int from comments where post_id = posts.id and status = 'PUBLISHED'), 0) * 6
+      +
+      case when posts.institution_id = ${profile.institutionId} then 40 else 0 end
+      +
+      case when posts.community_id is not null then 20 else 0 end
+    `;
+
     // Trending score: votes + comments
     const trendingSql = sql<number>`
       coalesce((select sum(value)::int from votes where post_id = posts.id), 0)
@@ -65,8 +76,10 @@ export async function GET(req: Request) {
       coalesce((select count(*)::int from comments where post_id = posts.id and status = 'PUBLISHED'), 0)
     `;
 
-    let orderClauses = [desc(posts.createdAt)];
-    if (sort === "trending") {
+    let orderClauses = [desc(forYouSql), desc(posts.createdAt)];
+    if (sort === "latest") {
+      orderClauses = [desc(posts.createdAt)];
+    } else if (sort === "trending") {
       orderClauses = [desc(trendingSql), desc(posts.createdAt)];
     } else if (sort === "top_voted") {
       orderClauses = [desc(votesCountSql), desc(posts.createdAt)];

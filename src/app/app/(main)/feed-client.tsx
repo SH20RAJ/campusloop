@@ -38,9 +38,10 @@ export function FeedClient() {
   const [showFilters, setShowFilters] = useState(false);
   
   // Dashboard state
+  // Dashboard state
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
   const [type, setType] = useState<string>("ALL");
-  const [sort, setSort] = useState<string>("latest");
+  const [sort, setSort] = useState<string>("for_you");
   const [visibility, setVisibility] = useState<string>("all");
 
   const { 
@@ -77,13 +78,13 @@ export function FeedClient() {
   const activeFiltersCount = 
     (scope !== "GLOBAL" ? 1 : 0) + 
     (type !== "ALL" ? 1 : 0) + 
-    (sort !== "latest" ? 1 : 0) + 
+    (sort !== "for_you" ? 1 : 0) + 
     (visibility !== "all" ? 1 : 0);
 
   const resetFilters = () => {
     setScope("GLOBAL");
     setType("ALL");
-    setSort("latest");
+    setSort("for_you");
     setVisibility("all");
   };
 
@@ -124,10 +125,11 @@ export function FeedClient() {
         </div>
 
         {/* Minimal Sub-navigation/Filters bar */}
-        <div className="flex items-center justify-between border-t border-border/10 pt-2.5">
+        <div className="flex items-center justify-between border-t border-border/10 pt-2.5 overflow-x-auto no-scrollbar">
           {/* Sort links */}
-          <div className="flex items-center gap-4 text-xs font-semibold text-muted-foreground">
+          <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground shrink-0">
             {[
+              { id: "for_you", label: "✨ For You" },
               { id: "latest", label: "Latest" },
               { id: "trending", label: "Trending" },
               { id: "top_voted", label: "Top Voted" },
@@ -137,8 +139,8 @@ export function FeedClient() {
                 key={s.id}
                 onClick={() => setSort(s.id)}
                 className={cn(
-                  "hover:text-foreground transition-colors cursor-pointer relative py-0.5",
-                  sort === s.id && "text-foreground"
+                  "hover:text-foreground transition-colors cursor-pointer relative py-0.5 shrink-0",
+                  sort === s.id && "text-foreground font-bold"
                 )}
               >
                 {s.label}

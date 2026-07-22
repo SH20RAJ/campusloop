@@ -37,10 +37,11 @@ export function ChatDashboard({
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // SWR for conversations list
+  // SWR for conversations list (polls every 2.5s for new incoming DMs)
   const { data: conversations, mutate: mutateConvs } = useSWR<ConversationWithDetail[]>(
     "/api/chat",
-    fetcher
+    fetcher,
+    { refreshInterval: 2500, revalidateOnFocus: true }
   );
 
   const activeConv = conversations?.find(c => c.id === activeConversationId);

@@ -13,6 +13,7 @@ import {
   UserCircle,
   Shield,
   LogOut,
+  Sliders,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -42,6 +43,7 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
     { icon: MessageSquare, href: "/app/chat", label: "Messages" },
     { icon: Bell, href: "/app/notifications", label: "Notifications" },
     { icon: UserCircle, href: "/app/profile", label: "Profile" },
+    { icon: Sliders, href: "/app/settings", label: "Settings" },
   ];
 
   if (isAdmin) {

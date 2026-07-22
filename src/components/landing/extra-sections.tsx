@@ -5,20 +5,17 @@ import {
   MessageSquare,
   Heart,
   Users,
-  Sparkles,
   FileText,
   MessageCircle,
   Clock,
   BarChart3,
   Lock,
-  MailCheck,
   ShieldCheck,
   ShieldAlert,
   ChevronDown,
 } from "lucide-react";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { Reveal } from "@/components/landing/reveal";
-import { cn } from "@/lib/utils";
 
 // ──────── Section 1: Stats & Numbers ────────
 
@@ -28,32 +25,24 @@ const STATS = [
     value: 1350,
     suffix: "+",
     label: "Colleges Enrolled",
-    gradient: "from-amber-500 to-orange-500",
-    bgGlow: "bg-amber-500/5",
   },
   {
     icon: MessageSquare,
     value: 10240,
     suffix: "+",
-    label: "Posts Created",
-    gradient: "from-blue-500 to-cyan-500",
-    bgGlow: "bg-blue-500/5",
+    label: "Secrets & Confessions",
   },
   {
     icon: Heart,
     value: 5840,
     suffix: "+",
-    label: "Matches Made",
-    gradient: "from-pink-500 to-rose-500",
-    bgGlow: "bg-pink-500/5",
+    label: "Matches Made (Zero Catfish)",
   },
   {
     icon: Users,
     value: 2500,
     suffix: "+",
-    label: "Daily Active Users",
-    gradient: "from-emerald-500 to-teal-500",
-    bgGlow: "bg-emerald-500/5",
+    label: "Daily Procrastinating Students",
   },
 ];
 
@@ -61,7 +50,7 @@ export function StatsSection() {
   return (
     <section className="border-t border-border/60 bg-muted/10">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
-        <Reveal className="mx-auto mb-14 max-w-xl text-center">
+        <Reveal className="mx-auto mb-12 max-w-xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             The numbers
           </p>
@@ -70,32 +59,17 @@ export function StatsSection() {
           </h2>
         </Reveal>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {STATS.map((stat, i) => (
-            <Reveal key={stat.label} delay={i * 0.08}>
-              <div
-                className={cn(
-                  "group relative overflow-hidden rounded-xl border border-border bg-card p-6 text-center transition-all duration-300 hover:shadow-md hover:-translate-y-0.5",
-                  stat.bgGlow
-                )}
-              >
-                {/* Gradient accent line */}
-                <div
-                  className={cn(
-                    "absolute left-0 top-0 h-1 w-full bg-gradient-to-r opacity-60",
-                    stat.gradient
-                  )}
-                />
-
-                <div className="mx-auto mb-3 flex size-11 items-center justify-center rounded-xl bg-muted/80 ring-1 ring-border/50">
-                  <stat.icon className="size-5 text-muted-foreground" />
+            <Reveal key={stat.label} delay={i * 0.06}>
+              <div className="relative overflow-hidden rounded-xl border border-border bg-card p-5 text-center transition-all hover:border-border/80 shadow-sm">
+                <div className="mx-auto mb-3 flex size-10 items-center justify-center rounded-lg bg-muted border border-border/60">
+                  <stat.icon className="size-4 text-muted-foreground" />
                 </div>
 
                 <p className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-                  <NumberTicker value={stat.value} delay={0.2 + i * 0.15} />
-                  <span className={cn("bg-gradient-to-r bg-clip-text text-transparent", stat.gradient)}>
-                    {stat.suffix}
-                  </span>
+                  <NumberTicker value={stat.value} delay={0.2 + i * 0.1} />
+                  <span className="text-primary">{stat.suffix}</span>
                 </p>
                 <p className="mt-1 text-xs font-medium text-muted-foreground">
                   {stat.label}
@@ -114,81 +88,56 @@ export function StatsSection() {
 const FEATURES = [
   {
     icon: FileText,
-    title: "Rich Text Editor",
-    desc: "Bold, italic, lists, and code blocks. Your campus posts deserve formatting.",
-    gradient: "from-purple-500/20 to-pink-500/20",
-    iconBg: "bg-purple-500/10 text-purple-500",
+    title: "Rich Text Confessions",
+    desc: "Bold your canteen drama, italicize your exam rants, and code-block your lab meltdowns.",
   },
   {
     icon: MessageCircle,
-    title: "Real-time Chat",
-    desc: "DM classmates without exchanging numbers. Read receipts, typing indicators, and more.",
-    gradient: "from-rose-500/20 to-red-500/20",
-    iconBg: "bg-rose-500/10 text-rose-500",
+    title: "Direct In-App DMs",
+    desc: "Slide in without giving out your personal phone number or Instagram handle.",
   },
   {
     icon: Clock,
-    title: "Story Rings",
-    desc: "24-hour moments that vanish. No screenshots, no archives, no pressure.",
-    gradient: "from-orange-500/20 to-amber-500/20",
-    iconBg: "bg-orange-500/10 text-orange-500",
+    title: "24h Story Rings",
+    desc: "Post campus moments that vanish before your HOD or batch CR wakes up.",
   },
   {
     icon: BarChart3,
-    title: "Live Poll Results",
-    desc: "Vote and watch percentages shift in real time. No refresh needed.",
-    gradient: "from-emerald-500/20 to-teal-500/20",
-    iconBg: "bg-emerald-500/10 text-emerald-500",
+    title: "Live Canteen Polls",
+    desc: "Settle 'Nescafe vs Mess Food' debates with instant real-time votes.",
   },
   {
     icon: Users,
-    title: "Community Hubs",
-    desc: "Dedicated spaces for clubs, hostels, and interest groups. Your campus, organized.",
-    gradient: "from-blue-500/20 to-indigo-500/20",
-    iconBg: "bg-blue-500/10 text-blue-500",
+    title: "Hostel & Club Hubs",
+    desc: "Dedicated spaces for coding nerds, sports teams, and late-night study wings.",
   },
   {
     icon: Lock,
-    title: "Anonymous Posting",
-    desc: "Speak freely behind a cryptographic hash. Your identity stays off the record.",
-    gradient: "from-red-500/20 to-rose-500/20",
-    iconBg: "bg-red-500/10 text-red-500",
+    title: "Cryptographic Anonymity",
+    desc: "Speak freely behind a one-way hash. Your name stays completely off the record.",
   },
 ];
 
 export function IntegrationsSection() {
   return (
-    <section className="border-t border-border/60">
+    <section className="border-t border-border/60 bg-background">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
-        <Reveal className="mx-auto mb-14 max-w-xl text-center">
+        <Reveal className="mx-auto mb-12 max-w-xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Features that matter
+            Campus Survival Kit
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-            Everything a campus needs.
+            Everything a student needs.
           </h2>
         </Reveal>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((feature, i) => (
             <Reveal key={feature.title} delay={i * 0.05}>
-              <div className="group relative cursor-default rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
-                <div
-                  className={cn(
-                    "pointer-events-none absolute -inset-px rounded-xl opacity-0 blur-sm transition-opacity duration-500",
-                    "bg-gradient-to-br",
-                    feature.gradient,
-                    "group-hover:opacity-100"
-                  )}
-                />
-                <div className="relative flex items-start gap-3">
-                  <div
-                    className={cn(
-                      "flex size-10 shrink-0 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-110",
-                      feature.iconBg
-                    )}
-                  >
-                    <feature.icon className="size-5" />
+              <div className="rounded-xl border border-border bg-card p-5 transition-all hover:border-border/80 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <feature.icon className="size-4.5" />
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-heading text-sm font-semibold">
@@ -212,84 +161,72 @@ export function IntegrationsSection() {
 
 const TESTIMONIALS = [
   {
-    quote: "I found my study group through CampusLoop. Now we crush every assignment together.",
+    quote: "My attendance is at 45% but my Loop Points are at 10,000. Priorities.",
     name: "Ananya Sharma",
     role: "BITS Pilani, CS '27",
     initials: "AS",
-    color: "from-blue-500 to-cyan-500",
   },
   {
-    quote: "The anonymity made me brave enough to come out to my campus. Best decision ever.",
+    quote: "Met my girlfriend here when we were both studying for the same Endsem exam we failed.",
     name: "Rahul Verma",
     role: "Christ University, Design '26",
     initials: "RV",
-    color: "from-pink-500 to-rose-500",
   },
   {
-    quote: "Confessions here are unhinged in the best way. Our canteen poll got 800+ votes in a day.",
+    quote: "Our canteen poll got 800+ votes in a day. Nescafe booth won by an absolute landslide.",
     name: "Priya Mehta",
     role: "SRCC, Economics '25",
     initials: "PM",
-    color: "from-amber-500 to-orange-500",
   },
   {
-    quote: "Swiped right, matched, and now we get chai together every evening. CampusLoop matchmaking is insane.",
+    quote: "I posted a lost ID card at 8 AM and the owner found me before the first lecture started.",
     name: "Arun Kumar",
     role: "IIT Delhi, Electrical '26",
     initials: "AK",
-    color: "from-emerald-500 to-teal-500",
   },
   {
-    quote: "The moderation is actually good. Trolls get shut down fast. Feels like a safe space.",
+    quote: "The anonymity is real. I complained about mess food and didn't get kicked out of the hostel.",
     name: "Neha Singh",
     role: "NIT Trichy, Mechanical '27",
     initials: "NS",
-    color: "from-purple-500 to-violet-500",
   },
   {
-    quote: "I posted a lost ID card at 8 AM and the owner contacted me by lunch. CampusLoop is magic.",
+    quote: "Found my study group here. We still fail together, but now we fail in style.",
     name: "Karthik Rajan",
     role: "VIT Vellore, CSE '25",
     initials: "KR",
-    color: "from-red-500 to-orange-500",
   },
 ];
 
 export function TestimonialsSection() {
   return (
-    <section className="border-t border-border/60 bg-muted/5">
+    <section className="border-t border-border/60 bg-muted/10">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
-        <Reveal className="mx-auto mb-14 max-w-xl text-center">
+        <Reveal className="mx-auto mb-12 max-w-xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Real voices
+            Real Student Voices
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-            What students are saying.
+            What your classmates are saying.
           </h2>
         </Reveal>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {TESTIMONIALS.map((t, i) => (
-            <Reveal key={t.name} delay={i * 0.06}>
-              <div className="group relative rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:shadow-md">
-                {/* Quote mark */}
-                <div className="mb-3 text-3xl leading-none font-serif text-muted-foreground/20">
+            <Reveal key={t.name} delay={i * 0.05}>
+              <div className="rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-border/80">
+                <div className="mb-2 text-2xl leading-none font-serif text-muted-foreground/30">
                   &ldquo;
                 </div>
-                <p className="mb-4 text-sm leading-relaxed text-foreground/90">
+                <p className="mb-4 text-xs leading-relaxed text-foreground/90 font-medium">
                   {t.quote}
                 </p>
                 <div className="flex items-center gap-2.5 border-t border-border/40 pt-3">
-                  <div
-                    className={cn(
-                      "flex size-8 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white shadow-sm",
-                      t.color
-                    )}
-                  >
+                  <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
                     {t.initials}
                   </div>
                   <div>
-                    <p className="text-xs font-semibold">{t.name}</p>
+                    <p className="text-xs font-bold text-foreground">{t.name}</p>
                     <p className="text-[10px] text-muted-foreground">
                       {t.role}
                     </p>
@@ -310,81 +247,59 @@ const SAFETY_ITEMS = [
   {
     icon: ShieldCheck,
     title: "PII Auto-Scrubbing",
-    desc: "Phone numbers and emails are stripped from every confession before it hits the feed. No exceptions.",
-    gradient: "from-emerald-500/20 to-teal-500/20",
-    iconBg: "bg-emerald-500/10 text-emerald-500",
+    desc: "We delete phone numbers and emails faster than you delete your ex's texts. No personal data leaks.",
     status: "Active",
   },
   {
     icon: Lock,
     title: "Anonymous by Default",
     desc: "Your posts carry a cryptographic hash, not your name. No profile link, no trace back.",
-    gradient: "from-blue-500/20 to-indigo-500/20",
-    iconBg: "bg-blue-500/10 text-blue-500",
     status: "Active",
   },
   {
     icon: ShieldAlert,
-    title: "Report & Block",
-    desc: "Flag anything that shouldn't be there. Moderators review within hours.",
-    gradient: "from-amber-500/20 to-orange-500/20",
-    iconBg: "bg-amber-500/10 text-amber-500",
+    title: "Instant Moderation",
+    desc: "Flag anything out of line. Trolls and toxic accounts get banned permanently.",
     status: "Active",
   },
   {
     icon: School,
     title: "College-Gated Access",
-    desc: "Every account is verified by college email. No alumni, no outsiders, no bots.",
-    gradient: "from-red-500/20 to-rose-500/20",
-    iconBg: "bg-red-500/10 text-red-500",
+    desc: "Verified by official college email. No random uncles, alumni, or bots allowed.",
     status: "Always On",
   },
 ];
 
 export function SafetySection() {
   return (
-    <section className="border-t border-border/60 bg-muted/10">
+    <section className="border-t border-border/60 bg-background">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
-        <Reveal className="mx-auto mb-14 max-w-xl text-center">
+        <Reveal className="mx-auto mb-12 max-w-xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Safety first
+            Safety First
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-            Speak freely. Safely.
+            Speak freely without your HOD finding out.
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            We built guardrails so you can be loud without worrying about who&apos;s
-            watching.
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            We built cryptographic guardrails so you can be loud without getting suspended.
           </p>
         </Reveal>
 
         <div className="grid gap-4 sm:grid-cols-2">
           {SAFETY_ITEMS.map((item, i) => (
-            <Reveal key={item.title} delay={i * 0.08}>
-              <div className="group relative rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
-                <div
-                  className={cn(
-                    "pointer-events-none absolute -inset-px rounded-xl opacity-0 blur-sm transition-opacity duration-500",
-                    "bg-gradient-to-br",
-                    item.gradient,
-                    "group-hover:opacity-100"
-                  )}
-                />
-                <div className="relative flex items-start gap-4">
-                  <div
-                    className={cn(
-                      "flex size-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110",
-                      item.iconBg
-                    )}
-                  >
+            <Reveal key={item.title} delay={i * 0.06}>
+              <div className="rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-border/80">
+                <div className="flex items-start gap-3.5">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <item.icon className="size-5" />
                   </div>
                   <div className="min-w-0">
                     <div className="mb-1 flex items-center gap-2">
-                      <h3 className="font-heading text-sm font-semibold">
+                      <h3 className="font-heading text-sm font-bold text-foreground">
                         {item.title}
                       </h3>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[9px] font-medium text-emerald-600 dark:text-emerald-400">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[9px] font-semibold text-emerald-500">
                         <span className="size-1.5 rounded-full bg-emerald-500" />
                         {item.status}
                       </span>
@@ -407,41 +322,41 @@ export function SafetySection() {
 
 const FAQS = [
   {
-    q: "Is it really anonymous?",
-    a: "Yes. Confessions and anonymous posts are tied to a one-way cryptographic hash of your identity. Your name, email, and profile are never stored alongside the post. Even we cannot deanonymize you without a legal request.",
+    q: "Is it really anonymous or will my HOD catch me?",
+    a: "100% anonymous. Confessions and anonymous posts use a one-way cryptographic hash. Your name, email, and profile are never attached to the post.",
   },
   {
-    q: "Which colleges are supported?",
-    a: "1,350+ Indian colleges are already enrolled. If yours isn&apos;t on the list, you can request it by emailing us with your college email address. We typically add new colleges within 48 hours.",
+    q: "What if my college isn't on the list?",
+    a: "1,350+ Indian colleges are already supported. If yours isn't, email mail@campusloop.space with your college domain and we add it within 24 hours.",
   },
   {
     q: "Is CampusLoop completely free?",
-    a: "Yes — always free for verified students. No subscription, no hidden charges, no &lsquo;premium&apos; tiers. Your college email is the only ticket you need.",
+    a: "Yes — always 100% free for verified students. No premium tiers, no hidden charges.",
   },
   {
     q: "How does verification work?",
-    a: "You sign up with your college email (e.g., name@iitd.ac.in). We send a one-time code to that inbox. Once you enter it, you&apos;re in. No documents, no selfies, no waiting.",
+    a: "Sign up with your college email (e.g. name@iitd.ac.in). Enter the 6-digit OTP code we send to your inbox. That's it — takes 5 seconds.",
   },
   {
     q: "Can I delete my posts or account?",
-    a: "Absolutely. You can delete any post at any time. Your account can be permanently deleted from settings — all your data goes with it within 30 days.",
+    a: "Yes. You can delete any post instantly. You can also delete your account permanently from settings.",
   },
   {
     q: "What if someone harasses me?",
-    a: "Block them instantly or report the content. Our moderation team reviews reports within hours. Serial offenders get banned from the platform permanently.",
+    a: "Block them instantly or report the post. Our moderators review reports quickly and ban toxic users permanently.",
   },
 ];
 
 export function FAQSection() {
   return (
-    <section className="border-t border-border/60">
+    <section className="border-t border-border/60 bg-muted/10">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
-        <Reveal className="mx-auto mb-14 max-w-xl text-center">
+        <Reveal className="mx-auto mb-12 max-w-xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Got questions?
+            Quick Answers
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-            Quick answers.
+            Frequently Asked Questions.
           </h2>
         </Reveal>
 
@@ -464,10 +379,10 @@ function FAQItem({
 }) {
   return (
     <Reveal delay={index * 0.04}>
-      <details className="group rounded-xl border border-border bg-card transition-all duration-300 hover:shadow-md [&[open]]:border-primary/20 [&[open]]:bg-primary/[0.02]">
-        <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-medium transition-colors group-open:text-primary">
+      <details className="group rounded-xl border border-border bg-card transition-all duration-200 [&[open]]:border-primary/30">
+        <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-xs md:text-sm font-semibold transition-colors group-open:text-primary">
           <span>{faq.q}</span>
-          <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-300 group-open:rotate-180" />
+          <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
         </summary>
         <div className="border-t border-border/40 px-5 pb-4 pt-3">
           <p className="text-xs leading-relaxed text-muted-foreground">
@@ -484,77 +399,52 @@ function FAQItem({
 const HOW_STEPS = [
   {
     step: 1,
-    title: "Sign up with your college email",
-    desc: "Type your @yourcollege.ac.in address. We send a one-time code to your inbox.",
-    icon: MailCheck,
-    gradient: "from-amber-500/20 to-orange-500/20",
-    iconBg: "bg-amber-500/10 text-amber-500",
+    title: "Use your college email",
+    desc: "The address you only open for exam hall tickets and fee reminders.",
   },
   {
     step: 2,
-    title: "Verify with one tap",
-    desc: "Enter the OTP. That's it — no documents, no selfies, no waitlist.",
-    icon: ShieldCheck,
-    gradient: "from-blue-500/20 to-cyan-500/20",
-    iconBg: "bg-blue-500/10 text-blue-500",
+    title: "Verify with 1 tap",
+    desc: "Enter the OTP code we send to your inbox. No ID cards, no waitlists.",
   },
   {
     step: 3,
     title: "Join your campus loop",
-    desc: "You land in a feed where every single account passed the same email check.",
-    icon: Users,
-    gradient: "from-emerald-500/20 to-teal-500/20",
-    iconBg: "bg-emerald-500/10 text-emerald-500",
+    desc: "Enter a feed where every single account cleared the same email check.",
   },
   {
     step: 4,
-    title: "Post, poll, match, chat",
-    desc: "Confess anonymously, settle debates with polls, swipe to match, and DM classmates.",
-    icon: Sparkles,
-    gradient: "from-purple-500/20 to-pink-500/20",
-    iconBg: "bg-purple-500/10 text-purple-500",
+    title: "Post, poll, match & chat",
+    desc: "Confess anonymously, settle canteen debates, swipe to match, and pretend to study.",
   },
 ];
 
 export function HowItWorksSection() {
   return (
-    <section className="border-t border-border/60 bg-muted/10">
+    <section className="border-t border-border/60 bg-background">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
-        <Reveal className="mx-auto mb-14 max-w-xl text-center">
+        <Reveal className="mx-auto mb-12 max-w-xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            How it works
+            How It Works
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
             Four steps to your campus loop.
           </h2>
         </Reveal>
 
-        <div className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Connector line */}
-          <div className="pointer-events-none absolute left-8 top-12 hidden h-px bg-gradient-to-r from-primary/40 via-primary/20 to-transparent lg:block lg:left-[calc(12.5%+1.5rem)] lg:right-[calc(12.5%+1.5rem)]" />
-
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {HOW_STEPS.map((step, i) => (
-            <Reveal key={step.title} delay={i * 0.1}>
-              <div className="group relative rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
-                <div
-                  className={cn(
-                    "pointer-events-none absolute -inset-px rounded-xl opacity-0 blur-sm transition-opacity duration-500",
-                    "bg-gradient-to-br",
-                    step.gradient,
-                    "group-hover:opacity-100"
-                  )}
-                />
-                <div className="relative">
-                  <span className="mb-3 flex size-10 items-center justify-center rounded-lg text-xs font-bold ring-1 ring-border/50 bg-muted/80 text-muted-foreground">
-                    {step.step}
-                  </span>
-                  <h3 className="mb-1.5 font-heading text-sm font-semibold">
-                    {step.title}
-                  </h3>
-                  <p className="text-xs leading-relaxed text-muted-foreground">
-                    {step.desc}
-                  </p>
-                </div>
+            <Reveal key={step.title} delay={i * 0.08}>
+              <div className="rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-border/80">
+                <span className="mb-3 flex size-8 items-center justify-center rounded-md text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                  {step.step}
+                </span>
+                <h3 className="mb-1 font-heading text-sm font-bold text-foreground">
+                  {step.title}
+                </h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {step.desc}
+                </p>
               </div>
             </Reveal>
           ))}
@@ -563,5 +453,3 @@ export function HowItWorksSection() {
     </section>
   );
 }
-
-

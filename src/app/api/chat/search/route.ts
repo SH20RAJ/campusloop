@@ -4,6 +4,8 @@ import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and, ilike, ne, or } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   try {
     const user = await hexclaveServerApp.getUser();
@@ -27,10 +29,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
 
-    // Search users in the same institution matching display name or username
+    // Search users matching display name or username
     const matches = await db.query.userProfiles.findMany({
       where: and(
-        eq(userProfiles.institutionId, profile.institutionId),
         ne(userProfiles.id, profile.id), // Exclude self
         or(
           ilike(userProfiles.displayName, `%${query}%`),

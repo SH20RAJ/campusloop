@@ -4,6 +4,8 @@ import { messages, userProfiles, conversations } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, asc } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 interface RouteParams {
   params: Promise<{ id: string }>;
 }

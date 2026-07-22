@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { X, Heart, Send, Share2 } from "lucide-react";
+import { X, Heart, Send, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -25,16 +25,22 @@ interface StoryViewerClientProps {
     };
   };
   currentUserId: string;
+  prevStoryId?: string | null;
+  nextStoryId?: string | null;
 }
 
-export function StoryViewerClient({ story }: StoryViewerClientProps) {
+export function StoryViewerClient({
+  story,
+  prevStoryId,
+  nextStoryId,
+}: StoryViewerClientProps) {
   const router = useRouter();
   const [liked, setLiked] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [isReplying, setIsReplying] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  // Auto-progress bar timer
+  // Auto-progress bar timer & auto-advance
   useEffect(() => {
     setProgress(0);
     const interval = 50;
@@ -45,6 +51,11 @@ export function StoryViewerClient({ story }: StoryViewerClientProps) {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
+          if (nextStoryId) {
+            router.push(`/app/story/${nextStoryId}`);
+          } else {
+            router.push("/app");
+          }
           return 100;
         }
         return prev + step;
@@ -52,7 +63,26 @@ export function StoryViewerClient({ story }: StoryViewerClientProps) {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [story.id]);
+  }, [story.id, nextStoryId, router]);
+
+  // Keyboard left/right arrow navigation
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowLeft" && prevStoryId) {
+        router.push(`/app/story/${prevStoryId}`);
+      } else if (e.key === "ArrowRight") {
+        if (nextStoryId) {
+          router.push(`/app/story/${nextStoryId}`);
+        } else {
+          router.push("/app");
+        }
+      } else if (e.key === "Escape") {
+        router.push("/app");
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [prevStoryId, nextStoryId, router]);
 
   function handleLike() {
     if (liked) {
@@ -103,17 +133,37 @@ export function StoryViewerClient({ story }: StoryViewerClientProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-95 md:bg-opacity-80 backdrop-blur-md select-none p-0 md:p-4">
+      {/* Prev Arrow Button (Desktop) */}
+      <button
+        onClick={() => prevStoryId ? router.push(`/app/story/${prevStoryId}`) : router.push("/app")}
+        className="hidden md:flex h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white items-center justify-center cursor-pointer transition-all mr-4 shadow-lg active:scale-90"
+        aria-label="Previous story"
+      >
+        <ChevronLeft className="size-6" />
+      </button>
+
       <div className="relative w-full max-w-md aspect-[9/16] h-full md:h-[90vh] md:max-h-[850px] bg-neutral-950 flex flex-col justify-between p-4 md:rounded-3xl overflow-hidden shadow-2xl">
-        
+        {/* Left & Right Tappable Zones for Mobile Touch */}
+        <div
+          onClick={() => prevStoryId ? router.push(`/app/story/${prevStoryId}`) : router.push("/app")}
+          className="absolute left-0 top-16 bottom-20 w-1/3 z-10 cursor-pointer"
+          title="Previous story"
+        />
+        <div
+          onClick={() => nextStoryId ? router.push(`/app/story/${nextStoryId}`) : router.push("/app")}
+          className="absolute right-0 top-16 bottom-20 w-1/3 z-10 cursor-pointer"
+          title="Next story"
+        />
+
         {/* Fullscreen Story Canvas */}
         <div
           className={cn(
-            "absolute inset-0 flex flex-col justify-between p-6 text-white transition-all duration-300",
+            "absolute inset-0 flex flex-col justify-between p-6 text-white transition-all duration-300 pointer-events-none",
             bgClass
           )}
         >
           {/* Top Header: Progress Bar + User Metadata */}
-          <div className="w-full space-y-4 z-20">
+          <div className="w-full space-y-4 z-20 pointer-events-auto">
             {/* Progress Bar */}
             <div className="h-1 w-full bg-white/30 rounded-full overflow-hidden">
               <div
@@ -158,14 +208,14 @@ export function StoryViewerClient({ story }: StoryViewerClientProps) {
           </div>
 
           {/* Center: Story Text Content */}
-          <div className="flex-1 flex flex-col justify-center items-center text-center px-4 relative z-20">
+          <div className="flex-1 flex flex-col justify-center items-center text-center px-4 relative z-20 pointer-events-auto">
             <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-relaxed max-w-[290px] break-words whitespace-pre-wrap select-text drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
               {story.text || "Campus Vibe ✨"}
             </h2>
           </div>
 
           {/* Bottom Controls: Like, Reply & Share */}
-          <div className="w-full space-y-3 z-20">
+          <div className="w-full space-y-3 z-20 pointer-events-auto">
             <form onSubmit={handleSendReply} className="flex items-center gap-2">
               <input
                 type="text"
@@ -211,6 +261,15 @@ export function StoryViewerClient({ story }: StoryViewerClientProps) {
           </div>
         </div>
       </div>
+
+      {/* Next Arrow Button (Desktop) */}
+      <button
+        onClick={() => nextStoryId ? router.push(`/app/story/${nextStoryId}`) : router.push("/app")}
+        className="hidden md:flex h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white items-center justify-center cursor-pointer transition-all ml-4 shadow-lg active:scale-90"
+        aria-label="Next story"
+      >
+        <ChevronRight className="size-6" />
+      </button>
     </div>
   );
 }

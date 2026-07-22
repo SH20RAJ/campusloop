@@ -4,6 +4,8 @@ import { conversations, conversationParticipants, userProfiles, messages } from 
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, desc, inArray } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const user = await hexclaveServerApp.getUser();
@@ -91,15 +93,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
 
-    const { participantId } = (await req.json()) as { participantId: string };
+    const bodyData = (await req.json()) as {
+      participantId?: string;
+      recipientId?: string;
+      content?: string;
+      body?: string;
+    };
+    const targetUserId = bodyData.participantId || bodyData.recipientId;
+    const messageContent = bodyData.content || bodyData.body;
 
-    if (!participantId) {
-      return NextResponse.json({ error: "participantId is required" }, { status: 400 });
+    if (!targetUserId) {
+      return NextResponse.json({ error: "participantId or recipientId is required" }, { status: 400 });
     }
 
     // Check if participant exists
     const targetUser = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.id, participantId),
+      where: eq(userProfiles.id, targetUserId),
     });
 
     if (!targetUser) {
@@ -111,26 +120,40 @@ export async function POST(req: Request) {
       where: eq(conversationParticipants.userId, profile.id),
     });
     const targetConvs = await db.query.conversationParticipants.findMany({
-      where: eq(conversationParticipants.userId, participantId),
+      where: eq(conversationParticipants.userId, targetUserId),
     });
 
     const commonConv = myConvs.find(mc => targetConvs.some(tc => tc.conversationId === mc.conversationId));
 
-    if (commonConv) {
-      // Return existing conversation ID
-      return NextResponse.json({ id: commonConv.conversationId }, { status: 200 });
+    let conversationId = commonConv?.conversationId;
+
+    if (!conversationId) {
+      // Create a new conversation session
+      const [newConv] = await db.insert(conversations).values({}).returning();
+      conversationId = newConv.id;
+
+      // Add participants
+      await db.insert(conversationParticipants).values([
+        { conversationId, userId: profile.id },
+        { conversationId, userId: targetUserId },
+      ]);
     }
 
-    // Otherwise, create a new conversation session
-    const [newConv] = await db.insert(conversations).values({}).returning();
+    // If message content was passed (e.g. story reply), insert message directly
+    if (messageContent && messageContent.trim()) {
+      await db.insert(messages).values({
+        conversationId,
+        senderId: profile.id,
+        body: messageContent.trim(),
+      });
 
-    // Add participants
-    await db.insert(conversationParticipants).values([
-      { conversationId: newConv.id, userId: profile.id },
-      { conversationId: newConv.id, userId: participantId },
-    ]);
+      await db
+        .update(conversations)
+        .set({ updatedAt: new Date() })
+        .where(eq(conversations.id, conversationId));
+    }
 
-    return NextResponse.json(newConv, { status: 201 });
+    return NextResponse.json({ id: conversationId }, { status: 200 });
   } catch (error) {
     console.error("Error creating conversation:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

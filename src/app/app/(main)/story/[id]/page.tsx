@@ -1,6 +1,6 @@
 import { getDb } from "@/db";
 import { stories, userProfiles } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, gt, desc } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { Metadata } from "next";
@@ -64,6 +64,18 @@ export default async function StoryPage({ params }: PageProps) {
     notFound();
   }
 
+  // Fetch all active story IDs for prev/next navigation
+  const allStories = await db.query.stories.findMany({
+    where: gt(stories.expiresAt, new Date()),
+    orderBy: [desc(stories.createdAt)],
+    columns: { id: true },
+  });
+
+  const storyIds = allStories.map((s) => s.id);
+  const currentIndex = storyIds.indexOf(id);
+  const prevStoryId = currentIndex > 0 ? storyIds[currentIndex - 1] : null;
+  const nextStoryId = currentIndex >= 0 && currentIndex < storyIds.length - 1 ? storyIds[currentIndex + 1] : null;
+
   const formattedStory = {
     id: rawStory.id,
     mediaUrl: rawStory.mediaUrl,
@@ -84,6 +96,8 @@ export default async function StoryPage({ params }: PageProps) {
     <StoryViewerClient
       story={formattedStory}
       currentUserId={profile.id}
+      prevStoryId={prevStoryId}
+      nextStoryId={nextStoryId}
     />
   );
 }

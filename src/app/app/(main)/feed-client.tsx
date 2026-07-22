@@ -36,7 +36,7 @@ const fetcher = <T,>(url: string): Promise<T> =>
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-export function FeedClient() {
+export function FeedClient({ forcedType }: { forcedType?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -45,13 +45,17 @@ export function FeedClient() {
   // Dashboard state synced with URL
   const initialScope = (searchParams.get("scope") as "CAMPUS" | "GLOBAL") || "GLOBAL";
   const [scope, setScopeState] = useState<"CAMPUS" | "GLOBAL">(initialScope);
-  const initialType = searchParams.get("type") || "ALL";
+  const initialType = forcedType || searchParams.get("type") || "ALL";
   const [type, setTypeState] = useState<string>(initialType);
   const sortParam = searchParams.get("sort") || "for_you";
   const [sort, setSortState] = useState<string>(sortParam);
   const [visibility, setVisibility] = useState<string>("all");
 
   useEffect(() => {
+    if (forcedType) {
+      setTypeState(forcedType);
+      return;
+    }
     const currentScope = searchParams.get("scope") as "CAMPUS" | "GLOBAL";
     if (currentScope && currentScope !== scope) {
       setScopeState(currentScope);
@@ -64,7 +68,7 @@ export function FeedClient() {
     if (currentType && currentType !== type) {
       setTypeState(currentType);
     }
-  }, [searchParams, scope, sort, type]);
+  }, [searchParams, scope, sort, type, forcedType]);
 
   function handleScopeChange(newScope: "CAMPUS" | "GLOBAL") {
     setScopeState(newScope);
@@ -75,13 +79,11 @@ export function FeedClient() {
 
   function handleTypeChange(newType: string) {
     setTypeState(newType);
-    const params = new URLSearchParams(searchParams.toString());
-    if (newType && newType !== "ALL") {
-      params.set("type", newType);
+    if (newType === "ALL") {
+      router.push("/app");
     } else {
-      params.delete("type");
+      router.push(`/app/posts/${newType}`);
     }
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
   function handleSortChange(newSort: string) {

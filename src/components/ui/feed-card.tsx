@@ -398,51 +398,51 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
 
       {/* Repost Modal */}
       {showRepostModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <Repeat2 className="h-5 w-5 text-emerald-500" /> Repost to Campus
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-2xl border border-border/60 bg-background p-5 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-1 border-b border-border/40">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2 tracking-tight">
+                <Repeat2 className="h-4 w-4 text-emerald-500" /> Repost to Campus
               </h3>
               <button
                 onClick={() => setShowRepostModal(false)}
-                className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                className="h-7 w-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Quoted Original Post Preview */}
-            <div className="rounded-2xl border border-border/80 bg-muted/30 p-3.5 text-xs space-y-1">
-              <p className="font-bold text-foreground">@{authorHandle}</p>
+            <div className="rounded-xl border border-border/40 bg-muted/30 p-3 text-xs space-y-1">
+              <p className="font-semibold text-foreground">@{authorHandle}</p>
               <p className="text-muted-foreground line-clamp-3 leading-relaxed">{post.body}</p>
             </div>
 
             {/* Add Thoughts Input */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-foreground">Add your thoughts (optional)</label>
+              <label className="text-xs font-semibold text-muted-foreground">Add your thoughts (optional)</label>
               <textarea
                 value={quoteThoughts}
                 onChange={(e) => setQuoteThoughts(e.target.value)}
                 placeholder="What's your take on this?..."
                 rows={3}
-                className="w-full rounded-2xl border border-border bg-muted/40 p-3 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-background transition-all resize-none"
+                className="w-full rounded-xl border border-border/60 bg-muted/20 p-3 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-background transition-all resize-none"
               />
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center gap-2 pt-2">
+            <div className="flex items-center gap-2 pt-1">
               <button
                 onClick={() => handleExecuteRepost(false)}
                 disabled={isReposting}
-                className="flex-1 py-2.5 rounded-xl border border-border bg-muted/60 text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer disabled:opacity-50"
+                className="flex-1 py-2 rounded-xl border border-border/60 bg-muted/40 text-foreground text-xs font-semibold hover:bg-muted transition-all cursor-pointer disabled:opacity-50"
               >
                 Instant Repost
               </button>
               <button
                 onClick={() => handleExecuteRepost(true)}
                 disabled={isReposting || !quoteThoughts.trim()}
-                className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm"
+                className="flex-1 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-xs"
               >
                 <Send className="h-3.5 w-3.5" /> Quote Reshare
               </button>

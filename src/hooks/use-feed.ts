@@ -49,7 +49,14 @@ export function useFeed(
 
   const { data, error, size, setSize, isLoading, mutate } = useSWRInfinite<FeedPost[]>(
     getKey,
-    fetcher
+    fetcher,
+    {
+      revalidateFirstPage: false,
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      keepPreviousData: true,
+    }
   );
 
   const rawFeed = data ? data.flat() : undefined;

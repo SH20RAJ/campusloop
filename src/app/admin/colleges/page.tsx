@@ -5,6 +5,8 @@ import { Plus } from "lucide-react";
 import { desc } from "drizzle-orm";
 import { CollegesTable } from "./colleges-table";
 
+export const dynamic = "force-dynamic";
+
 export default async function CollegesAdminPage() {
   const db = getDb();
   const colleges = await db.query.institutions.findMany({

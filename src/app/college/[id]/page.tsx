@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
 import { institutions, posts, userProfiles } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
-import { notFound } from "next/navigation";
+import { eq, or, desc } from "drizzle-orm";
+import { notFound, redirect } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
 import { School, MapPin, Globe, Calendar, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
   const db = getDb();
   const college = await db.query.institutions.findFirst({
-    where: eq(institutions.id, id),
+    where: or(eq(institutions.slug, id), eq(institutions.id, id)),
   });
 
   return {
@@ -30,7 +30,7 @@ export default async function CollegePage({ params }: PageProps) {
   const db = getDb();
   
   const college = await db.query.institutions.findFirst({
-    where: eq(institutions.id, id),
+    where: or(eq(institutions.slug, id), eq(institutions.id, id)),
   });
 
   if (!college) {
@@ -38,15 +38,10 @@ export default async function CollegePage({ params }: PageProps) {
   }
 
   const user = await hexclaveServerApp.getUser().catch(() => null);
-  let currentProfile: typeof userProfiles.$inferSelect | null = null;
   if (user) {
-    const found = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
-    if (found) {
-      currentProfile = found;
-    }
+    redirect(`/app/college/${id}`);
   }
+  let currentProfile: typeof userProfiles.$inferSelect | null = null;
 
   // Fetch posts from this college
   const collegePosts = await db.query.posts.findMany({
@@ -63,14 +58,16 @@ export default async function CollegePage({ params }: PageProps) {
     }
   });
 
+  const profileId = currentProfile ? (currentProfile as { id: string }).id : null;
+
   const formattedPosts = collegePosts.map(post => {
     const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
     const commentsCount = post.comments.length;
-    const userVote = currentProfile ? (post.votes.find(v => v.userId === currentProfile.id)?.value || 0) : 0;
+    const userVote = profileId ? (post.votes.find(v => v.userId === profileId)?.value || 0) : 0;
 
     const formattedPollOptions = post.pollOptions?.map(opt => {
       const optVotesCount = opt.votes.length;
-      const userVoted = currentProfile ? opt.votes.some(v => v.userId === currentProfile.id) : false;
+      const userVoted = profileId ? opt.votes.some(v => v.userId === profileId) : false;
       return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
     });
 

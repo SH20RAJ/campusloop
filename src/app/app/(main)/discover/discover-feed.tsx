@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 
 interface College {
   id: string;
+  slug?: string | null;
   name: string;
   state: string | null;
   district: string | null;

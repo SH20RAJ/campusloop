@@ -48,15 +48,17 @@ export async function GET(req: Request) {
       conditions.push(sql`${posts.body} ILIKE ${`%#${hashtag}%`}`);
     }
 
-    // For You score: campus match + community match + engagement velocity
+    // For You score: campus match + community match + engagement velocity + random shuffle noise
     const forYouSql = sql<number>`
       coalesce((select sum(value)::int from votes where post_id = posts.id), 0) * 4
       +
       coalesce((select count(*)::int from comments where post_id = posts.id and status = 'PUBLISHED'), 0) * 6
       +
-      case when posts.institution_id = ${profile.institutionId} then 40 else 0 end
+      case when posts.institution_id = ${profile.institutionId} then 35 else 0 end
       +
       case when posts.community_id is not null then 20 else 0 end
+      +
+      (random() * 25)::int
     `;
 
     // Trending score: votes + comments

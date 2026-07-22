@@ -34,15 +34,34 @@ interface MyProfile {
 const fetcher = <T,>(url: string): Promise<T> =>
   fetch(url).then((r) => r.json() as Promise<T>);
 
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+
 export function FeedClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [showFilters, setShowFilters] = useState(false);
   
-  // Dashboard state
-  // Dashboard state
+  // Dashboard state synced with URL
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
   const [type, setType] = useState<string>("ALL");
-  const [sort, setSort] = useState<string>("for_you");
+  const sortParam = searchParams.get("sort") || "for_you";
+  const [sort, setSortState] = useState<string>(sortParam);
   const [visibility, setVisibility] = useState<string>("all");
+
+  useEffect(() => {
+    const currentSort = searchParams.get("sort");
+    if (currentSort && currentSort !== sort) {
+      setSortState(currentSort);
+    }
+  }, [searchParams]);
+
+  function handleSortChange(newSort: string) {
+    setSortState(newSort);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("sort", newSort);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
 
   const { 
     feed, 
@@ -84,7 +103,7 @@ export function FeedClient() {
   const resetFilters = () => {
     setScope("GLOBAL");
     setType("ALL");
-    setSort("for_you");
+    handleSortChange("for_you");
     setVisibility("all");
   };
 
@@ -137,7 +156,7 @@ export function FeedClient() {
             ].map((s) => (
               <button
                 key={s.id}
-                onClick={() => setSort(s.id)}
+                onClick={() => handleSortChange(s.id)}
                 className={cn(
                   "hover:text-foreground transition-colors cursor-pointer relative py-0.5 shrink-0",
                   sort === s.id && "text-foreground font-bold"

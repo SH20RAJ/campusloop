@@ -159,31 +159,36 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
             </Link>
           )}
           {post.type !== "NORMAL" && (
-            <span className={cn(
-              "text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1",
-              post.type === "CONFESSION" && "bg-pink-500/10 text-pink-500 border-pink-500/20",
-              post.type === "POLL" && "bg-blue-500/10 text-blue-500 border-blue-500/20",
-              post.type === "QUESTION" && "bg-orange-500/10 text-orange-500 border-orange-500/20"
-            )}>
-              {post.type === "CONFESSION" && (
-                <>
-                  <Lock className="h-2.5 w-2.5" />
-                  <span>Confession</span>
-                </>
-              )}
-              {post.type === "POLL" && (
-                <>
-                  <BarChart3 className="h-2.5 w-2.5" />
-                  <span>Poll</span>
-                </>
-              )}
-              {post.type === "QUESTION" && (
-                <>
-                  <HelpCircle className="h-2.5 w-2.5" />
-                  <span>Question</span>
-                </>
-              )}
-            </span>
+            <Link
+              href={post.type === "CONFESSION" ? "/app/confessions" : `/app?type=${post.type}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className={cn(
+                "text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 hover:opacity-85 transition-opacity cursor-pointer",
+                post.type === "CONFESSION" && "bg-pink-500/10 text-pink-500 border-pink-500/20",
+                post.type === "POLL" && "bg-blue-500/10 text-blue-500 border-blue-500/20",
+                post.type === "QUESTION" && "bg-orange-500/10 text-orange-500 border-orange-500/20"
+              )}>
+                {post.type === "CONFESSION" && (
+                  <>
+                    <Lock className="h-2.5 w-2.5" />
+                    <span>Confession</span>
+                  </>
+                )}
+                {post.type === "POLL" && (
+                  <>
+                    <BarChart3 className="h-2.5 w-2.5" />
+                    <span>Poll</span>
+                  </>
+                )}
+                {post.type === "QUESTION" && (
+                  <>
+                    <HelpCircle className="h-2.5 w-2.5" />
+                    <span>Question</span>
+                  </>
+                )}
+              </span>
+            </Link>
           )}
 
           <div className="relative">

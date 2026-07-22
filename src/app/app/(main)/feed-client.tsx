@@ -44,7 +44,8 @@ export function FeedClient() {
   
   // Dashboard state synced with URL
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
-  const [type, setType] = useState<string>("ALL");
+  const initialType = searchParams.get("type") || "ALL";
+  const [type, setTypeState] = useState<string>(initialType);
   const sortParam = searchParams.get("sort") || "for_you";
   const [sort, setSortState] = useState<string>(sortParam);
   const [visibility, setVisibility] = useState<string>("all");
@@ -54,7 +55,22 @@ export function FeedClient() {
     if (currentSort && currentSort !== sort) {
       setSortState(currentSort);
     }
-  }, [searchParams]);
+    const currentType = searchParams.get("type");
+    if (currentType && currentType !== type) {
+      setTypeState(currentType);
+    }
+  }, [searchParams, sort, type]);
+
+  function handleTypeChange(newType: string) {
+    setTypeState(newType);
+    const params = new URLSearchParams(searchParams.toString());
+    if (newType && newType !== "ALL") {
+      params.set("type", newType);
+    } else {
+      params.delete("type");
+    }
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
 
   function handleSortChange(newSort: string) {
     setSortState(newSort);
@@ -75,7 +91,7 @@ export function FeedClient() {
   const { stories, mutate: mutateStories, isLoading: storiesLoading } = useStories();
   const { data: profile } = useSWR<MyProfile>("/api/profile/me", fetcher);
 
-  // Infinite scroll trigger ref and observer
+  // Infinite scroll trigger ref and observer with 600px prefetch rootMargin
   const [loadMoreRef, setLoadMoreRef] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -87,7 +103,7 @@ export function FeedClient() {
           setSize((s) => s + 1);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.05, rootMargin: "600px" }
     );
 
     observer.observe(loadMoreRef);
@@ -102,7 +118,7 @@ export function FeedClient() {
 
   const resetFilters = () => {
     setScope("GLOBAL");
-    setType("ALL");
+    handleTypeChange("ALL");
     handleSortChange("for_you");
     setVisibility("all");
   };
@@ -232,7 +248,7 @@ export function FeedClient() {
               <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Category</span>
               <div className="flex rounded-lg bg-muted/65 p-0.5 border border-border/40 text-[9px] font-bold">
                 <button
-                  onClick={() => setType("ALL")}
+                  onClick={() => handleTypeChange("ALL")}
                   className={cn(
                     "flex-1 py-1 rounded-md transition-all cursor-pointer",
                     type === "ALL" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
@@ -241,7 +257,7 @@ export function FeedClient() {
                   All
                 </button>
                 <button
-                  onClick={() => setType("CONFESSION")}
+                  onClick={() => handleTypeChange("CONFESSION")}
                   className={cn(
                     "flex-1 py-1 rounded-md transition-all cursor-pointer",
                     type === "CONFESSION" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
@@ -250,7 +266,7 @@ export function FeedClient() {
                   Confess
                 </button>
                 <button
-                  onClick={() => setType("POLL")}
+                  onClick={() => handleTypeChange("POLL")}
                   className={cn(
                     "flex-1 py-1 rounded-md transition-all cursor-pointer",
                     type === "POLL" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"

@@ -12,30 +12,33 @@ import { Reveal } from "./reveal";
 const MOCK_PROFILES = [
   {
     id: 1,
-    name: "Aditi S.",
+    name: "Aditi Sharma",
     age: 20,
     college: "BITS Pilani",
     branch: "Computer Science '27",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
     bio: "Current attendance: 42%. Surviving on 2 AM canteen coffee and crying over DSA assignments ☕💻",
     interests: ["Coding", "Chai at 2 AM", "Indie Rock", "Valorant"],
     verified: true,
   },
   {
     id: 2,
-    name: "Rohan M.",
+    name: "Rohan Mehta",
     age: 21,
     college: "IIT Bombay",
     branch: "Electrical Eng '26",
+    avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=600&q=80",
     bio: "Fest coordinator & professional procrastinator. Looking for someone to skip 8 AM lectures with 🎸🍕",
     interests: ["Music", "Fest Drama", "Basketball", "Meme Culture"],
     verified: true,
   },
   {
     id: 3,
-    name: "Sneha R.",
+    name: "Sneha Roy",
     age: 19,
     college: "Delhi University (SRCC)",
     branch: "Economics Hons '27",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
     bio: "Will debate you on market crashes, then ask to copy your lab record 5 minutes before submission 📈🥤",
     interests: ["Finance Memes", "Cold Coffee", "Anime", "Debating"],
     verified: true,
@@ -102,24 +105,31 @@ export function MatchmakingShowcase() {
                   className="absolute inset-0"
                 >
                   <Card className="h-full overflow-hidden border border-border shadow-md flex flex-col justify-between bg-card">
-                    {/* Top Simulated Header */}
-                    <div className="relative h-2/5 w-full bg-muted/60 p-5 flex flex-col justify-between border-b border-border/60">
+                    {/* Top Photo Header */}
+                    <div className="relative h-1/2 w-full overflow-hidden border-b border-border/60 p-4 flex flex-col justify-between">
+                      <img
+                        src={currentProfile.avatar}
+                        alt={currentProfile.name}
+                        className="absolute inset-0 size-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/40" />
+
                       <div className="flex items-center justify-between z-10">
-                        <Badge variant="outline" className="bg-background/90 text-foreground border-border text-[10px] gap-1 px-2 py-0.5 font-semibold">
-                          <ShieldCheck className="size-3 text-emerald-500" />
+                        <Badge variant="outline" className="bg-black/60 text-white border-white/20 backdrop-blur-md text-[10px] gap-1 px-2 py-0.5 font-semibold">
+                          <ShieldCheck className="size-3 text-emerald-400" />
                           Verified Student
                         </Badge>
-                        <Badge variant="secondary" className="text-[10px] font-semibold">
+                        <Badge variant="secondary" className="bg-black/60 text-white border-white/20 backdrop-blur-md text-[10px] font-semibold">
                           {currentProfile.college}
                         </Badge>
                       </div>
 
-                      <div className="z-10">
+                      <div className="z-10 text-white">
                         <div className="flex items-baseline gap-2">
-                          <h3 className="text-xl font-bold text-foreground">{currentProfile.name}</h3>
-                          <span className="text-base font-medium text-muted-foreground">{currentProfile.age}</span>
+                          <h3 className="text-xl font-black drop-shadow-sm">{currentProfile.name}</h3>
+                          <span className="text-base font-bold opacity-80">{currentProfile.age}</span>
                         </div>
-                        <p className="text-xs text-muted-foreground font-medium">{currentProfile.branch}</p>
+                        <p className="text-xs text-white/80 font-semibold drop-shadow-xs">{currentProfile.branch}</p>
                       </div>
                     </div>
 

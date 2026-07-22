@@ -73,23 +73,40 @@ export function InlineCommunitiesWidget() {
 
 export function InlineDatingWidget() {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm flex items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-pink-500/10 text-pink-500">
-          <Flame className="size-5" />
+    <div className="rounded-2xl border border-pink-500/20 bg-gradient-to-r from-pink-500/5 via-card to-card p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-center gap-3.5">
+        {/* Student Avatars Stack */}
+        <div className="flex -space-x-2.5 shrink-0">
+          <img
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
+            alt="Verified Student"
+            className="size-9 rounded-full border-2 border-background object-cover shadow-sm"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80"
+            alt="Verified Student"
+            className="size-9 rounded-full border-2 border-background object-cover shadow-sm"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80"
+            alt="Verified Student"
+            className="size-9 rounded-full border-2 border-background object-cover shadow-sm"
+          />
         </div>
+
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5">
             <h4 className="text-xs font-bold text-foreground">Campus Matchmaking</h4>
-            <Badge variant="outline" className="text-[9px] border-pink-500/20 text-pink-500 bg-pink-500/5">Zero Catfish</Badge>
+            <Badge variant="outline" className="text-[9px] border-pink-500/30 text-pink-500 bg-pink-500/10 font-bold">Zero Catfish</Badge>
           </div>
           <p className="text-[11px] text-muted-foreground leading-snug">
             Swipe on verified classmates from your university. Meet people worth meeting.
           </p>
         </div>
       </div>
+
       <Link href="/app/dating" className="shrink-0">
-        <Button size="sm" className="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-xs h-8 gap-1 shadow-sm cursor-pointer">
+        <Button size="sm" className="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-xs h-8 gap-1 shadow-sm cursor-pointer hover:opacity-95">
           <Heart className="size-3.5 fill-white" /> Start Swiping
         </Button>
       </Link>

@@ -16,7 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const PHONE_RE = /\b\d{10}\b/g;
@@ -172,6 +172,7 @@ const PROFILES = [
     college: "SRCC, Delhi",
     bio: "Economics major. Will judge your playlist before your degree.",
     initials: "AD",
+    avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
   },
   {
     name: "Rohan, 21",
@@ -179,6 +180,7 @@ const PROFILES = [
     college: "IIT Delhi",
     bio: "Codes at 2am, plays football at 6. Pick your fighter.",
     initials: "RO",
+    avatarUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80",
   },
   {
     name: "Meera, 19",
@@ -186,6 +188,7 @@ const PROFILES = [
     college: "Christ University",
     bio: "Design student. Here mostly for the fest gossip.",
     initials: "ME",
+    avatarUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80",
   },
 ];
 
@@ -232,7 +235,8 @@ export function MatchDemo() {
             className="space-y-4"
           >
             <div className="flex items-center gap-3">
-              <Avatar className="size-12 border">
+              <Avatar className="size-12 border border-border shadow-xs">
+                <AvatarImage src={profile.avatarUrl} alt={profile.name} className="object-cover" />
                 <AvatarFallback className="bg-primary/10 font-semibold text-primary">
                   {profile.initials}
                 </AvatarFallback>

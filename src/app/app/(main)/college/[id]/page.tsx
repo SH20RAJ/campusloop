@@ -129,7 +129,7 @@ export default async function MainCollegePage({ params }: PageProps) {
       {/* Header Back Link */}
       <div className="flex items-center justify-between">
         <Link
-          href="/colleges"
+          href="/app/colleges"
           className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" /> Campus Directory
@@ -272,7 +272,7 @@ export default async function MainCollegePage({ params }: PageProps) {
             {relatedColleges
               .filter((c) => c.id !== college.id)
               .map((c) => (
-                <Link key={c.id} href={`/college/${c.slug || c.id}`}>
+                <Link key={c.id} href={`/app/college/${c.slug || c.id}`}>
                   <div className="rounded-xl border border-border/60 bg-muted/30 p-3 hover:bg-muted/80 transition-colors">
                     <p className="text-xs font-bold text-foreground truncate">{c.name}</p>
                     <p className="text-[10px] text-muted-foreground">{c.district || c.state}</p>

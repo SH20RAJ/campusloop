@@ -144,7 +144,7 @@ export default function CollegesClient() {
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {colleges.map((col) => (
-              <Link key={col.id} href={`/college/${col.slug || col.id}`}>
+              <Link key={col.id} href={`/app/college/${col.slug || col.id}`}>
                 <div className="group h-full flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-4 hover:border-primary/50 hover:shadow-md transition-all duration-200">
                   <div className="space-y-2">
                     <div className="flex items-start gap-2.5">

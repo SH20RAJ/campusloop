@@ -143,7 +143,7 @@ export default function SearchClient() {
               </h3>
               <div className="grid gap-2.5 sm:grid-cols-2">
                 {results.colleges.map((col) => (
-                  <Link key={col.id} href={`/college/${col.slug || col.id}`}>
+                  <Link key={col.id} href={`/app/college/${col.slug || col.id}`}>
                     <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-card p-3 hover:border-primary/50 hover:shadow-sm transition-all">
                       <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                         <School className="size-4" />

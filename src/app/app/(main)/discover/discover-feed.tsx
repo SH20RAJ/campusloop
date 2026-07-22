@@ -316,7 +316,7 @@ export function DiscoverFeed() {
                   .map((college, i) => (
                     <Link
                       key={college.id}
-                      href={`/college/${college.id}`}
+                      href={`/app/college/${college.slug || college.id}`}
                       className={cn(
                         "group relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br p-4 transition-all duration-300",
                         "hover:-translate-y-0.5 hover:shadow-md",

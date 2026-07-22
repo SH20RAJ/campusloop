@@ -3,6 +3,7 @@
 import {
   Home,
   Compass,
+  School,
   Heart,
   MessageSquare,
   Sparkles,
@@ -33,6 +34,7 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
   const navItems = [
     { icon: Home, href: "/app", label: "Home" },
     { icon: Compass, href: "/app/discover", label: "Discover" },
+    { icon: School, href: "/app/colleges", label: "Colleges" },
     { icon: Heart, href: "/app/confessions", label: "Confessions" },
     { icon: Users, href: "/app/communities", label: "Communities" },
     { icon: Sparkles, href: "/app/dating", label: "Matches" },

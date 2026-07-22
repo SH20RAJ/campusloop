@@ -69,7 +69,7 @@ export function RightSidebar() {
             <Flame className="size-3.5 text-orange-500" />
             <span>Trending Campuses</span>
           </div>
-          <Link href="/colleges" className="text-[10px] font-semibold text-primary hover:underline">
+          <Link href="/app/colleges" className="text-[10px] font-semibold text-primary hover:underline">
             View All
           </Link>
         </div>
@@ -78,7 +78,7 @@ export function RightSidebar() {
           {colleges?.slice(0, 4).map((college, idx) => (
             <Link
               key={college.id}
-              href={`/college/${college.slug || college.id}`}
+              href={`/app/college/${college.slug || college.id}`}
               className="flex items-center justify-between rounded-xl px-2.5 py-2 hover:bg-muted/40 transition-colors group cursor-pointer"
             >
               <div className="flex items-center gap-2.5 min-w-0">

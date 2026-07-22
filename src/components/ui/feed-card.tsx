@@ -139,7 +139,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
               ) : (
                 `@${authorHandle}`
               )}
-              {" "}• <Link href={`/college/${post.institutionId}`} className="hover:text-primary transition-colors hover:underline">{post.institution.name}</Link>
+              {" "}• <Link href={`/app/college/${post.institution?.slug || post.institutionId}`} className="hover:text-primary transition-colors hover:underline">{post.institution.name}</Link>
             </span>
           </div>
         </div>

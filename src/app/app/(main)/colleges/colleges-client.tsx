@@ -277,69 +277,66 @@ export default function CollegesClient() {
         </div>
       )}
 
-      {/* Add Missing College Modal Dialog */}
+      {/* Add College Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-md rounded-3xl border border-border/80 bg-card p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex size-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <School className="size-4" />
-                </div>
-                <h3 className="text-base font-bold text-foreground">Add Your College</h3>
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-2xl border border-border/60 bg-background p-5 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-1 border-b border-border/40">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2 tracking-tight">
+                <School className="h-4 w-4 text-primary" /> Request New College Hub
+              </h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="rounded-lg p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                className="h-7 w-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
-                <X className="size-4" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <form onSubmit={handleAddCollege} className="space-y-4 text-xs">
+            <form onSubmit={handleAddCollege} className="space-y-3.5 text-xs">
               <div className="space-y-1">
-                <label className="font-bold text-foreground">College / University Name *</label>
+                <label className="font-semibold text-muted-foreground">College / University Name *</label>
                 <Input
                   type="text"
                   placeholder="e.g. St. Xavier's College, Mumbai"
                   value={newCollegeName}
                   onChange={(e) => setNewCollegeName(e.target.value)}
                   required
-                  className="h-10 text-xs rounded-xl"
+                  className="h-9 text-xs rounded-xl border border-border/60 bg-muted/20 focus:border-primary"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div className="space-y-1">
-                  <label className="font-bold text-foreground">State</label>
+                  <label className="font-semibold text-muted-foreground">State</label>
                   <Input
                     type="text"
                     placeholder="e.g. Maharashtra"
                     value={newCollegeState}
                     onChange={(e) => setNewCollegeState(e.target.value)}
-                    className="h-10 text-xs rounded-xl"
+                    className="h-9 text-xs rounded-xl border border-border/60 bg-muted/20 focus:border-primary"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-bold text-foreground">District / City</label>
+                  <label className="font-semibold text-muted-foreground">District / City</label>
                   <Input
                     type="text"
                     placeholder="e.g. Mumbai"
                     value={newCollegeDistrict}
                     onChange={(e) => setNewCollegeDistrict(e.target.value)}
-                    className="h-10 text-xs rounded-xl"
+                    className="h-9 text-xs rounded-xl border border-border/60 bg-muted/20 focus:border-primary"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-foreground">Website (Optional)</label>
+                <label className="font-semibold text-muted-foreground">Website (Optional)</label>
                 <Input
                   type="text"
                   placeholder="e.g. xaviers.edu"
                   value={newCollegeWebsite}
                   onChange={(e) => setNewCollegeWebsite(e.target.value)}
-                  className="h-10 text-xs rounded-xl"
+                  className="h-9 text-xs rounded-xl border border-border/60 bg-muted/20 focus:border-primary"
                 />
               </div>
 
@@ -348,14 +345,14 @@ export default function CollegesClient() {
                   type="button"
                   variant="outline"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 text-xs font-bold h-10 rounded-xl cursor-pointer"
+                  className="flex-1 text-xs font-semibold h-9 rounded-xl border border-border/60 cursor-pointer"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 text-xs font-bold h-10 rounded-xl bg-primary text-white cursor-pointer"
+                  className="flex-1 text-xs font-semibold h-9 rounded-xl bg-primary text-primary-foreground cursor-pointer shadow-xs"
                 >
                   {submitting ? "Adding..." : "Create Campus Hub"}
                 </Button>

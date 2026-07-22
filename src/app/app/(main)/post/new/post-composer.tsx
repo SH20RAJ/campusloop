@@ -141,15 +141,15 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* 1. Interactive Post Type Selector Tabs */}
       <div className="space-y-1.5">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-          Select Post Type
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+          Post Type
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
-            { id: "NORMAL", label: "Thought", icon: MessageSquare, desc: "Standard thread" },
-            { id: "CONFESSION", label: "Confession", icon: Lock, desc: "100% Anonymous" },
-            { id: "POLL", label: "Poll", icon: BarChart3, desc: "Campus vote" },
-            { id: "QUESTION", label: "Question", icon: HelpCircle, desc: "Ask students" },
+            { id: "NORMAL", label: "Thought", icon: MessageSquare },
+            { id: "CONFESSION", label: "Confession", icon: Lock },
+            { id: "POLL", label: "Poll", icon: BarChart3 },
+            { id: "QUESTION", label: "Question", icon: HelpCircle },
           ].map((t) => {
             const Icon = t.icon;
             const isSelected = postType === t.id;
@@ -162,17 +162,14 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
                   if (t.id === "CONFESSION") setIsAnonymous(true);
                 }}
                 className={cn(
-                  "flex flex-col items-start p-3 rounded-2xl border transition-all text-left cursor-pointer",
+                  "flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer",
                   isSelected
-                    ? "bg-primary/10 border-primary text-primary shadow-sm"
-                    : "bg-card/60 border-border/60 hover:bg-muted/40 text-muted-foreground"
+                    ? "bg-primary/10 border-primary text-primary shadow-xs"
+                    : "bg-muted/20 border-border/60 hover:bg-muted/40 text-muted-foreground hover:text-foreground"
                 )}
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs">
-                  <Icon className="size-3.5 shrink-0" />
-                  <span>{t.label}</span>
-                </div>
-                <span className="text-[9.5px] opacity-75 mt-0.5">{t.desc}</span>
+                <Icon className="size-3.5 shrink-0" />
+                <span>{t.label}</span>
               </button>
             );
           })}

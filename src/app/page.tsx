@@ -21,6 +21,7 @@ import {
   VerifyDemo,
 } from "@/components/landing/demos";
 import { ArtifactsShowcase } from "@/components/landing/artifacts-demos";
+import { StatsSection } from "@/components/landing/extra-sections";
 
 import { cn } from "@/lib/utils";
 
@@ -355,6 +356,8 @@ export default async function LandingPage() {
         </section>
 
         <ArtifactsShowcase />
+
+        <StatsSection />
 
         {/* Verification */}
         <section className="border-t border-border/60 bg-muted/30">

@@ -176,7 +176,7 @@ export default async function CommunityDetailPage({ params }: PageProps) {
         
         <div className="space-y-6">
           {formattedPosts.map((post) => (
-            <FeedCard key={post.id} post={post as FeedPost} />
+            <FeedCard key={post.id} post={post as FeedPost} currentUserId={profile.id} />
           ))}
           {formattedPosts.length === 0 && (
             <div className="text-center py-20 border border-dashed rounded-3xl border-border bg-card text-muted-foreground text-xs font-semibold">

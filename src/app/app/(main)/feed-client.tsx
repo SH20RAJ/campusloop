@@ -19,6 +19,7 @@ import useSWR from "swr";
 import { toast } from "sonner";
 
 interface MyProfile {
+  id: string;
   displayName: string;
   username: string;
   avatarUrl: string | null;
@@ -314,7 +315,7 @@ export function FeedClient() {
         ) : feed && feed.length > 0 ? (
           <>
             {feed.map((post) => (
-              <FeedCard key={post.id} post={post} />
+              <FeedCard key={post.id} post={post} currentUserId={profile?.id} />
             ))}
             
             {/* Load more trigger anchor */}

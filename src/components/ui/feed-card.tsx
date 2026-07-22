@@ -2,24 +2,27 @@
 
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
-import { Heart, MessageCircle, Share2, MoreHorizontal, Lock, BarChart3, HelpCircle } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreHorizontal, Lock, BarChart3, HelpCircle, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { FeedPost } from "@/hooks/use-feed";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { deletePost } from "@/app/app/(main)/post/actions";
 
 interface FeedCardProps {
   post: FeedPost;
+  currentUserId?: string;
 }
 
-export function FeedCard({ post }: FeedCardProps) {
+export function FeedCard({ post, currentUserId }: FeedCardProps) {
   const [userVote, setUserVote] = useState(post.userVote);
   const [votesCount, setVotesCount] = useState(post.votesCount);
   const [isLoading, setIsLoading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author.displayName;
   const authorHandle = post.isAnonymous ? "anonymous" : post.author.username;
@@ -180,6 +183,31 @@ export function FeedCard({ post }: FeedCardProps) {
             
             {showMenu && (
               <div className="absolute right-0 mt-2 w-32 rounded-md border border-border bg-popover text-popover-foreground shadow-lg z-20 py-1 animate-in fade-in slide-in-from-top-1">
+                {currentUserId && post.authorId === currentUserId && (
+                  <button
+                    onClick={async () => {
+                      setShowMenu(false);
+                      const confirmed = window.confirm("Are you sure you want to delete this post? This action cannot be undone.");
+                      if (!confirmed) return;
+                      setIsDeleting(true);
+                      try {
+                        await deletePost(post.id);
+                        toast.success("Post deleted successfully");
+                      } catch (error) {
+                        toast.error(error instanceof Error ? error.message : "Failed to delete post");
+                      } finally {
+                        setIsDeleting(false);
+                      }
+                    }}
+                    disabled={isDeleting}
+                    className="w-full text-left px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-muted transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete Post
+                    </span>
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setShowMenu(false);

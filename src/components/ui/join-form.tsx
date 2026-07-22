@@ -5,10 +5,24 @@ import { SignIn, SignUp } from "@hexclave/next";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { UserPlus } from "lucide-react";
+
+interface ReferrerProfile {
+  id: string;
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  institution?: { name: string } | null;
+  referralCount: number;
+  points: number;
+}
 
 export function JoinForm() {
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [referrerProfile, setReferrerProfile] = useState<ReferrerProfile | null>(null);
+  const [isLoadingReferrer, setIsLoadingReferrer] = useState(false);
 
   useEffect(() => {
     const initialMode = searchParams.get("mode");
@@ -21,6 +35,21 @@ export function JoinForm() {
     const invite = searchParams.get("invite");
     if (invite) {
       document.cookie = `cl_referred_by=${encodeURIComponent(invite)}; path=/; max-age=604800; SameSite=Lax`;
+      setIsLoadingReferrer(true);
+      fetch(`/api/profile/${encodeURIComponent(invite)}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Not found");
+          return res.json() as Promise<ReferrerProfile>;
+        })
+        .then((data) => {
+          setReferrerProfile(data);
+        })
+        .catch(() => {
+          setReferrerProfile(null);
+        })
+        .finally(() => {
+          setIsLoadingReferrer(false);
+        });
     }
   }, [searchParams]);
 
@@ -45,6 +74,41 @@ export function JoinForm() {
             : "Verify your college email to access confessions, polls, and matches."}
         </p>
       </div>
+
+      {/* Referrer Card */}
+      {searchParams.get("invite") && (
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 shadow-sm animate-in fade-in slide-in-from-top-2">
+          {isLoadingReferrer ? (
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-muted/60 shimmer-effect" />
+              <div className="space-y-2 flex-1">
+                <div className="h-3 w-24 bg-muted/60 rounded shimmer-effect" />
+                <div className="h-2.5 w-32 bg-muted/40 rounded shimmer-effect" />
+              </div>
+            </div>
+          ) : referrerProfile ? (
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-orange-500/20 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                {referrerProfile.displayName?.[0] || "?"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-foreground truncate">
+                  You were invited by <span className="text-primary">@{referrerProfile.username}</span>
+                </p>
+                <p className="text-[11px] text-muted-foreground truncate">
+                  {referrerProfile.displayName}
+                  {referrerProfile.institution?.name ? ` • ${referrerProfile.institution.name}` : ""}
+                </p>
+              </div>
+              <UserPlus className="h-4 w-4 text-primary shrink-0" />
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground text-center">
+              You were invited by a CampusLoop student
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Card Wrapper */}
       <div className="rounded-[28px] border border-border/80 bg-card p-6 shadow-xl relative overflow-hidden">

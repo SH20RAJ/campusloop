@@ -3,7 +3,7 @@ import { institutions, posts, userProfiles } from "@/db/schema";
 import { eq, or, desc } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
-import { School, MapPin, Globe, Calendar, ArrowLeft, Users, MessageSquare, Flame, Sparkles, Trophy } from "lucide-react";
+import { School, MapPin, Globe, Calendar, ArrowLeft, Users, MessageSquare, Flame, Sparkles, Trophy, Award, Hash, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { FeedPost } from "@/hooks/use-feed";
@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 
   return {
-    title: college ? `${college.name} | CampusLoop` : "College Hub | CampusLoop",
-    description: college ? `Explore confessions, canteen polls, and student discussions from ${college.name}.` : "",
+    title: college ? `${college.name} Rank & Campus Hub | CampusLoop` : "College Hub | CampusLoop",
+    description: college ? `Explore rankings, student lists, confessions, and discussions from ${college.name}.` : "",
   };
 }
 
@@ -42,9 +42,7 @@ export default async function MainCollegePage({ params }: PageProps) {
   const college = await db.query.institutions.findFirst({
     where: or(eq(institutions.slug, id), eq(institutions.id, id)),
     with: {
-      profiles: {
-        limit: 8,
-      },
+      profiles: true,
     },
   });
 
@@ -59,6 +57,7 @@ export default async function MainCollegePage({ params }: PageProps) {
     with: {
       author: true,
       institution: true,
+      community: true,
       votes: true,
       comments: true,
       pollOptions: {
@@ -94,6 +93,29 @@ export default async function MainCollegePage({ params }: PageProps) {
     };
   });
 
+  // Calculate Campus Collective Score & Points
+  const studentCount = college.profiles?.length || 0;
+  const totalStudentPoints = college.profiles?.reduce((acc, p) => acc + (p.points || 0), 0) || 0;
+  const totalInvites = college.profiles?.reduce((acc, p) => acc + (p.referralCount || 0), 0) || 0;
+  const postsCount = collegePosts.length;
+
+  const collectivePoints = Math.round(
+    studentCount * 50 + totalStudentPoints * 1.5 + totalInvites * 20 + postsCount * 15
+  );
+
+  // Extract hashtags from posts
+  const hashtagSet = new Set<string>();
+  collegePosts.forEach((p) => {
+    const matches = p.body.match(/#[a-zA-Z0-9_]+/g);
+    if (matches) {
+      matches.forEach((tag) => hashtagSet.add(tag.slice(1)));
+    }
+  });
+  const trendingTags = Array.from(hashtagSet).slice(0, 6);
+  if (trendingTags.length === 0) {
+    trendingTags.push("LateNightTea", "CanteenDebate", "EndsemSurvivors", "HostelLife");
+  }
+
   // Fetch related campuses in the same state
   const relatedColleges = college.state
     ? await db.query.institutions.findMany({
@@ -105,28 +127,45 @@ export default async function MainCollegePage({ params }: PageProps) {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-20 px-4 pt-4 gap-6">
       {/* Header Back Link */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between">
         <Link
-          href="/app/discover"
+          href="/colleges"
           className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Discover
+          <ArrowLeft className="h-4 w-4" /> Campus Directory
         </Link>
+        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center gap-1">
+          <Trophy className="size-3" /> Campus Rank Score
+        </span>
       </div>
 
       {/* Hero Campus Banner Card */}
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm space-y-4">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="rounded-xl bg-primary/10 p-3 text-primary border border-primary/20 shrink-0">
-              <School className="h-7 w-7" />
+            <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-orange-500/20 p-3.5 text-primary border border-primary/20 shrink-0 shadow-inner">
+              <School className="h-8 w-8" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-foreground">{college.name}</h1>
+              <h1 className="text-xl md:text-2xl font-black tracking-tight text-foreground">{college.name}</h1>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {college.district ? `${college.district}, ` : ""}{college.state || "India"} &middot; AISHE: {college.aisheCode}
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Collective Rank & Points Metric */}
+        <div className="rounded-2xl border border-border/60 bg-gradient-to-r from-amber-500/10 via-primary/5 to-card p-4 flex items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
+              <Award className="size-3.5" /> Collective Campus Rank Score
+            </span>
+            <p className="text-xl font-black text-foreground">{collectivePoints.toLocaleString()} <span className="text-xs font-bold text-muted-foreground">LP</span></p>
+          </div>
+          <div className="text-right text-[10px] font-semibold text-muted-foreground space-y-0.5">
+            <p>⚡ {studentCount} Verified Students</p>
+            <p>🔥 {postsCount} Active Threads</p>
           </div>
         </div>
 
@@ -139,7 +178,7 @@ export default async function MainCollegePage({ params }: PageProps) {
               rel="noreferrer"
               className="flex items-center gap-1.5 hover:text-primary transition-colors font-medium"
             >
-              <Globe className="h-4 w-4 shrink-0 text-muted-foreground/60" /> {college.website}
+              <Globe className="h-4 w-4 shrink-0 text-muted-foreground/60" /> {college.website} <ExternalLink className="size-3" />
             </a>
           )}
           {college.yearOfEstablishment && (
@@ -148,41 +187,34 @@ export default async function MainCollegePage({ params }: PageProps) {
             </span>
           )}
         </div>
-
-        {/* Stats Pill Bar */}
-        <div className="flex flex-wrap items-center gap-4 pt-1 text-xs">
-          <div className="flex items-center gap-1.5 text-foreground font-bold">
-            <MessageSquare className="size-4 text-primary" />
-            <span>{formattedPosts.length} Posts</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-foreground font-bold">
-            <Users className="size-4 text-emerald-500" />
-            <span>{college.profiles?.length || 0} Enrolled Students</span>
-          </div>
-        </div>
       </div>
 
-      {/* Discover Section 1: Active Student Members */}
+      {/* Discover Section 1: Enrolled Campus Leaders */}
       {college.profiles && college.profiles.length > 0 && (
         <div className="rounded-2xl border border-border bg-card p-4 space-y-3 shadow-sm">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <Users className="size-3.5 text-primary" /> Enrolled Campus Members
+              <Users className="size-3.5 text-emerald-500" /> Top Campus Student Leaders
             </h3>
             <span className="text-[10px] text-muted-foreground font-semibold">Verified Students</span>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {college.profiles.map((u) => (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {college.profiles.slice(0, 6).map((u) => (
               <Link key={u.id} href={`/app/profile/${u.username}`}>
-                <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/30 px-3 py-1.5 hover:bg-muted/80 transition-colors">
-                  <div className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
-                    {u.displayName?.[0] || "S"}
+                <div className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/30 px-3 py-2 hover:bg-muted/80 hover:border-primary/30 transition-all cursor-pointer">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary shrink-0">
+                      {u.displayName?.[0] || "S"}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-foreground truncate">{u.displayName}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">@{u.username}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-foreground leading-none">{u.displayName}</p>
-                    <p className="text-[9px] text-muted-foreground font-medium">@{u.username}</p>
-                  </div>
+                  <span className="text-[10px] font-extrabold text-amber-500 shrink-0">
+                    {u.points || 0} LP
+                  </span>
                 </div>
               </Link>
             ))}
@@ -193,10 +225,10 @@ export default async function MainCollegePage({ params }: PageProps) {
       {/* Discover Section 2: Trending Hashtags */}
       <div className="rounded-2xl border border-border bg-card p-4 space-y-2.5 shadow-sm">
         <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-          <Flame className="size-3.5 text-primary" /> Campus Topic Hubs
+          <Hash className="size-3.5 text-primary" /> Trending Topics in {college.name}
         </h3>
         <div className="flex flex-wrap gap-1.5">
-          {["LateNightTea", "CanteenDebate", "EndsemSurvivors", "ExamMemes", "HostelLife"].map((tag) => (
+          {trendingTags.map((tag) => (
             <Link key={tag} href={`/app/hashtag/${tag}`}>
               <span className="inline-flex items-center gap-1 rounded-lg border border-border/60 bg-muted/40 px-2.5 py-1 text-xs font-semibold text-foreground hover:text-primary hover:border-primary/40 transition-colors cursor-pointer">
                 #{tag}
@@ -206,13 +238,13 @@ export default async function MainCollegePage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* College Posts Feed */}
+      {/* College Posts Feed (Across Profiles & Sub-Communities) */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles className="size-3.5 text-primary" /> Posts from {college.name}
+            <Sparkles className="size-3.5 text-primary" /> Campus Discussions & Sub-Hub Posts
           </h2>
-          <span className="text-[10px] text-muted-foreground font-semibold">Latest Discussions</span>
+          <span className="text-[10px] text-muted-foreground font-semibold">{formattedPosts.length} Threads</span>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -230,7 +262,7 @@ export default async function MainCollegePage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Discover Section 3: Related Campuses in State */}
+      {/* Discover Section 3: Related Campuses */}
       {relatedColleges.length > 1 && (
         <div className="rounded-2xl border border-border bg-card p-4 space-y-3 shadow-sm">
           <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">

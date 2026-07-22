@@ -302,9 +302,29 @@ async function main() {
     id: "post_4",
     authorId: "prof_ananya",
     institutionId: iitbId,
-    body: "Where is the best place to get late-night hot beverages inside or right outside the campus after 2 AM?",
+    body: "Where is the best place to get late-night hot beverages inside or right outside the campus after 2 AM? #LateNightTea #CanteenDebate",
     type: "QUESTION",
     title: "LateNightTea",
+    status: "PUBLISHED",
+  });
+
+  await db.insert(posts).values({
+    id: "post_5",
+    authorId: "prof_aarav",
+    institutionId: iitbId,
+    communityId: "comm_coding",
+    body: "What is your favorite system programming language for high performance services in 2026? #Coding #DevOps",
+    type: "POLL",
+    status: "PUBLISHED",
+  });
+
+  await db.insert(posts).values({
+    id: "post_6",
+    authorId: "prof_kabir",
+    institutionId: iitbId,
+    communityId: "comm_music",
+    body: "Organizing an open mic acoustic jam session near the central canteen stage this Friday evening! All student musicians welcome 🎸🎤 #MusicJams",
+    type: "NORMAL",
     status: "PUBLISHED",
   });
 

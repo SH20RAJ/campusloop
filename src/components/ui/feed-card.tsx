@@ -45,6 +45,8 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
   const [showShareStoryModal, setShowShareStoryModal] = useState(false);
   const [quoteThoughts, setQuoteThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
+  const [isReposted, setIsReposted] = useState(false);
+  const [repostSpin, setRepostSpin] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
 
@@ -373,16 +375,33 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
           <span>{post.commentsCount || 0}</span>
         </Link>
 
-        {/* Repost Quick Action */}
+        {/* Repost Quick Action (1-Tap Twitter/X style with SVG path animation) */}
         <button
-          onClick={() => setShowRepostModal(true)}
-          className="flex items-center gap-1.5 hover:text-emerald-500 transition-colors font-semibold cursor-pointer"
-          title="Repost or Reshare"
+          onClick={() => {
+            if (!isReposted && !isReposting) {
+              setRepostSpin(true);
+              setIsReposted(true);
+              setTimeout(() => setRepostSpin(false), 700);
+              handleExecuteRepost(false);
+            }
+          }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            setShowRepostModal(true);
+          }}
+          className={cn(
+            "flex items-center gap-1.5 transition-colors font-semibold cursor-pointer select-none",
+            isReposted ? "text-emerald-500 font-bold" : "hover:text-emerald-500"
+          )}
+          title="Click to Repost (Right-click to Quote Reshare)"
         >
-          <AnimateIcon animateOnHover animation="path">
-            <Repeat2 className="h-4 w-4 text-emerald-500/80" />
-          </AnimateIcon>
-          <span>Repost</span>
+          <motion.div
+            animate={repostSpin ? { rotate: [0, 180, 360], scale: [1, 1.35, 1] } : { scale: 1, rotate: 0 }}
+            transition={{ duration: 0.55, ease: "easeInOut" }}
+          >
+            <Repeat2 className={cn("h-4 w-4 transition-all duration-300", isReposted ? "text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "")} />
+          </motion.div>
+          <span>{isReposted ? "Reposted" : "Repost"}</span>
         </button>
 
         {/* Share Quick Action */}

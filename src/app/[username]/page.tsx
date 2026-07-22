@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: VanityProfileProps): Promise<
   
   if (!rawUsername.startsWith("@")) {
     return {
-      title: "Profile | CampusLoop",
+      title: "Profile",
     };
   }
   
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: VanityProfileProps): Promise<
     with: { institution: true },
   });
 
-  const title = profile ? `${profile.displayName} (@${username}) Student Profile | CampusLoop` : `@${username} | CampusLoop`;
+  const title = profile ? `${profile.displayName} (@${username})` : `@${username}`;
   const description = profile?.bio
     ? profile.bio
     : `View @${username}'s student clout rank, points, and campus activity on CampusLoop.`;

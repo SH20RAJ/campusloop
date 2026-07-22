@@ -22,12 +22,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!college) {
     return {
-      title: "College Hub | CampusLoop",
+      title: "College Hub",
       description: "Explore Indian college rankings and student communities on CampusLoop.",
     };
   }
 
-  const title = `${college.name} Rank & Campus Hub | CampusLoop`;
+  const title = `${college.name} Rank & Campus Hub`;
   const description = `Explore live rankings, verified student leaderboards, confessions, and sub-community posts for ${college.name} (${college.district || college.state}).`;
   const url = `https://campusloop.space/app/college/${college.slug || college.id}`;
 

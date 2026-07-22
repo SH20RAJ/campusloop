@@ -24,13 +24,13 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 
   if (!post) {
     return {
-      title: "Post Details | CampusLoop",
+      title: "Post Details",
     };
   }
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const snippet = post.body.length > 120 ? `${post.body.slice(0, 117)}...` : post.body;
-  const title = `Post by ${authorName} in ${post.institution?.name?.split(",")[0] || "Campus"} | CampusLoop`;
+  const title = `Post by ${authorName} in ${post.institution?.name?.split(",")[0] || "Campus"}`;
   const url = `https://campusloop.space/app/post/${id}`;
 
   return {

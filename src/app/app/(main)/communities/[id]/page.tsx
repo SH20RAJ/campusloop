@@ -25,11 +25,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!comm) {
     return {
-      title: "Community Hub | CampusLoop",
+      title: "Community Hub",
     };
   }
 
-  const title = `c/${comm.name} Sub-Hub Community | CampusLoop`;
+  const title = `c/${comm.name} Sub-Hub`;
   const description = comm.description || `Join c/${comm.name} student sub-community on CampusLoop for hot posts, confessions, and campus discussions.`;
   const url = `https://campusloop.space/app/communities/${comm.id}`;
 

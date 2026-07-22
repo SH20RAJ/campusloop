@@ -19,10 +19,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 
   if (!story) {
-    return { title: "Story | CampusLoop" };
+    return { title: "Campus Story" };
   }
 
-  const title = `Story by ${story.user?.displayName || "Student"} | CampusLoop`;
+  const title = `Story by ${story.user?.displayName || "Student"}`;
   const description = story.text || "View campus vibe story on CampusLoop.";
 
   return {

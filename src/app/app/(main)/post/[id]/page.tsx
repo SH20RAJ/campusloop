@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
 import { PostComments } from "./post-comments";
 import { hexclaveServerApp } from "@/hexclave/server";
+import type { FeedPost } from "@/hooks/use-feed";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -89,9 +90,9 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground pb-20">
+    <main className="min-h-screen bg-background text-foreground">
       {/* Header with back button */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/40 px-4 py-4 flex items-center gap-3">
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/40 px-4 py-3 flex items-center gap-3">
         <Link href="/app" className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/80 hover:bg-muted transition-colors cursor-pointer shrink-0">
           <ArrowLeft className="h-4 w-4" />
         </Link>
@@ -101,8 +102,8 @@ export default async function PostDetailPage({ params }: PostPageProps) {
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
-        <FeedCard post={post as any} />
+      <div className="p-4 space-y-5">
+        <FeedCard post={post as FeedPost} currentUserId={profile.id} />
         <PostComments postId={id} currentUser={profile} />
       </div>
     </main>

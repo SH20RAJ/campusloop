@@ -110,16 +110,15 @@ export async function GET(req: Request) {
       },
     });
 
-    // If campus scope returns fewer posts than limit, backfill with global posts
-    if (scope === "CAMPUS" && rawFeed.length < limit) {
+    // Infinite Feed Guarantee: If page/offset runs out of strict posts, backfill with randomly shuffled posts
+    if (rawFeed.length < limit) {
       const existingIds = new Set(rawFeed.map((p) => p.id));
-      const globalConditions = conditions.filter((c) => c !== eq(posts.institutionId, profile.institutionId));
       const needed = limit - rawFeed.length;
       
       const extraFeed = await db.query.posts.findMany({
-        where: and(...globalConditions),
-        orderBy: orderClauses,
-        limit: needed * 2,
+        where: eq(posts.status, "PUBLISHED"),
+        orderBy: [sql`random()`],
+        limit: needed * 3,
         with: {
           author: true,
           institution: true,

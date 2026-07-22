@@ -43,7 +43,8 @@ export function FeedClient() {
   const [showFilters, setShowFilters] = useState(false);
   
   // Dashboard state synced with URL
-  const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
+  const initialScope = (searchParams.get("scope") as "CAMPUS" | "GLOBAL") || "GLOBAL";
+  const [scope, setScopeState] = useState<"CAMPUS" | "GLOBAL">(initialScope);
   const initialType = searchParams.get("type") || "ALL";
   const [type, setTypeState] = useState<string>(initialType);
   const sortParam = searchParams.get("sort") || "for_you";
@@ -51,6 +52,10 @@ export function FeedClient() {
   const [visibility, setVisibility] = useState<string>("all");
 
   useEffect(() => {
+    const currentScope = searchParams.get("scope") as "CAMPUS" | "GLOBAL";
+    if (currentScope && currentScope !== scope) {
+      setScopeState(currentScope);
+    }
     const currentSort = searchParams.get("sort");
     if (currentSort && currentSort !== sort) {
       setSortState(currentSort);
@@ -59,7 +64,14 @@ export function FeedClient() {
     if (currentType && currentType !== type) {
       setTypeState(currentType);
     }
-  }, [searchParams, sort, type]);
+  }, [searchParams, scope, sort, type]);
+
+  function handleScopeChange(newScope: "CAMPUS" | "GLOBAL") {
+    setScopeState(newScope);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("scope", newScope);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
 
   function handleTypeChange(newType: string) {
     setTypeState(newType);
@@ -117,7 +129,7 @@ export function FeedClient() {
     (visibility !== "all" ? 1 : 0);
 
   const resetFilters = () => {
-    setScope("GLOBAL");
+    handleScopeChange("GLOBAL");
     handleTypeChange("ALL");
     handleSortChange("for_you");
     setVisibility("all");
@@ -137,7 +149,7 @@ export function FeedClient() {
           {/* Scope selection pill */}
           <div className="flex rounded-full bg-muted/65 p-0.5 border border-border/40 shadow-sm text-[10px] font-bold">
             <button
-              onClick={() => setScope("CAMPUS")}
+              onClick={() => handleScopeChange("CAMPUS")}
               className={cn(
                 "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
                 scope === "CAMPUS" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
@@ -147,7 +159,7 @@ export function FeedClient() {
               {profile?.institution?.name?.split(",")[0] || "My College"}
             </button>
             <button
-              onClick={() => setScope("GLOBAL")}
+              onClick={() => handleScopeChange("GLOBAL")}
               className={cn(
                 "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
                 scope === "GLOBAL" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"

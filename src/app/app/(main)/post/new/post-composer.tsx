@@ -164,9 +164,23 @@ export function PostComposer({ communityId }: { communityId?: string }) {
         </div>
       )}
 
-      <div className="flex items-center justify-between rounded-xl border border-border/60 bg-card/40 px-4 py-2.5">
-        <span className="text-xs font-semibold text-foreground">Post Anonymously</span>
-        <input id="isAnonymous" name="isAnonymous" type="checkbox" checked={isAnonymous} onChange={(e) => setIsAnonymous(e.target.checked)} className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary cursor-pointer" />
+      <div className="space-y-2">
+        <div className="flex items-center justify-between rounded-xl border border-border/60 bg-card/40 px-4 py-2.5">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-foreground">Post Anonymously 🙈</span>
+          </div>
+          <input id="isAnonymous" name="isAnonymous" type="checkbox" checked={isAnonymous} onChange={(e) => setIsAnonymous(e.target.checked)} className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary cursor-pointer" />
+        </div>
+        {isAnonymous && (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-[11px] text-amber-600 dark:text-amber-400 font-semibold space-y-1 animate-in fade-in">
+            <p className="font-bold flex items-center gap-1">
+              ⚠️ Anti-Abuse & Moderation Notice
+            </p>
+            <p className="text-[10.5px] leading-relaxed text-amber-600/90 dark:text-amber-300/90 font-medium">
+              Anonymous posts shield your public handle, but all submissions are subject to automated moderation. Harassment, hate speech, or abuse will result in an immediate permanent ban.
+            </p>
+          </div>
+        )}
       </div>
 
       {error && (

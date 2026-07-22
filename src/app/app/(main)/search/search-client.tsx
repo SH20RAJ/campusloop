@@ -167,7 +167,7 @@ export default function SearchClient() {
               </h3>
               <div className="grid gap-2.5 sm:grid-cols-2">
                 {results.users.map((u) => (
-                  <Link key={u.id} href={`/app/profile/${u.username}`}>
+                  <Link key={u.id} href={`/@${u.username}`}>
                     <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-card p-3 hover:border-primary/50 hover:shadow-sm transition-all">
                       <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500 font-bold text-xs">
                         {u.displayName?.[0] || "U"}

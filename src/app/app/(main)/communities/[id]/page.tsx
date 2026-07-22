@@ -161,7 +161,12 @@ export default async function CommunityDetailPage({ params, searchParams }: Page
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground font-semibold">
                 <span className="text-primary font-bold">{membersCount} members</span>
                 <span>&bull;</span>
-                <span>Created by @{comm.creator?.username || "admin"}</span>
+                <span>
+                  Created by{" "}
+                  <Link href={`/@${comm.creator?.username || "admin"}`} className="hover:text-primary transition-colors hover:underline">
+                    @{comm.creator?.username || "admin"}
+                  </Link>
+                </span>
               </div>
             </div>
           </div>

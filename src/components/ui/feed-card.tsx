@@ -108,7 +108,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
       <div className="flex items-center justify-between p-6 pb-4">
         <div className="flex items-center gap-3">
           {!post.isAnonymous ? (
-            <Link href={`/app/profile/${authorHandle}`}>
+            <Link href={`/@${authorHandle}`}>
               <Avatar className="h-10 w-10 border hover:opacity-85 transition-opacity cursor-pointer">
                 <AvatarImage src={avatarUrl || ""} />
                 <AvatarFallback>{avatarFallback}</AvatarFallback>
@@ -123,7 +123,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
           <div className="flex flex-col">
             <span className="text-sm font-semibold flex items-center gap-1">
               {!post.isAnonymous ? (
-                <Link href={`/app/profile/${authorHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
+                <Link href={`/@${authorHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
                   {authorName}
                 </Link>
               ) : (
@@ -133,7 +133,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
             </span>
             <span className="text-xs text-muted-foreground">
               {!post.isAnonymous ? (
-                <Link href={`/app/profile/${authorHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
+                <Link href={`/@${authorHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
                   @{authorHandle}
                 </Link>
               ) : (

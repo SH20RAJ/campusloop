@@ -201,7 +201,7 @@ export default async function MainCollegePage({ params }: PageProps) {
 
           <div className="grid gap-2 sm:grid-cols-2">
             {college.profiles.slice(0, 6).map((u) => (
-              <Link key={u.id} href={`/app/profile/${u.username}`}>
+              <Link key={u.id} href={`/@${u.username}`}>
                 <div className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/30 px-3 py-2 hover:bg-muted/80 hover:border-primary/30 transition-all cursor-pointer">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary shrink-0">

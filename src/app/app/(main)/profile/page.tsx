@@ -31,7 +31,7 @@ export default async function ProfilePage({
       where: eq(userProfiles.id, targetId),
     });
     if (targetProfile) {
-      redirect(`/app/profile/${targetProfile.username}`);
+      redirect(`/@${targetProfile.username}`);
     }
   }
 

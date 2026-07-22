@@ -53,7 +53,7 @@ function CommentItem({
     <div className={cn("flex gap-2.5 items-start", depth > 0 && "ml-8 pl-3 border-l border-border/30")}>
       <div className="shrink-0">
         {!isAnon ? (
-          <Link href={`/app/profile/${handle}`}>
+          <Link href={`/@${handle}`}>
             <Avatar className="h-7 w-7 border hover:opacity-80 transition-opacity">
               <AvatarImage src={avatarUrl || ""} />
               <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">{fallback}</AvatarFallback>
@@ -71,7 +71,7 @@ function CommentItem({
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
           {!isAnon ? (
-            <Link href={`/app/profile/${handle}`} className="text-xs font-bold text-foreground hover:text-primary transition-colors">
+            <Link href={`/@${handle}`} className="text-xs font-bold text-foreground hover:text-primary transition-colors">
               {displayName}
             </Link>
           ) : (

@@ -1,29 +1,28 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { institutions } from "@/db/schema";
+import { communities } from "@/db/schema";
 import { desc } from "drizzle-orm";
 
 export async function GET() {
   try {
     const db = getDb();
-    const list = await db.query.institutions.findMany({
-      orderBy: [desc(institutions.createdAt)],
+    const list = await db.query.communities.findMany({
+      orderBy: [desc(communities.createdAt)],
       limit: 5000,
     });
 
     let urls = "";
     for (const item of list) {
-      const slugOrId = item.slug || item.id;
       urls += `
   <url>
-    <loc>https://campusloop.space/app/college/${slugOrId}</loc>
+    <loc>https://campusloop.space/app/communities/${item.id}</loc>
     <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://campusloop.space/college/${item.id}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://campusloop.space/c/${item.id}</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>`;
     }
 
@@ -34,11 +33,11 @@ export async function GET() {
     return new NextResponse(xml, {
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=43200, s-maxage=86400",
+        "Cache-Control": "public, max-age=1800, s-maxage=3600",
       },
     });
   } catch (error) {
-    console.error("Colleges sitemap error:", error);
+    console.error("Communities sitemap error:", error);
     return new NextResponse("<urlset></urlset>", {
       headers: { "Content-Type": "application/xml" },
     });

@@ -7,9 +7,9 @@ export async function GET() {
   try {
     const db = getDb();
     const list = await db.query.posts.findMany({
-      where: and(eq(posts.isAnonymous, false), eq(posts.status, "PUBLISHED")),
+      where: eq(posts.status, "PUBLISHED"),
       orderBy: [desc(posts.createdAt)],
-      limit: 10000,
+      limit: 20000,
     });
 
     let urls = "";

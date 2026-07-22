@@ -12,6 +12,12 @@ export async function GET() {
   <sitemap>
     <loc>https://campusloop.space/sitemaps/posts.xml</loc>
   </sitemap>
+  <sitemap>
+    <loc>https://campusloop.space/sitemaps/communities.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://campusloop.space/sitemaps/profiles.xml</loc>
+  </sitemap>
 </sitemapindex>`;
 
   return new NextResponse(xml, {

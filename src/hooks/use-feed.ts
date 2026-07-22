@@ -6,6 +6,7 @@ export type FeedPost = Post & {
   author: UserProfile;
   institution: Institution;
   community?: { id: string; name: string } | null;
+  repostOf?: (Post & { author: UserProfile; institution?: Institution }) | null;
   votesCount: number;
   commentsCount: number;
   userVote: number;

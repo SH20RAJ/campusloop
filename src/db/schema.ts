@@ -157,6 +157,9 @@ export const posts = pgTable(
 		title: text("title"),
 		body: text("body").notNull(),
 		isAnonymous: boolean("is_anonymous").default(false).notNull(),
+		isEdited: boolean("is_edited").default(false).notNull(),
+		repostOfId: text("repost_of_id").references((): AnyPgColumn => posts.id, { onDelete: "cascade" }),
+		repostComment: text("repost_comment"),
 		status: contentStatusEnum("status").default("PUBLISHED").notNull(),
 		riskScore: integer("risk_score").default(0).notNull(),
 		communityId: text("community_id"),
@@ -348,6 +351,11 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 	community: one(communities, {
 		fields: [posts.communityId],
 		references: [communities.id],
+	}),
+	repostOf: one(posts, {
+		fields: [posts.repostOfId],
+		references: [posts.id],
+		relationName: "post_reposts",
 	}),
 }));
 

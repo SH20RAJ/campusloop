@@ -96,6 +96,12 @@ export async function GET(req: Request) {
         author: true,
         institution: true,
         community: true,
+        repostOf: {
+          with: {
+            author: true,
+            institution: true,
+          },
+        },
         votes: true,
         comments: true,
         pollOptions: {
@@ -117,6 +123,12 @@ export async function GET(req: Request) {
           author: true,
           institution: true,
           community: true,
+          repostOf: {
+            with: {
+              author: true,
+              institution: true,
+            },
+          },
           votes: true,
           comments: true,
           pollOptions: {

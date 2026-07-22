@@ -49,14 +49,16 @@ export async function POST(req: Request, { params }: RouteParams) {
       newPostBody = `🔁 Reposted from ${authorName}:\n"${originalPost.body}"`;
     }
 
-    // Insert new post into DB
+    // Insert new post into DB with repostOfId DB flag
     const [repostedPost] = await db
       .insert(posts)
       .values({
         authorId: profile.id,
         institutionId: profile.institutionId || originalPost.institutionId,
-        body: newPostBody,
+        body: commentary && commentary.trim().length > 0 ? commentary.trim() : originalPost.body,
         type: originalPost.type,
+        repostOfId: originalPost.id,
+        repostComment: commentary && commentary.trim().length > 0 ? commentary.trim() : null,
         isAnonymous: false,
         status: "PUBLISHED",
       })

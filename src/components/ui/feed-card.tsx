@@ -169,12 +169,20 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 sm:p-5 pb-2 sm:pb-3">
+      {/* Repost Banner Header (Twitter/X Style) */}
+      {post.repostOfId && (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold px-5 pt-3 -mb-1 select-none">
+          <Repeat2 className="size-3.5 text-emerald-500" />
+          <span>{authorName} Reposted</span>
+        </div>
+      )}
+
+      {/* Header Info */}
+      <div className="p-5 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
           {!post.isAnonymous ? (
             <Link href={`/@${authorHandle}`}>
-              <Avatar className="h-10 w-10 border hover:opacity-85 transition-opacity cursor-pointer shrink-0">
+              <Avatar className="h-10 w-10 border hover:opacity-80 transition-opacity shrink-0">
                 <AvatarImage src={avatarUrl || ""} />
                 <AvatarFallback>{avatarFallback}</AvatarFallback>
               </Avatar>
@@ -211,6 +219,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
                 `@${authorHandle}`
               )}
               {" "}• <Link href={`/app/college/${post.institution?.slug || post.institutionId}`} className="hover:text-primary transition-colors hover:underline">{post.institution.name}</Link>
+              {post.isEdited && <span className="text-[10px] text-muted-foreground/70 ml-1 font-normal">(edited)</span>}
             </span>
           </div>
         </div>
@@ -344,6 +353,25 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
             {renderPostBody(post.body)}
           </p>
         </Link>
+
+        {/* Embedded Original Quoted Post (Twitter/X style) */}
+        {post.repostOf && (
+          <Link href={`/app/post/${post.repostOf.id}`} onClick={(e) => e.stopPropagation()}>
+            <div className="mt-3 rounded-2xl border border-border/60 bg-muted/20 hover:bg-muted/30 transition-colors p-3.5 text-xs space-y-1.5 cursor-pointer">
+              <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
+                <span className="font-bold text-foreground">@{post.repostOf.author?.username || "student"}</span>
+                {post.repostOf.institution?.name && (
+                  <>
+                    <span>•</span>
+                    <span className="truncate text-[11px]">{post.repostOf.institution.name}</span>
+                  </>
+                )}
+              </div>
+              <p className="text-foreground leading-relaxed font-medium line-clamp-3">{post.repostOf.body}</p>
+            </div>
+          </Link>
+        )}
+
         {post.type === "POLL" && (
           <PollCard post={post} />
         )}

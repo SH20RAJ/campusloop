@@ -12,9 +12,6 @@ export async function GET(request: Request) {
     const list = await db.query.institutions.findMany({
       orderBy: [desc(institutions.createdAt)],
       limit,
-      with: {
-        posts: true,
-      },
     });
 
     const enriched = list.map((college) => ({
@@ -22,7 +19,7 @@ export async function GET(request: Request) {
       name: college.name,
       state: college.state,
       district: college.district,
-      postCount: college.posts?.length || 0,
+      postCount: 0,
     }));
 
     return NextResponse.json(enriched);

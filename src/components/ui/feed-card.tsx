@@ -145,6 +145,13 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
         </div>
         
         <div className="flex items-center gap-2">
+          {post.community && (
+            <Link href={`/app/communities/${post.community.id}`}>
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full border bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20 transition-colors cursor-pointer">
+                c/{post.community.name}
+              </span>
+            </Link>
+          )}
           {post.type !== "NORMAL" && (
             <span className={cn(
               "text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1",

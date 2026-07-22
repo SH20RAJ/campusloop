@@ -5,6 +5,7 @@ import { Post, UserProfile, Institution } from "@/db/schema";
 export type FeedPost = Post & {
   author: UserProfile;
   institution: Institution;
+  community?: { id: string; name: string } | null;
   votesCount: number;
   commentsCount: number;
   userVote: number;

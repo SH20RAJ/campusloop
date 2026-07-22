@@ -82,6 +82,7 @@ export async function GET(req: Request) {
       with: {
         author: true,
         institution: true,
+        community: true,
         votes: true,
         comments: true,
         pollOptions: {

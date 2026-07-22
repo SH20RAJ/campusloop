@@ -35,6 +35,16 @@ A running log of significant changes and design decisions.
 
 ---
 
+**<next_commit>** — Redesign discover page with animated tabs, college search, premium campus cards  
+- Animated tab indicator with spring layout animation  
+- College search input with AnimatePresence expand/collapse  
+- Featured campus cards with gradient backgrounds and per-campus colors  
+- Differentiated empty states per tab (confessions vs questions vs trending)  
+- Feed cards with stagger scroll-in animation  
+- Updated loading skeleton to match new layout  
+
+---
+
 ### Format
 
 Each entry: `commit_hash` — Brief description of what was done

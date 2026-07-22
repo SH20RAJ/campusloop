@@ -3,6 +3,8 @@ import { userProfiles, posts, institutions } from "@/db/schema";
 import { sql, desc } from "drizzle-orm";
 import { Users, FileText, School, MessageSquare } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
   const db = getDb();
   

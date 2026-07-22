@@ -50,13 +50,35 @@ export async function GET(req: Request) {
       conditions.push(eq(userProfiles.gender, genderFilter));
     }
 
-    const candidates = await db.query.userProfiles.findMany({
+    const { sql } = await import("drizzle-orm");
+
+    let candidates = await db.query.userProfiles.findMany({
       where: and(...conditions.filter(Boolean)),
+      orderBy: [sql`random()`],
       limit: 20,
       with: {
         institution: true,
       }
     });
+
+    // If candidate deck has fewer than 5 profiles, backfill with random active profiles excluding self and swiped
+    if (candidates.length < 5) {
+      const existingIds = new Set([profile.id, ...swipedIds, ...candidates.map(c => c.id)]);
+      const extraCandidates = await db.query.userProfiles.findMany({
+        orderBy: [sql`random()`],
+        limit: 15,
+        with: {
+          institution: true,
+        }
+      });
+
+      for (const extra of extraCandidates) {
+        if (!existingIds.has(extra.id)) {
+          candidates.push(extra);
+          existingIds.add(extra.id);
+        }
+      }
+    }
 
     return NextResponse.json(candidates);
   } catch (error) {

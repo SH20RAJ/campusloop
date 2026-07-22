@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     const sort = searchParams.get("sort") as "latest" | "trending" | "top_voted" | "most_discussed" | null;
     const visibility = searchParams.get("visibility") as "all" | "anonymous" | "public" | null;
     const page = Number(searchParams.get("page")) || 1;
-    const limit = Number(searchParams.get("limit")) || 10;
+    const limit = Number(searchParams.get("limit")) || 12;
     const offset = (page - 1) * limit;
     const hashtag = searchParams.get("hashtag");
 

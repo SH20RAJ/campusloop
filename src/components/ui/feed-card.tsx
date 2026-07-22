@@ -244,7 +244,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
       {/* Content */}
       <div className="px-6 py-2">
         <Link href={`/app/post/${post.id}`}>
-          <p className="text-sm md:text-base leading-relaxed text-foreground whitespace-pre-wrap hover:underline">
+          <p className="text-sm md:text-base leading-relaxed text-foreground whitespace-pre-wrap">
             {renderPostBody(post.body)}
           </p>
         </Link>

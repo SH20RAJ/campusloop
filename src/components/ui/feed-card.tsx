@@ -148,7 +148,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
   return (
     <div className="rounded-2xl border border-border bg-card text-card-foreground shadow-xs hover:border-border/80 transition-all relative">
       {/* Header */}
-      <div className="flex items-center justify-between p-5 pb-3">
+      <div className="flex items-center justify-between p-4 sm:p-5 pb-2 sm:pb-3">
         <div className="flex items-center gap-3 min-w-0">
           {!post.isAnonymous ? (
             <Link href={`/@${authorHandle}`}>

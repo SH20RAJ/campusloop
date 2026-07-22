@@ -141,7 +141,7 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
       </aside>
 
       {/* ─── Mobile Bottom Bar ─── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-around border-t border-border bg-background px-2 md:hidden shadow-md">
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-around border-t border-border/80 bg-background/90 backdrop-blur-xl px-2 md:hidden shadow-lg touch-manipulation">
         {mobileItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;

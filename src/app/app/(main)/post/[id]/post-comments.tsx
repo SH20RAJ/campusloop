@@ -71,8 +71,13 @@ function CommentItem({
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
           {!isAnon ? (
-            <Link href={`/@${handle}`} className="text-xs font-bold text-foreground hover:text-primary transition-colors">
-              {displayName}
+            <Link href={`/@${handle}`} className="text-xs font-bold text-foreground hover:text-primary transition-colors flex items-center gap-1">
+              <span>{displayName}</span>
+              {(comment.author?.points >= 150 || comment.author?.role === "ADMIN") && (
+                <svg className="size-3 text-blue-500 fill-blue-500/20 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              )}
             </Link>
           ) : (
             <span className="text-xs font-bold text-foreground">{displayName}</span>

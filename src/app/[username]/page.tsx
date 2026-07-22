@@ -126,6 +126,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                 profile={profile}
                 formattedPosts={formattedPosts as FeedPost[]}
                 isOwnProfile={isOwnProfile}
+                currentUserId={currentProfile.id}
               />
             </main>
           </div>

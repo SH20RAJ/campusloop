@@ -97,6 +97,7 @@ export default async function ProfilePage({
       profile={profile}
       formattedPosts={formattedPosts as FeedPost[]}
       isOwnProfile={isOwnProfile}
+      currentUserId={currentProfile.id}
     />
   );
 }

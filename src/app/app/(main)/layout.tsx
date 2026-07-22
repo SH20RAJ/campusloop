@@ -1,4 +1,5 @@
 import { Navigation } from "@/components/ui/navigation";
+import { RightSidebar } from "@/components/ui/right-sidebar";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
 import { userProfiles, institutions } from "@/db/schema";
@@ -38,9 +39,12 @@ export default async function MainLayout({
       />
 
       <div className="flex md:pl-64 min-h-screen">
-        <main className="flex-1 w-full max-w-2xl px-0 py-0 pb-28 md:pb-0 mx-auto min-h-screen">
+        <main className="flex-1 w-full min-h-screen">
           {children}
         </main>
+        <aside className="hidden xl:block w-72 xl:w-80 shrink-0 border-l border-border/40 p-4">
+          <RightSidebar />
+        </aside>
       </div>
     </div>
   );

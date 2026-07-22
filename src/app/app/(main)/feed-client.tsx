@@ -16,7 +16,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import useSWR from "swr";
-import { toast } from "sonner";
 
 interface MyProfile {
   id: string;
@@ -277,35 +276,6 @@ export function FeedClient() {
             </div>
           </div>
         </Link>
-      </div>
-
-      {/* ─── Virality Booster: Share / Invite Card ─── */}
-      <div className="px-4 pt-4">
-        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/5 p-4 shadow-sm group">
-          <div className="absolute right-[-10%] top-[-30%] h-24 w-24 rounded-full bg-primary/10 blur-xl group-hover:bg-primary/25 transition-colors pointer-events-none" />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <h4 className="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-1">
-                <Sparkles className="h-3.5 w-3.5 animate-pulse" /> Gatekeep? Nah, invite.
-              </h4>
-              <p className="text-[11px] text-muted-foreground font-semibold max-w-sm leading-relaxed">
-                Invite your campus group chat. Let's get the whole college yapping before the tea gets cold.
-              </p>
-            </div>
-            <button
-              onClick={() => {
-                const college = profile?.institution?.name?.split(",")[0] || "campus";
-                const username = profile?.username || "student";
-                const inviteText = `yo, ${college} is going crazy on CampusLoop right now. verified students only, join before the tea gets cold: https://campusloop.space/join?invite=${username} 🔥`;
-                navigator.clipboard.writeText(inviteText);
-                toast.success("Copied to clipboard! Share it in your college WhatsApp group chat 🚀");
-              }}
-              className="rounded-xl bg-primary text-white text-[10px] font-bold px-3 py-1.5 hover:opacity-90 active:scale-95 shadow-md shadow-primary/15 transition-all shrink-0 cursor-pointer flex items-center gap-1"
-            >
-              Copy Invite Copypasta
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* ─── Main Feed List ─── */}

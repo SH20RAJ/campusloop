@@ -20,6 +20,7 @@ import {
   PointsDemo,
   VerifyDemo,
 } from "@/components/landing/demos";
+import { ArtifactsShowcase } from "@/components/landing/artifacts-demos";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -351,6 +352,8 @@ export default async function LandingPage() {
             </Reveal>
           </div>
         </section>
+
+        <ArtifactsShowcase />
 
         {/* Verification */}
         <section className="border-t border-border/60 bg-muted/30">

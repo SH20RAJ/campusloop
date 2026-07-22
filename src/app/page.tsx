@@ -21,7 +21,7 @@ import {
   VerifyDemo,
 } from "@/components/landing/demos";
 import { ArtifactsShowcase } from "@/components/landing/artifacts-demos";
-import { StatsSection, IntegrationsSection, SafetySection, TestimonialsSection } from "@/components/landing/extra-sections";
+import { StatsSection, IntegrationsSection, SafetySection, TestimonialsSection, FAQSection } from "@/components/landing/extra-sections";
 
 import { cn } from "@/lib/utils";
 
@@ -407,6 +407,8 @@ export default async function LandingPage() {
         </section>
 
         <TestimonialsSection />
+
+        <FAQSection />
 
         {/* Final CTA */}
         <section className="border-t border-border/60">

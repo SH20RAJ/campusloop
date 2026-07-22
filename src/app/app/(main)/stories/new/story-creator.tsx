@@ -91,111 +91,111 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-4rem)] space-y-6 max-w-4xl mx-auto px-4 py-6">
+    <div className="flex flex-col space-y-5 max-w-3xl mx-auto px-4 py-4 select-none pb-12">
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-border/40">
         <button
           onClick={() => router.push("/app")}
-          className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Feed
+          <ArrowLeft className="h-4 w-4" /> Feed
         </button>
-        <h2 className="text-sm font-black uppercase tracking-wider text-foreground">
-          Vibe Creator
+        <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">
+          Vibe Story Creator
         </h2>
-        <div className="w-16" /> {/* Spacer to center title */}
+        <div className="w-12" />
       </div>
 
       {/* Main Workspace Split Grid */}
-      <div className="grid gap-6 md:grid-cols-2 items-start">
-        {/* Left Side: Live Preview Canvas */}
-        <div className="flex flex-col items-center justify-center space-y-3">
-          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-            <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" /> Live Canvas Preview
+      <div className="grid gap-6 md:grid-cols-2 items-center">
+        {/* Live Canvas Preview */}
+        <div className="flex flex-col items-center justify-center space-y-2">
+          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+            <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" /> Live 9:16 Story Preview
           </span>
           
           <div
             className={cn(
-              "w-full max-w-[320px] aspect-[9/16] rounded-3xl p-6 flex flex-col justify-between text-white shadow-2xl relative overflow-hidden transition-all duration-300 border border-white/10",
+              "w-full max-w-[260px] aspect-[9/16] rounded-2xl p-5 flex flex-col justify-between text-white shadow-2xl relative overflow-hidden transition-all duration-300 border border-white/10",
               selectedGrad.split(" ")[0]
             )}
           >
             {/* Gloss Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
 
             {/* Header info */}
-            <div className="flex items-center gap-2.5 relative z-10">
-              <Avatar className="h-8 w-8 border border-white/20">
+            <div className="flex items-center gap-2 relative z-10">
+              <Avatar className="h-7 w-7 border border-white/20">
                 <AvatarImage src={profile.avatarUrl || ""} />
                 <AvatarFallback className="text-xs bg-white text-primary font-bold">
                   {profile.displayName[0]}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="text-[11px] font-black leading-none truncate">{profile.displayName}</p>
-                <p className="text-[9px] text-white/70">Just now</p>
+                <p className="text-[10.5px] font-bold leading-none truncate">{profile.displayName}</p>
+                <p className="text-[8.5px] text-white/70 mt-0.5">Just now</p>
               </div>
             </div>
 
             {/* Content text */}
             <div className={cn(
-              "flex-1 flex flex-col items-center justify-center text-center px-2 py-4 relative z-10",
+              "flex-1 flex flex-col items-center justify-center text-center px-1 py-3 relative z-10",
               selectedFont,
               textAlign === "left" ? "text-left items-start" : textAlign === "right" ? "text-right items-end" : "text-center items-center"
             )}>
               {selectedStickers.length > 0 && (
-                <div className="flex gap-2 mb-4 animate-bounce text-2xl select-none">
+                <div className="flex gap-1.5 mb-3 text-xl select-none">
                   {selectedStickers.map(s => <span key={s}>{s}</span>)}
                 </div>
               )}
-              <p className="text-xl font-extrabold tracking-tight leading-relaxed max-w-[240px] break-words whitespace-pre-wrap drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+              <p className="text-lg font-extrabold tracking-tight leading-relaxed max-w-[220px] break-words whitespace-pre-wrap drop-shadow-xs">
                 {storyText || "What's the vibe today?"}
               </p>
             </div>
 
             {/* Footer Brand */}
-            <div className="text-[9px] text-center text-white/40 tracking-widest font-black uppercase relative z-10 select-none">
+            <div className="text-[8.5px] text-center text-white/50 tracking-widest font-bold uppercase relative z-10 select-none">
               CAMPUSLOOP VIBE
             </div>
           </div>
         </div>
 
-        {/* Right Side: Creator Controls & Inputs */}
-        <form onSubmit={handlePostStory} className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-6">
+        {/* Creator Controls & Inputs */}
+        <form onSubmit={handlePostStory} className="rounded-2xl border border-border/60 bg-background p-5 shadow-xs space-y-4">
           {/* Story Text Box */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
               <Type className="h-3.5 w-3.5" /> Story Text
             </label>
             <textarea
               maxLength={100}
               required
               rows={3}
-              placeholder="Spill some tea, drop a vibe, or ask an anonymous question..."
+              placeholder="Drop a vibe, canteen gossip, or campus update..."
               value={storyText}
               onChange={(e) => setStoryText(e.target.value)}
-              className="flex min-h-[80px] w-full rounded-xl border border-border bg-muted/20 px-3.5 py-2.5 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none font-medium leading-relaxed"
+              className="flex min-h-[75px] w-full rounded-xl border border-border/60 bg-muted/20 p-3 text-xs placeholder:text-muted-foreground outline-none focus:border-primary resize-none font-medium leading-relaxed"
             />
-            <span className="text-[9px] text-muted-foreground block text-right font-bold">
-              {storyText.length}/100 characters
+            <span className="text-[9px] text-muted-foreground block text-right font-semibold">
+              {storyText.length}/100 chars
             </span>
           </div>
 
-          {/* Background Gradient Picker */}
-          <div className="space-y-2.5">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-              <Layout className="h-3.5 w-3.5" /> Background Canvas
+          {/* Background Canvas Gradient Picker */}
+          <div className="space-y-2">
+            <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+              <Layout className="h-3.5 w-3.5" /> Canvas Gradient
             </label>
-            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2.5">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
               {GRADIENTS.map((g) => (
                 <button
                   key={g.id}
                   type="button"
                   onClick={() => setSelectedGrad(g.class)}
                   className={cn(
-                    "h-8 w-8 rounded-full border-2 transition-all cursor-pointer hover:scale-105 active:scale-95 shrink-0 shadow-sm",
+                    "h-7 w-7 rounded-full border-2 transition-all cursor-pointer hover:scale-105 active:scale-95 shrink-0 shadow-xs",
                     g.class.split(" ")[0],
-                    selectedGrad === g.class ? "border-primary scale-110 ring-2 ring-primary/20" : "border-transparent"
+                    selectedGrad === g.class ? "border-primary scale-110" : "border-transparent opacity-80"
                   )}
                   title={g.label}
                 />
@@ -203,20 +203,19 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
             </div>
           </div>
 
-          {/* Typography Customization */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Font Selector */}
-            <div className="space-y-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Font Style</span>
-              <div className="flex flex-col gap-1.5">
+          {/* Typography & Alignment Controls */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Font Style</span>
+              <div className="flex flex-col gap-1">
                 {FONTS.map(f => (
                   <button
                     key={f.id}
                     type="button"
                     onClick={() => setSelectedFont(f.class)}
                     className={cn(
-                      "text-left text-xs font-bold px-3 py-1.5 rounded-lg border transition-all cursor-pointer flex justify-between items-center",
-                      selectedFont === f.class ? "bg-primary/5 text-primary border-primary" : "bg-muted/10 border-border hover:bg-muted/20"
+                      "text-left text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex justify-between items-center",
+                      selectedFont === f.class ? "bg-primary/10 text-primary border-primary" : "bg-muted/10 border-border/60 text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <span>{f.name}</span>
@@ -226,50 +225,49 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
               </div>
             </div>
 
-            {/* Align Selector */}
-            <div className="space-y-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Alignment</span>
-              <div className="flex gap-1 bg-muted/20 p-1 rounded-lg border border-border">
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Alignment</span>
+              <div className="flex gap-1 bg-muted/20 p-1 rounded-lg border border-border/60">
                 <button
                   type="button"
                   onClick={() => setTextAlign("left")}
                   className={cn(
-                    "flex-1 h-8 rounded-md flex items-center justify-center cursor-pointer transition-colors",
-                    textAlign === "left" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    "flex-1 h-7 rounded-md flex items-center justify-center cursor-pointer transition-colors text-xs",
+                    textAlign === "left" ? "bg-background text-foreground shadow-xs font-bold" : "text-muted-foreground"
                   )}
                 >
-                  <AlignLeft className="h-4 w-4" />
+                  <AlignLeft className="h-3.5 w-3.5" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setTextAlign("center")}
                   className={cn(
-                    "flex-1 h-8 rounded-md flex items-center justify-center cursor-pointer transition-colors",
-                    textAlign === "center" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    "flex-1 h-7 rounded-md flex items-center justify-center cursor-pointer transition-colors text-xs",
+                    textAlign === "center" ? "bg-background text-foreground shadow-xs font-bold" : "text-muted-foreground"
                   )}
                 >
-                  <AlignCenter className="h-4 w-4" />
+                  <AlignCenter className="h-3.5 w-3.5" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setTextAlign("right")}
                   className={cn(
-                    "flex-1 h-8 rounded-md flex items-center justify-center cursor-pointer transition-colors",
-                    textAlign === "right" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    "flex-1 h-7 rounded-md flex items-center justify-center cursor-pointer transition-colors text-xs",
+                    textAlign === "right" ? "bg-background text-foreground shadow-xs font-bold" : "text-muted-foreground"
                   )}
                 >
-                  <AlignRight className="h-4 w-4" />
+                  <AlignRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Stickers/Reaction Badges */}
-          <div className="space-y-2.5">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-              Add Vibe Badges (Max 3)
+          {/* Sticker Badges */}
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
+              Vibe Badges (Max 3)
             </span>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {STICKERS.map(sticker => {
                 const isSelected = selectedStickers.includes(sticker);
                 return (
@@ -278,8 +276,8 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
                     type="button"
                     onClick={() => handleAddSticker(sticker)}
                     className={cn(
-                      "text-sm h-8 px-2.5 rounded-lg border transition-all cursor-pointer active:scale-95",
-                      isSelected ? "bg-primary/10 border-primary text-primary font-bold scale-105" : "bg-muted/10 border-border hover:bg-muted/20"
+                      "text-xs py-1 px-2 rounded-lg border transition-all cursor-pointer active:scale-95",
+                      isSelected ? "bg-primary/10 border-primary text-primary font-bold" : "bg-muted/10 border-border/60 hover:bg-muted/20"
                     )}
                   >
                     {sticker}
@@ -293,15 +291,15 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
           <Button
             type="submit"
             disabled={isPosting || !storyText.trim()}
-            className="w-full bg-gradient-to-r from-primary to-orange-500 text-white font-bold h-10.5 rounded-xl gap-1.5 shadow-md shadow-primary/10 text-xs cursor-pointer hover:opacity-95 transition-opacity"
+            className="w-full bg-primary text-primary-foreground font-semibold h-10 rounded-xl gap-1.5 text-xs cursor-pointer hover:opacity-95 transition-opacity shadow-xs"
           >
             {isPosting ? "Publishing Vibe..." : "Post Vibe to Campus"}
             <Send className="h-3.5 w-3.5 shrink-0" />
           </Button>
 
           {error && (
-            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2 text-xs text-destructive font-bold">
-              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-2.5 flex items-center gap-2 text-xs text-destructive font-semibold">
+              <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}

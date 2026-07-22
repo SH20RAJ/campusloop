@@ -26,6 +26,8 @@ import { toast } from "sonner";
 import { deletePost } from "@/app/app/(main)/post/actions";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 
+import { motion, AnimatePresence } from "framer-motion";
+
 interface FeedCardProps {
   post: FeedPost;
   currentUserId?: string;
@@ -41,6 +43,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
   const [quoteThoughts, setQuoteThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author.displayName;
   const authorHandle = post.isAnonymous ? "anonymous" : post.author.username;
@@ -103,6 +106,14 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
     }
   }
 
+  function handleDoubleTap() {
+    if (userVote !== 1) {
+      handleVote();
+    }
+    setShowDoubleTapHeart(true);
+    setTimeout(() => setShowDoubleTapHeart(false), 900);
+  }
+
   function handleShare() {
     const postUrl = `${window.location.origin}/app/post/${post.id}`;
     let shareText = "";
@@ -146,7 +157,24 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card text-card-foreground shadow-xs hover:border-border/80 transition-all relative">
+    <div className="rounded-2xl border border-border bg-card text-card-foreground shadow-xs hover:border-border/80 transition-all relative overflow-hidden">
+      {/* Double Tap Heart Pop Overlay */}
+      <AnimatePresence>
+        {showDoubleTapHeart && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none bg-rose-500/5 backdrop-blur-[1px]">
+            <motion.div
+              initial={{ scale: 0.2, opacity: 0, rotate: -20 }}
+              animate={{ scale: [0.2, 1.4, 1.1], opacity: [0, 1, 0.9], rotate: [0, 10, 0] }}
+              exit={{ scale: 1.6, opacity: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="relative"
+            >
+              <Heart className="h-20 w-20 fill-rose-500 text-rose-500 drop-shadow-[0_0_25px_rgba(244,63,94,0.8)]" />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="flex items-center justify-between p-4 sm:p-5 pb-2 sm:pb-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -312,8 +340,11 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
         </div>
       </div>
 
-      {/* Content Body */}
-      <div className="px-5 py-1">
+      {/* Content Body (Supports Double-Tap to Like) */}
+      <div 
+        className="px-5 py-1 cursor-pointer select-none"
+        onDoubleClick={handleDoubleTap}
+      >
         <Link href={`/app/post/${post.id}`}>
           <p className="text-sm md:text-base leading-relaxed text-foreground whitespace-pre-wrap">
             {renderPostBody(post.body)}
@@ -335,16 +366,13 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
 
       {/* Actions Bottom Bar */}
       <div className="flex items-center gap-6 px-5 py-3 border-t border-border/50 mt-3 text-muted-foreground text-xs">
-        <button 
-          onClick={handleVote}
-          disabled={isLoading}
-          className={`flex items-center gap-1.5 transition-colors cursor-pointer font-semibold ${userVote === 1 ? "text-rose-500" : "hover:text-foreground"}`}
-        >
-          <AnimateIcon animateOnHover animation="path">
-            <Heart className={`h-4 w-4 ${userVote === 1 ? "fill-rose-500" : ""}`} />
-          </AnimateIcon>
-          <span>{votesCount}</span>
-        </button>
+        {/* Animated Particle Burst Like Button */}
+        <AnimatedLikeButton
+          isLiked={userVote === 1}
+          votesCount={votesCount}
+          onVote={handleVote}
+          isLoading={isLoading}
+        />
         
         <Link href={`/app/post/${post.id}`} className="flex items-center gap-1.5 hover:text-foreground transition-colors font-semibold">
           <AnimateIcon animateOnHover animation="path">
@@ -432,6 +460,86 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
       )}
 
       <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
+    </div>
+  );
+}
+
+function AnimatedLikeButton({
+  isLiked,
+  votesCount,
+  onVote,
+  isLoading,
+}: {
+  isLiked: boolean;
+  votesCount: number;
+  onVote: () => void;
+  isLoading: boolean;
+}) {
+  const [showBurst, setShowBurst] = useState(false);
+
+  function handleClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!isLiked) {
+      setShowBurst(true);
+      setTimeout(() => setShowBurst(false), 750);
+    }
+    onVote();
+  }
+
+  const particles = [
+    { x: -16, y: -20, color: "bg-rose-500" },
+    { x: 0, y: -24, color: "bg-pink-400" },
+    { x: 16, y: -20, color: "bg-rose-400" },
+    { x: 20, y: 0, color: "bg-amber-400" },
+    { x: -20, y: 0, color: "bg-rose-500" },
+    { x: 0, y: 20, color: "bg-pink-500" },
+  ];
+
+  return (
+    <div className="relative inline-flex items-center">
+      <motion.button
+        onClick={handleClick}
+        disabled={isLoading}
+        whileTap={{ scale: 0.8 }}
+        className={cn(
+          "flex items-center gap-1.5 transition-colors cursor-pointer font-semibold select-none py-1 px-1.5 rounded-full hover:bg-rose-500/10",
+          isLiked ? "text-rose-500" : "text-muted-foreground hover:text-foreground"
+        )}
+      >
+        <motion.div
+          animate={isLiked ? { scale: [1, 1.45, 0.9, 1.15, 1], rotate: [0, -12, 12, 0] } : { scale: 1, rotate: 0 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="relative flex items-center justify-center"
+        >
+          <Heart className={cn("h-4.5 w-4.5 transition-all duration-300", isLiked ? "fill-rose-500 text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]" : "")} />
+        </motion.div>
+        
+        <motion.span
+          key={votesCount}
+          initial={{ y: -4, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        >
+          {votesCount}
+        </motion.span>
+      </motion.button>
+
+      <AnimatePresence>
+        {showBurst && (
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+            {particles.map((p, idx) => (
+              <motion.span
+                key={idx}
+                initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+                animate={{ x: p.x, y: p.y, scale: 0, opacity: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.65, ease: "easeOut" }}
+                className={cn("absolute size-1.5 rounded-full shadow-xs", p.color)}
+              />
+            ))}
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -42,7 +42,7 @@ export function useFeed(
     if (visibility && visibility !== "all") url.searchParams.set("visibility", visibility);
     if (hashtag) url.searchParams.set("hashtag", hashtag);
     url.searchParams.set("page", String(pageIndex + 1));
-    url.searchParams.set("limit", "12");
+    url.searchParams.set("limit", "20");
 
     return url.toString();
   };

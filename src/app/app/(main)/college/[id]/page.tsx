@@ -20,9 +20,53 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     where: or(eq(institutions.slug, id), eq(institutions.id, id)),
   });
 
+  if (!college) {
+    return {
+      title: "College Hub | CampusLoop",
+      description: "Explore Indian college rankings and student communities on CampusLoop.",
+    };
+  }
+
+  const title = `${college.name} Rank & Campus Hub | CampusLoop`;
+  const description = `Explore live rankings, verified student leaderboards, confessions, and sub-community posts for ${college.name} (${college.district || college.state}).`;
+  const url = `https://campusloop.space/app/college/${college.slug || college.id}`;
+
   return {
-    title: college ? `${college.name} Rank & Campus Hub | CampusLoop` : "College Hub | CampusLoop",
-    description: college ? `Explore rankings, student lists, confessions, and discussions from ${college.name}.` : "",
+    title,
+    description,
+    keywords: [
+      college.name,
+      `${college.name} rankings`,
+      `${college.name} students`,
+      `${college.name} confessions`,
+      college.state || "Indian Colleges",
+      "CampusLoop college hub",
+    ],
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "CampusLoop",
+      locale: "en_IN",
+      type: "website",
+      images: [
+        {
+          url: "https://campusloop.space/logo.png",
+          width: 512,
+          height: 512,
+          alt: college.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["https://campusloop.space/logo.png"],
+    },
   };
 }
 
@@ -126,6 +170,27 @@ export default async function MainCollegePage({ params }: PageProps) {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-20 px-4 pt-4 gap-6">
+      {/* EducationalOrganization JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "EducationalOrganization",
+            name: college.name,
+            url: college.website || `https://campusloop.space/app/college/${college.slug || college.id}`,
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: college.district || undefined,
+              addressRegion: college.state || "India",
+              addressCountry: "IN",
+            },
+            identifier: college.aisheCode || undefined,
+            foundingDate: college.yearOfEstablishment ? String(college.yearOfEstablishment) : undefined,
+          }),
+        }}
+      />
+
       {/* Header Back Link */}
       <div className="flex items-center justify-between">
         <Link

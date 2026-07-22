@@ -23,9 +23,51 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     where: eq(communities.id, id),
   });
 
+  if (!comm) {
+    return {
+      title: "Community Hub | CampusLoop",
+    };
+  }
+
+  const title = `c/${comm.name} Sub-Hub Community | CampusLoop`;
+  const description = comm.description || `Join c/${comm.name} student sub-community on CampusLoop for hot posts, confessions, and campus discussions.`;
+  const url = `https://campusloop.space/app/communities/${comm.id}`;
+
   return {
-    title: comm ? `c/${comm.name} Community | CampusLoop` : "Community Hub | CampusLoop",
-    description: comm ? `Join c/${comm.name} student community for hot posts, discussions, and campus polls.` : "",
+    title,
+    description,
+    keywords: [
+      `c/${comm.name}`,
+      comm.name,
+      `${comm.name} college club`,
+      "campus sub-hub",
+      "student community",
+    ],
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "CampusLoop",
+      locale: "en_IN",
+      type: "website",
+      images: [
+        {
+          url: "https://campusloop.space/logo.png",
+          width: 512,
+          height: 512,
+          alt: comm.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["https://campusloop.space/logo.png"],
+    },
   };
 }
 
@@ -130,6 +172,21 @@ export default async function CommunityDetailPage({ params, searchParams }: Page
 
   return (
     <main className="space-y-6 max-w-2xl mx-auto pb-20 px-4 pt-4">
+      {/* Community JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "DiscussionForum",
+            name: `c/${comm.name}`,
+            description: comm.description || `Sub-hub community for ${comm.name} on CampusLoop.`,
+            url: `https://campusloop.space/app/communities/${comm.id}`,
+            memberCount: membersCount,
+          }),
+        }}
+      />
+
       {/* Back button */}
       <Link
         href="/app/communities"

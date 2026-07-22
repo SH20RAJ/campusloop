@@ -105,6 +105,40 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "CampusLoop",
+              url: "https://campusloop.space",
+              description: "The verified student-only social network for Indian colleges.",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: "https://campusloop.space/app/search?q={search_term_string}",
+                },
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "CampusLoop",
+              url: "https://campusloop.space",
+              logo: "https://campusloop.space/logo.png",
+              sameAs: ["https://twitter.com/campusloop", "https://instagram.com/campusloop"],
+              description: "CampusLoop connects students across 1,350+ Indian colleges with verified campus feeds, confessions, dating matches, and sub-hubs.",
+            }),
+          }}
+        />
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               try {

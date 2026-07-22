@@ -20,13 +20,54 @@ export async function generateMetadata({ params }: VanityProfileProps): Promise<
   const rawUsername = decodeURIComponent(resolved.username);
   
   if (!rawUsername.startsWith("@")) {
-    return {};
+    return {
+      title: "Profile | CampusLoop",
+    };
   }
   
   const username = rawUsername.slice(1);
+  const db = getDb();
+  const profile = await db.query.userProfiles.findFirst({
+    where: eq(userProfiles.username, username),
+    with: { institution: true },
+  });
+
+  const title = profile ? `${profile.displayName} (@${username}) Student Profile | CampusLoop` : `@${username} | CampusLoop`;
+  const description = profile?.bio
+    ? profile.bio
+    : `View @${username}'s student clout rank, points, and campus activity on CampusLoop.`;
+  const url = `https://campusloop.space/@${username}`;
+
   return {
-    title: `@${username} | CampusLoop`,
-    description: `View @${username}'s student profile, vibe rank, and activity on CampusLoop.`,
+    title,
+    description,
+    keywords: [
+      `@${username}`,
+      profile?.displayName || username,
+      profile?.institution?.name || "CampusLoop Student",
+      "student profile",
+      "campus clout",
+    ],
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "CampusLoop",
+      locale: "en_IN",
+      type: "profile",
+      images: profile?.avatarUrl
+        ? [{ url: profile.avatarUrl, alt: profile.displayName }]
+        : [{ url: "https://campusloop.space/logo.png", alt: title }],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images: profile?.avatarUrl ? [profile.avatarUrl] : ["https://campusloop.space/logo.png"],
+    },
   };
 }
 

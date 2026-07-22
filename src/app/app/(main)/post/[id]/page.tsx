@@ -16,8 +16,39 @@ interface PostPageProps {
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { id } = await params;
+  const db = getDb();
+  const post = await db.query.posts.findFirst({
+    where: eq(posts.id, id),
+    with: { author: true, institution: true },
+  });
+
+  if (!post) {
+    return {
+      title: "Post Details | CampusLoop",
+    };
+  }
+
+  const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
+  const snippet = post.body.length > 120 ? `${post.body.slice(0, 117)}...` : post.body;
+  const title = `Post by ${authorName} in ${post.institution?.name?.split(",")[0] || "Campus"} | CampusLoop`;
+  const url = `https://campusloop.space/app/post/${id}`;
+
   return {
-    title: `Post ${id} | CampusLoop`,
+    title,
+    description: snippet,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description: snippet,
+      url,
+      siteName: "CampusLoop",
+      type: "article",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description: snippet,
+    },
   };
 }
 
@@ -91,6 +122,36 @@ export default async function PostDetailPage({ params }: PostPageProps) {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
+      {/* DiscussionForumPosting JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "DiscussionForumPosting",
+            headline: rawPost.body.slice(0, 100),
+            articleBody: rawPost.body,
+            datePublished: rawPost.createdAt,
+            author: {
+              "@type": "Person",
+              name: rawPost.isAnonymous ? "Anonymous Student" : rawPost.author?.displayName || "Student",
+            },
+            interactionStatistic: [
+              {
+                "@type": "InteractionCounter",
+                interactionType: "https://schema.org/LikeAction",
+                userInteractionCount: votesCount,
+              },
+              {
+                "@type": "InteractionCounter",
+                interactionType: "https://schema.org/CommentAction",
+                userInteractionCount: commentsCount,
+              },
+            ],
+          }),
+        }}
+      />
+
       {/* Header with back button */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/40 px-4 py-3 flex items-center gap-3">
         <Link href="/app" className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/80 hover:bg-muted transition-colors cursor-pointer shrink-0">

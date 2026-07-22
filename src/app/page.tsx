@@ -21,6 +21,7 @@ import {
   VerifyDemo,
 } from "@/components/landing/demos";
 import { ArtifactsShowcase } from "@/components/landing/artifacts-demos";
+
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {

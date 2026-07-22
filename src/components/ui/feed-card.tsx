@@ -24,6 +24,7 @@ import { ReportDialog } from "./report-dialog";
 import { cn, getAvatarUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { deletePost } from "@/app/app/(main)/post/actions";
+import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 
 interface FeedCardProps {
   post: FeedPost;
@@ -339,12 +340,16 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
           disabled={isLoading}
           className={`flex items-center gap-1.5 transition-colors cursor-pointer font-semibold ${userVote === 1 ? "text-rose-500" : "hover:text-foreground"}`}
         >
-          <Heart className={`h-4 w-4 ${userVote === 1 ? "fill-rose-500" : ""}`} />
+          <AnimateIcon animateOnHover animation="path">
+            <Heart className={`h-4 w-4 ${userVote === 1 ? "fill-rose-500" : ""}`} />
+          </AnimateIcon>
           <span>{votesCount}</span>
         </button>
         
         <Link href={`/app/post/${post.id}`} className="flex items-center gap-1.5 hover:text-foreground transition-colors font-semibold">
-          <MessageCircle className="h-4 w-4" />
+          <AnimateIcon animateOnHover animation="path">
+            <MessageCircle className="h-4 w-4" />
+          </AnimateIcon>
           <span>{post.commentsCount || 0}</span>
         </Link>
 
@@ -354,7 +359,9 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
           className="flex items-center gap-1.5 hover:text-emerald-500 transition-colors font-semibold cursor-pointer"
           title="Repost or Reshare"
         >
-          <Repeat2 className="h-4 w-4 text-emerald-500/80" />
+          <AnimateIcon animateOnHover animation="path">
+            <Repeat2 className="h-4 w-4 text-emerald-500/80" />
+          </AnimateIcon>
           <span>Repost</span>
         </button>
 
@@ -363,7 +370,9 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
           onClick={handleShare}
           className="flex items-center gap-1.5 hover:text-foreground transition-colors font-semibold cursor-pointer ml-auto"
         >
-          <Share2 className="h-4 w-4" />
+          <AnimateIcon animateOnHover animation="path">
+            <Share2 className="h-4 w-4" />
+          </AnimateIcon>
         </button>
       </div>
 

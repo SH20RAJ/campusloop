@@ -14,6 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/landing/reveal";
 import { HeroPreview } from "@/components/landing/hero-preview";
 import { Marquee } from "@/components/ui/marquee";
+import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import {
   ConfessionDemo,
   MatchDemo,

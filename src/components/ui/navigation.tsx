@@ -85,10 +85,10 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                       : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
-                  <AnimateIcon animateOnHover>
+                  <AnimateIcon animateOnHover animation="path">
                     <Icon
                       className={cn(
-                        "h-4.5 w-4.5 shrink-0 transition-transform duration-300 group-hover:scale-125 group-hover:-translate-y-0.5 group-active:scale-90",
+                        "h-4.5 w-4.5 shrink-0 transition-colors",
                         isActive ? "text-foreground stroke-[2.5]" : "text-muted-foreground group-hover:text-foreground"
                       )}
                     />
@@ -130,7 +130,9 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                   className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:text-destructive transition-colors"
                   title="Sign out"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <AnimateIcon animateOnHover animation="path">
+                    <LogOut className="h-4 w-4" />
+                  </AnimateIcon>
                 </Link>
               </div>
             </div>
@@ -149,9 +151,11 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
               <Link
                 key="create"
                 href="/app/post/new"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform active:scale-95 border-none"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm border-none"
               >
-                <Plus className="h-5 w-5" />
+                <AnimateIcon animateOnHover animation="path">
+                  <Plus className="h-5 w-5" />
+                </AnimateIcon>
               </Link>
             );
           }
@@ -165,7 +169,9 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                 isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Icon className="h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-125 group-active:scale-90" />
+              <AnimateIcon animateOnHover animation="path">
+                <Icon className="h-4.5 w-4.5 transition-colors" />
+              </AnimateIcon>
               <span className="mt-0.5 text-[8.5px] font-bold">{item.label}</span>
               {isActive && (
                 <div className="absolute bottom-1 size-1 rounded-full bg-foreground" />

@@ -20,6 +20,10 @@ import {
   PointsDemo,
   VerifyDemo,
 } from "@/components/landing/demos";
+import { MatchmakingShowcase } from "@/components/landing/matchmaking-demo";
+import { LeaderboardShowcase } from "@/components/landing/leaderboard-demo";
+import { ComparisonShowcase } from "@/components/landing/comparison-table";
+import { AmbassadorShowcase } from "@/components/landing/ambassador-demo";
 import { ArtifactsShowcase } from "@/components/landing/artifacts-demos";
 import { StatsSection, IntegrationsSection, SafetySection, TestimonialsSection, FAQSection, HowItWorksSection } from "@/components/landing/extra-sections";
 
@@ -355,11 +359,19 @@ export default async function LandingPage() {
           </div>
         </section>
 
+        <MatchmakingShowcase />
+
         <ArtifactsShowcase />
+
+        <LeaderboardShowcase />
 
         <StatsSection />
 
+        <ComparisonShowcase />
+
         <IntegrationsSection />
+
+        <AmbassadorShowcase />
 
         <SafetySection />
 

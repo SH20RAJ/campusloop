@@ -10,14 +10,11 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { fetcher } from "@/lib/api";
+
 type CommentWithAuthor = Comment & {
   author: UserProfile;
 };
-
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json() as Promise<CommentWithAuthor[]>;
-});
 
 function CommentItem({
   comment,

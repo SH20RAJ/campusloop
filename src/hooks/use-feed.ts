@@ -79,22 +79,4 @@ export function useFeed(
   };
 }
 
-export interface StoryGroupUser {
-  id: string;
-  displayName: string;
-  username: string;
-  avatarUrl: string | null;
-  stories: {
-    id: string;
-    mediaUrl: string | null;
-    text: string | null;
-    backgroundColor: string | null;
-    createdAt: string;
-    expiresAt: string;
-  }[];
-}
-
-export function useStories() {
-  const { data, error, isLoading, mutate } = useSWR<StoryGroupUser[]>("/api/stories", fetcher);
-  return { stories: data, isLoading, isError: error, mutate };
-}
+export { useStories } from "./use-stories";

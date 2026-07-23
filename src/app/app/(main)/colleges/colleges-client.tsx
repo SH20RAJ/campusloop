@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { fetcher } from "@/lib/api";
 
 interface CollegeItem {
   id: string;
@@ -61,13 +62,10 @@ export default function CollegesClient() {
         if (search.trim()) url.searchParams.set("q", search.trim());
         if (selectedState !== "ALL") url.searchParams.set("state", selectedState);
 
-        const res = await fetch(url.toString());
-        if (res.ok) {
-          const data = (await res.json()) as { colleges: CollegeItem[]; hasMore: boolean };
-          if (!ignore) {
-            setColleges(data.colleges || []);
-            setHasMore(data.hasMore || false);
-          }
+        const data = await fetcher<{ colleges: CollegeItem[]; hasMore: boolean }>(url.toString());
+        if (!ignore) {
+          setColleges(data.colleges || []);
+          setHasMore(data.hasMore || false);
         }
       } catch (err) {
         console.error("Failed to load colleges:", err);

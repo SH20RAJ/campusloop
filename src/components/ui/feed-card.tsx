@@ -25,6 +25,7 @@ import { cn, getAvatarUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { deletePost } from "@/app/app/(main)/post/actions";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
+import { voteOnPost, repostPost } from "@/lib/api";
 
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -90,17 +91,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`/api/posts/${post.id}/vote`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ value: newValue }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to cast vote");
-      }
-      
-      const data = await res.json() as { userVote: number };
+      const data = await voteOnPost(post.id, newValue);
       setUserVote(data.userVote);
     } catch (error) {
       console.error(error);
@@ -128,16 +119,7 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
     setIsReposting(true);
 
     try {
-      const res = await fetch(`/api/posts/${post.id}/repost`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          commentary: withCommentary ? quoteThoughts : undefined,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Repost failed");
-
+      await repostPost(post.id, withCommentary ? quoteThoughts : undefined);
       toast.success(withCommentary ? "Reshared with your thoughts! 🎉" : "Reposted to campus feed! 🔁");
       setShowRepostModal(false);
       setQuoteThoughts("");

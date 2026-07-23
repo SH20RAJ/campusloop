@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import useSWR from "swr";
 import { useFeed } from "@/hooks/use-feed";
+import { useColleges } from "@/hooks/use-colleges";
 import { FeedCard } from "@/components/ui/feed-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -76,15 +77,7 @@ export function DiscoverFeed() {
     setSize 
   } = useFeed("GLOBAL", feedType);
 
-  const { data: rawColleges, isLoading: collegesLoading } = useSWR<{ colleges: College[] } | College[]>(
-    "/api/colleges?limit=50",
-    fetcher
-  );
-
-  const colleges = useMemo(() => {
-    if (Array.isArray(rawColleges)) return rawColleges;
-    return rawColleges?.colleges || [];
-  }, [rawColleges]);
+  const { colleges, isLoading: collegesLoading } = useColleges(50);
 
   // Infinite scroll trigger ref and observer
   const [loadMoreRef, setLoadMoreRef] = useState<HTMLDivElement | null>(null);

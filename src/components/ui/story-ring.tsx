@@ -9,6 +9,9 @@ import { Plus, X, ChevronLeft, ChevronRight, Send, Loader2, Heart } from "lucide
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+import { fetcher } from "@/lib/api";
+import { useProfile } from "@/hooks/use-profile";
+
 interface Story {
   id: string;
   mediaUrl: string | null;
@@ -26,23 +29,10 @@ interface UserWithStories {
   stories: Story[];
 }
 
-interface MyProfile {
-  id: string;
-  displayName: string;
-  username: string;
-  avatarUrl: string | null;
-}
-
 interface StoryRingProps {
   users: UserWithStories[];
   mutateStories: () => void;
 }
-
-const fetcher = <T,>(url: string): Promise<T> =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch");
-    return res.json() as Promise<T>;
-  });
 
 const GRADIENTS = [
   { id: "purple-indigo", class: "bg-gradient-to-tr from-violet-600 to-indigo-600", label: "Classic Indigo" },
@@ -53,7 +43,7 @@ const GRADIENTS = [
 ];
 
 export function StoryRing({ users, mutateStories }: StoryRingProps) {
-  const { data: profile } = useSWR<MyProfile>("/api/profile/me", fetcher);
+  const { profile } = useProfile();
   const router = useRouter();
 
   // Compose Story state

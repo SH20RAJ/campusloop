@@ -10,11 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 
-const fetcher = <T,>(url: string): Promise<T> =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch");
-    return res.json() as Promise<T>;
-  });
+import { fetcher } from "@/lib/api";
 
 type Candidate = {
   id: string;

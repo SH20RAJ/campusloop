@@ -8,26 +8,7 @@ import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Lock, Check } from "lucid
 import Link from "next/link";
 import { toast } from "sonner";
 import { getAvatarUrl } from "@/lib/utils";
-
-const fetcher = <T,>(url: string): Promise<T> =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch");
-    return res.json() as Promise<T>;
-  });
-
-interface MyProfile {
-  id: string;
-  displayName: string;
-  username: string;
-  avatarUrl: string | null;
-  gender: string | null;
-  course: string | null;
-  branch: string | null;
-  year: number | null;
-  bio: string | null;
-  interests: string[];
-  institution?: { name: string } | null;
-}
+import { useProfile } from "@/hooks/use-profile";
 
 const INTEREST_SUGGESTIONS = [
   "Tech & Coding 💻",
@@ -44,7 +25,7 @@ const INTEREST_SUGGESTIONS = [
 
 export function EditProfileClient() {
   const router = useRouter();
-  const { data: profile, isLoading: isProfileLoading, mutate } = useSWR<MyProfile>("/api/profile/me", fetcher);
+  const { profile, isLoading: isProfileLoading, mutate } = useProfile();
 
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");

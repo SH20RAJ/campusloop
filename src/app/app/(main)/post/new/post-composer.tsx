@@ -27,16 +27,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-interface Community {
-  id: string;
-  name: string;
-}
-
-const fetcher = <T,>(url: string): Promise<T> =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch");
-    return res.json() as Promise<T>;
-  });
+import { useCommunities } from "@/hooks/use-communities";
 
 export function PostComposer({ communityId: initialCommunityId }: { communityId?: string }) {
   const router = useRouter();
@@ -51,8 +42,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const [isAnonymous, setIsAnonymous] = useState(false);
 
   // Fetch communities list for sub-hub publishing
-  const { data: communitiesData } = useSWR<Community[]>("/api/communities", fetcher);
-  const communities = Array.isArray(communitiesData) ? communitiesData : [];
+  const { communities } = useCommunities();
 
   const editor = useEditor({
     extensions: [StarterKit],

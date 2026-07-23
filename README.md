@@ -37,6 +37,17 @@ CampusLoop is the **ultimate social layer built exclusively for college students
 
 ---
 
+## 📚 Documentation & Architecture
+
+For detailed architecture guides, design system tokens, and roadmap specs, check out the [`docs/`](campusloop/docs) directory:
+
+- 🏗️ [**Architecture & AI Agent Guide**](campusloop/docs/ARCHITECTURE.md)
+- 🎨 [**Design System**](campusloop/docs/DESIGN_SYSTEM.md)
+- 🗺️ [**Roadmap & Phases**](campusloop/docs/ROADMAP_PHASES.md)
+- 📜 [**Changelog**](campusloop/docs/CHANGELOG.md)
+
+---
+
 ## 🛠️ Stack & Technologies
 
 - **Frontend**: Next.js 16 (App Router), React 19, TypeScript, Vanilla CSS + Tailwind

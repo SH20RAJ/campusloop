@@ -1,43 +1,18 @@
 "use client";
 
-import useSWR from "swr";
 import { Flame, ArrowUpRight, UserPlus, Sparkles, Trophy } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getCloutTier } from "@/lib/gamification";
-
-interface MyProfile {
-  id: string;
-  displayName: string;
-  username: string;
-  avatarUrl: string | null;
-  institution?: { name: string } | null;
-  points?: number | null;
-  referralCount?: number | null;
-  role?: string | null;
-}
-
-interface College {
-  id: string;
-  slug?: string | null;
-  name: string;
-  state: string | null;
-  district: string | null;
-}
-
-const fetcher = <T,>(url: string): Promise<T> =>
-  fetch(url).then((r) => r.json() as Promise<T>);
+import { useProfile } from "@/hooks/use-profile";
+import { useColleges } from "@/hooks/use-colleges";
 
 export function RightSidebar() {
-  const { data: profile } = useSWR<MyProfile>("/api/profile/me", fetcher);
-  const { data: collegeData } = useSWR<{ colleges: College[] } | College[]>("/api/colleges?limit=5", fetcher);
+  const { profile } = useProfile();
+  const { colleges } = useColleges(5);
 
-  const colleges = Array.isArray(collegeData)
-    ? collegeData
-    : (collegeData?.colleges || []);
-
-  const points = profile?.points || 0;
-  const referrals = profile?.referralCount || 0;
+  const points = profile?.loopPoints || 0;
+  const referrals = 0;
   const tier = getCloutTier(points);
 
   return (

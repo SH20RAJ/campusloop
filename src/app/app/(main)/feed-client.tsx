@@ -21,20 +21,8 @@ import { FeedSkeleton } from "@/components/ui/skeleton-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import useSWR from "swr";
-
-interface MyProfile {
-  id: string;
-  displayName: string;
-  username: string;
-  avatarUrl: string | null;
-  institution?: { name: string } | null;
-}
-
-const fetcher = <T,>(url: string): Promise<T> =>
-  fetch(url).then((r) => r.json() as Promise<T>);
-
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useProfile } from "@/hooks/use-profile";
 
 export function FeedClient({ forcedType }: { forcedType?: string }) {
   const router = useRouter();
@@ -103,7 +91,7 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
   } = useFeed(scope, type, sort, visibility);
   
   const { stories, mutate: mutateStories, isLoading: storiesLoading } = useStories();
-  const { data: profile } = useSWR<MyProfile>("/api/profile/me", fetcher);
+  const { profile } = useProfile();
 
   // Infinite scroll trigger ref and observer with 600px prefetch rootMargin
   const [loadMoreRef, setLoadMoreRef] = useState<HTMLDivElement | null>(null);
@@ -311,7 +299,16 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
             ))}
           </div>
         ) : (
-          <StoryRing users={stories || []} mutateStories={mutateStories} />
+          <StoryRing
+            users={(stories || []).map((s) => ({
+              id: s.user.id,
+              displayName: s.user.displayName,
+              username: s.user.username,
+              avatarUrl: s.user.avatarUrl,
+              stories: s.stories,
+            }))}
+            mutateStories={mutateStories}
+          />
         )}
       </div>
 

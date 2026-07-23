@@ -1,25 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, School, MapPin, ChevronLeft, ChevronRight, Sparkles, SlidersHorizontal, Plus, X } from "lucide-react";
-import Link from "next/link";
+import { Search, School, Sparkles, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { fetcher } from "@/lib/api";
-
-interface CollegeItem {
-  id: string;
-  slug?: string | null;
-  name: string;
-  state: string | null;
-  district: string | null;
-  website: string | null;
-  yearOfEstablishment: number | null;
-  aisheCode: string;
-}
+import { CollegeHubCard, CollegeItem } from "@/components/colleges/college-hub-card";
+import { AddCollegeModal } from "@/components/colleges/add-college-modal";
 
 const POPULAR_STATES = [
   "ALL",
@@ -35,7 +23,6 @@ const POPULAR_STATES = [
 ];
 
 export default function CollegesClient() {
-  const router = useRouter();
   const [search, setSearch] = useState("");
   const [selectedState, setSelectedState] = useState("ALL");
   const [page, setPage] = useState(1);
@@ -43,7 +30,6 @@ export default function CollegesClient() {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
 
-  // Add College Modal State
   const [showAddModal, setShowAddModal] = useState(false);
   const [newCollegeName, setNewCollegeName] = useState("");
   const [newCollegeState, setNewCollegeState] = useState("");
@@ -74,10 +60,7 @@ export default function CollegesClient() {
       }
     }
 
-    const timer = setTimeout(() => {
-      fetchColleges();
-    }, 250);
-
+    const timer = setTimeout(() => fetchColleges(), 250);
     return () => {
       ignore = true;
       clearTimeout(timer);
@@ -86,10 +69,7 @@ export default function CollegesClient() {
 
   async function handleAddCollege(e: React.FormEvent) {
     e.preventDefault();
-    if (!newCollegeName.trim()) {
-      toast.error("Please enter your college name");
-      return;
-    }
+    if (!newCollegeName.trim() || submitting) return;
 
     setSubmitting(true);
     try {
@@ -104,261 +84,111 @@ export default function CollegesClient() {
         }),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to add college");
-      }
+      if (!res.ok) throw new Error("Failed to add college");
 
-      const created = (await res.json()) as CollegeItem;
-      toast.success("College added successfully! Welcome to your new campus hub 🚀");
+      toast.success("College request submitted successfully!");
       setShowAddModal(false);
       setNewCollegeName("");
       setNewCollegeState("");
       setNewCollegeDistrict("");
       setNewCollegeWebsite("");
-
-      router.push(`/app/college/${created.slug || created.id}`);
     } catch (err) {
-      console.error(err);
-      toast.error("Error adding college. Try again.");
+      toast.error(err instanceof Error ? err.message : "Failed to add college");
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col min-h-screen pb-20 px-4 pt-6 gap-6">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
-              <School className="size-5" />
-            </span>
-            <h1 className="text-xl font-black tracking-tight text-foreground">
-              Campus Directory <span className="text-primary font-medium text-xs ml-1">(1,350+ Colleges)</span>
-            </h1>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed max-w-xl">
-            Search and explore verified higher education institutions across India. Can&apos;t find your college? Add it in 1-click!
-          </p>
+    <main className="mx-auto flex w-full max-w-4xl flex-col min-h-screen px-4 pt-4 pb-24 space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border/40">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+            <School className="size-5 text-primary" />
+            Campus Directory
+          </h1>
+          <p className="text-xs text-muted-foreground">Find & join your college hub</p>
         </div>
 
-        <button
+        <Button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary text-white h-9 px-4 text-xs font-bold shadow-sm shadow-primary/20 hover:opacity-95 transition-all cursor-pointer shrink-0 active:scale-95"
+          className="h-9 px-3 text-xs font-semibold rounded-xl bg-primary text-primary-foreground gap-1.5 cursor-pointer shadow-xs"
         >
-          <Plus className="size-4" /> Add Missing College
-        </button>
+          <Plus className="size-4" /> Request Campus Hub
+        </Button>
       </div>
 
-      {/* Search Input & State Filter Pills */}
-      <div className="space-y-3.5">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search by college name, AISHE code, city, or state..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
+      {/* Search Input */}
+      <div className="relative">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder="Search 1,350+ colleges by name, city, or state..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          className="pl-10 h-10 rounded-xl border border-border/60 bg-card text-xs focus:border-primary"
+        />
+      </div>
+
+      {/* Popular State Chips */}
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+        {POPULAR_STATES.map((st) => (
+          <button
+            key={st}
+            onClick={() => {
+              setSelectedState(st);
               setPage(1);
             }}
-            className="pl-10 h-11 text-xs rounded-xl bg-card border-border/80 shadow-sm focus-visible:ring-primary"
-          />
-        </div>
-
-        {/* State Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-          <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0 mr-1 flex items-center gap-1">
-            <SlidersHorizontal className="size-3" /> State:
-          </span>
-          {POPULAR_STATES.map((st) => (
-            <button
-              key={st}
-              onClick={() => {
-                setSelectedState(st);
-                setPage(1);
-              }}
-              className={cn(
-                "px-3 py-1 text-xs font-semibold rounded-lg border transition-all shrink-0 cursor-pointer",
-                selectedState === st
-                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                  : "bg-card text-muted-foreground border-border/60 hover:text-foreground hover:bg-muted"
-              )}
-            >
-              {st}
-            </button>
-          ))}
-        </div>
+            className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer ${
+              selectedState === st
+                ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                : "bg-card text-muted-foreground border-border/60 hover:text-foreground"
+            }`}
+          >
+            {st}
+          </button>
+        ))}
       </div>
 
-      {/* Colleges Grid */}
+      {/* College Hubs Grid */}
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-32 rounded-2xl border border-border bg-card/60 shimmer-effect" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} className="h-28 rounded-2xl bg-muted/40 animate-pulse" />
           ))}
         </div>
       ) : colleges.length > 0 ? (
-        <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {colleges.map((col) => (
-              <Link key={col.id} href={`/app/college/${col.slug || col.id}`}>
-                <div className="group h-full flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-4 hover:border-primary/50 hover:shadow-md transition-all duration-200">
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2.5">
-                      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/10 group-hover:bg-primary group-hover:text-white transition-colors">
-                        <School className="size-4" />
-                      </div>
-                      <div>
-                        <h3 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                          {col.name}
-                        </h3>
-                        <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                          <MapPin className="size-3 shrink-0" />
-                          {col.district ? `${col.district}, ` : ""}{col.state || "India"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-border/40 mt-3 flex items-center justify-between text-[10px] text-muted-foreground font-medium">
-                    <span>AISHE: {col.aisheCode}</span>
-                    {col.yearOfEstablishment && <span>Est. {col.yearOfEstablishment}</span>}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Pagination Controls */}
-          <div className="flex items-center justify-between pt-4 border-t border-border/40">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="text-xs font-bold gap-1 cursor-pointer"
-            >
-              <ChevronLeft className="size-4" /> Previous
-            </Button>
-            <span className="text-xs font-bold text-muted-foreground">
-              Page {page}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!hasMore}
-              onClick={() => setPage((p) => p + 1)}
-              className="text-xs font-bold gap-1 cursor-pointer"
-            >
-              Next <ChevronRight className="size-4" />
-            </Button>
-          </div>
-        </>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {colleges.map((col) => (
+            <CollegeHubCard key={col.id} college={col} />
+          ))}
+        </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed rounded-3xl border-border bg-card/40 p-6 space-y-3">
-          <Sparkles className="size-8 text-muted-foreground/40" />
-          <h3 className="text-sm font-bold text-foreground">No colleges found matching "{search}"</h3>
-          <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
-            Can&apos;t find your campus in our database? You can add your college right now!
-          </p>
-          <button
-            onClick={() => {
-              setNewCollegeName(search);
-              setShowAddModal(true);
-            }}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary text-white h-9 px-4 text-xs font-bold shadow-sm cursor-pointer mt-2"
-          >
-            <Plus className="size-4" /> Add "{search || "Your College"}"
-          </button>
+        <div className="text-center py-16 border border-dashed border-border rounded-2xl bg-card/50 space-y-2">
+          <School className="size-8 text-muted-foreground/60 mx-auto" />
+          <h3 className="text-sm font-semibold text-foreground">No college hubs found</h3>
+          <p className="text-xs text-muted-foreground">Try adjusting your search query or state filter.</p>
         </div>
       )}
 
       {/* Add College Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md rounded-2xl border border-border/60 bg-background p-5 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-1 border-b border-border/40">
-              <h3 className="text-sm font-bold text-foreground flex items-center gap-2 tracking-tight">
-                <School className="h-4 w-4 text-primary" /> Request New College Hub
-              </h3>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="h-7 w-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddCollege} className="space-y-3.5 text-xs">
-              <div className="space-y-1">
-                <label className="font-semibold text-muted-foreground">College / University Name *</label>
-                <Input
-                  type="text"
-                  placeholder="e.g. St. Xavier's College, Mumbai"
-                  value={newCollegeName}
-                  onChange={(e) => setNewCollegeName(e.target.value)}
-                  required
-                  className="h-9 text-xs rounded-xl border border-border/60 bg-muted/20 focus:border-primary"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2.5">
-                <div className="space-y-1">
-                  <label className="font-semibold text-muted-foreground">State</label>
-                  <Input
-                    type="text"
-                    placeholder="e.g. Maharashtra"
-                    value={newCollegeState}
-                    onChange={(e) => setNewCollegeState(e.target.value)}
-                    className="h-9 text-xs rounded-xl border border-border/60 bg-muted/20 focus:border-primary"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-semibold text-muted-foreground">District / City</label>
-                  <Input
-                    type="text"
-                    placeholder="e.g. Mumbai"
-                    value={newCollegeDistrict}
-                    onChange={(e) => setNewCollegeDistrict(e.target.value)}
-                    className="h-9 text-xs rounded-xl border border-border/60 bg-muted/20 focus:border-primary"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-muted-foreground">Website (Optional)</label>
-                <Input
-                  type="text"
-                  placeholder="e.g. xaviers.edu"
-                  value={newCollegeWebsite}
-                  onChange={(e) => setNewCollegeWebsite(e.target.value)}
-                  className="h-9 text-xs rounded-xl border border-border/60 bg-muted/20 focus:border-primary"
-                />
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowAddModal(false)}
-                  className="flex-1 text-xs font-semibold h-9 rounded-xl border border-border/60 cursor-pointer"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 text-xs font-semibold h-9 rounded-xl bg-primary text-primary-foreground cursor-pointer shadow-xs"
-                >
-                  {submitting ? "Adding..." : "Create Campus Hub"}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <AddCollegeModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        newCollegeName={newCollegeName}
+        setNewCollegeName={setNewCollegeName}
+        newCollegeState={newCollegeState}
+        setNewCollegeState={setNewCollegeState}
+        newCollegeDistrict={newCollegeDistrict}
+        setNewCollegeDistrict={setNewCollegeDistrict}
+        newCollegeWebsite={newCollegeWebsite}
+        setNewCollegeWebsite={setNewCollegeWebsite}
+        submitting={submitting}
+        onSubmit={handleAddCollege}
+      />
     </main>
   );
 }

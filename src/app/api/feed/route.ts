@@ -52,40 +52,8 @@ export async function GET(req: Request) {
       conditions.push(sql`${posts.body} ILIKE ${`%#${hashtag}%`}`);
     }
 
-    // For You score: randomize feed sequence so users discover fresh random posts on every load
-    const forYouSql = sql<number>`
-      (random() * 1000)::int
-      +
-      case when posts.institution_id = ${userInstId} then 50 else 0 end
-    `;
-
-    // Trending score: votes + comments
-    const trendingSql = sql<number>`
-      coalesce((select sum(value)::int from votes where post_id = posts.id), 0)
-      +
-      coalesce((select count(*)::int from comments where post_id = posts.id and status = 'PUBLISHED'), 0)
-    `;
-
-    // Top Voted score
-    const votesCountSql = sql<number>`
-      coalesce((select sum(value)::int from votes where post_id = posts.id), 0)
-    `;
-
-    // Most Discussed score
-    const commentsCountSql = sql<number>`
-      coalesce((select count(*)::int from comments where post_id = posts.id and status = 'PUBLISHED'), 0)
-    `;
-
-    let orderClauses = [desc(forYouSql), desc(posts.createdAt)];
-    if (sort === "latest") {
-      orderClauses = [desc(posts.createdAt)];
-    } else if (sort === "trending") {
-      orderClauses = [desc(trendingSql), desc(posts.createdAt)];
-    } else if (sort === "top_voted") {
-      orderClauses = [desc(votesCountSql), desc(posts.createdAt)];
-    } else if (sort === "most_discussed") {
-      orderClauses = [desc(commentsCountSql), desc(posts.createdAt)];
-    }
+    // Order clause safe for Drizzle Relational Query Builder
+    let orderClauses = [desc(posts.createdAt)];
 
     let rawFeed = await db.query.posts.findMany({
       where: and(...conditions),
@@ -115,45 +83,52 @@ export async function GET(req: Request) {
       const existingIds = new Set(rawFeed.map((p) => p.id));
       const needed = limit - rawFeed.length;
       
-      const extraFeed = await db.query.posts.findMany({
-        where: and(...conditions),
-        orderBy: [sql`random()`],
-        limit: needed * 3,
-        with: {
-          author: true,
-          institution: true,
-          community: true,
-          repostOf: {
-            with: {
-              author: true,
-              institution: true,
+      try {
+        const extraFeed = await db.query.posts.findMany({
+          where: and(...conditions),
+          orderBy: [desc(posts.createdAt)],
+          limit: needed * 3,
+          with: {
+            author: true,
+            institution: true,
+            community: true,
+            repostOf: {
+              with: {
+                author: true,
+                institution: true,
+              },
+            },
+            votes: true,
+            comments: true,
+            pollOptions: {
+              with: { votes: true },
             },
           },
-          votes: true,
-          comments: true,
-          pollOptions: {
-            with: { votes: true },
-          },
-        },
-      });
+        });
 
-      for (const extra of extraFeed) {
-        if (!existingIds.has(extra.id) && rawFeed.length < limit) {
-          rawFeed.push(extra);
-          existingIds.add(extra.id);
+        for (const extra of extraFeed) {
+          if (!existingIds.has(extra.id) && rawFeed.length < limit) {
+            rawFeed.push(extra);
+            existingIds.add(extra.id);
+          }
         }
+      } catch (e) {
+        console.error("Backfill query error:", e);
       }
     }
 
     const feed = rawFeed.map(post => {
-      const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
-      const commentsCount = post.comments.length;
-      const userVoteObj = post.votes.find(v => v.userId === profile.id);
+      const votesList = post.votes || [];
+      const commentsList = post.comments || [];
+      const votesCount = votesList.reduce((acc, vote) => acc + (vote?.value || 0), 0);
+      const commentsCount = commentsList.length;
+      const userVoteObj = votesList.find(v => v?.userId === profile.id);
       const userVote = userVoteObj ? userVoteObj.value : 0;
 
       const formattedPollOptions = post.pollOptions?.map(opt => {
-        const optVotesCount = opt.votes.length;
-        const userVoted = opt.votes.some(v => v.userId === profile.id);
+        const optVotesList = opt.votes || [];
+        const optVotesCount = optVotesList.length;
+        const userVoted = optVotesList.some(v => v?.userId === profile.id);
         return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
       });
 

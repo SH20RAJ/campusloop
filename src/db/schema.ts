@@ -357,6 +357,9 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 		references: [posts.id],
 		relationName: "post_reposts",
 	}),
+	reposts: many(posts, {
+		relationName: "post_reposts",
+	}),
 }));
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { desc, eq, and, sql, SQL } from "drizzle-orm";
+import { desc, eq, and, sql, SQL, inArray } from "drizzle-orm";
 import { posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 
@@ -33,8 +33,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
 
-    const userInstId = profile.institutionId || "";
-
     // Build conditions
     const conditions: SQL[] = [eq(posts.status, "PUBLISHED")];
     if (scope === "CAMPUS" && profile.institutionId) {
@@ -64,12 +62,6 @@ export async function GET(req: Request) {
         author: true,
         institution: true,
         community: true,
-        repostOf: {
-          with: {
-            author: true,
-            institution: true,
-          },
-        },
         votes: true,
         comments: true,
         pollOptions: {
@@ -92,12 +84,6 @@ export async function GET(req: Request) {
             author: true,
             institution: true,
             community: true,
-            repostOf: {
-              with: {
-                author: true,
-                institution: true,
-              },
-            },
             votes: true,
             comments: true,
             pollOptions: {
@@ -114,6 +100,29 @@ export async function GET(req: Request) {
         }
       } catch (e) {
         console.error("Backfill query error:", e);
+      }
+    }
+
+    // Safely batch-resolve repostOf original posts
+    const repostOfIds = Array.from(
+      new Set(rawFeed.map((p) => p.repostOfId).filter((id): id is string => Boolean(id)))
+    );
+
+    const repostedPostsMap = new Map<string, any>();
+    if (repostOfIds.length > 0) {
+      try {
+        const repostedPosts = await db.query.posts.findMany({
+          where: inArray(posts.id, repostOfIds),
+          with: {
+            author: true,
+            institution: true,
+          },
+        });
+        for (const p of repostedPosts) {
+          repostedPostsMap.set(p.id, p);
+        }
+      } catch (e) {
+        console.error("Error fetching reposted posts:", e);
       }
     }
 
@@ -134,9 +143,11 @@ export async function GET(req: Request) {
 
       const hasVotedPoll = formattedPollOptions?.some(opt => opt.userVoted) || false;
       const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
+      const repostOf = post.repostOfId ? repostedPostsMap.get(post.repostOfId) || null : null;
 
       return {
         ...post,
+        repostOf,
         votesCount,
         commentsCount,
         userVote,

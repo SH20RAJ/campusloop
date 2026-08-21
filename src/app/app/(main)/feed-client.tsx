@@ -10,26 +10,20 @@ import {
   InlineHashtagsWidget,
   InlineReferralWidget,
 } from "@/components/ui/inline-feed-widgets";
-import {
-  Sparkles,
-  Plus,
-  Globe,
-  School,
-  ListFilter,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useProfile } from "@/hooks/use-profile";
+import { FeedHeader } from "@/components/feed/feed-header";
+import { FeedCaughtUpCard, FeedEmptyState, FeedErrorState } from "@/components/feed/feed-state-cards";
 
 export function FeedClient({ forcedType }: { forcedType?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [showFilters, setShowFilters] = useState(false);
-  
+
   // Dashboard state synced with URL
   const initialScope = (searchParams.get("scope") as "CAMPUS" | "GLOBAL") || "GLOBAL";
   const [scope, setScopeState] = useState<"CAMPUS" | "GLOBAL">(initialScope);
@@ -81,15 +75,17 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
-  const { 
-    feed, 
-    isLoading: feedLoading, 
-    isLoadingMore, 
-    isReachingEnd, 
-    size, 
-    setSize 
+  const {
+    feed,
+    isLoading: feedLoading,
+    isLoadingMore,
+    isReachingEnd,
+    isError,
+    size,
+    setSize,
+    mutate,
   } = useFeed(scope, type, sort, visibility);
-  
+
   const { stories, mutate: mutateStories, isLoading: storiesLoading } = useStories();
   const { profile } = useProfile();
 
@@ -97,7 +93,7 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
   const [loadMoreRef, setLoadMoreRef] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!loadMoreRef || isReachingEnd || isLoadingMore) return;
+    if (!loadMoreRef || isReachingEnd || isLoadingMore || isError) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -110,182 +106,21 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
 
     observer.observe(loadMoreRef);
     return () => observer.disconnect();
-  }, [loadMoreRef, isReachingEnd, isLoadingMore, setSize]);
-
-  const activeFiltersCount = 
-    (scope !== "GLOBAL" ? 1 : 0) + 
-    (type !== "ALL" ? 1 : 0) + 
-    (sort !== "for_you" ? 1 : 0) + 
-    (visibility !== "all" ? 1 : 0);
-
-  const resetFilters = () => {
-    handleScopeChange("GLOBAL");
-    handleTypeChange("ALL");
-    handleSortChange("for_you");
-    setVisibility("all");
-  };
+  }, [loadMoreRef, isReachingEnd, isLoadingMore, isError, setSize]);
 
   return (
     <main className="mx-auto flex w-full flex-col min-h-screen max-w-2xl bg-background text-foreground pb-20">
-      {/* ─── Premium Header ─── */}
-      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/40 px-4 py-4 flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-black tracking-tight text-foreground">
-              Campus <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Pulse</span>
-            </span>
-          </div>
-
-          {/* Scope selection pill */}
-          <div className="flex rounded-full bg-muted/65 p-0.5 border border-border/40 shadow-sm text-[10px] font-bold">
-            <button
-              onClick={() => handleScopeChange("CAMPUS")}
-              className={cn(
-                "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
-                scope === "CAMPUS" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-              )}
-            >
-              <School className="h-3 w-3" />
-              {profile?.institution?.slug || profile?.institution?.name?.split(",")[0] || "My College"}
-            </button>
-            <button
-              onClick={() => handleScopeChange("GLOBAL")}
-              className={cn(
-                "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
-                scope === "GLOBAL" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-              )}
-            >
-              <Globe className="h-3 w-3" />
-              Global
-            </button>
-          </div>
-        </div>
-
-        {/* Minimal Sub-navigation/Filters bar */}
-        <div className="flex items-center justify-between border-t border-border/10 pt-2.5 overflow-x-auto no-scrollbar">
-          {/* Sort links */}
-          <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground shrink-0">
-            {[
-              { id: "for_you", label: "🔥 For You" },
-              { id: "latest", label: "Latest" },
-              { id: "trending", label: "Trending" },
-              { id: "top_voted", label: "Top Voted" },
-              { id: "most_discussed", label: "Discussed" },
-            ].map((s) => (
-              <button
-                key={s.id}
-                onClick={() => handleSortChange(s.id)}
-                className={cn(
-                  "hover:text-foreground transition-colors cursor-pointer relative py-0.5 shrink-0",
-                  sort === s.id && "text-foreground font-bold"
-                )}
-              >
-                {s.label}
-                {sort === s.id && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary animate-in fade-in" />
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* Toggle filter drawer button */}
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={cn(
-              "flex h-7 items-center gap-1 rounded-xl px-2 text-[10px] font-bold border transition-all cursor-pointer",
-              showFilters || activeFiltersCount > 1 // scope & sort active by default
-                ? "border-primary/30 bg-primary/5 text-primary"
-                : "border-transparent text-muted-foreground hover:bg-muted/50"
-            )}
-          >
-            <ListFilter className="h-3 w-3" />
-            <span>Identity/Filter</span>
-          </button>
-        </div>
-
-        {/* Advanced Filters Dropdown */}
-        <div
-          className={cn(
-            "overflow-hidden transition-all duration-300 ease-in-out border-t border-transparent bg-muted/10 rounded-2xl",
-            showFilters ? "max-h-[160px] border-border/30 pb-3.5 pt-3 px-3.5 mt-2" : "max-h-0 pb-0 pt-0"
-          )}
-        >
-          <div className="grid grid-cols-2 gap-4">
-            {/* Identity filter */}
-            <div className="space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Show Posts By</span>
-              <div className="flex rounded-lg bg-muted/65 p-0.5 border border-border/40 text-[9px] font-bold">
-                <button
-                  onClick={() => setVisibility("all")}
-                  className={cn(
-                    "flex-1 py-1 rounded-md transition-all cursor-pointer",
-                    visibility === "all" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                  )}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setVisibility("anonymous")}
-                  className={cn(
-                    "flex-1 py-1 rounded-md transition-all cursor-pointer",
-                    visibility === "anonymous" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                  )}
-                >
-                  Anonymous
-                </button>
-                <button
-                  onClick={() => setVisibility("public")}
-                  className={cn(
-                    "flex-1 py-1 rounded-md transition-all cursor-pointer",
-                    visibility === "public" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                  )}
-                >
-                  Public
-                </button>
-              </div>
-            </div>
-
-            {/* Category selection */}
-            <div className="space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Category</span>
-              <div className="flex rounded-lg bg-muted/65 p-0.5 border border-border/40 text-[9px] font-bold">
-                <button
-                  onClick={() => handleTypeChange("ALL")}
-                  className={cn(
-                    "flex-1 py-1 rounded-md transition-all cursor-pointer",
-                    type === "ALL" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                  )}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => handleTypeChange("CONFESSION")}
-                  className={cn(
-                    "flex-1 py-1 rounded-md transition-all cursor-pointer",
-                    type === "CONFESSION" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                  )}
-                >
-                  Confess
-                </button>
-                <button
-                  onClick={() => handleTypeChange("POLL")}
-                  className={cn(
-                    "flex-1 py-1 rounded-md transition-all cursor-pointer",
-                    type === "POLL" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                  )}
-                >
-                  Polls
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end pt-3 text-[10px] font-bold">
-            <button onClick={resetFilters} className="text-primary hover:underline cursor-pointer">
-              Reset Filters
-            </button>
-          </div>
-        </div>
-      </header>
+      <FeedHeader
+        scope={scope}
+        onScopeChange={handleScopeChange}
+        sort={sort}
+        onSortChange={handleSortChange}
+        type={type}
+        onTypeChange={handleTypeChange}
+        visibility={visibility}
+        onVisibilityChange={setVisibility}
+        institutionSlug={profile?.institution?.slug}
+      />
 
       {/* ─── Story Ring ─── */}
       <div className="w-full">
@@ -336,6 +171,8 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
       <div className="flex flex-col px-4 pt-4 gap-4.5">
         {feedLoading && size === 1 ? (
           <FeedSkeleton />
+        ) : isError ? (
+          <FeedErrorState onRetry={() => mutate()} />
         ) : feed && feed.length > 0 ? (
           <>
             {feed.map((post, idx) => (
@@ -347,57 +184,21 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
                 {idx === 14 && <InlineReferralWidget />}
               </div>
             ))}
-            
+
             {/* Load more trigger anchor */}
             {!isReachingEnd && (
-              <div 
-                ref={setLoadMoreRef} 
+              <div
+                ref={setLoadMoreRef}
                 className="flex items-center justify-center py-8 text-xs font-bold text-muted-foreground/80"
               >
                 <span className="animate-pulse">Loading more posts...</span>
               </div>
             )}
 
-            {isReachingEnd && (
-              <div className="space-y-4 pt-4 pb-10">
-                <div className="rounded-2xl border border-border/70 bg-card p-5 text-center space-y-3 shadow-sm">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mx-auto">
-                    <Sparkles className="size-5" />
-                  </div>
-                  <h4 className="text-xs font-bold text-foreground">You&apos;ve caught up on all posts! 🎉</h4>
-                  <p className="text-[11px] text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                    Want more campus activity? Explore 1,350+ Indian colleges or swipe on student dating profiles.
-                  </p>
-                  <div className="flex items-center justify-center gap-2 pt-1">
-                    <Link
-                      href="/colleges"
-                      className="px-3.5 py-1.5 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
-                    >
-                      Campus Directory
-                    </Link>
-                    <Link
-                      href="/app/dating"
-                      className="px-3.5 py-1.5 rounded-xl border border-pink-500/30 bg-pink-500/10 text-pink-500 text-xs font-bold hover:bg-pink-500/20 transition-colors"
-                    >
-                      Dating Matches
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
+            {isReachingEnd && <FeedCaughtUpCard />}
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center glass-card-dark rounded-3xl p-6 border border-border/40 my-4 mx-2">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 mb-4">
-              <Sparkles className="h-6 w-6 text-muted-foreground/50" />
-            </div>
-            <h3 className="font-semibold text-foreground text-sm">
-              Your feed is quiet
-            </h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-xs px-4 leading-relaxed">
-              No posts matched your active filter settings. Try resetting filters or post something yourself!
-            </p>
-          </div>
+          <FeedEmptyState />
         )}
       </div>
     </main>

@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, or, sql, type SQL } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { comments, institutions, posts, reports, userProfiles, votes } from "@/db/schema";
@@ -159,6 +159,153 @@ export async function getVisibleProfilePosts(profileId: string) {
 		.where(and(published, eq(posts.authorId, profileId), eq(posts.isAnonymous, false)))
 		.orderBy(desc(posts.createdAt))
 		.limit(30);
+}
+
+// ─── API Feed Sort Engine (used by /api/feed) ───
+
+export type ApiFeedSort = "for_you" | "latest" | "trending" | "top_voted" | "most_discussed";
+
+const recentVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id} and ${votes.createdAt} > now() - interval '7 days'), 0)`;
+const recentCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED' and ${comments.createdAt} > now() - interval '7 days'), 0)`;
+const hoursSinceSql = sql<number>`(extract(epoch from (now() - ${posts.createdAt})) / 3600.0)`;
+const forYouScoreSql = sql<number>`((${voteScoreSql} * 3 + ${commentCountSql} * 2 + 1) / power(${hoursSinceSql} + 2, 1.5))`;
+const trendingScoreSql = sql<number>`(${recentVoteScoreSql} * 3 + ${recentCommentCountSql} * 2)`;
+
+export function normalizeApiFeedSort(value?: string | null): ApiFeedSort {
+	if (
+		value === "for_you" ||
+		value === "latest" ||
+		value === "trending" ||
+		value === "top_voted" ||
+		value === "most_discussed"
+	) {
+		return value;
+	}
+	return "latest";
+}
+
+export function getFeedOrderBy(sort: ApiFeedSort) {
+	switch (sort) {
+		case "top_voted":
+			return [desc(voteScoreSql), desc(posts.createdAt), asc(posts.id)];
+		case "most_discussed":
+			return [desc(commentCountSql), desc(posts.createdAt), asc(posts.id)];
+		case "trending":
+			return [desc(trendingScoreSql), desc(posts.createdAt), asc(posts.id)];
+		case "for_you":
+			return [desc(forYouScoreSql), asc(posts.id)];
+		default:
+			return [desc(posts.createdAt), asc(posts.id)];
+	}
+}
+
+type HydratedFeedPost = Awaited<ReturnType<typeof resolveFeedPage>>[number];
+
+/**
+ * Two-phase feed resolution: select the page's post IDs with full SQL
+ * ordering flexibility (aggregates, time decay), then hydrate relations
+ * via the relational query builder and restore order in JS.
+ */
+export async function resolveFeedPage(options: {
+	conditions: SQL[];
+	sort: ApiFeedSort;
+	limit: number;
+	offset: number;
+}) {
+	const db = getDb();
+
+	const idRows = await db
+		.select({ id: posts.id })
+		.from(posts)
+		.where(and(...options.conditions))
+		.orderBy(...getFeedOrderBy(options.sort))
+		.limit(options.limit)
+		.offset(options.offset);
+
+	const ids = idRows.map((row) => row.id);
+	if (ids.length === 0) return [];
+
+	const hydrated = await db.query.posts.findMany({
+		where: inArray(posts.id, ids),
+		with: {
+			author: true,
+			institution: true,
+			community: true,
+			votes: true,
+			comments: true,
+			pollOptions: {
+				with: { votes: true },
+			},
+		},
+	});
+
+	const byId = new Map(hydrated.map((post) => [post.id, post]));
+	return ids
+		.map((postId) => byId.get(postId))
+		.filter((post): post is NonNullable<typeof post> => Boolean(post));
+}
+
+/**
+ * Batch-resolve repost originals and format hydrated posts into the
+ * JSON contract consumed by the client feed hooks.
+ */
+export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProfileId: string) {
+	const db = getDb();
+
+	const repostOfIds = Array.from(
+		new Set(rawFeed.map((p) => p.repostOfId).filter((id): id is string => Boolean(id)))
+	);
+
+	const repostedPostsMap = new Map<string, HydratedFeedPost>();
+	if (repostOfIds.length > 0) {
+		try {
+			const repostedPosts = await db.query.posts.findMany({
+				where: inArray(posts.id, repostOfIds),
+				with: {
+					author: true,
+					institution: true,
+				},
+			});
+			for (const p of repostedPosts) {
+				repostedPostsMap.set(p.id, p as HydratedFeedPost);
+			}
+		} catch (e) {
+			console.error("Error fetching reposted posts:", e);
+		}
+	}
+
+	return rawFeed.map((post) => {
+		const votesList = post.votes || [];
+		const commentsList = post.comments || [];
+		const votesCount = votesList.reduce((acc, vote) => acc + (vote?.value || 0), 0);
+		const commentsCount = commentsList.length;
+		const userVoteObj = votesList.find((v) => v?.userId === viewerProfileId);
+		const userVote = userVoteObj ? userVoteObj.value : 0;
+
+		const formattedPollOptions = post.pollOptions?.map((opt) => {
+			const optVotesList = opt.votes || [];
+			const optVotesCount = optVotesList.length;
+			const userVoted = optVotesList.some((v) => v?.userId === viewerProfileId);
+			return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
+		});
+
+		const hasVotedPoll = formattedPollOptions?.some((opt) => opt.userVoted) || false;
+		const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
+		const repostOf = post.repostOfId ? repostedPostsMap.get(post.repostOfId) || null : null;
+
+		return {
+			...post,
+			repostOf,
+			votesCount,
+			commentsCount,
+			userVote,
+			pollOptions: formattedPollOptions,
+			hasVotedPoll,
+			totalPollVotes,
+			votes: undefined,
+			comments: undefined,
+		};
+	});
 }
 
 export function sortFeedPosts<T extends { 

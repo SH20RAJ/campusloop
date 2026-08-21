@@ -146,7 +146,7 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
               )}
             >
               <School className="h-3 w-3" />
-              {profile?.institution?.name?.split(",")[0] || "My College"}
+              {profile?.institution?.slug || profile?.institution?.name?.split(",")[0] || "My College"}
             </button>
             <button
               onClick={() => handleScopeChange("GLOBAL")}

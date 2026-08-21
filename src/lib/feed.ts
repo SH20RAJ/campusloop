@@ -160,3 +160,50 @@ export async function getVisibleProfilePosts(profileId: string) {
 		.orderBy(desc(posts.createdAt))
 		.limit(30);
 }
+
+export function sortFeedPosts<T extends { 
+	createdAt: Date | string; 
+	votesCount: number; 
+	commentsCount: number; 
+	institutionId: string;
+}>(items: T[], sort: string | null, userInstitutionId?: string): T[] {
+	const sorted = [...items];
+
+	switch (sort) {
+		case "latest":
+			return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+		case "trending":
+			return sorted.sort((a, b) => {
+				const scoreA = a.votesCount + a.commentsCount * 2;
+				const scoreB = b.votesCount + b.commentsCount * 2;
+				if (scoreB !== scoreA) return scoreB - scoreA;
+				return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+			});
+
+		case "top_voted":
+			return sorted.sort((a, b) => {
+				if (b.votesCount !== a.votesCount) return b.votesCount - a.votesCount;
+				return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+			});
+
+		case "most_discussed":
+		case "discussed":
+			return sorted.sort((a, b) => {
+				if (b.commentsCount !== a.commentsCount) return b.commentsCount - a.commentsCount;
+				return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+			});
+
+		case "for_you":
+		default:
+			return sorted.sort((a, b) => {
+				const campusBonusA = userInstitutionId && a.institutionId === userInstitutionId ? 500 : 0;
+				const campusBonusB = userInstitutionId && b.institutionId === userInstitutionId ? 500 : 0;
+				const scoreA = campusBonusA + a.votesCount * 2 + a.commentsCount * 3;
+				const scoreB = campusBonusB + b.votesCount * 2 + b.commentsCount * 3;
+				if (scoreB !== scoreA) return scoreB - scoreA;
+				return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+			});
+	}
+}
+

@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { desc, eq, and, sql, SQL, inArray } from "drizzle-orm";
 import { posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { sortFeedPosts } from "@/lib/feed";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const scope = searchParams.get("scope") as "CAMPUS" | "GLOBAL" | null;
     const type = searchParams.get("type") as string | null;
-    const sort = searchParams.get("sort") as "latest" | "trending" | "top_voted" | "most_discussed" | null;
+    const sort = searchParams.get("sort") as "latest" | "trending" | "top_voted" | "most_discussed" | "discussed" | "for_you" | null;
     const visibility = searchParams.get("visibility") as "all" | "anonymous" | "public" | null;
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 12;
@@ -126,7 +127,7 @@ export async function GET(req: Request) {
       }
     }
 
-    const feed = rawFeed.map(post => {
+    const formattedFeed = rawFeed.map(post => {
       const votesList = post.votes || [];
       const commentsList = post.comments || [];
       const votesCount = votesList.reduce((acc, vote) => acc + (vote?.value || 0), 0);
@@ -159,9 +160,12 @@ export async function GET(req: Request) {
       };
     });
 
+    const feed = sortFeedPosts(formattedFeed, sort, profile.institutionId || undefined);
+
     return NextResponse.json(feed);
   } catch (error) {
     console.error("Error fetching feed:", error);
     return NextResponse.json({ error: "Failed to fetch feed" }, { status: 500 });
   }
 }
+

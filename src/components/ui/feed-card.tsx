@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Heart, Repeat2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,6 +22,7 @@ interface FeedCardProps {
 }
 
 export function FeedCard({ post, currentUserId }: FeedCardProps) {
+  const router = useRouter();
   const [userVote, setUserVote] = useState(post.userVote);
   const [votesCount, setVotesCount] = useState(post.votesCount);
   const [isLoading, setIsLoading] = useState(false);
@@ -136,15 +138,14 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
       />
 
       {/* Content Body */}
-      <div 
+      <div
         className="px-5 py-1 cursor-pointer select-none"
+        onClick={() => router.push(`/app/post/${post.id}`)}
         onDoubleClick={handleDoubleTap}
       >
-        <Link href={`/app/post/${post.id}`}>
-          <p className="text-sm md:text-base leading-relaxed text-foreground whitespace-pre-wrap">
-            {renderPostBody(post.body)}
-          </p>
-        </Link>
+        <p className="text-sm md:text-base leading-relaxed text-foreground whitespace-pre-wrap">
+          {renderPostBody(post.body)}
+        </p>
 
         {/* Embedded Original Quoted Post */}
         {post.repostOf && (

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MoreHorizontal, Lock, BarChart3, HelpCircle, Repeat2, Link2, Flag, Trash2 } from "lucide-react";
-import { cn, getAvatarUrl } from "@/lib/utils";
+import { cn, getAvatarUrl, formatTimeAgo } from "@/lib/utils";
 import { toast } from "sonner";
 import { deletePost } from "@/app/app/(main)/post/actions";
 import { FeedPost } from "@/hooks/use-feed";
@@ -74,6 +74,7 @@ export function FeedCardHeader({
               `@${authorHandle}`
             )}
             {" "}• <Link href={`/app/college/${post.institution?.slug || post.institutionId}`} className="hover:text-primary transition-colors hover:underline">{post.institution.name}</Link>
+            <span className="text-muted-foreground/60 text-[10px]">• {formatTimeAgo(post.createdAt)}</span>
             {post.isEdited && <span className="text-[10px] text-muted-foreground/70 ml-1 font-normal">(edited)</span>}
           </span>
         </div>

@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CornerDownRight, Reply } from "lucide-react";
 import Link from "next/link";
 import { Comment, UserProfile } from "@/db/schema";
-import { getAvatarUrl } from "@/lib/utils";
+import { getAvatarUrl, formatTimeAgo } from "@/lib/utils";
 
 export type CommentWithAuthor = Comment & {
   author: UserProfile;
@@ -77,6 +77,7 @@ export function CommentItem({
               <span className="font-bold text-foreground truncate">{displayName}</span>
             )}
             <span className="text-muted-foreground/60 text-[10px]">@{handle}</span>
+            <span className="text-muted-foreground/50 text-[10px]">• {formatTimeAgo(comment.createdAt)}</span>
           </div>
 
           {depth < 3 && (

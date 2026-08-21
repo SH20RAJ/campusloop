@@ -26,6 +26,8 @@ const fetcher = <T,>(url: string): Promise<T> =>
     return res.json() as Promise<T>;
   });
 
+const PAGE_LIMIT = 20;
+
 export function useFeed(
   scope: "CAMPUS" | "GLOBAL" = "CAMPUS",
   type?: string,
@@ -34,7 +36,7 @@ export function useFeed(
   hashtag?: string,
 ) {
   const getKey = (pageIndex: number, previousPageData: FeedPost[] | null) => {
-    if (previousPageData && !previousPageData.length) return null;
+    if (previousPageData && previousPageData.length < PAGE_LIMIT) return null;
 
     const url = new URL("/api/feed", typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
     url.searchParams.set("scope", scope);
@@ -43,7 +45,7 @@ export function useFeed(
     if (visibility && visibility !== "all") url.searchParams.set("visibility", visibility);
     if (hashtag) url.searchParams.set("hashtag", hashtag);
     url.searchParams.set("page", String(pageIndex + 1));
-    url.searchParams.set("limit", "20");
+    url.searchParams.set("limit", String(PAGE_LIMIT));
 
     return url.toString();
   };
@@ -64,8 +66,10 @@ export function useFeed(
   const feed = rawFeed
     ? Array.from(new Map(rawFeed.map((post) => [post.id, post])).values())
     : undefined;
-  const isReachingEnd = Boolean(data && data[data.length - 1]?.length === 0);
-  const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+  const isReachingEnd = Boolean(
+    data && (data.length === 0 || (data[data.length - 1] && data[data.length - 1].length < PAGE_LIMIT))
+  );
+  const isLoadingMore = Boolean(isLoading || (size > 0 && data && typeof data[size - 1] === "undefined"));
 
   return {
     feed,

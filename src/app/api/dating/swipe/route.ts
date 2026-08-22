@@ -27,21 +27,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
 
-    const { targetId, direction } = (await req.json()) as { 
-      targetId: string; 
-      direction: "LIKE" | "PASS"; 
+    const body = (await req.json()) as { 
+      targetId?: string; 
+      targetUserId?: string; 
+      direction?: "LIKE" | "PASS"; 
+      action?: "like" | "pass"; 
     };
 
-    if (!targetId || !direction) {
-      return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
+    const targetId = body.targetId || body.targetUserId;
+    const rawDir = body.direction || (body.action ? body.action.toUpperCase() : undefined);
+    const direction = rawDir === "LIKE" ? "LIKE" : "PASS";
+
+    if (!targetId) {
+      return NextResponse.json({ error: "Missing targetId parameter" }, { status: 400 });
     }
 
-    // Insert swipe choice
+    // Upsert swipe choice to prevent duplicate key errors
     await db.insert(swipes).values({
       swiperId: profile.id,
       targetId,
       direction,
-    });
+    }).onConflictDoNothing();
 
     // Check if it's a mutual LIKE
     if (direction === "LIKE") {
@@ -83,7 +89,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ 
           matched: true, 
           conversationId: newConv.id,
-          matchedUser
+          matchedUser: matchedUser ? {
+            displayName: matchedUser.displayName,
+            avatarUrl: matchedUser.avatarUrl,
+          } : null
         });
       }
     }
@@ -91,6 +100,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ matched: false });
   } catch (error) {
     console.error("Error logging dating swipe:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+/** Reset all swipes for current user so they can start fresh */
+export async function DELETE() {
+  try {
+    const user = await hexclaveServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const db = getDb();
+    const profile = await db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, user.id),
+    });
+
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
+    }
+
+    await db.delete(swipes).where(eq(swipes.swiperId, profile.id));
+
+    return NextResponse.json({ success: true, message: "Swipes reset successfully" });
+  } catch (error) {
+    console.error("Error resetting swipes:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

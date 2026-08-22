@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, X, MessageCircle, School, ShieldCheck } from "lucide-react";
+import { Heart, X, MessageCircle, School, ShieldCheck, Sparkles, MapPin } from "lucide-react";
 import Link from "next/link";
 import { getAvatarUrl } from "@/lib/utils";
 
@@ -12,7 +12,10 @@ export type Candidate = {
   username: string;
   avatarUrl: string | null;
   bio: string | null;
-  institution?: { name: string } | null;
+  gender?: string | null;
+  points?: number;
+  compatibilityScore?: number;
+  institution?: { name: string; slug?: string; state?: string | null } | null;
 };
 
 interface DatingCardStackProps {
@@ -27,6 +30,7 @@ export function DatingCardStack({ candidate, onSwipe }: DatingCardStackProps) {
 
   const avatarUrl = getAvatarUrl(candidate.avatarUrl, candidate.username);
   const avatarFallback = candidate.displayName[0]?.toUpperCase() || "S";
+  const matchScore = candidate.compatibilityScore || 85;
 
   return (
     <div className="relative w-full max-w-sm aspect-[3/4] mx-auto select-none">
@@ -35,66 +39,85 @@ export function DatingCardStack({ candidate, onSwipe }: DatingCardStackProps) {
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         onDragEnd={(_, info) => {
-          if (info.offset.x > 100) onSwipe("like");
-          else if (info.offset.x < -100) onSwipe("pass");
+          if (info.offset.x > 90) onSwipe("like");
+          else if (info.offset.x < -90) onSwipe("pass");
         }}
-        className="w-full h-full rounded-3xl border border-border/80 bg-gradient-to-b from-card to-background p-6 shadow-2xl flex flex-col justify-between cursor-grab active:cursor-grabbing relative overflow-hidden"
+        className="w-full h-full rounded-3xl border border-border/80 bg-gradient-to-b from-card via-card to-muted/30 p-6 shadow-2xl flex flex-col justify-between cursor-grab active:cursor-grabbing relative overflow-hidden backdrop-blur-xl"
       >
-        {/* Card Header Profile Info */}
-        <div className="flex items-center gap-3 relative z-10">
-          <Avatar className="h-14 w-14 border-2 border-primary/20 shadow-md">
-            <AvatarImage src={avatarUrl || ""} />
-            <AvatarFallback className="text-lg font-bold bg-primary/10 text-primary">
-              {avatarFallback}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0">
-            <h3 className="text-lg font-bold text-foreground flex items-center gap-1.5 truncate">
-              {candidate.displayName}
-              <ShieldCheck className="h-4 w-4 text-blue-500 shrink-0" />
-            </h3>
-            <p className="text-xs text-muted-foreground truncate">@{candidate.username}</p>
-          </div>
+        {/* Top Badges: Compatibility Score & Verified Badge */}
+        <div className="flex items-center justify-between relative z-10">
+          <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-[11px] font-black text-rose-500 shadow-xs">
+            <Sparkles className="size-3" /> {matchScore}% Vibe Match
+          </span>
+
+          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-500">
+            <ShieldCheck className="size-3" /> Verified Student
+          </span>
         </div>
 
-        {/* Institution Badge & Bio */}
-        <div className="space-y-3 relative z-10 my-auto">
+        {/* Profile Info & Avatar */}
+        <div className="flex flex-col items-center text-center space-y-3 relative z-10 my-auto">
+          <div className="relative">
+            <Avatar className="size-24 border-4 border-background shadow-xl">
+              <AvatarImage src={avatarUrl || ""} />
+              <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary">
+                {avatarFallback}
+              </AvatarFallback>
+            </Avatar>
+            {candidate.points && candidate.points >= 200 && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-amber-500 text-[9px] font-black text-black px-2 py-0.5 shadow-sm whitespace-nowrap">
+                🔥 {candidate.points} LP
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <h3 className="text-xl font-black tracking-tight text-foreground flex items-center justify-center gap-1.5">
+              <span>{candidate.displayName}</span>
+            </h3>
+            <p className="text-xs text-muted-foreground font-semibold">@{candidate.username}</p>
+          </div>
+
+          {/* Institution Badge */}
           {candidate.institution?.name && (
-            <div className="flex items-center gap-1.5 text-xs text-primary font-semibold bg-primary/10 px-3 py-1.5 rounded-full w-fit border border-primary/20">
-              <School className="h-3.5 w-3.5" />
-              <span className="truncate">{candidate.institution.name}</span>
+            <div className="inline-flex items-center gap-1.5 text-xs text-primary font-bold bg-primary/10 px-3.5 py-1.5 rounded-full max-w-[260px] border border-primary/20 shadow-xs">
+              <School className="size-3.5 shrink-0" />
+              <span className="truncate">{candidate.institution.name.split(",")[0]}</span>
             </div>
           )}
 
-          <p className="text-sm leading-relaxed text-foreground/90 font-medium italic bg-muted/20 p-4 rounded-2xl border border-border/40">
+          {/* Bio Callout */}
+          <div className="w-full rounded-2xl border border-border/50 bg-muted/20 p-3.5 text-xs font-medium text-foreground/90 leading-relaxed italic line-clamp-3">
             "{candidate.bio || "Looking to connect with fellow campus minds!"}"
-          </p>
+          </div>
         </div>
 
-        {/* Swipe Control Buttons */}
+        {/* Action Buttons */}
         <div className="flex items-center justify-center gap-6 relative z-10 pt-2">
           <button
+            type="button"
             onClick={() => onSwipe("pass")}
-            className="h-14 w-14 rounded-full bg-card border-2 border-muted hover:border-destructive text-muted-foreground hover:text-destructive flex items-center justify-center shadow-lg transition-all cursor-pointer hover:scale-110 active:scale-95"
+            className="size-14 rounded-full bg-card border-2 border-border hover:border-destructive text-muted-foreground hover:text-destructive flex items-center justify-center shadow-lg transition-all cursor-pointer hover:scale-110 active:scale-95"
             aria-label="Pass"
           >
-            <X className="h-6 w-6" />
+            <X className="size-6" />
           </button>
 
           <Link
             href={`/@${candidate.username}`}
-            className="h-10 w-10 rounded-full bg-muted/40 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer"
+            className="size-11 rounded-full bg-muted/50 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer hover:scale-105"
             title="View Profile"
           >
-            <MessageCircle className="h-4 w-4" />
+            <MessageCircle className="size-4.5" />
           </Link>
 
           <button
+            type="button"
             onClick={() => onSwipe("like")}
-            className="h-14 w-14 rounded-full bg-gradient-to-tr from-rose-500 to-pink-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/20 transition-all cursor-pointer hover:scale-110 active:scale-95"
+            className="size-14 rounded-full bg-gradient-to-tr from-rose-500 to-pink-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/25 transition-all cursor-pointer hover:scale-110 active:scale-95"
             aria-label="Like candidate"
           >
-            <Heart className="h-6 w-6 fill-white" />
+            <Heart className="size-6 fill-white" />
           </button>
         </div>
       </motion.div>

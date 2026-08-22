@@ -121,7 +121,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="mx-auto flex w-full flex-col min-h-screen max-w-2xl bg-background text-foreground">
       {/* DiscussionForumPosting JSON-LD Schema */}
       <script
         type="application/ld+json"
@@ -163,8 +163,8 @@ export default async function PostDetailPage({ params }: PostPageProps) {
         </div>
       </div>
 
-      <div className="p-4 space-y-5">
-        <FeedCard post={post as FeedPost} currentUserId={profile.id} />
+      <div className="flex flex-col px-4 pt-4 pb-24 gap-4">
+        <FeedCard post={post as FeedPost} currentUserId={profile.id} disableNavigation />
         <PostComments postId={id} currentUser={profile} />
       </div>
     </main>

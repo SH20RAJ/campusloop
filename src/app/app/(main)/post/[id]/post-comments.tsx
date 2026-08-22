@@ -75,7 +75,18 @@ export function PostComments({ postId, currentUser }: { postId: string; currentU
   const getReplies = (parentId: string) => (comments || []).filter((c) => c.parentId === parentId);
 
   return (
-    <div className="space-y-4 pt-2">
+    <div className="space-y-3">
+      {/* Discussion Header */}
+      <h3 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-2 px-1">
+        <MessageSquare className="size-4 text-primary" />
+        Discussion
+        {!isLoading && (
+          <span className="text-[10px] font-bold text-muted-foreground bg-muted/60 border border-border/40 rounded-full px-2 py-0.5 normal-case tracking-normal">
+            {(comments || []).length}
+          </span>
+        )}
+      </h3>
+
       {/* Top Comment Input Box */}
       <form onSubmit={handlePostComment} className="space-y-2 bg-card border border-border p-3.5 rounded-2xl">
         <textarea

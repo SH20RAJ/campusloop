@@ -6,7 +6,12 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" });
+const outfit = Outfit({ 
+  subsets: ["latin"], 
+  variable: "--font-sans",
+  display: "swap",
+  fallback: ["system-ui", "-apple-system", "sans-serif"],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://campusloop.space"),

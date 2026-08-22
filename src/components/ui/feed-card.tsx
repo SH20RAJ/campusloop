@@ -19,9 +19,10 @@ import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
 interface FeedCardProps {
   post: FeedPost;
   currentUserId?: string;
+  disableNavigation?: boolean;
 }
 
-export function FeedCard({ post, currentUserId }: FeedCardProps) {
+export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardProps) {
   const router = useRouter();
   const [userVote, setUserVote] = useState(post.userVote);
   const [votesCount, setVotesCount] = useState(post.votesCount);
@@ -140,7 +141,9 @@ export function FeedCard({ post, currentUserId }: FeedCardProps) {
       {/* Content Body */}
       <div
         className="px-5 py-1 cursor-pointer select-none"
-        onClick={() => router.push(`/app/post/${post.id}`)}
+        onClick={() => {
+          if (!disableNavigation) router.push(`/app/post/${post.id}`);
+        }}
         onDoubleClick={handleDoubleTap}
       >
         <p className="text-sm md:text-base leading-relaxed text-foreground whitespace-pre-wrap">

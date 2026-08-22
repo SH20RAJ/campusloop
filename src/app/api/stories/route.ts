@@ -28,14 +28,12 @@ export async function GET() {
       Story,
       "id" | "mediaUrl" | "text" | "backgroundColor" | "createdAt" | "expiresAt"
     >;
-    const userStoriesMap = new Map<
-      string,
-      UserProfile & { stories: StoryPayload[] }
-    >();
+    const userStoriesMap = new Map<string, { user: UserProfile; stories: StoryPayload[] }>();
     for (const story of activeStories) {
+      if (!story.user) continue; // Skip orphaned stories whose author no longer exists
       if (!userStoriesMap.has(story.userId)) {
         userStoriesMap.set(story.userId, {
-          ...story.user,
+          user: story.user,
           stories: [],
         });
       }

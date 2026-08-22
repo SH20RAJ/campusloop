@@ -135,13 +135,15 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
           </div>
         ) : (
           <StoryRing
-            users={(stories || []).map((s) => ({
-              id: s.user.id,
-              displayName: s.user.displayName,
-              username: s.user.username,
-              avatarUrl: s.user.avatarUrl,
-              stories: s.stories,
-            }))}
+            users={(stories || [])
+              .filter((s) => s?.user)
+              .map((s) => ({
+                id: s.user.id,
+                displayName: s.user.displayName,
+                username: s.user.username,
+                avatarUrl: s.user.avatarUrl,
+                stories: s.stories,
+              }))}
             mutateStories={mutateStories}
           />
         )}

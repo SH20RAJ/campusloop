@@ -1,9 +1,9 @@
 import { getDb } from "@/db";
 import { institutions, posts, userProfiles } from "@/db/schema";
 import { eq, or, desc } from "drizzle-orm";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
-import { School, MapPin, Globe, Calendar, ArrowLeft, Users, MessageSquare, Flame, Sparkles, Trophy, Award, Hash, ExternalLink } from "lucide-react";
+import { School, MapPin, Globe, Calendar, ArrowLeft, Users, MessageSquare, Flame, Sparkles, Trophy, Award, Hash, ExternalLink, Lock } from "lucide-react";
 import Link from "next/link";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { FeedPost } from "@/hooks/use-feed";
@@ -22,14 +22,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!college) {
     return {
-      title: "College Hub",
+      title: "College Hub | CampusLoop",
       description: "Explore Indian college rankings and student communities on CampusLoop.",
     };
   }
 
   const title = `${college.name} Rank & Campus Hub`;
   const description = `Explore live rankings, verified student leaderboards, confessions, and sub-community posts for ${college.name} (${college.district || college.state}).`;
-  const url = `https://campusloop.space/app/college/${college.slug || college.id}`;
+  const url = `https://campusloop.space/college/${college.slug || college.id}`;
 
   return {
     title,
@@ -73,14 +73,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function MainCollegePage({ params }: PageProps) {
   const { id } = await params;
   const user = await hexclaveServerApp.getUser();
-  if (!user) redirect("/join");
-
   const db = getDb();
-  const profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
 
-  if (!profile) redirect("/app/onboarding");
+  const profile = user
+    ? await db.query.userProfiles.findFirst({
+        where: eq(userProfiles.userId, user.id),
+      })
+    : null;
 
   // Query college by slug or id
   const college = await db.query.institutions.findFirst({
@@ -113,11 +112,11 @@ export default async function MainCollegePage({ params }: PageProps) {
   const formattedPosts = collegePosts.map((post) => {
     const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
     const commentsCount = post.comments.length;
-    const userVote = post.votes.find((v) => v.userId === profile.id)?.value || 0;
+    const userVote = profile ? post.votes.find((v) => v.userId === profile.id)?.value || 0 : 0;
 
     const formattedPollOptions = post.pollOptions?.map((opt) => {
       const optVotesCount = opt.votes.length;
-      const userVoted = opt.votes.some((v) => v.userId === profile.id);
+      const userVoted = profile ? opt.votes.some((v) => v.userId === profile.id) : false;
       return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
     });
 
@@ -178,7 +177,7 @@ export default async function MainCollegePage({ params }: PageProps) {
             "@context": "https://schema.org",
             "@type": "EducationalOrganization",
             name: college.name,
-            url: college.website || `https://campusloop.space/app/college/${college.slug || college.id}`,
+            url: college.website || `https://campusloop.space/college/${college.slug || college.id}`,
             address: {
               "@type": "PostalAddress",
               addressLocality: college.district || undefined,
@@ -194,7 +193,7 @@ export default async function MainCollegePage({ params }: PageProps) {
       {/* Header Back Link */}
       <div className="flex items-center justify-between">
         <Link
-          href="/app/colleges"
+          href="/colleges"
           className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" /> Campus Directory
@@ -254,6 +253,25 @@ export default async function MainCollegePage({ params }: PageProps) {
         </div>
       </div>
 
+      {/* Guest Sign-Up Banner if unauthenticated */}
+      {!profile && (
+        <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+          <div className="space-y-0.5 text-center sm:text-left">
+            <p className="text-xs font-bold text-foreground flex items-center justify-center sm:justify-start gap-1.5">
+              <Lock className="size-3.5 text-primary" /> Are you a student at {college.name}?
+            </p>
+            <p className="text-[11px] text-muted-foreground font-medium">
+              Verify your student email to post confessions, run polls, and connect with classmates.
+            </p>
+          </div>
+          <Link href="/join">
+            <button className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white hover:opacity-95 shadow-sm shadow-primary/20 transition-all cursor-pointer whitespace-nowrap">
+              Join Campus Hub
+            </button>
+          </Link>
+        </div>
+      )}
+
       {/* Discover Section 1: Enrolled Campus Leaders */}
       {college.profiles && college.profiles.length > 0 && (
         <div className="rounded-2xl border border-border bg-card p-4 space-y-3 shadow-sm">
@@ -303,18 +321,18 @@ export default async function MainCollegePage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* College Posts Feed (Across Profiles & Sub-Communities) */}
+      {/* College Posts Feed */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles className="size-3.5 text-primary" /> Campus Discussions & Sub-Hub Posts
+            <Sparkles className="size-3.5 text-primary" /> Campus Discussions &amp; Sub-Hub Posts
           </h2>
           <span className="text-[10px] text-muted-foreground font-semibold">{formattedPosts.length} Threads</span>
         </div>
 
         <div className="flex flex-col gap-4">
           {formattedPosts.map((post) => (
-            <FeedCard key={post.id} post={post as FeedPost} currentUserId={profile.id} />
+            <FeedCard key={post.id} post={post as FeedPost} currentUserId={profile?.id} />
           ))}
           {formattedPosts.length === 0 && (
             <div className="text-center py-16 border border-dashed rounded-2xl border-border bg-card text-muted-foreground text-xs font-semibold space-y-2">
@@ -327,7 +345,7 @@ export default async function MainCollegePage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Discover Section 3: Related Campuses */}
+      {/* Related Campuses */}
       {relatedColleges.length > 1 && (
         <div className="rounded-2xl border border-border bg-card p-4 space-y-3 shadow-sm">
           <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
@@ -337,7 +355,7 @@ export default async function MainCollegePage({ params }: PageProps) {
             {relatedColleges
               .filter((c) => c.id !== college.id)
               .map((c) => (
-                <Link key={c.id} href={`/app/college/${c.slug || c.id}`}>
+                <Link key={c.id} href={`/college/${c.slug || c.id}`}>
                   <div className="rounded-xl border border-border/60 bg-muted/30 p-3 hover:bg-muted/80 transition-colors">
                     <p className="text-xs font-bold text-foreground truncate">{c.name}</p>
                     <p className="text-[10px] text-muted-foreground">{c.district || c.state}</p>

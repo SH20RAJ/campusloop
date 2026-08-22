@@ -37,6 +37,25 @@ export function OverviewClient() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "AboutPage",
+            name: "CampusLoop Platform Overview & Strategic Brief",
+            url: "https://campusloop.space/overview",
+            description:
+              "Deep research and strategic overview of CampusLoop verified campus network, product architecture, and market size.",
+            publisher: {
+              "@type": "Organization",
+              name: "CampusLoop",
+              url: "https://campusloop.space",
+              logo: "https://campusloop.space/logo.png",
+            },
+          }),
+        }}
+      />
       {/* Background glow accents */}
       <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-[500px] w-full max-w-4xl rounded-full bg-gradient-to-b from-primary/10 via-orange-500/5 to-transparent blur-3xl" />
 

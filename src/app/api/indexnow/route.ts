@@ -22,6 +22,7 @@ export async function GET() {
       `https://${HOST}/privacy`,
       `https://${HOST}/safety`,
       `https://${HOST}/colleges`,
+      `https://${HOST}/overview`,
       `https://${HOST}/pitch`,
     ];
 

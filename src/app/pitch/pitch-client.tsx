@@ -75,6 +75,24 @@ export function PitchClient() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden pb-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "PresentationDigitalDocument",
+            name: "CampusLoop Investor Pitch Deck",
+            url: "https://campusloop.space/pitch",
+            description: "CampusLoop investor presentation, market sizing, network density moats, and interactive valuation calculator.",
+            publisher: {
+              "@type": "Organization",
+              name: "CampusLoop",
+              url: "https://campusloop.space",
+              logo: "https://campusloop.space/logo.png",
+            },
+          }),
+        }}
+      />
       {/* Glow blur background */}
       <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 h-[450px] w-full max-w-4xl rounded-full bg-primary/5 blur-3xl" />
 

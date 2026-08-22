@@ -1,18 +1,4 @@
-import { redirect } from "next/navigation";
-import { Metadata } from "next";
+import MainCollegePage, { generateMetadata } from "../../app/(main)/college/[id]/page";
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
-
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: `College Hub`,
-    description: `Explore student discussions and campus hub on CampusLoop.`,
-  };
-}
-
-export default async function RootCollegeRedirectPage({ params }: PageProps) {
-  const { id } = await params;
-  redirect(`/app/college/${id}`);
-}
+export { generateMetadata };
+export default MainCollegePage;

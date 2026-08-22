@@ -192,6 +192,9 @@ export default async function LandingPage() {
               <Link href="/about" className="transition-colors hover:text-foreground">
                 About
               </Link>
+              <Link href="/overview" className="transition-colors hover:text-foreground">
+                Overview
+              </Link>
               <Link href="/pitch" className="transition-colors hover:text-foreground">
                 Pitch
               </Link>
@@ -481,6 +484,9 @@ export default async function LandingPage() {
             <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-muted-foreground">
               <Link href="/about" className="transition-colors hover:text-foreground">
                 About
+              </Link>
+              <Link href="/overview" className="transition-colors hover:text-foreground">
+                Overview
               </Link>
               <Link href="/pitch" className="transition-colors hover:text-foreground">
                 Pitch

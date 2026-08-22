@@ -2,49 +2,63 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Sparkles, TrendingUp, DollarSign, Users, ChevronRight, ChevronLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  Sparkles,
+  TrendingUp,
+  DollarSign,
+  Users,
+  ChevronRight,
+  ChevronLeft,
+  ShieldCheck,
+  Layers,
+  ExternalLink,
+  BookOpen,
+  HelpCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const SLIDES = [
   {
-    title: "1. The Opportunity",
-    headline: "Indian College Students lack a unified verified social network.",
+    title: "1. Executive Summary & Motive",
+    headline: "CampusLoop — The Verified Social Network for College Campuses.",
     points: [
-      "No anonymous sharing platforms: Traditional platforms like Reddit lack real student verification, causing local trust deficits.",
-      "Outsider interference: Recruiting bots, spam, and administrators block students from yapping freely.",
-      "Fragmented tools: Matchmaking, discussion groups, and confessions are scattered across loose WhatsApp/Instagram links."
+      "Fragmented Campus Life: Students currently use fragmented WhatsApp groups, Instagram pages, Discord servers, and confession accounts.",
+      "The Solution: CampusLoop brings the entire campus social graph into one verified, student-only digital layer.",
+      "Primary Moat: Network density per campus (>20% penetration per college beats 100k scattered global users)."
     ],
-    icon: <Users className="h-8 w-8 text-primary" />
+    icon: <Sparkles className="size-7 text-primary" />
   },
   {
-    title: "2. The Solution",
-    headline: "CampusLoop — The verified social layer for colleges.",
+    title: "2. The 5 Core Product Layers",
+    headline: "Built specifically around student life & verified identity.",
     points: [
-      "Strict Domain Gatekeeping: Verified official college domains (.edu, .ac.in) keep out unwanted corporate eyes and spammers.",
-      "Absolute Anonymity: Cryptographic separation hashes posts, securing absolute privacy for confessions and yaps.",
-      "Gamified Vibe ranking: Loop Points (LP) boost user interactions via micro-incentives, stories, and tinder-swipes matches."
+      "Verified Identity & Gatekeeping: .ac.in / .edu domain OTP verification & campus/global scope toggle.",
+      "Social & Anonymous Layer: Feed, confessions, canteen polls, anonymous yapping, and Twitter-style reposts.",
+      "Connection & Utility: Swipeable student matchmaking deck, Lost & Found bulletin, and sub-community hubs."
     ],
-    icon: <Sparkles className="h-8 w-8 text-violet-500" />
+    icon: <Layers className="size-7 text-violet-500" />
   },
   {
-    title: "3. Market Size (TAM/SAM)",
-    headline: "Indian College Student Ecosystem is ripe for network adoption.",
+    title: "3. Market Size & Opportunity",
+    headline: "India's 43.3 Million College Student Market.",
     points: [
-      "Total Addressable Market (TAM): 30 Million+ students currently enrolled in Indian higher education institutions.",
-      "Serviceable Addressable Market (SAM): 8 Million+ students across top tier Engineering, Medical, and Humanities universities.",
-      "Virality: Referral points loops (+20 LP) and class-sharing copywritings spark organic WhatsApp group promotions."
+      "Total Addressable Market (TAM): 43.3M+ higher education students across 1,350+ indexed Indian colleges.",
+      "Serviceable Addressable Market (SAM): 12.5M+ students in Tier-1/2 Engineering, Tech & Management universities.",
+      "Viral Distribution: Referral loops (+20 LP) and class-sharing copywritings spark organic campus adoption."
     ],
-    icon: <TrendingUp className="h-8 w-8 text-rose-500" />
+    icon: <TrendingUp className="size-7 text-rose-500" />
   },
   {
-    title: "4. Monetization Model",
-    headline: "Sustained hyper-local cashflows.",
+    title: "4. Monetization & Unit Economics",
+    headline: "Hyper-local revenue streams built on campus density.",
     points: [
-      "Hobby-Community ticketing: Commission on campus fests, study hacks workshops, and local event listings.",
-      "Micro-Targeted Ads: Brands targeting regional college youth with high CTR placements based on college verification scopes.",
-      "Gamification Boosters: Premium custom story stickers, anonymous tags customizations, and swipe boosts."
+      "Targeted Campus Advertising: High CTR brand activations for co-living, laptops, and student tech bootcamps.",
+      "Event Ticketing: Commission fee on campus cultural fests, workshops, and student club passes.",
+      "Commerce & Recruitment: Peer-to-peer textbook marketplace and verified student talent discovery for tech startups."
     ],
-    icon: <DollarSign className="h-8 w-8 text-emerald-500" />
+    icon: <DollarSign className="size-7 text-emerald-500" />
   }
 ];
 
@@ -60,68 +74,95 @@ export function PitchClient() {
   const formattedValuation = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(valuation);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground bg-grid-pattern relative overflow-x-hidden pb-16">
-      {/* Glow blur backgrounds */}
-      <div className="absolute top-[-10%] left-[5%] right-[5%] h-[400px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+    <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden pb-16">
+      {/* Glow blur background */}
+      <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 h-[450px] w-full max-w-4xl rounded-full bg-primary/5 blur-3xl" />
 
       {/* Header */}
-      <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/70 px-6 backdrop-blur-md">
+      <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/80 px-4 sm:px-8 backdrop-blur-xl">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
-            <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
+          <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
+            <img src="/logo.png" alt="CampusLoop Logo" className="size-full object-cover scale-110" />
           </div>
-          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-extrabold tracking-tight text-transparent">
+          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-black tracking-tight text-transparent">
             CampusLoop
           </span>
         </Link>
         <div className="flex items-center gap-3">
+          <Link href="/overview" className="hidden sm:inline-flex text-xs font-bold text-primary hover:underline">
+            Platform Brief →
+          </Link>
           <ThemeToggle />
           <Link href="/join">
-            <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
-              Join CampusLoop
+            <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/20 transition-all cursor-pointer">
+              Launch App
             </button>
           </Link>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 w-full max-w-2xl px-6 pt-28 mx-auto space-y-12">
+      {/* Main Pitch Content */}
+      <main className="flex-1 w-full max-w-3xl px-4 sm:px-8 pt-24 mx-auto space-y-10">
         <div className="space-y-3">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors">
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Home
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors">
+              <ArrowLeft className="size-3.5" /> Back to Home
+            </Link>
+            <span className="text-muted-foreground">•</span>
+            <Link href="/overview" className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline">
+              <BookOpen className="size-3.5" /> Read Full Strategic Brief
+            </Link>
+          </div>
+
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-            Investor <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Pitch Deck</span>
+            Investor <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">Pitch Deck</span>
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-semibold">
-            Explore the core metrics, product pillars, business model, and valuation calculator of CampusLoop.
+            Explore CampusLoop's core thesis, campus network moats, business model, and interactive valuation calculator.
           </p>
         </div>
 
-        {/* --- Slides Navigator --- */}
-        <section className="glass-card rounded-2xl p-6 space-y-6 shadow-md min-h-[380px] flex flex-col justify-between">
+        {/* Banner Link to /overview */}
+        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="space-y-0.5">
+            <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+              <Sparkles className="size-3.5 text-primary" /> Want to read our complete deep research &amp; product overview?
+            </p>
+            <p className="text-[11px] text-muted-foreground font-medium">
+              Explore market sizing breakdown, security architecture, 5 product layers, and FAQ.
+            </p>
+          </div>
+          <Link href="/overview">
+            <button className="rounded-xl bg-primary/10 border border-primary/30 px-3.5 py-1.5 text-xs font-bold text-primary hover:bg-primary/20 transition-all cursor-pointer whitespace-nowrap">
+              Explore /overview →
+            </button>
+          </Link>
+        </div>
+
+        {/* --- Interactive Slides Presentation --- */}
+        <section className="rounded-3xl border border-border/60 bg-card p-6 sm:p-8 space-y-6 shadow-xl shadow-black/[0.03] min-h-[380px] flex flex-col justify-between">
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-primary">
                 {SLIDES[slideIdx].title}
               </span>
-              <span className="text-[9px] font-bold text-muted-foreground">
+              <span className="text-[10px] font-bold text-muted-foreground">
                 Slide {slideIdx + 1} of {SLIDES.length}
               </span>
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-muted/65 border border-border/40 flex items-center justify-center shrink-0">
+              <div className="size-12 rounded-2xl bg-muted/65 border border-border/40 flex items-center justify-center shrink-0 shadow-xs">
                 {SLIDES[slideIdx].icon}
               </div>
-              <div className="space-y-3.5">
-                <h3 className="text-sm font-black text-foreground">
+              <div className="space-y-3.5 flex-1">
+                <h3 className="text-base sm:text-lg font-black text-foreground">
                   {SLIDES[slideIdx].headline}
                 </h3>
-                <ul className="space-y-2">
+                <ul className="space-y-2.5">
                   {SLIDES[slideIdx].points.map((pt, i) => (
-                    <li key={i} className="text-xs text-muted-foreground leading-relaxed flex items-start gap-2 font-medium">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                    <li key={i} className="text-xs sm:text-sm text-muted-foreground leading-relaxed flex items-start gap-2.5 font-medium">
+                      <CheckCircle2 className="size-4 text-primary shrink-0 mt-0.5" />
                       <span>{pt}</span>
                     </li>
                   ))}
@@ -132,34 +173,48 @@ export function PitchClient() {
 
           <div className="flex items-center justify-between border-t border-border/30 pt-4 mt-6">
             <button
-              onClick={() => setSlideIdx(prev => Math.max(0, prev - 1))}
+              onClick={() => setSlideIdx((prev) => Math.max(0, prev - 1))}
               disabled={slideIdx === 0}
-              className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer"
+              className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer"
             >
-              <ChevronLeft className="h-4 w-4" /> Previous Slide
+              <ChevronLeft className="size-4" /> Previous Slide
             </button>
+
+            <div className="flex items-center gap-1">
+              {SLIDES.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSlideIdx(i)}
+                  className={`size-2 rounded-full transition-all cursor-pointer ${
+                    i === slideIdx ? "bg-primary w-5" : "bg-muted-foreground/30"
+                  }`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
+
             <button
-              onClick={() => setSlideIdx(prev => Math.min(SLIDES.length - 1, prev + 1))}
+              onClick={() => setSlideIdx((prev) => Math.min(SLIDES.length - 1, prev + 1))}
               disabled={slideIdx === SLIDES.length - 1}
-              className="flex items-center gap-1 text-xs font-bold text-primary hover:opacity-85 disabled:opacity-30 cursor-pointer"
+              className="flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85 disabled:opacity-30 cursor-pointer"
             >
-              Next Slide <ChevronRight className="h-4 w-4" />
+              Next Slide <ChevronRight className="size-4" />
             </button>
           </div>
         </section>
 
         {/* --- Interactive Valuation Calculator --- */}
-        <section className="glass-card rounded-2xl p-6 space-y-6 shadow-md">
+        <section className="rounded-3xl border border-border/60 bg-card p-6 sm:p-8 space-y-6 shadow-xl shadow-black/[0.03]">
           <div className="space-y-1">
-            <h2 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
-              <TrendingUp className="h-4 w-4 text-emerald-500" /> Interactive Valuation Calculator
+            <h2 className="text-base font-black uppercase tracking-wider text-foreground flex items-center gap-2">
+              <TrendingUp className="size-5 text-emerald-500" /> Interactive Valuation Calculator
             </h2>
-            <p className="text-[11px] text-muted-foreground font-semibold">
+            <p className="text-xs text-muted-foreground font-semibold">
               Adjust parameters below to see projected annual revenue and platform valuation.
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* DAU Slider */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-semibold">
@@ -173,7 +228,7 @@ export function PitchClient() {
                 step="10000"
                 value={dau}
                 onChange={(e) => setDau(Number(e.target.value))}
-                className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
               />
             </div>
 
@@ -190,35 +245,62 @@ export function PitchClient() {
                 step="0.5"
                 value={arpu}
                 onChange={(e) => setArpu(Number(e.target.value))}
-                className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
               />
             </div>
 
-            {/* Calculations results block */}
+            {/* Calculation results */}
             <div className="grid grid-cols-2 gap-4 border-t border-border/40 pt-4">
-              <div className="bg-muted/15 border border-border/25 rounded-xl p-4 text-center space-y-1">
+              <div className="bg-muted/20 border border-border/40 rounded-2xl p-4 text-center space-y-1">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Projected Revenue</p>
-                <p className="text-lg font-black text-foreground">{formattedRevenue}</p>
+                <p className="text-xl font-black text-foreground">{formattedRevenue}</p>
               </div>
 
-              <div className="bg-muted/15 border border-border/25 rounded-xl p-4 text-center space-y-1">
+              <div className="bg-muted/20 border border-border/40 rounded-2xl p-4 text-center space-y-1">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-primary">Projected Valuation</p>
-                <p className="text-lg font-black text-primary">{formattedValuation}</p>
+                <p className="text-xl font-black text-primary">{formattedValuation}</p>
               </div>
             </div>
           </div>
         </section>
 
+        {/* ─── Notion Structured Data Link Card ─── */}
+        <section className="rounded-3xl border border-primary/30 bg-gradient-to-r from-primary/10 via-orange-500/10 to-amber-500/10 p-6 sm:p-8 space-y-4 shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
+                <BookOpen className="size-4" /> Live Notion Resource Database
+              </span>
+              <h3 className="text-base font-black text-foreground">
+                CampusLoop Structured Notion Hub
+              </h3>
+              <p className="text-xs text-muted-foreground max-w-md leading-relaxed font-medium">
+                View our live structured data, roadmap phases, market research, and continuous updates directly on Notion.
+              </p>
+            </div>
+
+            <a
+              href="https://app.notion.com/p/Campusloop-3c4cd0ed0c2580b88ac4f1c2ae54961b"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-xs font-bold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/95 active:scale-95 cursor-pointer shrink-0"
+            >
+              <span>Explore Notion Docs</span>
+              <ExternalLink className="size-4" />
+            </a>
+          </div>
+        </section>
+
         {/* Call to action */}
-        <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center space-y-4 shadow-sm">
+        <div className="rounded-3xl border border-dashed border-border bg-card p-8 text-center space-y-4 shadow-sm">
           <div className="space-y-1">
-            <h3 className="text-sm font-bold text-foreground">Interested in backing CampusLoop?</h3>
-            <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
+            <h3 className="text-base font-bold text-foreground">Interested in backing CampusLoop?</h3>
+            <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed font-medium">
               We are currently closing our Seed round to accelerate campus deployments across Tier-1 Indian engineering colleges.
             </p>
           </div>
           <Link href="/contact">
-            <button className="rounded-xl bg-primary h-9 px-6 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
+            <button className="rounded-2xl bg-primary h-10 px-6 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/20 transition-all cursor-pointer">
               Contact Deal Partners
             </button>
           </Link>

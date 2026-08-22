@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
+import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
 
 const outfit = Outfit({ 
   subsets: ["latin"], 
@@ -12,6 +13,18 @@ const outfit = Outfit({
   display: "swap",
   fallback: ["system-ui", "-apple-system", "sans-serif"],
 });
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://campusloop.space"),
@@ -36,17 +49,26 @@ export const metadata: Metadata = {
     "campus gossip",
     "college dating",
   ],
-  referrer: "origin-when-cross-origin",
-  creator: "CampusLoop Inc.",
-  publisher: "CampusLoop Inc.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "CampusLoop",
+  },
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   icons: {
-    icon: "/favicon.svg",
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
   },
   robots: {
     index: true,
@@ -106,9 +128,9 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#f97316" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -167,6 +189,7 @@ export default function RootLayout({
         <HexclaveProvider app={hexclaveServerApp}>
           <HexclaveTheme>
             {children}
+            <PWAInstallBanner />
             <Toaster position="top-center" richColors />
           </HexclaveTheme>
         </HexclaveProvider>

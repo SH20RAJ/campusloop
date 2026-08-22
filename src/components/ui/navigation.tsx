@@ -20,6 +20,7 @@ import {
   FileText,
   HelpCircle,
   Layers,
+  Download,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -88,6 +89,7 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
       group: "Account & System",
       items: [
         { icon: UserCircle, href: "/app/profile", label: "My Profile", desc: "View LP clout & badges" },
+        { icon: Download, href: "#install", label: "Install Campus App", desc: "Add to home screen for 2x speed", badge: "PWA" },
         { icon: Sliders, href: "/app/settings", label: "Settings", desc: "Preferences & privacy" },
         { icon: Layers, href: "/overview", label: "Strategic Overview", desc: "Architecture & TAM brief" },
         { icon: FileText, href: "/pitch", label: "Pitch Deck", desc: "Investor presentation & metrics" },

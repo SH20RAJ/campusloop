@@ -1,12 +1,17 @@
 {
-  "name": "CampusLoop",
+  "name": "CampusLoop — Verified Campus Network",
   "short_name": "CampusLoop",
-  "description": "Your Verified Campus Social Network. Speak freely, connect with peers, find matches.",
+  "description": "Verified student-only campus social network. Feed, Matches, Confessions, and College Directory.",
+  "id": "/app",
   "start_url": "/app",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": ["standalone", "window-controls-overlay", "minimal-ui"],
+  "orientation": "portrait-primary",
   "background_color": "#09090b",
-  "theme_color": "#f97316",
+  "theme_color": "#09090b",
+  "prefer_related_applications": false,
+  "categories": ["social", "education", "lifestyle"],
   "icons": [
     {
       "src": "/icons/icon-96x96.png",
@@ -55,6 +60,36 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Campus Feed",
+      "short_name": "Feed",
+      "description": "View live campus discussions and confessions",
+      "url": "/app",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Create Post",
+      "short_name": "Post",
+      "description": "Drop a confession, poll or campus thread",
+      "url": "/app/post/new",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Campus Matches",
+      "short_name": "Dating",
+      "description": "Swipe verified students in your campus radius",
+      "url": "/app/dating",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Direct Messages",
+      "short_name": "Chat",
+      "description": "Private student chats",
+      "url": "/app/chat",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }

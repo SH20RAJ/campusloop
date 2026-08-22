@@ -20,16 +20,16 @@ export function PollOptionsEditor({ options, onChange, onAdd, onRemove }: PollOp
         transition={{ duration: 0.25, ease: "easeOut" }}
         className="overflow-hidden"
       >
-        <div className="mx-5 mb-4 rounded-2xl border border-border/50 bg-muted/20 p-4 space-y-3">
+        <div className="mx-4 sm:mx-5 mb-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 space-y-3">
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 text-xs font-bold text-foreground">
-              <BarChart3 className="size-3.5 text-primary" /> Voting Options
+              <BarChart3 className="size-4 text-emerald-500" /> Voting Options
             </span>
             {options.length < 6 && (
               <button
                 type="button"
                 onClick={onAdd}
-                className="flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/10 px-2 py-1 text-[10px] font-bold text-primary transition-all hover:bg-primary/20 active:scale-95 cursor-pointer"
+                className="flex items-center gap-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-500 transition-all hover:bg-emerald-500/20 active:scale-95 cursor-pointer"
               >
                 <Plus className="size-3" /> Add Option
               </button>
@@ -45,7 +45,7 @@ export function PollOptionsEditor({ options, onChange, onAdd, onRemove }: PollOp
                 transition={{ delay: index * 0.03 }}
                 className="flex items-center gap-2"
               >
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-[10px] font-black text-primary">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-xs font-black text-emerald-500 border border-emerald-500/20 shadow-xs">
                   {String.fromCharCode(65 + index)}
                 </span>
                 <input
@@ -55,24 +55,25 @@ export function PollOptionsEditor({ options, onChange, onAdd, onRemove }: PollOp
                   required={index < 2}
                   maxLength={80}
                   onChange={(e) => onChange(index, e.target.value)}
-                  className="h-9 flex-1 rounded-xl border border-border/60 bg-card px-3 text-xs font-medium outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/40"
+                  className="h-10 flex-1 rounded-xl border border-border/60 bg-card px-3.5 text-xs font-medium outline-none transition-all placeholder:text-muted-foreground/60 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 shadow-xs"
                 />
                 {options.length > 2 && (
                   <button
                     type="button"
                     onClick={() => onRemove(index)}
                     aria-label={`Remove option ${index + 1}`}
-                    className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                    className="rounded-xl p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive cursor-pointer active:scale-95"
                   >
-                    <Trash2 className="size-3.5" />
+                    <Trash2 className="size-4" />
                   </button>
                 )}
               </motion.div>
             ))}
           </div>
 
-          <p className="text-[10px] font-medium text-muted-foreground">
-            {options.filter((o) => o.trim()).length}/6 options · minimum 2 required
+          <p className="text-[10px] font-semibold text-muted-foreground flex items-center justify-between">
+            <span>Minimum 2 options required</span>
+            <span className="tabular-nums font-bold">{options.filter((o) => o.trim()).length}/6 options</span>
           </p>
         </div>
       </motion.div>

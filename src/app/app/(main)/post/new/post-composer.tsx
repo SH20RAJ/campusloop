@@ -10,12 +10,13 @@ import {
   ArrowRight,
   Hash,
   Users,
+  ChevronDown,
 } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { useCommunities } from "@/hooks/use-communities";
 import { useProfile } from "@/hooks/use-profile";
@@ -50,14 +51,16 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     editorProps: {
       attributes: {
         class:
-          "w-full min-h-[220px] px-5 pb-5 pt-3 text-sm outline-none prose prose-sm dark:prose-invert max-w-none",
+          "w-full min-h-[200px] sm:min-h-[240px] px-4 sm:px-5 pb-5 pt-3 text-sm leading-relaxed outline-none prose prose-sm dark:prose-invert max-w-none placeholder:text-muted-foreground/50",
       },
     },
     onUpdate: ({ editor }) => setCharCount(editor.getText().length),
   });
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleSubmit(e?: React.FormEvent<HTMLFormElement>) {
+    if (e) e.preventDefault();
+    if (isLoading || overLimit) return;
+
     setIsLoading(true);
     setError(null);
 
@@ -135,44 +138,44 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
 
   const isConfession = postType === "CONFESSION";
   const overLimit = charCount > MAX_CHARS;
+  const progressPercent = Math.min((charCount / MAX_CHARS) * 100, 100);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* ─── Composer Card ─── */}
-      <div className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-xl shadow-black/[0.03]">
-        {/* Identity & Destination Row */}
-        <div className="flex items-center gap-3 px-5 pt-5">
-          <Avatar className="size-10 shrink-0 border border-border/60 shadow-sm">
-            <AvatarImage src={profile?.avatarUrl || ""} />
-            <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
-              {profile?.displayName?.[0] || "U"}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-bold text-foreground">
-              {profile?.displayName || "You"}
-              {(isAnonymous || isConfession) && (
-                <span className="ml-1.5 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-extrabold text-amber-500">
-                  ANON
-                </span>
-              )}
-            </p>
-            <p className="text-[10px] font-semibold text-muted-foreground">
-              posting in{" "}
-              {selectedCommunityId !== "NONE"
-                ? `c/${communities?.find((c) => c.id === selectedCommunityId)?.name ?? "sub-hub"}`
-                : "campus feed"}
-            </p>
+    <form onSubmit={(e) => handleSubmit(e)} className="space-y-4 pb-20 sm:pb-0">
+      {/* ─── Main Glass Composer Card ─── */}
+      <div className="overflow-hidden rounded-3xl border border-border/60 bg-card/80 backdrop-blur-xl shadow-xl shadow-black/[0.04]">
+        {/* Header: Author + Scope Switcher */}
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-5 pt-4 sm:pt-5 pb-3 border-b border-border/30">
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar className="size-10 shrink-0 border border-border/60 shadow-sm">
+              <AvatarImage src={profile?.avatarUrl || ""} />
+              <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
+                {profile?.displayName?.[0] || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-bold text-foreground flex items-center gap-1.5">
+                <span>{profile?.displayName || "Student"}</span>
+                {(isAnonymous || isConfession) && (
+                  <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[9px] font-extrabold text-amber-500">
+                    ANON 🙈
+                  </span>
+                )}
+              </p>
+              <p className="text-[10px] font-semibold text-muted-foreground truncate">
+                {profile?.institution?.slug ? `@${profile.institution.slug}` : "Campus Member"}
+              </p>
+            </div>
           </div>
 
-          {/* Audience Scope Segmented */}
-          <div className="flex shrink-0 rounded-xl bg-muted/40 p-0.5 text-[10px] font-bold">
+          {/* Scope Segmented Selector */}
+          <div className="flex shrink-0 rounded-2xl bg-muted/60 p-1 text-[10px] font-bold border border-border/40 shadow-xs">
             <button
               type="button"
               onClick={() => setScope("CAMPUS")}
               className={cn(
-                "flex items-center gap-1 rounded-lg px-2 py-1 transition-all cursor-pointer",
-                scope === "CAMPUS" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+                "flex items-center gap-1 rounded-xl px-2.5 py-1 transition-all cursor-pointer select-none",
+                scope === "CAMPUS" ? "bg-card text-primary shadow-xs" : "text-muted-foreground hover:text-foreground"
               )}
             >
               <School className="size-3" /> Campus
@@ -181,17 +184,17 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
               type="button"
               onClick={() => setScope("GLOBAL")}
               className={cn(
-                "flex items-center gap-1 rounded-lg px-2 py-1 transition-all cursor-pointer",
-                scope === "GLOBAL" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+                "flex items-center gap-1 rounded-xl px-2.5 py-1 transition-all cursor-pointer select-none",
+                scope === "GLOBAL" ? "bg-card text-primary shadow-xs" : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Globe className="size-3" /> India
+              <Globe className="size-3" /> Global
             </button>
           </div>
         </div>
 
-        {/* Type Selector */}
-        <div className="px-5 pt-4">
+        {/* Post Type Tabs */}
+        <div className="px-4 sm:px-5 pt-4">
           <PostTypeSelector
             value={postType}
             onChange={(type) => {
@@ -201,15 +204,15 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
           />
         </div>
 
-        {/* Publish Destination */}
-        <div className="px-5 pt-3">
+        {/* Publish Destination Sub-hub Selector */}
+        <div className="px-4 sm:px-5 pt-3">
           <div className="relative flex items-center">
-            <Users className="pointer-events-none absolute left-3 size-3.5 text-muted-foreground" />
+            <Users className="pointer-events-none absolute left-3.5 size-3.5 text-primary" />
             <select
               value={selectedCommunityId}
               onChange={(e) => setSelectedCommunityId(e.target.value)}
               aria-label="Publish destination"
-              className="w-full cursor-pointer appearance-none rounded-xl border border-border/50 bg-muted/20 py-2 pl-9 pr-8 text-xs font-semibold text-foreground outline-none transition-colors focus:border-primary/40"
+              className="w-full cursor-pointer appearance-none rounded-2xl border border-border/60 bg-muted/30 py-2.5 pl-10 pr-9 text-xs font-semibold text-foreground outline-none transition-all hover:bg-muted/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
             >
               <option value="NONE">🎓 My Campus Feed (General)</option>
               {communities?.map((c) => (
@@ -218,36 +221,36 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
                 </option>
               ))}
             </select>
-            <span className="pointer-events-none absolute right-3 text-muted-foreground">▾</span>
+            <ChevronDown className="pointer-events-none absolute right-3.5 size-4 text-muted-foreground" />
           </div>
         </div>
 
-        {/* Toolbar */}
-        <div className="px-5 pt-4">
+        {/* Rich-Text Formatting Toolbar */}
+        <div className="px-4 sm:px-5 pt-3">
           <PostComposerToolbar editor={editor} />
         </div>
 
-        {/* Editor */}
+        {/* Tiptap Editor Content */}
         <EditorContent editor={editor} />
 
-        {/* Trending Hashtags */}
-        <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 bg-muted/10 px-5 py-3">
-          <span className="flex shrink-0 items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-            <Hash className="size-3" /> Trending
+        {/* Trending Tags Bar (Horizontal Scrollable on Mobile) */}
+        <div className="flex items-center gap-2 border-t border-border/40 bg-muted/10 px-4 sm:px-5 py-3 overflow-x-auto no-scrollbar">
+          <span className="flex shrink-0 items-center gap-1 text-[10px] font-extrabold uppercase tracking-wide text-muted-foreground pr-1">
+            <Hash className="size-3 text-primary" /> Trending:
           </span>
           {TRENDING_TAGS.map((tag) => (
             <button
               key={tag}
               type="button"
               onClick={() => insertTag(tag)}
-              className="rounded-lg border border-border/50 bg-card px-2 py-0.5 text-[10.5px] font-semibold text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary active:scale-95 cursor-pointer"
+              className="rounded-xl border border-border/60 bg-card px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary active:scale-95 cursor-pointer shrink-0"
             >
               {tag}
             </button>
           ))}
         </div>
 
-        {/* Poll Options */}
+        {/* Poll Options Builder (If Poll selected) */}
         {postType === "POLL" && (
           <PollOptionsEditor
             options={pollOptions}
@@ -257,15 +260,25 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
           />
         )}
 
-        {/* Footer: anonymity + counter */}
-        <div className="border-t border-border/40 px-5 py-4 space-y-3">
+        {/* Footer: Anonymity + Character Meter */}
+        <div className="border-t border-border/40 px-4 sm:px-5 py-4 space-y-3">
           <AnonymityNotice
             enabled={isAnonymous}
             onToggle={setIsAnonymous}
             forcedByType={isConfession}
           />
 
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-between pt-1">
+            <div className="h-1.5 flex-1 max-w-[140px] bg-muted rounded-full overflow-hidden">
+              <div
+                className={cn(
+                  "h-full transition-all duration-300 rounded-full",
+                  overLimit ? "bg-destructive" : progressPercent > 80 ? "bg-amber-500" : "bg-primary"
+                )}
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+
             <span
               className={cn(
                 "text-[10px] font-bold tabular-nums",
@@ -278,39 +291,68 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         </div>
       </div>
 
-      {/* Error Callout */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -6 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-start gap-2 rounded-2xl border border-destructive/20 bg-destructive/10 p-3.5 text-xs font-semibold text-destructive"
-        >
-          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
-          {error}
-        </motion.div>
-      )}
-
-      {/* Submit Button */}
-      <motion.button
-        type="submit"
-        disabled={isLoading || overLimit}
-        whileTap={{ scale: 0.97 }}
-        className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-orange-500 text-xs font-bold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-      >
-        {isLoading ? (
-          <>
-            <Sparkles className="size-4 animate-spin text-white" />
-            <span>Publishing to Campus Loop...</span>
-          </>
-        ) : (
-          <>
-            <span>Publish Post (+5 LP)</span>
-            <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400 }}>
-              <ArrowRight className="size-4" />
-            </motion.div>
-          </>
+      {/* Error Banner */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            className="flex items-start gap-2.5 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-xs font-semibold text-destructive shadow-sm"
+          >
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+            <span>{error}</span>
+          </motion.div>
         )}
-      </motion.button>
+      </AnimatePresence>
+
+      {/* Desktop Submit Button */}
+      <div className="hidden sm:block">
+        <motion.button
+          type="button"
+          onClick={() => handleSubmit()}
+          disabled={isLoading || overLimit}
+          whileTap={{ scale: 0.98 }}
+          className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary via-orange-500 to-amber-500 text-xs font-bold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/35 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+        >
+          {isLoading ? (
+            <>
+              <Sparkles className="size-4 animate-spin text-white" />
+              <span>Publishing to Campus Loop...</span>
+            </>
+          ) : (
+            <>
+              <span>Publish Post (+5 LP)</span>
+              <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400 }}>
+                <ArrowRight className="size-4" />
+              </motion.div>
+            </>
+          )}
+        </motion.button>
+      </div>
+
+      {/* Mobile Floating Bottom Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 block sm:hidden border-t border-border/50 bg-background/90 p-3 backdrop-blur-xl shadow-2xl">
+        <motion.button
+          type="button"
+          onClick={() => handleSubmit()}
+          disabled={isLoading || overLimit}
+          whileTap={{ scale: 0.97 }}
+          className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary via-orange-500 to-amber-500 text-xs font-bold text-white shadow-lg shadow-primary/25 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+        >
+          {isLoading ? (
+            <>
+              <Sparkles className="size-4 animate-spin text-white" />
+              <span>Publishing...</span>
+            </>
+          ) : (
+            <>
+              <span>Publish Post (+5 LP)</span>
+              <ArrowRight className="size-4" />
+            </>
+          )}
+        </motion.button>
+      </div>
     </form>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Bold, Italic, List, Heading2 } from "lucide-react";
+import { Bold, Italic, List, Heading2, Code, Quote } from "lucide-react";
 import { Editor } from "@tiptap/react";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ export function PostComposerToolbar({ editor }: PostComposerToolbarProps) {
   if (!editor) return null;
 
   return (
-    <div className="flex items-center gap-0.5 rounded-xl border border-border/50 bg-muted/30 p-1">
+    <div className="flex items-center gap-1 rounded-2xl border border-border/50 bg-muted/30 p-1.5 backdrop-blur-xs overflow-x-auto no-scrollbar">
       <ToolbarChip
         label="Bold"
         active={editor.isActive("bold")}
@@ -20,6 +20,7 @@ export function PostComposerToolbar({ editor }: PostComposerToolbarProps) {
       >
         <Bold className="size-3.5" />
       </ToolbarChip>
+      
       <ToolbarChip
         label="Italic"
         active={editor.isActive("italic")}
@@ -27,6 +28,7 @@ export function PostComposerToolbar({ editor }: PostComposerToolbarProps) {
       >
         <Italic className="size-3.5" />
       </ToolbarChip>
+      
       <ToolbarChip
         label="Heading"
         active={editor.isActive("heading", { level: 2 })}
@@ -34,13 +36,31 @@ export function PostComposerToolbar({ editor }: PostComposerToolbarProps) {
       >
         <Heading2 className="size-3.5" />
       </ToolbarChip>
-      <div className="mx-1 h-4 w-px bg-border/60" />
+
+      <div className="mx-1 h-4 w-px bg-border/60 shrink-0" />
+
       <ToolbarChip
         label="Bullet list"
         active={editor.isActive("bulletList")}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       >
         <List className="size-3.5" />
+      </ToolbarChip>
+
+      <ToolbarChip
+        label="Code block"
+        active={editor.isActive("codeBlock")}
+        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+      >
+        <Code className="size-3.5" />
+      </ToolbarChip>
+
+      <ToolbarChip
+        label="Blockquote"
+        active={editor.isActive("blockquote")}
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+      >
+        <Quote className="size-3.5" />
       </ToolbarChip>
     </div>
   );
@@ -64,9 +84,9 @@ function ToolbarChip({
       aria-label={label}
       title={label}
       className={cn(
-        "rounded-lg p-1.5 transition-all cursor-pointer",
+        "flex items-center justify-center rounded-xl p-2 transition-all cursor-pointer select-none active:scale-95 shrink-0",
         active
-          ? "bg-primary/15 text-primary"
+          ? "bg-primary text-primary-foreground font-bold shadow-xs"
           : "text-muted-foreground hover:bg-muted hover:text-foreground"
       )}
     >

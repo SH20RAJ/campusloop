@@ -8,8 +8,9 @@ export type DetailComment = {
 	id: string;
 	body: string;
 	isAnonymous: boolean;
+	pseudonym: string | null;
 	createdAt: Date;
-	authorId: string;
+	authorId: string | null;
 	authorDisplayName: string | null;
 	authorUsername: string | null;
 };
@@ -35,12 +36,15 @@ export async function getPostDetail(postId: string, viewerProfileId: string) {
 			title: posts.title,
 			body: posts.body,
 			isAnonymous: posts.isAnonymous,
+			pseudonym: posts.pseudonym,
 			status: posts.status,
 			riskScore: posts.riskScore,
 			createdAt: posts.createdAt,
 			authorId: posts.authorId,
-			authorDisplayName: userProfiles.displayName,
-			authorUsername: userProfiles.username,
+			// Identity fields are nulled server-side for anonymous posts so the
+			// real author never reaches the client (RSC payload included).
+			authorDisplayName: sql<string | null>`case when ${posts.isAnonymous} then null else ${userProfiles.displayName} end`,
+			authorUsername: sql<string | null>`case when ${posts.isAnonymous} then null else ${userProfiles.username} end`,
 			institutionName: institutions.name,
 			institutionState: institutions.state,
 			commentCount: commentCountSql,
@@ -48,7 +52,7 @@ export async function getPostDetail(postId: string, viewerProfileId: string) {
 			reportCount: reportCountSql,
 		})
 		.from(posts)
-		.innerJoin(userProfiles, eq(posts.authorId, userProfiles.id))
+		.leftJoin(userProfiles, eq(posts.authorId, userProfiles.id))
 		.innerJoin(institutions, eq(posts.institutionId, institutions.id))
 		.where(eq(posts.id, postId))
 		.limit(1);
@@ -62,13 +66,14 @@ export async function getPostDetail(postId: string, viewerProfileId: string) {
 			id: comments.id,
 			body: comments.body,
 			isAnonymous: comments.isAnonymous,
+			pseudonym: comments.pseudonym,
 			createdAt: comments.createdAt,
 			authorId: comments.authorId,
-			authorDisplayName: userProfiles.displayName,
-			authorUsername: userProfiles.username,
+			authorDisplayName: sql<string | null>`case when ${comments.isAnonymous} then null else ${userProfiles.displayName} end`,
+			authorUsername: sql<string | null>`case when ${comments.isAnonymous} then null else ${userProfiles.username} end`,
 		})
 		.from(comments)
-		.innerJoin(userProfiles, eq(comments.authorId, userProfiles.id))
+		.leftJoin(userProfiles, eq(comments.authorId, userProfiles.id))
 		.where(and(eq(comments.postId, postId), eq(comments.status, "PUBLISHED")))
 		.orderBy(asc(comments.createdAt));
 

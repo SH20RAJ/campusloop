@@ -6,7 +6,8 @@ import { ReportsTable } from "./reports-table";
 export default async function AdminReportsPage() {
   const db = getDb();
   
-  // Fetch open reports with joined post and author details
+  // Fetch open reports with joined post and author details.
+  // leftJoin keeps anonymous posts (null author) visible for review.
   const openReports = await db
     .select({
       id: reports.id,
@@ -15,12 +16,13 @@ export default async function AdminReportsPage() {
       createdAt: reports.createdAt,
       postId: posts.id,
       postBody: posts.body,
+      postPseudonym: posts.pseudonym,
       authorDisplayName: userProfiles.displayName,
       authorUsername: userProfiles.username,
     })
     .from(reports)
     .innerJoin(posts, eq(reports.targetId, posts.id))
-    .innerJoin(userProfiles, eq(posts.authorId, userProfiles.id))
+    .leftJoin(userProfiles, eq(posts.authorId, userProfiles.id))
     .where(eq(reports.status, "OPEN"))
     .orderBy(desc(reports.createdAt));
 

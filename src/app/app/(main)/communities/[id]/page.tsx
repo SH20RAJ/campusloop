@@ -4,6 +4,7 @@ import { eq, desc, sql } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { FeedPost } from "@/hooks/use-feed";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { sanitizeAnonRow } from "@/lib/anonymity";
 import { FeedCard } from "@/components/ui/feed-card";
 import { PostComposer } from "../../post/new/post-composer";
 import { JoinCommunityButton } from "../join-community-button";
@@ -146,7 +147,7 @@ export default async function CommunityDetailPage({ params, searchParams }: Page
     const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
 
     return {
-      ...post,
+      ...sanitizeAnonRow(post),
       votesCount,
       commentsCount,
       userVote,

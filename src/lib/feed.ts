@@ -10,6 +10,7 @@ export type FeedPost = {
 	title: string | null;
 	body: string;
 	isAnonymous: boolean;
+	pseudonym: string | null;
 	status: "PUBLISHED" | "HIDDEN" | "DELETED" | "PENDING_REVIEW";
 	riskScore: number;
 	createdAt: Date;
@@ -66,6 +67,7 @@ function feedSelect() {
 		title: posts.title,
 		body: posts.body,
 		isAnonymous: posts.isAnonymous,
+		pseudonym: posts.pseudonym,
 		status: posts.status,
 		riskScore: posts.riskScore,
 		createdAt: posts.createdAt,
@@ -88,7 +90,7 @@ export async function getCampusFeed(institutionId: string, filterValue?: string)
 	return db
 		.select(feedSelect())
 		.from(posts)
-		.innerJoin(userProfiles, eq(posts.authorId, userProfiles.id))
+		.leftJoin(userProfiles, eq(posts.authorId, userProfiles.id))
 		.innerJoin(institutions, eq(posts.institutionId, institutions.id))
 		.where(where)
 		.orderBy(filter === "trending" ? desc(trendingSql) : desc(posts.createdAt))
@@ -107,7 +109,7 @@ export async function getGlobalFeed(profile: { institutionId: string }, state: s
 	return db
 		.select(feedSelect())
 		.from(posts)
-		.innerJoin(userProfiles, eq(posts.authorId, userProfiles.id))
+		.leftJoin(userProfiles, eq(posts.authorId, userProfiles.id))
 		.innerJoin(institutions, eq(posts.institutionId, institutions.id))
 		.where(where)
 		.orderBy(filter === "trending" ? desc(trendingSql) : desc(posts.createdAt))
@@ -124,7 +126,7 @@ export async function getConfessionsFeed(institutionId: string, scope: "campus" 
 	return db
 		.select(feedSelect())
 		.from(posts)
-		.innerJoin(userProfiles, eq(posts.authorId, userProfiles.id))
+		.leftJoin(userProfiles, eq(posts.authorId, userProfiles.id))
 		.innerJoin(institutions, eq(posts.institutionId, institutions.id))
 		.where(where)
 		.orderBy(desc(trendingSql), desc(posts.createdAt))
@@ -141,7 +143,7 @@ export async function getPollFeed(institutionId: string, scope: "campus" | "glob
 	return db
 		.select(feedSelect())
 		.from(posts)
-		.innerJoin(userProfiles, eq(posts.authorId, userProfiles.id))
+		.leftJoin(userProfiles, eq(posts.authorId, userProfiles.id))
 		.innerJoin(institutions, eq(posts.institutionId, institutions.id))
 		.where(where)
 		.orderBy(desc(posts.createdAt))
@@ -154,7 +156,7 @@ export async function getVisibleProfilePosts(profileId: string) {
 	return db
 		.select(feedSelect())
 		.from(posts)
-		.innerJoin(userProfiles, eq(posts.authorId, userProfiles.id))
+		.leftJoin(userProfiles, eq(posts.authorId, userProfiles.id))
 		.innerJoin(institutions, eq(posts.institutionId, institutions.id))
 		.where(and(published, eq(posts.authorId, profileId), eq(posts.isAnonymous, false)))
 		.orderBy(desc(posts.createdAt))
@@ -249,6 +251,21 @@ export async function resolveFeedPage(options: {
  * Batch-resolve repost originals and format hydrated posts into the
  * JSON contract consumed by the client feed hooks.
  */
+/**
+ * Anonymous posts must never carry their author relation past this boundary —
+ * the client only receives the pseudonym handle.
+ */
+function stripAuthorForAnonymity<T extends { isAnonymous: boolean; pseudonym?: string | null; author?: unknown }>(
+	post: T,
+): Omit<T, "author"> {
+	if (post.isAnonymous) {
+		const rest = { ...post } as Partial<Record<"author", unknown>>;
+		delete rest.author;
+		return rest as Omit<T, "author">;
+	}
+	return post;
+}
+
 export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProfileId: string) {
 	const db = getDb();
 
@@ -292,10 +309,11 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
 		const hasVotedPoll = formattedPollOptions?.some((opt) => opt.userVoted) || false;
 		const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
 		const repostOf = post.repostOfId ? repostedPostsMap.get(post.repostOfId) || null : null;
+		const safeRepostOf = repostOf ? stripAuthorForAnonymity(repostOf) : null;
 
 		return {
-			...post,
-			repostOf,
+			...stripAuthorForAnonymity(post),
+			repostOf: safeRepostOf,
 			votesCount,
 			commentsCount,
 			userVote,

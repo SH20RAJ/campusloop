@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
 import { PostComments } from "./post-comments";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { sanitizeAnonRow } from "@/lib/anonymity";
 import type { FeedPost } from "@/hooks/use-feed";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -125,8 +126,9 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   const hasVotedPoll = formattedPollOptions?.some((opt) => opt.userVoted) || false;
   const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
 
+  // Strip identity relations before anything crosses the client boundary.
   const post = {
-    ...rawPost,
+    ...sanitizeAnonRow(rawPost),
     votesCount,
     commentsCount,
     userVote,
@@ -134,7 +136,6 @@ export default async function PostDetailPage({ params }: PostPageProps) {
     hasVotedPoll,
     totalPollVotes,
     votes: undefined,
-    comments: undefined,
   };
 
   const authorName = rawPost.isAnonymous ? "Anonymous Student" : rawPost.author?.displayName || "Student";
@@ -216,10 +217,10 @@ export default async function PostDetailPage({ params }: PostPageProps) {
             {/* Read-Only Comments List for Guests & Crawlers */}
             <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
               <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
-                Discussion ({rawPost.comments.length})
+                Discussion ({post.commentsCount})
               </h3>
               <div className="space-y-2.5">
-                {rawPost.comments.map((comment) => (
+                {post.comments?.map((comment) => (
                   <div key={comment.id} className="rounded-xl border border-border/50 bg-muted/20 p-3 space-y-1">
                     <div className="flex items-center justify-between text-xs font-bold">
                       <span className="text-foreground">
@@ -232,7 +233,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
                     <p className="text-xs text-muted-foreground leading-relaxed">{comment.body}</p>
                   </div>
                 ))}
-                {rawPost.comments.length === 0 && (
+                {!post.comments?.length && (
                   <p className="text-xs text-muted-foreground py-4 text-center">No comments yet.</p>
                 )}
               </div>

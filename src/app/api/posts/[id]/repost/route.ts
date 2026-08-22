@@ -39,7 +39,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Original post not found" }, { status: 404 });
     }
 
-    const authorName = originalPost.isAnonymous ? "Anonymous Student" : `@${originalPost.author.username}`;
+    const authorName = originalPost.isAnonymous || !originalPost.author ? "Anonymous Student" : `@${originalPost.author.username}`;
     
     // Construct repost content
     let newPostBody = "";

@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deletePost } from "./actions";
-import { SearchIcon, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { revealAnonymousAuthor, type RevealedIdentity } from "../anonymity-actions";
+import { SearchIcon, ChevronLeft, ChevronRight, Trash2, Eye } from "lucide-react";
 
 interface PostRow {
   id: string;
   body: string;
   type: string;
   isAnonymous: boolean;
+  pseudonym?: string | null;
   createdAt: string | Date;
   author?: { displayName: string; username: string } | null;
 }
@@ -25,6 +27,7 @@ export function PostsTable({ initialPosts, page, totalPages }: PostsTableProps) 
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [revealed, setRevealed] = useState<Record<string, RevealedIdentity>>({});
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,6 +55,19 @@ export function PostsTable({ initialPosts, page, totalPages }: PostsTableProps) 
       router.refresh();
     } catch (e) {
       alert(e instanceof Error ? e.message : "Failed to delete post");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleReveal(postId: string) {
+    if (!confirm("Reveal the author of this anonymous post? This action is audit-logged.")) return;
+    setActionLoading(postId);
+    try {
+      const identity = await revealAnonymousAuthor("POST", postId);
+      setRevealed((prev) => ({ ...prev, [postId]: identity }));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to reveal author");
     } finally {
       setActionLoading(null);
     }
@@ -98,9 +114,20 @@ export function PostsTable({ initialPosts, page, totalPages }: PostsTableProps) 
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
                       <span className="font-semibold text-foreground">
-                        {post.isAnonymous ? "Anonymous" : post.author?.displayName}
+                        {post.isAnonymous ? (revealed[post.id]?.displayName ?? "Anonymous") : post.author?.displayName}
                       </span>
-                      {!post.isAnonymous && (
+                      {post.isAnonymous ? (
+                        revealed[post.id] ? (
+                          <a
+                            href={`/admin/users?q=${revealed[post.id].username}`}
+                            className="text-xs text-blue-500 hover:underline"
+                          >
+                            @{revealed[post.id].username} · {revealed[post.id].accountStatus}
+                          </a>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">{post.pseudonym || "anon"}</span>
+                        )
+                      ) : (
                         <span className="text-xs text-muted-foreground">@{post.author?.username}</span>
                       )}
                     </div>
@@ -117,13 +144,25 @@ export function PostsTable({ initialPosts, page, totalPages }: PostsTableProps) 
                     {new Date(post.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button
-                      disabled={actionLoading === post.id}
-                      onClick={() => handleDelete(post.id)}
-                      className="p-1.5 rounded hover:bg-muted text-destructive disabled:opacity-50 transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1">
+                      {post.isAnonymous && !revealed[post.id] && (
+                        <button
+                          disabled={actionLoading === post.id}
+                          onClick={() => handleReveal(post.id)}
+                          title="Reveal author (audit logged)"
+                          className="p-1.5 rounded hover:bg-muted text-blue-500 disabled:opacity-50 transition-colors cursor-pointer"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      )}
+                      <button
+                        disabled={actionLoading === post.id}
+                        onClick={() => handleDelete(post.id)}
+                        className="p-1.5 rounded hover:bg-muted text-destructive disabled:opacity-50 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

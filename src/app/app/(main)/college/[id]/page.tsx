@@ -6,6 +6,7 @@ import { FeedCard } from "@/components/ui/feed-card";
 import { School, MapPin, Globe, Calendar, ArrowLeft, Users, MessageSquare, Flame, Sparkles, Trophy, Award, Hash, ExternalLink, Lock } from "lucide-react";
 import Link from "next/link";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { sanitizeAnonRow } from "@/lib/anonymity";
 import { FeedPost } from "@/hooks/use-feed";
 import { Metadata } from "next";
 
@@ -124,7 +125,7 @@ export default async function MainCollegePage({ params }: PageProps) {
     const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
 
     return {
-      ...post,
+      ...sanitizeAnonRow(post),
       votesCount,
       commentsCount,
       userVote,

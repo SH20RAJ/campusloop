@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { posts, userProfiles, pollOptions } from "@/db/schema";
+import { anonIdentityVault, posts, userProfiles, pollOptions } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { runSafetyCheck } from "@/lib/moderation/rules";
+import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
 import { eq } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 
 export async function POST(req: Request) {
   try {
@@ -35,42 +38,52 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Post body cannot be empty" }, { status: 400 });
     }
 
-    // Safety Checks (Doxxing / Personal info detection)
-    const phoneRegex = /(\+?\d{1,4}[-.\s]?)?\(?\d{3,4}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
-    const emailRegex = /[\w\.-]+@[\w\.-]+\.\w+/g;
-    
-    // Slur blocklist (examples)
-    const blocklist = ["slur1", "slur2", "offensiveword"]; // Replace with actual words if needed
-    const lowerBody = body.toLowerCase();
-    
-    const containsPhone = phoneRegex.test(body);
-    const containsEmail = emailRegex.test(body);
-    const containsBlockedWord = blocklist.some(word => lowerBody.includes(word));
-
-    if (containsPhone || containsEmail) {
-      return NextResponse.json({ 
-        error: "Post blocked: Sharing phone numbers or email addresses is not allowed to prevent doxxing." 
-      }, { status: 400 });
+    // Centralized safety engine (PII / doxxing / threats / abuse)
+    const safety = runSafetyCheck({ title, body });
+    if (safety.blocked) {
+      return NextResponse.json(
+        { error: safety.messages.join(" "), messages: safety.messages, riskScore: safety.riskScore },
+        { status: 400 },
+      );
     }
 
-    if (containsBlockedWord) {
-      return NextResponse.json({ 
-        error: "Post blocked: Contains words that violate our community safety guidelines." 
-      }, { status: 400 });
-    }
+    const anonymous = Boolean(isAnonymous);
+    const postId = randomUUID();
 
-    const [newPost] = await db.insert(posts).values({
-      authorId: profile.id,
-      institutionId: profile.institutionId,
-      body,
-      type: type || "NORMAL",
-      scope: scope || "CAMPUS",
-      isAnonymous: isAnonymous || false,
-      title: title || null,
-      communityId: communityId || null,
-      status: "PUBLISHED", // Assuming no auto-hide logic for now
-      riskScore: 0,
-    }).returning();
+    // Anonymous posts carry NO author foreign key. The real profile id is
+    // AES-sealed into the identity vault; the post row only holds a stable
+    // HMAC pseudonym handle that cannot be reversed without the pepper.
+    const [newPost] = await db.transaction(async (tx) => {
+      const inserted = await tx
+        .insert(posts)
+        .values({
+          id: postId,
+          authorId: anonymous ? null : profile.id,
+          pseudonym: anonymous ? deriveAnonHandle(profile.id) : null,
+          institutionId: profile.institutionId,
+          body,
+          type: type || "NORMAL",
+          scope: scope || "CAMPUS",
+          isAnonymous: anonymous,
+          title: title || null,
+          communityId: communityId || null,
+          status: safety.status,
+          riskScore: safety.riskScore,
+        })
+        .returning();
+
+      if (anonymous) {
+        await tx
+          .insert(anonIdentityVault)
+          .values({
+            handle: deriveAnonHandle(profile.id),
+            sealedIdentity: sealIdentity(profile.id),
+          })
+          .onConflictDoNothing({ target: anonIdentityVault.handle });
+      }
+
+      return inserted;
+    });
 
     // Award +5 points
     await db.update(userProfiles)

@@ -34,8 +34,8 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const [isReposting, setIsReposting] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
 
-  const authorName = post.isAnonymous ? "Anonymous Student" : post.author.displayName;
-  const authorHandle = post.isAnonymous ? "anonymous" : post.author.username;
+  const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
+  const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
 
   function renderPostBody(body: string) {
     const parts = body.split(/(#[a-zA-Z0-9_]+)/g);

@@ -33,14 +33,17 @@ export async function GET(request: Request) {
       },
     });
 
-    const formattedPosts = foundPosts.map((post) => ({
-      ...post,
-      votesCount: post.votes.reduce((acc, v) => acc + v.value, 0),
-      commentsCount: post.comments.length,
-      userVote: 0,
-      votes: undefined,
-      comments: undefined,
-    }));
+    const formattedPosts = foundPosts.map((post) => {
+      const safePost = post.isAnonymous ? { ...post, author: null } : post;
+      return {
+        ...safePost,
+        votesCount: post.votes.reduce((acc, v) => acc + v.value, 0),
+        commentsCount: post.comments.length,
+        userVote: 0,
+        votes: undefined,
+        comments: undefined,
+      };
+    });
 
     // 2. Search Colleges
     const foundColleges = await db.query.institutions.findMany({

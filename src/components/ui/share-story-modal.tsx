@@ -2,8 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { FeedPost } from "@/hooks/use-feed";
-import { getAvatarUrl } from "@/lib/utils";
-import { X, Download, Share2, MessageCircle, Sparkles, Copy, Check } from "lucide-react";
+import { X, Download, Share2, MessageCircle, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 
 interface ShareStoryModalProps {
@@ -26,9 +25,7 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
 
   const postUrl = typeof window !== "undefined" ? `${window.location.origin}/app/post/${post.id}` : `https://campusloop.space/app/post/${post.id}`;
 
-  const authorName = post.isAnonymous ? "Anonymous Student" : post.author.displayName;
-  const authorHandle = post.isAnonymous ? "anonymous" : post.author.username;
-  const avatarUrl = post.isAnonymous ? "" : getAvatarUrl(post.author.avatarUrl, post.author.username);
+  const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
 
   function handleShareWhatsApp() {
     let text = "";

@@ -146,9 +146,11 @@ export const posts = pgTable(
 	"posts",
 	{
 		id: id(),
-		authorId: text("author_id")
-			.notNull()
-			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		// Null when the post is anonymous — no relational path back to the
+		// profile exists on the post row itself. Identity is sealed in
+		// anon_identity_vault (admin-only, key-separated).
+		authorId: text("author_id").references(() => userProfiles.id, { onDelete: "cascade" }),
+		pseudonym: text("pseudonym"),
 		institutionId: text("institution_id")
 			.notNull()
 			.references(() => institutions.id, { onDelete: "cascade" }),
@@ -180,9 +182,10 @@ export const comments = pgTable(
 		postId: text("post_id")
 			.notNull()
 			.references(() => posts.id, { onDelete: "cascade" }),
-		authorId: text("author_id")
-			.notNull()
-			.references(() => userProfiles.id, { onDelete: "cascade" }),
+		// Null when the comment is anonymous — identity is sealed in
+		// anon_identity_vault (admin-only, key-separated).
+		authorId: text("author_id").references(() => userProfiles.id, { onDelete: "cascade" }),
+		pseudonym: text("pseudonym"),
 		parentId: text("parent_id")
 			.references((): AnyPgColumn => comments.id, { onDelete: "cascade" }),
 		body: text("body").notNull(),
@@ -294,6 +297,26 @@ export const moderationActions = pgTable(
 		createdAt,
 	},
 	(table) => [index("moderation_actions_target_idx").on(table.targetType, table.targetId)],
+);
+
+/**
+ * Anonymous identity vault. Maps a pseudonym handle to the AES-256-GCM
+ * sealed profile id of the real author. Deliberately has NO foreign key to
+ * user_profiles, so no SQL join can deanonymize content — resolution requires
+ * ANON_VAULT_SECRET and is restricted to audited ADMIN-only server actions.
+ */
+export const anonIdentityVault = pgTable(
+	"anon_identity_vault",
+	{
+		id: id(),
+		handle: text("handle").notNull(),
+		sealedIdentity: text("sealed_identity").notNull(),
+		createdAt,
+		updatedAt,
+	},
+	(table) => [
+		uniqueIndex("anon_identity_vault_handle_idx").on(table.handle),
+	],
 );
 
 export const institutionRequests = pgTable(
@@ -654,6 +677,9 @@ export const storiesRelations = relations(stories, ({ one }) => ({
 
 export type Story = typeof stories.$inferSelect;
 export type NewStory = typeof stories.$inferInsert;
+
+export type AnonIdentityVaultEntry = typeof anonIdentityVault.$inferSelect;
+export type NewAnonIdentityVaultEntry = typeof anonIdentityVault.$inferInsert;
 
 
 

@@ -11,8 +11,9 @@ interface ReportRow {
   details: string | null;
   postId: string;
   postBody: string;
-  authorDisplayName: string;
-  authorUsername: string;
+  postPseudonym?: string | null;
+  authorDisplayName: string | null;
+  authorUsername: string | null;
 }
 
 export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }) {
@@ -70,8 +71,12 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
               </td>
               <td className="px-6 py-4">
                 <div className="flex flex-col">
-                  <span className="font-medium text-foreground">{report.authorDisplayName}</span>
-                  <span className="text-xs text-muted-foreground">@{report.authorUsername}</span>
+                  <span className="font-medium text-foreground">
+                    {report.authorDisplayName ?? "Anonymous"}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {report.authorUsername ? `@${report.authorUsername}` : report.postPseudonym || "anon"}
+                  </span>
                 </div>
               </td>
               <td className="px-6 py-4 text-right">

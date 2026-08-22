@@ -3,10 +3,11 @@ import useSWRInfinite from "swr/infinite";
 import { Post, UserProfile, Institution } from "@/db/schema";
 
 export type FeedPost = Post & {
-  author: UserProfile;
+  // Stripped to null by the server for anonymous posts.
+  author: UserProfile | null;
   institution: Institution;
   community?: { id: string; name: string } | null;
-  repostOf?: (Post & { author: UserProfile; institution?: Institution }) | null;
+  repostOf?: (Post & { author: UserProfile | null; institution?: Institution }) | null;
   votesCount: number;
   commentsCount: number;
   userVote: number;

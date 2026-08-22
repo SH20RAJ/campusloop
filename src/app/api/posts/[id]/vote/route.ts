@@ -63,7 +63,9 @@ export async function POST(req: Request, { params }: RouteParams) {
           const targetPost = await db.query.posts.findFirst({
             where: eq(posts.id, id),
           });
-          if (targetPost && targetPost.authorId !== profile.id) {
+          // Anonymous posts have no addressable author — skip to avoid a
+          // notification FK failure or an identity leak.
+          if (targetPost && targetPost.authorId && targetPost.authorId !== profile.id) {
             await db.insert(notifications).values({
               userId: targetPost.authorId,
               type: "LIKE",

@@ -8,7 +8,7 @@ import { Comment, UserProfile } from "@/db/schema";
 import { getAvatarUrl, formatTimeAgo } from "@/lib/utils";
 
 export type CommentWithAuthor = Comment & {
-  author: UserProfile;
+  author: UserProfile | null;
 };
 
 interface CommentItemProps {
@@ -39,10 +39,10 @@ export function CommentItem({
   submitReply,
 }: CommentItemProps) {
   const isAnon = comment.isAnonymous;
-  const displayName = isAnon ? "Anonymous Student" : comment.author.displayName;
-  const handle = isAnon ? "anonymous" : comment.author.username;
-  const fallback = isAnon ? "A" : comment.author.displayName[0].toUpperCase();
-  const avatarUrl = isAnon ? "" : getAvatarUrl(comment.author.avatarUrl, comment.author.username);
+  const displayName = isAnon ? "Anonymous Student" : comment.author?.displayName || "Student";
+  const handle = isAnon ? comment.pseudonym || "anonymous" : comment.author?.username || "student";
+  const fallback = isAnon ? "A" : (comment.author?.displayName?.[0] ?? "S").toUpperCase();
+  const avatarUrl = isAnon ? "" : getAvatarUrl(comment.author?.avatarUrl, comment.author?.username ?? "student");
 
   return (
     <motion.div

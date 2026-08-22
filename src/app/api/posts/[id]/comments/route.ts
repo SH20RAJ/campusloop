@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { comments, userProfiles, posts, notifications } from "@/db/schema";
+import { anonIdentityVault, comments, userProfiles, posts, notifications } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { runSafetyCheck } from "@/lib/moderation/rules";
+import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
 import { eq, and, asc } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -28,7 +31,15 @@ export async function GET(req: Request, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json(postComments);
+    // Strip author identity for anonymous comments before it leaves the server.
+    const sanitized = postComments.map((comment) => {
+      if (!comment.isAnonymous) return comment;
+      const rest = { ...comment } as Partial<Record<"author", unknown>>;
+      delete rest.author;
+      return { ...rest, author: null };
+    });
+
+    return NextResponse.json(sanitized);
   } catch (error) {
     console.error("Error fetching comments:", error);
     return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
@@ -58,27 +69,57 @@ export async function POST(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Comment cannot be empty" }, { status: 400 });
     }
 
-    const [newComment] = await db.insert(comments).values({
-      postId: id,
-      authorId: profile.id,
-      parentId: parentId || null,
-      body,
-      isAnonymous: isAnonymous || false,
-      status: "PUBLISHED",
-    }).returning();
+    const safety = runSafetyCheck({ body });
+    if (safety.blocked) {
+      return NextResponse.json(
+        { error: safety.messages.join(" "), messages: safety.messages, riskScore: safety.riskScore },
+        { status: 400 },
+      );
+    }
+
+    const anonymous = Boolean(isAnonymous);
+    const commentId = randomUUID();
+
+    const [newComment] = await db.transaction(async (tx) => {
+      const inserted = await tx
+        .insert(comments)
+        .values({
+          id: commentId,
+          postId: id,
+          authorId: anonymous ? null : profile.id,
+          pseudonym: anonymous ? deriveAnonHandle(profile.id) : null,
+          parentId: parentId || null,
+          body,
+          isAnonymous: anonymous,
+          status: safety.status,
+        })
+        .returning();
+
+      if (anonymous) {
+        await tx
+          .insert(anonIdentityVault)
+          .values({
+            handle: deriveAnonHandle(profile.id),
+            sealedIdentity: sealIdentity(profile.id),
+          })
+          .onConflictDoNothing({ target: anonIdentityVault.handle });
+      }
+
+      return inserted;
+    });
 
     // Award +2 points
     await db.update(userProfiles)
       .set({ points: (profile.points || 0) + 2 })
       .where(eq(userProfiles.id, profile.id));
 
-    // Trigger notification
+    // Trigger notification. Never notify anonymous authors — the notification
+    // system has no way to address them without deanonymizing them.
     if (parentId) {
-      // Notify parent comment author
       const parentComment = await db.query.comments.findFirst({
         where: eq(comments.id, parentId),
       });
-      if (parentComment && parentComment.authorId !== profile.id) {
+      if (parentComment && parentComment.authorId && parentComment.authorId !== profile.id) {
         await db.insert(notifications).values({
           userId: parentComment.authorId,
           type: "REPLY",
@@ -87,11 +128,10 @@ export async function POST(req: Request, { params }: RouteParams) {
         });
       }
     } else {
-      // Notify post author
       const targetPost = await db.query.posts.findFirst({
         where: eq(posts.id, id),
       });
-      if (targetPost && targetPost.authorId !== profile.id) {
+      if (targetPost && targetPost.authorId && targetPost.authorId !== profile.id) {
         await db.insert(notifications).values({
           userId: targetPost.authorId,
           type: "COMMENT",

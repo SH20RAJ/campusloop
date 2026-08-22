@@ -27,10 +27,10 @@ export function FeedCardHeader({
   const [showMenu, setShowMenu] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const authorName = post.isAnonymous ? "Anonymous Student" : post.author.displayName;
-  const authorHandle = post.isAnonymous ? "anonymous" : post.author.username;
-  const avatarFallback = post.isAnonymous ? "A" : post.author.displayName[0];
-  const avatarUrl = post.isAnonymous ? "" : getAvatarUrl(post.author.avatarUrl, post.author.username);
+  const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
+  const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
+  const avatarFallback = post.isAnonymous ? "A" : (post.author?.displayName?.[0] ?? "S");
+  const avatarUrl = post.isAnonymous ? "" : getAvatarUrl(post.author?.avatarUrl, post.author?.username ?? "student");
 
   return (
     <div className="p-5 pb-2 flex items-center justify-between">
@@ -53,7 +53,7 @@ export function FeedCardHeader({
             {!post.isAnonymous ? (
               <Link href={`/@${authorHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer flex items-center gap-1 truncate">
                 <span className="truncate">{authorName}</span>
-                {(post.author?.points >= 150 || post.author?.role === "ADMIN") && (
+                {(post.author && (post.author.points >= 150 || post.author.role === "ADMIN")) && (
                   <span title="Verified Campus Star (Unlocked at 150+ LP)">
                     <svg className="size-3.5 text-blue-500 fill-blue-500/20 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>

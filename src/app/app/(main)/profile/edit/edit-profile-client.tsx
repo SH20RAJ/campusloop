@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Lock, Check } from "lucide-react";
+import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getAvatarUrl } from "@/lib/utils";
 import { useProfile } from "@/hooks/use-profile";
+import { validateDisplayName, validateUsername } from "@/lib/validation";
 
 const INTEREST_SUGGESTIONS = [
   "Tech & Coding 💻",
@@ -39,6 +39,9 @@ export function EditProfileClient() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const nameVal = displayName ? validateDisplayName(displayName) : null;
+  const userVal = username ? validateUsername(username) : null;
+
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.displayName || "");
@@ -60,7 +63,7 @@ export function EditProfileClient() {
   }
 
   function handleGenerateDiceBearAvatar() {
-    const seed = username.trim() || "student";
+    const seed = username.trim() || displayName.trim() || "student";
     const generated = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`;
     setAvatarUrl(generated);
     toast.success("Generated new Campus avatar! 🎨");
@@ -71,18 +74,32 @@ export function EditProfileClient() {
     setIsSaving(true);
     setError(null);
 
+    const nameCheck = validateDisplayName(displayName);
+    if (!nameCheck.isValid) {
+      setError(nameCheck.error || "Please provide a valid display name.");
+      setIsSaving(false);
+      return;
+    }
+
+    const userCheck = validateUsername(username);
+    if (!userCheck.isValid) {
+      setError(userCheck.error || "Please provide a valid username.");
+      setIsSaving(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/profile/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          displayName,
-          username,
+          displayName: displayName.trim(),
+          username: username.trim().toLowerCase(),
           gender,
-          course,
-          branch,
+          course: course.trim(),
+          branch: branch.trim(),
           year,
-          bio,
+          bio: bio.trim(),
           avatarUrl,
           interests,
         }),
@@ -155,26 +172,54 @@ export function EditProfileClient() {
           </div>
         </div>
 
-        {/* Basic Details (Display Name & Username) */}
+        {/* Basic Details (Display Name & Username) with Validation */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
           <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
             <User className="size-3.5 text-primary" /> Identity Details
           </h3>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-muted-foreground">Display Name (2-50 chars)</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-muted-foreground">Full / Display Name</label>
+              {nameVal && !nameVal.isValid && (
+                <span className="text-[10px] text-destructive font-semibold flex items-center gap-1">
+                  <AlertCircle className="size-3" /> {nameVal.error}
+                </span>
+              )}
+              {nameVal && nameVal.isValid && (
+                <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
+                  <Check className="size-3" /> Valid name
+                </span>
+              )}
+            </div>
             <input
               type="text"
               required
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Your full name or handle"
-              className="w-full rounded-xl border border-border/60 bg-muted/20 px-3.5 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary focus:bg-background transition-all"
+              placeholder="e.g. Aarav Sharma"
+              className={`w-full rounded-xl border bg-muted/20 px-3.5 py-2 text-xs font-semibold text-foreground outline-none transition-all ${
+                nameVal && !nameVal.isValid
+                  ? "border-destructive focus:border-destructive"
+                  : "border-border/60 focus:border-primary focus:bg-background"
+              }`}
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-muted-foreground">Campus Username (@handle)</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-muted-foreground">Campus Username (@handle)</label>
+              {userVal && !userVal.isValid && (
+                <span className="text-[10px] text-destructive font-semibold flex items-center gap-1">
+                  <AlertCircle className="size-3" /> {userVal.error}
+                </span>
+              )}
+              {userVal && userVal.isValid && (
+                <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
+                  <Check className="size-3" /> Valid handle
+                </span>
+              )}
+            </div>
             <div className="relative">
               <span className="absolute left-3.5 top-2 text-xs font-bold text-muted-foreground">@</span>
               <input
@@ -183,12 +228,16 @@ export function EditProfileClient() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="username"
-                className="w-full pl-8 pr-3.5 py-2 rounded-xl border border-border/60 bg-muted/20 text-xs font-semibold text-foreground outline-none focus:border-primary focus:bg-background transition-all"
+                className={`w-full pl-8 pr-3.5 py-2 rounded-xl border bg-muted/20 text-xs font-semibold text-foreground outline-none transition-all ${
+                  userVal && !userVal.isValid
+                    ? "border-destructive focus:border-destructive"
+                    : "border-border/60 focus:border-primary focus:bg-background"
+                }`}
               />
             </div>
           </div>
 
-          {/* Gender Selector as requested by user */}
+          {/* Gender Selector */}
           <div className="space-y-1.5 pt-1">
             <label className="text-xs font-semibold text-muted-foreground">Gender Identification</label>
             <div className="grid grid-cols-3 gap-2">
@@ -301,7 +350,7 @@ export function EditProfileClient() {
         {/* Action Button */}
         <button
           type="submit"
-          disabled={isSaving}
+          disabled={isSaving || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid)}
           className="w-full py-3 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
         >
           <Save className="size-4" />

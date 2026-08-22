@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq } from "drizzle-orm";
+import { validateDisplayName, validateUsername } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -63,22 +64,20 @@ export async function PATCH(req: Request) {
     const updateData: Partial<typeof userProfiles.$inferInsert> = {};
 
     if (body.displayName !== undefined) {
-      const trimmed = body.displayName.trim();
-      if (trimmed.length < 2 || trimmed.length > 50) {
-        return NextResponse.json({ error: "Display name must be between 2 and 50 characters" }, { status: 400 });
+      const val = validateDisplayName(body.displayName);
+      if (!val.isValid) {
+        return NextResponse.json({ error: val.error }, { status: 400 });
       }
-      updateData.displayName = trimmed;
+      updateData.displayName = body.displayName.trim();
     }
 
     if (body.username !== undefined) {
-      const trimmed = body.username.trim().toLowerCase();
-      if (!/^[a-z0-9_]{3,30}$/.test(trimmed)) {
-        return NextResponse.json(
-          { error: "Username must be 3-30 characters and contain only letters, numbers, and underscores" },
-          { status: 400 }
-        );
+      const val = validateUsername(body.username);
+      if (!val.isValid) {
+        return NextResponse.json({ error: val.error }, { status: 400 });
       }
 
+      const trimmed = body.username.trim().toLowerCase();
       if (trimmed !== existingProfile.username) {
         const taken = await db.query.userProfiles.findFirst({
           where: eq(userProfiles.username, trimmed),

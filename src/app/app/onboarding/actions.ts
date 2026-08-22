@@ -6,6 +6,7 @@ import { userProfiles, institutionDomains } from "@/db/schema";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { validateDisplayName, validateUsername } from "@/lib/validation";
 
 export async function completeOnboarding(formData: FormData) {
   const user = await hexclaveServerApp.getUser();
@@ -20,12 +21,25 @@ export async function completeOnboarding(formData: FormData) {
 
   const username = formData.get("username") as string;
   const displayName = formData.get("displayName") as string;
-  
-  if (!username || !displayName) {
-    throw new Error("Missing required fields");
+  const gender = (formData.get("gender") as "MALE" | "FEMALE" | "OTHER") || "MALE";
+  const avatarUrl = (formData.get("avatarUrl") as string) || null;
+  const course = (formData.get("course") as string)?.trim() || null;
+  const branch = (formData.get("branch") as string)?.trim() || null;
+  const year = Number(formData.get("year")) || 1;
+  const bio = (formData.get("bio") as string)?.trim() || null;
+
+  // Strict Name & Username Validation
+  const nameVal = validateDisplayName(displayName);
+  if (!nameVal.isValid) {
+    throw new Error(nameVal.error);
   }
 
-  const domain = email.split('@')[1]?.toLowerCase();
+  const userVal = validateUsername(username);
+  if (!userVal.isValid) {
+    throw new Error(userVal.error);
+  }
+
+  const domain = email.split("@")[1]?.toLowerCase();
   if (!domain) {
     throw new Error("Invalid email format");
   }
@@ -33,7 +47,7 @@ export async function completeOnboarding(formData: FormData) {
   const db = getDb();
 
   const whitelistedDomain = await db.query.institutionDomains.findFirst({
-    where: eq(institutionDomains.domain, domain)
+    where: eq(institutionDomains.domain, domain),
   });
 
   if (!whitelistedDomain) {
@@ -55,19 +69,26 @@ export async function completeOnboarding(formData: FormData) {
     }
   }
 
-  const rawUsername = email.split('@')[0] || "student";
+  const rawUsername = email.split("@")[0] || "student";
   const officialName = rawUsername
     .split(/[\._\-]/)
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+
+  const cleanAvatarUrl = avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
 
   try {
     await db.insert(userProfiles).values({
       userId: user.id,
-      username,
-      displayName,
+      username: username.trim().toLowerCase(),
+      displayName: displayName.trim(),
       officialName,
-      avatarUrl: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`,
+      avatarUrl: cleanAvatarUrl,
+      gender,
+      course,
+      branch,
+      year,
+      bio,
       institutionId: whitelistedDomain.institutionId,
       referredById: referrerId,
       onboardingCompleted: true,
@@ -76,16 +97,17 @@ export async function completeOnboarding(formData: FormData) {
     });
 
     if (referrerProfile) {
-      await db.update(userProfiles)
-        .set({ 
+      await db
+        .update(userProfiles)
+        .set({
           referralCount: (referrerProfile.referralCount || 0) + 1,
-          points: (referrerProfile.points || 0) + 20
+          points: (referrerProfile.points || 0) + 20,
         })
         .where(eq(userProfiles.id, referrerProfile.id));
     }
   } catch (error: unknown) {
-    if (typeof error === "object" && error !== null && "code" in error && (error as { code?: string }).code === '23505') {
-      throw new Error("Username already taken");
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code?: string }).code === "23505") {
+      throw new Error("Username already taken. Please pick a different one.");
     }
     throw error;
   }

@@ -10,48 +10,54 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   try {
     const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     const { searchParams } = new URL(req.url);
     const scope = searchParams.get("scope") as "CAMPUS" | "GLOBAL" | null;
     const type = searchParams.get("type");
     const sort = normalizeApiFeedSort(searchParams.get("sort"));
     const visibility = searchParams.get("visibility");
-    const page = Number(searchParams.get("page")) || 1;
-    const limit = Math.min(Number(searchParams.get("limit")) || 12, 50);
+    const page = Math.max(1, Number(searchParams.get("page")) || 1);
+    const limit = Math.min(Math.max(1, Number(searchParams.get("limit")) || 20), 50);
     const offset = (page - 1) * limit;
     const hashtag = searchParams.get("hashtag");
 
     const db = getDb();
 
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
+    let profileId: string | null = null;
+    let institutionId: string | null = null;
 
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
+    if (user) {
+      const profile = await db.query.userProfiles.findFirst({
+        where: eq(userProfiles.userId, user.id),
+      });
+      if (profile) {
+        profileId = profile.id;
+        institutionId = profile.institutionId;
+      }
     }
 
     const conditions: SQL[] = [eq(posts.status, "PUBLISHED")];
-    if (scope === "CAMPUS" && profile.institutionId) {
-      conditions.push(eq(posts.institutionId, profile.institutionId));
+
+    if (scope === "CAMPUS" && institutionId) {
+      conditions.push(eq(posts.institutionId, institutionId));
     }
+
     if (type && type !== "ALL" && type !== "all") {
       conditions.push(eq(posts.type, type as (typeof posts.type.enumValues)[number]));
     }
+
     if (visibility === "anonymous") {
       conditions.push(eq(posts.isAnonymous, true));
     } else if (visibility === "public") {
       conditions.push(eq(posts.isAnonymous, false));
     }
+
     if (hashtag) {
       conditions.push(sql`${posts.body} ILIKE ${`%#${hashtag}%`}`);
     }
 
     const rawFeed = await resolveFeedPage({ conditions, sort, limit, offset });
-    const feed = await formatApiFeedPosts(rawFeed, profile.id);
+    const feed = await formatApiFeedPosts(rawFeed, profileId);
 
     return NextResponse.json(feed);
   } catch (error) {

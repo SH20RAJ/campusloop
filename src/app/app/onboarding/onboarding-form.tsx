@@ -2,17 +2,60 @@
 
 import { useState } from "react";
 import { completeOnboarding } from "./actions";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Sparkles, User, ShieldCheck, Check, AlertCircle } from "lucide-react";
+import { validateDisplayName, validateUsername } from "@/lib/validation";
 
 export function OnboardingForm() {
+  const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
+  const [gender, setGender] = useState<"MALE" | "FEMALE" | "OTHER">("MALE");
+  const [course, setCourse] = useState("");
+  const [branch, setBranch] = useState("");
+  const [year, setYear] = useState(1);
+  const [bio, setBio] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const nameVal = displayName ? validateDisplayName(displayName) : null;
+  const userVal = username ? validateUsername(username) : null;
+
+  function handleGenerateAvatar() {
+    const seed = username.trim() || displayName.trim() || "student";
+    const generated = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`;
+    setAvatarUrl(generated);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
-    const formData = new FormData(e.currentTarget);
+
+    const nameCheck = validateDisplayName(displayName);
+    if (!nameCheck.isValid) {
+      setError(nameCheck.error || "Please enter a valid display name");
+      setIsLoading(false);
+      return;
+    }
+
+    const userCheck = validateUsername(username);
+    if (!userCheck.isValid) {
+      setError(userCheck.error || "Please enter a valid username");
+      setIsLoading(false);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("displayName", displayName);
+    formData.set("username", username);
+    formData.set("gender", gender);
+    formData.set("course", course);
+    formData.set("branch", branch);
+    formData.set("year", String(year));
+    formData.set("bio", bio);
+    formData.set("avatarUrl", avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`);
+
     try {
       await completeOnboarding(formData);
     } catch (err) {
@@ -21,45 +64,174 @@ export function OnboardingForm() {
     }
   }
 
+  const currentAvatar = avatarUrl || (username ? `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}` : "");
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <label htmlFor="displayName" className="text-sm font-medium">Display Name</label>
-        <input 
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5 select-none">
+      {/* Avatar Picker */}
+      <div className="flex flex-col items-center justify-center space-y-2.5 rounded-2xl border border-border/60 bg-muted/20 p-4 text-center">
+        <Avatar className="h-20 w-20 border-2 border-primary/40 shadow-lg">
+          <AvatarImage src={currentAvatar} />
+          <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
+            {displayName ? displayName[0].toUpperCase() : "U"}
+          </AvatarFallback>
+        </Avatar>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleGenerateAvatar}
+            className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+          >
+            <Sparkles className="size-3.5" /> 🎲 Generate Avatar
+          </button>
+        </div>
+      </div>
+
+      {/* Full / Display Name Input with Live Validation */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <label htmlFor="displayName" className="text-xs font-bold text-foreground flex items-center gap-1">
+            <User className="size-3.5 text-primary" /> Full Name <span className="text-destructive">*</span>
+          </label>
+          {nameVal && !nameVal.isValid && (
+            <span className="text-[10px] text-destructive font-semibold flex items-center gap-1">
+              <AlertCircle className="size-3" /> {nameVal.error}
+            </span>
+          )}
+          {nameVal && nameVal.isValid && (
+            <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
+              <Check className="size-3" /> Valid name
+            </span>
+          )}
+        </div>
+        <input
           id="displayName"
           name="displayName"
-          type="text" 
-          placeholder="e.g. John Doe" 
-          required 
-          className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          type="text"
+          placeholder="e.g. Aarav Sharma"
+          required
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          className={`w-full rounded-xl border bg-muted/20 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none transition-all ${
+            nameVal && !nameVal.isValid
+              ? "border-destructive focus:border-destructive"
+              : "border-border/60 focus:border-primary"
+          }`}
         />
+        <p className="text-[10px] text-muted-foreground">Real student names help connect with campus peers.</p>
       </div>
-      
-      <div className="flex flex-col gap-2">
-        <label htmlFor="username" className="text-sm font-medium">Username</label>
-        <input 
-          id="username"
-          name="username"
-          type="text" 
-          placeholder="e.g. johndoe99" 
-          required 
-          className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+
+      {/* Username Handle Input */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <label htmlFor="username" className="text-xs font-bold text-foreground">
+            Campus Username <span className="text-destructive">*</span>
+          </label>
+          {userVal && !userVal.isValid && (
+            <span className="text-[10px] text-destructive font-semibold">{userVal.error}</span>
+          )}
+          {userVal && userVal.isValid && (
+            <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
+              <Check className="size-3" /> Valid handle
+            </span>
+          )}
+        </div>
+        <div className="relative">
+          <span className="absolute left-3.5 top-2.5 text-xs font-bold text-muted-foreground">@</span>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            placeholder="aarav_sharma"
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className={`w-full pl-8 pr-3.5 py-2.5 rounded-xl border bg-muted/20 text-xs font-semibold text-foreground focus:outline-none transition-all ${
+              userVal && !userVal.isValid
+                ? "border-destructive focus:border-destructive"
+                : "border-border/60 focus:border-primary"
+            }`}
+          />
+        </div>
+        <p className="text-[10px] text-muted-foreground">Visible on public posts and your campus profile.</p>
+      </div>
+
+      {/* Gender Selection */}
+      <div className="space-y-1.5">
+        <label className="text-xs font-bold text-foreground">Gender Identification</label>
+        <div className="grid grid-cols-3 gap-2">
+          {(["MALE", "FEMALE", "OTHER"] as const).map((g) => (
+            <button
+              key={g}
+              type="button"
+              onClick={() => setGender(g)}
+              className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                gender === g
+                  ? "border-primary bg-primary/10 text-primary shadow-xs"
+                  : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {g === "MALE" ? "👨 Male" : g === "FEMALE" ? "👩 Female" : "✨ Other"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Academic Info */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-muted-foreground">Course (e.g. B.Tech)</label>
+          <input
+            type="text"
+            placeholder="B.Tech / MBA"
+            value={course}
+            onChange={(e) => setCourse(e.target.value)}
+            className="w-full rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs font-semibold text-foreground focus:border-primary outline-none"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-muted-foreground">Year of Study</label>
+          <select
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+            className="w-full rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs font-semibold text-foreground focus:border-primary outline-none"
+          >
+            {[1, 2, 3, 4, 5].map((y) => (
+              <option key={y} value={y}>
+                Year {y}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Campus Bio */}
+      <div className="space-y-1">
+        <label className="text-xs font-semibold text-muted-foreground">Campus Bio</label>
+        <textarea
+          rows={2}
+          placeholder="Tell your college what you study or like..."
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          className="w-full rounded-xl border border-border/60 bg-muted/20 p-2.5 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary resize-none"
         />
-        <p className="text-xs text-muted-foreground">This will be public on your profile, but hidden on anonymous posts.</p>
       </div>
 
       {error && (
-        <div className="rounded-xl bg-destructive/20 p-4 text-sm text-destructive">
+        <div className="rounded-xl bg-destructive/15 border border-destructive/30 p-3 text-xs font-semibold text-destructive text-center">
           {error}
         </div>
       )}
 
-      <button 
-        type="submit" 
-        disabled={isLoading}
-        className="mt-4 flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
+      <button
+        type="submit"
+        disabled={isLoading || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid)}
+        className="mt-2 flex w-full items-center justify-center rounded-2xl bg-primary px-4 py-3 text-xs font-bold text-primary-foreground transition-all hover:bg-primary/95 disabled:opacity-50 shadow-md cursor-pointer"
       >
-        {isLoading ? "Setting up..." : "Complete Setup"}
+        <ShieldCheck className="size-4 mr-1.5" />
+        {isLoading ? "Setting up profile..." : "Complete Setup & Enter Campus"}
       </button>
     </form>
   );

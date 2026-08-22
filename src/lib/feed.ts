@@ -266,7 +266,7 @@ function stripAuthorForAnonymity<T extends { isAnonymous: boolean; pseudonym?: s
 	return post;
 }
 
-export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProfileId: string) {
+export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProfileId?: string | null) {
 	const db = getDb();
 
 	const repostOfIds = Array.from(

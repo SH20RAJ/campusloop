@@ -1,105 +1,190 @@
-# 🚀 CampusLoop
+# 🎓 CampusLoop — The Verified Campus Social Network
 
-CampusLoop is the **ultimate social layer built exclusively for college students**. Speak freely via anonymous confessions, vote on local drama, join custom hobby communities, swipe to match on verified profiles, and build your social presence — all gatekept securely by your official student email.
+<p align="center">
+  <img src="public/logo.png" alt="CampusLoop Logo" width="96" height="96" />
+</p>
 
-🌐 **Production Link:** [https://campusloop.space](https://campusloop.space)
+<p align="center">
+  <strong>Your Campus, Unfiltered.</strong><br />
+  The private digital social layer for college campuses — gatekept by verified student email.
+</p>
 
----
-
-## ✨ Key Features
-
-### 1. ⚡ Loop Points (LP) & Vibe Ranks
-- **Gamified Engagement**: Users earn Loop Points (LP) automatically for participating in the campus ecosystem:
-  - **+20 LP** per successfully onboarding referral invite.
-  - **+5 LP** per post created.
-  - **+2 LP** per discussion comment or reply posted.
-  - **+1 LP** per poll vote/post heart.
-- **Dynamic Vibe Badges**: Users receive special rank badges displayed directly on their profile cards:
-  - `🔥 Campus Legend` (>= 500 LP)
-  - `👑 Campus Talker` (>= 200 LP)
-  - `⚡ Loop Starter` (>= 0 LP)
-
-### 2. 📱 PWA Integration & Mobile optimization
-- **Home Screen Install**: Fully compliant PWA manifest (`manifest.json`) and service worker (`sw.js`) for a premium mobile-first application experience.
-- **Micro-Animations & Toasts**: Sleek, non-intrusive toast popups powered by `sonner` replace legacy browser alerts, offering smooth feedback when copying invite handles or posting stories.
-
-### 3. 🎨 Fullscreen Vibe Creator (Stories)
-- **Creative Canvas**: Separate interactive creator view at `/app/stories/new` with live canvas preview.
-- **Customization**: Support for multiple gradients, typography alignments (Left/Center/Right), and Gen-Z stickers (maximum 3 to keep it clean).
-
-### 4. 🔗 Dynamic Vanity URLs (`/@username`)
-- **Vanity URL routing**: Students get beautiful vanity URLs directly at the root level: `campusloop.space/@username`.
-- **High-Virality Conversion**: Non-logged-in visitors landing on a user's vanity link see a premium locked teaser card encouraging them to register with their college email to unlock private chats and posts.
-
-### 5. 💬 Instant Messaging & Swiping
-- **Matching Preferences**: Filter candidates by gender and college scope (Campus vs. Global).
-- **Direct Chat Redirection**: Click "Message" on any profile to instantly start/resume private chats.
+<p align="center">
+  <a href="https://campusloop.space"><strong>🌐 Live App (campusloop.space)</strong></a> •
+  <a href="https://campusloop.space/overview"><strong>📊 Strategic Overview</strong></a> •
+  <a href="https://campusloop.space/pitch"><strong>⚡ Pitch Deck</strong></a> •
+  <a href="https://app.notion.com/p/Campusloop-3c4cd0ed0c2580b88ac4f1c2ae54961b"><strong>📝 Notion Database</strong></a>
+</p>
 
 ---
 
-## 📚 Documentation & Architecture
+## 🎯 What is CampusLoop?
 
-For detailed architecture guides, design system tokens, and roadmap specs, check out the [`docs/`](campusloop/docs) directory:
+Student life is fragmented across loose WhatsApp groups, Instagram pages, Discord servers, anonymous confession accounts, and event links. 
 
-- 🏗️ [**Architecture & AI Agent Guide**](campusloop/docs/ARCHITECTURE.md)
-- 🎨 [**Design System**](campusloop/docs/DESIGN_SYSTEM.md)
-- 🗺️ [**Roadmap & Phases**](campusloop/docs/ROADMAP_PHASES.md)
-- 📜 [**Changelog**](campusloop/docs/CHANGELOG.md)
+**CampusLoop brings the entire campus social graph into one unified, verified digital network.**
 
----
-
-## 🛠️ Stack & Technologies
-
-- **Frontend**: Next.js 16 (App Router), React 19, TypeScript, Vanilla CSS + Tailwind
-- **Backend/Auth**: Hexclave Auth (sign-in, sessions, server credentials)
-- **Database**: PostgreSQL (Neon Serverless) + Drizzle ORM
-- **Deployment**: OpenNext + Cloudflare Workers (Wrangler Edge)
-- **Notifications**: Sonner Toasts
+- **Consumer Thesis**: *"Your campus, unfiltered."* Safe yapping, confessions, canteen polls, lost & found, and peer connections without corporate or faculty eyes.
+- **Investor Thesis**: *"The verified social graph for higher education in India."* Building dense campus-by-campus network effects across 1,350+ indexed colleges, monetizing attention and hyper-local transactions.
 
 ---
 
-## ⚙️ Setup & Installation
+## 🌟 The 5 Core Product Layers
 
-1. **Clone the Repository & Install Dependencies**:
-   ```bash
-   bun install
-   ```
+```
+                               ┌─────────────────────────────────────────┐
+                               │     🎓 CAMPUSLOOP PRODUCT ARCHITECTURE  │
+                               └────────────────────┬────────────────────┘
+                                                    │
+     ┌───────────────────┬──────────────────┬───────┴──────────┬──────────────────┐
+     ▼                   ▼                  ▼                  ▼                  ▼
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  1. IDENTITY │  │  2. SOCIAL   │  │3. CONNECTION │  │  4. UTILITY  │  │  5. CLOUT    │
+│  GATEKEEPING │  │   & FEEDS    │  │  & MATCHING  │  │ & SUB-HUBS   │  │ GAMIFICATION │
+└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
+```
 
-2. **Configure Environment Variables**:
-   Create a `.env.local` file:
-   ```env
-   DB_URL="postgresql://neondb_owner:..."
-   NEXT_PUBLIC_HEXCLAVE_API_URL="https://api.stack-auth.com"
-   NEXT_PUBLIC_HEXCLAVE_PROJECT_ID="e40e0f..."
-   HEXCLAVE_SECRET_SERVER_KEY="ssk_..."
-   ```
+### 1. 🛡️ Identity & Gatekeeping Layer
+- **Institutional OTP Verification**: Access is restricted strictly to verified `.ac.in` and `.edu` college emails.
+- **Campus & Global Scope**: Seamlessly toggle between your local college feed and across all 1,350+ colleges in India.
+- **Outsider Isolation**: Corporate recruiters, bots, and non-students are strictly blocked.
 
-3. **Push Schema and Seed DB**:
-   ```bash
-   bun run db:push
-   bun run db:seed
-   ```
+### 2. 💬 Social & Discussion Layer
+- **Multi-Sort Feed Engine**: 5 distinct feed tabs (*🔥 For You, Latest, Trending, Top Voted, Discussed*).
+- **Post Types**: Thoughts, Confessions, Interactive Polls with custom options, and Questions.
+- **1-Tap & Quoted Reposts**: Twitter-style reposts with embedded quote previews.
+- **24-Hour Stories (Vibes)**: Fullscreen visual vibe sharing with custom Gen-Z stickers & color gradients.
 
-4. **Start Development Server**:
-   ```bash
-   bun run dev
-   ```
+### 3. 💖 Connection & Matchmaking Layer
+- **Campus Match Deck**: Swipe card deck for connecting with verified fellow students.
+- **Filtering**: Scope candidates by gender and college radius (Campus vs. Global).
+- **Instant Messaging**: Real-time 1-on-1 DMs with typing indicators and match overlays.
+
+### 4. 🏫 Campus Utility & Sub-Hubs
+- **Lost & Found Bulletin**: Post lost keys, IDs, or electronics with instant claim messaging.
+- **Sub-Hub Communities**: Student-created interest groups (Coding Club, Anime Otakus, Music Jams, Hostel Hubs).
+- **Directory**: 1,350+ indexed Indian college hubs with instant search & hub request forms.
+
+### 5. ⚡ Clout, Reputation & Virality (Loop Points - LP)
+- **Micro-Incentives**: Earn **Loop Points (LP)** for participation:
+  - **+20 LP**: Per successful student referral onboarding.
+  - **+5 LP**: Per post created.
+  - **+2 LP**: Per comment / reply.
+  - **+1 LP**: Per poll vote / upvote.
+- **Dynamic Vibe Badges**: `🔥 Campus Legend` (≥500 LP), `👑 Campus Talker` (≥200 LP), `⚡ Loop Starter`.
 
 ---
 
-## 🚀 Production Deployment
+## 🏰 Network Moat: Campus Density > User Count
 
-Wrangler variables and credentials must be set before deploying.
+The value of CampusLoop is **not** in total user headcount across India — it is in **local campus network density**.
 
-1. **Set Secrets on Cloudflare**:
-   ```bash
-   echo "YOUR_POSTGRES_URL" | bunx wrangler secret put DB_URL
-   echo "https://api.stack-auth.com" | bunx wrangler secret put NEXT_PUBLIC_HEXCLAVE_API_URL
-   echo "YOUR_PROJECT_ID" | bunx wrangler secret put NEXT_PUBLIC_HEXCLAVE_PROJECT_ID
-   echo "YOUR_SERVER_KEY" | bunx wrangler secret put HEXCLAVE_SECRET_SERVER_KEY
-   ```
+| Metric Type | Weak Social Network | CampusLoop Strategy |
+| :--- | :--- | :--- |
+| **User Distribution** | 5,000 users scattered across 500 colleges | 5,000 verified classmates in **1 college** |
+| **Network Effect** | Zero daily retention pull | **25%+ local campus penetration (Unbreakable Moat)** |
+| **Virality** | Generic referral ads | High-velocity organic WhatsApp class group sharing |
 
-2. **Deploy to Workers**:
-   ```bash
-   bun run deploy
-   ```
+---
+
+## 📊 India Higher Education Market Sizing
+
+- **Total Addressable Market (TAM)**: **43.3 Million+** enrolled students in Indian higher education.
+- **Serviceable Addressable Market (SAM)**: **12.5 Million+** students across engineering, tech, medical & management campuses.
+- **Indexed College Hubs**: **1,350+** verified Indian universities pre-indexed.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+- **Framework**: Next.js 16 (App Router + Turbopack)
+- **Runtime & Deployment**: Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`)
+- **Database**: Neon Serverless Postgres via Drizzle ORM
+- **Auth & User Management**: Hexclave Auth (`hexclaveServerApp.getUser()`)
+- **Rich Text Editor**: Tiptap Editor
+- **Styling & UI**: Vanilla CSS + TailwindCSS + Framer Motion + Lucide Icons + Sonner Toasts
+- **Package Manager**: Bun (`bun run dev`, `bun run deploy`)
+
+---
+
+## 📂 Project Sitemap
+
+```
+campusloop/
+├── docs/                      # Architectural docs & design guidelines
+│   ├── ARCHITECTURE.md
+│   ├── DESIGN_SYSTEM.md
+│   ├── ROADMAP_PHASES.md
+│   └── CHANGELOG.md
+├── OVERVIEW.md                # Strategic Brief & Deep Research document
+├── AGENTS.md                  # Instructions & rules for AI agents
+├── src/
+│   ├── app/                   # Next.js App Router (Pages & API routes)
+│   │   ├── (main)/            # Main app shell (Feed, Dating, Stories, Chat)
+│   │   ├── overview/          # Strategic overview page (/overview)
+│   │   ├── pitch/             # Pitch deck page (/pitch)
+│   │   ├── api/               # REST API endpoints (/api/feed, /api/posts, etc.)
+│   │   └── admin/             # Admin moderation dashboard
+│   ├── components/            # Feature subcomponents & Shadcn primitives
+│   │   ├── feed/              # Feed cards, sorters, repost modals
+│   │   ├── post/              # Composer toolbar, poll editor, anonymity notice
+│   │   ├── stories/           # Story viewer & creator components
+│   │   ├── dating/            # Match deck & filters modal
+│   │   └── ui/                # Shared UI primitives
+│   ├── db/                    # Drizzle ORM schema & Neon database client
+│   ├── hexclave/              # Hexclave SDK config
+│   ├── hooks/                 # Custom React hooks (useFeed, useProfile, useStories)
+│   └── lib/                   # API client, feed sorting engine, moderation & LP utilities
+└── .agents/
+    └── skills/
+        └── campusloop-guide/  # Comprehensive AI agent handbook
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Installation
+```bash
+git clone https://github.com/SH20RAJ/campusloop.git
+cd campusloop
+bun install
+```
+
+### 2. Environment Variables
+Create a `.env.local` file:
+```env
+DB_URL="postgresql://neondb_owner:..."
+NEXT_PUBLIC_HEXCLAVE_API_URL="https://api.stack-auth.com"
+NEXT_PUBLIC_HEXCLAVE_PROJECT_ID="e40e0f..."
+HEXCLAVE_SECRET_SERVER_KEY="ssk_..."
+```
+
+### 3. Development & Type Check
+```bash
+# Type Check (Must pass with 0 errors)
+bunx tsc --noEmit
+
+# Development Server
+bun run dev
+```
+
+### 4. Cloudflare Edge Deployment
+```bash
+bun run deploy
+```
+
+---
+
+## 🔗 Resources & Links
+
+- 🌐 **Official Website**: [https://campusloop.space](https://campusloop.space)
+- 📊 **Strategic Overview**: [https://campusloop.space/overview](https://campusloop.space/overview)
+- ⚡ **Investor Pitch Deck**: [https://campusloop.space/pitch](https://campusloop.space/pitch)
+- 📝 **Notion Live Database**: [CampusLoop Notion Hub](https://app.notion.com/p/Campusloop-3c4cd0ed0c2580b88ac4f1c2ae54961b)
+
+---
+
+<p align="center">
+  Made with ❤️ for college students across India.
+</p>

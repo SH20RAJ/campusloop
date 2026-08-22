@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { desc, eq } from "drizzle-orm";
 
-import { getDb } from "@/db";
 import { institutions, posts, userProfiles } from "@/db/schema";
 
 import { ActivityChart } from "./_components/activity-chart";

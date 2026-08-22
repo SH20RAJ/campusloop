@@ -2,24 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
 import {
-  PlusIcon,
-  Trash2Icon,
-  Bold,
-  Italic,
-  List,
-  Heading2,
-  Sparkles,
   School,
   Globe,
-  Users,
-  MessageSquare,
-  BarChart3,
-  HelpCircle,
-  Lock,
+  Sparkles,
   AlertTriangle,
   ArrowRight,
+  Hash,
+  Users,
 } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -28,6 +18,15 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 import { useCommunities } from "@/hooks/use-communities";
+import { useProfile } from "@/hooks/use-profile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PostTypeSelector, type PostType } from "@/components/post/post-type-selector";
+import { PollOptionsEditor } from "@/components/post/poll-options-editor";
+import { AnonymityNotice } from "@/components/post/anonymity-notice";
+import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
+
+const TRENDING_TAGS = ["#LateNightTea", "#Confessions", "#CanteenGossip", "#ExamStress", "#LibraryVibes", "#HostelLife"];
+const MAX_CHARS = 2000;
 
 export function PostComposer({ communityId: initialCommunityId }: { communityId?: string }) {
   const router = useRouter();
@@ -35,14 +34,15 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const [error, setError] = useState<string | null>(null);
 
   // Composer Form State
-  const [postType, setPostType] = useState<"NORMAL" | "CONFESSION" | "POLL" | "QUESTION">("NORMAL");
+  const [postType, setPostType] = useState<PostType>("NORMAL");
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("CAMPUS");
   const [selectedCommunityId, setSelectedCommunityId] = useState<string>(initialCommunityId || "NONE");
   const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [charCount, setCharCount] = useState(0);
 
-  // Fetch communities list for sub-hub publishing
   const { communities } = useCommunities();
+  const { profile } = useProfile();
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -50,9 +50,10 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     editorProps: {
       attributes: {
         class:
-          "w-full min-h-[160px] bg-muted/20 border border-border/60 rounded-2xl px-4 py-3.5 text-sm focus:border-primary/40 focus:ring-1 focus:ring-primary/20 outline-none prose prose-sm dark:prose-invert max-w-none transition-colors",
+          "w-full min-h-[220px] px-5 pb-5 pt-3 text-sm outline-none prose prose-sm dark:prose-invert max-w-none",
       },
     },
+    onUpdate: ({ editor }) => setCharCount(editor.getText().length),
   });
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -127,256 +128,189 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     setPollOptions((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function insertTag(tag: string) {
+    editor?.commands.focus();
+    editor?.commands.insertContent(`${tag} `);
+  }
+
+  const isConfession = postType === "CONFESSION";
+  const overLimit = charCount > MAX_CHARS;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* 1. Interactive Post Type Selector Tabs */}
-      <div className="space-y-1.5">
-        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-          Post Type
-        </span>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {[
-            { id: "NORMAL", label: "Thought", icon: MessageSquare },
-            { id: "CONFESSION", label: "Confession", icon: Lock },
-            { id: "POLL", label: "Poll", icon: BarChart3 },
-            { id: "QUESTION", label: "Question", icon: HelpCircle },
-          ].map((t) => {
-            const Icon = t.icon;
-            const isSelected = postType === t.id;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => {
-                  setPostType(t.id as typeof postType);
-                  if (t.id === "CONFESSION") setIsAnonymous(true);
-                }}
-                className={cn(
-                  "flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer",
-                  isSelected
-                    ? "bg-primary/10 border-primary text-primary shadow-xs"
-                    : "bg-muted/20 border-border/60 hover:bg-muted/40 text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Icon className="size-3.5 shrink-0" />
-                <span>{t.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* ─── Composer Card ─── */}
+      <div className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-xl shadow-black/[0.03]">
+        {/* Identity & Destination Row */}
+        <div className="flex items-center gap-3 px-5 pt-5">
+          <Avatar className="size-10 shrink-0 border border-border/60 shadow-sm">
+            <AvatarImage src={profile?.avatarUrl || ""} />
+            <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
+              {profile?.displayName?.[0] || "U"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs font-bold text-foreground">
+              {profile?.displayName || "You"}
+              {(isAnonymous || isConfession) && (
+                <span className="ml-1.5 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-extrabold text-amber-500">
+                  ANON
+                </span>
+              )}
+            </p>
+            <p className="text-[10px] font-semibold text-muted-foreground">
+              posting in{" "}
+              {selectedCommunityId !== "NONE"
+                ? `c/${communities?.find((c) => c.id === selectedCommunityId)?.name ?? "sub-hub"}`
+                : "campus feed"}
+            </p>
+          </div>
 
-      {/* 2. Destination (Campus vs Sub-Hub & Scope) */}
-      <div className="grid gap-3 sm:grid-cols-2">
-        {/* Destination Sub-Hub */}
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-            Publish Destination
-          </label>
-          <select
-            value={selectedCommunityId}
-            onChange={(e) => setSelectedCommunityId(e.target.value)}
-            className="w-full rounded-xl border border-border/60 bg-card px-3 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary/40 cursor-pointer"
-          >
-            <option value="NONE">🎓 My Campus Feed (General)</option>
-            {communities?.map((c) => (
-              <option key={c.id} value={c.id}>
-                c/{c.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Audience Scope */}
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-            Audience Scope
-          </label>
-          <div className="flex rounded-xl bg-muted/30 p-1 border border-border/60 text-xs font-semibold">
+          {/* Audience Scope Segmented */}
+          <div className="flex shrink-0 rounded-xl bg-muted/40 p-0.5 text-[10px] font-bold">
             <button
               type="button"
               onClick={() => setScope("CAMPUS")}
               className={cn(
-                "flex-1 flex items-center justify-center gap-1 py-1 rounded-lg transition-all cursor-pointer",
-                scope === "CAMPUS" ? "bg-background text-foreground shadow-sm font-bold" : "text-muted-foreground"
+                "flex items-center gap-1 rounded-lg px-2 py-1 transition-all cursor-pointer",
+                scope === "CAMPUS" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
               )}
             >
-              <School className="size-3.5" /> Campus Only
+              <School className="size-3" /> Campus
             </button>
             <button
               type="button"
               onClick={() => setScope("GLOBAL")}
               className={cn(
-                "flex-1 flex items-center justify-center gap-1 py-1 rounded-lg transition-all cursor-pointer",
-                scope === "GLOBAL" ? "bg-background text-foreground shadow-sm font-bold" : "text-muted-foreground"
+                "flex items-center gap-1 rounded-lg px-2 py-1 transition-all cursor-pointer",
+                scope === "GLOBAL" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
               )}
             >
-              <Globe className="size-3.5" /> All India
+              <Globe className="size-3" /> India
             </button>
           </div>
         </div>
-      </div>
 
-      {/* 3. Text Editor Box with Formatting Toolbar */}
-      <div className="space-y-2">
-        {editor && (
-          <div className="flex items-center gap-0.5 border border-border/60 border-b-0 rounded-t-xl bg-muted/25 px-3 py-2">
-            <FormatButton icon={Bold} action={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} />
-            <FormatButton icon={Italic} action={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} />
-            <FormatButton icon={Heading2} action={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })} />
-            <div className="w-px h-3.5 bg-border/60 mx-1.5" />
-            <FormatButton icon={List} action={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} />
-          </div>
-        )}
-        <EditorContent editor={editor} />
-      </div>
-
-      {/* 4. Trending Hashtag Helper Pills */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide shrink-0">
-          Trending Topics:
-        </span>
-        {["#LateNightTea", "#Confessions", "#CanteenGossip", "#ExamStress", "#LibraryVibes", "#HostelLife"].map((tag) => (
-          <button
-            key={tag}
-            type="button"
-            onClick={() => editor?.commands.focus() && editor.commands.insertContent(`${tag} `)}
-            className="rounded-lg bg-muted/40 hover:bg-primary/10 border border-border/50 hover:border-primary/30 text-muted-foreground hover:text-primary px-2.5 py-0.5 text-[10.5px] font-semibold transition-all active:scale-95 cursor-pointer"
-          >
-            {tag}
-          </button>
-        ))}
-      </div>
-
-      {/* 5. Poll Options (Conditional) */}
-      {postType === "POLL" && (
-        <div className="space-y-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm animate-in fade-in">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-              <BarChart3 className="size-3.5 text-primary" /> Voting Options
-            </span>
-            {pollOptions.length < 6 && (
-              <button
-                type="button"
-                onClick={addPollOption}
-                className="flex items-center gap-1 text-[10px] text-primary font-bold hover:underline cursor-pointer"
-              >
-                <PlusIcon className="size-3" /> Add Option
-              </button>
-            )}
-          </div>
-          <div className="space-y-2">
-            {pollOptions.map((option, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder={`Option ${index + 1}`}
-                  value={option}
-                  required={index < 2}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
-                  className="flex h-9 flex-1 rounded-xl border border-border/60 bg-muted/20 px-3 py-1.5 text-xs font-medium placeholder:text-muted-foreground outline-none focus:border-primary/40"
-                />
-                {pollOptions.length > 2 && (
-                  <button
-                    type="button"
-                    onClick={() => removePollOption(index)}
-                    className="p-1.5 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                  >
-                    <Trash2Icon className="size-4" />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 6. Anonymous Post Toggle & Safety Warning */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between rounded-2xl border border-border/60 bg-card px-4 py-3">
-          <div className="flex items-center gap-2">
-            <Lock className="size-4 text-amber-500" />
-            <span className="text-xs font-semibold text-foreground">Post Anonymously 🙈</span>
-          </div>
-          <input
-            id="isAnonymous"
-            name="isAnonymous"
-            type="checkbox"
-            checked={isAnonymous}
-            onChange={(e) => setIsAnonymous(e.target.checked)}
-            className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary cursor-pointer"
+        {/* Type Selector */}
+        <div className="px-5 pt-4">
+          <PostTypeSelector
+            value={postType}
+            onChange={(type) => {
+              setPostType(type);
+              if (type === "CONFESSION") setIsAnonymous(true);
+            }}
           />
         </div>
 
-        {isAnonymous && (
-          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-[11px] text-amber-600 dark:text-amber-400 font-semibold space-y-1 animate-in fade-in">
-            <p className="font-bold flex items-center gap-1">
-              <AlertTriangle className="size-3.5 shrink-0" /> Anti-Doxxing & Moderation Notice
-            </p>
-            <p className="text-[10.5px] leading-relaxed text-amber-600/90 dark:text-amber-300/90 font-medium">
-              Anonymous posts hide your student handle from public view. Sharing phone numbers, personal emails, or targeted harassment will result in an automated ban.
-            </p>
+        {/* Publish Destination */}
+        <div className="px-5 pt-3">
+          <div className="relative flex items-center">
+            <Users className="pointer-events-none absolute left-3 size-3.5 text-muted-foreground" />
+            <select
+              value={selectedCommunityId}
+              onChange={(e) => setSelectedCommunityId(e.target.value)}
+              aria-label="Publish destination"
+              className="w-full cursor-pointer appearance-none rounded-xl border border-border/50 bg-muted/20 py-2 pl-9 pr-8 text-xs font-semibold text-foreground outline-none transition-colors focus:border-primary/40"
+            >
+              <option value="NONE">🎓 My Campus Feed (General)</option>
+              {communities?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  c/{c.name}
+                </option>
+              ))}
+            </select>
+            <span className="pointer-events-none absolute right-3 text-muted-foreground">▾</span>
           </div>
+        </div>
+
+        {/* Toolbar */}
+        <div className="px-5 pt-4">
+          <PostComposerToolbar editor={editor} />
+        </div>
+
+        {/* Editor */}
+        <EditorContent editor={editor} />
+
+        {/* Trending Hashtags */}
+        <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 bg-muted/10 px-5 py-3">
+          <span className="flex shrink-0 items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+            <Hash className="size-3" /> Trending
+          </span>
+          {TRENDING_TAGS.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => insertTag(tag)}
+              className="rounded-lg border border-border/50 bg-card px-2 py-0.5 text-[10.5px] font-semibold text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary active:scale-95 cursor-pointer"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+
+        {/* Poll Options */}
+        {postType === "POLL" && (
+          <PollOptionsEditor
+            options={pollOptions}
+            onChange={handleOptionChange}
+            onAdd={addPollOption}
+            onRemove={removePollOption}
+          />
         )}
+
+        {/* Footer: anonymity + counter */}
+        <div className="border-t border-border/40 px-5 py-4 space-y-3">
+          <AnonymityNotice
+            enabled={isAnonymous}
+            onToggle={setIsAnonymous}
+            forcedByType={isConfession}
+          />
+
+          <div className="flex items-center justify-end">
+            <span
+              className={cn(
+                "text-[10px] font-bold tabular-nums",
+                overLimit ? "text-destructive" : "text-muted-foreground"
+              )}
+            >
+              {charCount.toLocaleString()} / {MAX_CHARS.toLocaleString()}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Error Callout */}
       {error && (
-        <div className="rounded-2xl bg-destructive/10 border border-destructive/20 p-3.5 text-xs text-destructive font-semibold">
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-start gap-2 rounded-2xl border border-destructive/20 bg-destructive/10 p-3.5 text-xs font-semibold text-destructive"
+        >
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
           {error}
-        </div>
+        </motion.div>
       )}
 
       {/* Submit Button */}
       <motion.button
         type="submit"
-        disabled={isLoading}
-        whileTap={{ scale: 0.96 }}
-        className="w-full rounded-2xl bg-primary text-white h-11 text-xs font-bold shadow-sm hover:opacity-95 transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+        disabled={isLoading || overLimit}
+        whileTap={{ scale: 0.97 }}
+        className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-orange-500 text-xs font-bold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
       >
         {isLoading ? (
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="flex items-center gap-2"
-          >
+          <>
             <Sparkles className="size-4 animate-spin text-white" />
             <span>Publishing to Campus Loop...</span>
-          </motion.div>
+          </>
         ) : (
           <>
             <span>Publish Post (+5 LP)</span>
-            <motion.div
-              whileHover={{ x: 4 }}
-              transition={{ type: "spring", stiffness: 400 }}
-            >
+            <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400 }}>
               <ArrowRight className="size-4" />
             </motion.div>
           </>
         )}
       </motion.button>
     </form>
-  );
-}
-
-function FormatButton({
-  icon: Icon,
-  action,
-  active,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  action: () => void;
-  active: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={action}
-      className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-        active ? "bg-muted text-foreground font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-      }`}
-    >
-      <Icon className="size-3.5" />
-    </button>
   );
 }

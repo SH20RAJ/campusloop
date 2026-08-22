@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CornerDownRight, Reply } from "lucide-react";
+import { Reply } from "lucide-react";
 import Link from "next/link";
 import { Comment, UserProfile } from "@/db/schema";
 import { getAvatarUrl, formatTimeAgo } from "@/lib/utils";

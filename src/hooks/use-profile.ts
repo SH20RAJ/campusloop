@@ -14,6 +14,8 @@ export interface UserProfileData {
   bio: string | null;
   interests: string[];
   loopPoints: number;
+  points?: number;
+  referralCount?: number;
   institutionId?: string | null;
   institution?: {
     id: string;

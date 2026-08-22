@@ -56,7 +56,7 @@ export async function GET(req: Request) {
       conditions.push(sql`${posts.body} ILIKE ${`%#${hashtag}%`}`);
     }
 
-    const rawFeed = await resolveFeedPage({ conditions, sort, limit, offset });
+    const rawFeed = await resolveFeedPage({ conditions, sort, limit, offset, userInstitutionId: institutionId });
     const feed = await formatApiFeedPosts(rawFeed, profileId);
 
     return NextResponse.json(feed);

@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle } from "lucide-react";
+import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getAvatarUrl } from "@/lib/utils";
 import { useProfile } from "@/hooks/use-profile";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
+import { uploadImageToImgBB } from "@/lib/upload";
 
 const INTEREST_SUGGESTIONS = [
   "Tech & Coding 💻",
@@ -37,7 +38,9 @@ export function EditProfileClient() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingPfp, setIsUploadingPfp] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pfpInputRef = useRef<HTMLInputElement | null>(null);
 
   const nameVal = displayName ? validateDisplayName(displayName) : null;
   const userVal = username ? validateUsername(username) : null;
@@ -60,6 +63,24 @@ export function EditProfileClient() {
     setInterests((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+  }
+
+  async function handlePfpUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingPfp(true);
+    try {
+      toast.loading("Uploading new profile photo to ImgBB...", { id: "pfp-upload" });
+      const res = await uploadImageToImgBB(file);
+      setAvatarUrl(res.displayUrl || res.url);
+      toast.success("Profile photo uploaded! 📸", { id: "pfp-upload" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload photo", { id: "pfp-upload" });
+    } finally {
+      setIsUploadingPfp(false);
+      if (pfpInputRef.current) pfpInputRef.current.value = "";
+    }
   }
 
   function handleGenerateDiceBearAvatar() {
@@ -131,6 +152,15 @@ export function EditProfileClient() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6 pb-12 pt-2 px-4 select-none">
+      {/* Hidden PFP File Input */}
+      <input
+        ref={pfpInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={handlePfpUpload}
+      />
+
       {/* Header Bar */}
       <div className="flex items-center justify-between border-b border-border/40 pb-3">
         <Link
@@ -144,22 +174,33 @@ export function EditProfileClient() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Avatar Section */}
-        <div className="flex flex-col items-center justify-center space-y-3 rounded-2xl border border-border/60 bg-muted/20 p-5 text-center">
-          <Avatar className="h-24 w-24 border-2 border-primary/30 shadow-md">
+        <div className="flex flex-col items-center justify-center space-y-3 rounded-2xl border border-border/60 bg-muted/20 p-5 text-center shadow-xs">
+          <Avatar className="size-24 border-2 border-primary/30 shadow-md">
             <AvatarImage src={avatarUrl || getAvatarUrl(null, username || "user")} />
             <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
               {displayName ? displayName[0].toUpperCase() : "U"}
             </AvatarFallback>
           </Avatar>
 
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+            <button
+              type="button"
+              disabled={isUploadingPfp}
+              onClick={() => pfpInputRef.current?.click()}
+              className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            >
+              {isUploadingPfp ? <Loader2 className="size-3.5 animate-spin text-primary" /> : <Upload className="size-3.5 text-primary" />}
+              <span>Upload Custom Photo</span>
+            </button>
+
             <button
               type="button"
               onClick={handleGenerateDiceBearAvatar}
-              className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-all cursor-pointer"
+              className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer"
             >
-              🎲 Generate Adventurer Avatar
+              🎲 Random Avatar
             </button>
+
             {avatarUrl && (
               <button
                 type="button"
@@ -350,7 +391,7 @@ export function EditProfileClient() {
         {/* Action Button */}
         <button
           type="submit"
-          disabled={isSaving || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid)}
+          disabled={isSaving || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid) || isUploadingPfp}
           className="w-full py-3 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
         >
           <Save className="size-4" />

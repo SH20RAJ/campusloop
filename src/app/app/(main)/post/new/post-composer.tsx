@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   School,
@@ -11,6 +11,9 @@ import {
   Hash,
   Users,
   ChevronDown,
+  Image as ImageIcon,
+  X,
+  Loader2,
 } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -25,6 +28,7 @@ import { PostTypeSelector, type PostType } from "@/components/post/post-type-sel
 import { PollOptionsEditor } from "@/components/post/poll-options-editor";
 import { AnonymityNotice } from "@/components/post/anonymity-notice";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
+import { uploadImageToImgBB } from "@/lib/upload";
 
 const TRENDING_TAGS = ["#LateNightTea", "#Confessions", "#CanteenGossip", "#ExamStress", "#LibraryVibes", "#HostelLife"];
 const MAX_CHARS = 2000;
@@ -42,6 +46,11 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [charCount, setCharCount] = useState(0);
 
+  // Image Upload State
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const { communities } = useCommunities();
   const { profile } = useProfile();
 
@@ -51,11 +60,33 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     editorProps: {
       attributes: {
         class:
-          "w-full min-h-[200px] sm:min-h-[240px] px-4 sm:px-5 pb-5 pt-3 text-sm leading-relaxed outline-none prose prose-sm dark:prose-invert max-w-none placeholder:text-muted-foreground/50",
+          "w-full min-h-[180px] sm:min-h-[220px] px-4 sm:px-5 pb-4 pt-3 text-sm leading-relaxed outline-none prose prose-sm dark:prose-invert max-w-none placeholder:text-muted-foreground/50",
       },
     },
     onUpdate: ({ editor }) => setCharCount(editor.getText().length),
   });
+
+  async function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      toast.loading("Uploading image to ImgBB...", { id: "img-upload" });
+      const uploaded = await uploadImageToImgBB(file);
+      setUploadedImages((prev) => [...prev, uploaded.displayUrl || uploaded.url]);
+      toast.success("Image attached! 📸", { id: "img-upload" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload image", { id: "img-upload" });
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  function handleRemoveImage(index: number) {
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+  }
 
   async function handleSubmit(e?: React.FormEvent<HTMLFormElement>) {
     if (e) e.preventDefault();
@@ -64,8 +95,14 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     setIsLoading(true);
     setError(null);
 
-    const body = editor?.getText() || "";
+    let body = editor?.getText() || "";
     const anon = isAnonymous || postType === "CONFESSION";
+
+    // If images attached, append them to body or format them
+    if (uploadedImages.length > 0) {
+      const imageMarkdown = uploadedImages.map((img) => `\n\n![Image](${img})`).join("");
+      body = `${body.trim()}${imageMarkdown}`;
+    }
 
     if (!body.trim()) {
       setError("Post content cannot be empty.");
@@ -142,6 +179,15 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
 
   return (
     <form onSubmit={(e) => handleSubmit(e)} className="space-y-4 pb-20 sm:pb-0">
+      {/* Hidden image file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={handleImageFileChange}
+      />
+
       {/* ─── Main Glass Composer Card ─── */}
       <div className="overflow-hidden rounded-3xl border border-border/60 bg-card/80 backdrop-blur-xl shadow-xl shadow-black/[0.04]">
         {/* Header: Author + Scope Switcher */}
@@ -225,13 +271,48 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
           </div>
         </div>
 
-        {/* Rich-Text Formatting Toolbar */}
-        <div className="px-4 sm:px-5 pt-3">
-          <PostComposerToolbar editor={editor} />
+        {/* Rich-Text Formatting Toolbar + Image Upload Trigger */}
+        <div className="px-4 sm:px-5 pt-3 flex items-center justify-between gap-2">
+          <div className="flex-1">
+            <PostComposerToolbar editor={editor} />
+          </div>
+
+          <button
+            type="button"
+            disabled={isUploadingImage}
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-1.5 rounded-xl border border-border/80 bg-muted/40 px-3 py-1.5 text-xs font-bold text-foreground hover:bg-muted transition-all cursor-pointer shrink-0 disabled:opacity-50 shadow-2xs"
+            title="Upload image via ImgBB"
+          >
+            {isUploadingImage ? (
+              <Loader2 className="size-3.5 animate-spin text-primary" />
+            ) : (
+              <ImageIcon className="size-3.5 text-rose-500" />
+            )}
+            <span>Add Photo</span>
+          </button>
         </div>
 
         {/* Tiptap Editor Content */}
         <EditorContent editor={editor} />
+
+        {/* Image Attachments Preview Strip */}
+        {uploadedImages.length > 0 && (
+          <div className="px-4 sm:px-5 pb-3 flex flex-wrap gap-2.5">
+            {uploadedImages.map((imgUrl, i) => (
+              <div key={i} className="relative group rounded-2xl overflow-hidden border border-border shadow-md max-w-[140px] max-h-[140px]">
+                <img src={imgUrl} alt="Uploaded attachment" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(i)}
+                  className="absolute top-1 right-1 size-6 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-destructive transition-colors cursor-pointer"
+                >
+                  <X className="size-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Trending Tags Bar (Horizontal Scrollable on Mobile) */}
         <div className="flex items-center gap-2 border-t border-border/40 bg-muted/10 px-4 sm:px-5 py-3 overflow-x-auto no-scrollbar">
@@ -311,7 +392,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         <motion.button
           type="button"
           onClick={() => handleSubmit()}
-          disabled={isLoading || overLimit}
+          disabled={isLoading || overLimit || isUploadingImage}
           whileTap={{ scale: 0.98 }}
           className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary via-orange-500 to-amber-500 text-xs font-bold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/35 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
         >
@@ -336,7 +417,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         <motion.button
           type="button"
           onClick={() => handleSubmit()}
-          disabled={isLoading || overLimit}
+          disabled={isLoading || overLimit || isUploadingImage}
           whileTap={{ scale: 0.97 }}
           className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary via-orange-500 to-amber-500 text-xs font-bold text-white shadow-lg shadow-primary/25 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
         >

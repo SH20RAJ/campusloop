@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { completeOnboarding } from "./actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sparkles, User, ShieldCheck, Check, AlertCircle } from "lucide-react";
+import { Sparkles, User, ShieldCheck, Check, AlertCircle, Upload, Loader2 } from "lucide-react";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { toast } from "sonner";
 
 export function OnboardingForm() {
   const [displayName, setDisplayName] = useState("");
@@ -15,11 +17,31 @@ export function OnboardingForm() {
   const [year, setYear] = useState(1);
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [isUploadingPfp, setIsUploadingPfp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const nameVal = displayName ? validateDisplayName(displayName) : null;
   const userVal = username ? validateUsername(username) : null;
+
+  async function handlePfpUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingPfp(true);
+    try {
+      toast.loading("Uploading photo...", { id: "onb-pfp" });
+      const res = await uploadImageToImgBB(file);
+      setAvatarUrl(res.displayUrl || res.url);
+      toast.success("Profile photo uploaded! 📸", { id: "onb-pfp" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload photo", { id: "onb-pfp" });
+    } finally {
+      setIsUploadingPfp(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   function handleGenerateAvatar() {
     const seed = username.trim() || displayName.trim() || "student";
@@ -68,6 +90,15 @@ export function OnboardingForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5 select-none">
+      {/* Hidden PFP File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={handlePfpUpload}
+      />
+
       {/* Avatar Picker */}
       <div className="flex flex-col items-center justify-center space-y-2.5 rounded-2xl border border-border/60 bg-muted/20 p-4 text-center">
         <Avatar className="h-20 w-20 border-2 border-primary/40 shadow-lg">
@@ -80,10 +111,20 @@ export function OnboardingForm() {
         <div className="flex items-center gap-2">
           <button
             type="button"
+            disabled={isUploadingPfp}
+            onClick={() => fileInputRef.current?.click()}
+            className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+          >
+            {isUploadingPfp ? <Loader2 className="size-3.5 animate-spin text-primary" /> : <Upload className="size-3.5 text-primary" />}
+            <span>Upload Photo</span>
+          </button>
+
+          <button
+            type="button"
             onClick={handleGenerateAvatar}
             className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
           >
-            <Sparkles className="size-3.5" /> 🎲 Generate Avatar
+            <Sparkles className="size-3.5" /> 🎲 Random
           </button>
         </div>
       </div>
@@ -227,7 +268,7 @@ export function OnboardingForm() {
 
       <button
         type="submit"
-        disabled={isLoading || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid)}
+        disabled={isLoading || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid) || isUploadingPfp}
         className="mt-2 flex w-full items-center justify-center rounded-2xl bg-primary px-4 py-3 text-xs font-bold text-primary-foreground transition-all hover:bg-primary/95 disabled:opacity-50 shadow-md cursor-pointer"
       >
         <ShieldCheck className="size-4 mr-1.5" />

@@ -186,18 +186,22 @@ export function normalizeApiFeedSort(value?: string | null): ApiFeedSort {
 	return "latest";
 }
 
-export function getFeedOrderBy(sort: ApiFeedSort) {
+export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | null) {
+	const campusPrioritySql = userInstitutionId
+		? sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 1 else 0 end)`
+		: sql<number>`0`;
+
 	switch (sort) {
 		case "top_voted":
-			return [desc(voteScoreSql), desc(posts.createdAt), asc(posts.id)];
+			return [desc(campusPrioritySql), desc(voteScoreSql), desc(posts.createdAt), asc(posts.id)];
 		case "most_discussed":
-			return [desc(commentCountSql), desc(posts.createdAt), asc(posts.id)];
+			return [desc(campusPrioritySql), desc(commentCountSql), desc(posts.createdAt), asc(posts.id)];
 		case "trending":
-			return [desc(trendingScoreSql), desc(posts.createdAt), asc(posts.id)];
+			return [desc(campusPrioritySql), desc(trendingScoreSql), desc(posts.createdAt), asc(posts.id)];
 		case "for_you":
-			return [desc(forYouScoreSql), asc(posts.id)];
+			return [desc(campusPrioritySql), desc(forYouScoreSql), asc(posts.id)];
 		default:
-			return [desc(posts.createdAt), asc(posts.id)];
+			return [desc(campusPrioritySql), desc(posts.createdAt), asc(posts.id)];
 	}
 }
 
@@ -213,6 +217,7 @@ export async function resolveFeedPage(options: {
 	sort: ApiFeedSort;
 	limit: number;
 	offset: number;
+	userInstitutionId?: string | null;
 }) {
 	const db = getDb();
 
@@ -220,7 +225,7 @@ export async function resolveFeedPage(options: {
 		.select({ id: posts.id })
 		.from(posts)
 		.where(and(...options.conditions))
-		.orderBy(...getFeedOrderBy(options.sort))
+		.orderBy(...getFeedOrderBy(options.sort, options.userInstitutionId))
 		.limit(options.limit)
 		.offset(options.offset);
 

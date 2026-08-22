@@ -1,131 +1,111 @@
-import { hexclaveServerApp } from "@/hexclave/server";
-import { getDb } from "@/db";
-import { userProfiles } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { cookies } from "next/headers";
-import { LayoutDashboard, School, ShieldAlert, ArrowLeft, Users, FileText, MessageSquare } from "lucide-react";
+import {
+	ArrowLeft,
+	FileText,
+	Ghost,
+	LayoutDashboard,
+	MessageSquare,
+	School,
+	ScrollText,
+	ShieldAlert,
+	Users,
+} from "lucide-react";
 
-export default async function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // 1. Verify Passkey Cookie first (bypass DB check)
-  const cookieStore = await cookies();
-  const passkey = cookieStore.get("admin_session")?.value;
-  
-  let isAuthorized = passkey === "17092006";
+import { resolveAdminSession } from "./_lib/guard";
 
-  if (!isAuthorized) {
-    // 2. Fallback to normal role check
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      redirect("/admin-login");
-    }
+const primaryNav = [
+	{ href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+	{ href: "/admin/review", label: "Review Queue", icon: ShieldAlert },
+	{ href: "/admin/reports", label: "Reports", icon: ShieldAlert },
+];
 
-    const db = getDb();
+const contentNav = [
+	{ href: "/admin/posts", label: "Posts", icon: FileText },
+	{ href: "/admin/comments", label: "Comments", icon: MessageSquare },
+	{ href: "/admin/users", label: "Users", icon: Users },
+	{ href: "/admin/colleges", label: "Colleges", icon: School },
+];
 
-    // If there are 0 users, auto-create the first user as ADMIN
-    const profilesCount = await db.select({ count: sql<number>`count(*)` }).from(userProfiles);
-    if (profilesCount[0]?.count === 0) {
-      const fallbackInst = await db.query.institutions.findFirst();
-      if (fallbackInst) {
-        const email = user.primaryEmail || "admin@campusloop.com";
-        const username = email.split("@")[0] || "admin";
-        
-        await db.insert(userProfiles).values({
-          userId: user.id,
-          username,
-          displayName: "Admin",
-          institutionId: fallbackInst.id,
-          onboardingCompleted: true,
-          role: "ADMIN",
-          status: "ACTIVE",
-        });
-      }
-    }
+const systemNav = [{ href: "/admin/audit", label: "Audit Log", icon: ScrollText }];
 
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
+function NavLink({ href, label, icon: Icon }: { href: string; label: string; icon: typeof FileText }) {
+	return (
+		<Link
+			href={href}
+			className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors"
+		>
+			<Icon className="h-4 w-4 text-muted-foreground" />
+			{label}
+		</Link>
+	);
+}
 
-    if (profile && profile.role === "ADMIN") {
-      isAuthorized = true;
-    }
-  }
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+	await resolveAdminSession();
 
-  if (!isAuthorized) {
-    redirect("/admin-login");
-  }
+	return (
+		<div className="relative min-h-screen bg-background flex">
+			{/* Desktop Sidebar */}
+			<aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border bg-card px-4 py-6 md:flex md:flex-col justify-between overflow-y-auto">
+				<div className="space-y-6">
+					<Link href="/admin" className="px-3 py-2 text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+						<span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
+						CampusLoop Admin
+					</Link>
 
-  return (
-    <div className="relative min-h-screen bg-background flex">
-      {/* Admin Sidebar */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border bg-card px-4 py-6 md:flex md:flex-col justify-between">
-        <div className="space-y-6">
-          <div className="px-3 py-2 text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
-            CampusLoop Admin
-          </div>
-          
-          <nav className="space-y-1">
-            <Link href="/admin" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
-              <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-              Dashboard
-            </Link>
-            <Link href="/admin/users" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              Users
-            </Link>
-            <Link href="/admin/posts" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
-              <FileText className="h-4 w-4 text-muted-foreground" />
-              Posts
-            </Link>
-            <Link href="/admin/comments" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-              Comments
-            </Link>
-            <Link href="/admin/colleges" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
-              <School className="h-4 w-4 text-muted-foreground" />
-              Colleges
-            </Link>
-            <Link href="/admin/reports" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-foreground transition-colors">
-              <ShieldAlert className="h-4 w-4 text-muted-foreground" />
-              Reports
-            </Link>
-            <Link href="/app" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              Exit Admin
-            </Link>
-          </nav>
-        </div>
-        
-        <div className="px-3 py-2 text-[10px] text-muted-foreground border-t border-border pt-4">
-          Admin Console • Secure Session
-        </div>
-      </aside>
+					<nav className="space-y-1" aria-label="Moderation">
+						<p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Safety</p>
+						{primaryNav.map((item) => (
+							<NavLink key={item.href} {...item} />
+						))}
+					</nav>
 
-      {/* Main Content Area */}
-      <div className="flex-1 md:pl-64 flex flex-col min-h-screen">
-        {/* Mobile Header */}
-        <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-card px-6 py-4 md:hidden">
-          <h1 className="text-md font-bold tracking-tight text-foreground flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
-            CampusLoop Admin
-          </h1>
-          <nav className="flex gap-4">
-            <Link href="/admin" className="text-xs font-semibold hover:text-primary">Dashboard</Link>
-            <Link href="/admin/posts" className="text-xs font-semibold hover:text-primary">Posts</Link>
-            <Link href="/admin/comments" className="text-xs font-semibold hover:text-primary">Comments</Link>
-          </nav>
-        </header>
+					<nav className="space-y-1" aria-label="Content">
+						<p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Content</p>
+						{contentNav.map((item) => (
+							<NavLink key={item.href} {...item} />
+						))}
+					</nav>
 
-        <main className="flex-1 p-6 md:p-8">
-          {children}
-        </main>
-      </div>
-    </div>
-  );
+					<nav className="space-y-1" aria-label="System">
+						<p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">System</p>
+						{systemNav.map((item) => (
+							<NavLink key={item.href} {...item} />
+						))}
+					</nav>
+				</div>
+
+				<div className="space-y-3 px-3 pt-4 border-t border-border">
+					<Link
+						href="/app"
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+					>
+						<ArrowLeft className="h-3.5 w-3.5" /> Exit Admin
+					</Link>
+					<p className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+						<Ghost className="h-3 w-3" /> Identity reveals are audit-logged
+					</p>
+				</div>
+			</aside>
+
+			{/* Main Content Area */}
+			<div className="flex-1 md:pl-64 flex flex-col min-h-screen">
+				<header className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-card px-6 py-4 md:hidden">
+					<h1 className="text-md font-bold tracking-tight text-foreground flex items-center gap-2">
+						<span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
+						CampusLoop Admin
+					</h1>
+					<nav className="flex gap-3 overflow-x-auto">
+						{[...primaryNav, ...contentNav].map((item) => (
+							<Link key={item.href} href={item.href} className="text-xs font-semibold whitespace-nowrap hover:text-primary transition-colors">
+								{item.label}
+							</Link>
+						))}
+					</nav>
+				</header>
+
+				<main className="flex-1 p-6 md:p-8">{children}</main>
+			</div>
+		</div>
+	);
 }

@@ -1,33 +1,49 @@
 "use server";
 
-import { getDb } from "@/db";
-import { posts, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
+import { revalidatePath } from "next/cache";
+
+import { posts, moderationActions } from "@/db/schema";
+import type { contentStatusEnum } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-async function verifyAdmin() {
-  const user = await hexclaveServerApp.getUser();
-  if (!user) throw new Error("Unauthorized");
+import { getAdminDb, requireAdminProfile } from "../_lib/guard";
 
-  const db = getDb();
-
-  const cookieStore = await import("next/headers").then(m => m.cookies());
-  const passkey = cookieStore.get("admin_session")?.value;
-  if (passkey === "17092006") {
-    return db;
-  }
-
-  const profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
-
-  if (!profile || profile.role !== "ADMIN") {
-    throw new Error("Forbidden");
-  }
-  return db;
-}
+type PostStatus = (typeof contentStatusEnum.enumValues)[number];
 
 export async function deletePost(postId: string) {
-  const db = await verifyAdmin();
-  await db.delete(posts).where(eq(posts.id, postId));
+	const db = await getAdminDb();
+	await db.update(posts).set({ status: "DELETED" }).where(eq(posts.id, postId));
+	await logAction(db, "DELETE_POST", postId);
+	revalidatePath("/admin/posts");
+}
+
+export async function setPostStatus(postId: string, status: PostStatus) {
+	const db = await getAdminDb();
+	await db.update(posts).set({ status }).where(eq(posts.id, postId));
+	await logAction(db, `SET_POST_${status}`, postId);
+	revalidatePath("/admin/posts");
+	revalidatePath("/admin/review");
+}
+
+export async function approvePendingPost(postId: string) {
+	return setPostStatus(postId, "PUBLISHED");
+}
+
+export async function rejectPendingPost(postId: string) {
+	return setPostStatus(postId, "HIDDEN");
+}
+
+async function logAction(db: Awaited<ReturnType<typeof getAdminDb>>, action: string, targetId: string) {
+	try {
+		const { profile } = await requireAdminProfile();
+		await db.insert(moderationActions).values({
+			moderatorId: profile.id,
+			targetType: "POST",
+			targetId,
+			action,
+			reason: "Admin console action",
+		});
+	} catch {
+		// Legacy passkey session has no profile — skip audit row rather than fail the action.
+	}
 }

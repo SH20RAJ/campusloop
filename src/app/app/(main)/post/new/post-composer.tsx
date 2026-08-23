@@ -425,6 +425,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         <div className="mx-4 mb-3 mt-1 flex items-center justify-between rounded-2xl border border-border/70 px-3 py-2">
           <span className="hidden text-xs font-bold text-foreground sm:block">Add to your post</span>
           <div className="flex flex-1 items-center justify-around gap-1 sm:flex-none sm:justify-end sm:gap-0.5">
+            {/* eslint-disable-next-line react-hooks/refs -- fileInputRef is only touched inside click handlers */}
             {addOns.map((addon) => (
               <button
                 key={addon.id}

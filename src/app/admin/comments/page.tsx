@@ -1,8 +1,9 @@
-import { getDb } from "@/db";
 import { comments } from "@/db/schema";
 import { desc, ilike, sql } from "drizzle-orm";
 import { CommentsTable } from "./comments-table";
 import { Metadata } from "next";
+
+import { resolveAdminSession } from "../_lib/guard";
 
 export const metadata: Metadata = {
   title: "Admin Comments | CampusLoop",
@@ -14,7 +15,7 @@ interface PageProps {
 
 export default async function AdminCommentsPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const db = getDb();
+  const { db } = await resolveAdminSession();
   
   const q = params.q || "";
   const page = Number(params.page) || 1;

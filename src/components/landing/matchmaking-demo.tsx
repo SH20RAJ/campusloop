@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { Heart, X, Sparkles, ShieldCheck, Check, MessageSquare, Flame } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +17,7 @@ const MOCK_PROFILES = [
     age: 20,
     college: "BITS Pilani",
     branch: "Computer Science '27",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+    avatar: "/images/dating/girl1.png",
     bio: "Current attendance: 42%. Surviving on 2 AM canteen coffee and crying over DSA assignments ☕💻",
     interests: ["Coding", "Chai at 2 AM", "Indie Rock", "Valorant"],
     verified: true,
@@ -27,7 +28,7 @@ const MOCK_PROFILES = [
     age: 21,
     college: "IIT Bombay",
     branch: "Electrical Eng '26",
-    avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=600&q=80",
+    avatar: "/images/dating/boy1.png",
     bio: "Fest coordinator & professional procrastinator. Looking for someone to skip 8 AM lectures with 🎸🍕",
     interests: ["Music", "Fest Drama", "Basketball", "Meme Culture"],
     verified: true,
@@ -38,9 +39,31 @@ const MOCK_PROFILES = [
     age: 19,
     college: "Delhi University (SRCC)",
     branch: "Economics Hons '27",
-    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
+    avatar: "/images/dating/girl2.png",
     bio: "Will debate you on market crashes, then ask to copy your lab record 5 minutes before submission 📈🥤",
     interests: ["Finance Memes", "Cold Coffee", "Anime", "Debating"],
+    verified: true,
+  },
+  {
+    id: 4,
+    name: "Arjun Kapoor",
+    age: 22,
+    college: "VIT Vellore",
+    branch: "Mechanical Eng '25",
+    avatar: "/images/dating/boy2.png",
+    bio: "Gym at 6 AM, FIFA till 2 AM. My mess plate balance is negative but my playlist never misses 🏋️🎧",
+    interests: ["Football", "Gym Rat", "Road Trips", "Techno"],
+    verified: true,
+  },
+  {
+    id: 5,
+    name: "Isha Verma",
+    age: 20,
+    college: "SRM Chennai",
+    branch: "Architecture '27",
+    avatar: "/images/dating/girl3.png",
+    bio: "Can find you the best street food within 2km of any metro station. Jury week survivor, twice 🍜✏️",
+    interests: ["Sketching", "Cafe Hopping", "K-Drama", "Photography"],
     verified: true,
   },
 ];
@@ -107,10 +130,13 @@ export function MatchmakingShowcase() {
                   <Card className="h-full overflow-hidden border border-border shadow-md flex flex-col justify-between bg-card">
                     {/* Top Photo Header */}
                     <div className="relative h-1/2 w-full overflow-hidden border-b border-border/60 p-4 flex flex-col justify-between">
-                      <img
+                      <Image
                         src={currentProfile.avatar}
                         alt={currentProfile.name}
-                        className="absolute inset-0 size-full object-cover"
+                        fill
+                        sizes="(max-width: 640px) 90vw, 400px"
+                        className="object-cover"
+                        priority
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/40" />
 

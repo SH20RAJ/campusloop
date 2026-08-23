@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
-import { Sparkles, Filter, RotateCcw, ShieldCheck, HeartHandshake, Flame, ArrowRight } from "lucide-react";
+import { Sparkles, Filter, RotateCcw, HeartHandshake, ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { fetcher } from "@/lib/api";

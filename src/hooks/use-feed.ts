@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 import { Post, UserProfile, Institution } from "@/db/schema";
 

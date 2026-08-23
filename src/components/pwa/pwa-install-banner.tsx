@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Download, X, Share, PlusSquare, Sparkles, Smartphone, Check } from "lucide-react";
+import { Download, X, Share, PlusSquare, Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -15,7 +15,7 @@ export function PWAInstallBanner() {
   const [isStandalone, setIsStandalone] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [showIOSModal, setShowIOSModal] = useState(false);
-  const [installed, setInstalled] = useState(false);
+  const [, setInstalled] = useState(false);
 
   useEffect(() => {
     // Check if already running in standalone / PWA mode

@@ -39,16 +39,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Original post not found" }, { status: 404 });
     }
 
-    const authorName = originalPost.isAnonymous || !originalPost.author ? "Anonymous Student" : `@${originalPost.author.username}`;
     
-    // Construct repost content
-    let newPostBody = "";
-    if (commentary && commentary.trim().length > 0) {
-      newPostBody = `${commentary.trim()}\n\n💬 Reshared from ${authorName}:\n"${originalPost.body}"`;
-    } else {
-      newPostBody = `🔁 Reposted from ${authorName}:\n"${originalPost.body}"`;
-    }
-
     // Insert new post into DB with repostOfId DB flag
     const [repostedPost] = await db
       .insert(posts)

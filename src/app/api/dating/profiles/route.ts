@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles, swipes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, and, ne, notInArray, desc, SQL } from "drizzle-orm";
+import { eq, and, ne, notInArray, type SQL } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 

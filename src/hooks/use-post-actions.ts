@@ -65,7 +65,7 @@ export function usePostActions(onMutationSuccess?: () => void) {
     try {
       await reportApi(postId, reason, details);
       toast.success("Report submitted. Thank you for keeping CampusLoop safe.");
-    } catch (err) {
+    } catch {
       toast.error("Failed to submit report");
     }
   }

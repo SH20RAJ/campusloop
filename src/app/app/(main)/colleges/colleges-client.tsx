@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, School, Sparkles, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, School, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -28,7 +28,6 @@ export default function CollegesClient() {
   const [page, setPage] = useState(1);
   const [colleges, setColleges] = useState<CollegeItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(false);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [newCollegeName, setNewCollegeName] = useState("");
@@ -51,7 +50,6 @@ export default function CollegesClient() {
         const data = await fetcher<{ colleges: CollegeItem[]; hasMore: boolean }>(url.toString());
         if (!ignore) {
           setColleges(data.colleges || []);
-          setHasMore(data.hasMore || false);
         }
       } catch (err) {
         console.error("Failed to load colleges:", err);

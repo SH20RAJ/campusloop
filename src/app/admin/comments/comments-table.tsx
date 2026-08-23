@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deleteComment } from "./actions";
-import { SearchIcon, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { revealAnonymousAuthor, type RevealedIdentity } from "../anonymity-actions";
+import { SearchIcon, ChevronLeft, ChevronRight, Trash2, Eye } from "lucide-react";
 
 interface CommentRow {
   id: string;
   body: string;
   isAnonymous: boolean;
+  pseudonym?: string | null;
   createdAt: string | Date;
   author?: { displayName: string; username: string } | null;
   post?: { body: string } | null;
@@ -25,6 +27,7 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [revealed, setRevealed] = useState<Record<string, RevealedIdentity>>({});
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,6 +55,19 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
       router.refresh();
     } catch (e) {
       alert(e instanceof Error ? e.message : "Failed to delete comment");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleReveal(commentId: string) {
+    if (!confirm("Reveal the author of this anonymous comment? This action is audit-logged.")) return;
+    setActionLoading(commentId);
+    try {
+      const identity = await revealAnonymousAuthor("COMMENT", commentId);
+      setRevealed((prev) => ({ ...prev, [commentId]: identity }));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to reveal author");
     } finally {
       setActionLoading(null);
     }
@@ -98,11 +114,15 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
                       <span className="font-semibold text-foreground">
-                        {c.isAnonymous ? "Anonymous" : c.author?.displayName}
+                        {c.isAnonymous ? (revealed[c.id]?.displayName ?? "👻 Anonymous") : c.author?.displayName}
                       </span>
-                      {!c.isAnonymous && (
-                        <span className="text-xs text-muted-foreground">@{c.author?.username}</span>
-                      )}
+                      <span className="text-xs text-muted-foreground">
+                        {c.isAnonymous
+                          ? revealed[c.id]
+                            ? `@${revealed[c.id].username} · ${revealed[c.id].accountStatus}`
+                            : c.pseudonym || "anon"
+                          : `@${c.author?.username}`}
+                      </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-foreground">
@@ -115,13 +135,25 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
                     {new Date(c.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button
-                      disabled={actionLoading === c.id}
-                      onClick={() => handleDelete(c.id)}
-                      className="p-1.5 rounded hover:bg-muted text-destructive disabled:opacity-50 transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1">
+                      {c.isAnonymous && !revealed[c.id] && (
+                        <button
+                          disabled={actionLoading === c.id}
+                          onClick={() => handleReveal(c.id)}
+                          title="Reveal author (audit logged)"
+                          className="p-1.5 rounded hover:bg-muted text-blue-500 disabled:opacity-50 transition-colors cursor-pointer"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      )}
+                      <button
+                        disabled={actionLoading === c.id}
+                        onClick={() => handleDelete(c.id)}
+                        className="p-1.5 rounded hover:bg-muted text-destructive disabled:opacity-50 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

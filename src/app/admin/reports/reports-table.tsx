@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { keepPost, deletePost } from "./actions";
-import { CheckIcon, Trash2Icon } from "lucide-react";
+import { keepPost, deletePost, hidePost, dismissReport } from "./actions";
+import { revealAnonymousAuthor, type RevealedIdentity } from "../anonymity-actions";
+import { CheckIcon, Trash2Icon, EyeOff, XCircle, Eye } from "lucide-react";
 
 interface ReportRow {
   id: string;
@@ -19,29 +20,43 @@ interface ReportRow {
 export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [revealed, setRevealed] = useState<Record<string, RevealedIdentity>>({});
 
-  async function handleKeep(postId: string) {
-    if (!confirm("Keep this post? This will dismiss all active reports for it.")) return;
+  async function run(fn: () => Promise<unknown>) {
     setIsLoading(true);
     try {
-      await keepPost(postId);
+      await fn();
       router.refresh();
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Failed to resolve report");
+      alert(e instanceof Error ? e.message : "Action failed");
     }
     setIsLoading(false);
   }
 
+  async function handleKeep(postId: string) {
+    if (!confirm("Keep this post? This will publish it and dismiss all active reports for it.")) return;
+    await run(() => keepPost(postId));
+  }
+
   async function handleDelete(postId: string) {
     if (!confirm("Are you sure you want to remove this post? It will be hidden from all user feeds.")) return;
-    setIsLoading(true);
-    try {
-      await deletePost(postId);
-      router.refresh();
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "Failed to remove post");
-    }
-    setIsLoading(false);
+    await run(() => deletePost(postId));
+  }
+
+  async function handleHide(postId: string) {
+    await run(() => hidePost(postId));
+  }
+
+  async function handleDismiss(reportId: string) {
+    await run(() => dismissReport(reportId));
+  }
+
+  function handleReveal(postId: string) {
+    if (!confirm("Reveal the author of this anonymous post? This action is audit-logged.")) return;
+    return run(async () => {
+      const identity = await revealAnonymousAuthor("POST", postId);
+      setRevealed((prev) => ({ ...prev, [postId]: identity }));
+    });
   }
 
   return (
@@ -72,30 +87,60 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
               <td className="px-6 py-4">
                 <div className="flex flex-col">
                   <span className="font-medium text-foreground">
-                    {report.authorDisplayName ?? "Anonymous"}
+                    {report.authorDisplayName ?? revealed[report.postId]?.displayName ?? "👻 Anonymous"}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {report.authorUsername ? `@${report.authorUsername}` : report.postPseudonym || "anon"}
+                    {report.authorUsername
+                      ? `@${report.authorUsername}`
+                      : revealed[report.postId]
+                        ? `@${revealed[report.postId].username} · ${revealed[report.postId].accountStatus}`
+                        : report.postPseudonym || "anon"}
                   </span>
                 </div>
               </td>
               <td className="px-6 py-4 text-right">
-                <div className="flex justify-end gap-2">
-                  <button 
-                    onClick={() => handleKeep(report.postId)} 
-                    disabled={isLoading} 
+                <div className="flex justify-end gap-1.5">
+                  {report.authorUsername === null && !revealed[report.postId] && (
+                    <button
+                      onClick={() => handleReveal(report.postId)}
+                      disabled={isLoading}
+                      title="Reveal author (audit logged)"
+                      className="p-2 rounded-md hover:bg-muted text-blue-500 transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleKeep(report.postId)}
+                    disabled={isLoading}
                     title="Keep Post"
-                    className="p-2 rounded-md hover:bg-muted text-green-500 hover:text-green-600 transition-colors"
+                    className="p-2 rounded-md hover:bg-muted text-green-500 hover:text-green-600 transition-colors disabled:opacity-50 cursor-pointer"
                   >
                     <CheckIcon className="h-4 w-4" />
                   </button>
-                  <button 
-                    onClick={() => handleDelete(report.postId)} 
-                    disabled={isLoading} 
+                  <button
+                    onClick={() => handleHide(report.postId)}
+                    disabled={isLoading}
+                    title="Hide Post (soft action)"
+                    className="p-2 rounded-md hover:bg-muted text-orange-500 transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    <EyeOff className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(report.postId)}
+                    disabled={isLoading}
                     title="Delete Post"
-                    className="p-2 rounded-md hover:bg-muted text-destructive hover:text-red-600 transition-colors"
+                    className="p-2 rounded-md hover:bg-muted text-destructive hover:text-red-600 transition-colors disabled:opacity-50 cursor-pointer"
                   >
                     <Trash2Icon className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDismiss(report.id)}
+                    disabled={isLoading}
+                    title="Dismiss report only (keep post status)"
+                    className="p-2 rounded-md hover:bg-muted text-muted-foreground transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    <XCircle className="h-4 w-4" />
                   </button>
                 </div>
               </td>

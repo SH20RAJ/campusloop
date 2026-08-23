@@ -13,12 +13,10 @@ function isTransientDbError(error: unknown): boolean {
 
 function withRetry<R>(fn: () => Promise<R>): Promise<R> {
 	return (async () => {
-		let lastError: unknown;
 		for (let attempt = 0; ; attempt++) {
 			try {
 				return await fn();
 			} catch (error) {
-				lastError = error;
 				if (attempt >= MAX_DB_RETRIES || !isTransientDbError(error)) {
 					throw error;
 				}

@@ -7,14 +7,14 @@ import {
   Sparkles,
   TrendingUp,
   DollarSign,
-  Users,
+
   ChevronRight,
   ChevronLeft,
-  ShieldCheck,
+
   Layers,
   ExternalLink,
   BookOpen,
-  HelpCircle,
+
   CheckCircle2,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";

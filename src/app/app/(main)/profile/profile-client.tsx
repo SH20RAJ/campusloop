@@ -15,8 +15,6 @@ import {
   Share2,
   Edit3,
   Flame,
-  Calendar,
-  Layers,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -166,13 +164,13 @@ export function ProfileClientView({
                   >
                     <Edit3 className="size-3.5" /> Edit Profile
                   </Link>
-                  <a
+                  <Link
                     href="/handler/sign-out"
                     className="flex items-center justify-center rounded-xl border border-border/60 bg-muted/20 size-9 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                     title="Sign Out"
                   >
                     <LogOut className="size-4" />
-                  </a>
+                  </Link>
                 </>
               ) : (
                 <Link

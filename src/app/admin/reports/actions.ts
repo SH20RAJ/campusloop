@@ -1,61 +1,67 @@
 "use server";
 
-import { getDb } from "@/db";
-import { posts, reports, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
+import { revalidatePath } from "next/cache";
+
+import { posts, reports, moderationActions } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
-async function verifyAdmin() {
-  const user = await hexclaveServerApp.getUser();
-  if (!user) throw new Error("Unauthorized");
-  
-  const db = getDb();
-  
-  // Try passkey bypass first
-  const cookieStore = await import("next/headers").then(m => m.cookies());
-  const passkey = cookieStore.get("admin_session")?.value;
-  if (passkey === "17092006") {
-    return db;
-  }
+import { getAdminDb, requireAdminProfile } from "../_lib/guard";
+import type { Db } from "../_lib/db-context";
 
-  const profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
+type ReportStatus = "OPEN" | "REVIEWING" | "RESOLVED" | "REJECTED";
 
-  if (!profile || profile.role !== "ADMIN") {
-    throw new Error("Forbidden");
-  }
-  return db;
+async function resolveReportsForPost(db: Db, postId: string, status: ReportStatus) {
+	await db
+		.update(reports)
+		.set({ status })
+		.where(and(eq(reports.targetId, postId), eq(reports.targetType, "POST")));
 }
 
 export async function keepPost(postId: string) {
-  const db = await verifyAdmin();
+	const db = await getAdminDb();
 
-  // Reset post status to PUBLISHED
-  await db
-    .update(posts)
-    .set({ status: "PUBLISHED" })
-    .where(eq(posts.id, postId));
-
-  // Resolve all open reports for this post
-  await db
-    .update(reports)
-    .set({ status: "RESOLVED" })
-    .where(and(eq(reports.targetId, postId), eq(reports.targetType, "POST")));
+	await db.update(posts).set({ status: "PUBLISHED" }).where(eq(posts.id, postId));
+	await resolveReportsForPost(db, postId, "RESOLVED");
+	await logAction(db, "REPORT_KEEP_POST", postId);
+	revalidatePath("/admin/reports");
 }
 
 export async function deletePost(postId: string) {
-  const db = await verifyAdmin();
+	const db = await getAdminDb();
 
-  // Mark post as DELETED
-  await db
-    .update(posts)
-    .set({ status: "DELETED" })
-    .where(eq(posts.id, postId));
+	await db.update(posts).set({ status: "DELETED" }).where(eq(posts.id, postId));
+	await resolveReportsForPost(db, postId, "RESOLVED");
+	await logAction(db, "REPORT_DELETE_POST", postId);
+	revalidatePath("/admin/reports");
+}
 
-  // Resolve all open reports for this post
-  await db
-    .update(reports)
-    .set({ status: "RESOLVED" })
-    .where(and(eq(reports.targetId, postId), eq(reports.targetType, "POST")));
+export async function hidePost(postId: string) {
+	const db = await getAdminDb();
+
+	await db.update(posts).set({ status: "HIDDEN" }).where(eq(posts.id, postId));
+	await resolveReportsForPost(db, postId, "REVIEWING");
+	await logAction(db, "REPORT_HIDE_POST", postId);
+	revalidatePath("/admin/reports");
+}
+
+export async function dismissReport(reportId: string) {
+	const db = await getAdminDb();
+	await db.update(reports).set({ status: "REJECTED" }).where(eq(reports.id, reportId));
+	await logAction(db, "REPORT_DISMISS", reportId);
+	revalidatePath("/admin/reports");
+}
+
+async function logAction(db: Db, action: string, targetId: string) {
+	try {
+		const { profile } = await requireAdminProfile();
+		await db.insert(moderationActions).values({
+			moderatorId: profile.id,
+			targetType: "POST",
+			targetId,
+			action,
+			reason: "Report review action",
+		});
+	} catch {
+		// Legacy passkey session has no profile — skip audit row.
+	}
 }

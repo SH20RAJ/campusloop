@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 type Peer = typeof userProfiles.$inferSelect & { institution?: typeof institutions.$inferSelect | null };
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const user = await hexclaveServerApp.getUser();
     const db = getDb();

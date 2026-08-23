@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, X, MessageCircle, School, ShieldCheck, Sparkles, MapPin } from "lucide-react";
+import { Heart, X, MessageCircle, School, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { getAvatarUrl } from "@/lib/utils";
 

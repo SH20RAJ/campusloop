@@ -13,7 +13,7 @@ export function OnboardingForm() {
   const [username, setUsername] = useState("");
   const [gender, setGender] = useState<"MALE" | "FEMALE" | "OTHER">("MALE");
   const [course, setCourse] = useState("");
-  const [branch, setBranch] = useState("");
+  const [branch] = useState("");
   const [year, setYear] = useState(1);
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");

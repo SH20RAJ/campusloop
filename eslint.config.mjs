@@ -34,4 +34,13 @@ export default [
 			"react-hooks/set-state-in-effect": "off",
 		},
 	},
+	{
+		// Vendored animation primitives (animate-ui) — upstream code relies on
+		// render-time ref access; refactoring would break upgrade compatibility.
+		files: ["src/components/animate-ui/**"],
+		rules: {
+			"react-hooks/static-components": "off",
+			"react-hooks/refs": "off",
+		},
+	},
 ];

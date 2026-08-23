@@ -1,33 +1,31 @@
 "use server";
 
-import { getDb } from "@/db";
-import { comments, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
+import { revalidatePath } from "next/cache";
+
+import { comments, moderationActions } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-async function verifyAdmin() {
-  const user = await hexclaveServerApp.getUser();
-  if (!user) throw new Error("Unauthorized");
-
-  const db = getDb();
-
-  const cookieStore = await import("next/headers").then(m => m.cookies());
-  const passkey = cookieStore.get("admin_session")?.value;
-  if (passkey === "17092006") {
-    return db;
-  }
-
-  const profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
-
-  if (!profile || profile.role !== "ADMIN") {
-    throw new Error("Forbidden");
-  }
-  return db;
-}
+import { getAdminDb, requireAdminProfile } from "../_lib/guard";
+import type { Db } from "../_lib/db-context";
 
 export async function deleteComment(commentId: string) {
-  const db = await verifyAdmin();
-  await db.delete(comments).where(eq(comments.id, commentId));
+	const db = await getAdminDb();
+	await db.delete(comments).where(eq(comments.id, commentId));
+	await logAction(db, "DELETE_COMMENT", commentId);
+	revalidatePath("/admin/comments");
+}
+
+async function logAction(db: Db, action: string, targetId: string) {
+	try {
+		const { profile } = await requireAdminProfile();
+		await db.insert(moderationActions).values({
+			moderatorId: profile.id,
+			targetType: "COMMENT",
+			targetId,
+			action,
+			reason: "Admin console action",
+		});
+	} catch {
+		// Legacy passkey session has no profile — skip audit row.
+	}
 }

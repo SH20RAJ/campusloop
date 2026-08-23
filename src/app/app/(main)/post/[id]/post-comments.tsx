@@ -9,7 +9,7 @@ import { CommentItem, CommentWithAuthor } from "@/components/post/comment-item";
 import { toast } from "sonner";
 import { uploadImageToImgBB } from "@/lib/upload";
 
-export function PostComments({ postId, currentUser }: { postId: string; currentUser?: unknown }) {
+export function PostComments({ postId }: { postId: string }) {
   const { data: comments, isLoading, mutate } = useSWR<CommentWithAuthor[]>(
     `/api/posts/${postId}/comments`,
     fetcher

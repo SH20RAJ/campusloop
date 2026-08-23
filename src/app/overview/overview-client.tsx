@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   Users,
   MessageSquare,
-  Lock,
   Heart,
   School,
   TrendingUp,

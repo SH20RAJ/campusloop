@@ -34,8 +34,8 @@ export async function createCommunity(name: string, description: string) {
     });
 
     return newComm;
-  } catch (error: any) {
-    if (error.code === "23505") { // Unique violation
+  } catch (error) {
+    if ((error as { code?: string }).code === "23505") { // Unique violation
       throw new Error("A community with this name already exists");
     }
     throw error;

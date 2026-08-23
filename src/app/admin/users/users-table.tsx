@@ -14,18 +14,44 @@ interface UserRow {
   institution?: { name: string } | null;
 }
 
+type RoleFilter = "ALL" | "STUDENT" | "MODERATOR" | "ADMIN";
+type StatusFilter = "ALL" | "ACTIVE" | "SUSPENDED" | "BANNED";
+
 interface UsersTableProps {
   initialUsers: UserRow[];
   page: number;
   totalPages: number;
+  totalCount: number;
   institutions: { id: string; name: string }[];
+  activeRole: RoleFilter;
+  activeStatus: StatusFilter;
 }
 
-export function UsersTable({ initialUsers, page, totalPages, institutions }: UsersTableProps) {
+const roleTabs: { value: RoleFilter; label: string }[] = [
+  { value: "ALL", label: "All Roles" },
+  { value: "STUDENT", label: "Students" },
+  { value: "MODERATOR", label: "Moderators" },
+  { value: "ADMIN", label: "Admins" },
+];
+
+const statusTabs: { value: StatusFilter; label: string }[] = [
+  { value: "ALL", label: "Any Status" },
+  { value: "ACTIVE", label: "Active" },
+  { value: "SUSPENDED", label: "Suspended" },
+  { value: "BANNED", label: "Banned" },
+];
+
+export function UsersTable({ initialUsers, page, totalPages, totalCount, institutions, activeRole, activeStatus }: UsersTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const [isLoading, setIsLoading] = useState<string | null>(null); // holds profileId of updating user
+
+  function pushParams(mutate: (params: URLSearchParams) => void) {
+    const params = new URLSearchParams(searchParams.toString());
+    mutate(params);
+    router.push(`/admin/users?${params.toString()}`);
+  }
 
   // Create User Form State
   const [showAddForm, setShowAddForm] = useState(false);
@@ -130,6 +156,37 @@ export function UsersTable({ initialUsers, page, totalPages, institutions }: Use
 
   return (
     <div className="space-y-4">
+      {/* Role / Status filter tabs */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {roleTabs.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => pushParams((p) => { p.set("role", tab.value); p.set("page", "1"); })}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+              activeRole === tab.value
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+        <span className="w-px bg-border mx-1" aria-hidden />
+        {statusTabs.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => pushParams((p) => { p.set("status", tab.value); p.set("page", "1"); })}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+              activeStatus === tab.value
+                ? "bg-foreground text-background border-foreground"
+                : "bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* Search Header Row */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <form onSubmit={handleSearchSubmit} className="flex gap-2 max-w-sm w-full">
@@ -330,7 +387,7 @@ export function UsersTable({ initialUsers, page, totalPages, institutions }: Use
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/40">
             <span className="text-xs text-muted-foreground">
-              Page {page} of {totalPages}
+              {totalCount.toLocaleString()} accounts · Page {page} of {totalPages}
             </span>
             <div className="flex gap-2">
               <button

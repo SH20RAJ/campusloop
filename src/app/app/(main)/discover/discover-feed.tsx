@@ -6,8 +6,7 @@ import { useFeed } from "@/hooks/use-feed";
 import { useColleges } from "@/hooks/use-colleges";
 import { FeedCard } from "@/components/ui/feed-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles, HelpCircle, Heart, Flame, School, Search, TrendingUp, Shuffle, Lightbulb } from "lucide-react";
-import Link from "next/link";
+import { Sparkles, HelpCircle, Heart, Flame, School, Search, TrendingUp, Lightbulb } from "lucide-react";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
 import { cn } from "@/lib/utils";
 import { FeaturedCampusCard } from "@/components/discover/featured-campus-card";
@@ -29,19 +28,20 @@ export function DiscoverFeed() {
   const { feed, isLoading: feedLoading, isLoadingMore, isReachingEnd, setSize } = useFeed("GLOBAL", feedType);
   const { colleges, isLoading: collegesLoading } = useColleges(50);
 
-  const [loadMoreRef, setLoadMoreRef] = useState<HTMLDivElement | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!loadMoreRef || isReachingEnd || isLoadingMore) return;
+    const node = loadMoreRef.current;
+    if (!node || isReachingEnd || isLoadingMore) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) setSize((s) => s + 1);
       },
       { threshold: 0.1 }
     );
-    observer.observe(loadMoreRef);
+    observer.observe(node);
     return () => observer.disconnect();
-  }, [loadMoreRef, isReachingEnd, isLoadingMore, setSize]);
+  }, [isReachingEnd, isLoadingMore, setSize]);
 
   const filteredFeed = feed?.filter((post) =>
     selectedCollegeId ? post.institutionId === selectedCollegeId : true
@@ -236,7 +236,7 @@ export function DiscoverFeed() {
           <FeedSkeleton />
         ) : filteredFeed && filteredFeed.length > 0 ? (
           <AnimatePresence mode="popLayout">
-            {filteredFeed.map((post, i) => (
+            {filteredFeed.map((post) => (
               <motion.div
                 key={post.id}
                 layout
@@ -257,6 +257,8 @@ export function DiscoverFeed() {
             </p>
           </div>
         )}
+        {/* Infinite-scroll sentinel */}
+        <div ref={loadMoreRef} aria-hidden />
       </div>
     </main>
   );

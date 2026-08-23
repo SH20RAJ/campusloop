@@ -889,77 +889,80 @@ function ArtifactCard({
 
   return (
     <motion.button
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{
-        duration: 0.5,
-        delay: index * 0.06,
+        duration: 0.55,
+        delay: (index % 4) * 0.07 + Math.floor(index / 4) * 0.12,
         ease: [0.16, 1, 0.3, 1],
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
-      className="group relative cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xl"
+      aria-label={`Preview ${artifact.title}`}
+      className="group relative cursor-pointer rounded-2xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      {/* Gradient background that appears on hover */}
       <div
         className={cn(
-          "pointer-events-none absolute -inset-px rounded-xl opacity-0 blur-sm transition-opacity duration-500",
-          "bg-gradient-to-br",
-          artifact.color,
-          isHovered && "opacity-100"
-        )}
-      />
-
-      {/* Card */}
-      <div
-        className={cn(
-          "relative rounded-xl border border-border bg-card p-5 transition-all duration-300",
-          "shadow-sm hover:shadow-md",
-          "hover:-translate-y-0.5",
+          "relative flex min-h-[210px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-card p-5",
+          "shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
           artifact.borderGlow
         )}
       >
-        {/* Accent bar at top */}
+        {/* Ambient gradient wash */}
         <div
           className={cn(
-            "absolute left-3 right-3 top-0 h-0.5 scale-x-0 rounded-full transition-transform duration-300",
+            "pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-gradient-to-br blur-3xl transition-opacity duration-500",
+            artifact.color,
+            isHovered ? "opacity-80" : "opacity-35"
+          )}
+        />
+        {/* Hairline accent that sweeps in on hover */}
+        <div
+          className={cn(
+            "absolute left-0 top-0 h-[2px] w-full origin-left scale-x-0 bg-gradient-to-r transition-transform duration-500 ease-out",
             artifact.accent,
             "group-hover:scale-x-100"
           )}
-          style={{ transformOrigin: "left" }}
         />
 
-        {/* Corner indicator */}
-        <div className="absolute right-3 top-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <ArrowUpRight className="size-3.5 text-muted-foreground" />
-        </div>
-
-        {/* Icon with hover animation */}
-        <div
-          className={cn(
-            "mb-3 flex size-10 items-center justify-center rounded-lg transition-all duration-300",
-            artifact.iconBg,
-            "group-hover:shadow-lg"
-          )}
-        >
-          <motion.div
-            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-            animate={(isHovered ? artifact.iconHover : artifact.iconRest) as any}
-            className="flex items-center justify-center"
+        {/* Header row: icon tile + editorial index */}
+        <div className="relative flex items-start justify-between">
+          <div
+            className={cn(
+              "flex size-11 items-center justify-center rounded-xl border border-black/[0.04] shadow-sm transition-shadow duration-300 dark:border-white/[0.06]",
+              artifact.iconBg,
+              "group-hover:shadow-md"
+            )}
           >
-            <artifact.icon className="size-5" />
-          </motion.div>
+            <motion.div
+              /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+              animate={(isHovered ? artifact.iconHover : artifact.iconRest) as any}
+              className="flex items-center justify-center"
+            >
+              <artifact.icon className="size-5" />
+            </motion.div>
+          </div>
+
+          <span className="font-mono text-[10px] font-medium tracking-widest text-muted-foreground/50 transition-colors duration-300 group-hover:text-muted-foreground">
+            {String(index + 1).padStart(2, "0")}
+          </span>
         </div>
 
-        {/* Content */}
-        <h3 className="mb-1.5 font-heading text-sm font-semibold tracking-tight">
-          {artifact.title}
-        </h3>
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          {artifact.description}
-        </p>
+        {/* Content pinned to bottom */}
+        <div className="relative mt-auto pt-8">
+          <h3 className="font-heading text-[15px] font-semibold tracking-tight text-foreground">
+            {artifact.title}
+          </h3>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            {artifact.description}
+          </p>
+          <span className="mt-3 flex translate-y-1 items-center gap-1 text-[11px] font-semibold text-primary opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+            Try live preview
+            <ArrowUpRight className="size-3" />
+          </span>
+        </div>
       </div>
     </motion.button>
   );
@@ -1077,22 +1080,28 @@ export function ArtifactsShowcase() {
     : null;
 
   return (
-    <section className="border-t border-border/60">
+    <section className="relative border-t border-border/60">
+      {/* Section-level ambient tint */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(99,102,241,0.06),transparent)] dark:bg-[radial-gradient(60%_100%_at_50%_0%,rgba(129,140,248,0.08),transparent)]" />
       <div className="mx-auto w-full max-w-6xl px-6 py-24">
-        <Reveal className="max-w-xl space-y-3 pb-14">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+        <Reveal className="max-w-2xl space-y-4 pb-14">
+          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             What you can create
+            <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 font-mono text-[10px] tracking-normal text-muted-foreground">
+              8 formats
+            </span>
           </p>
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+          <h2 className="text-balance text-3xl font-bold tracking-tight md:text-[2.75rem] md:leading-[1.1]">
             Eight ways to shape the loop.
           </h2>
-          <p className="text-base leading-relaxed text-muted-foreground">
-            Click any artifact to see a live preview. From anonymous whispers to
-            campus-wide polls — every post builds your campus vibe.
+          <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
+            Every post on CampusLoop is an artifact with its own personality.
+            Click any card to open a live, interactive preview — from anonymous
+            whispers to campus-wide polls.
           </p>
         </Reveal>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {ARTIFACTS.map((artifact, i) => (
             <ArtifactCard
               key={artifact.id}

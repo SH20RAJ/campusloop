@@ -3,7 +3,7 @@ import { institutions, posts, userProfiles } from "@/db/schema";
 import { eq, or, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
-import { School, MapPin, Globe, Calendar, ArrowLeft, Users, MessageSquare, Flame, Sparkles, Trophy, Award, Hash, ExternalLink, Lock } from "lucide-react";
+import { School, Globe, Calendar, ArrowLeft, Users, Sparkles, Trophy, Award, Hash, ExternalLink, Lock } from "lucide-react";
 import Link from "next/link";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { sanitizeAnonRow } from "@/lib/anonymity";

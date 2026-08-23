@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { posts, institutions, userProfiles, communities } from "@/db/schema";
-import { ilike, or, desc, eq } from "drizzle-orm";
+import { ilike, or, desc } from "drizzle-orm";
 
 export async function GET(request: Request) {
   try {

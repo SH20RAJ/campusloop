@@ -9,7 +9,7 @@ import { sanitizeAnonRow } from "@/lib/anonymity";
 import type { FeedPost } from "@/hooks/use-feed";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Lock, Sparkles, UserCheck } from "lucide-react";
+import { ArrowLeft, Lock } from "lucide-react";
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -211,7 +211,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
 
         {/* Comments Section */}
         {profile ? (
-          <PostComments postId={id} currentUser={profile} />
+          <PostComments postId={id} />
         ) : (
           <div className="space-y-4">
             {/* Read-Only Comments List for Guests & Crawlers */}

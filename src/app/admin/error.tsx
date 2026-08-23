@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 import { RefreshCw, TriangleAlert } from "lucide-react";
 
@@ -31,12 +32,12 @@ export default function AdminError({
 				>
 					<RefreshCw className="h-3.5 w-3.5" /> Reload
 				</button>
-				<a
+				<Link
 					href="/admin"
 					className="rounded-lg border border-border px-4 py-2 text-xs font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
 				>
 					Go to Dashboard
-				</a>
+				</Link>
 			</div>
 		</div>
 	);

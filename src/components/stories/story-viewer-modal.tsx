@@ -1,6 +1,6 @@
 "use client";
 
-import { X, ChevronLeft, ChevronRight, Send, Heart } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Send } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";

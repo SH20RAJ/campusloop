@@ -2,7 +2,7 @@
 
 import { useFeed } from "@/hooks/use-feed";
 import { FeedCard } from "@/components/ui/feed-card";
-import { ArrowLeft, Sparkles, Hash, MessageSquare, TrendingUp } from "lucide-react";
+import { ArrowLeft, Hash, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";

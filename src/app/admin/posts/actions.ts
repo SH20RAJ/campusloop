@@ -7,6 +7,7 @@ import type { contentStatusEnum } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 import { getAdminDb, requireAdminProfile } from "../_lib/guard";
+import type { Db } from "../_lib/db-context";
 
 type PostStatus = (typeof contentStatusEnum.enumValues)[number];
 
@@ -33,7 +34,7 @@ export async function rejectPendingPost(postId: string) {
 	return setPostStatus(postId, "HIDDEN");
 }
 
-async function logAction(db: Awaited<ReturnType<typeof getAdminDb>>, action: string, targetId: string) {
+async function logAction(db: Db, action: string, targetId: string) {
 	try {
 		const { profile } = await requireAdminProfile();
 		await db.insert(moderationActions).values({

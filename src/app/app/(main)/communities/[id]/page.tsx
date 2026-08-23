@@ -8,7 +8,7 @@ import { sanitizeAnonRow } from "@/lib/anonymity";
 import { FeedCard } from "@/components/ui/feed-card";
 import { PostComposer } from "../../post/new/post-composer";
 import { JoinCommunityButton } from "../join-community-button";
-import { ArrowLeft, Lock, Flame, Sparkles, Trophy, MessageSquare, ShieldCheck, Users, Clock } from "lucide-react";
+import { ArrowLeft, Lock, Flame, Sparkles, Trophy, MessageSquare, ShieldCheck, Clock } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -101,7 +101,6 @@ export default async function CommunityDetailPage({ params, searchParams }: Page
 
   const isMember = comm.members.some((m) => m.userId === profile.id);
   const membersCount = comm.members.length;
-  const initials = comm.name.slice(0, 2).toUpperCase();
 
   // Trending & sort calculations
   const trendingSql = sql<number>`

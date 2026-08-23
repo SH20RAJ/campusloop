@@ -27,8 +27,8 @@ export function CollegeForm() {
 
     try {
       await createCollege(formData);
-    } catch (err: any) {
-      setError(err.message || "Failed to create college");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create college");
       setIsLoading(false);
     }
   }

@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 		follow: false,
 	},
 };
+
 import {
 	ArrowLeft,
 	FileText,
@@ -26,7 +27,6 @@ import {
 	Users,
 } from "lucide-react";
 
-import { resolveAdminSession } from "./_lib/guard";
 
 const primaryNav = [
 	{ href: "/admin", label: "Dashboard", icon: LayoutDashboard },

@@ -2,6 +2,7 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { OnboardingForm } from "./onboarding-form";
 

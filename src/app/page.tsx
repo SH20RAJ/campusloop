@@ -91,14 +91,7 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
-    images: [
-      {
-        url: "/logo.png",
-        width: 512,
-        height: 512,
-        alt: "CampusLoop: Your Campus, Verified",
-      },
-    ],
+    // Image served by src/app/opengraph-image.tsx (1200x630, build-time generated)
   },
   twitter: {
     card: "summary_large_image",
@@ -106,7 +99,6 @@ export const metadata: Metadata = {
     description:
       "The verified student-only social network for Indian colleges. Confess anonymously, run campus polls, match, and chat safely with classmates.",
     creator: "@campusloop",
-    images: ["/logo.png"],
   },
   verification: {
     google: "google-site-verification-id",

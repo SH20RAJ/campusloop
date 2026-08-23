@@ -53,20 +53,13 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       url,
       siteName: "CampusLoop",
       type: "article",
-      images: [
-        {
-          url: "https://campusloop.space/logo.png",
-          width: 512,
-          height: 512,
-          alt: "CampusLoop Post",
-        },
-      ],
+      // Inherits build-time OG card from src/app/opengraph-image.tsx
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: snippet,
-      images: ["https://campusloop.space/logo.png"],
+      // Inherits build-time OG card from src/app/opengraph-image.tsx
     },
     robots: { index: true, follow: true },
   };

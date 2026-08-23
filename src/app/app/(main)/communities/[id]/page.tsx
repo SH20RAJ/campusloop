@@ -54,20 +54,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: "CampusLoop",
       locale: "en_IN",
       type: "website",
-      images: [
-        {
-          url: "https://campusloop.space/logo.png",
-          width: 512,
-          height: 512,
-          alt: comm.name,
-        },
-      ],
+      // Inherits build-time OG card from src/app/opengraph-image.tsx
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["https://campusloop.space/logo.png"],
+      // Inherits build-time OG card from src/app/opengraph-image.tsx
     },
     robots: { index: true, follow: true },
   };

@@ -5,30 +5,37 @@ import { useRouter } from "next/navigation";
 import {
   School,
   Globe,
-  Sparkles,
   AlertTriangle,
   ArrowRight,
-  Hash,
   Users,
   ChevronDown,
   Image as ImageIcon,
   X,
   Loader2,
+  Lock,
+  BarChart3,
+  HelpCircle,
+  FileText,
 } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-
 import { useCommunities } from "@/hooks/use-communities";
 import { useProfile } from "@/hooks/use-profile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { PostTypeSelector, type PostType } from "@/components/post/post-type-selector";
 import { PollOptionsEditor } from "@/components/post/poll-options-editor";
-import { AnonymityNotice } from "@/components/post/anonymity-notice";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
 import { uploadImageToImgBB } from "@/lib/upload";
+
+export type PostType = "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
+
+const POST_TYPES: { id: PostType; label: string; icon: typeof FileText; color: string }[] = [
+  { id: "NORMAL", label: "Post", icon: FileText, color: "text-foreground" },
+  { id: "CONFESSION", label: "Confession", icon: Lock, color: "text-pink-500" },
+  { id: "POLL", label: "Poll", icon: BarChart3, color: "text-blue-500" },
+  { id: "QUESTION", label: "Question", icon: HelpCircle, color: "text-orange-500" },
+];
 
 const TRENDING_TAGS = ["#LateNightTea", "#Confessions", "#CanteenGossip", "#ExamStress", "#LibraryVibes", "#HostelLife"];
 const MAX_CHARS = 2000;
@@ -38,9 +45,9 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Composer Form State
+  // Composer State - Global by default
   const [postType, setPostType] = useState<PostType>("NORMAL");
-  const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("CAMPUS");
+  const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
   const [selectedCommunityId, setSelectedCommunityId] = useState<string>(initialCommunityId || "NONE");
   const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -60,7 +67,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     editorProps: {
       attributes: {
         class:
-          "w-full min-h-[180px] sm:min-h-[220px] px-4 sm:px-5 pb-4 pt-3 text-sm leading-relaxed outline-none prose prose-sm dark:prose-invert max-w-none placeholder:text-muted-foreground/50",
+          "w-full min-h-[160px] sm:min-h-[190px] px-4 py-3 text-sm leading-relaxed outline-none prose prose-sm dark:prose-invert max-w-none placeholder:text-muted-foreground/40",
       },
     },
     onUpdate: ({ editor }) => setCharCount(editor.getText().length),
@@ -72,10 +79,10 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
 
     setIsUploadingImage(true);
     try {
-      toast.loading("Uploading image to ImgBB...", { id: "img-upload" });
+      toast.loading("Uploading photo...", { id: "img-upload" });
       const uploaded = await uploadImageToImgBB(file);
       setUploadedImages((prev) => [...prev, uploaded.displayUrl || uploaded.url]);
-      toast.success("Image attached! 📸", { id: "img-upload" });
+      toast.success("Photo attached! 📸", { id: "img-upload" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to upload image", { id: "img-upload" });
     } finally {
@@ -88,7 +95,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     setUploadedImages((prev) => prev.filter((_, i) => i !== index));
   }
 
-  async function handleSubmit(e?: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault();
     if (isLoading || overLimit) return;
 
@@ -98,7 +105,6 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     let body = editor?.getText() || "";
     const anon = isAnonymous || postType === "CONFESSION";
 
-    // If images attached, append them to body or format them
     if (uploadedImages.length > 0) {
       const imageMarkdown = uploadedImages.map((img) => `\n\n![Image](${img})`).join("");
       body = `${body.trim()}${imageMarkdown}`;
@@ -114,7 +120,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     if (postType === "POLL") {
       options = pollOptions.filter((opt) => opt.trim().length > 0);
       if (options.length < 2) {
-        setError("Polls must have at least 2 voting options.");
+        setError("Polls must have at least 2 options.");
         setIsLoading(false);
         return;
       }
@@ -140,7 +146,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         throw new Error(data.error || "Failed to create post.");
       }
 
-      toast.success("Post published! Earned +5 Loop Points (LP) 🎉");
+      toast.success("Post published! 🎉");
       router.push("/app");
       router.refresh();
     } catch (err: unknown) {
@@ -178,7 +184,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const progressPercent = Math.min((charCount / MAX_CHARS) * 100, 100);
 
   return (
-    <form onSubmit={(e) => handleSubmit(e)} className="space-y-4 pb-20 sm:pb-0">
+    <form onSubmit={handleSubmit} className="space-y-4 select-none">
       {/* Hidden image file input */}
       <input
         ref={fileInputRef}
@@ -188,252 +194,221 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         onChange={handleImageFileChange}
       />
 
-      {/* ─── Main Glass Composer Card ─── */}
-      <div className="overflow-hidden rounded-3xl border border-border/60 bg-card/80 backdrop-blur-xl shadow-xl shadow-black/[0.04]">
-        {/* Header: Author + Scope Switcher */}
-        <div className="flex items-center justify-between gap-3 px-4 sm:px-5 pt-4 sm:pt-5 pb-3 border-b border-border/30">
-          <div className="flex items-center gap-3 min-w-0">
-            <Avatar className="size-10 shrink-0 border border-border/60 shadow-sm">
+      {/* ─── Minimal Composer Shell ─── */}
+      <div className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-xs">
+        {/* Top Minimal Bar: Profile + Scope Segment */}
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border/50 bg-muted/20">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Avatar className="size-8 shrink-0 border border-border/60">
               <AvatarImage src={profile?.avatarUrl || ""} />
-              <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
+              <AvatarFallback className="text-[10px] font-bold">
                 {profile?.displayName?.[0] || "U"}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="truncate text-xs font-bold text-foreground flex items-center gap-1.5">
-                <span>{profile?.displayName || "Student"}</span>
-                {(isAnonymous || isConfession) && (
-                  <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[9px] font-extrabold text-amber-500">
-                    ANON 🙈
-                  </span>
-                )}
+              <p className="truncate text-xs font-bold text-foreground">
+                {isAnonymous || isConfession ? "Anonymous Student" : profile?.displayName || "Student"}
               </p>
-              <p className="text-[10px] font-semibold text-muted-foreground truncate">
-                {profile?.institution?.slug ? `@${profile.institution.slug}` : "Campus Member"}
+              <p className="text-[10px] text-muted-foreground truncate">
+                {profile?.institution?.name?.split(",")[0] || "Campus"}
               </p>
             </div>
           </div>
 
-          {/* Scope Segmented Selector */}
-          <div className="flex shrink-0 rounded-2xl bg-muted/60 p-1 text-[10px] font-bold border border-border/40 shadow-xs">
-            <button
-              type="button"
-              onClick={() => setScope("CAMPUS")}
-              className={cn(
-                "flex items-center gap-1 rounded-xl px-2.5 py-1 transition-all cursor-pointer select-none",
-                scope === "CAMPUS" ? "bg-card text-primary shadow-xs" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <School className="size-3" /> Campus
-            </button>
+          {/* Scope Segment: Global by Default */}
+          <div className="flex shrink-0 rounded-xl bg-muted/60 p-0.5 text-[10px] font-bold border border-border/50">
             <button
               type="button"
               onClick={() => setScope("GLOBAL")}
               className={cn(
-                "flex items-center gap-1 rounded-xl px-2.5 py-1 transition-all cursor-pointer select-none",
-                scope === "GLOBAL" ? "bg-card text-primary shadow-xs" : "text-muted-foreground hover:text-foreground"
+                "flex items-center gap-1 rounded-lg px-2.5 py-1 transition-all cursor-pointer",
+                scope === "GLOBAL" ? "bg-background text-primary shadow-2xs font-black" : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Globe className="size-3" /> Global
             </button>
-          </div>
-        </div>
-
-        {/* Post Type Tabs */}
-        <div className="px-4 sm:px-5 pt-4">
-          <PostTypeSelector
-            value={postType}
-            onChange={(type) => {
-              setPostType(type);
-              if (type === "CONFESSION") setIsAnonymous(true);
-            }}
-          />
-        </div>
-
-        {/* Publish Destination Sub-hub Selector */}
-        <div className="px-4 sm:px-5 pt-3">
-          <div className="relative flex items-center">
-            <Users className="pointer-events-none absolute left-3.5 size-3.5 text-primary" />
-            <select
-              value={selectedCommunityId}
-              onChange={(e) => setSelectedCommunityId(e.target.value)}
-              aria-label="Publish destination"
-              className="w-full cursor-pointer appearance-none rounded-2xl border border-border/60 bg-muted/30 py-2.5 pl-10 pr-9 text-xs font-semibold text-foreground outline-none transition-all hover:bg-muted/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+            <button
+              type="button"
+              onClick={() => setScope("CAMPUS")}
+              className={cn(
+                "flex items-center gap-1 rounded-lg px-2.5 py-1 transition-all cursor-pointer",
+                scope === "CAMPUS" ? "bg-background text-primary shadow-2xs font-black" : "text-muted-foreground hover:text-foreground"
+              )}
             >
-              <option value="NONE">🎓 My Campus Feed (General)</option>
-              {communities?.map((c) => (
-                <option key={c.id} value={c.id}>
-                  c/{c.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-3.5 size-4 text-muted-foreground" />
+              <School className="size-3" /> My College
+            </button>
           </div>
         </div>
 
-        {/* Rich-Text Formatting Toolbar + Image Upload Trigger */}
-        <div className="px-4 sm:px-5 pt-3 flex items-center justify-between gap-2">
-          <div className="flex-1">
-            <PostComposerToolbar editor={editor} />
+        {/* Post Type Selector Pills */}
+        <div className="flex items-center gap-1.5 px-4 pt-3 overflow-x-auto no-scrollbar">
+          {POST_TYPES.map((type) => {
+            const Icon = type.icon;
+            const isSelected = postType === type.id;
+            return (
+              <button
+                key={type.id}
+                type="button"
+                onClick={() => {
+                  setPostType(type.id);
+                  if (type.id === "CONFESSION") setIsAnonymous(true);
+                }}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border shrink-0",
+                  isSelected
+                    ? "bg-primary/10 text-primary border-primary/30 shadow-2xs"
+                    : "bg-muted/20 text-muted-foreground border-border/60 hover:text-foreground"
+                )}
+              >
+                <Icon className={cn("size-3.5", type.color)} />
+                <span>{type.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Sub-Hub Selector (Optional) */}
+        {communities && communities.length > 0 && (
+          <div className="px-4 pt-2.5">
+            <div className="relative flex items-center">
+              <Users className="pointer-events-none absolute left-3 size-3 text-muted-foreground" />
+              <select
+                value={selectedCommunityId}
+                onChange={(e) => setSelectedCommunityId(e.target.value)}
+                className="w-full appearance-none rounded-xl border border-border/60 bg-muted/20 py-2 pl-8 pr-8 text-xs font-semibold text-foreground outline-none hover:bg-muted/40 transition-colors"
+              >
+                <option value="NONE">General Campus Feed</option>
+                {communities.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    c/{c.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 size-3.5 text-muted-foreground" />
+            </div>
           </div>
+        )}
+
+        {/* Formatting Toolbar */}
+        <div className="px-4 pt-3 flex items-center justify-between gap-2">
+          <PostComposerToolbar editor={editor} />
 
           <button
             type="button"
             disabled={isUploadingImage}
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 rounded-xl border border-border/80 bg-muted/40 px-3 py-1.5 text-xs font-bold text-foreground hover:bg-muted transition-all cursor-pointer shrink-0 disabled:opacity-50 shadow-2xs"
-            title="Upload image via ImgBB"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-border/70 bg-muted/30 text-xs font-bold text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
           >
             {isUploadingImage ? (
               <Loader2 className="size-3.5 animate-spin text-primary" />
             ) : (
               <ImageIcon className="size-3.5 text-rose-500" />
             )}
-            <span>Add Photo</span>
+            <span>Photo</span>
           </button>
         </div>
 
-        {/* Tiptap Editor Content */}
+        {/* Editor Body */}
         <EditorContent editor={editor} />
 
-        {/* Image Attachments Preview Strip */}
+        {/* Image Attachments */}
         {uploadedImages.length > 0 && (
-          <div className="px-4 sm:px-5 pb-3 flex flex-wrap gap-2.5">
+          <div className="px-4 pb-3 flex flex-wrap gap-2">
             {uploadedImages.map((imgUrl, i) => (
-              <div key={i} className="relative group rounded-2xl overflow-hidden border border-border shadow-md max-w-[140px] max-h-[140px]">
-                <img src={imgUrl} alt="Uploaded attachment" className="w-full h-full object-cover" />
+              <div key={i} className="relative rounded-2xl overflow-hidden border border-border size-20 shadow-xs">
+                <img src={imgUrl} alt="Attached" className="size-full object-cover" />
                 <button
                   type="button"
                   onClick={() => handleRemoveImage(i)}
-                  className="absolute top-1 right-1 size-6 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-destructive transition-colors cursor-pointer"
+                  className="absolute top-1 right-1 size-5 rounded-full bg-black/75 text-white flex items-center justify-center cursor-pointer hover:bg-destructive"
                 >
-                  <X className="size-3.5" />
+                  <X className="size-3" />
                 </button>
               </div>
             ))}
           </div>
         )}
 
-        {/* Trending Tags Bar (Horizontal Scrollable on Mobile) */}
-        <div className="flex items-center gap-2 border-t border-border/40 bg-muted/10 px-4 sm:px-5 py-3 overflow-x-auto no-scrollbar">
-          <span className="flex shrink-0 items-center gap-1 text-[10px] font-extrabold uppercase tracking-wide text-muted-foreground pr-1">
-            <Hash className="size-3 text-primary" /> Trending:
-          </span>
+        {/* Poll Options (If selected) */}
+        {postType === "POLL" && (
+          <div className="px-4 pb-3">
+            <PollOptionsEditor
+              options={pollOptions}
+              onChange={handleOptionChange}
+              onAdd={addPollOption}
+              onRemove={removePollOption}
+            />
+          </div>
+        )}
+
+        {/* Hashtags Strip */}
+        <div className="flex items-center gap-1.5 px-4 py-2.5 border-t border-border/40 bg-muted/10 overflow-x-auto no-scrollbar text-xs">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0">Tags:</span>
           {TRENDING_TAGS.map((tag) => (
             <button
               key={tag}
               type="button"
               onClick={() => insertTag(tag)}
-              className="rounded-xl border border-border/60 bg-card px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary active:scale-95 cursor-pointer shrink-0"
+              className="text-[11px] font-semibold text-muted-foreground hover:text-primary transition-colors cursor-pointer shrink-0"
             >
               {tag}
             </button>
           ))}
         </div>
 
-        {/* Poll Options Builder (If Poll selected) */}
-        {postType === "POLL" && (
-          <PollOptionsEditor
-            options={pollOptions}
-            onChange={handleOptionChange}
-            onAdd={addPollOption}
-            onRemove={removePollOption}
-          />
-        )}
+        {/* Anonymity Switch + Meter */}
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border/40 bg-muted/20 text-xs">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={isAnonymous || isConfession}
+              disabled={isConfession}
+              onChange={(e) => setIsAnonymous(e.target.checked)}
+              className="size-4 rounded accent-primary cursor-pointer"
+            />
+            <span className="font-bold text-foreground">Post Anonymously</span>
+          </label>
 
-        {/* Footer: Anonymity + Character Meter */}
-        <div className="border-t border-border/40 px-4 sm:px-5 py-4 space-y-3">
-          <AnonymityNotice
-            enabled={isAnonymous}
-            onToggle={setIsAnonymous}
-            forcedByType={isConfession}
-          />
-
-          <div className="flex items-center justify-between pt-1">
-            <div className="h-1.5 flex-1 max-w-[140px] bg-muted rounded-full overflow-hidden">
+          <div className="flex items-center gap-2">
+            <div className="h-1.5 w-16 bg-muted rounded-full overflow-hidden">
               <div
-                className={cn(
-                  "h-full transition-all duration-300 rounded-full",
-                  overLimit ? "bg-destructive" : progressPercent > 80 ? "bg-amber-500" : "bg-primary"
-                )}
+                className={cn("h-full rounded-full transition-all", overLimit ? "bg-destructive" : "bg-primary")}
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-
-            <span
-              className={cn(
-                "text-[10px] font-bold tabular-nums",
-                overLimit ? "text-destructive" : "text-muted-foreground"
-              )}
-            >
-              {charCount.toLocaleString()} / {MAX_CHARS.toLocaleString()}
+            <span className={cn("text-[10px] font-mono font-bold", overLimit ? "text-destructive" : "text-muted-foreground")}>
+              {charCount}/{MAX_CHARS}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Error Banner */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="flex items-start gap-2.5 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-xs font-semibold text-destructive shadow-sm"
-          >
-            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-            <span>{error}</span>
-          </motion.div>
+      {/* Error Notice */}
+      {error && (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-bold text-destructive flex items-center gap-2">
+          <AlertTriangle className="size-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={isLoading || overLimit || isUploadingImage}
+        className="w-full h-11 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/95 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="size-4 animate-spin" />
+            <span>Publishing...</span>
+          </>
+        ) : (
+          <>
+            <span>Publish Post (+5 LP)</span>
+            <ArrowRight className="size-4" />
+          </>
         )}
-      </AnimatePresence>
-
-      {/* Desktop Submit Button */}
-      <div className="hidden sm:block">
-        <motion.button
-          type="button"
-          onClick={() => handleSubmit()}
-          disabled={isLoading || overLimit || isUploadingImage}
-          whileTap={{ scale: 0.98 }}
-          className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary via-orange-500 to-amber-500 text-xs font-bold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/35 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-        >
-          {isLoading ? (
-            <>
-              <Sparkles className="size-4 animate-spin text-white" />
-              <span>Publishing to Campus Loop...</span>
-            </>
-          ) : (
-            <>
-              <span>Publish Post (+5 LP)</span>
-              <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400 }}>
-                <ArrowRight className="size-4" />
-              </motion.div>
-            </>
-          )}
-        </motion.button>
-      </div>
-
-      {/* Mobile Floating Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 block sm:hidden border-t border-border/50 bg-background/90 p-3 backdrop-blur-xl shadow-2xl">
-        <motion.button
-          type="button"
-          onClick={() => handleSubmit()}
-          disabled={isLoading || overLimit || isUploadingImage}
-          whileTap={{ scale: 0.97 }}
-          className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary via-orange-500 to-amber-500 text-xs font-bold text-white shadow-lg shadow-primary/25 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-        >
-          {isLoading ? (
-            <>
-              <Sparkles className="size-4 animate-spin text-white" />
-              <span>Publishing...</span>
-            </>
-          ) : (
-            <>
-              <span>Publish Post (+5 LP)</span>
-              <ArrowRight className="size-4" />
-            </>
-          )}
-        </motion.button>
-      </div>
+      </button>
     </form>
   );
 }

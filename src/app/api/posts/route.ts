@@ -53,37 +53,34 @@ export async function POST(req: Request) {
     // Anonymous posts carry NO author foreign key. The real profile id is
     // AES-sealed into the identity vault; the post row only holds a stable
     // HMAC pseudonym handle that cannot be reversed without the pepper.
-    const [newPost] = await db.transaction(async (tx) => {
-      const inserted = await tx
-        .insert(posts)
+    const [newPost] = await db
+      .insert(posts)
+      .values({
+        id: postId,
+        authorId: anonymous ? null : profile.id,
+        pseudonym: anonymous ? deriveAnonHandle(profile.id) : null,
+        institutionId: profile.institutionId,
+        body,
+        type: type || "NORMAL",
+        scope: scope || "GLOBAL",
+        isAnonymous: anonymous,
+        title: title || null,
+        communityId: communityId || null,
+        status: safety.status,
+        riskScore: safety.riskScore,
+      })
+      .returning();
+
+    if (anonymous) {
+      await db
+        .insert(anonIdentityVault)
         .values({
-          id: postId,
-          authorId: anonymous ? null : profile.id,
-          pseudonym: anonymous ? deriveAnonHandle(profile.id) : null,
-          institutionId: profile.institutionId,
-          body,
-          type: type || "NORMAL",
-          scope: scope || "CAMPUS",
-          isAnonymous: anonymous,
-          title: title || null,
-          communityId: communityId || null,
-          status: safety.status,
-          riskScore: safety.riskScore,
+          handle: deriveAnonHandle(profile.id),
+          sealedIdentity: sealIdentity(profile.id),
         })
-        .returning();
-
-      if (anonymous) {
-        await tx
-          .insert(anonIdentityVault)
-          .values({
-            handle: deriveAnonHandle(profile.id),
-            sealedIdentity: sealIdentity(profile.id),
-          })
-          .onConflictDoNothing({ target: anonIdentityVault.handle });
-      }
-
-      return inserted;
-    });
+        .onConflictDoNothing({ target: anonIdentityVault.handle })
+        .catch((err) => console.error("Identity vault insert error:", err));
+    }
 
     // Award +5 points
     await db.update(userProfiles)

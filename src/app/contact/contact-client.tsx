@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Send } from "lucide-react";
 import { toast } from "sonner";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { MarketingHeader, MarketingFooter } from "@/components/marketing/system";
 
 export function ContactClient() {
   const [email, setEmail] = useState("");
@@ -28,25 +28,7 @@ export function ContactClient() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground bg-grid-pattern relative overflow-x-hidden pb-12">
-      {/* Header */}
-      <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/70 px-6 backdrop-blur-md">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
-            <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
-          </div>
-          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-extrabold tracking-tight text-transparent">
-            CampusLoop
-          </span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <Link href="/join">
-            <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
-              Join CampusLoop
-            </button>
-          </Link>
-        </div>
-      </header>
+      <MarketingHeader />
 
       {/* Main Content */}
       <main className="flex-1 w-full max-w-md px-6 pt-28 mx-auto space-y-6">
@@ -109,6 +91,8 @@ export function ContactClient() {
           </button>
         </form>
       </main>
+
+      <MarketingFooter />
     </div>
   );
 }

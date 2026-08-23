@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { 
   CheckCircle, 
   XCircle, 
@@ -20,7 +19,7 @@ import {
   Smartphone
 } from "lucide-react";
 import { toast } from "sonner";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { MarketingHeader, MarketingFooter } from "@/components/marketing/system";
 
 // Whitelisted Indian institutions for the mock verification tool
 const whitelistedColleges = [
@@ -231,25 +230,7 @@ export function AboutClient() {
       <div className="absolute top-[40%] right-[-10%] h-[400px] w-[400px] rounded-full bg-orange-500/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[20%] left-[-10%] h-[350px] w-[350px] rounded-full bg-violet-500/5 blur-[100px] pointer-events-none" />
 
-      {/* ─── Header ─── */}
-      <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/70 px-6 backdrop-blur-md lg:px-12">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
-            <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
-          </div>
-          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-extrabold tracking-tight text-transparent">
-            CampusLoop
-          </span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <Link href="/join">
-            <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
-              Join App 🚀
-            </button>
-          </Link>
-        </div>
-      </header>
+      <MarketingHeader />
 
       <main className="flex-1 w-full max-w-5xl px-6 pt-24 mx-auto space-y-16">
         {/* ─── Hero Section ─── */}
@@ -923,17 +904,7 @@ export function AboutClient() {
         </section>
       </main>
 
-      {/* ─── Footer ─── */}
-      <footer className="w-full max-w-5xl mx-auto px-6 mt-16 pt-8 border-t border-border/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground font-semibold">
-        <div className="flex items-center gap-2">
-          <span>&copy; 2026 CampusLoop. Speak freely. Stay safe.</span>
-        </div>
-        <div className="flex gap-4">
-          <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-          <Link href="/safety" className="hover:text-primary transition-colors">Safety Center</Link>
-          <Link href="/contact" className="hover:text-primary transition-colors">Contact Support</Link>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }

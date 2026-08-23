@@ -17,10 +17,9 @@ import {
   BookOpen,
   CheckCircle2,
   HelpCircle,
-  Zap,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { motion, AnimatePresence } from "framer-motion";
+import { MarketingHeader } from "@/components/marketing/system";
 
 const SECTIONS = [
   { id: "concept", label: "Core Motive", icon: Sparkles },
@@ -58,32 +57,7 @@ export function OverviewClient() {
       {/* Background glow accents */}
       <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-[500px] w-full max-w-4xl rounded-full bg-gradient-to-b from-primary/10 via-orange-500/5 to-transparent blur-3xl" />
 
-      {/* Header */}
-      <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/80 px-4 sm:px-8 backdrop-blur-xl">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
-            <img src="/logo.png" alt="CampusLoop Logo" className="size-full object-cover scale-110" />
-          </div>
-          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-black tracking-tight text-transparent">
-            CampusLoop
-          </span>
-        </Link>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/pitch"
-            className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
-          >
-            <Zap className="size-3.5 text-amber-500" /> Pitch Deck
-          </Link>
-          <ThemeToggle />
-          <Link href="/join">
-            <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/20 transition-all cursor-pointer">
-              Launch App
-            </button>
-          </Link>
-        </div>
-      </header>
+      <MarketingHeader />
 
       {/* Hero Banner */}
       <main className="flex-1 w-full max-w-4xl px-4 sm:px-8 pt-24 mx-auto space-y-8">

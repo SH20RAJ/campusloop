@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { userProfiles, institutions } from "@/db/schema";
+import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, ne, and, desc, sql } from "drizzle-orm";
 import { getViewerInstitutionId } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
-
-type Peer = typeof userProfiles.$inferSelect & { institution?: typeof institutions.$inferSelect | null };
 
 export async function GET() {
   try {
@@ -33,41 +31,64 @@ export async function GET() {
       conditions.push(ne(userProfiles.id, currentProfile.id));
     }
 
-    // Try finding peers from the same campus first
-    let peers: Peer[] = [];
-    if (currentProfile?.institutionId) {
-      peers = await db.query.userProfiles.findMany({
-        where: and(...conditions, eq(userProfiles.institutionId, currentProfile.institutionId)),
-        orderBy: [desc(userProfiles.points), sql`random()`],
-        limit: 5,
-        with: {
-          institution: true,
-        },
-      });
-    }
+    // Fetch candidate pool from home campus and India
+    const candidatePool = await db.query.userProfiles.findMany({
+      where: and(...conditions),
+      orderBy: [desc(userProfiles.points), sql`random()`],
+      limit: 35,
+      with: {
+        institution: true,
+      },
+    });
 
-    // If fewer than 4 peers from same college, backfill with active campus leaders across India
-    if (peers.length < 4) {
-      const existingIds = new Set([currentProfile?.id, ...peers.map((p) => p.id)].filter(Boolean));
-      const generalPeers = await db.query.userProfiles.findMany({
-        where: and(...conditions),
-        orderBy: [desc(userProfiles.points), sql`random()`],
-        limit: 8,
-        with: {
-          institution: true,
-        },
-      });
+    const myInterests = new Set((currentProfile?.interests ?? []).map((i) => i.toLowerCase().trim()));
 
-      for (const gp of generalPeers) {
-        if (!existingIds.has(gp.id)) {
-          peers.push(gp);
-          existingIds.add(gp.id);
-          if (peers.length >= 5) break;
+    // Score candidates using SimCluster & campus affinity model
+    const scored = candidatePool.map((cand) => {
+      let score = 0;
+
+      // 1. Same Campus Boost (+30 pts)
+      if (currentProfile?.institutionId && cand.institutionId === currentProfile.institutionId) {
+        score += 30;
+      }
+
+      // 2. Same Academic Course / Branch (+15 pts)
+      if (currentProfile?.course && cand.course && currentProfile.course.toLowerCase() === cand.course.toLowerCase()) {
+        score += 10;
+      }
+      if (currentProfile?.branch && cand.branch && currentProfile.branch.toLowerCase() === cand.branch.toLowerCase()) {
+        score += 8;
+      }
+
+      // 3. Shared Interest Affinity (Jaccard-like overlap: +12 pts per shared interest)
+      const candInterests = cand.interests ?? [];
+      let sharedCount = 0;
+      for (const ci of candInterests) {
+        if (myInterests.has(ci.toLowerCase().trim())) {
+          sharedCount++;
         }
       }
-    }
+      score += Math.min(sharedCount * 12, 36);
 
-    return NextResponse.json(peers.slice(0, 5));
+      // 4. Activity & Reputation Factor (up to 15 pts)
+      score += Math.min((cand.points || 0) * 0.1, 15);
+
+      // 5. Stochastic Jitter for non-stagnant exploration
+      score += Math.random() * 10;
+
+      return {
+        profile: cand,
+        score,
+        sharedInterestsCount: sharedCount,
+      };
+    });
+
+    // Sort by final affinity score descending
+    scored.sort((a, b) => b.score - a.score);
+
+    const result = scored.slice(0, 5).map((s) => s.profile);
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching suggested profiles:", error);
     return NextResponse.json({ error: "Failed to fetch suggested profiles" }, { status: 500 });

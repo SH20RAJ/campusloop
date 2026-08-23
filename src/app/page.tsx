@@ -8,8 +8,13 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  MarketingHeader,
+  MarketingFooter,
+  GradientText,
+  CTABand,
+} from "@/components/marketing/system";
 import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/landing/reveal";
 import { HeroPreview } from "@/components/landing/hero-preview";
@@ -163,63 +168,7 @@ export default async function LandingPage() {
       />
 
       <div className="flex min-h-screen flex-col bg-background text-foreground">
-        {/* Nav */}
-        <header className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
-          <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex size-7 items-center justify-center overflow-hidden rounded-lg border border-border bg-black">
-                <img
-                  src="/logo.png"
-                  alt="CampusLoop logo"
-                  className="size-full scale-110 object-cover"
-                />
-              </span>
-              <span className="text-base font-bold tracking-tight">
-                CampusLoop
-              </span>
-            </Link>
-
-            <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
-              <Link href="/about" className="transition-colors hover:text-foreground">
-                About
-              </Link>
-              <Link href="/overview" className="transition-colors hover:text-foreground">
-                Overview
-              </Link>
-              <Link href="/pitch" className="transition-colors hover:text-foreground">
-                Pitch
-              </Link>
-              <Link href="/safety" className="transition-colors hover:text-foreground">
-                Safety
-              </Link>
-            </nav>
-
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              {isAuthenticated ? (
-                <Link href="/app" className={cn(buttonVariants({ size: "sm" }), "gap-1")}>
-                  Open app
-                  <ArrowRight className="size-3.5" />
-                </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/join?mode=signin"
-                    className={buttonVariants({ variant: "ghost", size: "sm" })}
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/join?mode=signup"
-                    className={buttonVariants({ size: "sm" })}
-                  >
-                    Get verified
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </header>
+        <MarketingHeader isAuthenticated={isAuthenticated} />
 
         {/* Hero */}
         <section className="mx-auto grid w-full max-w-6xl items-center gap-12 px-6 pt-32 pb-20 lg:grid-cols-2 lg:gap-8 lg:pt-24 lg:pb-16">
@@ -231,11 +180,12 @@ export default async function LandingPage() {
             <h1 className="text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl">
               Your campus,
               <br />
-              <em>unfiltered.</em>
+              <GradientText><em>unfiltered.</em></GradientText>
             </h1>
             <p className="max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
-              Verify your college email and unlock anonymous confessions,
-              campus polls, matching, and chat with real students.
+              The verified student network across 1,350+ Indian colleges.
+              Anonymous confessions, canteen polls, campus matching, and chat —
+              with zero recruiters, zero faculty, zero outsiders.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               {isAuthenticated ? (
@@ -259,6 +209,28 @@ export default async function LandingPage() {
                 See what&apos;s inside
               </Link>
             </div>
+
+            {!isAuthenticated && (
+              <p className="text-xs font-medium text-muted-foreground">
+                JEE/NEET aspirant or just exploring?{" "}
+                <Link href="/join?mode=signup" className="font-bold text-primary hover:underline">
+                  Browse in Viewer Mode
+                </Link>{" "}
+                with any email — read-only, no college ID needed.
+              </p>
+            )}
+
+            <ul className="flex flex-wrap gap-x-5 gap-y-2 pt-1 text-xs font-semibold text-muted-foreground">
+              <li className="flex items-center gap-1.5">
+                <ShieldCheck className="size-3.5 text-primary" /> College-email gated
+              </li>
+              <li className="flex items-center gap-1.5">
+                <School className="size-3.5 text-primary" /> 1,350+ colleges indexed
+              </li>
+              <li className="flex items-center gap-1.5">
+                <HeartHandshake className="size-3.5 text-primary" /> Anonymity, sealed &amp; safe
+              </li>
+            </ul>
           </div>
 
           <HeroPreview />
@@ -419,87 +391,16 @@ export default async function LandingPage() {
 
         <FAQSection />
 
-        {/* Final CTA */}
-        <section className="border-t border-border/60">
-          <div className="mx-auto w-full max-w-6xl px-6 py-28 text-center">
-            <Reveal className="space-y-6">
-              <h2 className="text-4xl font-bold tracking-tight md:text-6xl">
-                Your email is the ticket.
-              </h2>
-              <p className="mx-auto max-w-md text-base text-muted-foreground md:text-lg">
-                Free for verified students. No outsiders, ever.
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                {isAuthenticated ? (
-                  <Link href="/app" className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}>
-                    Open app
-                    <ArrowRight className="size-4" />
-                  </Link>
-                ) : (
-                  <Link
-                    href="/join?mode=signup"
-                    className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}
-                  >
-                    Get verified
-                    <ArrowRight className="size-4" />
-                  </Link>
-                )}
-                {!isAuthenticated && (
-                  <Link
-                    href="/join?mode=signin"
-                    className={buttonVariants({ variant: "ghost", size: "lg" })}
-                  >
-                    Already verified? Sign in
-                  </Link>
-                )}
-              </div>
-            </Reveal>
-          </div>
-        </section>
+        <CTABand
+          title="Your email is the ticket."
+          lede="Free for verified students. No outsiders, ever. Aspirants can watch from the stands in Viewer Mode."
+          primaryHref={isAuthenticated ? "/app" : "/join?mode=signup"}
+          primaryLabel={isAuthenticated ? "Open app" : "Get verified"}
+          secondaryHref={isAuthenticated ? undefined : "/join?mode=signin"}
+          secondaryLabel={isAuthenticated ? undefined : "Already verified? Sign in"}
+        />
 
-        {/* Footer */}
-        <footer className="border-t border-border/60">
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 md:flex-row md:items-center md:justify-between">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex size-6 items-center justify-center overflow-hidden rounded-md border border-border bg-black">
-                <img
-                  src="/logo.png"
-                  alt="CampusLoop logo"
-                  className="size-full scale-110 object-cover"
-                />
-              </span>
-              <span className="text-sm font-bold tracking-tight">
-                CampusLoop
-              </span>
-            </Link>
-            <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-muted-foreground">
-              <Link href="/about" className="transition-colors hover:text-foreground">
-                About
-              </Link>
-              <Link href="/overview" className="transition-colors hover:text-foreground">
-                Overview
-              </Link>
-              <Link href="/pitch" className="transition-colors hover:text-foreground">
-                Pitch
-              </Link>
-              <Link href="/safety" className="transition-colors hover:text-foreground">
-                Safety
-              </Link>
-              <Link href="/privacy" className="transition-colors hover:text-foreground">
-                Privacy
-              </Link>
-              <Link href="/contact" className="transition-colors hover:text-foreground">
-                Contact
-              </Link>
-            </nav>
-          </div>
-          <div className="border-t border-border/60">
-            <p className="mx-auto w-full max-w-6xl px-6 py-5 text-xs text-muted-foreground">
-              © {new Date().getFullYear()} CampusLoop. Built for students,
-              gated by a college email.
-            </p>
-          </div>
-        </footer>
+        <MarketingFooter />
       </div>
     </>
   );

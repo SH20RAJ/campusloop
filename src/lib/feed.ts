@@ -170,8 +170,27 @@ export type ApiFeedSort = "for_you" | "latest" | "trending" | "top_voted" | "mos
 const recentVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id} and ${votes.createdAt} > now() - interval '7 days'), 0)`;
 const recentCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED' and ${comments.createdAt} > now() - interval '7 days'), 0)`;
 const hoursSinceSql = sql<number>`(extract(epoch from (now() - ${posts.createdAt})) / 3600.0)`;
-const forYouScoreSql = sql<number>`((${voteScoreSql} * 3 + ${commentCountSql} * 2 + 1) / power(${hoursSinceSql} + 2, 1.5))`;
 const trendingScoreSql = sql<number>`(${recentVoteScoreSql} * 3 + ${recentCommentCountSql} * 2)`;
+
+function getForYouScoreSql(userInstitutionId?: string | null) {
+	const ownCollegeBonus = userInstitutionId
+		? sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 25.0 else 0.0 end)`
+		: sql<number>`0.0`;
+
+	return sql<number>`(
+		${ownCollegeBonus}
+		+ (45.0 / power(${hoursSinceSql} + 1.2, 0.75))
+		+ (${voteScoreSql} * 3.5)
+		+ (${commentCountSql} * 2.5)
+		+ (case 
+			when ${posts.type} = 'POLL' then 8.0
+			when ${posts.type} = 'QUESTION' then 6.0
+			when ${posts.type} = 'CONFESSION' then 4.0
+			else 0.0 
+		end)
+		+ (random() * 18.0)
+	)`;
+}
 
 export function normalizeApiFeedSort(value?: string | null): ApiFeedSort {
 	if (
@@ -198,8 +217,10 @@ export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | n
 			return [desc(campusPrioritySql), desc(commentCountSql), desc(posts.createdAt), asc(posts.id)];
 		case "trending":
 			return [desc(campusPrioritySql), desc(trendingScoreSql), desc(posts.createdAt), asc(posts.id)];
-		case "for_you":
-			return [desc(campusPrioritySql), desc(forYouScoreSql), asc(posts.id)];
+		case "for_you": {
+			const forYouScore = getForYouScoreSql(userInstitutionId);
+			return [desc(forYouScore), desc(posts.createdAt), asc(posts.id)];
+		}
 		default:
 			return [desc(campusPrioritySql), desc(posts.createdAt), asc(posts.id)];
 	}
@@ -367,10 +388,14 @@ export function sortFeedPosts<T extends {
 		case "for_you":
 		default:
 			return sorted.sort((a, b) => {
-				const campusBonusA = userInstitutionId && a.institutionId === userInstitutionId ? 500 : 0;
-				const campusBonusB = userInstitutionId && b.institutionId === userInstitutionId ? 500 : 0;
-				const scoreA = campusBonusA + a.votesCount * 2 + a.commentsCount * 3;
-				const scoreB = campusBonusB + b.votesCount * 2 + b.commentsCount * 3;
+				const hoursA = Math.max(0, (Date.now() - new Date(a.createdAt).getTime()) / (3600 * 1000));
+				const hoursB = Math.max(0, (Date.now() - new Date(b.createdAt).getTime()) / (3600 * 1000));
+				const decayA = 45 / Math.pow(hoursA + 1.2, 0.75);
+				const decayB = 45 / Math.pow(hoursB + 1.2, 0.75);
+				const campusBonusA = userInstitutionId && a.institutionId === userInstitutionId ? 25 : 0;
+				const campusBonusB = userInstitutionId && b.institutionId === userInstitutionId ? 25 : 0;
+				const scoreA = campusBonusA + decayA + a.votesCount * 3.5 + a.commentsCount * 2.5;
+				const scoreB = campusBonusB + decayB + b.votesCount * 3.5 + b.commentsCount * 2.5;
 				if (scoreB !== scoreA) return scoreB - scoreA;
 				return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 			});

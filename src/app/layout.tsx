@@ -1,18 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit } from "next/font/google";
 import "./globals.css";
 import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
-
-const outfit = Outfit({ 
-  subsets: ["latin"], 
-  variable: "--font-sans",
-  display: "swap",
-  fallback: ["system-ui", "-apple-system", "sans-serif"],
-});
 
 export const viewport: Viewport = {
   themeColor: [
@@ -124,8 +115,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={cn("font-sans", outfit.variable)} suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" className="font-sans antialiased" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -185,7 +182,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
+      <body className="antialiased font-sans">
         <HexclaveProvider app={hexclaveServerApp}>
           <HexclaveTheme>
             {children}

@@ -30,7 +30,6 @@ import {
   PartyPopper,
   ChevronDown,
   ChevronRight,
-  GraduationCap,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -301,13 +300,13 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                   </Link>
 
                   <div className="border-t border-border/50 pt-1">
-                    <a
+                    <Link
                       href="/handler/sign-out"
                       className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                     >
                       <LogOut className="size-3.5" />
                       <span>Sign Out</span>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}

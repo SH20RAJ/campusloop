@@ -28,9 +28,26 @@ export default async function OnboardingPage() {
     redirect("/app");
   }
 
-  const emailUsername = user.primaryEmail?.split("@")[0] || "";
-  const initialDisplayName = (user as { name?: string }).name || profile?.displayName || "";
-  const initialUsername = profile?.username || emailUsername.toLowerCase().replace(/[^a-z0-9_]/g, "_");
+  const email = user.primaryEmail || "";
+  const rawEmailUser = email.split("@")[0] || "";
+
+  // Smart Name Parser: e.g. "shaswat.raj" -> "Shaswat Raj", "aarav_sharma" -> "Aarav Sharma"
+  function parseNameFromEmail(raw: string): string {
+    const parts = raw
+      .replace(/[0-9]+/g, " ")
+      .split(/[\._\-\+ ]+/)
+      .filter((p) => p.length > 0)
+      .map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase());
+    
+    if (parts.length > 0) {
+      return parts.join(" ");
+    }
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+  }
+
+  const extractedName = parseNameFromEmail(rawEmailUser);
+  const initialDisplayName = (user as { name?: string }).name || profile?.displayName || extractedName || "";
+  const initialUsername = profile?.username || rawEmailUser.toLowerCase().replace(/[^a-z0-9_]/g, "_").replace(/^_+|_+$/g, "") || "student";
   const initialAvatarUrl = profile?.avatarUrl || (user as { picture?: string }).picture || "";
 
   return (

@@ -40,12 +40,12 @@ export default async function InvalidEmailPage() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <a
+          <Link
             href="/handler/sign-out"
             className="flex w-full items-center justify-center rounded-lg bg-primary h-10 px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/95 transition-colors cursor-pointer"
           >
             Sign Out
-          </a>
+          </Link>
         </div>
       </div>
     </div>

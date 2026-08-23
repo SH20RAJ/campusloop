@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 import { Copy, Check, Gift, Sparkles, ArrowRight, ShieldCheck, Flame, Users } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Reveal } from "./reveal";
 import Link from "next/link";
 import { toast } from "sonner";

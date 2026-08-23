@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { completeOnboarding } from "./actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sparkles, User, ShieldCheck, Check, AlertCircle, Upload, Loader2, GraduationCap, Heart, Tag } from "lucide-react";
+import { Sparkles, User, ShieldCheck, Check, AlertCircle, Upload, Loader2, GraduationCap, Tag } from "lucide-react";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { DEGREE_CATEGORIES, getBranchesForDegree } from "@/lib/academic-constants";

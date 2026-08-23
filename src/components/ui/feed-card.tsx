@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Heart, Repeat2 } from "lucide-react";
+import { Repeat2, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FeedPost } from "@/hooks/use-feed";
 import { PollCard } from "./poll-card";
@@ -38,25 +38,6 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
 
-  function renderPostBody(body: string) {
-    const parts = body.split(/(#[a-zA-Z0-9_]+)/g);
-    return parts.map((part, index) => {
-      if (part.startsWith("#")) {
-        const tag = part.slice(1);
-        return (
-          <Link
-            key={index}
-            href={`/app/hashtag/${tag}`}
-            className="text-primary font-bold hover:underline cursor-pointer relative z-10"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {part}
-          </Link>
-        );
-      }
-      return part;
-    });
-  }
 
   async function handleVote() {
     if (isLoading) return;

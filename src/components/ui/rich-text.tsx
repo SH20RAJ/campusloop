@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Image as ImageIcon, ExternalLink, X, ZoomIn } from "lucide-react";
+import { ExternalLink, X, ZoomIn } from "lucide-react";
 
 interface RichTextProps {
   content: string;

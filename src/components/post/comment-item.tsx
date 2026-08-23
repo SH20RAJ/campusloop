@@ -6,6 +6,7 @@ import { Reply } from "lucide-react";
 import Link from "next/link";
 import { Comment, UserProfile } from "@/db/schema";
 import { getAvatarUrl, formatTimeAgo } from "@/lib/utils";
+import { RichText } from "@/components/ui/rich-text";
 
 export type CommentWithAuthor = Comment & {
   author: UserProfile | null;
@@ -90,7 +91,9 @@ export function CommentItem({
           )}
         </div>
 
-        <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">{comment.body}</p>
+        <div className="pt-0.5">
+          <RichText content={comment.body} className="text-foreground/90 leading-relaxed" />
+        </div>
 
         {/* Inline Reply Form */}
         {replyingToId === comment.id && (

@@ -21,6 +21,16 @@ import {
   HelpCircle,
   Layers,
   Download,
+  ShoppingBag,
+  Search,
+  Home as HomeIcon,
+  Car,
+  Gift,
+  Wrench,
+  PartyPopper,
+  ChevronDown,
+  ChevronRight,
+  GraduationCap,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -40,6 +50,8 @@ interface NavigationProps {
 export function Navigation({ profile, isAdmin }: NavigationProps) {
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showUtilitySubmenu, setShowUtilitySubmenu] = useState(false);
+  const [showSocialSubmenu, setShowSocialSubmenu] = useState(false);
 
   const desktopNavItems = [
     { icon: Home, href: "/app", label: "Home" },
@@ -57,6 +69,26 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
   if (isAdmin) {
     desktopNavItems.push({ icon: Shield, href: "/admin", label: "Admin Console" });
   }
+
+  const campusUtilities = [
+    { icon: ShoppingBag, label: "Buy / Sell / Trade", href: "/app/hashtag/BuySell" },
+    { icon: Search, label: "Lost & Found", href: "/app/hashtag/LostAndFound" },
+    { icon: HomeIcon, label: "Roommate / Flat", href: "/app/hashtag/Roommates" },
+    { icon: Car, label: "Ride Sharing", href: "/app/hashtag/RideShare" },
+    { icon: Gift, label: "Free Stuff", href: "/app/hashtag/FreeStuff" },
+    { icon: Wrench, label: "Need / Can Help", href: "/app/hashtag/CampusHelp" },
+  ];
+
+  const socialChannels = [
+    { label: "Memes & Banter", href: "/app/hashtag/CampusMemes", emoji: "🎭" },
+    { label: "Events & Fests", href: "/app/hashtag/CampusEvents", emoji: "🎪" },
+    { label: "Sports & Fitness", href: "/app/hashtag/Sports", emoji: "⚽" },
+    { label: "Gaming & Esports", href: "/app/hashtag/Gaming", emoji: "🎮" },
+    { label: "Music & Jamming", href: "/app/hashtag/MusicJam", emoji: "🎸" },
+    { label: "Movies & Shows", href: "/app/hashtag/BingeWatch", emoji: "🍿" },
+    { label: "Photography", href: "/app/hashtag/Photography", emoji: "📸" },
+    { label: "Creative Corner", href: "/app/hashtag/Creatives", emoji: "🎨" },
+  ];
 
   const mobileBottomItems = [
     { icon: Home, href: "/app", label: "Home" },
@@ -78,11 +110,24 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
       ],
     },
     {
-      group: "Communities & Colleges",
+      group: "🛒 Campus Utility",
       items: [
-        { icon: School, href: "/app/colleges", label: "College Directory", desc: "1,350+ indexed Indian colleges" },
-        { icon: Users, href: "/app/communities", label: "Communities", desc: "Clubs, departments & groups" },
+        { icon: ShoppingBag, href: "/app/hashtag/BuySell", label: "Buy / Sell / Exchange", desc: "Books, tech, cycles & dorm items" },
+        { icon: Search, href: "/app/hashtag/LostAndFound", label: "Lost & Found", desc: "Report or claim campus belongings" },
+        { icon: HomeIcon, href: "/app/hashtag/Roommates", label: "Roommate / Flat Finder", desc: "Find hostel & flat roommates" },
+        { icon: Car, href: "/app/hashtag/RideShare", label: "Ride Sharing", desc: "Carpool to metro or station" },
+        { icon: Gift, href: "/app/hashtag/FreeStuff", label: "Free Stuff", desc: "Giveaways & free student gear" },
+        { icon: Wrench, href: "/app/hashtag/CampusHelp", label: "Need / Can Help", desc: "Peer tutoring, lab help & notes" },
+      ],
+    },
+    {
+      group: "🎉 Social & Vibes",
+      items: [
+        { icon: PartyPopper, href: "/app/hashtag/CampusMemes", label: "Memes & Banter", desc: "Hostel tea & campus humor" },
+        { icon: PartyPopper, href: "/app/hashtag/CampusEvents", label: "Events & Fests", desc: "Cultural fests, hackathons & gigs" },
+        { icon: Users, href: "/app/communities", label: "Sub-Hubs & Clubs", desc: "Interest communities & branches" },
         { icon: Heart, href: "/app/confessions", label: "Confessions", desc: "Anonymous campus thoughts" },
+        { icon: School, href: "/app/colleges", label: "College Directory", desc: "1,350+ indexed Indian colleges" },
       ],
     },
     {
@@ -101,16 +146,16 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
   return (
     <>
       {/* ─── Desktop Sidebar ─── */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-60 border-r border-border bg-background py-6 px-4 md:flex md:flex-col justify-between">
-        <div className="space-y-6">
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-60 border-r border-border bg-background py-5 px-3 md:flex md:flex-col justify-between overflow-y-auto">
+        <div className="space-y-4">
           {/* Logo */}
-          <Link href="/app" className="flex items-center gap-2 px-3 text-lg font-black tracking-tight text-foreground select-none">
-            <img src="/logo.png" alt="CampusLoop Logo" className="h-6 w-6 object-cover rounded-lg" />
+          <Link href="/app" className="flex items-center gap-2 px-3 text-base font-black tracking-tight text-foreground select-none">
+            <img src="/logo.png" alt="CampusLoop Logo" className="size-6 object-cover rounded-lg" />
             <span>CampusLoop</span>
           </Link>
 
           {/* Navigation Links */}
-          <nav className="space-y-1">
+          <nav className="space-y-0.5">
             {desktopNavItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
@@ -119,16 +164,16 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "group flex items-center gap-4 rounded-xl px-4 py-3 text-xs font-bold transition-all duration-200",
+                    "group flex items-center gap-3.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition-all duration-200",
                     isActive
-                      ? "bg-muted text-foreground shadow-xs"
+                      ? "bg-muted text-foreground shadow-2xs"
                       : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
                   <AnimateIcon animateOnHover animation="path">
                     <Icon
                       className={cn(
-                        "h-4.5 w-4.5 shrink-0 transition-colors",
+                        "size-4 shrink-0 transition-colors",
                         isActive ? "text-foreground stroke-[2.5]" : "text-muted-foreground group-hover:text-foreground"
                       )}
                     />
@@ -137,41 +182,104 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                 </Link>
               );
             })}
+
+            {/* ─── Campus Utility Expandable Submenu ─── */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setShowUtilitySubmenu(!showUtilitySubmenu)}
+                className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <span>🛒</span>
+                  <span>Campus Utility</span>
+                </span>
+                {showUtilitySubmenu ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
+              </button>
+
+              {showUtilitySubmenu && (
+                <div className="pl-4 pr-1 py-1 space-y-0.5 animate-in fade-in duration-150">
+                  {campusUtilities.map((u) => {
+                    const Icon = u.icon;
+                    return (
+                      <Link
+                        key={u.label}
+                        href={u.href}
+                        className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                      >
+                        <Icon className="size-3 text-primary shrink-0" />
+                        <span className="truncate">{u.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* ─── Social & Vibes Channels ─── */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowSocialSubmenu(!showSocialSubmenu)}
+                className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <span>🎉</span>
+                  <span>Social Channels</span>
+                </span>
+                {showSocialSubmenu ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
+              </button>
+
+              {showSocialSubmenu && (
+                <div className="pl-4 pr-1 py-1 space-y-0.5 animate-in fade-in duration-150">
+                  {socialChannels.map((s) => (
+                    <Link
+                      key={s.label}
+                      href={s.href}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
+                    >
+                      <span className="text-xs">{s.emoji}</span>
+                      <span className="truncate">{s.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
         </div>
 
         {/* Bottom Actions Area */}
-        <div className="space-y-3 pt-4 border-t border-border/60">
+        <div className="space-y-3 pt-3 border-t border-border/60">
           <Link href="/app/post/new" className="block">
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold py-2.5 rounded-lg text-xs cursor-pointer border-none transition-colors">
+            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold py-2 rounded-xl text-xs cursor-pointer border-none shadow-xs transition-colors">
               Create Post
             </Button>
           </Link>
 
           {profile && (
-            <div className="flex items-center justify-between gap-2 px-2 py-2">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <Avatar className="h-8 w-8 shrink-0">
+            <div className="flex items-center justify-between gap-2 px-1.5 py-1.5">
+              <Link href="/app/profile" className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-80 transition-opacity">
+                <Avatar className="size-8 shrink-0">
                   <AvatarImage src={profile.avatarUrl || ""} />
-                  <AvatarFallback className="text-[9px] font-bold text-xs">
+                  <AvatarFallback className="text-[9px] font-bold">
                     {profile.displayName[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-semibold text-foreground">{profile.displayName}</p>
-                  <p className="truncate text-[8.5px] text-muted-foreground">@{profile.username}</p>
+                  <p className="truncate text-xs font-bold text-foreground">{profile.displayName}</p>
+                  <p className="truncate text-[9px] text-muted-foreground">@{profile.username}</p>
                 </div>
-              </div>
+              </Link>
 
               <div className="flex items-center gap-1 shrink-0">
-                <ThemeToggle className="h-6 w-6 rounded border-none bg-transparent hover:bg-muted/50" />
+                <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted/50" />
                 <Link
                   href="/handler/sign-out"
-                  className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:text-destructive transition-colors"
+                  className="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:text-destructive transition-colors"
                   title="Sign out"
                 >
                   <AnimateIcon animateOnHover animation="path">
-                    <LogOut className="h-4 w-4" />
+                    <LogOut className="size-3.5" />
                   </AnimateIcon>
                 </Link>
               </div>
@@ -191,10 +299,10 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
               <Link
                 key="create"
                 href="/app/post/new"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md border-none active:scale-95 transition-transform"
+                className="flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md border-none active:scale-95 transition-transform"
               >
                 <AnimateIcon animateOnHover animation="path">
-                  <Plus className="h-5 w-5" />
+                  <Plus className="size-5" />
                 </AnimateIcon>
               </Link>
             );
@@ -208,7 +316,7 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                 onClick={() => setShowMobileMenu(true)}
                 className="group flex flex-col items-center justify-center flex-1 h-full py-1 text-muted-foreground hover:text-foreground cursor-pointer"
               >
-                <Icon className="h-4.5 w-4.5 transition-colors" />
+                <Icon className="size-4.5 transition-colors" />
                 <span className="mt-0.5 text-[9px] font-bold">Menu</span>
               </button>
             );
@@ -224,7 +332,7 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
               )}
             >
               <AnimateIcon animateOnHover animation="path">
-                <Icon className="h-4.5 w-4.5 transition-colors" />
+                <Icon className="size-4.5 transition-colors" />
               </AnimateIcon>
               <span className="mt-0.5 text-[9px] font-bold">{item.label}</span>
               {isActive && (
@@ -238,7 +346,7 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
       {/* ─── Full Mobile Navigation Drawer Sheet ─── */}
       {showMobileMenu && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-md md:hidden animate-in fade-in select-none">
-          <div className="max-h-[85vh] w-full rounded-t-[32px] border-t border-border bg-card p-5 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
+          <div className="max-h-[88vh] w-full rounded-t-[32px] border-t border-border bg-card p-5 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
             {/* Drawer Header with Profile */}
             <div className="flex items-center justify-between pb-4 border-b border-border/60">
               {profile ? (
@@ -332,7 +440,7 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
             {/* Bottom Actions Bar */}
             <div className="pt-3 border-t border-border/60 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ThemeToggle className="h-8 w-8 rounded-xl border border-border/60 bg-muted/30" />
+                <ThemeToggle className="size-8 rounded-xl border border-border/60 bg-muted/30" />
                 <span className="text-xs font-semibold text-muted-foreground">Theme</span>
               </div>
 

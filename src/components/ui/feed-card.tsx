@@ -15,6 +15,7 @@ import { voteOnPost, repostPost } from "@/lib/api";
 import { FeedCardHeader } from "@/components/feed/feed-card-header";
 import { FeedCardActions } from "@/components/feed/feed-card-actions";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
+import { RichText } from "@/components/ui/rich-text";
 
 interface FeedCardProps {
   post: FeedPost;
@@ -146,9 +147,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
         }}
         onDoubleClick={handleDoubleTap}
       >
-        <p className="text-sm md:text-base leading-relaxed text-foreground whitespace-pre-wrap">
-          {renderPostBody(post.body)}
-        </p>
+        <RichText content={post.body} className="text-sm md:text-base leading-relaxed text-foreground" />
 
         {/* Embedded Original Quoted Post */}
         {post.repostOf && (

@@ -1,0 +1,2 @@
+- onboardingscreen for new users isnt working, auto assigning name, username remove it on signup ask user to enter there details also ask and save intrestes (will be helpful for matchmaking and personalised feeds) in a good ui ux 
+- when we click on profile picture we should get edit profile option and other options for it as well

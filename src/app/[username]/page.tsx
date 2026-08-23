@@ -1,6 +1,6 @@
 import { getDb } from "@/db";
 import { posts, userProfiles, institutions } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { Metadata } from "next";
@@ -101,8 +101,9 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
   // Fetch posts written by this user
   const userPosts = await db.query.posts.findMany({
-    where: eq(posts.authorId, profile.id),
+    where: and(eq(posts.authorId, profile.id), eq(posts.status, "PUBLISHED")),
     orderBy: [desc(posts.createdAt)],
+    limit: 20,
     with: {
       author: true,
       institution: true,

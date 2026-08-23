@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MoreHorizontal, Lock, BarChart3, HelpCircle, Repeat2, Link2, Flag, Trash2 } from "lucide-react";
 import { cn, getAvatarUrl, formatTimeAgo } from "@/lib/utils";
@@ -24,6 +25,7 @@ export function FeedCardHeader({
   onOpenReportModal,
   onShare,
 }: FeedCardHeaderProps) {
+  const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -176,6 +178,7 @@ export function FeedCardHeader({
                     try {
                       await deletePost(post.id);
                       toast.success("Post deleted successfully");
+                      router.refresh();
                     } catch (error) {
                       toast.error(error instanceof Error ? error.message : "Failed to delete post");
                     } finally {

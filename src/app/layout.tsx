@@ -88,14 +88,7 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
-    images: [
-      {
-        url: "/logo.png",
-        width: 512,
-        height: 512,
-        alt: "CampusLoop Logo",
-      },
-    ],
+    // Image served by src/app/opengraph-image.tsx (1200x630, build-time generated)
   },
   twitter: {
     card: "summary_large_image",
@@ -103,7 +96,6 @@ export const metadata: Metadata = {
     description:
       "Join your real campus. Speak freely. Stay safe. Meet students like you. Share confessions, run polls, and connect securely.",
     creator: "@campusloop",
-    images: ["/logo.png"],
   },
   category: "social networking",
   classification: "Student Community Platform",

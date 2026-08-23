@@ -56,6 +56,20 @@ export async function GET(req: Request) {
       conditions.push(sql`${posts.body} ILIKE ${`%#${hashtag}%`}`);
     }
 
+    const authorId = searchParams.get("authorId");
+    const authorUsername = searchParams.get("authorUsername");
+
+    if (authorId) {
+      conditions.push(eq(posts.authorId, authorId));
+    } else if (authorUsername) {
+      const targetUser = await db.query.userProfiles.findFirst({
+        where: eq(userProfiles.username, authorUsername.toLowerCase().trim()),
+      });
+      if (targetUser) {
+        conditions.push(eq(posts.authorId, targetUser.id));
+      }
+    }
+
     const rawFeed = await resolveFeedPage({ conditions, sort, limit, offset, userInstitutionId: institutionId });
     const feed = await formatApiFeedPosts(rawFeed, profileId);
 

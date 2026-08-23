@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   LogOut,
@@ -24,6 +24,7 @@ import {
   TrendingUp,
   X,
   Upload,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -50,25 +51,82 @@ interface ProfileClientViewProps {
 
 export function ProfileClientView({
   profile,
-  formattedPosts,
+  formattedPosts: initialPosts,
   isOwnProfile,
   currentUserId,
 }: ProfileClientViewProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"posts" | "photos" | "about" | "clout">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "photos" | "clout">("posts");
   const [copiedHandle, setCopiedHandle] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showPhotoLightbox, setShowPhotoLightbox] = useState<string | null>(null);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
 
+  // ─── Infinite Scroll for Profile Posts ───
+  const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(initialPosts.length >= 20);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const observerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setPosts(initialPosts);
+    setHasMore(initialPosts.length >= 20);
+  }, [initialPosts]);
+
+  const loadMorePosts = useCallback(async () => {
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
+    const nextPage = page + 1;
+
+    try {
+      const res = await fetch(`/api/feed?authorId=${profile.id}&page=${nextPage}&limit=20`);
+      if (!res.ok) throw new Error("Failed to load more posts");
+      const newPosts = (await res.json()) as FeedPost[];
+
+      if (newPosts.length === 0 || newPosts.length < 20) {
+        setHasMore(false);
+      }
+
+      setPosts((prev) => {
+        const existingIds = new Set(prev.map((p) => p.id));
+        const filtered = newPosts.filter((p) => !existingIds.has(p.id));
+        return [...prev, ...filtered];
+      });
+      setPage(nextPage);
+    } catch {
+      setHasMore(false);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, hasMore, page, profile.id]);
+
+  useEffect(() => {
+    const sentinel = observerRef.current;
+    if (!sentinel || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          loadMorePosts();
+        }
+      },
+      { threshold: 0.2, rootMargin: "100px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isLoadingMore, loadMorePosts]);
+
   const points = profile.points || 0;
   const referrals = profile.referralCount || 0;
   const tier = getCloutTier(points);
 
-  const candidatePhotos = (profile.photos && profile.photos.length > 0)
-    ? profile.photos
-    : profile.avatarUrl
+  const candidatePhotos =
+    profile.photos && profile.photos.length > 0
+      ? profile.photos
+      : profile.avatarUrl
       ? [profile.avatarUrl]
       : [];
 
@@ -77,7 +135,9 @@ export function ProfileClientView({
 
   const institutionName = profile.institution?.name || "Indian Institute of Technology";
   const campusShort = institutionName.split(",")[0];
-  const campusLocation = profile.institution?.state ? `${profile.institution.district || ""}, ${profile.institution.state}` : "India";
+  const campusLocation = profile.institution?.state
+    ? `${profile.institution.district || ""}, ${profile.institution.state}`
+    : "India";
 
   function handleCopyHandle() {
     const handleUrl = `https://campusloop.space/@${profile.username}`;
@@ -146,7 +206,9 @@ export function ProfileClientView({
           <h1 className="text-xs font-black text-foreground tracking-tight flex items-center gap-1">
             <span>@{profile.username}</span>
             {points >= 150 && (
-              <span className="text-blue-500 font-bold" title="Verified Student">✓</span>
+              <span className="text-blue-500 font-bold" title="Verified Student">
+                ✓
+              </span>
             )}
           </h1>
 
@@ -236,13 +298,13 @@ export function ProfileClientView({
                       <Edit3 className="size-3.5" /> Edit Profile
                     </Link>
 
-                    <Link
+                    <a
                       href="/handler/sign-out"
                       className="flex items-center justify-center rounded-2xl border border-border/70 bg-muted/20 size-9 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                       title="Sign Out"
                     >
                       <LogOut className="size-4" />
-                    </Link>
+                    </a>
                   </>
                 ) : (
                   <Link
@@ -273,11 +335,10 @@ export function ProfileClientView({
 
               {/* Headline / Student One-Liner */}
               <p className="text-xs sm:text-sm font-semibold text-foreground/90 leading-snug">
-                {profile.headline || (
-                  profile.branch && profile.course
+                {profile.headline ||
+                  (profile.branch && profile.course
                     ? `${profile.course} in ${profile.branch} @ ${campusShort}`
-                    : `Student @ ${campusShort}`
-                )}
+                    : `Student @ ${campusShort}`)}
               </p>
 
               {/* Handle & Location row */}
@@ -309,7 +370,7 @@ export function ProfileClientView({
             {/* Quick Stats Pill Bar */}
             <div className="flex items-center gap-4 py-2 px-3.5 rounded-2xl bg-muted/30 border border-border/50 text-xs font-semibold text-muted-foreground">
               <span className="text-foreground">
-                <strong className="text-foreground font-black">{formattedPosts.length}</strong> Posts
+                <strong className="text-foreground font-black">{posts.length}</strong> Posts
               </span>
               <span>•</span>
               <span className="text-foreground">
@@ -420,7 +481,9 @@ export function ProfileClientView({
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-bold">
               <span>{tier.tierName}</span>
-              <span className="text-primary font-black">{points} / {tier.maxPoints + 1} LP</span>
+              <span className="text-primary font-black">
+                {points} / {tier.maxPoints + 1} LP
+              </span>
             </div>
             <div className="h-2 w-full rounded-full bg-muted overflow-hidden border border-border/40">
               <div
@@ -429,7 +492,9 @@ export function ProfileClientView({
               />
             </div>
             <p className="text-[10px] font-semibold text-muted-foreground">
-              {points >= 1000 ? "Maximum Legend rank reached! 👑" : `${tier.maxPoints + 1 - points} LP needed to unlock next rank`}
+              {points >= 1000
+                ? "Maximum Legend rank reached! 👑"
+                : `${tier.maxPoints + 1 - points} LP needed to unlock next rank`}
             </p>
           </div>
         </div>
@@ -446,7 +511,7 @@ export function ProfileClientView({
                 : "bg-card/40 text-muted-foreground border-border/40 hover:text-foreground"
             )}
           >
-            Activity ({formattedPosts.length})
+            Activity ({posts.length})
           </button>
 
           <button
@@ -479,10 +544,11 @@ export function ProfileClientView({
         {/* ─── Tab Content ─── */}
         {activeTab === "posts" && (
           <div className="space-y-3.5">
-            {formattedPosts.map((post) => (
+            {posts.map((post) => (
               <FeedCard key={post.id} post={post} currentUserId={currentUserId || profile.id} />
             ))}
-            {formattedPosts.length === 0 && (
+
+            {posts.length === 0 && (
               <div className="text-center py-16 border border-dashed rounded-3xl border-border bg-card text-muted-foreground text-xs font-semibold space-y-2 p-6">
                 <div className="size-12 rounded-2xl bg-muted flex items-center justify-center mx-auto text-primary">
                   <Sparkles className="size-6" />
@@ -498,6 +564,18 @@ export function ProfileClientView({
                 )}
               </div>
             )}
+
+            {/* Infinite Scroll Trigger Sentinel */}
+            {hasMore && (
+              <div ref={observerRef} className="py-6 flex items-center justify-center">
+                {isLoadingMore && (
+                  <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                    <Loader2 className="size-4 animate-spin text-primary" />
+                    <span>Loading more campus posts...</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -510,7 +588,11 @@ export function ProfileClientView({
                   onClick={() => setShowPhotoLightbox(photoUrl)}
                   className="relative aspect-square rounded-2xl overflow-hidden border border-border/80 shadow-xs bg-muted/30 group cursor-pointer"
                 >
-                  <img src={photoUrl} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <img
+                    src={photoUrl}
+                    alt={`Photo ${idx + 1}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                   {idx === 0 && (
                     <span className="absolute bottom-2 left-2 bg-primary/90 text-white text-[9px] font-black px-2 py-0.5 rounded-md backdrop-blur-md">
                       Avatar

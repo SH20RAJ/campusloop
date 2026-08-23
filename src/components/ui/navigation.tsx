@@ -28,8 +28,6 @@ import {
   Gift,
   Wrench,
   PartyPopper,
-  ChevronDown,
-  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -51,14 +49,11 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showUtilitySubmenu, setShowUtilitySubmenu] = useState(false);
-  const [showSocialSubmenu, setShowSocialSubmenu] = useState(false);
 
   const desktopNavItems = [
     { icon: Home, href: "/app", label: "Home" },
     { icon: Compass, href: "/app/discover", label: "Discover" },
     { icon: School, href: "/app/colleges", label: "Colleges" },
-    { icon: Heart, href: "/app/confessions", label: "Confessions" },
     { icon: Users, href: "/app/communities", label: "Communities" },
     ...(isViewer
       ? []
@@ -68,32 +63,11 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
         ]),
     { icon: Bell, href: "/app/notifications", label: "Notifications" },
     { icon: UserCircle, href: "/app/profile", label: "Profile" },
-    { icon: Sliders, href: "/app/settings", label: "Settings" },
   ];
 
   if (isAdmin) {
     desktopNavItems.push({ icon: Shield, href: "/admin", label: "Admin Console" });
   }
-
-  const campusUtilities = [
-    { icon: ShoppingBag, label: "Buy / Sell / Trade", href: "/app/hashtag/BuySell" },
-    { icon: Search, label: "Lost & Found", href: "/app/hashtag/LostAndFound" },
-    { icon: HomeIcon, label: "Roommate / Flat", href: "/app/hashtag/Roommates" },
-    { icon: Car, label: "Ride Sharing", href: "/app/hashtag/RideShare" },
-    { icon: Gift, label: "Free Stuff", href: "/app/hashtag/FreeStuff" },
-    { icon: Wrench, label: "Need / Can Help", href: "/app/hashtag/CampusHelp" },
-  ];
-
-  const socialChannels = [
-    { label: "Memes & Banter", href: "/app/hashtag/CampusMemes", emoji: "🎭" },
-    { label: "Events & Fests", href: "/app/hashtag/CampusEvents", emoji: "🎪" },
-    { label: "Sports & Fitness", href: "/app/hashtag/Sports", emoji: "⚽" },
-    { label: "Gaming & Esports", href: "/app/hashtag/Gaming", emoji: "🎮" },
-    { label: "Music & Jamming", href: "/app/hashtag/MusicJam", emoji: "🎸" },
-    { label: "Movies & Shows", href: "/app/hashtag/BingeWatch", emoji: "🍿" },
-    { label: "Photography", href: "/app/hashtag/Photography", emoji: "📸" },
-    { label: "Creative Corner", href: "/app/hashtag/Creatives", emoji: "🎨" },
-  ];
 
   const mobileBottomItems = [
     { icon: Home, href: "/app", label: "Home" },
@@ -188,68 +162,6 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
               );
             })}
 
-            {/* ─── Campus Utility Expandable Submenu ─── */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => setShowUtilitySubmenu(!showUtilitySubmenu)}
-                className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
-              >
-                <span className="flex items-center gap-2">
-                  <span>🛒</span>
-                  <span>Campus Utility</span>
-                </span>
-                {showUtilitySubmenu ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
-              </button>
-
-              {showUtilitySubmenu && (
-                <div className="pl-4 pr-1 py-1 space-y-0.5 animate-in fade-in duration-150">
-                  {campusUtilities.map((u) => {
-                    const Icon = u.icon;
-                    return (
-                      <Link
-                        key={u.label}
-                        href={u.href}
-                        className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
-                      >
-                        <Icon className="size-3 text-primary shrink-0" />
-                        <span className="truncate">{u.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* ─── Social & Vibes Channels ─── */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setShowSocialSubmenu(!showSocialSubmenu)}
-                className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
-              >
-                <span className="flex items-center gap-2">
-                  <span>🎉</span>
-                  <span>Social Channels</span>
-                </span>
-                {showSocialSubmenu ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
-              </button>
-
-              {showSocialSubmenu && (
-                <div className="pl-4 pr-1 py-1 space-y-0.5 animate-in fade-in duration-150">
-                  {socialChannels.map((s) => (
-                    <Link
-                      key={s.label}
-                      href={s.href}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
-                    >
-                      <span className="text-xs">{s.emoji}</span>
-                      <span className="truncate">{s.label}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
           </nav>
         </div>
 
@@ -299,6 +211,15 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
                   >
                     <Sliders className="size-3.5 text-blue-500" />
                     <span>Edit Profile & Photos</span>
+                  </Link>
+
+                  <Link
+                    href="/app/settings"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <Sliders className="size-3.5 text-muted-foreground" />
+                    <span>Settings</span>
                   </Link>
 
                   {!isViewer && (

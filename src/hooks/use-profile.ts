@@ -7,6 +7,7 @@ export interface UserProfileData {
   displayName: string;
   username: string;
   avatarUrl: string | null;
+  photos?: string[];
   gender: string | null;
   course: string | null;
   branch: string | null;

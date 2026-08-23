@@ -75,6 +75,7 @@ export function ChatPane({
         year: null,
         bio: null,
         interests: [],
+        photos: [],
         onboardingCompleted: true,
         role: "STUDENT",
         status: "ACTIVE",

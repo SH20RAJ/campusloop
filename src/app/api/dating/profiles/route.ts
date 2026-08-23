@@ -22,7 +22,19 @@ export async function GET(req: Request) {
     });
 
     if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
+    // Strict Gate: Must have gender set to access dating
+    const validGenders = ["MALE", "FEMALE", "OTHER"];
+    if (!profile.gender || !validGenders.includes(profile.gender)) {
+      return NextResponse.json(
+        {
+          error: "GENDER_REQUIRED",
+          message: "Gender is required to access Campus Dating and matching.",
+        },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(req.url);
@@ -75,7 +87,9 @@ export async function GET(req: Request) {
         score += 10;
       }
 
-      // Profile completeness bonus
+      // Profile completeness bonus (multiple photos give extra vibe points!)
+      const candPhotos = cand.photos && cand.photos.length > 0 ? cand.photos : (cand.avatarUrl ? [cand.avatarUrl] : []);
+      if (candPhotos.length >= 2) score += 5;
       if (cand.bio && cand.bio.length > 10) score += 5;
       if (cand.avatarUrl) score += 5;
 
@@ -87,6 +101,7 @@ export async function GET(req: Request) {
 
       return {
         ...cand,
+        photos: candPhotos,
         compatibilityScore: score,
       };
     });

@@ -58,6 +58,7 @@ export async function PATCH(req: Request) {
       year?: number;
       bio?: string;
       avatarUrl?: string;
+      photos?: string[];
       interests?: string[];
     };
 
@@ -101,6 +102,9 @@ export async function PATCH(req: Request) {
     if (body.branch !== undefined) updateData.branch = body.branch.trim();
     if (body.year !== undefined) updateData.year = Number(body.year);
     if (body.avatarUrl !== undefined) updateData.avatarUrl = body.avatarUrl.trim() || null;
+    if (body.photos !== undefined && Array.isArray(body.photos)) {
+      updateData.photos = body.photos.slice(0, 6).filter((url) => typeof url === "string" && url.trim().length > 0);
+    }
     if (body.bio !== undefined) {
       if (body.bio.length > 300) {
         return NextResponse.json({ error: "Bio cannot exceed 300 characters" }, { status: 400 });

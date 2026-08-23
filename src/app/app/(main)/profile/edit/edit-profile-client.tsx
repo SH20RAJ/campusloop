@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2 } from "lucide-react";
+import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2, Image as ImageIcon, X, Plus } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getAvatarUrl } from "@/lib/utils";
@@ -36,11 +36,15 @@ export function EditProfileClient() {
   const [year, setYear] = useState<number>(1);
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [photos, setPhotos] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingPfp, setIsUploadingPfp] = useState(false);
+  const [isUploadingDatingPhoto, setIsUploadingDatingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const pfpInputRef = useRef<HTMLInputElement | null>(null);
+  const datingPhotoInputRef = useRef<HTMLInputElement | null>(null);
 
   const nameVal = displayName ? validateDisplayName(displayName) : null;
   const userVal = username ? validateUsername(username) : null;
@@ -55,6 +59,7 @@ export function EditProfileClient() {
       setYear(profile.year || 1);
       setBio(profile.bio || "");
       setAvatarUrl(profile.avatarUrl || "");
+      setPhotos(profile.photos || []);
       setInterests(profile.interests || []);
     }
   }, [profile]);
@@ -71,7 +76,7 @@ export function EditProfileClient() {
 
     setIsUploadingPfp(true);
     try {
-      toast.loading("Uploading new profile photo to ImgBB...", { id: "pfp-upload" });
+      toast.loading("Uploading profile avatar to ImgBB...", { id: "pfp-upload" });
       const res = await uploadImageToImgBB(file);
       setAvatarUrl(res.displayUrl || res.url);
       toast.success("Profile photo uploaded! 📸", { id: "pfp-upload" });
@@ -81,6 +86,34 @@ export function EditProfileClient() {
       setIsUploadingPfp(false);
       if (pfpInputRef.current) pfpInputRef.current.value = "";
     }
+  }
+
+  async function handleDatingPhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (photos.length >= 6) {
+      toast.error("Maximum 6 dating photos allowed.");
+      return;
+    }
+
+    setIsUploadingDatingPhoto(true);
+    try {
+      toast.loading("Uploading dating photo...", { id: "dating-photo" });
+      const res = await uploadImageToImgBB(file);
+      const newUrl = res.displayUrl || res.url;
+      setPhotos((prev) => [...prev, newUrl]);
+      toast.success("Photo added to dating gallery! 📸", { id: "dating-photo" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed", { id: "dating-photo" });
+    } finally {
+      setIsUploadingDatingPhoto(false);
+      if (datingPhotoInputRef.current) datingPhotoInputRef.current.value = "";
+    }
+  }
+
+  function handleRemoveDatingPhoto(index: number) {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
   }
 
   function handleGenerateDiceBearAvatar() {
@@ -122,6 +155,7 @@ export function EditProfileClient() {
           year,
           bio: bio.trim(),
           avatarUrl,
+          photos,
           interests,
         }),
       });
@@ -132,7 +166,7 @@ export function EditProfileClient() {
         throw new Error(data.error || "Failed to update profile.");
       }
 
-      toast.success("Profile updated successfully! ✨");
+      toast.success("Profile & dating photos saved! ✨");
       await mutate();
       router.push("/app/profile");
     } catch (err) {
@@ -151,7 +185,7 @@ export function EditProfileClient() {
   }
 
   return (
-    <div className="max-w-xl mx-auto space-y-6 pb-12 pt-2 px-4 select-none">
+    <div className="max-w-xl mx-auto space-y-6 pb-16 pt-2 px-4 select-none">
       {/* Hidden PFP File Input */}
       <input
         ref={pfpInputRef}
@@ -159,6 +193,15 @@ export function EditProfileClient() {
         accept="image/jpeg,image/png,image/webp,image/gif"
         className="hidden"
         onChange={handlePfpUpload}
+      />
+
+      {/* Hidden Dating Photo File Input */}
+      <input
+        ref={datingPhotoInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={handleDatingPhotoUpload}
       />
 
       {/* Header Bar */}
@@ -169,11 +212,11 @@ export function EditProfileClient() {
         >
           <ArrowLeft className="size-4" /> Back to Profile
         </Link>
-        <h2 className="text-sm font-bold text-foreground">Edit Profile</h2>
+        <h2 className="text-sm font-bold text-foreground">Edit Profile & Dating Photos</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Avatar Section */}
+        {/* ─── Avatar Section ─── */}
         <div className="flex flex-col items-center justify-center space-y-3 rounded-2xl border border-border/60 bg-muted/20 p-5 text-center shadow-xs">
           <Avatar className="size-24 border-2 border-primary/30 shadow-md">
             <AvatarImage src={avatarUrl || getAvatarUrl(null, username || "user")} />
@@ -190,7 +233,7 @@ export function EditProfileClient() {
               className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
             >
               {isUploadingPfp ? <Loader2 className="size-3.5 animate-spin text-primary" /> : <Upload className="size-3.5 text-primary" />}
-              <span>Upload Custom Photo</span>
+              <span>Upload Avatar</span>
             </button>
 
             <button
@@ -200,20 +243,69 @@ export function EditProfileClient() {
             >
               🎲 Random Avatar
             </button>
+          </div>
+        </div>
 
-            {avatarUrl && (
+        {/* ─── Campus Dating Photo Gallery Section (Up to 6 Photos) ─── */}
+        <div className="space-y-3 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <ImageIcon className="size-3.5 text-rose-500" /> Dating Photo Gallery
+              </h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Upload up to 6 pictures to showcase on your Campus Dating swipe card.
+              </p>
+            </div>
+            <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full border border-border">
+              {photos.length}/6
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2.5 pt-1">
+            {photos.map((imgUrl, i) => (
+              <div
+                key={i}
+                className="relative aspect-square rounded-2xl overflow-hidden border border-border/80 shadow-xs group bg-muted/40"
+              >
+                <img src={imgUrl} alt={`Dating photo ${i + 1}`} className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveDatingPhoto(i)}
+                  className="absolute top-1.5 right-1.5 size-6 rounded-full bg-black/75 text-white flex items-center justify-center hover:bg-destructive transition-colors cursor-pointer shadow-md"
+                  title="Remove photo"
+                >
+                  <X className="size-3.5" />
+                </button>
+                {i === 0 && (
+                  <span className="absolute bottom-1.5 left-1.5 bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow-xs">
+                    Main
+                  </span>
+                )}
+              </div>
+            ))}
+
+            {photos.length < 6 && (
               <button
                 type="button"
-                onClick={() => setAvatarUrl("")}
-                className="py-1.5 px-3 rounded-xl border border-border/60 text-muted-foreground hover:text-foreground text-xs font-semibold transition-all cursor-pointer"
+                disabled={isUploadingDatingPhoto}
+                onClick={() => datingPhotoInputRef.current?.click()}
+                className="aspect-square rounded-2xl border-2 border-dashed border-border hover:border-primary/60 bg-muted/20 hover:bg-muted/40 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-all cursor-pointer disabled:opacity-50"
               >
-                Reset Default
+                {isUploadingDatingPhoto ? (
+                  <Loader2 className="size-5 animate-spin text-primary" />
+                ) : (
+                  <>
+                    <Plus className="size-5" />
+                    <span className="text-[10px] font-bold">Add Photo</span>
+                  </>
+                )}
               </button>
             )}
           </div>
         </div>
 
-        {/* Basic Details (Display Name & Username) with Validation */}
+        {/* ─── Basic Details (Display Name & Username) with Validation ─── */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
           <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
             <User className="size-3.5 text-primary" /> Identity Details
@@ -300,7 +392,7 @@ export function EditProfileClient() {
           </div>
         </div>
 
-        {/* Academic Info */}
+        {/* ─── Academic Info ─── */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
           <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
             <ShieldCheck className="size-3.5 text-blue-500" /> Academic & Campus Info
@@ -346,7 +438,7 @@ export function EditProfileClient() {
           </div>
         </div>
 
-        {/* Bio & Campus Interests */}
+        {/* ─── Bio & Campus Interests ─── */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-muted-foreground">Campus Bio (max 300 chars)</label>
@@ -391,11 +483,11 @@ export function EditProfileClient() {
         {/* Action Button */}
         <button
           type="submit"
-          disabled={isSaving || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid) || isUploadingPfp}
+          disabled={isSaving || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid) || isUploadingPfp || isUploadingDatingPhoto}
           className="w-full py-3 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
         >
           <Save className="size-4" />
-          {isSaving ? "Saving changes..." : "Save Profile Changes"}
+          {isSaving ? "Saving changes..." : "Save Profile & Dating Photos"}
         </button>
       </form>
     </div>

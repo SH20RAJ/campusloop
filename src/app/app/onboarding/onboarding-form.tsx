@@ -68,6 +68,12 @@ export function OnboardingForm() {
       return;
     }
 
+    if (!gender) {
+      setError("Please select your gender identification (Required for campus matching & safety).");
+      setIsLoading(false);
+      return;
+    }
+
     const formData = new FormData();
     formData.set("displayName", displayName);
     formData.set("username", username);

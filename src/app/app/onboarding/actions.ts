@@ -21,12 +21,18 @@ export async function completeOnboarding(formData: FormData) {
 
   const username = formData.get("username") as string;
   const displayName = formData.get("displayName") as string;
-  const gender = (formData.get("gender") as "MALE" | "FEMALE" | "OTHER") || "MALE";
+  const rawGender = formData.get("gender") as string;
   const avatarUrl = (formData.get("avatarUrl") as string) || null;
   const course = (formData.get("course") as string)?.trim() || null;
   const branch = (formData.get("branch") as string)?.trim() || null;
   const year = Number(formData.get("year")) || 1;
   const bio = (formData.get("bio") as string)?.trim() || null;
+
+  // Strict Gender Validation
+  if (!rawGender || !["MALE", "FEMALE", "OTHER"].includes(rawGender)) {
+    throw new Error("Please select your gender identification to complete onboarding.");
+  }
+  const gender = rawGender as "MALE" | "FEMALE" | "OTHER";
 
   // Strict Name & Username Validation
   const nameVal = validateDisplayName(displayName);

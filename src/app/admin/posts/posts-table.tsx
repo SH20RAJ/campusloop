@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Eye, EyeOff, RotateCcw, SearchIcon, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 import { deletePost, setPostStatus } from "./actions";
 import { revealAnonymousAuthor, type RevealedIdentity } from "../anonymity-actions";
@@ -58,6 +60,8 @@ export function PostsTable({ initialPosts, page, totalPages, totalCount, activeS
 	const [search, setSearch] = useState(searchParams.get("q") || "");
 	const [actionLoading, setActionLoading] = useState<string | null>(null);
 	const [revealed, setRevealed] = useState<Record<string, RevealedIdentity>>({});
+	const [revealPostId, setRevealPostId] = useState<string | null>(null);
+	const [deletePostId, setDeletePostId] = useState<string | null>(null);
 
 	function pushParams(mutate: (params: URLSearchParams) => void) {
 		const params = new URLSearchParams(searchParams.toString());
@@ -65,24 +69,36 @@ export function PostsTable({ initialPosts, page, totalPages, totalCount, activeS
 		router.push(`/admin/posts?${params.toString()}`);
 	}
 
-	async function runAction(postId: string, fn: () => Promise<unknown>) {
+	async function runAction(postId: string, fn: () => Promise<unknown>, successMsg = "Action completed") {
 		setActionLoading(postId);
 		try {
 			await fn();
+			toast.success(successMsg);
 			router.refresh();
 		} catch (e) {
-			alert(e instanceof Error ? e.message : "Action failed");
+			toast.error(e instanceof Error ? e.message : "Action failed");
 		} finally {
 			setActionLoading(null);
 		}
 	}
 
-	async function handleReveal(postId: string) {
-		if (!confirm("Reveal the author of this anonymous post? This action is audit-logged.")) return;
+	async function confirmReveal() {
+		if (!revealPostId) return;
+		const postId = revealPostId;
 		await runAction(postId, async () => {
 			const identity = await revealAnonymousAuthor("POST", postId);
 			setRevealed((prev) => ({ ...prev, [postId]: identity }));
-		});
+			setRevealPostId(null);
+		}, "Anonymous author revealed (audit logged)");
+	}
+
+	async function confirmDelete() {
+		if (!deletePostId) return;
+		const postId = deletePostId;
+		await runAction(postId, async () => {
+			await deletePost(postId);
+			setDeletePostId(null);
+		}, "Post deleted successfully");
 	}
 
 	return (
@@ -191,7 +207,7 @@ export function PostsTable({ initialPosts, page, totalPages, totalCount, activeS
 											{post.isAnonymous && !revealed[post.id] && (
 												<button
 													disabled={actionLoading === post.id}
-													onClick={() => handleReveal(post.id)}
+													onClick={() => setRevealPostId(post.id)}
 													title="Reveal author (audit logged)"
 													className="p-1.5 rounded hover:bg-muted text-blue-500 disabled:opacity-50 transition-colors cursor-pointer"
 												>
@@ -201,7 +217,7 @@ export function PostsTable({ initialPosts, page, totalPages, totalCount, activeS
 											{post.status === "PUBLISHED" ? (
 												<button
 													disabled={actionLoading === post.id}
-													onClick={() => runAction(post.id, () => setPostStatus(post.id, "HIDDEN"))}
+													onClick={() => runAction(post.id, () => setPostStatus(post.id, "HIDDEN"), "Post hidden from feeds")}
 													title="Hide post"
 													className="p-1.5 rounded hover:bg-muted text-orange-500 disabled:opacity-50 transition-colors cursor-pointer"
 												>
@@ -210,7 +226,7 @@ export function PostsTable({ initialPosts, page, totalPages, totalCount, activeS
 											) : (
 												<button
 													disabled={actionLoading === post.id}
-													onClick={() => runAction(post.id, () => setPostStatus(post.id, "PUBLISHED"))}
+													onClick={() => runAction(post.id, () => setPostStatus(post.id, "PUBLISHED"), "Post published successfully")}
 													title="Restore / publish"
 													className="p-1.5 rounded hover:bg-muted text-emerald-500 disabled:opacity-50 transition-colors cursor-pointer"
 												>
@@ -219,10 +235,7 @@ export function PostsTable({ initialPosts, page, totalPages, totalCount, activeS
 											)}
 											<button
 												disabled={actionLoading === post.id}
-												onClick={() => {
-													if (!confirm("Are you sure you want to delete this post?")) return;
-													runAction(post.id, () => deletePost(post.id));
-												}}
+												onClick={() => setDeletePostId(post.id)}
 												title="Delete post"
 												className="p-1.5 rounded hover:bg-muted text-destructive disabled:opacity-50 transition-colors cursor-pointer"
 											>
@@ -264,6 +277,30 @@ export function PostsTable({ initialPosts, page, totalPages, totalCount, activeS
 					</div>
 				</div>
 			</div>
+
+			{/* Reveal Author Modal */}
+			<ConfirmDialog
+				isOpen={Boolean(revealPostId)}
+				title="Reveal Anonymous Author?"
+				description="Are you sure you want to reveal the identity of this anonymous author? This action is permanently audit-logged with your admin ID."
+				confirmText="Reveal Identity"
+				variant="info"
+				isLoading={Boolean(actionLoading && revealPostId && actionLoading === revealPostId)}
+				onClose={() => setRevealPostId(null)}
+				onConfirm={confirmReveal}
+			/>
+
+			{/* Delete Post Modal */}
+			<ConfirmDialog
+				isOpen={Boolean(deletePostId)}
+				title="Delete Post?"
+				description="Are you sure you want to delete this post? It will be removed from all feeds."
+				confirmText="Delete Post"
+				variant="danger"
+				isLoading={Boolean(actionLoading && deletePostId && actionLoading === deletePostId)}
+				onClose={() => setDeletePostId(null)}
+				onConfirm={confirmDelete}
+			/>
 		</div>
 	);
 }

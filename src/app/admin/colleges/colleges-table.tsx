@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteCollege, addDomain, removeDomain } from "./actions";
 import { Trash2Icon, PlusIcon } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface CollegeRow {
   id: string;
@@ -19,35 +21,53 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
   const [newDomain, setNewDomain] = useState("");
   const [activeInstId, setActiveInstId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteCollegeData, setDeleteCollegeData] = useState<{ id: string; name: string } | null>(null);
+  const [removeDomainId, setRemoveDomainId] = useState<string | null>(null);
 
-  async function handleDelete(id: string) {
-    if (!confirm("Are you sure? This will delete all users and posts associated with this college!")) return;
+  async function confirmDeleteCollege() {
+    if (!deleteCollegeData) return;
     setIsLoading(true);
-    await deleteCollege(id);
-    setIsLoading(false);
-    router.refresh();
+    try {
+      await deleteCollege(deleteCollegeData.id);
+      toast.success("College hub deleted");
+      setDeleteCollegeData(null);
+      router.refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to delete college");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function handleAddDomain(institutionId: string) {
-    if (!newDomain) return;
+    if (!newDomain.trim()) return;
     setIsLoading(true);
     try {
-      await addDomain(institutionId, newDomain);
+      await addDomain(institutionId, newDomain.trim().toLowerCase());
+      toast.success(`Domain @${newDomain} added!`);
       setNewDomain("");
       setActiveInstId(null);
       router.refresh();
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Failed to add domain");
+      toast.error(e instanceof Error ? e.message : "Failed to add domain");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
-  async function handleRemoveDomain(domainId: string) {
-    if (!confirm("Remove this domain?")) return;
+  async function confirmRemoveDomain() {
+    if (!removeDomainId) return;
     setIsLoading(true);
-    await removeDomain(domainId);
-    setIsLoading(false);
-    router.refresh();
+    try {
+      await removeDomain(removeDomainId);
+      toast.success("Domain removed");
+      setRemoveDomainId(null);
+      router.refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to remove domain");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -71,7 +91,7 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
                   {college.domains?.map((d) => (
                     <span key={d.id} className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs text-secondary-foreground border">
                       @{d.domain}
-                      <button onClick={() => handleRemoveDomain(d.id)} className="hover:text-foreground ml-1" disabled={isLoading}>
+                      <button onClick={() => setRemoveDomainId(d.id)} className="hover:text-foreground ml-1 cursor-pointer" disabled={isLoading}>
                         &times;
                       </button>
                     </span>
@@ -86,18 +106,23 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
                         onChange={(e) => setNewDomain(e.target.value)}
                         className="rounded border border-input bg-transparent px-2 py-1 text-xs text-foreground outline-none focus:ring-1 focus:ring-ring"
                       />
-                      <button onClick={() => handleAddDomain(college.id)} disabled={isLoading} className="text-xs font-semibold text-primary">Save</button>
-                      <button onClick={() => setActiveInstId(null)} className="text-xs text-muted-foreground">Cancel</button>
+                      <button onClick={() => handleAddDomain(college.id)} disabled={isLoading} className="text-xs font-semibold text-primary cursor-pointer">Save</button>
+                      <button onClick={() => setActiveInstId(null)} className="text-xs text-muted-foreground cursor-pointer">Cancel</button>
                     </div>
                   ) : (
-                    <button onClick={() => setActiveInstId(college.id)} className="flex items-center gap-1 rounded-full border border-input px-2.5 py-0.5 text-xs text-foreground hover:bg-muted">
+                    <button onClick={() => setActiveInstId(college.id)} className="flex items-center gap-1 rounded-full border border-input px-2.5 py-0.5 text-xs text-foreground hover:bg-muted cursor-pointer">
                       <PlusIcon className="h-3 w-3" /> Add Domain
                     </button>
                   )}
                 </div>
               </td>
               <td className="px-6 py-4 text-right">
-                <button onClick={() => handleDelete(college.id)} disabled={isLoading} className="text-destructive hover:text-red-400">
+                <button
+                  onClick={() => setDeleteCollegeData({ id: college.id, name: college.name })}
+                  disabled={isLoading}
+                  className="text-destructive hover:text-red-400 cursor-pointer"
+                  title="Delete College"
+                >
                   <Trash2Icon className="h-4 w-4" />
                 </button>
               </td>
@@ -110,6 +135,30 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
           )}
         </tbody>
       </table>
+
+      {/* Delete College Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(deleteCollegeData)}
+        title="Delete College Hub?"
+        description={`Are you sure you want to delete ${deleteCollegeData?.name || "this college"}? This will permanently delete all associated student accounts, posts, and domains.`}
+        confirmText="Delete College"
+        variant="danger"
+        isLoading={isLoading}
+        onClose={() => setDeleteCollegeData(null)}
+        onConfirm={confirmDeleteCollege}
+      />
+
+      {/* Remove Domain Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(removeDomainId)}
+        title="Remove Allowed Domain?"
+        description="Are you sure you want to remove this verified email domain? New signups with this domain will no longer be allowed."
+        confirmText="Remove Domain"
+        variant="warning"
+        isLoading={isLoading}
+        onClose={() => setRemoveDomainId(null)}
+        onConfirm={confirmRemoveDomain}
+      />
     </div>
   );
 }

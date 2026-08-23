@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { keepPost, deletePost, hidePost, dismissReport } from "./actions";
 import { revealAnonymousAuthor, type RevealedIdentity } from "../anonymity-actions";
 import { CheckIcon, Trash2Icon, EyeOff, XCircle, Eye } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface ReportRow {
   id: string;
@@ -21,42 +23,51 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [revealed, setRevealed] = useState<Record<string, RevealedIdentity>>({});
+  const [revealPostId, setRevealPostId] = useState<string | null>(null);
+  const [deletePostId, setDeletePostId] = useState<string | null>(null);
+  const [keepPostId, setKeepPostId] = useState<string | null>(null);
 
-  async function run(fn: () => Promise<unknown>) {
+  async function run(fn: () => Promise<unknown>, successMsg = "Action completed") {
     setIsLoading(true);
     try {
       await fn();
+      toast.success(successMsg);
       router.refresh();
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Action failed");
+      toast.error(e instanceof Error ? e.message : "Action failed");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
-  async function handleKeep(postId: string) {
-    if (!confirm("Keep this post? This will publish it and dismiss all active reports for it.")) return;
-    await run(() => keepPost(postId));
+  async function confirmKeep() {
+    if (!keepPostId) return;
+    await run(() => keepPost(keepPostId), "Post approved and reports dismissed");
+    setKeepPostId(null);
   }
 
-  async function handleDelete(postId: string) {
-    if (!confirm("Are you sure you want to remove this post? It will be hidden from all user feeds.")) return;
-    await run(() => deletePost(postId));
+  async function confirmDelete() {
+    if (!deletePostId) return;
+    await run(() => deletePost(deletePostId), "Post removed successfully");
+    setDeletePostId(null);
   }
 
   async function handleHide(postId: string) {
-    await run(() => hidePost(postId));
+    await run(() => hidePost(postId), "Post hidden from public feed");
   }
 
   async function handleDismiss(reportId: string) {
-    await run(() => dismissReport(reportId));
+    await run(() => dismissReport(reportId), "Report dismissed");
   }
 
-  function handleReveal(postId: string) {
-    if (!confirm("Reveal the author of this anonymous post? This action is audit-logged.")) return;
-    return run(async () => {
+  async function confirmReveal() {
+    if (!revealPostId) return;
+    const postId = revealPostId;
+    await run(async () => {
       const identity = await revealAnonymousAuthor("POST", postId);
       setRevealed((prev) => ({ ...prev, [postId]: identity }));
-    });
+      setRevealPostId(null);
+    }, "Anonymous author revealed (audit logged)");
   }
 
   return (
@@ -102,7 +113,7 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
                 <div className="flex justify-end gap-1.5">
                   {report.authorUsername === null && !revealed[report.postId] && (
                     <button
-                      onClick={() => handleReveal(report.postId)}
+                      onClick={() => setRevealPostId(report.postId)}
                       disabled={isLoading}
                       title="Reveal author (audit logged)"
                       className="p-2 rounded-md hover:bg-muted text-blue-500 transition-colors disabled:opacity-50 cursor-pointer"
@@ -111,7 +122,7 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
                     </button>
                   )}
                   <button
-                    onClick={() => handleKeep(report.postId)}
+                    onClick={() => setKeepPostId(report.postId)}
                     disabled={isLoading}
                     title="Keep Post"
                     className="p-2 rounded-md hover:bg-muted text-green-500 hover:text-green-600 transition-colors disabled:opacity-50 cursor-pointer"
@@ -127,7 +138,7 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
                     <EyeOff className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(report.postId)}
+                    onClick={() => setDeletePostId(report.postId)}
                     disabled={isLoading}
                     title="Delete Post"
                     className="p-2 rounded-md hover:bg-muted text-destructive hover:text-red-600 transition-colors disabled:opacity-50 cursor-pointer"
@@ -153,6 +164,42 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
           )}
         </tbody>
       </table>
+
+      {/* Reveal Author Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(revealPostId)}
+        title="Reveal Anonymous Author?"
+        description="Are you sure you want to reveal the author of this reported post? This action is permanently audit-logged with your admin ID."
+        confirmText="Reveal Identity"
+        variant="info"
+        isLoading={isLoading}
+        onClose={() => setRevealPostId(null)}
+        onConfirm={confirmReveal}
+      />
+
+      {/* Keep Post Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(keepPostId)}
+        title="Keep & Publish Post?"
+        description="Keep this post as published and dismiss all associated active reports?"
+        confirmText="Keep Post"
+        variant="success"
+        isLoading={isLoading}
+        onClose={() => setKeepPostId(null)}
+        onConfirm={confirmKeep}
+      />
+
+      {/* Delete Post Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(deletePostId)}
+        title="Delete Reported Post?"
+        description="Are you sure you want to delete this post? It will be removed from all feeds."
+        confirmText="Delete Post"
+        variant="danger"
+        isLoading={isLoading}
+        onClose={() => setDeletePostId(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

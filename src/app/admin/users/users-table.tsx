@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { updateUserRole, updateUserStatus, deleteUserProfile, createUserProfile } from "./actions";
 import { SearchIcon, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface UserRow {
   id: string;
@@ -45,7 +47,8 @@ export function UsersTable({ initialUsers, page, totalPages, totalCount, institu
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
-  const [isLoading, setIsLoading] = useState<string | null>(null); // holds profileId of updating user
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [userToDelete, setUserToDelete] = useState<{ id: string; name: string } | null>(null);
 
   function pushParams(mutate: (params: URLSearchParams) => void) {
     const params = new URLSearchParams(searchParams.toString());
@@ -91,9 +94,10 @@ export function UsersTable({ initialUsers, page, totalPages, totalCount, institu
     setIsLoading(profileId);
     try {
       await updateUserRole(profileId, role);
+      toast.success("User role updated successfully");
       router.refresh();
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Failed to update role");
+      toast.error(e instanceof Error ? e.message : "Failed to update role");
     } finally {
       setIsLoading(null);
     }
@@ -103,9 +107,10 @@ export function UsersTable({ initialUsers, page, totalPages, totalCount, institu
     setIsLoading(profileId);
     try {
       await updateUserStatus(profileId, status);
+      toast.success("User status updated successfully");
       router.refresh();
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Failed to update status");
+      toast.error(e instanceof Error ? e.message : "Failed to update status");
     } finally {
       setIsLoading(null);
     }
@@ -114,7 +119,7 @@ export function UsersTable({ initialUsers, page, totalPages, totalCount, institu
   async function handleCreateUser(e: React.FormEvent) {
     e.preventDefault();
     if (!newDisplayName.trim() || !newUsername.trim() || !newInstitutionId) {
-      alert("Please fill in all required fields.");
+      toast.error("Please fill in all required fields.");
       return;
     }
 
@@ -130,25 +135,26 @@ export function UsersTable({ initialUsers, page, totalPages, totalCount, institu
       setNewDisplayName("");
       setNewUsername("");
       setShowAddForm(false);
+      toast.success("User profile created! 🎉");
       router.refresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to create user");
+      toast.error(err instanceof Error ? err.message : "Failed to create user");
     } finally {
       setIsCreating(false);
     }
   }
 
-  async function handleDeleteUser(profileId: string, displayName: string) {
-    if (!window.confirm(`Are you sure you want to delete ${displayName}'s account? This action is permanent and will delete all their posts and data.`)) {
-      return;
-    }
-
+  async function confirmDeleteUser() {
+    if (!userToDelete) return;
+    const profileId = userToDelete.id;
     setIsLoading(profileId);
     try {
       await deleteUserProfile(profileId);
+      toast.success("User account deleted successfully");
+      setUserToDelete(null);
       router.refresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to delete user");
+      toast.error(err instanceof Error ? err.message : "Failed to delete user");
     } finally {
       setIsLoading(null);
     }
@@ -365,7 +371,7 @@ export function UsersTable({ initialUsers, page, totalPages, totalCount, institu
                   <td className="px-6 py-4 text-right">
                     <button
                       disabled={isLoading === p.id}
-                      onClick={() => handleDeleteUser(p.id, p.displayName)}
+                      onClick={() => setUserToDelete({ id: p.id, name: p.displayName })}
                       className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors cursor-pointer disabled:opacity-50 inline-flex items-center justify-center"
                       title="Delete User"
                     >
@@ -408,6 +414,18 @@ export function UsersTable({ initialUsers, page, totalPages, totalCount, institu
           </div>
         )}
       </div>
+
+      {/* Delete User Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(userToDelete)}
+        title="Delete User Account?"
+        description={`Are you sure you want to permanently delete ${userToDelete?.name || "this user"}'s account? This action cannot be undone and will purge all their posts and data.`}
+        confirmText="Delete Account"
+        variant="danger"
+        isLoading={Boolean(isLoading && userToDelete && isLoading === userToDelete.id)}
+        onClose={() => setUserToDelete(null)}
+        onConfirm={confirmDeleteUser}
+      />
     </div>
   );
 }

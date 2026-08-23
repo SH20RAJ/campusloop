@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { deleteComment } from "./actions";
 import { revealAnonymousAuthor, type RevealedIdentity } from "../anonymity-actions";
 import { SearchIcon, ChevronLeft, ChevronRight, Trash2, Eye } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface CommentRow {
   id: string;
@@ -28,6 +30,8 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<Record<string, RevealedIdentity>>({});
+  const [revealCommentId, setRevealCommentId] = useState<string | null>(null);
+  const [deleteCommentId, setDeleteCommentId] = useState<string | null>(null);
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,27 +51,33 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
     router.push(`/admin/comments?${params.toString()}`);
   }
 
-  async function handleDelete(commentId: string) {
-    if (!confirm("Are you sure you want to delete this comment?")) return;
+  async function confirmDelete() {
+    if (!deleteCommentId) return;
+    const commentId = deleteCommentId;
     setActionLoading(commentId);
     try {
       await deleteComment(commentId);
+      toast.success("Comment deleted successfully");
+      setDeleteCommentId(null);
       router.refresh();
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Failed to delete comment");
+      toast.error(e instanceof Error ? e.message : "Failed to delete comment");
     } finally {
       setActionLoading(null);
     }
   }
 
-  async function handleReveal(commentId: string) {
-    if (!confirm("Reveal the author of this anonymous comment? This action is audit-logged.")) return;
+  async function confirmReveal() {
+    if (!revealCommentId) return;
+    const commentId = revealCommentId;
     setActionLoading(commentId);
     try {
       const identity = await revealAnonymousAuthor("COMMENT", commentId);
       setRevealed((prev) => ({ ...prev, [commentId]: identity }));
+      toast.success("Anonymous author revealed (audit logged)");
+      setRevealCommentId(null);
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Failed to reveal author");
+      toast.error(e instanceof Error ? e.message : "Failed to reveal author");
     } finally {
       setActionLoading(null);
     }
@@ -139,7 +149,7 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
                       {c.isAnonymous && !revealed[c.id] && (
                         <button
                           disabled={actionLoading === c.id}
-                          onClick={() => handleReveal(c.id)}
+                          onClick={() => setRevealCommentId(c.id)}
                           title="Reveal author (audit logged)"
                           className="p-1.5 rounded hover:bg-muted text-blue-500 disabled:opacity-50 transition-colors cursor-pointer"
                         >
@@ -148,7 +158,7 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
                       )}
                       <button
                         disabled={actionLoading === c.id}
-                        onClick={() => handleDelete(c.id)}
+                        onClick={() => setDeleteCommentId(c.id)}
                         className="p-1.5 rounded hover:bg-muted text-destructive disabled:opacity-50 transition-colors cursor-pointer"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -191,6 +201,30 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
           </div>
         )}
       </div>
+
+      {/* Reveal Author Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(revealCommentId)}
+        title="Reveal Anonymous Comment Author?"
+        description="Are you sure you want to reveal the author of this comment? This action is permanently audit-logged with your admin ID."
+        confirmText="Reveal Identity"
+        variant="info"
+        isLoading={Boolean(actionLoading && revealCommentId && actionLoading === revealCommentId)}
+        onClose={() => setRevealCommentId(null)}
+        onConfirm={confirmReveal}
+      />
+
+      {/* Delete Comment Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(deleteCommentId)}
+        title="Delete Comment?"
+        description="Are you sure you want to delete this comment? It will be removed permanently."
+        confirmText="Delete Comment"
+        variant="danger"
+        isLoading={Boolean(actionLoading && deleteCommentId && actionLoading === deleteCommentId)}
+        onClose={() => setDeleteCommentId(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

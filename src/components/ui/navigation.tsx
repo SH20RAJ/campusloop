@@ -91,7 +91,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
       ],
     },
     {
-      group: "🛒 Campus Utility",
+      group: "Campus Utility",
       items: [
         { icon: ShoppingBag, href: "/app/hashtag/BuySell", label: "Buy / Sell / Exchange", desc: "Books, tech, cycles & dorm items" },
         { icon: Search, href: "/app/hashtag/LostAndFound", label: "Lost & Found", desc: "Report or claim campus belongings" },
@@ -102,7 +102,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
       ],
     },
     {
-      group: "🎉 Social & Vibes",
+      group: "Social & Vibes",
       items: [
         { icon: PartyPopper, href: "/app/hashtag/CampusMemes", label: "Memes & Banter", desc: "Hostel tea & campus humor" },
         { icon: PartyPopper, href: "/app/hashtag/CampusEvents", label: "Events & Fests", desc: "Cultural fests, hackathons & gigs" },

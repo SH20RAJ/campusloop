@@ -10,18 +10,18 @@ import { DEGREE_CATEGORIES, getBranchesForDegree } from "@/lib/academic-constant
 import { toast } from "sonner";
 
 const POPULAR_INTERESTS = [
-  "Tech & Coding 💻",
-  "Late Night Tea ☕",
-  "Hostel Life 🏢",
-  "Campus Dating 💕",
-  "Gaming & Esports 🎮",
-  "Startups & AI 🚀",
-  "Music & Jamming 🎸",
-  "Exam Stress 📚",
-  "Sports & Gym ⚽",
-  "Photography 📸",
-  "Memes & Banter 🎭",
-  "Movies & Shows 🍿",
+  "Tech & Coding",
+  "Late Night Tea",
+  "Hostel Life",
+  "Campus Dating",
+  "Gaming & Esports",
+  "Startups & AI",
+  "Music & Jamming",
+  "Exam Prep",
+  "Sports & Fitness",
+  "Photography",
+  "Memes & Banter",
+  "Cinema & TV",
 ];
 
 interface OnboardingFormProps {
@@ -170,7 +170,7 @@ export function OnboardingForm({
             onClick={handleGenerateAvatar}
             className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
           >
-            <Sparkles className="size-3.5" /> 🎲 Random
+            <Sparkles className="size-3.5" /> Randomize
           </button>
         </div>
       </div>
@@ -257,7 +257,7 @@ export function OnboardingForm({
                   : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
               }`}
             >
-              {g === "MALE" ? "👨 Male" : g === "FEMALE" ? "👩 Female" : "✨ Other"}
+              {g === "MALE" ? "Male" : g === "FEMALE" ? "Female" : "Other"}
             </button>
           ))}
         </div>

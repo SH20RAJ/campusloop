@@ -12,16 +12,16 @@ import { validateDisplayName, validateUsername } from "@/lib/validation";
 import { uploadImageToImgBB } from "@/lib/upload";
 
 const INTEREST_SUGGESTIONS = [
-  "Tech & Coding 💻",
-  "Late Night Tea ☕",
-  "Hostel Life 🏢",
-  "Exam Stress 📚",
-  "Music & Jamming 🎸",
-  "Campus Dating 💕",
-  "Gaming 🎮",
-  "Sports ⚽",
-  "Photography 📸",
-  "Startups 🚀",
+  "Tech & Coding",
+  "Late Night Tea",
+  "Hostel Life",
+  "Exam Prep",
+  "Music & Jamming",
+  "Campus Dating",
+  "Gaming",
+  "Sports",
+  "Photography",
+  "Startups & AI",
 ];
 
 export function EditProfileClient() {
@@ -462,7 +462,7 @@ export function EditProfileClient() {
                       : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {g === "MALE" ? "👨 Male" : g === "FEMALE" ? "👩 Female" : "✨ Other"}
+                  {g === "MALE" ? "Male" : g === "FEMALE" ? "Female" : "Other"}
                 </button>
               ))}
             </div>

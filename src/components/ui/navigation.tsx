@@ -284,7 +284,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
       </aside>
 
       {/* ─── Mobile Bottom Bar ─── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-around border-t border-border/80 bg-background/95 backdrop-blur-xl px-2 md:hidden shadow-lg touch-manipulation">
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] items-center justify-around border-t border-border/80 bg-background/95 backdrop-blur-xl px-2 md:hidden shadow-lg touch-manipulation select-none">
         {mobileBottomItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -295,7 +295,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
               <Link
                 key="create"
                 href="/app/post/new"
-                className="flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md border-none active:scale-95 transition-transform"
+                className="flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md border-none active:scale-90 transition-transform cursor-pointer"
               >
                 <AnimateIcon animateOnHover animation="path">
                   <Plus className="size-5" />
@@ -310,7 +310,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
                 key="menu-trigger"
                 type="button"
                 onClick={() => setShowMobileMenu(true)}
-                className="group flex flex-col items-center justify-center flex-1 h-full py-1 text-muted-foreground hover:text-foreground cursor-pointer"
+                className="group flex flex-col items-center justify-center flex-1 h-full py-1 text-muted-foreground hover:text-foreground active:scale-95 transition-transform cursor-pointer"
               >
                 <Icon className="size-4.5 transition-colors" />
                 <span className="mt-0.5 text-[9px] font-bold">Menu</span>
@@ -323,7 +323,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "group flex flex-col items-center justify-center flex-1 h-full py-1 relative",
+                "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
                 isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
               )}
             >

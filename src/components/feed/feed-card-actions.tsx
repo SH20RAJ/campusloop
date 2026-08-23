@@ -33,12 +33,12 @@ export function FeedCardActions({
   }
 
   return (
-    <div className="flex items-center justify-between px-5 py-3 border-t border-border/40 text-muted-foreground">
+    <div className="flex items-center justify-between px-5 py-3 border-t border-border/40 text-muted-foreground select-none">
       {/* Upvote Button */}
       <button
         onClick={onVote}
         className={cn(
-          "flex items-center gap-1.5 text-xs font-semibold hover:text-rose-500 transition-colors group cursor-pointer",
+          "flex items-center gap-1.5 text-xs font-semibold hover:text-rose-500 transition-all active:scale-90 active:opacity-75 group cursor-pointer",
           userVote === 1 && "text-rose-500"
         )}
         aria-label="Upvote post"
@@ -57,7 +57,7 @@ export function FeedCardActions({
       {/* Comment Link */}
       <Link
         href={`/app/post/${post.id}`}
-        className="flex items-center gap-1.5 text-xs font-semibold hover:text-primary transition-colors group cursor-pointer"
+        className="flex items-center gap-1.5 text-xs font-semibold hover:text-primary transition-all active:scale-90 active:opacity-75 group cursor-pointer"
         aria-label="Comments"
       >
         <AnimateIcon animateOnHover animation="path">
@@ -69,7 +69,7 @@ export function FeedCardActions({
       {/* Instant 1-Tap Repost Button */}
       <button
         onClick={triggerRepostAnimation}
-        className="flex items-center gap-1.5 text-xs font-semibold hover:text-emerald-500 transition-colors group cursor-pointer"
+        className="flex items-center gap-1.5 text-xs font-semibold hover:text-emerald-500 transition-all active:scale-90 active:opacity-75 group cursor-pointer"
         title="Instant Repost to Feed"
       >
         <Repeat2
@@ -84,7 +84,7 @@ export function FeedCardActions({
       {/* Share Button */}
       <button
         onClick={onShare}
-        className="flex items-center gap-1.5 text-xs font-semibold hover:text-primary transition-colors group cursor-pointer"
+        className="flex items-center gap-1.5 text-xs font-semibold hover:text-primary transition-all active:scale-90 active:opacity-75 group cursor-pointer"
         aria-label="Share post"
       >
         <AnimateIcon animateOnHover animation="path">

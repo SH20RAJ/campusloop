@@ -4,6 +4,7 @@ import { userProfiles, swipes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and, ne, notInArray, type SQL } from "drizzle-orm";
 import { rejectViewerWrite, getViewerInstitutionId } from "@/lib/viewer";
+import { computeCompatibility, resolveGenderPreference } from "@/lib/dating";
 
 export const dynamic = "force-dynamic";
 
@@ -42,20 +43,24 @@ export async function GET(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    const genderFilter = searchParams.get("gender") || "ALL"; // MALE, FEMALE, ALL
+    // No explicit choice → smart default: male sees women, female sees men.
+    const genderFilter = resolveGenderPreference(profile.gender, searchParams.get("gender"));
     const collegeFilter = searchParams.get("scope") || searchParams.get("college") || "GLOBAL"; // CAMPUS, GLOBAL
-    const targetInstitutionId = searchParams.get("collegeId") || searchParams.get("targetInstitutionId"); // specific college id
+    const targetInstitutionId = searchParams.get("collegeId") || searchParams.get("targetInstitutionId");
     const sort = searchParams.get("sort") || "COMPATIBILITY"; // COMPATIBILITY, RECENT, POPULAR
 
-    // Find all target IDs the user has already swiped on
-    const swiped = await db
-      .select({ id: swipes.targetId })
-      .from(swipes)
-      .where(eq(swipes.swiperId, profile.id));
+    // Everyone I already swiped on, and everyone who already liked me.
+    const [swiped, likedMeRows] = await Promise.all([
+      db.select({ id: swipes.targetId }).from(swipes).where(eq(swipes.swiperId, profile.id)),
+      db
+        .select({ id: swipes.swiperId })
+        .from(swipes)
+        .where(and(eq(swipes.targetId, profile.id), eq(swipes.direction, "LIKE"))),
+    ]);
 
     const swipedIds = swiped.map((s) => s.id);
+    const likedMeIds = new Set(likedMeRows.map((s) => s.id));
 
-    // Build conditions
     const viewerInstitutionId = await getViewerInstitutionId();
     const conditions: (SQL | undefined)[] = [
       ne(userProfiles.id, profile.id), // Exclude self
@@ -76,53 +81,66 @@ export async function GET(req: Request) {
 
     const rawCandidates = await db.query.userProfiles.findMany({
       where: and(...conditions.filter((c): c is SQL => c !== undefined)),
-      limit: 50,
+      limit: 60,
       with: {
         institution: true,
       },
     });
 
-    // Score and rank candidates intelligently
     const scoredCandidates = rawCandidates.map((cand) => {
-      let score = 70; // baseline compatibility
+      const candPhotos =
+        cand.photos && cand.photos.length > 0 ? cand.photos : cand.avatarUrl ? [cand.avatarUrl] : [];
 
-      // Same college bonus
-      if (cand.institutionId && profile.institutionId && cand.institutionId === profile.institutionId) {
-        score += 20;
-      } else if (cand.institution?.state && profile.institution?.state && cand.institution.state === profile.institution.state) {
-        score += 10;
-      }
-
-      // Profile completeness bonus (multiple photos give extra vibe points!)
-      const candPhotos = cand.photos && cand.photos.length > 0 ? cand.photos : (cand.avatarUrl ? [cand.avatarUrl] : []);
-      if (candPhotos.length >= 2) score += 5;
-      if (cand.bio && cand.bio.length > 10) score += 5;
-      if (cand.avatarUrl) score += 5;
-
-      // Activity / LP points bonus
-      if (cand.points > 100) score += 5;
-
-      // Cap at 99%
-      score = Math.min(score, 99);
+      const { score, sharedInterests } = computeCompatibility(
+        profile,
+        { ...cand, photos: candPhotos },
+        { likedMe: likedMeIds.has(cand.id) }
+      );
 
       return {
-        ...cand,
+        id: cand.id,
+        displayName: cand.displayName,
+        username: cand.username,
+        avatarUrl: cand.avatarUrl,
         photos: candPhotos,
+        bio: cand.bio,
+        gender: cand.gender,
+        course: cand.course,
+        branch: cand.branch,
+        year: cand.year,
+        points: cand.points,
+        interests: cand.interests ?? [],
+        institution: cand.institution
+          ? { name: cand.institution.name, slug: cand.institution.slug, state: cand.institution.state }
+          : null,
+        createdAt: cand.createdAt,
         compatibilityScore: score,
+        sharedInterests,
+        likedYou: likedMeIds.has(cand.id),
       };
     });
 
-    // Apply sorting
     if (sort === "RECENT") {
-      scoredCandidates.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      scoredCandidates.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     } else if (sort === "POPULAR") {
       scoredCandidates.sort((a, b) => (b.points || 0) - (a.points || 0));
     } else {
-      // COMPATIBILITY (default)
       scoredCandidates.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
     }
 
-    return NextResponse.json(scoredCandidates.slice(0, 20));
+    // Likes still waiting for an answer (they liked me, I haven't swiped back)
+    const swipedSet = new Set(swipedIds);
+    const pendingLikes = [...likedMeIds].filter((id) => !swipedSet.has(id)).length;
+
+    return NextResponse.json({
+      candidates: scoredCandidates.slice(0, 25),
+      meta: {
+        showingGender: genderFilter,
+        likesYouCount: pendingLikes,
+      },
+    });
   } catch (error) {
     console.error("Error fetching dating candidates:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

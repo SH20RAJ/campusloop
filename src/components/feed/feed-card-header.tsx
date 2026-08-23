@@ -9,6 +9,7 @@ import { cn, getAvatarUrl, formatTimeAgo } from "@/lib/utils";
 import { toast } from "sonner";
 import { deletePost } from "@/app/app/(main)/post/actions";
 import { FeedPost } from "@/hooks/use-feed";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface FeedCardHeaderProps {
   post: FeedPost;
@@ -27,6 +28,7 @@ export function FeedCardHeader({
 }: FeedCardHeaderProps) {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
@@ -170,20 +172,9 @@ export function FeedCardHeader({
 
               {currentUserId && post.authorId === currentUserId && (
                 <button
-                  onClick={async () => {
+                  onClick={() => {
                     setShowMenu(false);
-                    const confirmed = window.confirm("Are you sure you want to delete this post?");
-                    if (!confirmed) return;
-                    setIsDeleting(true);
-                    try {
-                      await deletePost(post.id);
-                      toast.success("Post deleted successfully");
-                      router.refresh();
-                    } catch (error) {
-                      toast.error(error instanceof Error ? error.message : "Failed to delete post");
-                    } finally {
-                      setIsDeleting(false);
-                    }
+                    setShowDeleteConfirm(true);
                   }}
                   disabled={isDeleting}
                   className="w-full text-left px-3.5 py-2 text-xs font-semibold text-destructive hover:bg-muted transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-2"
@@ -196,6 +187,30 @@ export function FeedCardHeader({
           )}
         </div>
       </div>
+
+      {/* Modern Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete Post?"
+        description="Are you sure you want to permanently delete this post? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+        isLoading={isDeleting}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={async () => {
+          setIsDeleting(true);
+          try {
+            await deletePost(post.id);
+            toast.success("Post deleted successfully");
+            setShowDeleteConfirm(false);
+            router.refresh();
+          } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Failed to delete post");
+          } finally {
+            setIsDeleting(false);
+          }
+        }}
+      />
     </div>
   );
 }

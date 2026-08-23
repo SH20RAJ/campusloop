@@ -46,12 +46,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing targetId parameter" }, { status: 400 });
     }
 
-    // Upsert swipe choice to prevent duplicate key errors
-    await db.insert(swipes).values({
-      swiperId: profile.id,
-      targetId,
-      direction,
-    }).onConflictDoNothing();
+    // Upsert so changing your mind (e.g. like-back after an old pass) works
+    await db
+      .insert(swipes)
+      .values({
+        swiperId: profile.id,
+        targetId,
+        direction,
+      })
+      .onConflictDoUpdate({
+        target: [swipes.swiperId, swipes.targetId],
+        set: { direction },
+      });
 
     // Check if it's a mutual LIKE
     if (direction === "LIKE") {
@@ -108,8 +114,12 @@ export async function POST(req: Request) {
   }
 }
 
-/** Reset all swipes for current user so they can start fresh */
-export async function DELETE() {
+/**
+ * Undo / reset swipes.
+ * With `?targetId=`: removes just that one swipe (the Rewind button).
+ * Without: clears every swipe so the deck starts fresh.
+ */
+export async function DELETE(req: Request) {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {
@@ -123,6 +133,16 @@ export async function DELETE() {
 
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const targetId = searchParams.get("targetId");
+
+    if (targetId) {
+      await db
+        .delete(swipes)
+        .where(and(eq(swipes.swiperId, profile.id), eq(swipes.targetId, targetId)));
+      return NextResponse.json({ success: true, message: "Swipe undone" });
     }
 
     await db.delete(swipes).where(eq(swipes.swiperId, profile.id));

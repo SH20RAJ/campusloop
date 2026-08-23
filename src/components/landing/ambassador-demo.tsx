@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, Gift, Sparkles, ArrowRight } from "lucide-react";
+import { Copy, Check, Gift, Sparkles, ArrowRight, ShieldCheck, Flame, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,111 +10,125 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 export function AmbassadorShowcase() {
-  const [username, setUsername] = useState("yourname");
+  const [username, setUsername] = useState("shaswat");
   const [copied, setCopied] = useState(false);
 
-  const cleanHandle = username.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase() || "yourname";
+  const cleanHandle = username.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase() || "student";
   const shareLink = `https://campusloop.space/join?invite=${cleanHandle}`;
 
   function handleCopy() {
     navigator.clipboard.writeText(shareLink);
     setCopied(true);
-    toast.success("Link copied! Share it in your batch WhatsApp group 🚀");
+    toast.success("Link copied! Share with your college classmates 🚀");
     setTimeout(() => setCopied(false), 2500);
   }
 
   return (
-    <section className="border-t border-border/60 bg-background py-20">
-      <div className="mx-auto w-full max-w-6xl px-6">
-        <div className="grid gap-10 lg:grid-cols-2 items-center">
-          <Reveal className="space-y-5">
-            <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5 gap-1.5 py-1 px-3 text-xs">
+    <section className="border-t border-border/60 bg-background py-16 sm:py-20 select-none overflow-hidden">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <div className="grid gap-8 lg:grid-cols-2 items-center">
+          {/* Left Column: Ambassador Value Proposition */}
+          <Reveal className="space-y-4 sm:space-y-5">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
               <Gift className="size-3.5 text-primary" /> Campus Ambassador & Referral
-            </Badge>
+            </div>
 
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl leading-tight">
-              Infiltrate your campus. Get paid in clout and LP.
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-foreground leading-tight">
+              Infiltrate your campus. Get paid in Clout & LP.
             </h2>
 
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Share your invite link in the college WhatsApp group your CR hasn&apos;t muted yet. Every verified classmate who joins boosts your college leaderboard rank!
+            <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground">
+              Share your invite link in your batch WhatsApp groups & hostel chats. Every verified classmate who joins boosts your college ranking!
             </p>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5 pt-1">
               {[
-                { title: "+20 Loop Points per verified signup", desc: "Climb from Backlog Survivor to Campus Legend status." },
-                { title: "Flex your Ambassador Badge", desc: "Get featured at the top of your college leaderboard." },
-                { title: "Bring your whole batch", desc: "So someone can finally answer 'is attendance mandatory today?'" },
-              ].map((perk, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary mt-0.5">
-                    <Check className="size-3" />
+                { icon: Flame, title: "+20 Loop Points per verified peer", desc: "Climb from Rookie to Campus Star & Legend tier." },
+                { icon: ShieldCheck, title: "Verified Ambassador Badge", desc: "Get featured at the top of your college directory." },
+                { icon: Users, title: "Bring your whole batch", desc: "Unlock exclusive batch discussion threads & confessions." },
+              ].map((perk, idx) => {
+                const Icon = perk.icon;
+                return (
+                  <div key={idx} className="flex items-start gap-3 rounded-2xl border border-border/50 bg-card/60 p-3 shadow-2xs">
+                    <div className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary mt-0.5">
+                      <Icon className="size-3.5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold text-foreground truncate">{perk.title}</p>
+                      <p className="text-[11px] text-muted-foreground leading-snug">{perk.desc}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-foreground">{perk.title}</p>
-                    <p className="text-[11px] text-muted-foreground">{perk.desc}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Reveal>
 
-          {/* Interactive Link Generator Widget */}
+          {/* Right Column: Mobile-Safe Interactive Link Generator */}
           <Reveal delay={0.1}>
-            <Card className="border border-border bg-card shadow-sm p-5 space-y-4">
-              <CardContent className="p-0 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="size-3.5" /> Test Referral Link Generator
+            <div className="rounded-3xl border border-border/80 bg-card p-4 sm:p-6 shadow-sm space-y-4 max-w-full overflow-hidden">
+              <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                <span className="text-xs font-black text-primary uppercase tracking-wider flex items-center gap-1.5 truncate">
+                  <Sparkles className="size-3.5 shrink-0" /> Live Referral Link Generator
+                </span>
+                <span className="text-[10px] font-black bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full shrink-0">
+                  +20 LP
+                </span>
+              </div>
+
+              {/* Handle Input */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-muted-foreground">Type your campus username:</label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-xs font-bold text-muted-foreground">@</span>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="your_handle"
+                    maxLength={30}
+                    className="w-full rounded-xl border border-border/70 bg-muted/20 pl-7 pr-3 py-2 text-xs font-bold text-foreground focus:border-primary focus:bg-background outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Generated Link Box with Safe Wrapping */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Your Unique Invitation URL
+                </label>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 rounded-2xl border border-border/70 bg-muted/30 p-2.5">
+                  <span className="text-[11px] font-mono font-bold text-foreground break-all sm:truncate flex-1 px-1">
+                    {shareLink}
                   </span>
-                  <Badge variant="secondary" className="text-[10px]">Live Demo</Badge>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="shrink-0 rounded-xl bg-primary px-3 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                  >
+                    {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                    <span>{copied ? "Copied Link!" : "Copy Link"}</span>
+                  </button>
                 </div>
+              </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-foreground">Type your desired handle:</label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-muted-foreground">@</span>
-                    <input
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="e.g. aditi_bits"
-                      className="w-full rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-primary outline-none"
-                    />
-                  </div>
-                </div>
+              {/* Pro-Tip Box */}
+              <div className="rounded-2xl bg-muted/30 p-3 text-[11px] text-muted-foreground leading-relaxed border border-border/40 space-y-1">
+                <p className="font-medium">
+                  💡 <strong className="text-foreground">Pro-tip:</strong> Share this link in your college WhatsApp or Telegram group to farm +20 Loop Points per peer!
+                </p>
+              </div>
 
-                {/* Generated Link Box */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Your Unique Link</label>
-                  <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 p-2">
-                    <span className="text-xs font-mono font-semibold text-foreground truncate flex-1">
-                      {shareLink}
-                    </span>
-                    <Button
-                      size="sm"
-                      onClick={handleCopy}
-                      className="shrink-0 text-xs font-bold gap-1 bg-primary text-primary-foreground hover:bg-primary/90 h-8"
-                    >
-                      {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                      {copied ? "Copied!" : "Copy"}
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="rounded-lg bg-muted/50 p-3 text-[11px] text-muted-foreground leading-relaxed border border-border/40">
-                  💡 <strong className="text-foreground">Pro-tip:</strong> Put this in your Instagram bio or spam it in your college WhatsApp group to farm LP.
-                </div>
-
-                <div className="pt-1">
-                  <Link href="/join?mode=signup" className="w-full">
-                    <Button className="w-full font-semibold text-xs gap-1.5">
-                      Get Your Verified Link Now <ArrowRight className="size-3.5" />
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+              {/* CTA Button */}
+              <div className="pt-1">
+                <Link
+                  href="/join?mode=signup"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/95 transition-all cursor-pointer"
+                >
+                  <span>Get Your Official Verified Link</span>
+                  <ArrowRight className="size-3.5" />
+                </Link>
+              </div>
+            </div>
           </Reveal>
         </div>
       </div>

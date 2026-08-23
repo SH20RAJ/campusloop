@@ -16,7 +16,6 @@ import {
   AlignRight,
   Check,
   AlertCircle,
-  Image as ImageIcon,
   Upload,
   Camera,
   X,

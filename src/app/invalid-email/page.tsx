@@ -2,13 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ShieldAlertIcon } from "lucide-react";
 
+import { hexclaveServerApp } from "@/hexclave/server";
+import { redirect } from "next/navigation";
+
 export const metadata: Metadata = {
 	title: "Invalid Email",
 	description: "The email used to sign up is not a verified student email. Sign up again with your official college email.",
 	robots: { index: false, follow: false },
 };
 
-export default function InvalidEmailPage() {
+export default async function InvalidEmailPage() {
+  const user = await hexclaveServerApp.getUser();
+  if (!user) {
+    redirect("/");
+  }
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center">
       <div className="max-w-md w-full space-y-6 rounded-xl bg-card p-8 shadow-sm border border-border">
@@ -33,12 +40,12 @@ export default function InvalidEmailPage() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <Link
+          <a
             href="/handler/sign-out"
-            className="flex w-full items-center justify-center rounded-lg bg-primary h-10 px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/95 transition-colors"
+            className="flex w-full items-center justify-center rounded-lg bg-primary h-10 px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/95 transition-colors cursor-pointer"
           >
             Sign Out
-          </Link>
+          </a>
         </div>
       </div>
     </div>

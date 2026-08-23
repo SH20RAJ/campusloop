@@ -1,6 +1,6 @@
 import { getDb } from "../src/db";
-import { userProfiles, institutions, posts, comments, votes } from "../src/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { userProfiles, institutions, posts } from "../src/db/schema";
+import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { loadLocalEnv } from "../src/lib/load-env";
 

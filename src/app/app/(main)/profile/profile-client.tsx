@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   LogOut,
-  School,
   Shield,
   MessageSquare,
   Sparkles,
@@ -16,22 +15,15 @@ import {
   Edit3,
   Flame,
   Camera,
-  Layers,
   ArrowUpRight,
-  UserCheck,
   Briefcase,
   GraduationCap,
   Calendar,
   MapPin,
-  MoreHorizontal,
-  ExternalLink,
-  Plus,
   Eye,
   TrendingUp,
-  Image as ImageIcon,
   X,
   Upload,
-  Sparkle,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -39,7 +31,7 @@ import { FeedCard } from "@/components/ui/feed-card";
 import { toast } from "sonner";
 import type { FeedPost } from "@/hooks/use-feed";
 import type { UserProfile, Institution } from "@/db/schema";
-import { cn, getAvatarUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { getCloutTier } from "@/lib/gamification";
 import { slugifyBranch, getBranchIcon } from "@/lib/academic-constants";
 import { uploadImageToImgBB } from "@/lib/upload";
@@ -81,7 +73,6 @@ export function ProfileClientView({
       : [];
 
   const branchSlug = profile.branch ? slugifyBranch(profile.branch) : null;
-  const courseSlug = profile.course ? slugifyBranch(profile.course) : null;
   const branchIcon = getBranchIcon(profile.branch || profile.course);
 
   const institutionName = profile.institution?.name || "Indian Institute of Technology";
@@ -245,13 +236,13 @@ export function ProfileClientView({
                       <Edit3 className="size-3.5" /> Edit Profile
                     </Link>
 
-                    <a
+                    <Link
                       href="/handler/sign-out"
                       className="flex items-center justify-center rounded-2xl border border-border/70 bg-muted/20 size-9 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                       title="Sign Out"
                     >
                       <LogOut className="size-4" />
-                    </a>
+                    </Link>
                   </>
                 ) : (
                   <Link

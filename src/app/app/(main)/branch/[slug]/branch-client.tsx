@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
-import { ArrowLeft, Search, School, Globe, Sparkles, MessageSquare, ShieldCheck, Trophy, Filter, UserPlus } from "lucide-react";
+import { ArrowLeft, Search, School, Globe, MessageSquare, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetcher } from "@/lib/api";

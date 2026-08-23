@@ -19,6 +19,7 @@ export interface UserProfileData {
   loopPoints: number;
   points?: number;
   referralCount?: number;
+  onboardingCompleted?: boolean;
   institutionId?: string | null;
   institution?: {
     id: string;

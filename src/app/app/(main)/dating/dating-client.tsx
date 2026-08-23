@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
-import { Sparkles, Filter, RotateCcw, HeartHandshake, ArrowRight, Camera, ShieldCheck, Heart, User } from "lucide-react";
+import { Sparkles, Filter, RotateCcw, HeartHandshake, ArrowRight, Camera, Heart } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { fetcher } from "@/lib/api";

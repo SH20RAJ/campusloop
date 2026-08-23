@@ -261,6 +261,13 @@ export function EditProfileClient() {
               {isUploadingBanner ? <Loader2 className="size-3.5 animate-spin" /> : <Camera className="size-3.5" />}
               <span>{bannerUrl ? "Change Banner" : "Upload Banner"}</span>
             </button>
+            <input
+              ref={bannerInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleBannerUpload}
+            />
           </div>
 
           {/* Avatar Row */}

@@ -160,19 +160,19 @@ export function InlineReferralWidget() {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm flex items-center justify-between gap-4">
+    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 select-none">
       <div className="flex items-center gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
-          <Gift className="size-5" />
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+          <Gift className="size-4.5" />
         </div>
-        <div className="space-y-0.5">
-          <h4 className="text-xs font-bold text-foreground">Earn 20 LP per Verified Invite</h4>
+        <div className="space-y-0.5 min-w-0 flex-1">
+          <h4 className="text-xs font-bold text-foreground truncate">Earn 20 LP per Verified Invite</h4>
           <p className="text-[11px] text-muted-foreground leading-snug">
             Bring your classmates onboard to unlock your Campus Ambassador rank!
           </p>
         </div>
       </div>
-      <Button size="sm" onClick={handleCopy} variant="outline" className="shrink-0 font-bold text-xs h-8 gap-1 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer">
+      <Button size="sm" onClick={handleCopy} variant="outline" className="shrink-0 font-bold text-xs h-8 gap-1.5 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer">
         <Sparkles className="size-3.5" /> Copy Invite Link
       </Button>
     </div>

@@ -7,11 +7,11 @@ import { Metadata } from "next";
 import { ProfileClientView } from "../app/(main)/profile/profile-client";
 import { Navigation } from "@/components/ui/navigation";
 import Link from "next/link";
-import { Lock, School, Sparkles, ShieldCheck, ArrowRight, Flame } from "lucide-react";
+import { Lock, School } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedPost } from "@/hooks/use-feed";
 import { getCloutTier } from "@/lib/gamification";
-import { getBranchIcon, slugifyBranch } from "@/lib/academic-constants";
+import { getBranchIcon } from "@/lib/academic-constants";
 
 interface VanityProfileProps {
   params: Promise<{ username: string }>;
@@ -181,7 +181,6 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
   // If not authenticated, render LinkedIn-style public card
   const tier = getCloutTier(profile.points || 0);
   const branchIcon = getBranchIcon(profile.branch || profile.course);
-  const branchSlug = profile.branch ? slugifyBranch(profile.branch) : null;
   const institutionName = profile.institution?.name || "Indian Institute of Technology";
   const campusShort = institutionName.split(",")[0];
 

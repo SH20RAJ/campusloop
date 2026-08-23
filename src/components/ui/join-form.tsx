@@ -29,7 +29,7 @@ export function JoinForm() {
 
   // A signed-in visitor never needs the auth forms again.
   const isLoggedIn = Boolean(profile);
-  const needsOnboarding = isLoggedIn && !profile?.institutionId;
+  const needsOnboarding = isLoggedIn && !profile?.onboardingCompleted;
 
   useEffect(() => {
     const initialMode = searchParams.get("mode");

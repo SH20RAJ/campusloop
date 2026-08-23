@@ -267,7 +267,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
 
             <Link
               href="/handler/sign-out"
-              className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:bg-destructive/90 transition-all flex items-center gap-1.5 shrink-0 shadow-xs"
+              className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:bg-destructive/90 transition-all flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer"
             >
               <LogOut className="h-3.5 w-3.5" /> Sign Out
             </Link>

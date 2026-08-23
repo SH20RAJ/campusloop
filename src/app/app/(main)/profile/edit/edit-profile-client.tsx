@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2, Image as ImageIcon, X, Plus, Camera } from "lucide-react";
+import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2, Image as ImageIcon, X, Plus, Camera, Cake, Lock } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getAvatarUrl } from "@/lib/utils";
@@ -32,6 +32,8 @@ export function EditProfileClient() {
   const [username, setUsername] = useState("");
   const [headline, setHeadline] = useState("");
   const [gender, setGender] = useState<"MALE" | "FEMALE" | "OTHER">("MALE");
+  const [dob, setDob] = useState("");
+  const [isDobPrivate, setIsDobPrivate] = useState(false);
   const [course, setCourse] = useState("");
   const [branch, setBranch] = useState("");
   const [year, setYear] = useState<number>(1);
@@ -59,6 +61,8 @@ export function EditProfileClient() {
       setUsername(profile.username || "");
       setHeadline(profile.headline || "");
       setGender((profile.gender as "MALE" | "FEMALE" | "OTHER") || "MALE");
+      setDob(profile.dob || "");
+      setIsDobPrivate(Boolean(profile.isDobPrivate));
       setCourse(profile.course || "");
       setBranch(profile.branch || "");
       setYear(profile.year || 1);
@@ -175,6 +179,8 @@ export function EditProfileClient() {
           username: username.trim().toLowerCase(),
           headline: headline.trim(),
           gender,
+          dob: dob ? dob : null,
+          isDobPrivate,
           course: course.trim(),
           branch: branch.trim(),
           year,
@@ -460,6 +466,35 @@ export function EditProfileClient() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Birthday / Date of Birth */}
+          <div className="space-y-2 pt-2 border-t border-border/40">
+            <div className="flex items-center justify-between">
+              <label htmlFor="edit-dob" className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                <Cake className="size-3.5 text-pink-500" /> Birthday / Date of Birth
+              </label>
+              <span className="text-[10px] text-muted-foreground">Used for campus birthday wishes</span>
+            </div>
+            <input
+              id="edit-dob"
+              type="date"
+              value={dob}
+              max={new Date().toISOString().split("T")[0]}
+              onChange={(e) => setDob(e.target.value)}
+              className="w-full rounded-xl border border-border/60 bg-muted/20 px-3.5 py-2 text-xs font-semibold text-foreground outline-none transition-all focus:border-primary focus:bg-background"
+            />
+            <label className="flex items-center gap-2 pt-1 text-xs text-muted-foreground cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={isDobPrivate}
+                onChange={(e) => setIsDobPrivate(e.target.checked)}
+                className="size-3.5 rounded border-border accent-primary cursor-pointer"
+              />
+              <span className="flex items-center gap-1">
+                <Lock className="size-3 text-muted-foreground" /> Keep birthday private (do not display in campus celebrations)
+              </span>
+            </label>
           </div>
         </div>
 

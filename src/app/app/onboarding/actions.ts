@@ -28,6 +28,8 @@ export async function completeOnboarding(formData: FormData) {
   const branch = (formData.get("branch") as string)?.trim() || null;
   const year = Number(formData.get("year")) || 1;
   const bio = (formData.get("bio") as string)?.trim() || null;
+  const dob = (formData.get("dob") as string)?.trim() || null;
+  const isDobPrivate = formData.get("isDobPrivate") === "true" || formData.get("isDobPrivate") === "on";
   const interestsRaw = (formData.get("interests") as string) || "[]";
   let interests: string[] = [];
   try {
@@ -103,6 +105,8 @@ export async function completeOnboarding(formData: FormData) {
         officialName,
         avatarUrl: cleanAvatarUrl,
         gender,
+        dob,
+        isDobPrivate,
         course,
         branch,
         year,
@@ -121,6 +125,8 @@ export async function completeOnboarding(formData: FormData) {
           displayName: displayName.trim(),
           avatarUrl: cleanAvatarUrl,
           gender,
+          dob,
+          isDobPrivate,
           course,
           branch,
           year,

@@ -11,6 +11,8 @@ export interface UserProfileData {
   headline?: string | null;
   photos?: string[];
   gender: string | null;
+  dob?: string | null;
+  isDobPrivate?: boolean;
   course: string | null;
   branch: string | null;
   year: number | null;

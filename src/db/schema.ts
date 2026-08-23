@@ -127,6 +127,8 @@ export const userProfiles = pgTable(
 		year: integer("year"),
 		bio: text("bio"),
 		gender: text("gender").default("MALE"),
+		dob: text("dob"), // Format: YYYY-MM-DD
+		isDobPrivate: boolean("is_dob_private").default(false).notNull(),
 		interests: jsonb("interests").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
 		photos: jsonb("photos").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
 		datingPreferences: jsonb("dating_preferences").$type<{

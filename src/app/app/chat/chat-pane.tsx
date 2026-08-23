@@ -82,6 +82,8 @@ export function ChatPane({
         role: "STUDENT",
         status: "ACTIVE",
         gender: "ALL",
+        dob: null,
+        isDobPrivate: false,
         datingPreferences: null,
         referralCount: 0,
         referredById: null,

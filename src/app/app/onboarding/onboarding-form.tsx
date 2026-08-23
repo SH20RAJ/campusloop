@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { completeOnboarding } from "./actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sparkles, User, ShieldCheck, Check, AlertCircle, Upload, Loader2, GraduationCap, Tag } from "lucide-react";
+import { Sparkles, User, ShieldCheck, Check, AlertCircle, Upload, Loader2, GraduationCap, Tag, Cake, Lock } from "lucide-react";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { DEGREE_CATEGORIES, getBranchesForDegree } from "@/lib/academic-constants";
@@ -43,6 +43,8 @@ export function OnboardingForm({
   const [year, setYear] = useState(1);
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
+  const [dob, setDob] = useState("");
+  const [isDobPrivate, setIsDobPrivate] = useState(false);
   const [interests, setInterests] = useState<string[]>(["Tech & Coding 💻", "Hostel Life 🏢"]);
   const [isUploadingPfp, setIsUploadingPfp] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,6 +115,8 @@ export function OnboardingForm({
     formData.set("displayName", displayName.trim());
     formData.set("username", username.trim().toLowerCase());
     formData.set("gender", gender);
+    formData.set("dob", dob);
+    formData.set("isDobPrivate", String(isDobPrivate));
     formData.set("course", course.trim());
     formData.set("branch", branch.trim());
     formData.set("year", String(year));
@@ -257,6 +261,37 @@ export function OnboardingForm({
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Birthday / Date of Birth */}
+      <div className="space-y-2 rounded-2xl border border-border/60 bg-muted/20 p-4">
+        <div className="flex items-center justify-between">
+          <label htmlFor="dob" className="text-xs font-bold text-foreground flex items-center gap-1.5">
+            <Cake className="size-4 text-pink-500" /> Date of Birth (DOB)
+          </label>
+          <span className="text-[10px] text-muted-foreground font-medium">Optional</span>
+        </div>
+
+        <input
+          id="dob"
+          type="date"
+          value={dob}
+          max={new Date().toISOString().split("T")[0]}
+          onChange={(e) => setDob(e.target.value)}
+          className="w-full rounded-xl border border-border/60 bg-card px-3 py-2 text-xs font-semibold text-foreground focus:border-primary outline-none"
+        />
+
+        <label className="flex items-center gap-2 pt-1 text-xs text-muted-foreground cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={isDobPrivate}
+            onChange={(e) => setIsDobPrivate(e.target.checked)}
+            className="size-3.5 rounded border-border accent-primary cursor-pointer"
+          />
+          <span className="flex items-center gap-1">
+            <Lock className="size-3 text-muted-foreground" /> Keep my birthday private (hide from campus birthday calendar)
+          </span>
+        </label>
       </div>
 
       {/* Degree, Branch & Year Catalog */}

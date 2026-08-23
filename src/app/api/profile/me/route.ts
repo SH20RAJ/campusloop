@@ -53,6 +53,8 @@ export async function PATCH(req: Request) {
       displayName?: string;
       username?: string;
       gender?: string;
+      dob?: string | null;
+      isDobPrivate?: boolean;
       course?: string;
       branch?: string;
       year?: number;
@@ -65,6 +67,14 @@ export async function PATCH(req: Request) {
     };
 
     const updateData: Partial<typeof userProfiles.$inferInsert> = {};
+
+    if (body.dob !== undefined) {
+      updateData.dob = body.dob ? body.dob.trim() : null;
+    }
+
+    if (body.isDobPrivate !== undefined) {
+      updateData.isDobPrivate = Boolean(body.isDobPrivate);
+    }
 
     if (body.displayName !== undefined) {
       const val = validateDisplayName(body.displayName);

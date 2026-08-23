@@ -6,7 +6,6 @@ import {
   School,
   Globe,
   AlertTriangle,
-  ArrowRight,
   Users,
   ChevronDown,
   Image as ImageIcon,
@@ -15,7 +14,8 @@ import {
   Lock,
   BarChart3,
   HelpCircle,
-  FileText,
+  VenetianMask,
+  Check,
 } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -30,13 +30,6 @@ import { uploadImageToImgBB } from "@/lib/upload";
 
 export type PostType = "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
 
-const POST_TYPES: { id: PostType; label: string; icon: typeof FileText; color: string }[] = [
-  { id: "NORMAL", label: "Post", icon: FileText, color: "text-foreground" },
-  { id: "CONFESSION", label: "Confession", icon: Lock, color: "text-pink-500" },
-  { id: "POLL", label: "Poll", icon: BarChart3, color: "text-blue-500" },
-  { id: "QUESTION", label: "Question", icon: HelpCircle, color: "text-orange-500" },
-];
-
 const TRENDING_TAGS = ["#LateNightTea", "#Confessions", "#CanteenGossip", "#ExamStress", "#LibraryVibes", "#HostelLife"];
 const MAX_CHARS = 2000;
 
@@ -45,15 +38,14 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Composer State - Global by default
   const [postType, setPostType] = useState<PostType>("NORMAL");
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
+  const [showAudienceMenu, setShowAudienceMenu] = useState(false);
   const [selectedCommunityId, setSelectedCommunityId] = useState<string>(initialCommunityId || "NONE");
   const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [charCount, setCharCount] = useState(0);
 
-  // Image Upload State
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -61,13 +53,15 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const { communities } = useCommunities();
   const { profile } = useProfile();
 
+  const firstName = profile?.displayName?.split(" ")[0];
+
   const editor = useEditor({
     extensions: [StarterKit],
     content: "",
     editorProps: {
       attributes: {
         class:
-          "w-full min-h-[160px] sm:min-h-[190px] px-4 py-3 text-sm leading-relaxed outline-none prose prose-sm dark:prose-invert max-w-none placeholder:text-muted-foreground/40",
+          "w-full min-h-[140px] sm:min-h-[170px] px-4 py-3 text-base leading-relaxed outline-none prose prose-base dark:prose-invert max-w-none",
       },
     },
     onUpdate: ({ editor }) => setCharCount(editor.getText().length),
@@ -179,12 +173,75 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     editor?.commands.insertContent(`${tag} `);
   }
 
+  function openFilePicker() {
+    fileInputRef.current?.click();
+  }
+
   const isConfession = postType === "CONFESSION";
+  const anonActive = isAnonymous || isConfession;
   const overLimit = charCount > MAX_CHARS;
   const progressPercent = Math.min((charCount / MAX_CHARS) * 100, 100);
 
+  const addOns: {
+    id: string;
+    label: string;
+    icon: typeof ImageIcon;
+    color: string;
+    active: boolean;
+    onClick: () => void;
+    disabled?: boolean;
+  }[] = [
+    {
+      id: "photo",
+      label: "Photo",
+      icon: ImageIcon,
+      color: "text-emerald-500",
+      active: uploadedImages.length > 0,
+      onClick: openFilePicker,
+      disabled: isUploadingImage,
+    },
+    {
+      id: "poll",
+      label: "Poll",
+      icon: BarChart3,
+      color: "text-blue-500",
+      active: postType === "POLL",
+      onClick: () => setPostType((t) => (t === "POLL" ? "NORMAL" : "POLL")),
+    },
+    {
+      id: "question",
+      label: "Question",
+      icon: HelpCircle,
+      color: "text-orange-500",
+      active: postType === "QUESTION",
+      onClick: () => setPostType((t) => (t === "QUESTION" ? "NORMAL" : "QUESTION")),
+    },
+    {
+      id: "confession",
+      label: "Confession",
+      icon: Lock,
+      color: "text-pink-500",
+      active: isConfession,
+      onClick: () => {
+        setPostType((t) => (t === "CONFESSION" ? "NORMAL" : "CONFESSION"));
+        setIsAnonymous(true);
+      },
+    },
+    {
+      id: "anon",
+      label: "Anonymous",
+      icon: VenetianMask,
+      color: "text-violet-500",
+      active: anonActive,
+      onClick: () => {
+        if (!isConfession) setIsAnonymous((a) => !a);
+      },
+      disabled: isConfession,
+    },
+  ];
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 select-none">
+    <form onSubmit={handleSubmit} className="space-y-3 select-none">
       {/* Hidden image file input */}
       <input
         ref={fileInputRef}
@@ -194,142 +251,148 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         onChange={handleImageFileChange}
       />
 
-      {/* ─── Minimal Composer Shell ─── */}
+      {/* ─── Create Post Card (Facebook-style) ─── */}
       <div className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-xs">
-        {/* Top Minimal Bar: Profile + Scope Segment */}
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border/50 bg-muted/20">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <Avatar className="size-8 shrink-0 border border-border/60">
-              <AvatarImage src={profile?.avatarUrl || ""} />
-              <AvatarFallback className="text-[10px] font-bold">
-                {profile?.displayName?.[0] || "U"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-bold text-foreground">
-                {isAnonymous || isConfession ? "Anonymous Student" : profile?.displayName || "Student"}
-              </p>
-              <p className="text-[10px] text-muted-foreground truncate">
-                {profile?.institution?.name?.split(",")[0] || "Campus"}
-              </p>
-            </div>
-          </div>
+        {/* Identity row: avatar + name + audience pill */}
+        <div className="flex items-start gap-3 px-4 pt-4">
+          <Avatar
+            className={cn(
+              "size-10 shrink-0 border transition-all",
+              anonActive ? "border-violet-500/60 opacity-80 grayscale" : "border-border/60"
+            )}
+          >
+            <AvatarImage src={anonActive ? "" : profile?.avatarUrl || ""} />
+            <AvatarFallback className="text-xs font-bold">
+              {anonActive ? "🎭" : profile?.displayName?.[0] || "U"}
+            </AvatarFallback>
+          </Avatar>
 
-          {/* Scope Segment: Global by Default */}
-          <div className="flex shrink-0 rounded-xl bg-muted/60 p-0.5 text-[10px] font-bold border border-border/50">
-            <button
-              type="button"
-              onClick={() => setScope("GLOBAL")}
-              className={cn(
-                "flex items-center gap-1 rounded-lg px-2.5 py-1 transition-all cursor-pointer",
-                scope === "GLOBAL" ? "bg-background text-primary shadow-2xs font-black" : "text-muted-foreground hover:text-foreground"
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-foreground">
+              {anonActive ? "Anonymous Student" : profile?.displayName || "Student"}
+            </p>
+
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              {/* Audience pill w/ dropdown (FB privacy-selector style) */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowAudienceMenu((s) => !s)}
+                  className="flex items-center gap-1 rounded-lg bg-muted/70 px-2 py-1 text-[11px] font-bold text-foreground transition-colors hover:bg-muted cursor-pointer"
+                >
+                  {scope === "GLOBAL" ? <Globe className="size-3" /> : <School className="size-3" />}
+                  {scope === "GLOBAL" ? "All Colleges" : "My College"}
+                  <ChevronDown className="size-3 text-muted-foreground" />
+                </button>
+
+                {showAudienceMenu && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setShowAudienceMenu(false)} />
+                    <div className="absolute left-0 top-8 z-40 w-56 rounded-2xl border border-border bg-card p-1.5 shadow-xl">
+                      {(
+                        [
+                          {
+                            id: "GLOBAL" as const,
+                            icon: Globe,
+                            label: "All Colleges",
+                            desc: "Every campus across India",
+                          },
+                          {
+                            id: "CAMPUS" as const,
+                            icon: School,
+                            label: "My College",
+                            desc: profile?.institution?.name?.split(",")[0] || "Only your campus",
+                          },
+                        ]
+                      ).map((opt) => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            setScope(opt.id);
+                            setShowAudienceMenu(false);
+                          }}
+                          className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-colors hover:bg-muted cursor-pointer"
+                        >
+                          <opt.icon className="size-4 shrink-0 text-muted-foreground" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-xs font-bold text-foreground">{opt.label}</span>
+                            <span className="block truncate text-[10px] text-muted-foreground">{opt.desc}</span>
+                          </span>
+                          {scope === opt.id && <Check className="size-3.5 shrink-0 text-primary" />}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Community pill */}
+              {communities && communities.length > 0 && (
+                <div className="relative flex items-center">
+                  <Users className="pointer-events-none absolute left-2 size-3 text-muted-foreground" />
+                  <select
+                    value={selectedCommunityId}
+                    onChange={(e) => setSelectedCommunityId(e.target.value)}
+                    className="appearance-none rounded-lg bg-muted/70 py-1 pl-6.5 pr-6 text-[11px] font-bold text-foreground outline-none transition-colors hover:bg-muted cursor-pointer max-w-40 truncate"
+                  >
+                    <option value="NONE">Main Feed</option>
+                    {communities.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        c/{c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-1.5 size-3 text-muted-foreground" />
+                </div>
               )}
-            >
-              <Globe className="size-3" /> Global
-            </button>
-            <button
-              type="button"
-              onClick={() => setScope("CAMPUS")}
-              className={cn(
-                "flex items-center gap-1 rounded-lg px-2.5 py-1 transition-all cursor-pointer",
-                scope === "CAMPUS" ? "bg-background text-primary shadow-2xs font-black" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <School className="size-3" /> My College
-            </button>
+            </div>
           </div>
         </div>
 
-        {/* Post Type Selector Pills */}
-        <div className="flex items-center gap-1.5 px-4 pt-3 overflow-x-auto no-scrollbar">
-          {POST_TYPES.map((type) => {
-            const Icon = type.icon;
-            const isSelected = postType === type.id;
-            return (
-              <button
-                key={type.id}
-                type="button"
-                onClick={() => {
-                  setPostType(type.id);
-                  if (type.id === "CONFESSION") setIsAnonymous(true);
-                }}
+        {/* Big borderless editor */}
+        <div className="relative">
+          {charCount === 0 && (
+            <span className="pointer-events-none absolute left-4 top-3 text-base text-muted-foreground/50">
+              {isConfession
+                ? "Confess it. Nobody will ever know it's you... 🤫"
+                : postType === "QUESTION"
+                ? "Ask your campus anything..."
+                : postType === "POLL"
+                ? "What should the campus vote on?"
+                : `What's on your mind${firstName ? `, ${firstName}` : ""}?`}
+            </span>
+          )}
+          <EditorContent editor={editor} />
+        </div>
+
+        {/* Image attachments — FB-style large grid */}
+        {uploadedImages.length > 0 && (
+          <div className={cn("gap-1.5 px-4 pb-3", uploadedImages.length === 1 ? "flex" : "grid grid-cols-2")}>
+            {uploadedImages.map((imgUrl, i) => (
+              <div
+                key={i}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border shrink-0",
-                  isSelected
-                    ? "bg-primary/10 text-primary border-primary/30 shadow-2xs"
-                    : "bg-muted/20 text-muted-foreground border-border/60 hover:text-foreground"
+                  "group relative overflow-hidden rounded-2xl border border-border",
+                  uploadedImages.length === 1 ? "max-h-80 w-full" : "aspect-square"
                 )}
               >
-                <Icon className={cn("size-3.5", type.color)} />
-                <span>{type.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Sub-Hub Selector (Optional) */}
-        {communities && communities.length > 0 && (
-          <div className="px-4 pt-2.5">
-            <div className="relative flex items-center">
-              <Users className="pointer-events-none absolute left-3 size-3 text-muted-foreground" />
-              <select
-                value={selectedCommunityId}
-                onChange={(e) => setSelectedCommunityId(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-border/60 bg-muted/20 py-2 pl-8 pr-8 text-xs font-semibold text-foreground outline-none hover:bg-muted/40 transition-colors"
-              >
-                <option value="NONE">General Campus Feed</option>
-                {communities.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    c/{c.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-3 size-3.5 text-muted-foreground" />
-            </div>
-          </div>
-        )}
-
-        {/* Formatting Toolbar */}
-        <div className="px-4 pt-3 flex items-center justify-between gap-2">
-          <PostComposerToolbar editor={editor} />
-
-          <button
-            type="button"
-            disabled={isUploadingImage}
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-border/70 bg-muted/30 text-xs font-bold text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
-          >
-            {isUploadingImage ? (
-              <Loader2 className="size-3.5 animate-spin text-primary" />
-            ) : (
-              <ImageIcon className="size-3.5 text-rose-500" />
-            )}
-            <span>Photo</span>
-          </button>
-        </div>
-
-        {/* Editor Body */}
-        <EditorContent editor={editor} />
-
-        {/* Image Attachments */}
-        {uploadedImages.length > 0 && (
-          <div className="px-4 pb-3 flex flex-wrap gap-2">
-            {uploadedImages.map((imgUrl, i) => (
-              <div key={i} className="relative rounded-2xl overflow-hidden border border-border size-20 shadow-xs">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={imgUrl} alt="Attached" className="size-full object-cover" />
                 <button
                   type="button"
                   onClick={() => handleRemoveImage(i)}
-                  className="absolute top-1 right-1 size-5 rounded-full bg-black/75 text-white flex items-center justify-center cursor-pointer hover:bg-destructive"
+                  className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-full bg-black/70 text-white backdrop-blur-sm transition-colors hover:bg-destructive cursor-pointer"
+                  aria-label="Remove image"
                 >
-                  <X className="size-3" />
+                  <X className="size-3.5" />
                 </button>
               </div>
             ))}
           </div>
         )}
 
-        {/* Poll Options (If selected) */}
+        {/* Poll options */}
         {postType === "POLL" && (
           <div className="px-4 pb-3">
             <PollOptionsEditor
@@ -341,74 +404,98 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
           </div>
         )}
 
-        {/* Hashtags Strip */}
-        <div className="flex items-center gap-1.5 px-4 py-2.5 border-t border-border/40 bg-muted/10 overflow-x-auto no-scrollbar text-xs">
-          <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0">Tags:</span>
-          {TRENDING_TAGS.map((tag) => (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => insertTag(tag)}
-              className="text-[11px] font-semibold text-muted-foreground hover:text-primary transition-colors cursor-pointer shrink-0"
-            >
-              {tag}
-            </button>
-          ))}
+        {/* Formatting + trending tags strip */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-border/40 px-4 py-2">
+          <PostComposerToolbar editor={editor} />
+          <div className="flex items-center gap-1.5">
+            {TRENDING_TAGS.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => insertTag(tag)}
+                className="shrink-0 text-[11px] font-semibold text-primary/80 transition-colors hover:text-primary cursor-pointer"
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Anonymity Switch + Meter */}
-        <div className="flex items-center justify-between px-4 py-3 border-t border-border/40 bg-muted/20 text-xs">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={isAnonymous || isConfession}
-              disabled={isConfession}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="size-4 rounded accent-primary cursor-pointer"
-            />
-            <span className="font-bold text-foreground">Post Anonymously</span>
-          </label>
+        {/* "Add to your post" row (FB-style) */}
+        <div className="mx-4 mb-3 mt-1 flex items-center justify-between rounded-2xl border border-border/70 px-3 py-2">
+          <span className="hidden text-xs font-bold text-foreground sm:block">Add to your post</span>
+          <div className="flex flex-1 items-center justify-around gap-1 sm:flex-none sm:justify-end sm:gap-0.5">
+            {addOns.map((addon) => (
+              <button
+                key={addon.id}
+                type="button"
+                disabled={addon.disabled}
+                onClick={addon.onClick}
+                title={addon.label}
+                className={cn(
+                  "flex size-9 items-center justify-center rounded-full transition-all cursor-pointer active:scale-90 disabled:cursor-not-allowed disabled:opacity-40",
+                  addon.active ? "bg-muted ring-1 ring-border" : "hover:bg-muted/60"
+                )}
+              >
+                {addon.id === "photo" && isUploadingImage ? (
+                  <Loader2 className="size-5 animate-spin text-primary" />
+                ) : (
+                  <addon.icon className={cn("size-5", addon.color)} />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
 
-          <div className="flex items-center gap-2">
-            <div className="h-1.5 w-16 bg-muted rounded-full overflow-hidden">
+        {/* Char meter (only when close to limit) */}
+        {charCount > MAX_CHARS - 400 && (
+          <div className="flex items-center justify-end gap-2 px-4 pb-2 text-xs">
+            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
               <div
                 className={cn("h-full rounded-full transition-all", overLimit ? "bg-destructive" : "bg-primary")}
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className={cn("text-[10px] font-mono font-bold", overLimit ? "text-destructive" : "text-muted-foreground")}>
+            <span className={cn("font-mono text-[10px] font-bold", overLimit ? "text-destructive" : "text-muted-foreground")}>
               {charCount}/{MAX_CHARS}
             </span>
           </div>
+        )}
+
+        {/* Anonymity hint */}
+        {anonActive && (
+          <div className="mx-4 mb-3 flex items-center gap-2 rounded-2xl border border-violet-500/20 bg-violet-500/5 px-3 py-2 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+            <VenetianMask className="size-4 shrink-0" />
+            Your identity is sealed — this will show as “Anonymous Student”.
+          </div>
+        )}
+
+        {/* Submit */}
+        <div className="border-t border-border/40 p-3">
+          <button
+            type="submit"
+            disabled={isLoading || overLimit || isUploadingImage || charCount === 0}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/95 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                <span>Publishing...</span>
+              </>
+            ) : (
+              <span>{isConfession ? "Confess Anonymously" : "Post"} · +5 LP</span>
+            )}
+          </button>
         </div>
       </div>
 
-      {/* Error Notice */}
+      {/* Error notice */}
       {error && (
-        <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-bold text-destructive flex items-center gap-2">
+        <div className="flex items-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-bold text-destructive">
           <AlertTriangle className="size-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
-
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isLoading || overLimit || isUploadingImage}
-        className="w-full h-11 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/95 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="size-4 animate-spin" />
-            <span>Publishing...</span>
-          </>
-        ) : (
-          <>
-            <span>Publish Post (+5 LP)</span>
-            <ArrowRight className="size-4" />
-          </>
-        )}
-      </button>
     </form>
   );
 }

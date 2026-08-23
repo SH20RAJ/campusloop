@@ -7,9 +7,11 @@ import { Metadata } from "next";
 import { ProfileClientView } from "../app/(main)/profile/profile-client";
 import { Navigation } from "@/components/ui/navigation";
 import Link from "next/link";
-import { Lock, School } from "lucide-react";
+import { Lock, School, Sparkles, ShieldCheck, ArrowRight, Flame } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedPost } from "@/hooks/use-feed";
+import { getCloutTier } from "@/lib/gamification";
+import { getBranchIcon, slugifyBranch } from "@/lib/academic-constants";
 
 interface VanityProfileProps {
   params: Promise<{ username: string }>;
@@ -161,7 +163,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
             isAdmin={currentProfile.role === "ADMIN"} 
           />
 
-          <div className="flex md:pl-64 min-h-screen">
+          <div className="flex md:pl-60 min-h-screen">
             <main className="flex-1 w-full max-w-2xl px-0 py-0 pb-28 md:pb-0 mx-auto min-h-screen">
               <ProfileClientView
                 profile={profile}
@@ -176,84 +178,116 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
     }
   }
 
-  // If not authenticated, render beautiful read-only teaser page for high virality conversion!
-  const ratingBadge = profile.points >= 500 ? "Campus Legend" : profile.points >= 200 ? "Campus Talker" : "Loop Starter";
-  const badgeColor = profile.points >= 500 ? "border-rose-500 bg-rose-500/5 text-rose-500" : profile.points >= 200 ? "border-violet-500 bg-violet-500/5 text-violet-500" : "border-primary/20 bg-primary/5 text-primary";
+  // If not authenticated, render soft minimal public card
+  const tier = getCloutTier(profile.points || 0);
+  const branchIcon = getBranchIcon(profile.branch || profile.course);
+  const branchSlug = profile.branch ? slugifyBranch(profile.branch) : null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground bg-grid-pattern relative overflow-x-hidden pb-12">
-      {/* Header */}
-      <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/70 px-6 backdrop-blur-md">
+    <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden pb-16 select-none">
+      {/* Top Floating Glass Header */}
+      <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/80 px-6 backdrop-blur-xl">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
+          <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
             <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
           </div>
-          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-extrabold tracking-tight text-transparent">
+          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-black tracking-tight text-transparent">
             CampusLoop
           </span>
         </Link>
         <Link href="/join">
           <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
-            Join CampusLoop
+            Join Campus
           </button>
         </Link>
       </header>
 
-      {/* Main Teaser Container */}
-      <main className="flex-1 w-full max-w-xl px-4 pt-28 mx-auto space-y-6">
-        <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xl space-y-6">
+      {/* Main Container */}
+      <main className="flex-1 w-full max-w-lg px-4 pt-24 mx-auto space-y-5">
+        <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-b from-card via-card to-muted/20 p-6 shadow-xl space-y-5">
           <div className="flex flex-col items-center text-center space-y-3">
-            <Avatar className="h-24 w-24 border-4 border-background shadow-xl">
-              <AvatarImage src={profile.avatarUrl || ""} />
-              <AvatarFallback className="text-3xl bg-primary/10 text-primary font-bold">
-                {profile.displayName[0]}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="space-y-1">
-              <h2 className="text-xl font-black tracking-tight text-foreground">
-                {profile.displayName}
-              </h2>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold justify-center">
-                <span>@{profile.username}</span>
-                <span className="text-muted-foreground/45">•</span>
-                <span className={`inline-flex items-center gap-1 text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${badgeColor}`}>
-                  {ratingBadge}
+            <div className="relative">
+              <Avatar className="size-24 border-3 border-background shadow-2xl">
+                <AvatarImage src={profile.avatarUrl || ""} />
+                <AvatarFallback className="text-3xl bg-primary/10 text-primary font-black">
+                  {profile.displayName[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              {(profile.points || 0) >= 150 && (
+                <span className="absolute -bottom-1 -right-1 size-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md text-xs font-black border-2 border-background">
+                  ✓
                 </span>
-              </div>
-              <p className="text-xs text-primary font-semibold flex items-center justify-center gap-1.5 mt-1">
-                <School className="h-3.5 w-3.5" /> {profile.institution?.name || "Verified Student"}
-              </p>
+              )}
             </div>
 
+            <div className="space-y-1">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
+                {profile.displayName}
+              </h2>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground font-semibold justify-center">
+                <span>@{profile.username}</span>
+                <span>•</span>
+                <span className="inline-flex items-center gap-1 text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                  <Flame className="size-3 text-rose-500" /> {tier.tierName} · {profile.points || 0} LP
+                </span>
+              </div>
+
+              {profile.institution && (
+                <p className="text-xs text-primary font-bold flex items-center justify-center gap-1.5 pt-1">
+                  <School className="size-3.5" /> {profile.institution.name.split(",")[0]}
+                </p>
+              )}
+            </div>
+
+            {/* Academic Badges */}
+            {(profile.course || profile.branch || profile.year) && (
+              <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                {profile.branch && (
+                  <span className="text-[11px] font-bold bg-primary/10 border border-primary/20 text-primary px-2.5 py-0.5 rounded-lg">
+                    {branchIcon} {profile.branch}
+                  </span>
+                )}
+                {profile.course && (
+                  <span className="text-[11px] font-bold bg-muted/60 border border-border px-2.5 py-0.5 rounded-lg text-foreground">
+                    🎓 {profile.course}
+                  </span>
+                )}
+                {profile.year && (
+                  <span className="text-[11px] font-bold bg-muted/60 border border-border px-2.5 py-0.5 rounded-lg text-muted-foreground">
+                    📅 Year {profile.year}
+                  </span>
+                )}
+              </div>
+            )}
+
             {profile.bio && (
-              <p className="text-xs text-foreground/80 font-medium italic max-w-sm pt-2">
-                "{profile.bio}"
+              <p className="text-xs text-foreground/90 font-medium italic max-w-sm pt-1 leading-relaxed">
+                &ldquo;{profile.bio}&rdquo;
               </p>
             )}
           </div>
         </div>
 
-        {/* Locked CTA view */}
-        <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center space-y-4 shadow-sm">
-          <div className="h-10 w-10 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto">
-            <Lock className="h-5 w-5" />
+        {/* Locked Teaser CTA */}
+        <div className="rounded-3xl border border-dashed border-border/80 bg-card/60 p-6 text-center space-y-4 shadow-sm">
+          <div className="size-11 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto border border-primary/20">
+            <Lock className="size-5" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm font-bold text-foreground">View Posts & Chat with @{profile.username}</h3>
+            <h3 className="text-sm font-bold text-foreground">Connect with @{profile.username} on CampusLoop</h3>
             <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
-              Sign up with your college email to verify your identity, interact with posts, and swipe to match.
+              Verify your student email to join your campus feed, swipe matches, and private message fellow classmates.
             </p>
           </div>
-          <div className="flex gap-3 justify-center pt-2">
+          <div className="flex gap-2.5 justify-center pt-1">
             <Link href="/join?mode=signin">
-              <button className="rounded-xl border border-input h-9 px-4.5 text-xs font-bold hover:bg-muted text-foreground transition-all cursor-pointer">
+              <button className="rounded-xl border border-input h-9 px-4 text-xs font-bold hover:bg-muted text-foreground transition-all cursor-pointer">
                 Sign In
               </button>
             </Link>
             <Link href="/join?mode=signup">
-              <button className="rounded-xl bg-primary h-9 px-4.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
-                Create Account
+              <button className="rounded-xl bg-primary h-9 px-4 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
+                Verify & Join
               </button>
             </Link>
           </div>

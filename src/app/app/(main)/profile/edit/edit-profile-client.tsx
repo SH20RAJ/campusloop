@@ -392,32 +392,75 @@ export function EditProfileClient() {
           </div>
         </div>
 
-        {/* ─── Academic Info ─── */}
+        {/* ─── Academic Info with Presets ─── */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
           <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
             <ShieldCheck className="size-3.5 text-blue-500" /> Academic & Campus Info
           </h3>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground">Course</label>
+              <label className="text-xs font-semibold text-muted-foreground">Degree / Course</label>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 pb-1">
+                {["B.Tech", "B.Arch", "MCA", "MBA", "MBBS", "BBA", "B.Com", "BCA", "PhD", "M.Tech"].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setCourse(c)}
+                    className={`py-1.5 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer truncate ${
+                      course === c
+                        ? "border-primary bg-primary/10 text-primary shadow-xs"
+                        : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
               <input
                 type="text"
                 value={course}
                 onChange={(e) => setCourse(e.target.value)}
-                placeholder="B.Tech, MBA, MBBS..."
-                className="w-full rounded-xl border border-border/60 bg-muted/20 px-3.5 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary"
+                placeholder="Or type custom course (e.g. B.Arch, MCA, PhD Physics)..."
+                className="w-full rounded-xl border border-border/60 bg-muted/20 px-3.5 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary focus:bg-background transition-all"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground">Branch / Dept</label>
+              <label className="text-xs font-semibold text-muted-foreground">Department / Branch</label>
+              <div className="flex flex-wrap gap-1.5 pb-1">
+                {[
+                  "Computer Science & Engineering",
+                  "Architecture & Urban Planning",
+                  "AI & Data Science",
+                  "Electronics & Communication (ECE)",
+                  "Mechanical Engineering",
+                  "Civil Engineering",
+                  "Business Administration (MBA)",
+                  "Computer Applications (MCA)",
+                  "Medicine & Surgery (MBBS)",
+                  "Design & UI/UX",
+                ].map((b) => (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() => setBranch(b)}
+                    className={`py-1 px-2.5 rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
+                      branch === b
+                        ? "border-primary bg-primary/10 text-primary shadow-xs"
+                        : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
               <input
                 type="text"
                 value={branch}
                 onChange={(e) => setBranch(e.target.value)}
-                placeholder="CSE, ECE, Finance..."
-                className="w-full rounded-xl border border-border/60 bg-muted/20 px-3.5 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary"
+                placeholder="Or type custom branch/major..."
+                className="w-full rounded-xl border border-border/60 bg-muted/20 px-3.5 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary focus:bg-background transition-all"
               />
             </div>
           </div>
@@ -427,11 +470,11 @@ export function EditProfileClient() {
             <select
               value={year}
               onChange={(e) => setYear(Number(e.target.value))}
-              className="w-full rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary"
+              className="w-full rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary cursor-pointer"
             >
               {[1, 2, 3, 4, 5].map((y) => (
                 <option key={y} value={y}>
-                  Year {y} Student
+                  Year {y} Student {y === 1 ? "(Fresher)" : y >= 4 ? "(Senior/Final)" : ""}
                 </option>
               ))}
             </select>

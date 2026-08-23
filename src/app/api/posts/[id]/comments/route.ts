@@ -63,7 +63,11 @@ export async function POST(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
 
-    const { body, isAnonymous, parentId } = (await req.json()) as { body: string; isAnonymous?: boolean; parentId?: string };
+    const { body, isAnonymous, parentId } = (await req.json()) as {
+      body: string;
+      isAnonymous?: boolean;
+      parentId?: string;
+    };
 
     if (!body || body.trim().length === 0) {
       return NextResponse.json({ error: "Comment cannot be empty" }, { status: 400 });
@@ -79,71 +83,90 @@ export async function POST(req: Request, { params }: RouteParams) {
 
     const anonymous = Boolean(isAnonymous);
     const commentId = randomUUID();
+    let anonHandle: string | null = null;
 
-    const [newComment] = await db.transaction(async (tx) => {
-      const inserted = await tx
-        .insert(comments)
-        .values({
-          id: commentId,
-          postId: id,
-          authorId: anonymous ? null : profile.id,
-          pseudonym: anonymous ? deriveAnonHandle(profile.id) : null,
-          parentId: parentId || null,
-          body,
-          isAnonymous: anonymous,
-          status: safety.status,
-        })
-        .returning();
+    if (anonymous) {
+      try {
+        anonHandle = deriveAnonHandle(profile.id);
+      } catch (err) {
+        console.warn("Anonymity hashing fallback:", err);
+        anonHandle = `anon_${profile.id.slice(0, 8)}`;
+      }
+    }
 
-      if (anonymous) {
-        await tx
+    // Direct sequential insert (no nested db.transaction which breaks in Neon HTTP driver)
+    const [newComment] = await db
+      .insert(comments)
+      .values({
+        id: commentId,
+        postId: id,
+        authorId: anonymous ? null : profile.id,
+        pseudonym: anonHandle,
+        parentId: parentId || null,
+        body: body.trim(),
+        isAnonymous: anonymous,
+        status: safety.status,
+      })
+      .returning();
+
+    if (anonymous && anonHandle) {
+      try {
+        await db
           .insert(anonIdentityVault)
           .values({
-            handle: deriveAnonHandle(profile.id),
+            handle: anonHandle,
             sealedIdentity: sealIdentity(profile.id),
           })
           .onConflictDoNothing({ target: anonIdentityVault.handle });
+      } catch (err) {
+        console.warn("Anon vault insert warning:", err);
       }
+    }
 
-      return inserted;
-    });
+    // Award +2 Loop Points safely
+    try {
+      await db
+        .update(userProfiles)
+        .set({ points: (profile.points || 0) + 2 })
+        .where(eq(userProfiles.id, profile.id));
+    } catch (err) {
+      console.warn("Points update warning:", err);
+    }
 
-    // Award +2 points
-    await db.update(userProfiles)
-      .set({ points: (profile.points || 0) + 2 })
-      .where(eq(userProfiles.id, profile.id));
-
-    // Trigger notification. Never notify anonymous authors — the notification
-    // system has no way to address them without deanonymizing them.
-    if (parentId) {
-      const parentComment = await db.query.comments.findFirst({
-        where: eq(comments.id, parentId),
-      });
-      if (parentComment && parentComment.authorId && parentComment.authorId !== profile.id) {
-        await db.insert(notifications).values({
-          userId: parentComment.authorId,
-          type: "REPLY",
-          actorId: profile.id,
-          referenceId: id,
+    // Trigger in-app notification safely without blocking the comment response
+    try {
+      if (parentId) {
+        const parentComment = await db.query.comments.findFirst({
+          where: eq(comments.id, parentId),
         });
-      }
-    } else {
-      const targetPost = await db.query.posts.findFirst({
-        where: eq(posts.id, id),
-      });
-      if (targetPost && targetPost.authorId && targetPost.authorId !== profile.id) {
-        await db.insert(notifications).values({
-          userId: targetPost.authorId,
-          type: "COMMENT",
-          actorId: profile.id,
-          referenceId: id,
+        if (parentComment && parentComment.authorId && parentComment.authorId !== profile.id) {
+          await db.insert(notifications).values({
+            userId: parentComment.authorId,
+            type: "REPLY",
+            actorId: profile.id,
+            referenceId: id,
+          });
+        }
+      } else {
+        const targetPost = await db.query.posts.findFirst({
+          where: eq(posts.id, id),
         });
+        if (targetPost && targetPost.authorId && targetPost.authorId !== profile.id) {
+          await db.insert(notifications).values({
+            userId: targetPost.authorId,
+            type: "COMMENT",
+            actorId: profile.id,
+            referenceId: id,
+          });
+        }
       }
+    } catch (notifErr) {
+      console.warn("Notification insert warning:", notifErr);
     }
 
     return NextResponse.json(newComment, { status: 201 });
   } catch (error) {
     console.error("Error creating comment:", error);
-    return NextResponse.json({ error: "Failed to create comment" }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Failed to create comment" }, { status: 500 });
   }
 }

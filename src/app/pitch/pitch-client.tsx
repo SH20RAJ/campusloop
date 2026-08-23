@@ -3,78 +3,144 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
-  Sparkles,
   TrendingUp,
-  DollarSign,
-
-  ChevronRight,
-  ChevronLeft,
-
-  Layers,
   ExternalLink,
   BookOpen,
-
-  CheckCircle2,
+  ShieldCheck,
+  Layers,
+  MessagesSquare,
+  HeartHandshake,
+  Store,
+  Trophy,
+  Megaphone,
+  Ticket,
+  ShoppingBag,
+  BriefcaseBusiness,
+  Flame,
+  Ban,
+  Split,
+  EyeOff,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import {
+  MarketingHeader,
+  MarketingFooter,
+  Section,
+  SectionHeading,
+  GradientText,
+  StatCard,
+  CTABand,
+} from "@/components/marketing/system";
+import { Reveal } from "@/components/landing/reveal";
 
-const SLIDES = [
+const PAIN_POINTS = [
   {
-    title: "1. Executive Summary & Motive",
-    headline: "CampusLoop — The Verified Social Network for College Campuses.",
-    points: [
-      "Fragmented Campus Life: Students currently use fragmented WhatsApp groups, Instagram pages, Discord servers, and confession accounts.",
-      "The Solution: CampusLoop brings the entire campus social graph into one verified, student-only digital layer.",
-      "Primary Moat: Network density per campus (>20% penetration per college beats 100k scattered global users)."
-    ],
-    icon: <Sparkles className="size-7 text-primary" />
+    icon: Split,
+    title: "Fragmented by default",
+    body: "Campus life is scattered across 15 WhatsApp groups, unofficial Instagram pages, dead Discord servers, and anonymous confession accounts nobody moderates.",
   },
   {
-    title: "2. The 5 Core Product Layers",
-    headline: "Built specifically around student life & verified identity.",
-    points: [
-      "Verified Identity & Gatekeeping: .ac.in / .edu domain OTP verification & campus/global scope toggle.",
-      "Social & Anonymous Layer: Feed, confessions, canteen polls, anonymous yapping, and Twitter-style reposts.",
-      "Connection & Utility: Swipeable student matchmaking deck, Lost & Found bulletin, and sub-community hubs."
-    ],
-    icon: <Layers className="size-7 text-violet-500" />
+    icon: Ban,
+    title: "No identity guarantee",
+    body: "Every existing channel is open to recruiters, bots, seniors' side-hustles, and catfish. Students self-censor because they can't know who's reading.",
   },
   {
-    title: "3. Market Size & Opportunity",
-    headline: "India's 43.3 Million College Student Market.",
-    points: [
-      "Total Addressable Market (TAM): 43.3M+ higher education students across 1,350+ indexed Indian colleges.",
-      "Serviceable Addressable Market (SAM): 12.5M+ students in Tier-1/2 Engineering, Tech & Management universities.",
-      "Viral Distribution: Referral loops (+20 LP) and class-sharing copywritings spark organic campus adoption."
-    ],
-    icon: <TrendingUp className="size-7 text-rose-500" />
+    icon: EyeOff,
+    title: "Anonymity without safety",
+    body: "Confession pages run on DMs to an anonymous admin. Zero accountability, zero moderation, and no way to act on harassment or doxxing.",
   },
   {
-    title: "4. Monetization & Unit Economics",
-    headline: "Hyper-local revenue streams built on campus density.",
-    points: [
-      "Targeted Campus Advertising: High CTR brand activations for co-living, laptops, and student tech bootcamps.",
-      "Event Ticketing: Commission fee on campus cultural fests, workshops, and student club passes.",
-      "Commerce & Recruitment: Peer-to-peer textbook marketplace and verified student talent discovery for tech startups."
-    ],
-    icon: <DollarSign className="size-7 text-emerald-500" />
-  }
+    icon: Flame,
+    title: "Attention leaks off campus",
+    body: "The most engaged demographic in India spends hours daily on platforms that know nothing about their campus — and monetize none of its context.",
+  },
+];
+
+const PRODUCT_LAYERS = [
+  {
+    icon: ShieldCheck,
+    title: "Identity & Gatekeeping",
+    body: "OTP verification on .ac.in/.edu domains. Every account on campus cleared the same check — outsiders read-only at best.",
+    color: "text-primary",
+  },
+  {
+    icon: MessagesSquare,
+    title: "Social & Anonymous Feeds",
+    body: "Campus + national feeds: confessions with sealed identity escrow, canteen polls, questions, reposts, and 24h stories.",
+    color: "text-blue-500",
+  },
+  {
+    icon: HeartHandshake,
+    title: "Connection & Matching",
+    body: "A swipe deck where every profile is a verified student. No catfish by construction.",
+    color: "text-pink-500",
+  },
+  {
+    icon: Store,
+    title: "Utility Sub-Hubs",
+    body: "Buy/sell, lost & found, roommates, ride-share, events — hyper-local classifieds that only work with campus density.",
+    color: "text-emerald-500",
+  },
+  {
+    icon: Trophy,
+    title: "Clout & Gamification",
+    body: "Loop Points reward posting, inviting, and helping. Referral loops (+20 LP) make every user a distribution channel.",
+    color: "text-amber-500",
+  },
+];
+
+const REVENUE_STREAMS = [
+  {
+    icon: Megaphone,
+    title: "Campus-targeted brand activations",
+    body: "Co-living, laptops, bootcamps, D2C brands — advertisers pay premium CPMs for a verified, geo-dense 18–24 audience.",
+  },
+  {
+    icon: Ticket,
+    title: "Event ticketing",
+    body: "Commission on fests, workshops, and club passes sold where the audience already lives.",
+  },
+  {
+    icon: ShoppingBag,
+    title: "Peer-to-peer commerce",
+    body: "Take-rate on textbooks, cycles, and hostel essentials traded inside the trust boundary of a campus.",
+  },
+  {
+    icon: BriefcaseBusiness,
+    title: "Verified talent discovery",
+    body: "Startups pay to reach provably-real students by college, branch, and skill — recruiting without the spam.",
+  },
+];
+
+const ROADMAP = [
+  {
+    phase: "Now",
+    title: "Product live at campusloop.space",
+    body: "Feeds, confessions with identity escrow, polls, stories, matching, chat, communities, moderation console, and read-only Viewer Mode for aspirants — deployed on Cloudflare's edge.",
+  },
+  {
+    phase: "Next 2 quarters",
+    title: "Density playbook in Tier-1 engineering",
+    body: "Ambassador-led launches targeting >20% penetration per campus across the first 25 colleges, compounding through referral loops.",
+  },
+  {
+    phase: "12–18 months",
+    title: "Monetization switch-on",
+    body: "Brand activations and event ticketing in dense campuses first; marketplace take-rate follows liquidity.",
+  },
 ];
 
 export function PitchClient() {
-  const [slideIdx, setSlideIdx] = useState(0);
-  const [dau, setDau] = useState(100000); // 100k
-  const [arpu, setArpu] = useState(3.5); // $3.5
+  const [dau, setDau] = useState(100000);
+  const [arpu, setArpu] = useState(3.5);
 
   const revenue = dau * arpu;
-  const valuation = revenue * 8; // 8x multiple
+  const valuation = revenue * 8;
 
-  const formattedRevenue = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(revenue);
-  const formattedValuation = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(valuation);
+  const fmtUsd = (n: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden pb-16">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -83,7 +149,8 @@ export function PitchClient() {
             "@type": "PresentationDigitalDocument",
             name: "CampusLoop Investor Pitch Deck",
             url: "https://campusloop.space/pitch",
-            description: "CampusLoop investor presentation, market sizing, network density moats, and interactive valuation calculator.",
+            description:
+              "CampusLoop investor presentation: market sizing, network density moats, product layers, business model, and interactive valuation calculator.",
             publisher: {
               "@type": "Organization",
               name: "CampusLoop",
@@ -93,237 +160,266 @@ export function PitchClient() {
           }),
         }}
       />
-      {/* Glow blur background */}
-      <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 h-[450px] w-full max-w-4xl rounded-full bg-primary/5 blur-3xl" />
 
-      {/* Header */}
-      <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/80 px-4 sm:px-8 backdrop-blur-xl">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
-            <img src="/logo.png" alt="CampusLoop Logo" className="size-full object-cover scale-110" />
-          </div>
-          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-black tracking-tight text-transparent">
-            CampusLoop
-          </span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <Link href="/overview" className="hidden sm:inline-flex text-xs font-bold text-primary hover:underline">
-            Platform Brief →
-          </Link>
-          <ThemeToggle />
-          <Link href="/join">
-            <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/20 transition-all cursor-pointer">
-              Launch App
-            </button>
-          </Link>
-        </div>
-      </header>
+      <MarketingHeader />
 
-      {/* Main Pitch Content */}
-      <main className="flex-1 w-full max-w-3xl px-4 sm:px-8 pt-24 mx-auto space-y-10">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors">
-              <ArrowLeft className="size-3.5" /> Back to Home
-            </Link>
-            <span className="text-muted-foreground">•</span>
-            <Link href="/overview" className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline">
-              <BookOpen className="size-3.5" /> Read Full Strategic Brief
-            </Link>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-            Investor <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">Pitch Deck</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-semibold">
-            Explore CampusLoop's core thesis, campus network moats, business model, and interactive valuation calculator.
+      {/* ── Hero ── */}
+      <Section className="pt-36 pb-16 md:pt-40 md:pb-20">
+        <div className="max-w-3xl space-y-6">
+          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            <TrendingUp className="size-3.5" /> Investor pitch · Seed
           </p>
-        </div>
-
-        {/* Banner Link to /overview */}
-        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-          <div className="space-y-0.5">
-            <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
-              <Sparkles className="size-3.5 text-primary" /> Want to read our complete deep research &amp; product overview?
-            </p>
-            <p className="text-[11px] text-muted-foreground font-medium">
-              Explore market sizing breakdown, security architecture, 5 product layers, and FAQ.
-            </p>
-          </div>
-          <Link href="/overview">
-            <button className="rounded-xl bg-primary/10 border border-primary/30 px-3.5 py-1.5 text-xs font-bold text-primary hover:bg-primary/20 transition-all cursor-pointer whitespace-nowrap">
-              Explore /overview →
-            </button>
-          </Link>
-        </div>
-
-        {/* --- Interactive Slides Presentation --- */}
-        <section className="rounded-3xl border border-border/60 bg-card p-6 sm:p-8 space-y-6 shadow-xl shadow-black/[0.03] min-h-[380px] flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-border/40 pb-3">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-primary">
-                {SLIDES[slideIdx].title}
-              </span>
-              <span className="text-[10px] font-bold text-muted-foreground">
-                Slide {slideIdx + 1} of {SLIDES.length}
-              </span>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="size-12 rounded-2xl bg-muted/65 border border-border/40 flex items-center justify-center shrink-0 shadow-xs">
-                {SLIDES[slideIdx].icon}
-              </div>
-              <div className="space-y-3.5 flex-1">
-                <h3 className="text-base sm:text-lg font-black text-foreground">
-                  {SLIDES[slideIdx].headline}
-                </h3>
-                <ul className="space-y-2.5">
-                  {SLIDES[slideIdx].points.map((pt, i) => (
-                    <li key={i} className="text-xs sm:text-sm text-muted-foreground leading-relaxed flex items-start gap-2.5 font-medium">
-                      <CheckCircle2 className="size-4 text-primary shrink-0 mt-0.5" />
-                      <span>{pt}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between border-t border-border/30 pt-4 mt-6">
-            <button
-              onClick={() => setSlideIdx((prev) => Math.max(0, prev - 1))}
-              disabled={slideIdx === 0}
-              className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer"
+          <h1 className="text-4xl font-bold leading-[1.08] tracking-tight md:text-6xl">
+            The verified social graph for{" "}
+            <GradientText>43 million</GradientText> Indian students.
+          </h1>
+          <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+            CampusLoop pulls every college's fragmented social life into one
+            student-only network, gated by the one credential no outsider has:
+            a college email. Density per campus is the product — and the moat.
+          </p>
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Link
+              href="/contact"
+              className="inline-flex h-11 items-center gap-2 rounded-2xl bg-primary px-6 text-sm font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/95"
             >
-              <ChevronLeft className="size-4" /> Previous Slide
-            </button>
-
-            <div className="flex items-center gap-1">
-              {SLIDES.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSlideIdx(i)}
-                  className={`size-2 rounded-full transition-all cursor-pointer ${
-                    i === slideIdx ? "bg-primary w-5" : "bg-muted-foreground/30"
-                  }`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={() => setSlideIdx((prev) => Math.min(SLIDES.length - 1, prev + 1))}
-              disabled={slideIdx === SLIDES.length - 1}
-              className="flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85 disabled:opacity-30 cursor-pointer"
+              Talk to us
+            </Link>
+            <Link
+              href="/overview"
+              className="inline-flex h-11 items-center gap-2 rounded-2xl border border-border px-6 text-sm font-bold text-foreground transition-colors hover:bg-muted"
             >
-              Next Slide <ChevronRight className="size-4" />
-            </button>
+              <BookOpen className="size-4" /> Read the full brief
+            </Link>
           </div>
-        </section>
+        </div>
+      </Section>
 
-        {/* --- Interactive Valuation Calculator --- */}
-        <section className="rounded-3xl border border-border/60 bg-card p-6 sm:p-8 space-y-6 shadow-xl shadow-black/[0.03]">
-          <div className="space-y-1">
-            <h2 className="text-base font-black uppercase tracking-wider text-foreground flex items-center gap-2">
-              <TrendingUp className="size-5 text-emerald-500" /> Interactive Valuation Calculator
-            </h2>
-            <p className="text-xs text-muted-foreground font-semibold">
-              Adjust parameters below to see projected annual revenue and platform valuation.
-            </p>
+      {/* ── Problem ── */}
+      <Section tone="muted">
+        <SectionHeading
+          eyebrow="The problem"
+          title="Campus life happens everywhere except one place."
+          lede="India's most engaged demographic coordinates its entire social life through tools that were never built for a campus — and it shows."
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          {PAIN_POINTS.map((p, i) => (
+            <Reveal key={p.title} delay={i * 0.06}>
+              <div className="h-full rounded-2xl border border-border/70 bg-card p-5 shadow-xs">
+                <span className="flex size-9 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                  <p.icon className="size-4.5" />
+                </span>
+                <h3 className="mt-3 text-base font-semibold">{p.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </Section>
+
+      {/* ── Insight ── */}
+      <Section>
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          <SectionHeading
+            className="pb-0"
+            eyebrow="The insight"
+            title={
+              <>
+                Verification isn&apos;t a feature. <GradientText>It&apos;s the product.</GradientText>
+              </>
+            }
+            lede="One OTP on a college domain does what no moderation team can: it makes every account on the network a provably-real student. That single guarantee unlocks honest confessions, safe matching, trusted commerce — and an audience advertisers can't buy anywhere else."
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <StatCard value="1,350+" label="Colleges indexed" sub="Every hub pre-built and SEO-indexed before launch" />
+            <StatCard value=">20%" label="Target campus penetration" sub="Density per college beats scattered global users" />
+            <StatCard value="+20 LP" label="Referral incentive" sub="Every student is a distribution channel" />
+            <StatCard value="0" label="Outsiders with write access" sub="Recruiters and bots are read-only at best" />
           </div>
+        </div>
+      </Section>
 
-          <div className="space-y-5">
-            {/* DAU Slider */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs font-semibold">
-                <span className="text-muted-foreground">Target DAU (Daily Active Users)</span>
-                <span className="text-foreground font-black">{new Intl.NumberFormat("en-IN").format(dau)} Users</span>
+      {/* ── Product ── */}
+      <Section tone="muted">
+        <SectionHeading
+          eyebrow="The product"
+          title="Five layers, one loop."
+          lede="Live today at campusloop.space — not a deck, a deployed product."
+        />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {PRODUCT_LAYERS.map((layer, i) => (
+            <Reveal key={layer.title} delay={i * 0.05}>
+              <div className="h-full rounded-2xl border border-border/70 bg-card p-5 shadow-xs">
+                <span className="flex size-9 items-center justify-center rounded-xl bg-muted">
+                  <layer.icon className={`size-4.5 ${layer.color}`} />
+                </span>
+                <h3 className="mt-3 text-base font-semibold">{layer.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{layer.body}</p>
               </div>
-              <input
-                type="range"
-                min="10000"
-                max="5000000"
-                step="10000"
-                value={dau}
-                onChange={(e) => setDau(Number(e.target.value))}
-                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
-              />
-            </div>
-
-            {/* ARPU Slider */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs font-semibold">
-                <span className="text-muted-foreground">Target ARPU (Annual Revenue Per User)</span>
-                <span className="text-foreground font-black">${arpu.toFixed(2)} / Year</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="15"
-                step="0.5"
-                value={arpu}
-                onChange={(e) => setArpu(Number(e.target.value))}
-                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
-              />
-            </div>
-
-            {/* Calculation results */}
-            <div className="grid grid-cols-2 gap-4 border-t border-border/40 pt-4">
-              <div className="bg-muted/20 border border-border/40 rounded-2xl p-4 text-center space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Projected Revenue</p>
-                <p className="text-xl font-black text-foreground">{formattedRevenue}</p>
-              </div>
-
-              <div className="bg-muted/20 border border-border/40 rounded-2xl p-4 text-center space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-primary">Projected Valuation</p>
-                <p className="text-xl font-black text-primary">{formattedValuation}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── Notion Structured Data Link Card ─── */}
-        <section className="rounded-3xl border border-primary/30 bg-gradient-to-r from-primary/10 via-orange-500/10 to-amber-500/10 p-6 sm:p-8 space-y-4 shadow-xl">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
-                <BookOpen className="size-4" /> Live Notion Resource Database
-              </span>
-              <h3 className="text-base font-black text-foreground">
-                CampusLoop Structured Notion Hub
-              </h3>
-              <p className="text-xs text-muted-foreground max-w-md leading-relaxed font-medium">
-                View our live structured data, roadmap phases, market research, and continuous updates directly on Notion.
+            </Reveal>
+          ))}
+          <Reveal delay={0.25}>
+            <div className="flex h-full flex-col justify-center rounded-2xl border border-primary/30 bg-primary/5 p-5">
+              <Layers className="size-5 text-primary" />
+              <p className="mt-3 text-sm font-semibold leading-relaxed text-foreground">
+                Each layer compounds the others: identity makes matching safe,
+                matching drives feeds, feeds drive utility, utility drives
+                clout — and clout recruits the next campus.
               </p>
             </div>
+          </Reveal>
+        </div>
+      </Section>
 
-            <a
-              href="https://app.notion.com/p/Campusloop-3c4cd0ed0c2580b88ac4f1c2ae54961b"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-xs font-bold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/95 active:scale-95 cursor-pointer shrink-0"
-            >
-              <span>Explore Notion Docs</span>
-              <ExternalLink className="size-4" />
-            </a>
+      {/* ── Market ── */}
+      <Section>
+        <SectionHeading
+          eyebrow="The market"
+          title="A 43M-student wedge into young India."
+          lede="Higher education is the densest, most identifiable segment of India's youth internet — and it graduates into every other market."
+        />
+        <div className="grid gap-4 sm:grid-cols-3">
+          <StatCard value="43.3M" label="TAM — students in Indian higher ed" sub="Across 1,350+ indexed colleges" />
+          <StatCard value="12.5M" label="SAM — Tier-1/2 engineering, tech & management" sub="English-first, smartphone-native, hostel-dense" />
+          <StatCard value="25 campuses" label="SOM — first density beachhead" sub="Ambassador-led launches at >20% penetration each" />
+        </div>
+      </Section>
+
+      {/* ── Business model ── */}
+      <Section tone="muted">
+        <SectionHeading
+          eyebrow="Business model"
+          title="Density monetizes four ways."
+          lede="Every stream needs campus density first — which is why the moat and the revenue plan are the same plan."
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          {REVENUE_STREAMS.map((r, i) => (
+            <Reveal key={r.title} delay={i * 0.06}>
+              <div className="h-full rounded-2xl border border-border/70 bg-card p-5 shadow-xs">
+                <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
+                  <r.icon className="size-4.5" />
+                </span>
+                <h3 className="mt-3 text-base font-semibold">{r.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{r.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </Section>
+
+      {/* ── Valuation calculator ── */}
+      <Section>
+        <SectionHeading
+          eyebrow="Run the numbers"
+          title="Interactive valuation model."
+          lede="Drag the sliders — projected annual revenue and an 8× revenue-multiple valuation update live."
+        />
+        <div className="max-w-2xl space-y-6 rounded-3xl border border-border/70 bg-card p-6 shadow-xs sm:p-8">
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs font-semibold">
+              <span className="text-muted-foreground">Daily Active Users</span>
+              <span className="font-black text-foreground">
+                {new Intl.NumberFormat("en-IN").format(dau)} users
+              </span>
+            </div>
+            <input
+              type="range"
+              min="10000"
+              max="5000000"
+              step="10000"
+              value={dau}
+              onChange={(e) => setDau(Number(e.target.value))}
+              className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
+            />
           </div>
-        </section>
 
-        {/* Call to action */}
-        <div className="rounded-3xl border border-dashed border-border bg-card p-8 text-center space-y-4 shadow-sm">
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs font-semibold">
+              <span className="text-muted-foreground">ARPU (annual revenue per user)</span>
+              <span className="font-black text-foreground">${arpu.toFixed(2)} / year</span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="15"
+              step="0.5"
+              value={arpu}
+              onChange={(e) => setArpu(Number(e.target.value))}
+              className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 border-t border-border/40 pt-4">
+            <div className="space-y-1 rounded-2xl border border-border/40 bg-muted/20 p-4 text-center">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                Projected revenue
+              </p>
+              <p className="text-xl font-black text-foreground">{fmtUsd(revenue)}</p>
+            </div>
+            <div className="space-y-1 rounded-2xl border border-border/40 bg-muted/20 p-4 text-center">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                Projected valuation (8×)
+              </p>
+              <p className="text-xl font-black text-primary">{fmtUsd(valuation)}</p>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── Roadmap ── */}
+      <Section tone="muted">
+        <SectionHeading
+          eyebrow="Traction & roadmap"
+          title="Shipped first. Raising second."
+          lede="The platform is live, indexed, and onboarding students today."
+        />
+        <ol className="relative space-y-8 border-l border-border/70 pl-6">
+          {ROADMAP.map((step) => (
+            <li key={step.phase} className="relative">
+              <span className="absolute -left-[1.85rem] top-1 size-3 rounded-full border-2 border-background bg-primary" />
+              <p className="text-[10px] font-bold uppercase tracking-wider text-primary">{step.phase}</p>
+              <h3 className="mt-0.5 text-base font-semibold">{step.title}</h3>
+              <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+
+        {/* Notion resource card */}
+        <div className="mt-12 flex flex-col justify-between gap-4 rounded-3xl border border-primary/30 bg-gradient-to-r from-primary/10 via-orange-500/10 to-amber-500/10 p-6 sm:flex-row sm:items-center sm:p-8">
           <div className="space-y-1">
-            <h3 className="text-base font-bold text-foreground">Interested in backing CampusLoop?</h3>
-            <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed font-medium">
-              We are currently closing our Seed round to accelerate campus deployments across Tier-1 Indian engineering colleges.
+            <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
+              <BookOpen className="size-4" /> Live resource database
+            </span>
+            <h3 className="text-base font-black text-foreground">CampusLoop Notion Hub</h3>
+            <p className="max-w-md text-xs font-medium leading-relaxed text-muted-foreground">
+              Roadmap phases, market research, and continuous updates — structured and live on Notion.
             </p>
           </div>
-          <Link href="/contact">
-            <button className="rounded-2xl bg-primary h-10 px-6 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/20 transition-all cursor-pointer">
-              Contact Deal Partners
-            </button>
-          </Link>
+          <a
+            href="https://app.notion.com/p/Campusloop-3c4cd0ed0c2580b88ac4f1c2ae54961b"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-xs font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/95 active:scale-95"
+          >
+            Explore the docs <ExternalLink className="size-4" />
+          </a>
         </div>
-      </main>
+      </Section>
+
+      <CTABand
+        title={
+          <>
+            Back the <GradientText>verified campus graph.</GradientText>
+          </>
+        }
+        lede="We're closing our Seed round to run the density playbook across Tier-1 Indian engineering campuses."
+        primaryHref="/contact"
+        primaryLabel="Contact deal partners"
+        secondaryHref="/overview"
+        secondaryLabel="Read the strategic brief"
+      />
+
+      <MarketingFooter />
     </div>
   );
 }

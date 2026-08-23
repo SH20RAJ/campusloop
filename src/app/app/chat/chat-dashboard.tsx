@@ -167,37 +167,43 @@ export function ChatDashboard({
             </div>
           ) : (
             <div className="p-2 space-y-1">
-              {conversations?.map((conv) => {
-                const isActive = conv.id === activeConversationId;
-                return (
-                  <button
-                    key={conv.id}
-                    type="button"
-                    onClick={() => setActiveConversationId(conv.id)}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left transition-all cursor-pointer",
-                      isActive
-                        ? "bg-primary/10 border border-primary/30 text-primary shadow-xs"
-                        : "hover:bg-muted/50 text-muted-foreground"
-                    )}
-                  >
-                    <Avatar className="size-10 border border-border shrink-0">
-                      <AvatarImage src={conv.otherParticipant.avatarUrl || ""} />
-                      <AvatarFallback className="font-bold">{conv.otherParticipant.displayName[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-baseline mb-0.5">
-                        <p className={cn("text-xs font-bold truncate", isActive ? "text-primary" : "text-foreground")}>
-                          {conv.otherParticipant.displayName}
+              {conversations
+                ?.filter((conv) => Boolean(conv.otherParticipant))
+                .map((conv) => {
+                  const isActive = conv.id === activeConversationId;
+                  const other = conv.otherParticipant;
+                  const name = other?.displayName || "Student";
+                  const initial = name[0]?.toUpperCase() || "S";
+
+                  return (
+                    <button
+                      key={conv.id}
+                      type="button"
+                      onClick={() => setActiveConversationId(conv.id)}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left transition-all cursor-pointer",
+                        isActive
+                          ? "bg-primary/10 border border-primary/30 text-primary shadow-xs"
+                          : "hover:bg-muted/50 text-muted-foreground"
+                      )}
+                    >
+                      <Avatar className="size-10 border border-border shrink-0">
+                        <AvatarImage src={other?.avatarUrl || ""} />
+                        <AvatarFallback className="font-bold">{initial}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-baseline mb-0.5">
+                          <p className={cn("text-xs font-bold truncate", isActive ? "text-primary" : "text-foreground")}>
+                            {name}
+                          </p>
+                        </div>
+                        <p className="text-[11px] truncate leading-normal text-muted-foreground">
+                          {conv.lastMessage ? conv.lastMessage.body : "Start conversation..."}
                         </p>
                       </div>
-                      <p className="text-[11px] truncate leading-normal text-muted-foreground">
-                        {conv.lastMessage ? conv.lastMessage.body : "Start conversation..."}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })}
 
               {conversations?.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground gap-3 px-4">

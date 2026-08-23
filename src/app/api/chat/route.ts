@@ -51,18 +51,22 @@ export async function GET() {
     });
 
     // Format the response payload
-    const formatted = rawConversations.map(conv => {
-      const otherParticipant = conv.participants.find(p => p.userId !== profile.id)?.user;
-      const lastMessage = conv.messages[0] || null;
+    const formatted = rawConversations
+      .map((conv) => {
+        const otherParticipant = conv.participants.find((p) => p.userId !== profile.id)?.user;
+        const lastMessage = conv.messages[0] || null;
 
-      return {
-        id: conv.id,
-        createdAt: conv.createdAt,
-        updatedAt: conv.updatedAt,
-        otherParticipant,
-        lastMessage,
-      };
-    });
+        if (!otherParticipant) return null;
+
+        return {
+          id: conv.id,
+          createdAt: conv.createdAt,
+          updatedAt: conv.updatedAt,
+          otherParticipant,
+          lastMessage,
+        };
+      })
+      .filter((c): c is NonNullable<typeof c> => c !== null);
 
     // Sort by last message date (or creation date)
     formatted.sort((a, b) => {

@@ -82,6 +82,7 @@ export function ChatPane({
         role: "STUDENT",
         status: "ACTIVE",
         gender: "ALL",
+        datingPreferences: null,
         referralCount: 0,
         referredById: null,
         points: 0,
@@ -140,23 +141,23 @@ export function ChatPane({
             </button>
           )}
 
-          <Link href={`/@${otherParticipant.username}`} className="flex items-center gap-2.5 min-w-0">
+          <Link href={`/@${otherParticipant.username || "student"}`} className="flex items-center gap-2.5 min-w-0">
             <Avatar className="size-9 border border-primary/20 shrink-0">
               <AvatarImage src={otherParticipant.avatarUrl || ""} />
-              <AvatarFallback className="font-bold text-xs">{otherParticipant.displayName[0]}</AvatarFallback>
+              <AvatarFallback className="font-bold text-xs">{(otherParticipant.displayName?.[0] || "S").toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="min-w-0">
               <span className="text-xs font-bold text-foreground flex items-center gap-1 truncate">
-                {otherParticipant.displayName}
+                {otherParticipant.displayName || "Student"}
                 <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
               </span>
-              <span className="text-[10px] text-muted-foreground truncate block">@{otherParticipant.username}</span>
+              <span className="text-[10px] text-muted-foreground truncate block">@{otherParticipant.username || "student"}</span>
             </div>
           </Link>
         </div>
 
         <Link
-          href={`/@${otherParticipant.username}`}
+          href={`/@${otherParticipant.username || "student"}`}
           className="text-[10px] font-bold text-primary hover:underline px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors"
         >
           View Profile
@@ -173,7 +174,7 @@ export function ChatPane({
                 {!isMe && (
                   <Avatar className="size-6 border shrink-0">
                     <AvatarImage src={otherParticipant.avatarUrl || ""} />
-                    <AvatarFallback className="text-[8px] font-bold">{otherParticipant.displayName[0]}</AvatarFallback>
+                    <AvatarFallback className="text-[8px] font-bold">{(otherParticipant.displayName?.[0] || "S").toUpperCase()}</AvatarFallback>
                   </Avatar>
                 )}
 

@@ -43,11 +43,17 @@ export async function GET(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    // No explicit choice → smart default: male sees women, female sees men.
-    const genderFilter = resolveGenderPreference(profile.gender, searchParams.get("gender"));
-    const collegeFilter = searchParams.get("scope") || searchParams.get("college") || "GLOBAL"; // CAMPUS, GLOBAL
+    // Precedence: explicit query param > saved DB preference > smart default
+    // (male sees women, female sees men, other sees everyone).
+    const prefs = profile.datingPreferences ?? {};
+    const requestedGender = searchParams.get("gender") ?? prefs.gender ?? null;
+    const genderFilter = resolveGenderPreference(
+      profile.gender,
+      requestedGender === "DEFAULT" ? null : requestedGender
+    );
+    const collegeFilter = searchParams.get("scope") || prefs.scope || "GLOBAL"; // CAMPUS, GLOBAL
     const targetInstitutionId = searchParams.get("collegeId") || searchParams.get("targetInstitutionId");
-    const sort = searchParams.get("sort") || "COMPATIBILITY"; // COMPATIBILITY, RECENT, POPULAR
+    const sort = searchParams.get("sort") || prefs.sort || "COMPATIBILITY";
 
     // Everyone I already swiped on, and everyone who already liked me.
     const [swiped, likedMeRows] = await Promise.all([

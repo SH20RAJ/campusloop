@@ -129,6 +129,11 @@ export const userProfiles = pgTable(
 		gender: text("gender").default("MALE"),
 		interests: jsonb("interests").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
 		photos: jsonb("photos").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
+		datingPreferences: jsonb("dating_preferences").$type<{
+			gender?: "DEFAULT" | "MALE" | "FEMALE" | "ALL";
+			scope?: "GLOBAL" | "CAMPUS";
+			sort?: "COMPATIBILITY" | "RECENT" | "POPULAR";
+		}>(),
 		onboardingCompleted: boolean("onboarding_completed").default(false).notNull(),
 		role: userRoleEnum("role").default("STUDENT").notNull(),
 		status: userStatusEnum("status").default("ACTIVE").notNull(),

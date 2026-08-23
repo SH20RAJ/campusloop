@@ -32,19 +32,25 @@ export default async function InvalidEmailPage() {
         </p>
 
         <div className="rounded-lg bg-muted p-4 text-left border border-border">
-          <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">How to fix:</h3>
+          <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">Your options:</h3>
           <ul className="mt-2 list-disc list-inside text-xs text-muted-foreground space-y-1">
-            <li>Sign out of this account</li>
-            <li>Sign up again using your student email (e.g. <code className="font-semibold text-foreground">name@college.edu</code>)</li>
+            <li>Sign up again using your student email (e.g. <code className="font-semibold text-foreground">name@college.edu</code>) to post &amp; interact</li>
+            <li>Or continue in <strong className="text-foreground">Viewer Mode</strong> — browse campus feeds, confessions, and polls read-only. Great for JEE/NEET aspirants exploring colleges!</li>
           </ul>
         </div>
 
         <div className="flex flex-col gap-3">
           <Link
-            href="/handler/sign-out"
+            href="/app/onboarding"
             className="flex w-full items-center justify-center rounded-lg bg-primary h-10 px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/95 transition-colors cursor-pointer"
           >
-            Sign Out
+            Continue in Viewer Mode 👀
+          </Link>
+          <Link
+            href="/handler/sign-out"
+            className="flex w-full items-center justify-center rounded-lg border border-border bg-background h-10 px-4 text-sm font-medium text-foreground shadow-sm hover:bg-muted transition-colors cursor-pointer"
+          >
+            Sign Out &amp; Use College Email
           </Link>
         </div>
       </div>

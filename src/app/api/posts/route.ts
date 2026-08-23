@@ -4,8 +4,9 @@ import { anonIdentityVault, posts, userProfiles, pollOptions } from "@/db/schema
 import { hexclaveServerApp } from "@/hexclave/server";
 import { runSafetyCheck } from "@/lib/moderation/rules";
 import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+import { rejectViewerWrite } from "@/lib/viewer";
 
 export async function POST(req: Request) {
   try {
@@ -22,6 +23,9 @@ export async function POST(req: Request) {
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
+
+    const viewerBlocked = await rejectViewerWrite(profile);
+    if (viewerBlocked) return viewerBlocked;
 
     const data = await req.json();
     const { body, type, scope, isAnonymous, title, options, communityId } = data as {
@@ -50,9 +54,27 @@ export async function POST(req: Request) {
     const anonymous = Boolean(isAnonymous);
     const postId = randomUUID();
 
+    const pollTexts =
+      type === "POLL" ? (options ?? []).map((opt) => opt.trim()).filter((opt) => opt.length > 0) : [];
+    if (type === "POLL" && pollTexts.length < 2) {
+      return NextResponse.json({ error: "A poll needs at least 2 options" }, { status: 400 });
+    }
+
     // Anonymous posts carry NO author foreign key. The real profile id is
     // AES-sealed into the identity vault; the post row only holds a stable
     // HMAC pseudonym handle that cannot be reversed without the pepper.
+    // The vault row must exist BEFORE the post: an anonymous post whose
+    // identity was never escrowed can never be resolved by moderators.
+    if (anonymous) {
+      await db
+        .insert(anonIdentityVault)
+        .values({
+          handle: deriveAnonHandle(profile.id),
+          sealedIdentity: sealIdentity(profile.id),
+        })
+        .onConflictDoNothing({ target: anonIdentityVault.handle });
+    }
+
     const [newPost] = await db
       .insert(posts)
       .values({
@@ -71,33 +93,13 @@ export async function POST(req: Request) {
       })
       .returning();
 
-    if (anonymous) {
-      await db
-        .insert(anonIdentityVault)
-        .values({
-          handle: deriveAnonHandle(profile.id),
-          sealedIdentity: sealIdentity(profile.id),
-        })
-        .onConflictDoNothing({ target: anonIdentityVault.handle })
-        .catch((err) => console.error("Identity vault insert error:", err));
-    }
-
     // Award +5 points
     await db.update(userProfiles)
-      .set({ points: (profile.points || 0) + 5 })
+      .set({ points: sql`${userProfiles.points} + 5` })
       .where(eq(userProfiles.id, profile.id));
 
-    // If type is POLL, insert options
-    if (type === "POLL" && options && options.length > 0) {
-      const optionsToInsert = options
-        .filter(opt => opt.trim().length > 0)
-        .map(opt => ({
-          postId: newPost.id,
-          text: opt,
-        }));
-      if (optionsToInsert.length > 0) {
-        await db.insert(pollOptions).values(optionsToInsert);
-      }
+    if (pollTexts.length > 0) {
+      await db.insert(pollOptions).values(pollTexts.map((text) => ({ postId: newPost.id, text })));
     }
 
     return NextResponse.json(newPost, { status: 201 });

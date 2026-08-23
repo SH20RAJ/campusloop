@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
-import { institutionDomains, userProfiles } from "@/db/schema";
+import { userProfiles } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
@@ -70,13 +70,8 @@ export default async function AppRootLayout({
     redirect("/invalid-email");
   }
 
-  const whitelistedDomain = await db.query.institutionDomains.findFirst({
-    where: eq(institutionDomains.domain, domain),
-  });
-
-  if (!whitelistedDomain) {
-    redirect("/invalid-email");
-  }
+  // Non-whitelisted domains are no longer rejected here: they proceed to
+  // onboarding and get a read-only Viewer Mode profile (see lib/viewer.ts).
 
   // Profile check: We do NOT auto-create profiles here.
   // If the profile does not exist or onboardingCompleted is false,

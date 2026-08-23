@@ -1,6 +1,6 @@
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
-import { userProfiles } from "@/db/schema";
+import { userProfiles, institutionDomains } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -30,6 +30,13 @@ export default async function OnboardingPage() {
 
   const email = user.primaryEmail || "";
   const rawEmailUser = email.split("@")[0] || "";
+  const emailDomain = email.split("@")[1]?.toLowerCase() || "";
+  const whitelistedDomain = emailDomain
+    ? await db.query.institutionDomains.findFirst({
+        where: eq(institutionDomains.domain, emailDomain),
+      })
+    : null;
+  const viewerMode = !whitelistedDomain;
 
   // Smart Name Parser: e.g. "shaswat.raj" -> "Shaswat Raj", "aarav_sharma" -> "Aarav Sharma"
   function parseNameFromEmail(raw: string): string {
@@ -57,11 +64,22 @@ export default async function OnboardingPage() {
           <div className="inline-flex size-10 rounded-2xl bg-primary/10 border border-primary/20 items-center justify-center text-primary text-xl mb-1">
             🎓
           </div>
-          <h1 className="text-2xl font-black text-foreground tracking-tight">Set up your Campus Profile</h1>
+          <h1 className="text-2xl font-black text-foreground tracking-tight">
+            {viewerMode ? "Set up your Viewer Profile" : "Set up your Campus Profile"}
+          </h1>
           <p className="text-xs text-muted-foreground">
-            Complete your student details to enter your campus community.
+            {viewerMode
+              ? "You're joining with a personal email, so you'll get read-only Viewer access."
+              : "Complete your student details to enter your campus community."}
           </p>
         </div>
+        {viewerMode && (
+          <div className="rounded-2xl border border-amber-500/25 bg-amber-500/10 p-3 text-left text-[11px] leading-relaxed text-amber-700 dark:text-amber-400">
+            👀 <strong>Viewer Mode</strong> — browse campus feeds, confessions, and polls across
+            1,350+ colleges, but posting, voting, and chat stay locked. Perfect for JEE/NEET
+            aspirants. Sign up later with your official college email to unlock everything.
+          </div>
+        )}
         <OnboardingForm
           initialDisplayName={initialDisplayName}
           initialUsername={initialUsername}

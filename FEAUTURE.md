@@ -30,3 +30,15 @@ and more but minimal....
     Student Services
 
 
+
+
+## USP
+- Dating
+- GYM
+- Gaming
+- Study
+
+- Anonymity
+- Posting
+- College Gamification
+- Events

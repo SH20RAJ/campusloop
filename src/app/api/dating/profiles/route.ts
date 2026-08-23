@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { userProfiles, swipes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and, ne, notInArray, type SQL } from "drizzle-orm";
+import { rejectViewerWrite, getViewerInstitutionId } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,9 @@ export async function GET(req: Request) {
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
+
+    const viewerBlocked = await rejectViewerWrite(profile);
+    if (viewerBlocked) return viewerBlocked;
 
     // Strict Gate: Must have gender set to access dating
     const validGenders = ["MALE", "FEMALE", "OTHER"];
@@ -52,9 +56,11 @@ export async function GET(req: Request) {
     const swipedIds = swiped.map((s) => s.id);
 
     // Build conditions
+    const viewerInstitutionId = await getViewerInstitutionId();
     const conditions: (SQL | undefined)[] = [
       ne(userProfiles.id, profile.id), // Exclude self
       eq(userProfiles.status, "ACTIVE"), // Only active students
+      ne(userProfiles.institutionId, viewerInstitutionId), // Never surface viewer accounts
       swipedIds.length > 0 ? notInArray(userProfiles.id, swipedIds) : undefined,
     ];
 

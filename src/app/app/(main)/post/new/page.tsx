@@ -2,13 +2,31 @@ import type { Metadata } from "next";
 import { PostComposer } from "./post-composer";
 import { Sparkles, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/db";
+import { userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { isViewerProfile } from "@/lib/viewer";
 
 export const metadata: Metadata = {
   title: "Create Post | CampusLoop",
   description: "Share a confession, start a poll, or ask your campus on CampusLoop.",
 };
 
-export default function NewPostPage() {
+export default async function NewPostPage() {
+  const user = await hexclaveServerApp.getUser();
+  if (!user) {
+    redirect("/join");
+  }
+
+  const profile = await getDb().query.userProfiles.findFirst({
+    where: eq(userProfiles.userId, user.id),
+  });
+  if (profile && (await isViewerProfile(profile))) {
+    redirect("/app");
+  }
+
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col min-h-screen pb-24">
       {/* Sticky App Header */}

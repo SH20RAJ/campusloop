@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { Metadata } from "next";
 import { StoryCreator } from "./story-creator";
+import { isViewerProfile } from "@/lib/viewer";
 
 export const metadata: Metadata = {
   title: "Create Story | CampusLoop",
@@ -26,6 +27,10 @@ export default async function CreateStoryPage() {
 
   if (!profile) {
     redirect("/app/onboarding");
+  }
+
+  if (await isViewerProfile(profile)) {
+    redirect("/app");
   }
 
   return (

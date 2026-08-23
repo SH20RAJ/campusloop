@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { votes, userProfiles, posts, notifications } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and } from "drizzle-orm";
+import { rejectViewerWrite } from "@/lib/viewer";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -24,6 +25,9 @@ export async function POST(req: Request, { params }: RouteParams) {
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
+
+    const viewerBlocked = await rejectViewerWrite(profile);
+    if (viewerBlocked) return viewerBlocked;
 
     const { value } = (await req.json()) as { value: number };
 

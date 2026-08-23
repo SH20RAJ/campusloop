@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { userProfiles, institutions } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, ne, and, desc, sql } from "drizzle-orm";
+import { getViewerInstitutionId } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -21,9 +22,11 @@ export async function GET() {
       });
     }
 
+    const viewerInstitutionId = await getViewerInstitutionId();
     const conditions = [
       eq(userProfiles.status, "ACTIVE"),
       eq(userProfiles.onboardingCompleted, true),
+      ne(userProfiles.institutionId, viewerInstitutionId),
     ];
 
     if (currentProfile) {

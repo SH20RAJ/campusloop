@@ -4,8 +4,9 @@ import { anonIdentityVault, comments, userProfiles, posts, notifications } from 
 import { hexclaveServerApp } from "@/hexclave/server";
 import { runSafetyCheck } from "@/lib/moderation/rules";
 import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
-import { eq, and, asc } from "drizzle-orm";
+import { eq, and, asc, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+import { rejectViewerWrite } from "@/lib/viewer";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -62,6 +63,9 @@ export async function POST(req: Request, { params }: RouteParams) {
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
+
+    const viewerBlocked = await rejectViewerWrite(profile);
+    if (viewerBlocked) return viewerBlocked;
 
     const { body, isAnonymous, parentId } = (await req.json()) as {
       body: string;
@@ -127,7 +131,7 @@ export async function POST(req: Request, { params }: RouteParams) {
     try {
       await db
         .update(userProfiles)
-        .set({ points: (profile.points || 0) + 2 })
+        .set({ points: sql`${userProfiles.points} + 2` })
         .where(eq(userProfiles.id, profile.id));
     } catch (err) {
       console.warn("Points update warning:", err);

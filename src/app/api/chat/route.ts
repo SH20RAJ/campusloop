@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { conversations, conversationParticipants, userProfiles, messages } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, desc, inArray } from "drizzle-orm";
+import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -92,6 +93,9 @@ export async function POST(req: Request) {
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
+
+    const viewerBlocked = await rejectViewerWrite(profile);
+    if (viewerBlocked) return viewerBlocked;
 
     const bodyData = (await req.json()) as {
       participantId?: string;

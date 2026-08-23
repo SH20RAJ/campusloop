@@ -44,9 +44,10 @@ interface NavigationProps {
   profile?: UserProfile;
   collegeName?: string;
   isAdmin?: boolean;
+  isViewer?: boolean;
 }
 
-export function Navigation({ profile, isAdmin }: NavigationProps) {
+export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -59,8 +60,12 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
     { icon: School, href: "/app/colleges", label: "Colleges" },
     { icon: Heart, href: "/app/confessions", label: "Confessions" },
     { icon: Users, href: "/app/communities", label: "Communities" },
-    { icon: Sparkles, href: "/app/dating", label: "Matches" },
-    { icon: MessageSquare, href: "/app/chat", label: "Messages" },
+    ...(isViewer
+      ? []
+      : [
+          { icon: Sparkles, href: "/app/dating", label: "Matches" },
+          { icon: MessageSquare, href: "/app/chat", label: "Messages" },
+        ]),
     { icon: Bell, href: "/app/notifications", label: "Notifications" },
     { icon: UserCircle, href: "/app/profile", label: "Profile" },
     { icon: Sliders, href: "/app/settings", label: "Settings" },
@@ -250,11 +255,17 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
 
         {/* Bottom Actions Area */}
         <div className="space-y-3 pt-3 border-t border-border/60">
-          <Link href="/app/post/new" className="block">
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold py-2 rounded-xl text-xs cursor-pointer border-none shadow-xs transition-colors">
-              Create Post
-            </Button>
-          </Link>
+          {isViewer ? (
+            <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-[10px] font-semibold leading-relaxed text-amber-600 dark:text-amber-400">
+              👀 Viewer Mode — join with your college email to post &amp; chat.
+            </div>
+          ) : (
+            <Link href="/app/post/new" className="block">
+              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold py-2 rounded-xl text-xs cursor-pointer border-none shadow-xs transition-colors">
+                Create Post
+              </Button>
+            </Link>
+          )}
 
           {profile && (
             <div className="relative">
@@ -290,14 +301,16 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
                     <span>Edit Profile & Photos</span>
                   </Link>
 
-                  <Link
-                    href="/app/stories/new"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
-                  >
-                    <Sparkles className="size-3.5 text-amber-500" />
-                    <span>Post 24h Campus Vibe</span>
-                  </Link>
+                  {!isViewer && (
+                    <Link
+                      href="/app/stories/new"
+                      onClick={() => setShowProfileMenu(false)}
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    >
+                      <Sparkles className="size-3.5 text-amber-500" />
+                      <span>Post 24h Campus Vibe</span>
+                    </Link>
+                  )}
 
                   <div className="border-t border-border/50 pt-1">
                     <Link
@@ -354,6 +367,7 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
           const Icon = item.icon;
 
           if (item.label === "") {
+            if (isViewer) return null;
             return (
               <Link
                 key="create"

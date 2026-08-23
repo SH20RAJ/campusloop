@@ -4,9 +4,10 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
 import { userProfiles, institutionDomains } from "@/db/schema";
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
+import { getViewerInstitutionId } from "@/lib/viewer";
 
 export async function completeOnboarding(formData: FormData) {
   const user = await hexclaveServerApp.getUser();
@@ -63,9 +64,11 @@ export async function completeOnboarding(formData: FormData) {
     where: eq(institutionDomains.domain, domain),
   });
 
-  if (!whitelistedDomain) {
-    throw new Error(`Your email domain (@${domain}) is not whitelisted for any campus.`);
-  }
+  // Non-college emails join in Viewer-Only Mode: they get a profile in the
+  // reserved Viewer Hub and can browse everything, but write APIs refuse them.
+  const institutionId = whitelistedDomain
+    ? whitelistedDomain.institutionId
+    : await getViewerInstitutionId();
 
   // Handle referral tracking
   const cookieStore = await cookies();
@@ -105,7 +108,7 @@ export async function completeOnboarding(formData: FormData) {
         year,
         bio,
         interests,
-        institutionId: whitelistedDomain.institutionId,
+        institutionId,
         referredById: referrerId,
         onboardingCompleted: true,
         role: "STUDENT",
@@ -123,7 +126,7 @@ export async function completeOnboarding(formData: FormData) {
           year,
           bio,
           interests,
-          institutionId: whitelistedDomain.institutionId,
+          institutionId,
           onboardingCompleted: true,
         },
       });
@@ -132,8 +135,8 @@ export async function completeOnboarding(formData: FormData) {
       await db
         .update(userProfiles)
         .set({
-          referralCount: (referrerProfile.referralCount || 0) + 1,
-          points: (referrerProfile.points || 0) + 20,
+          referralCount: sql`${userProfiles.referralCount} + 1`,
+          points: sql`${userProfiles.points} + 20`,
         })
         .where(eq(userProfiles.id, referrerProfile.id));
     }

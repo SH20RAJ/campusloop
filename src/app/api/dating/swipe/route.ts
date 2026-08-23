@@ -10,6 +10,7 @@ import {
 } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and } from "drizzle-orm";
+import { rejectViewerWrite } from "@/lib/viewer";
 
 export async function POST(req: Request) {
   try {
@@ -26,6 +27,9 @@ export async function POST(req: Request) {
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
+
+    const viewerBlocked = await rejectViewerWrite(profile);
+    if (viewerBlocked) return viewerBlocked;
 
     const body = (await req.json()) as { 
       targetId?: string; 

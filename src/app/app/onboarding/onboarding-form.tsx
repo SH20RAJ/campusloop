@@ -3,20 +3,47 @@
 import { useState, useRef } from "react";
 import { completeOnboarding } from "./actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sparkles, User, ShieldCheck, Check, AlertCircle, Upload, Loader2 } from "lucide-react";
+import { Sparkles, User, ShieldCheck, Check, AlertCircle, Upload, Loader2, GraduationCap, Heart, Tag } from "lucide-react";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
 import { uploadImageToImgBB } from "@/lib/upload";
+import { DEGREE_CATEGORIES, getBranchesForDegree } from "@/lib/academic-constants";
 import { toast } from "sonner";
 
-export function OnboardingForm() {
-  const [displayName, setDisplayName] = useState("");
-  const [username, setUsername] = useState("");
+const POPULAR_INTERESTS = [
+  "Tech & Coding 💻",
+  "Late Night Tea ☕",
+  "Hostel Life 🏢",
+  "Campus Dating 💕",
+  "Gaming & Esports 🎮",
+  "Startups & AI 🚀",
+  "Music & Jamming 🎸",
+  "Exam Stress 📚",
+  "Sports & Gym ⚽",
+  "Photography 📸",
+  "Memes & Banter 🎭",
+  "Movies & Shows 🍿",
+];
+
+interface OnboardingFormProps {
+  initialDisplayName?: string;
+  initialUsername?: string;
+  initialAvatarUrl?: string;
+}
+
+export function OnboardingForm({
+  initialDisplayName = "",
+  initialUsername = "",
+  initialAvatarUrl = "",
+}: OnboardingFormProps) {
+  const [displayName, setDisplayName] = useState(initialDisplayName);
+  const [username, setUsername] = useState(initialUsername);
   const [gender, setGender] = useState<"MALE" | "FEMALE" | "OTHER">("MALE");
-  const [course, setCourse] = useState("");
-  const [branch] = useState("");
+  const [course, setCourse] = useState("B.Tech");
+  const [branch, setBranch] = useState("Computer Science & Engineering");
   const [year, setYear] = useState(1);
   const [bio, setBio] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
+  const [interests, setInterests] = useState<string[]>(["Tech & Coding 💻", "Hostel Life 🏢"]);
   const [isUploadingPfp, setIsUploadingPfp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +51,14 @@ export function OnboardingForm() {
 
   const nameVal = displayName ? validateDisplayName(displayName) : null;
   const userVal = username ? validateUsername(username) : null;
+
+  const currentDegreeBranches = getBranchesForDegree(course);
+
+  function handleToggleInterest(tag: string) {
+    setInterests((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  }
 
   async function handlePfpUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -44,7 +79,7 @@ export function OnboardingForm() {
   }
 
   function handleGenerateAvatar() {
-    const seed = username.trim() || displayName.trim() || "student";
+    const seed = username.trim() || displayName.trim() || String(Date.now());
     const generated = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`;
     setAvatarUrl(generated);
   }
@@ -75,13 +110,14 @@ export function OnboardingForm() {
     }
 
     const formData = new FormData();
-    formData.set("displayName", displayName);
-    formData.set("username", username);
+    formData.set("displayName", displayName.trim());
+    formData.set("username", username.trim().toLowerCase());
     formData.set("gender", gender);
-    formData.set("course", course);
-    formData.set("branch", branch);
+    formData.set("course", course.trim());
+    formData.set("branch", branch.trim());
     formData.set("year", String(year));
-    formData.set("bio", bio);
+    formData.set("bio", bio.trim());
+    formData.set("interests", JSON.stringify(interests));
     formData.set("avatarUrl", avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`);
 
     try {
@@ -139,7 +175,7 @@ export function OnboardingForm() {
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <label htmlFor="displayName" className="text-xs font-bold text-foreground flex items-center gap-1">
-            <User className="size-3.5 text-primary" /> Full Name <span className="text-destructive">*</span>
+            <User className="size-3.5 text-primary" /> Full / Real Name <span className="text-destructive">*</span>
           </label>
           {nameVal && !nameVal.isValid && (
             <span className="text-[10px] text-destructive font-semibold flex items-center gap-1">
@@ -166,7 +202,6 @@ export function OnboardingForm() {
               : "border-border/60 focus:border-primary"
           }`}
         />
-        <p className="text-[10px] text-muted-foreground">Real student names help connect with campus peers.</p>
       </div>
 
       {/* Username Handle Input */}
@@ -201,12 +236,11 @@ export function OnboardingForm() {
             }`}
           />
         </div>
-        <p className="text-[10px] text-muted-foreground">Visible on public posts and your campus profile.</p>
       </div>
 
       {/* Gender Selection */}
       <div className="space-y-1.5">
-        <label className="text-xs font-bold text-foreground">Gender Identification</label>
+        <label className="text-xs font-bold text-foreground">Gender Identification <span className="text-destructive">*</span></label>
         <div className="grid grid-cols-3 gap-2">
           {(["MALE", "FEMALE", "OTHER"] as const).map((g) => (
             <button
@@ -225,32 +259,96 @@ export function OnboardingForm() {
         </div>
       </div>
 
-      {/* Academic Info */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <label className="text-xs font-semibold text-muted-foreground">Course (e.g. B.Tech)</label>
-          <input
-            type="text"
-            placeholder="B.Tech / MBA"
-            value={course}
-            onChange={(e) => setCourse(e.target.value)}
-            className="w-full rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs font-semibold text-foreground focus:border-primary outline-none"
-          />
+      {/* Degree, Branch & Year Catalog */}
+      <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/20 p-4">
+        <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+          <GraduationCap className="size-4 text-primary" /> Academic Degree & Branch
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="space-y-1">
+            <label className="text-[11px] font-semibold text-muted-foreground">Degree Level</label>
+            <select
+              value={course}
+              onChange={(e) => {
+                const newCourse = e.target.value;
+                setCourse(newCourse);
+                const branches = getBranchesForDegree(newCourse);
+                if (branches.length > 0) setBranch(branches[0]);
+              }}
+              className="w-full rounded-xl border border-border/60 bg-card px-3 py-2 text-xs font-semibold text-foreground focus:border-primary outline-none"
+            >
+              {DEGREE_CATEGORIES.map((cat) => (
+                <optgroup key={cat.category} label={cat.category}>
+                  {cat.degrees.map((d) => (
+                    <option key={d.code} value={d.code}>
+                      {d.code} — {d.name}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[11px] font-semibold text-muted-foreground">Year of Study</label>
+            <select
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+              className="w-full rounded-xl border border-border/60 bg-card px-3 py-2 text-xs font-semibold text-foreground focus:border-primary outline-none"
+            >
+              {[1, 2, 3, 4, 5].map((y) => (
+                <option key={y} value={y}>
+                  Year {y} {y === 1 ? "(Freshman / First Year)" : y === 4 ? "(Senior / Final Year)" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-xs font-semibold text-muted-foreground">Year of Study</label>
-          <select
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
-            className="w-full rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs font-semibold text-foreground focus:border-primary outline-none"
-          >
-            {[1, 2, 3, 4, 5].map((y) => (
-              <option key={y} value={y}>
-                Year {y}
-              </option>
-            ))}
-          </select>
+        {currentDegreeBranches.length > 0 && (
+          <div className="space-y-1">
+            <label className="text-[11px] font-semibold text-muted-foreground">Specialization / Department</label>
+            <select
+              value={branch}
+              onChange={(e) => setBranch(e.target.value)}
+              className="w-full rounded-xl border border-border/60 bg-card px-3 py-2 text-xs font-semibold text-foreground focus:border-primary outline-none"
+            >
+              {currentDegreeBranches.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Interests Selection for Personalization & Matchmaking */}
+      <div className="space-y-2">
+        <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+          <Tag className="size-3.5 text-primary" /> Campus Interests & Vibes
+        </label>
+        <p className="text-[10px] text-muted-foreground">Pick topics you care about to personalize your feed & matches.</p>
+
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {POPULAR_INTERESTS.map((tag) => {
+            const isSelected = interests.includes(tag);
+            return (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => handleToggleInterest(tag)}
+                className={`py-1.5 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                  isSelected
+                    ? "border-primary bg-primary/15 text-primary shadow-xs"
+                    : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tag}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -259,7 +357,7 @@ export function OnboardingForm() {
         <label className="text-xs font-semibold text-muted-foreground">Campus Bio</label>
         <textarea
           rows={2}
-          placeholder="Tell your college what you study or like..."
+          placeholder="Tell your college what you study, build, or what's your vibe..."
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           className="w-full rounded-xl border border-border/60 bg-muted/20 p-2.5 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary resize-none"
@@ -278,7 +376,7 @@ export function OnboardingForm() {
         className="mt-2 flex w-full items-center justify-center rounded-2xl bg-primary px-4 py-3 text-xs font-bold text-primary-foreground transition-all hover:bg-primary/95 disabled:opacity-50 shadow-md cursor-pointer"
       >
         <ShieldCheck className="size-4 mr-1.5" />
-        {isLoading ? "Setting up profile..." : "Complete Setup & Enter Campus"}
+        {isLoading ? "Setting up profile..." : "Complete Setup & Enter Campus 🚀"}
       </button>
     </form>
   );

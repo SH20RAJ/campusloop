@@ -68,6 +68,8 @@ export function ChatPane({
         officialName: "Me",
         username: "me",
         avatarUrl: "",
+        bannerUrl: null,
+        headline: null,
         userId: "",
         institutionId: "",
         course: null,

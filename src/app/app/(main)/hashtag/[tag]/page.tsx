@@ -10,6 +10,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `#${tag} Posts & Discussions | CampusLoop`,
     description: `Explore trending student confessions, polls, and discussions for #${tag} on CampusLoop.`,
+    robots: { index: true, follow: true },
   };
 }
 

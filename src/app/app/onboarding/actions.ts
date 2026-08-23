@@ -27,6 +27,13 @@ export async function completeOnboarding(formData: FormData) {
   const branch = (formData.get("branch") as string)?.trim() || null;
   const year = Number(formData.get("year")) || 1;
   const bio = (formData.get("bio") as string)?.trim() || null;
+  const interestsRaw = (formData.get("interests") as string) || "[]";
+  let interests: string[] = [];
+  try {
+    interests = JSON.parse(interestsRaw);
+  } catch {
+    interests = [];
+  }
 
   // Strict Gender Validation
   if (!rawGender || !["MALE", "FEMALE", "OTHER"].includes(rawGender)) {
@@ -84,23 +91,42 @@ export async function completeOnboarding(formData: FormData) {
   const cleanAvatarUrl = avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
 
   try {
-    await db.insert(userProfiles).values({
-      userId: user.id,
-      username: username.trim().toLowerCase(),
-      displayName: displayName.trim(),
-      officialName,
-      avatarUrl: cleanAvatarUrl,
-      gender,
-      course,
-      branch,
-      year,
-      bio,
-      institutionId: whitelistedDomain.institutionId,
-      referredById: referrerId,
-      onboardingCompleted: true,
-      role: "STUDENT",
-      status: "ACTIVE",
-    });
+    await db
+      .insert(userProfiles)
+      .values({
+        userId: user.id,
+        username: username.trim().toLowerCase(),
+        displayName: displayName.trim(),
+        officialName,
+        avatarUrl: cleanAvatarUrl,
+        gender,
+        course,
+        branch,
+        year,
+        bio,
+        interests,
+        institutionId: whitelistedDomain.institutionId,
+        referredById: referrerId,
+        onboardingCompleted: true,
+        role: "STUDENT",
+        status: "ACTIVE",
+      })
+      .onConflictDoUpdate({
+        target: userProfiles.userId,
+        set: {
+          username: username.trim().toLowerCase(),
+          displayName: displayName.trim(),
+          avatarUrl: cleanAvatarUrl,
+          gender,
+          course,
+          branch,
+          year,
+          bio,
+          interests,
+          institutionId: whitelistedDomain.institutionId,
+          onboardingCompleted: true,
+        },
+      });
 
     if (referrerProfile) {
       await db

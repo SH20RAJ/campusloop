@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       siteName: "CampusLoop",
     },
+    robots: { index: false, follow: true },
   };
 }
 

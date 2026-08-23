@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2, Image as ImageIcon, X, Plus } from "lucide-react";
+import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2, Image as ImageIcon, X, Plus, Camera } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getAvatarUrl } from "@/lib/utils";
@@ -30,20 +30,24 @@ export function EditProfileClient() {
 
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
+  const [headline, setHeadline] = useState("");
   const [gender, setGender] = useState<"MALE" | "FEMALE" | "OTHER">("MALE");
   const [course, setCourse] = useState("");
   const [branch, setBranch] = useState("");
   const [year, setYear] = useState<number>(1);
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [bannerUrl, setBannerUrl] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingPfp, setIsUploadingPfp] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [isUploadingDatingPhoto, setIsUploadingDatingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const pfpInputRef = useRef<HTMLInputElement | null>(null);
+  const bannerInputRef = useRef<HTMLInputElement | null>(null);
   const datingPhotoInputRef = useRef<HTMLInputElement | null>(null);
 
   const nameVal = displayName ? validateDisplayName(displayName) : null;
@@ -53,12 +57,14 @@ export function EditProfileClient() {
     if (profile) {
       setDisplayName(profile.displayName || "");
       setUsername(profile.username || "");
+      setHeadline(profile.headline || "");
       setGender((profile.gender as "MALE" | "FEMALE" | "OTHER") || "MALE");
       setCourse(profile.course || "");
       setBranch(profile.branch || "");
       setYear(profile.year || 1);
       setBio(profile.bio || "");
       setAvatarUrl(profile.avatarUrl || "");
+      setBannerUrl(profile.bannerUrl || "");
       setPhotos(profile.photos || []);
       setInterests(profile.interests || []);
     }
@@ -85,6 +91,24 @@ export function EditProfileClient() {
     } finally {
       setIsUploadingPfp(false);
       if (pfpInputRef.current) pfpInputRef.current.value = "";
+    }
+  }
+
+  async function handleBannerUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingBanner(true);
+    try {
+      toast.loading("Uploading cover banner to ImgBB...", { id: "banner-upload" });
+      const res = await uploadImageToImgBB(file);
+      setBannerUrl(res.displayUrl || res.url);
+      toast.success("Cover banner uploaded! 🎨", { id: "banner-upload" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload banner", { id: "banner-upload" });
+    } finally {
+      setIsUploadingBanner(false);
+      if (bannerInputRef.current) bannerInputRef.current.value = "";
     }
   }
 
@@ -149,12 +173,14 @@ export function EditProfileClient() {
         body: JSON.stringify({
           displayName: displayName.trim(),
           username: username.trim().toLowerCase(),
+          headline: headline.trim(),
           gender,
           course: course.trim(),
           branch: branch.trim(),
           year,
           bio: bio.trim(),
           avatarUrl,
+          bannerUrl,
           photos,
           interests,
         }),
@@ -216,33 +242,55 @@ export function EditProfileClient() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* ─── Avatar Section ─── */}
-        <div className="flex flex-col items-center justify-center space-y-3 rounded-2xl border border-border/60 bg-muted/20 p-5 text-center shadow-xs">
-          <Avatar className="size-24 border-2 border-primary/30 shadow-md">
-            <AvatarImage src={avatarUrl || getAvatarUrl(null, username || "user")} />
-            <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
-              {displayName ? displayName[0].toUpperCase() : "U"}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-            <button
-              type="button"
-              disabled={isUploadingPfp}
-              onClick={() => pfpInputRef.current?.click()}
-              className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
-            >
-              {isUploadingPfp ? <Loader2 className="size-3.5 animate-spin text-primary" /> : <Upload className="size-3.5 text-primary" />}
-              <span>Upload Avatar</span>
-            </button>
+        {/* ─── Cover Banner & Avatar Section ─── */}
+        <div className="rounded-3xl border border-border/80 bg-card overflow-hidden shadow-xs">
+          {/* Banner Preview */}
+          <div className="relative h-32 w-full bg-gradient-to-r from-orange-500/25 via-primary/30 to-amber-500/25">
+            {bannerUrl ? (
+              <img src={bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+            )}
 
             <button
               type="button"
-              onClick={handleGenerateDiceBearAvatar}
-              className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer"
+              disabled={isUploadingBanner}
+              onClick={() => bannerInputRef.current?.click()}
+              className="absolute top-3 right-3 py-1.5 px-3 rounded-xl bg-black/70 hover:bg-black/85 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md"
             >
-              🎲 Random Avatar
+              {isUploadingBanner ? <Loader2 className="size-3.5 animate-spin" /> : <Camera className="size-3.5" />}
+              <span>{bannerUrl ? "Change Banner" : "Upload Banner"}</span>
             </button>
+          </div>
+
+          {/* Avatar Row */}
+          <div className="p-5 flex flex-col sm:flex-row items-center gap-4 -mt-12">
+            <Avatar className="size-24 border-4 border-card shadow-xl shrink-0">
+              <AvatarImage src={avatarUrl || getAvatarUrl(null, username || "user")} />
+              <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
+                {displayName ? displayName[0].toUpperCase() : "U"}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2 sm:pt-6">
+              <button
+                type="button"
+                disabled={isUploadingPfp}
+                onClick={() => pfpInputRef.current?.click()}
+                className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+              >
+                {isUploadingPfp ? <Loader2 className="size-3.5 animate-spin text-primary" /> : <Upload className="size-3.5 text-primary" />}
+                <span>Upload Avatar</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleGenerateDiceBearAvatar}
+                className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer"
+              >
+                🎲 Random Avatar
+              </button>
+            </div>
           </div>
         </div>
 
@@ -368,6 +416,22 @@ export function EditProfileClient() {
                 }`}
               />
             </div>
+          </div>
+
+          {/* Student Headline / Tagline */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-muted-foreground">Profile Headline / Tagline</label>
+              <span className="text-[10px] text-muted-foreground">{headline.length}/100</span>
+            </div>
+            <input
+              type="text"
+              maxLength={100}
+              value={headline}
+              onChange={(e) => setHeadline(e.target.value)}
+              placeholder="e.g. CS Sophomore @ BIT Mesra | Building AI agents & web apps"
+              className="w-full rounded-xl border border-border/60 bg-muted/20 px-3.5 py-2 text-xs font-semibold text-foreground outline-none transition-all focus:border-primary focus:bg-background"
+            />
           </div>
 
           {/* Gender Selector */}

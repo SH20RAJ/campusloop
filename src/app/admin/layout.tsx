@@ -1,4 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+import { resolveAdminSession } from "./_lib/guard";
+
+export const metadata: Metadata = {
+	title: {
+		default: "Admin Console",
+		template: "%s | CampusLoop Admin",
+	},
+	description: "Internal moderation console — content review, user management, and audit trails.",
+	robots: {
+		index: false,
+		follow: false,
+	},
+};
 import {
 	ArrowLeft,
 	FileText,

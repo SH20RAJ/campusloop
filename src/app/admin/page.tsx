@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
 	Activity,
@@ -12,6 +13,10 @@ import {
 	Users,
 } from "lucide-react";
 import { desc, eq } from "drizzle-orm";
+
+export const metadata: Metadata = {
+	title: "Dashboard",
+};
 
 import { institutions, posts, userProfiles } from "@/db/schema";
 

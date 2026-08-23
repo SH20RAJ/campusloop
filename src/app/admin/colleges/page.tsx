@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
@@ -6,6 +7,10 @@ import { desc } from "drizzle-orm";
 import { CollegesTable } from "./colleges-table";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+	title: "Colleges",
+};
 
 export default async function CollegesAdminPage() {
   const db = getDb();

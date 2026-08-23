@@ -57,7 +57,9 @@ export async function PATCH(req: Request) {
       branch?: string;
       year?: number;
       bio?: string;
+      headline?: string;
       avatarUrl?: string;
+      bannerUrl?: string;
       photos?: string[];
       interests?: string[];
     };
@@ -101,7 +103,9 @@ export async function PATCH(req: Request) {
     if (body.course !== undefined) updateData.course = body.course.trim();
     if (body.branch !== undefined) updateData.branch = body.branch.trim();
     if (body.year !== undefined) updateData.year = Number(body.year);
+    if (body.headline !== undefined) updateData.headline = body.headline.trim() || null;
     if (body.avatarUrl !== undefined) updateData.avatarUrl = body.avatarUrl.trim() || null;
+    if (body.bannerUrl !== undefined) updateData.bannerUrl = body.bannerUrl.trim() || null;
     if (body.photos !== undefined && Array.isArray(body.photos)) {
       updateData.photos = body.photos.slice(0, 6).filter((url) => typeof url === "string" && url.trim().length > 0);
     }

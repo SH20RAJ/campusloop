@@ -49,6 +49,37 @@ export const DEGREE_OPTIONS: DegreeOption[] = [
   { code: "Diploma", name: "Polytechnic / Advanced Diploma", level: "DIPLOMA", durationYears: 3 },
 ];
 
+export const DEGREE_CATEGORIES: { category: string; degrees: DegreeOption[] }[] = [
+  {
+    category: "Bachelors / Undergraduate (UG)",
+    degrees: DEGREE_OPTIONS.filter((d) => d.level === "BACHELORS"),
+  },
+  {
+    category: "Masters / Postgraduate (PG)",
+    degrees: DEGREE_OPTIONS.filter((d) => d.level === "MASTERS"),
+  },
+  {
+    category: "Doctorate & Research (PhD)",
+    degrees: DEGREE_OPTIONS.filter((d) => d.level === "DOCTORATE"),
+  },
+  {
+    category: "Diploma & Dual Degrees",
+    degrees: DEGREE_OPTIONS.filter((d) => d.level === "DIPLOMA" || d.level === "OTHER"),
+  },
+];
+
+export function getBranchesForDegree(degreeCode?: string): string[] {
+  if (!degreeCode) return BRANCH_OPTIONS.map((b) => b.name);
+  const upper = degreeCode.toUpperCase();
+  if (upper.includes("ARCH")) return ["Architecture & Urban Planning", "Interior & Spatial Design"];
+  if (upper.includes("MBBS") || upper.includes("MD") || upper.includes("BDS")) return ["Medicine & Clinical Surgery (MBBS)", "Dental Sciences (BDS)", "Biotechnology & Bio-Engineering"];
+  if (upper.includes("MBA") || upper.includes("BBA") || upper.includes("COM")) return ["Master of Business Administration (MBA)", "Finance, Banking & Economics", "Commerce & Chartered Accountancy"];
+  if (upper.includes("MCA") || upper.includes("BCA")) return ["Master of Computer Applications (MCA)", "Computer Science & Engineering", "Artificial Intelligence & Data Science", "Information Technology (IT)"];
+  if (upper.includes("LAW") || upper.includes("LLB") || upper.includes("LLM")) return ["Law & Constitutional Studies"];
+  if (upper.includes("DES")) return ["Design, UI/UX & Animation", "Architecture & Urban Planning"];
+  return BRANCH_OPTIONS.map((b) => b.name);
+}
+
 export interface BranchOption {
   name: string;
   slug: string;

@@ -50,6 +50,7 @@ interface NavigationProps {
 export function Navigation({ profile, isAdmin }: NavigationProps) {
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showUtilitySubmenu, setShowUtilitySubmenu] = useState(false);
   const [showSocialSubmenu, setShowSocialSubmenu] = useState(false);
 
@@ -257,31 +258,90 @@ export function Navigation({ profile, isAdmin }: NavigationProps) {
           </Link>
 
           {profile && (
-            <div className="flex items-center justify-between gap-2 px-1.5 py-1.5">
-              <Link href="/app/profile" className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-80 transition-opacity">
-                <Avatar className="size-8 shrink-0">
-                  <AvatarImage src={profile.avatarUrl || ""} />
-                  <AvatarFallback className="text-[9px] font-bold">
-                    {profile.displayName[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0">
-                  <p className="truncate text-xs font-bold text-foreground">{profile.displayName}</p>
-                  <p className="truncate text-[9px] text-muted-foreground">@{profile.username}</p>
-                </div>
-              </Link>
+            <div className="relative">
+              {showProfileMenu && (
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowProfileMenu(false)}
+                />
+              )}
 
-              <div className="flex items-center gap-1 shrink-0">
-                <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted/50" />
-                <Link
-                  href="/handler/sign-out"
-                  className="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:text-destructive transition-colors"
-                  title="Sign out"
+              {showProfileMenu && (
+                <div className="absolute bottom-12 left-0 right-0 z-50 rounded-2xl border border-border bg-card p-2 shadow-2xl space-y-1 animate-in fade-in slide-in-from-bottom-2">
+                  <div className="px-2.5 py-1.5 border-b border-border/50">
+                    <p className="text-xs font-bold text-foreground truncate">{profile.displayName}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">@{profile.username}</p>
+                  </div>
+
+                  <Link
+                    href="/app/profile"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <UserCircle className="size-3.5 text-primary" />
+                    <span>View Profile</span>
+                  </Link>
+
+                  <Link
+                    href="/app/profile/edit"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <Sliders className="size-3.5 text-blue-500" />
+                    <span>Edit Profile & Photos</span>
+                  </Link>
+
+                  <Link
+                    href="/app/stories/new"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <Sparkles className="size-3.5 text-amber-500" />
+                    <span>Post 24h Campus Vibe</span>
+                  </Link>
+
+                  <div className="border-t border-border/50 pt-1">
+                    <a
+                      href="/handler/sign-out"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                    >
+                      <LogOut className="size-3.5" />
+                      <span>Sign Out</span>
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between gap-2 px-1.5 py-1.5 rounded-2xl hover:bg-muted/30 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer group"
                 >
-                  <AnimateIcon animateOnHover animation="path">
-                    <LogOut className="size-3.5" />
-                  </AnimateIcon>
-                </Link>
+                  <Avatar className="size-8 shrink-0 border border-border group-hover:scale-105 transition-transform">
+                    <AvatarImage src={profile.avatarUrl || ""} />
+                    <AvatarFallback className="text-[9px] font-bold">
+                      {profile.displayName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-bold text-foreground">{profile.displayName}</p>
+                    <p className="truncate text-[9px] text-muted-foreground">@{profile.username}</p>
+                  </div>
+                </button>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted/50" />
+                  <Link
+                    href="/handler/sign-out"
+                    className="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:text-destructive transition-colors"
+                    title="Sign out"
+                  >
+                    <AnimateIcon animateOnHover animation="path">
+                      <LogOut className="size-3.5" />
+                    </AnimateIcon>
+                  </Link>
+                </div>
               </div>
             </div>
           )}

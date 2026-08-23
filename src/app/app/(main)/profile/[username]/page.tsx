@@ -10,6 +10,7 @@ export async function generateMetadata({ params }: ProfileDetailProps): Promise<
   return {
     title: `@${username} | CampusLoop`,
     description: `View @${username}'s student profile on CampusLoop.`,
+    robots: { index: false, follow: true },
   };
 }
 

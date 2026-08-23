@@ -178,10 +178,12 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
     }
   }
 
-  // If not authenticated, render soft minimal public card
+  // If not authenticated, render LinkedIn-style public card
   const tier = getCloutTier(profile.points || 0);
   const branchIcon = getBranchIcon(profile.branch || profile.course);
   const branchSlug = profile.branch ? slugifyBranch(profile.branch) : null;
+  const institutionName = profile.institution?.name || "Indian Institute of Technology";
+  const campusShort = institutionName.split(",")[0];
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden pb-16 select-none">
@@ -195,78 +197,103 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
             CampusLoop
           </span>
         </Link>
-        <Link href="/join">
-          <button className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
-            Join Campus
-          </button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/join?mode=signin">
+            <button className="rounded-xl border border-input px-3.5 py-1.5 text-xs font-bold text-foreground hover:bg-muted transition-all cursor-pointer">
+              Sign In
+            </button>
+          </Link>
+          <Link href="/join?mode=signup">
+            <button className="rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
+              Join Campus
+            </button>
+          </Link>
+        </div>
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 w-full max-w-lg px-4 pt-24 mx-auto space-y-5">
-        <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-b from-card via-card to-muted/20 p-6 shadow-xl space-y-5">
-          <div className="flex flex-col items-center text-center space-y-3">
-            <div className="relative">
-              <Avatar className="size-24 border-3 border-background shadow-2xl">
-                <AvatarImage src={profile.avatarUrl || ""} />
-                <AvatarFallback className="text-3xl bg-primary/10 text-primary font-black">
-                  {profile.displayName[0]?.toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {(profile.points || 0) >= 150 && (
-                <span className="absolute -bottom-1 -right-1 size-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md text-xs font-black border-2 border-background">
-                  ✓
-                </span>
-              )}
+      <main className="flex-1 w-full max-w-xl px-4 pt-20 mx-auto space-y-4">
+        {/* Profile Card with Cover Banner */}
+        <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-lg">
+          <div className="relative h-28 sm:h-36 w-full bg-gradient-to-r from-orange-500/25 via-primary/30 to-amber-500/25 overflow-hidden">
+            {profile.bannerUrl ? (
+              <img src={profile.bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+            )}
+          </div>
+
+          <div className="px-5 pb-5 pt-0 space-y-3">
+            <div className="flex items-end justify-between -mt-12 sm:-mt-14">
+              <div className="relative">
+                <Avatar className="size-20 sm:size-24 border-4 border-card shadow-2xl bg-background">
+                  <AvatarImage src={profile.avatarUrl || ""} />
+                  <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary">
+                    {profile.displayName[0]?.toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {(profile.points || 0) >= 150 && (
+                  <span className="absolute bottom-0 right-0 size-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md text-xs font-black border-2 border-card">
+                    ✓
+                  </span>
+                )}
+              </div>
+
+              <span className="rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black px-2.5 py-1">
+                {tier.tierName} · {profile.points || 0} LP
+              </span>
             </div>
 
             <div className="space-y-1">
               <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
                 {profile.displayName}
               </h2>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground font-semibold justify-center">
+              <p className="text-xs sm:text-sm font-semibold text-foreground/90 leading-snug">
+                {profile.headline || (
+                  profile.branch && profile.course
+                    ? `${profile.course} in ${profile.branch} @ ${campusShort}`
+                    : `Student @ ${campusShort}`
+                )}
+              </p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium pt-0.5">
                 <span>@{profile.username}</span>
                 <span>•</span>
-                <span className="inline-flex items-center gap-1 text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
-                  <Flame className="size-3 text-rose-500" /> {tier.tierName} · {profile.points || 0} LP
-                </span>
+                <span>{campusShort}</span>
               </div>
-
-              {profile.institution && (
-                <p className="text-xs text-primary font-bold flex items-center justify-center gap-1.5 pt-1">
-                  <School className="size-3.5" /> {profile.institution.name.split(",")[0]}
-                </p>
-              )}
             </div>
-
-            {/* Academic Badges */}
-            {(profile.course || profile.branch || profile.year) && (
-              <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-                {profile.branch && (
-                  <span className="text-[11px] font-bold bg-primary/10 border border-primary/20 text-primary px-2.5 py-0.5 rounded-lg">
-                    {branchIcon} {profile.branch}
-                  </span>
-                )}
-                {profile.course && (
-                  <span className="text-[11px] font-bold bg-muted/60 border border-border px-2.5 py-0.5 rounded-lg text-foreground">
-                    🎓 {profile.course}
-                  </span>
-                )}
-                {profile.year && (
-                  <span className="text-[11px] font-bold bg-muted/60 border border-border px-2.5 py-0.5 rounded-lg text-muted-foreground">
-                    📅 Year {profile.year}
-                  </span>
-                )}
-              </div>
-            )}
-
-            {profile.bio && (
-              <p className="text-xs text-foreground/90 font-medium italic max-w-sm pt-1 leading-relaxed">
-                &ldquo;{profile.bio}&rdquo;
-              </p>
-            )}
           </div>
         </div>
+
+        {/* Education & Discipline Card */}
+        <div className="rounded-3xl border border-border/80 bg-card p-5 shadow-xs space-y-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <School className="size-4 text-primary" /> Campus & Academic Discipline
+          </h3>
+
+          <div className="flex items-start gap-3.5 pt-1">
+            <div className="flex size-11 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-xl shrink-0">
+              {branchIcon}
+            </div>
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-xs sm:text-sm font-bold text-foreground truncate">{institutionName}</p>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-medium">
+                {profile.course && <span>{profile.course}</span>}
+                {profile.course && profile.branch && <span>·</span>}
+                {profile.branch && <span className="text-primary font-bold">{profile.branch}</span>}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* About Card */}
+        {profile.bio && (
+          <div className="rounded-3xl border border-border/80 bg-card p-5 shadow-xs space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">About</h3>
+            <p className="text-xs text-foreground/90 font-medium leading-relaxed whitespace-pre-wrap">
+              {profile.bio}
+            </p>
+          </div>
+        )}
 
         {/* Locked Teaser CTA */}
         <div className="rounded-3xl border border-dashed border-border/80 bg-card/60 p-6 text-center space-y-4 shadow-sm">

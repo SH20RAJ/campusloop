@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ShieldAlertIcon } from "lucide-react";
+
+export const metadata: Metadata = {
+	title: "Invalid Email",
+	description: "The email used to sign up is not a verified student email. Sign up again with your official college email.",
+	robots: { index: false, follow: false },
+};
 
 export default function InvalidEmailPage() {
   return (

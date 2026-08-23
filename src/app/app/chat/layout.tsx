@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { Navigation } from "@/components/ui/navigation";
+
+export const metadata: Metadata = {
+	title: "Messages",
+	description: "Chat privately with verified students across your campus loop.",
+	robots: { index: false, follow: false },
+};
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
 import { userProfiles, institutions } from "@/db/schema";

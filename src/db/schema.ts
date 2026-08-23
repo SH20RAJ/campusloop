@@ -117,6 +117,8 @@ export const userProfiles = pgTable(
 		displayName: text("display_name").notNull(),
 		officialName: text("official_name"),
 		avatarUrl: text("avatar_url"),
+		bannerUrl: text("banner_url"),
+		headline: text("headline"),
 		institutionId: text("institution_id")
 			.notNull()
 			.references(() => institutions.id, { onDelete: "restrict" }),

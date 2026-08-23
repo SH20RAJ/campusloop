@@ -1,8 +1,22 @@
+import type { Metadata } from "next";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
 import { institutionDomains, userProfiles } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
+
+/**
+ * Default for everything behind auth: stay out of search indexes.
+ * Public, indexable surfaces (post/[id], college/[id], colleges,
+ * communities, hashtag/[tag], branch/[slug], …) explicitly opt back in
+ * with `robots: { index: true }` in their own metadata.
+ */
+export const metadata: Metadata = {
+	robots: {
+		index: false,
+		follow: true,
+	},
+};
 
 export default async function AppRootLayout({
   children,

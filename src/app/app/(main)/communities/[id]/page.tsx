@@ -69,6 +69,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: ["https://campusloop.space/logo.png"],
     },
+    robots: { index: true, follow: true },
   };
 }
 

@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: PostsTypePageProps): Promise<
   return {
     title: `${label} | CampusLoop`,
     description: `Browse ${label.toLowerCase()} from verified students on CampusLoop.`,
+    robots: { index: true, follow: true },
   };
 }
 

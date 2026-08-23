@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: BranchPageProps): Promise<Met
       description,
       url: `https://campusloop.space/app/branch/${decoded}`,
     },
+    robots: { index: true, follow: true },
   };
 }
 

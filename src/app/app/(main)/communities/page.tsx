@@ -10,6 +10,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Communities & Sub-Hub Posts | CampusLoop",
   description: "Browse student communities and community posts on CampusLoop.",
+  robots: { index: true, follow: true },
 };
 
 export default async function CommunitiesPage() {

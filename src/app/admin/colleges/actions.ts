@@ -1,51 +1,28 @@
 "use server";
 
-import { getDb } from "@/db";
 import {
-  institutions,
-  institutionDomains,
-  userProfiles,
+	institutions,
+	institutionDomains,
 } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
 import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-async function verifyAdmin() {
-  const cookieStore = await cookies();
-  const passkey = cookieStore.get("admin_session")?.value;
-  if (passkey === "17092006") {
-    return getDb();
-  }
-
-  const user = await hexclaveServerApp.getUser();
-  if (!user) throw new Error("Unauthorized");
-
-  const db = getDb();
-  const profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
-
-  if (!profile || profile.role !== "ADMIN") {
-    throw new Error("Forbidden");
-  }
-  return db;
-}
+import { getAdminDb } from "../_lib/guard";
 
 function slugify(text: string): string {
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w-]+/g, "")
-    .replace(/--+/g, "-")
-    .replace(/^-+|-+$/g, "");
+	return text
+		.toString()
+		.toLowerCase()
+		.trim()
+		.replace(/\s+/g, "-")
+		.replace(/[^\w-]+/g, "")
+		.replace(/--+/g, "-")
+		.replace(/^-+|-+$/g, "");
 }
 
 export async function createCollege(formData: FormData) {
-  const db = await verifyAdmin();
+	const db = await getAdminDb();
 
   const name = formData.get("name") as string;
   const slug = (formData.get("slug") as string) || slugify(name);
@@ -110,13 +87,13 @@ export async function createCollege(formData: FormData) {
 }
 
 export async function deleteCollege(id: string) {
-  const db = await verifyAdmin();
+  const db = await getAdminDb();
   await db.delete(institutions).where(eq(institutions.id, id));
   revalidatePath("/admin/colleges");
 }
 
 export async function addDomain(institutionId: string, domain: string) {
-  const db = await verifyAdmin();
+  const db = await getAdminDb();
   await db.insert(institutionDomains).values({
     institutionId,
     domain: domain.toLowerCase(),
@@ -127,7 +104,7 @@ export async function addDomain(institutionId: string, domain: string) {
 }
 
 export async function removeDomain(domainId: string) {
-  const db = await verifyAdmin();
+  const db = await getAdminDb();
   await db.delete(institutionDomains).where(eq(institutionDomains.id, domainId));
   revalidatePath("/admin/colleges");
 }

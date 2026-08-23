@@ -6,23 +6,27 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { userProfiles, type UserProfile } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { ADMIN_SESSION_COOKIE, isValidAdminSessionToken } from "./session";
 import { eq, sql } from "drizzle-orm";
 
-const LEGACY_PASSKEY_COOKIE = "admin_session";
 type Db = ReturnType<typeof getDb>;
 
 /**
  * Single source of truth for admin authorization.
  *
  * Two paths:
- * 1. Legacy passkey cookie — retained for owner convenience on read surfaces.
+ * 1. Signed passkey session cookie — owner convenience on read surfaces.
  *    NEVER accepted for identity reveal (see anonymity-actions).
  * 2. Hexclave session with role === "ADMIN" — required for sensitive actions.
  */
 
+function hasPasskeySession(cookieStore: Awaited<ReturnType<typeof cookies>>): boolean {
+	return isValidAdminSessionToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
+}
+
 export async function getAdminDb(): Promise<Db> {
 	const cookieStore = await cookies();
-	if (cookieStore.get(LEGACY_PASSKEY_COOKIE)?.value === "17092006") {
+	if (hasPasskeySession(cookieStore)) {
 		return getDb();
 	}
 	const { db } = await requireAdminProfile();
@@ -52,10 +56,10 @@ export type AdminSessionContext = {
 	isLegacyPasskey: boolean;
 };
 
-/** Layout-level check: passkey OR ADMIN profile. Also bootstraps first admin. */
+/** Layout-level check: signed passkey session OR ADMIN profile. Also bootstraps first admin. */
 export async function resolveAdminSession(): Promise<AdminSessionContext> {
 	const cookieStore = await cookies();
-	const isLegacyPasskey = cookieStore.get(LEGACY_PASSKEY_COOKIE)?.value === "17092006";
+	const isLegacyPasskey = hasPasskeySession(cookieStore);
 	const db = getDb();
 
 	if (!isLegacyPasskey) {

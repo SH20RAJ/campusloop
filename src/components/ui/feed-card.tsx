@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Repeat2, Heart } from "lucide-react";
@@ -25,6 +25,7 @@ interface FeedCardProps {
 
 export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardProps) {
   const router = useRouter();
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [userVote, setUserVote] = useState(post.userVote);
   const [votesCount, setVotesCount] = useState(post.votesCount);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +38,6 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
-
 
   async function handleVote() {
     if (isLoading) return;
@@ -61,7 +61,25 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
     }
   }
 
-  function handleDoubleTap() {
+  function handleCardClick() {
+    if (disableNavigation) return;
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+      return;
+    }
+    clickTimeoutRef.current = setTimeout(() => {
+      clickTimeoutRef.current = null;
+      router.push(`/app/post/${post.id}`);
+    }, 220);
+  }
+
+  function handleDoubleTap(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
     if (userVote !== 1) handleVote();
     setShowDoubleTapHeart(true);
     setTimeout(() => setShowDoubleTapHeart(false), 900);
@@ -123,9 +141,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
       {/* Content Body */}
       <div
         className="px-5 py-1 cursor-pointer select-none"
-        onClick={() => {
-          if (!disableNavigation) router.push(`/app/post/${post.id}`);
-        }}
+        onClick={handleCardClick}
         onDoubleClick={handleDoubleTap}
       >
         <RichText content={post.body} className="text-sm md:text-base leading-relaxed text-foreground" />

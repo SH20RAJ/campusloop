@@ -15,3 +15,12 @@ keep clean minimal ui with less text and create separate page for filters on dat
 
   improve page http://localhost:3000/app/post/bit_post_9 ui ux same as facebook , also add optimistic update whereever possible in the app....
   optimise full backend and frontend , also in feeds show less the posts already seen....
+
+
+  for producthunt launch suggest Link to the product
+[CampusLoop](https://www.producthunt.com/products/campusloop?launch=campusloop) recently launched on Product Hunt. Is this new launch a major update?
+No
+Yes, it got a major update!
+What's new in this version?
+Explaining your changes can help the moderation team assess whether or not your product should be featured. If you are unsure if your changes are significant and you don't want the post to go live, you may reach out to our support team.
+

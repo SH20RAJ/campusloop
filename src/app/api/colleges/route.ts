@@ -51,6 +51,10 @@ export async function GET(request: Request) {
       website: college.website,
       yearOfEstablishment: college.yearOfEstablishment,
       aisheCode: college.aisheCode,
+      logoUrl: college.logoUrl,
+      bannerUrl: college.bannerUrl,
+      nirfRank: college.nirfRank,
+      description: college.description,
       postCount: 0,
     }));
 

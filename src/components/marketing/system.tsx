@@ -1,52 +1,18 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
-/**
- * CampusLoop Marketing Design System
- * ----------------------------------
- * Single source of truth for every public-facing page (/, /about,
- * /overview, /pitch, /safety, /privacy, /contact). See
- * docs/DESIGN_SYSTEM.md for the full spec.
- *
- * Rules of thumb:
- *  - One `MarketingHeader` + one `MarketingFooter` per page, never hand-rolled.
- *  - Content lives in `Section` blocks introduced by `SectionHeading`.
- *  - The brand gradient (`GradientText`) is an accent: at most one phrase
- *    per heading, never whole paragraphs.
- */
-
-export const BRAND_GRADIENT = "bg-gradient-to-r from-primary via-orange-500 to-amber-500";
+export const BRAND_GRADIENT = "bg-gradient-to-r from-indigo-500 via-violet-600 to-purple-600";
 
 export function GradientText({ children, className }: { children: React.ReactNode; className?: string }) {
   return <span className={cn(BRAND_GRADIENT, "bg-clip-text text-transparent", className)}>{children}</span>;
 }
 
 export function BrandMark({ size = "md" }: { size?: "sm" | "md" }) {
-  return (
-    <Link href="/" className="flex items-center gap-2.5">
-      <span
-        className={cn(
-          "flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black",
-          size === "sm" ? "size-6" : "size-7"
-        )}
-      >
-        <Image
-          src="/logo.png"
-          alt="CampusLoop logo"
-          width={28}
-          height={28}
-          className="size-full scale-110 object-cover"
-        />
-      </span>
-      <span className={cn("font-black tracking-tight", size === "sm" ? "text-sm" : "text-base")}>
-        <GradientText>CampusLoop</GradientText>
-      </span>
-    </Link>
-  );
+  return <BrandLogo size={size} href="/" />;
 }
 
 const NAV_LINKS = [

@@ -37,6 +37,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import type { UserProfile } from "@/db/schema";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 interface NavigationProps {
   profile?: UserProfile;
@@ -130,10 +131,9 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
       <aside className="fixed left-0 top-0 z-30 hidden h-screen w-60 border-r border-border bg-background py-5 px-3 md:flex md:flex-col justify-between overflow-y-auto">
         <div className="space-y-4">
           {/* Logo */}
-          <Link href="/app" className="flex items-center gap-2 px-3 text-base font-black tracking-tight text-foreground select-none">
-            <img src="/logo.png" alt="CampusLoop Logo" className="size-6 object-cover rounded-lg" />
-            <span>CampusLoop</span>
-          </Link>
+          <div className="px-3 pb-1">
+            <BrandLogo href="/app" size="md" />
+          </div>
 
           {/* Navigation Links */}
           <nav className="space-y-0.5">

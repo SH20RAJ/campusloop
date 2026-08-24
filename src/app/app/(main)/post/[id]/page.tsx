@@ -173,26 +173,33 @@ export default async function PostDetailPage({ params }: PostPageProps) {
         }}
       />
 
-      {/* Header with back button */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/40 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      {/* Header with back button & college breadcrumb */}
+      <div className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60 px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/app"
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/80 hover:bg-muted transition-colors cursor-pointer shrink-0"
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/80 bg-card hover:bg-muted transition-colors cursor-pointer shrink-0 shadow-2xs"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <div>
-            <h1 className="text-sm font-black uppercase tracking-wider text-foreground">Post Details</h1>
-            <p className="text-[10px] text-muted-foreground font-semibold">
-              {rawPost.institution?.name?.split(",")[0] || "Campus Community"}
-            </p>
+          <div className="min-w-0">
+            <h1 className="text-xs font-black uppercase tracking-wider text-foreground truncate">
+              {post.type === "CONFESSION" ? "🤫 Campus Confession" : post.type === "POLL" ? "📊 Student Poll" : "💬 Discussion"}
+            </h1>
+            {rawPost.institution && (
+              <Link
+                href={`/app/college/${rawPost.institution.slug || rawPost.institution.id}`}
+                className="text-[10px] text-primary font-bold hover:underline truncate block"
+              >
+                {rawPost.institution.name.split(",")[0]} Hub →
+              </Link>
+            )}
           </div>
         </div>
 
         {!user && (
           <Link href="/join">
-            <button className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-sm shadow-primary/20 transition-all cursor-pointer">
+            <button className="rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:opacity-95 shadow-sm shadow-primary/20 transition-all cursor-pointer">
               Join Campus
             </button>
           </Link>

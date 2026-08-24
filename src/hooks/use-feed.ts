@@ -1,5 +1,7 @@
 import useSWRInfinite from "swr/infinite";
+import { useEffect } from "react";
 import { Post, UserProfile, Institution } from "@/db/schema";
+import { getSeenPostIds, markPostsAsSeen } from "@/lib/seen-posts";
 
 export type FeedPost = Post & {
   // Stripped to null by the server for anonymous posts.
@@ -47,6 +49,13 @@ export function useFeed(
     url.searchParams.set("page", String(pageIndex + 1));
     url.searchParams.set("limit", String(PAGE_LIMIT));
 
+    if (pageIndex === 0) {
+      const seenIds = getSeenPostIds();
+      if (seenIds.length > 0) {
+        url.searchParams.set("seenIds", seenIds.slice(0, 30).join(","));
+      }
+    }
+
     return url.toString();
   };
 
@@ -66,6 +75,14 @@ export function useFeed(
   const feed = rawFeed
     ? Array.from(new Map(rawFeed.map((post) => [post.id, post])).values())
     : undefined;
+
+  // Track impressions when feed items load
+  useEffect(() => {
+    if (feed && feed.length > 0) {
+      markPostsAsSeen(feed.slice(0, 15).map((p) => p.id));
+    }
+  }, [feed]);
+
   const isReachingEnd = Boolean(
     data && (data.length === 0 || (data[data.length - 1] && data[data.length - 1].length < PAGE_LIMIT))
   );

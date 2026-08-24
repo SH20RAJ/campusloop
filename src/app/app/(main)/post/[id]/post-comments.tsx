@@ -2,14 +2,17 @@
 
 import { useState, useRef } from "react";
 import useSWR from "swr";
-import { MessageSquare, Lock, Image as ImageIcon, X, Loader2 } from "lucide-react";
+import { MessageSquare, Lock, Image as ImageIcon, X, Loader2, Send, Sparkles } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { CommentItem, CommentWithAuthor } from "@/components/post/comment-item";
 import { toast } from "sonner";
 import { uploadImageToImgBB } from "@/lib/upload";
+import { useProfile } from "@/hooks/use-profile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function PostComments({ postId }: { postId: string }) {
+  const { profile } = useProfile();
   const { data: comments, isLoading, mutate } = useSWR<CommentWithAuthor[]>(
     `/api/posts/${postId}/comments`,
     fetcher
@@ -53,6 +56,27 @@ export function PostComments({ postId }: { postId: string }) {
 
     if (!body || isSubmitting) return;
 
+    // Build optimistic comment object
+    const optimisticComment: CommentWithAuthor = {
+      id: `temp_${Date.now()}`,
+      postId,
+      authorId: profile?.id || null,
+      author: isAnonymous ? null : (profile || null),
+      pseudonym: isAnonymous ? "Anonymous Student" : null,
+      parentId: null,
+      body,
+      isAnonymous,
+      status: "PUBLISHED",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const previousComments = comments || [];
+    // Instant optimistic injection
+    mutate([optimisticComment, ...previousComments], false);
+    setCommentText("");
+    setCommentImage(null);
+
     setIsSubmitting(true);
     try {
       const res = await fetch(`/api/posts/${postId}/comments`, {
@@ -62,12 +86,11 @@ export function PostComments({ postId }: { postId: string }) {
       });
 
       if (!res.ok) throw new Error("Failed to post comment");
-
-      setCommentText("");
-      setCommentImage(null);
-      toast.success("Comment added!");
+      toast.success("Comment added! 💬");
       mutate();
     } catch (err) {
+      // Rollback on failure
+      mutate(previousComments, false);
       toast.error(err instanceof Error ? err.message : "Failed to post comment");
     } finally {
       setIsSubmitting(false);
@@ -77,21 +100,38 @@ export function PostComments({ postId }: { postId: string }) {
   async function handlePostReply(parentId: string) {
     if (!replyBody.trim() || isSubmitting) return;
 
+    const optimisticReply: CommentWithAuthor = {
+      id: `temp_reply_${Date.now()}`,
+      postId,
+      authorId: profile?.id || null,
+      author: replyIsAnon ? null : (profile || null),
+      pseudonym: replyIsAnon ? "Anonymous Student" : null,
+      parentId,
+      body: replyBody.trim(),
+      isAnonymous: replyIsAnon,
+      status: "PUBLISHED",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const previousComments = comments || [];
+    mutate([...previousComments, optimisticReply], false);
+    setReplyBody("");
+    setReplyingToId(null);
+
     setIsSubmitting(true);
     try {
       const res = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: replyBody, isAnonymous: replyIsAnon, parentId }),
+        body: JSON.stringify({ body: optimisticReply.body, isAnonymous: replyIsAnon, parentId }),
       });
 
       if (!res.ok) throw new Error("Failed to post reply");
-
-      setReplyBody("");
-      setReplyingToId(null);
-      toast.success("Reply added!");
+      toast.success("Reply added! 💬");
       mutate();
     } catch (err) {
+      mutate(previousComments, false);
       toast.error(err instanceof Error ? err.message : "Failed to post reply");
     } finally {
       setIsSubmitting(false);
@@ -102,7 +142,7 @@ export function PostComments({ postId }: { postId: string }) {
   const getReplies = (parentId: string) => (comments || []).filter((c) => c.parentId === parentId);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4 select-none">
       {/* Hidden image file input */}
       <input
         ref={fileInputRef}
@@ -113,84 +153,128 @@ export function PostComments({ postId }: { postId: string }) {
       />
 
       {/* Discussion Header */}
-      <h3 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-2 px-1">
-        <MessageSquare className="size-4 text-primary" />
-        Discussion
-        {!isLoading && (
-          <span className="text-[10px] font-bold text-muted-foreground bg-muted/60 border border-border/40 rounded-full px-2 py-0.5 normal-case tracking-normal">
-            {(comments || []).length}
-          </span>
-        )}
-      </h3>
+      <div className="flex items-center justify-between px-1">
+        <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
+          <MessageSquare className="size-4 text-primary" />
+          Campus Discussion
+          {!isLoading && (
+            <span className="text-[10px] font-bold text-muted-foreground bg-muted/60 border border-border/40 rounded-full px-2 py-0.5 normal-case tracking-normal">
+              {(comments || []).length} Comments
+            </span>
+          )}
+        </h3>
 
-      {/* Top Comment Input Box */}
-      <form onSubmit={handlePostComment} className="space-y-2 bg-card border border-border p-3.5 rounded-2xl shadow-xs">
-        <textarea
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-          placeholder="Join the discussion... (Be respectful to fellow students)"
-          rows={2}
-          className="w-full rounded-xl border border-border/60 bg-muted/20 p-3 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary resize-none font-medium"
-        />
+        <span className="text-[10px] font-semibold text-muted-foreground hidden sm:inline-block">
+          Press Enter to Post • Markdown Supported
+        </span>
+      </div>
 
-        {/* Comment image preview */}
-        {commentImage && (
-          <div className="relative inline-block rounded-xl overflow-hidden border border-border shadow-xs max-w-[120px] max-h-[120px]">
-            <img src={commentImage} alt="Comment attachment" className="w-full h-full object-cover" />
-            <button
-              type="button"
-              onClick={() => setCommentImage(null)}
-              className="absolute top-1 right-1 size-5 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-destructive transition-colors cursor-pointer"
-            >
-              <X className="size-3" />
-            </button>
+      {/* ─── Facebook-Style Rich Comment Box ─── */}
+      <form
+        onSubmit={handlePostComment}
+        className="bg-card border border-border/80 p-3.5 rounded-3xl shadow-sm space-y-3 focus-within:border-primary/60 transition-colors"
+      >
+        <div className="flex items-start gap-3">
+          <Avatar className="size-8 border border-border shrink-0 mt-0.5">
+            <AvatarImage src={isAnonymous ? "" : profile?.avatarUrl || ""} />
+            <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary">
+              {isAnonymous ? "🙈" : profile?.displayName?.[0] || "U"}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex-1 min-w-0 space-y-2">
+            <textarea
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                  handlePostComment(e);
+                }
+              }}
+              placeholder={
+                isAnonymous
+                  ? "Write an anonymous reply..."
+                  : `Reply as @${profile?.username || "student"}...`
+              }
+              rows={2}
+              className="w-full bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none resize-none font-medium leading-relaxed"
+            />
+
+            {/* Comment image preview */}
+            {commentImage && (
+              <div className="relative inline-block rounded-2xl overflow-hidden border border-border shadow-xs max-w-[140px] max-h-[140px]">
+                <img src={commentImage} alt="Comment attachment" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => setCommentImage(null)}
+                  className="absolute top-1.5 right-1.5 size-5 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-destructive transition-colors cursor-pointer"
+                >
+                  <X className="size-3" />
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
-        <div className="flex items-center justify-between pt-1">
+        {/* Action Toolbar */}
+        <div className="flex items-center justify-between pt-2 border-t border-border/40">
           <div className="flex items-center gap-2">
+            {/* Anonymous Toggle */}
             <button
               type="button"
               onClick={() => setIsAnonymous(!isAnonymous)}
-              className={`text-xs font-bold px-2.5 py-1 rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5 ${
-                isAnonymous ? "bg-pink-500/10 text-pink-500 border-pink-500/20" : "bg-muted/30 text-muted-foreground border-border/40"
+              className={`text-xs font-bold px-3 py-1 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 ${
+                isAnonymous
+                  ? "bg-pink-500/10 text-pink-500 border-pink-500/30 shadow-2xs"
+                  : "bg-muted/30 text-muted-foreground hover:text-foreground border-border/50"
               }`}
             >
               <Lock className="size-3" />
-              {isAnonymous ? "Anon" : "Public"}
+              <span>{isAnonymous ? "Anon Mode 🙈" : "Public"}</span>
             </button>
 
+            {/* Photo Attachment */}
             <button
               type="button"
               disabled={isUploadingImage}
               onClick={() => fileInputRef.current?.click()}
-              className="text-xs font-bold px-2.5 py-1 rounded-lg border border-border/40 bg-muted/30 text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center gap-1"
+              className="text-xs font-bold px-2.5 py-1 rounded-xl border border-border/50 bg-muted/30 text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
             >
-              {isUploadingImage ? <Loader2 className="size-3 animate-spin text-primary" /> : <ImageIcon className="size-3 text-rose-500" />}
+              {isUploadingImage ? (
+                <Loader2 className="size-3.5 animate-spin text-primary" />
+              ) : (
+                <ImageIcon className="size-3.5 text-rose-500" />
+              )}
               <span>Photo</span>
             </button>
           </div>
 
+          {/* Send Comment Button */}
           <button
             type="submit"
             disabled={isSubmitting || (!commentText.trim() && !commentImage) || isUploadingImage}
-            className="px-4 py-1.5 text-xs font-bold rounded-xl bg-primary text-primary-foreground disabled:opacity-50 cursor-pointer shadow-xs"
+            className="px-4 py-1.5 text-xs font-bold rounded-xl bg-primary text-primary-foreground disabled:opacity-40 cursor-pointer shadow-xs hover:bg-primary/90 transition-all flex items-center gap-1.5 active:scale-95"
           >
-            {isSubmitting ? "Posting..." : "Comment"}
+            {isSubmitting ? (
+              <Loader2 className="size-3 animate-spin" />
+            ) : (
+              <Send className="size-3" />
+            )}
+            <span>Comment</span>
           </button>
         </div>
       </form>
 
-      {/* Comments List */}
-      <div className="space-y-2">
+      {/* ─── Facebook-Style Comments Stream ─── */}
+      <div className="space-y-3 pt-2">
         {isLoading ? (
           <div className="space-y-3 py-4">
-            <Skeleton className="h-12 w-full rounded-xl" />
-            <Skeleton className="h-12 w-full rounded-xl" />
+            <Skeleton className="h-16 w-full rounded-2xl" />
+            <Skeleton className="h-16 w-full rounded-2xl" />
           </div>
         ) : topLevelComments.length > 0 ? (
           topLevelComments.map((comment) => (
-            <div key={comment.id} className="space-y-1">
+            <div key={comment.id} className="space-y-2 bg-card/60 border border-border/60 rounded-3xl p-3.5 shadow-2xs">
               <CommentItem
                 comment={comment}
                 onReply={(id) => setReplyingToId(id)}
@@ -204,27 +288,31 @@ export function PostComments({ postId }: { postId: string }) {
                 submitReply={handlePostReply}
               />
 
+              {/* Nested Replies Stream */}
               {getReplies(comment.id).map((reply) => (
-                <CommentItem
-                  key={reply.id}
-                  comment={reply}
-                  depth={1}
-                  onReply={(id) => setReplyingToId(id)}
-                  replyingToId={replyingToId}
-                  replyBody={replyBody}
-                  setReplyBody={setReplyBody}
-                  setReplyingToId={setReplyingToId}
-                  replyIsAnon={replyIsAnon}
-                  setReplyIsAnon={setReplyIsAnon}
-                  isSubmitting={isSubmitting}
-                  submitReply={handlePostReply}
-                />
+                <div key={reply.id} className="pt-1">
+                  <CommentItem
+                    comment={reply}
+                    depth={1}
+                    onReply={(id) => setReplyingToId(id)}
+                    replyingToId={replyingToId}
+                    replyBody={replyBody}
+                    setReplyBody={setReplyBody}
+                    setReplyingToId={setReplyingToId}
+                    replyIsAnon={replyIsAnon}
+                    setReplyIsAnon={setReplyIsAnon}
+                    isSubmitting={isSubmitting}
+                    submitReply={handlePostReply}
+                  />
+                </div>
               ))}
             </div>
           ))
         ) : (
-          <div className="text-center py-10 text-xs text-muted-foreground/60">
-            No comments yet. Start the conversation!
+          <div className="text-center py-12 rounded-3xl border border-dashed border-border bg-card text-xs text-muted-foreground space-y-2">
+            <Sparkles className="size-5 mx-auto text-muted-foreground/40" />
+            <p className="font-bold text-foreground">No replies on this post yet.</p>
+            <p className="text-[11px]">Be the first classmate to drop your thoughts!</p>
           </div>
         )}
       </div>

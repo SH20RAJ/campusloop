@@ -58,6 +58,8 @@ export async function GET(req: Request) {
 
     const authorId = searchParams.get("authorId");
     const authorUsername = searchParams.get("authorUsername");
+    const seenIdsParam = searchParams.get("seenIds");
+    const seenIds = seenIdsParam ? seenIdsParam.split(",").map((s) => s.trim()).filter(Boolean) : undefined;
 
     if (authorId) {
       conditions.push(eq(posts.authorId, authorId));
@@ -70,7 +72,7 @@ export async function GET(req: Request) {
       }
     }
 
-    const rawFeed = await resolveFeedPage({ conditions, sort, limit, offset, userInstitutionId: institutionId });
+    const rawFeed = await resolveFeedPage({ conditions, sort, limit, offset, userInstitutionId: institutionId, seenIds });
     const feed = await formatApiFeedPosts(rawFeed, profileId);
 
     return NextResponse.json(feed);

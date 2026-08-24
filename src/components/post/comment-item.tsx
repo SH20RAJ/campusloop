@@ -1,15 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Reply } from "lucide-react";
+import { Reply, Heart } from "lucide-react";
 import Link from "next/link";
-import { Comment, UserProfile } from "@/db/schema";
+import { Comment } from "@/db/schema";
 import { getAvatarUrl, formatTimeAgo } from "@/lib/utils";
 import { RichText } from "@/components/ui/rich-text";
+import { cn } from "@/lib/utils";
 
-export type CommentWithAuthor = Comment & {
-  author: UserProfile | null;
+export type CommentWithAuthor = Omit<Comment, "createdAt" | "updatedAt"> & {
+  createdAt: Date | string;
+  updatedAt?: Date | string;
+  author: {
+    id?: string;
+    username?: string | null;
+    displayName?: string | null;
+    avatarUrl?: string | null;
+    points?: number | null;
+  } | null;
 };
 
 interface CommentItemProps {
@@ -39,88 +49,153 @@ export function CommentItem({
   isSubmitting,
   submitReply,
 }: CommentItemProps) {
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+
   const isAnon = comment.isAnonymous;
   const displayName = isAnon ? "Anonymous Student" : comment.author?.displayName || "Student";
   const handle = isAnon ? comment.pseudonym || "anonymous" : comment.author?.username || "student";
-  const fallback = isAnon ? "A" : (comment.author?.displayName?.[0] ?? "S").toUpperCase();
+  const fallback = isAnon ? "🙈" : (comment.author?.displayName?.[0] ?? "S").toUpperCase();
   const avatarUrl = isAnon ? "" : getAvatarUrl(comment.author?.avatarUrl, comment.author?.username ?? "student");
+  const isVerified = Boolean(!isAnon && (comment.author?.points || 0) >= 150);
+
+  function handleToggleLike() {
+    if (liked) {
+      setLiked(false);
+      setLikesCount((c) => Math.max(0, c - 1));
+    } else {
+      setLiked(true);
+      setLikesCount((c) => c + 1);
+    }
+  }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10, scale: 0.98 }}
+      initial={{ opacity: 0, y: -6, scale: 0.99 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      className={`group relative flex gap-3 text-xs ${depth > 0 ? "ml-4 sm:ml-8 pl-3 border-l-2 border-border/40 mt-3" : "pt-3 border-t border-border/30"}`}
+      className={`group relative flex gap-2.5 text-xs ${
+        depth > 0
+          ? "ml-6 sm:ml-9 pl-3 border-l-2 border-primary/20 mt-2"
+          : "pt-1"
+      }`}
     >
-      <div className="shrink-0">
+      <div className="shrink-0 pt-0.5">
         {!isAnon ? (
           <Link href={`/@${handle}`}>
-            <Avatar className="h-7 w-7 border hover:opacity-80 transition-opacity">
+            <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border border-border hover:opacity-85 transition-opacity">
               <AvatarImage src={avatarUrl || ""} />
-              <AvatarFallback className="text-[10px] font-bold">{fallback}</AvatarFallback>
+              <AvatarFallback className="text-[10px] font-bold bg-primary/10 text-primary">
+                {fallback}
+              </AvatarFallback>
             </Avatar>
           </Link>
         ) : (
-          <Avatar className="h-7 w-7 border">
-            <AvatarImage src={avatarUrl || ""} />
-            <AvatarFallback className="text-[10px] font-bold">{fallback}</AvatarFallback>
+          <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border border-border">
+            <AvatarFallback className="text-[10px] font-bold bg-muted text-muted-foreground">
+              {fallback}
+            </AvatarFallback>
           </Avatar>
         )}
       </div>
 
       <div className="flex-1 min-w-0 space-y-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 min-w-0">
-            {!isAnon ? (
-              <Link href={`/@${handle}`} className="font-bold text-foreground hover:underline truncate">
-                {displayName}
-              </Link>
-            ) : (
-              <span className="font-bold text-foreground truncate">{displayName}</span>
-            )}
-            <span className="text-muted-foreground/60 text-[10px]">@{handle}</span>
-            <span className="text-muted-foreground/50 text-[10px]">• {formatTimeAgo(comment.createdAt)}</span>
+        {/* Facebook-Style Comment Bubble */}
+        <div className="rounded-2xl bg-muted/40 hover:bg-muted/60 transition-colors p-3 border border-border/50 space-y-1">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              {!isAnon ? (
+                <Link
+                  href={`/@${handle}`}
+                  className="font-extrabold text-foreground hover:underline truncate text-xs flex items-center gap-1"
+                >
+                  <span>{displayName}</span>
+                  {isVerified && (
+                    <span className="text-blue-500 text-[10px] font-bold" title="Verified Student">
+                      ✓
+                    </span>
+                  )}
+                </Link>
+              ) : (
+                <span className="font-extrabold text-foreground truncate text-xs">
+                  {displayName} 🙈
+                </span>
+              )}
+              <span className="text-muted-foreground/60 text-[10px]">@{handle}</span>
+            </div>
+
+            <span className="text-muted-foreground/50 text-[10px] shrink-0">
+              {formatTimeAgo(comment.createdAt)}
+            </span>
           </div>
+
+          <div className="text-xs text-foreground/90 leading-relaxed font-normal">
+            <RichText content={comment.body} />
+          </div>
+        </div>
+
+        {/* Facebook-Style Comment Actions (Like / Reply) */}
+        <div className="flex items-center gap-3 px-2 text-[11px] font-bold text-muted-foreground select-none">
+          <button
+            type="button"
+            onClick={handleToggleLike}
+            className={cn(
+              "hover:text-rose-500 transition-colors flex items-center gap-1 cursor-pointer",
+              liked && "text-rose-500 font-extrabold"
+            )}
+          >
+            <Heart className={cn("size-3", liked && "fill-rose-500 text-rose-500")} />
+            <span>{likesCount > 0 ? `${likesCount} Likes` : "Like"}</span>
+          </button>
 
           {depth < 3 && (
             <button
+              type="button"
               onClick={() => onReply(comment.id)}
-              className="text-[10px] font-semibold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 opacity-80 group-hover:opacity-100 cursor-pointer"
+              className="hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"
             >
-              <Reply className="size-3" /> Reply
+              <Reply className="size-3" />
+              <span>Reply</span>
             </button>
           )}
         </div>
 
-        <div className="pt-0.5">
-          <RichText content={comment.body} className="text-foreground/90 leading-relaxed" />
-        </div>
-
-        {/* Inline Reply Form */}
+        {/* Inline Facebook-Style Nested Reply Box */}
         {replyingToId === comment.id && (
-          <div className="mt-2.5 space-y-2 bg-muted/20 p-2.5 rounded-xl border border-border/40">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="mt-2 space-y-2 bg-card p-3 rounded-2xl border border-border/80 shadow-xs"
+          >
             <textarea
               value={replyBody}
               onChange={(e) => setReplyBody(e.target.value)}
-              placeholder={`Reply to @${handle}...`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                  submitReply(comment.id);
+                }
+              }}
+              placeholder={`Write a reply to @${handle}...`}
               rows={2}
-              className="w-full rounded-lg border border-border/60 bg-background p-2 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary resize-none"
+              className="w-full rounded-xl border border-border/60 bg-muted/20 p-2.5 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary resize-none font-medium leading-relaxed"
             />
             <div className="flex items-center justify-between">
               <button
                 type="button"
                 onClick={() => setReplyIsAnon(!replyIsAnon)}
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-md border cursor-pointer ${
-                  replyIsAnon ? "bg-pink-500/10 text-pink-500 border-pink-500/20" : "bg-muted/40 text-muted-foreground border-border/40"
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border cursor-pointer transition-colors ${
+                  replyIsAnon
+                    ? "bg-pink-500/10 text-pink-500 border-pink-500/30"
+                    : "bg-muted/40 text-muted-foreground border-border/50"
                 }`}
               >
                 {replyIsAnon ? "🔒 Anon Reply" : "👤 Public Reply"}
               </button>
 
-              <div className="flex gap-1.5">
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => setReplyingToId(null)}
-                  className="px-2.5 py-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="px-2.5 py-1 text-[11px] font-bold text-muted-foreground hover:text-foreground cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -128,13 +203,13 @@ export function CommentItem({
                   type="button"
                   onClick={() => submitReply(comment.id)}
                   disabled={isSubmitting || !replyBody.trim()}
-                  className="px-3 py-1 text-[10px] font-semibold rounded-lg bg-primary text-primary-foreground disabled:opacity-50 cursor-pointer"
+                  className="px-3.5 py-1 text-[11px] font-bold rounded-xl bg-primary text-primary-foreground disabled:opacity-40 cursor-pointer shadow-xs active:scale-95 transition-all"
                 >
-                  {isSubmitting ? "Posting..." : "Reply"}
+                  {isSubmitting ? "Replying..." : "Reply"}
                 </button>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </motion.div>

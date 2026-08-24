@@ -172,13 +172,18 @@ const recentCommentCountSql = sql<number>`coalesce((select count(*)::int from ${
 const hoursSinceSql = sql<number>`(extract(epoch from (now() - ${posts.createdAt})) / 3600.0)`;
 const trendingScoreSql = sql<number>`(${recentVoteScoreSql} * 3 + ${recentCommentCountSql} * 2)`;
 
-function getForYouScoreSql(userInstitutionId?: string | null) {
+function getForYouScoreSql(userInstitutionId?: string | null, seenIds?: string[]) {
 	const ownCollegeBonus = userInstitutionId
 		? sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 25.0 else 0.0 end)`
 		: sql<number>`0.0`;
 
+	const seenPenaltySql = seenIds && seenIds.length > 0
+		? sql<number>`(case when ${posts.id} in (${sql.raw(seenIds.slice(0, 80).map((id) => `'${id.replace(/'/g, "''")}'`).join(","))}) then -55.0 else 0.0 end)`
+		: sql<number>`0.0`;
+
 	return sql<number>`(
 		${ownCollegeBonus}
+		+ ${seenPenaltySql}
 		+ (45.0 / power(${hoursSinceSql} + 1.2, 0.75))
 		+ (${voteScoreSql} * 3.5)
 		+ (${commentCountSql} * 2.5)
@@ -205,24 +210,28 @@ export function normalizeApiFeedSort(value?: string | null): ApiFeedSort {
 	return "latest";
 }
 
-export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | null) {
+export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | null, seenIds?: string[]) {
 	const campusPrioritySql = userInstitutionId
 		? sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 1 else 0 end)`
 		: sql<number>`0`;
 
+	const seenPenaltySql = seenIds && seenIds.length > 0
+		? sql<number>`(case when ${posts.id} in (${sql.raw(seenIds.slice(0, 80).map((id) => `'${id.replace(/'/g, "''")}'`).join(","))}) then 0 else 1 end)`
+		: sql<number>`1`;
+
 	switch (sort) {
 		case "top_voted":
-			return [desc(campusPrioritySql), desc(voteScoreSql), desc(posts.createdAt), asc(posts.id)];
+			return [desc(seenPenaltySql), desc(campusPrioritySql), desc(voteScoreSql), desc(posts.createdAt), asc(posts.id)];
 		case "most_discussed":
-			return [desc(campusPrioritySql), desc(commentCountSql), desc(posts.createdAt), asc(posts.id)];
+			return [desc(seenPenaltySql), desc(campusPrioritySql), desc(commentCountSql), desc(posts.createdAt), asc(posts.id)];
 		case "trending":
-			return [desc(campusPrioritySql), desc(trendingScoreSql), desc(posts.createdAt), asc(posts.id)];
+			return [desc(seenPenaltySql), desc(campusPrioritySql), desc(trendingScoreSql), desc(posts.createdAt), asc(posts.id)];
 		case "for_you": {
-			const forYouScore = getForYouScoreSql(userInstitutionId);
+			const forYouScore = getForYouScoreSql(userInstitutionId, seenIds);
 			return [desc(forYouScore), desc(posts.createdAt), asc(posts.id)];
 		}
 		default:
-			return [desc(campusPrioritySql), desc(posts.createdAt), asc(posts.id)];
+			return [desc(seenPenaltySql), desc(campusPrioritySql), desc(posts.createdAt), asc(posts.id)];
 	}
 }
 
@@ -230,8 +239,8 @@ type HydratedFeedPost = Awaited<ReturnType<typeof resolveFeedPage>>[number];
 
 /**
  * Two-phase feed resolution: select the page's post IDs with full SQL
- * ordering flexibility (aggregates, time decay), then hydrate relations
- * via the relational query builder and restore order in JS.
+ * ordering flexibility (aggregates, time decay, seen post demotion),
+ * then hydrate relations via the relational query builder and restore order in JS.
  */
 export async function resolveFeedPage(options: {
 	conditions: SQL[];
@@ -239,6 +248,7 @@ export async function resolveFeedPage(options: {
 	limit: number;
 	offset: number;
 	userInstitutionId?: string | null;
+	seenIds?: string[];
 }) {
 	const db = getDb();
 
@@ -246,7 +256,7 @@ export async function resolveFeedPage(options: {
 		.select({ id: posts.id })
 		.from(posts)
 		.where(and(...options.conditions))
-		.orderBy(...getFeedOrderBy(options.sort, options.userInstitutionId))
+		.orderBy(...getFeedOrderBy(options.sort, options.userInstitutionId, options.seenIds))
 		.limit(options.limit)
 		.offset(options.offset);
 

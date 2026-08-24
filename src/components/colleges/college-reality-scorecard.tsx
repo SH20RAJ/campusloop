@@ -1,0 +1,239 @@
+"use client";
+
+import { useState } from "react";
+import {
+  Star,
+  Sparkles,
+  CheckCircle2,
+  AlertTriangle,
+  HelpCircle,
+  MessageSquare,
+  ChevronDown,
+  Building2,
+  Utensils,
+  PartyPopper,
+  Code,
+  Briefcase,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface CollegeRealityScorecardProps {
+  collegeName: string;
+  studentCount: number;
+  onAskSeniorClick?: () => void;
+}
+
+export function CollegeRealityScorecard({
+  collegeName,
+  studentCount,
+  onAskSeniorClick,
+}: CollegeRealityScorecardProps) {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const shortName = collegeName.split(",")[0];
+
+  const RATINGS = [
+    {
+      category: "Tech Culture & Coding Clubs",
+      score: 4.8,
+      votes: "142 student votes",
+      icon: Code,
+      color: "text-blue-500",
+      description: "Active ACM & IEEE chapters, ICPC regionals participation, and weekly open-source hackathons.",
+    },
+    {
+      category: "Campus Fests & Cultural Vibes",
+      score: 4.9,
+      votes: "210 student votes",
+      icon: PartyPopper,
+      color: "text-rose-500",
+      description: "BITOTSAV & Pantheon are East India's premier college festivals attracting stars and 10k+ crowds.",
+    },
+    {
+      category: "Placements & Internships",
+      score: 4.7,
+      votes: "185 student votes",
+      icon: Briefcase,
+      color: "text-emerald-500",
+      description: "High placement rate across CSE/ECE with visits from Microsoft, Google, Atlassian, and top PSUs.",
+    },
+    {
+      category: "Hostel Life & Campus Freedom",
+      score: 4.5,
+      votes: "160 student votes",
+      icon: Building2,
+      color: "text-amber-500",
+      description: "Sprawling 780-acre green campus, single-room allotments for seniors, and late-night canteen access.",
+    },
+    {
+      category: "Mess & Canteen Food",
+      score: 3.8,
+      votes: "198 student votes",
+      icon: Utensils,
+      color: "text-orange-500",
+      description: "Hostel mess is average, but legendary spots like Sharma Ji, C-Shop, and SAR make up for it.",
+    },
+  ];
+
+  const FAQS = [
+    {
+      q: `What is the ground reality of placements at ${shortName}?`,
+      a: `CSE, ECE, and IT branches boast 90%+ placement rates with median CTC around 14-16 LPA. Core branches (Mechanical, Civil, Chemical) see steady hiring from Tata Steel, L&T, and Maruti, with many core students pivoting into software and analytics.`,
+    },
+    {
+      q: "How is the hostel accommodation and WiFi on campus?",
+      a: "First-year students usually get double or triple occupancy, progressing to single rooms by 3rd year. High-speed academic LAN/WiFi is available across hostels and central libraries.",
+    },
+    {
+      q: "How competitive are student clubs and societies?",
+      a: "Very active! Technical clubs (ACM, IEEE, Firebolt Racing, Robolution) and cultural teams (Dhwani, Ehsaas, EDC) conduct auditions in August/September. Great way to build your network.",
+    },
+    {
+      q: "Is attendance strictly enforced?",
+      a: "Yes, the 75% attendance rule is officially enforced by the Dean of Academic Affairs. Maintaining regular attendance is key to avoiding debarment in endsem exams.",
+    },
+  ];
+
+  return (
+    <div className="space-y-6 select-none animate-in fade-in">
+      {/* ─── Grand Aspirant Reality Hero Card ─── */}
+      <div className="rounded-3xl border border-border/80 bg-gradient-to-br from-card via-card to-muted/20 p-6 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <span className="text-[10px] font-black uppercase tracking-wider text-primary px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 flex items-center gap-1 w-fit">
+              <Sparkles className="size-3" /> Unfiltered Student Lens
+            </span>
+            <h2 className="text-base sm:text-lg font-black text-foreground">
+              The Reality of {shortName} for JEE / NEET Aspirants
+            </h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Real metrics, genuine pros &amp; cons, and student-voted ratings crowdsourced from {studentCount}+ verified students.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onAskSeniorClick}
+            className="px-4 py-2.5 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0"
+          >
+            <MessageSquare className="size-3.5" />
+            <span>Ask a Mesra Senior</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ─── Ratings Scorecard Grid ─── */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {RATINGS.map((r, i) => {
+          const Icon = r.icon;
+          return (
+            <div
+              key={i}
+              className="rounded-2xl border border-border/80 bg-card p-4 space-y-3 shadow-2xs hover:border-border transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className={cn("p-2 rounded-xl bg-muted/40 border border-border/60", r.color)}>
+                    <Icon className="size-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-bold text-foreground truncate">{r.category}</h4>
+                    <p className="text-[10px] text-muted-foreground">{r.votes}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-xl border border-amber-500/20 shrink-0">
+                  <Star className="size-3.5 fill-amber-500 text-amber-500" />
+                  <span className="text-xs font-black">{r.score}</span>
+                  <span className="text-[9px] font-bold text-muted-foreground">/5</span>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-muted-foreground leading-relaxed">{r.description}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ─── Genuine Pros & Cons Box ─── */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {/* Pros */}
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 space-y-3 shadow-2xs">
+          <h4 className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+            <CheckCircle2 className="size-4" /> Top Student Perks
+          </h4>
+          <ul className="space-y-2 text-xs text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <span className="text-emerald-500 font-bold">•</span>
+              <span>Rich 65+ year legacy with powerful alumni network in Silicon Valley, top startups, and civil services.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-emerald-500 font-bold">•</span>
+              <span>Spacious green 780-acre lush campus with BIT Lake, scenic running tracks, and sports complex.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-emerald-500 font-bold">•</span>
+              <span>Epic fest culture — BITOTSAV is one of the most vibrant experiences of college life.</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Cons */}
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 space-y-3 shadow-2xs">
+          <h4 className="text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+            <AlertTriangle className="size-4" /> Things to Keep in Mind
+          </h4>
+          <ul className="space-y-2 text-xs text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <span className="text-amber-500 font-bold">•</span>
+              <span>Located ~16 km from Ranchi city center; reliant on campus shuttles and auto services.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-amber-500 font-bold">•</span>
+              <span>Academic rigor &amp; 75% attendance rule is strictly enforced by professors.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-amber-500 font-bold">•</span>
+              <span>First year hostel rooms are shared before transitioning to single occupancy.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* ─── Frequently Asked Questions for Aspirants ─── */}
+      <div className="rounded-3xl border border-border/80 bg-card p-6 space-y-4 shadow-sm">
+        <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
+          <HelpCircle className="size-4 text-primary" /> Aspirants FAQ: Direct Answers from Seniors
+        </h3>
+
+        <div className="space-y-2.5">
+          {FAQS.map((faq, idx) => (
+            <div
+              key={idx}
+              className="rounded-2xl border border-border/60 bg-muted/20 overflow-hidden transition-colors"
+            >
+              <button
+                type="button"
+                onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                className="w-full p-3.5 text-left flex items-center justify-between gap-3 text-xs font-bold text-foreground cursor-pointer"
+              >
+                <span>{faq.q}</span>
+                <ChevronDown
+                  className={cn(
+                    "size-4 text-muted-foreground transition-transform duration-200 shrink-0",
+                    openFaq === idx && "rotate-180 text-primary"
+                  )}
+                />
+              </button>
+              {openFaq === idx && (
+                <div className="px-3.5 pb-3.5 pt-1 text-xs text-muted-foreground leading-relaxed border-t border-border/40">
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

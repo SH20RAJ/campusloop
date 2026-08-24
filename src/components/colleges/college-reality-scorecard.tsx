@@ -20,12 +20,25 @@ import { cn } from "@/lib/utils";
 interface CollegeRealityScorecardProps {
   collegeName: string;
   studentCount: number;
+  nirfRank?: number | null;
+  description?: string | null;
+  extraData?: {
+    wikipediaUrl?: string;
+    summary?: string;
+    campusAcreage?: string;
+    affiliation?: string;
+    chancellor?: string;
+    naacGrade?: string;
+  } | null;
   onAskSeniorClick?: () => void;
 }
 
 export function CollegeRealityScorecard({
   collegeName,
   studentCount,
+  nirfRank,
+  description,
+  extraData,
   onAskSeniorClick,
 }: CollegeRealityScorecardProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -121,6 +134,61 @@ export function CollegeRealityScorecard({
           </button>
         </div>
       </div>
+
+      {/* ─── Institutional Overview & Fast Facts ─── */}
+      {(description || nirfRank || extraData) && (
+        <div className="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 space-y-3 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <Building2 className="size-4 text-primary" /> Verified Campus Overview &amp; Accreditation
+            </h4>
+            {extraData?.wikipediaUrl && (
+              <a
+                href={extraData.wikipediaUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
+              >
+                <span>Wikipedia</span>
+                <span>↗</span>
+              </a>
+            )}
+          </div>
+
+          {description && (
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {description}
+            </p>
+          )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
+            {nirfRank && (
+              <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
+                <span className="text-[10px] text-muted-foreground font-bold uppercase block">NIRF Rank</span>
+                <span className="text-sm font-black text-amber-500">#{nirfRank}</span>
+              </div>
+            )}
+            {extraData?.campusAcreage && (
+              <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
+                <span className="text-[10px] text-muted-foreground font-bold uppercase block">Campus Size</span>
+                <span className="text-sm font-black text-foreground">{extraData.campusAcreage}</span>
+              </div>
+            )}
+            {extraData?.naacGrade && (
+              <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
+                <span className="text-[10px] text-muted-foreground font-bold uppercase block">NAAC Grade</span>
+                <span className="text-sm font-black text-emerald-500">{extraData.naacGrade}</span>
+              </div>
+            )}
+            {extraData?.affiliation && (
+              <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
+                <span className="text-[10px] text-muted-foreground font-bold uppercase block">Accreditation</span>
+                <span className="text-xs font-bold text-foreground truncate block">{extraData.affiliation}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ─── Ratings Scorecard Grid ─── */}
       <div className="grid gap-3 sm:grid-cols-2">

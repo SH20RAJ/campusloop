@@ -59,6 +59,10 @@ interface CollegeHubClientProps {
     yearOfEstablishment?: number | null;
     aisheCode?: string | null;
     locationType?: string | null;
+    logoUrl?: string | null;
+    bannerUrl?: string | null;
+    nirfRank?: number | null;
+    description?: string | null;
   };
   initialPosts: FeedPost[];
   students: StudentItem[];
@@ -482,6 +486,8 @@ export function CollegeHubClient({
         <CollegeRealityScorecard
           collegeName={college.name}
           studentCount={students.length}
+          nirfRank={college.nirfRank}
+          description={college.description}
           onAskSeniorClick={handleAskSenior}
         />
       )}

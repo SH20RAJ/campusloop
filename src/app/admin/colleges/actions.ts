@@ -108,3 +108,38 @@ export async function removeDomain(domainId: string) {
   await db.delete(institutionDomains).where(eq(institutionDomains.id, domainId));
   revalidatePath("/admin/colleges");
 }
+
+export async function updateCollegeDetails(id: string, data: {
+  name: string;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
+  nirfRank?: number | null;
+  description?: string | null;
+  website?: string | null;
+  state?: string | null;
+  district?: string | null;
+  yearOfEstablishment?: number | null;
+  extraData?: Record<string, unknown> | null;
+}) {
+  const db = await getAdminDb();
+
+  await db
+    .update(institutions)
+    .set({
+      name: data.name.trim(),
+      logoUrl: data.logoUrl ? data.logoUrl.trim() : null,
+      bannerUrl: data.bannerUrl ? data.bannerUrl.trim() : null,
+      nirfRank: data.nirfRank || null,
+      description: data.description ? data.description.trim() : null,
+      website: data.website ? data.website.trim() : null,
+      state: data.state ? data.state.trim() : null,
+      district: data.district ? data.district.trim() : null,
+      yearOfEstablishment: data.yearOfEstablishment || null,
+      extraData: data.extraData || null,
+    })
+    .where(eq(institutions.id, id));
+
+  revalidatePath("/admin/colleges");
+  revalidatePath("/colleges");
+}
+

@@ -228,6 +228,10 @@ export default async function MainCollegePage({ params }: PageProps) {
           yearOfEstablishment: college.yearOfEstablishment,
           aisheCode: college.aisheCode,
           locationType: college.locationType,
+          logoUrl: college.logoUrl,
+          bannerUrl: college.bannerUrl,
+          nirfRank: college.nirfRank,
+          description: college.description,
         }}
         initialPosts={formattedPosts}
         students={students}

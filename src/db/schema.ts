@@ -77,6 +77,20 @@ export const institutions = pgTable(
 		websiteDomain: text("website_domain"),
 		yearOfEstablishment: integer("year_of_establishment"),
 		locationType: text("location_type"),
+		logoUrl: text("logo_url"),
+		bannerUrl: text("banner_url"),
+		nirfRank: integer("nirf_rank"),
+		description: text("description"),
+		extraData: jsonb("extra_data").$type<{
+			wikipediaUrl?: string;
+			summary?: string;
+			campusAcreage?: string;
+			affiliation?: string;
+			chancellor?: string;
+			viceChancellor?: string;
+			phone?: string;
+			naacGrade?: string;
+		}>(),
 		country: text("country").default("India").notNull(),
 		source: text("source").default("colleges_csv").notNull(),
 		createdAt,

@@ -8,8 +8,28 @@ import { FeedPost } from "@/hooks/use-feed";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Communities & Sub-Hub Posts | CampusLoop",
-  description: "Browse student communities and community posts on CampusLoop.",
+  title: "Student Communities & Sub-Hubs | CampusLoop",
+  description: "Browse interest groups, technical societies, and student-created communities on CampusLoop.",
+  keywords: [
+    "Student Communities",
+    "College Sub-Hubs",
+    "Campus Clubs",
+    "Student Groups India",
+  ],
+  alternates: { canonical: "https://campusloop.space/app/communities" },
+  openGraph: {
+    title: "Student Communities & Sub-Hubs | CampusLoop",
+    description: "Browse interest groups and student communities on CampusLoop.",
+    url: "https://campusloop.space/app/communities",
+    siteName: "CampusLoop",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Student Communities & Sub-Hubs | CampusLoop",
+    description: "Browse interest groups and student communities on CampusLoop.",
+  },
   robots: { index: true, follow: true },
 };
 

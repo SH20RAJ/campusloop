@@ -118,6 +118,7 @@ const FOOTER_COLUMNS: { title: string; links: { href: string; label: string }[] 
     links: [
       { href: "/safety", label: "Safety Guidelines" },
       { href: "/privacy", label: "Privacy Policy" },
+      { href: "/terms", label: "Terms of Service" },
     ],
   },
 ];

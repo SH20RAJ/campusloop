@@ -9,6 +9,7 @@ export async function GET() {
     { url: "https://campusloop.space/about", priority: "0.8", changefreq: "monthly" },
     { url: "https://campusloop.space/safety", priority: "0.7", changefreq: "monthly" },
     { url: "https://campusloop.space/privacy", priority: "0.7", changefreq: "monthly" },
+    { url: "https://campusloop.space/terms", priority: "0.7", changefreq: "monthly" },
     { url: "https://campusloop.space/contact", priority: "0.7", changefreq: "monthly" },
     { url: "https://campusloop.space/join", priority: "0.9", changefreq: "weekly" },
   ];

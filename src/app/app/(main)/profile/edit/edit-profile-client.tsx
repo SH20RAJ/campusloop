@@ -3,13 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2, Image as ImageIcon, X, Plus, Camera, Cake, Lock } from "lucide-react";
+import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2, Image as ImageIcon, X, Plus, Camera, Cake, Lock, Move } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getAvatarUrl } from "@/lib/utils";
 import { useProfile } from "@/hooks/use-profile";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
 import { uploadImageToImgBB } from "@/lib/upload";
+import { ImageCropModal } from "@/components/ui/image-crop-modal";
 
 const INTEREST_SUGGESTIONS = [
   "Tech & Coding",
@@ -43,10 +44,14 @@ export function EditProfileClient() {
   const [photos, setPhotos] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploadingPfp, setIsUploadingPfp] = useState(false);
-  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
-  const [isUploadingDatingPhoto, setIsUploadingDatingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [isUploadingDatingPhoto, setIsUploadingDatingPhoto] = useState(false);
+
+  // Crop Modal States
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [cropImageUrl, setCropImageUrl] = useState("");
+  const [cropMode, setCropMode] = useState<"avatar" | "banner">("avatar");
 
   const pfpInputRef = useRef<HTMLInputElement | null>(null);
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
@@ -80,40 +85,48 @@ export function EditProfileClient() {
     );
   }
 
-  async function handlePfpUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handlePfpFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploadingPfp(true);
-    try {
-      toast.loading("Uploading profile avatar to ImgBB...", { id: "pfp-upload" });
-      const res = await uploadImageToImgBB(file);
-      setAvatarUrl(res.displayUrl || res.url);
-      toast.success("Profile photo uploaded! 📸", { id: "pfp-upload" });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to upload photo", { id: "pfp-upload" });
-    } finally {
-      setIsUploadingPfp(false);
-      if (pfpInputRef.current) pfpInputRef.current.value = "";
-    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setCropImageUrl(reader.result);
+        setCropMode("avatar");
+        setCropModalOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+    if (pfpInputRef.current) pfpInputRef.current.value = "";
   }
 
-  async function handleBannerUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleBannerFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploadingBanner(true);
-    try {
-      toast.loading("Uploading cover banner to ImgBB...", { id: "banner-upload" });
-      const res = await uploadImageToImgBB(file);
-      setBannerUrl(res.displayUrl || res.url);
-      toast.success("Cover banner uploaded! 🎨", { id: "banner-upload" });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to upload banner", { id: "banner-upload" });
-    } finally {
-      setIsUploadingBanner(false);
-      if (bannerInputRef.current) bannerInputRef.current.value = "";
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setCropImageUrl(reader.result);
+        setCropMode("banner");
+        setCropModalOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+    if (bannerInputRef.current) bannerInputRef.current.value = "";
+  }
+
+  function handleOpenCropForCurrent(mode: "avatar" | "banner") {
+    const targetUrl = mode === "avatar" ? avatarUrl : bannerUrl;
+    if (!targetUrl) {
+      if (mode === "avatar") pfpInputRef.current?.click();
+      else bannerInputRef.current?.click();
+      return;
     }
+    setCropImageUrl(targetUrl);
+    setCropMode(mode);
+    setCropModalOpen(true);
   }
 
   async function handleDatingPhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -218,13 +231,39 @@ export function EditProfileClient() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6 pb-16 pt-2 px-4 select-none">
+      {/* Image Crop & Resize Modal */}
+      {cropModalOpen && (
+        <ImageCropModal
+          isOpen={cropModalOpen}
+          onClose={() => setCropModalOpen(false)}
+          imageUrl={cropImageUrl}
+          mode={cropMode}
+          onCropComplete={(croppedUrl) => {
+            if (cropMode === "avatar") {
+              setAvatarUrl(croppedUrl);
+            } else {
+              setBannerUrl(croppedUrl);
+            }
+          }}
+        />
+      )}
+
       {/* Hidden PFP File Input */}
       <input
         ref={pfpInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         className="hidden"
-        onChange={handlePfpUpload}
+        onChange={handlePfpFileSelected}
+      />
+
+      {/* Hidden Banner File Input */}
+      <input
+        ref={bannerInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={handleBannerFileSelected}
       />
 
       {/* Hidden Dating Photo File Input */}
@@ -251,57 +290,86 @@ export function EditProfileClient() {
         {/* ─── Cover Banner & Avatar Section ─── */}
         <div className="rounded-3xl border border-border/80 bg-card overflow-hidden shadow-xs">
           {/* Banner Preview */}
-          <div className="relative h-32 w-full bg-gradient-to-r from-orange-500/25 via-primary/30 to-amber-500/25">
+          <div className="relative h-36 w-full bg-gradient-to-r from-orange-500/25 via-primary/30 to-amber-500/25">
             {bannerUrl ? (
               <img src={bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0 bg-grid-pattern opacity-30" />
             )}
 
-            <button
-              type="button"
-              disabled={isUploadingBanner}
-              onClick={() => bannerInputRef.current?.click()}
-              className="absolute top-3 right-3 py-1.5 px-3 rounded-xl bg-black/70 hover:bg-black/85 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md"
-            >
-              {isUploadingBanner ? <Loader2 className="size-3.5 animate-spin" /> : <Camera className="size-3.5" />}
-              <span>{bannerUrl ? "Change Banner" : "Upload Banner"}</span>
-            </button>
-            <input
-              ref={bannerInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleBannerUpload}
-            />
+            <div className="absolute top-3 right-3 flex items-center gap-2">
+              {bannerUrl && (
+                <button
+                  type="button"
+                  onClick={() => handleOpenCropForCurrent("banner")}
+                  className="py-1.5 px-3 rounded-xl bg-black/60 hover:bg-black/80 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md"
+                  title="Reposition / Crop Banner"
+                >
+                  <Move className="size-3.5" />
+                  <span>Reposition</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => bannerInputRef.current?.click()}
+                className="py-1.5 px-3 rounded-xl bg-black/70 hover:bg-black/85 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md"
+              >
+                <Camera className="size-3.5" />
+                <span>{bannerUrl ? "Change" : "Upload Banner"}</span>
+              </button>
+            </div>
           </div>
 
           {/* Avatar Row */}
-          <div className="p-5 flex flex-col sm:flex-row items-center gap-4 -mt-12">
-            <Avatar className="size-24 border-4 border-card shadow-xl shrink-0">
-              <AvatarImage src={avatarUrl || getAvatarUrl(null, username || "user")} />
-              <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
-                {displayName ? displayName[0].toUpperCase() : "U"}
-              </AvatarFallback>
-            </Avatar>
+          <div className="p-5 flex flex-col sm:flex-row items-center gap-4 -mt-14">
+            <div className="relative group shrink-0">
+              <Avatar className="size-24 border-4 border-card shadow-xl">
+                <AvatarImage src={avatarUrl || getAvatarUrl(null, username || "user")} />
+                <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
+                  {displayName ? displayName[0].toUpperCase() : "U"}
+                </AvatarFallback>
+              </Avatar>
 
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2 sm:pt-6">
+              {avatarUrl && (
+                <button
+                  type="button"
+                  onClick={() => handleOpenCropForCurrent("avatar")}
+                  className="absolute bottom-0 right-0 size-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:scale-110 transition-transform cursor-pointer"
+                  title="Resize & Crop Avatar"
+                >
+                  <Move className="size-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2 sm:pt-8">
               <button
                 type="button"
-                disabled={isUploadingPfp}
                 onClick={() => pfpInputRef.current?.click()}
                 className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
               >
-                {isUploadingPfp ? <Loader2 className="size-3.5 animate-spin text-primary" /> : <Upload className="size-3.5 text-primary" />}
+                <Upload className="size-3.5 text-primary" />
                 <span>Upload Avatar</span>
               </button>
+
+              {avatarUrl && (
+                <button
+                  type="button"
+                  onClick={() => handleOpenCropForCurrent("avatar")}
+                  className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                >
+                  <Move className="size-3.5 text-primary" />
+                  <span>Resize & Crop</span>
+                </button>
+              )}
 
               <button
                 type="button"
                 onClick={handleGenerateDiceBearAvatar}
-                className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer"
+                className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer flex items-center gap-1.5"
               >
-                🎲 Random Avatar
+                <Sparkles className="size-3.5" /> Randomize
               </button>
             </div>
           </div>
@@ -632,7 +700,7 @@ export function EditProfileClient() {
         {/* Action Button */}
         <button
           type="submit"
-          disabled={isSaving || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid) || isUploadingPfp || isUploadingDatingPhoto}
+          disabled={isSaving || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid) || isUploadingDatingPhoto}
           className="w-full py-3 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
         >
           <Save className="size-4" />

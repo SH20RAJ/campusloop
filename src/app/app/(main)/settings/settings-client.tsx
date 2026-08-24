@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   RotateCcw,
   Sparkles,
-  LogOut,
   Bell,
   Sliders,
   Check,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { SignOutButton } from "@/components/ui/sign-out-button";
 
 interface SettingsClientProps {
   profile: {
@@ -265,12 +265,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
               Sign out of your active student session on this device.
             </p>
 
-            <Link
-              href="/handler/sign-out"
-              className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:bg-destructive/90 transition-all flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer"
-            >
-              <LogOut className="h-3.5 w-3.5" /> Sign Out
-            </Link>
+            <SignOutButton className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:bg-destructive/90 transition-all flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer border-none" />
           </div>
         </section>
       </div>

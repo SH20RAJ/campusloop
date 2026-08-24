@@ -13,7 +13,6 @@ import {
   Plus,
   UserCircle,
   Shield,
-  LogOut,
   Sliders,
   Menu,
   X,
@@ -35,6 +34,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { SignOutButton } from "@/components/ui/sign-out-button";
 import type { UserProfile } from "@/db/schema";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 
@@ -236,13 +236,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
                   )}
 
                   <div className="border-t border-border/50 pt-1">
-                    <Link
-                      href="/handler/sign-out"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-                    >
-                      <LogOut className="size-3.5" />
-                      <span>Sign Out</span>
-                    </Link>
+                    <SignOutButton variant="menu-item" />
                   </div>
                 </div>
               )}
@@ -267,15 +261,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
 
                 <div className="flex items-center gap-1 shrink-0">
                   <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted/50" />
-                  <Link
-                    href="/handler/sign-out"
-                    className="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:text-destructive transition-colors"
-                    title="Sign out"
-                  >
-                    <AnimateIcon animateOnHover animation="path">
-                      <LogOut className="size-3.5" />
-                    </AnimateIcon>
-                  </Link>
+                  <SignOutButton variant="icon" />
                 </div>
               </div>
             </div>
@@ -440,12 +426,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
                 <span className="text-xs font-semibold text-muted-foreground">Theme</span>
               </div>
 
-              <Link
-                href="/handler/sign-out"
-                className="flex items-center gap-1.5 rounded-xl border border-border/60 bg-muted/20 px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-destructive transition-colors"
-              >
-                <LogOut className="size-3.5" /> Sign out
-              </Link>
+              <SignOutButton />
             </div>
           </div>
         </div>

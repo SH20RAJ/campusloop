@@ -3,46 +3,70 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  LogOut,
   Shield,
   MessageSquare,
-  Sparkles,
-  ArrowLeft,
   Copy,
-  Check,
   Trophy,
-  Share2,
   Edit3,
-  Flame,
-  Camera,
   ArrowUpRight,
   Briefcase,
   GraduationCap,
-  Calendar,
   MapPin,
-  Eye,
   TrendingUp,
-  X,
   Upload,
   Loader2,
+  ArrowLeft,
+  Share2,
+  Camera,
+  Check,
+  Flame,
+  Calendar,
+  Sparkles,
+  X,
+  Eye,
+  Move,
 } from "lucide-react";
+import { SignOutButton } from "@/components/ui/sign-out-button";
+import { ImageCropModal } from "@/components/ui/image-crop-modal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
 import { toast } from "sonner";
 import type { FeedPost } from "@/hooks/use-feed";
-import type { UserProfile, Institution } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import { getCloutTier } from "@/lib/gamification";
 import { slugifyBranch, getBranchIcon } from "@/lib/academic-constants";
-import { uploadImageToImgBB } from "@/lib/upload";
 
 interface ProfileClientViewProps {
-  profile: UserProfile & {
-    institution?: Institution | null;
-    photos?: string[];
-    headline?: string | null;
+  profile: {
+    id: string;
+    username: string;
+    displayName: string;
+    officialName?: string | null;
+    avatarUrl?: string | null;
     bannerUrl?: string | null;
+    headline?: string | null;
+    bio?: string | null;
+    gender?: string | null;
+    dob?: string | null;
+    isDobPrivate?: boolean | null;
+    course?: string | null;
+    branch?: string | null;
+    year?: number | null;
+    points?: number | null;
+    role?: string | null;
+    status?: string | null;
+    photos?: string[] | null;
+    interests?: string[] | null;
+    referralCount?: number | null;
+    createdAt?: Date | string | null;
+    institution?: {
+      id: string;
+      name: string;
+      slug: string;
+      state?: string | null;
+      district?: string | null;
+    } | null;
   };
   formattedPosts: FeedPost[];
   isOwnProfile: boolean;
@@ -60,8 +84,13 @@ export function ProfileClientView({
   const [copiedHandle, setCopiedHandle] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showPhotoLightbox, setShowPhotoLightbox] = useState<string | null>(null);
-  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
+  const pfpInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Crop Modal States
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [cropImageUrl, setCropImageUrl] = useState("");
+  const [cropMode, setCropMode] = useState<"avatar" | "banner">("avatar");
 
   // ─── Infinite Scroll for Profile Posts ───
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
@@ -155,41 +184,95 @@ export function ProfileClientView({
     toast.success("Profile link & Vibe Card copied! Share on WhatsApp 🚀");
   }
 
-  async function handleBannerUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleBannerFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploadingBanner(true);
-    try {
-      toast.loading("Uploading campus banner...", { id: "banner-up" });
-      const res = await uploadImageToImgBB(file);
-      const bannerUrl = res.displayUrl || res.url;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setCropImageUrl(reader.result);
+        setCropMode("banner");
+        setCropModalOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+    if (bannerInputRef.current) bannerInputRef.current.value = "";
+  }
 
-      await fetch("/api/profile/me", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bannerUrl }),
-      });
+  function handlePfpFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-      toast.success("Cover banner updated! 🎨", { id: "banner-up" });
-      router.refresh();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to upload banner", { id: "banner-up" });
-    } finally {
-      setIsUploadingBanner(false);
-      if (bannerInputRef.current) bannerInputRef.current.value = "";
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setCropImageUrl(reader.result);
+        setCropMode("avatar");
+        setCropModalOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+    if (pfpInputRef.current) pfpInputRef.current.value = "";
+  }
+
+  async function handleCropCompleted(croppedUrl: string) {
+    if (cropMode === "banner") {
+      try {
+        await fetch("/api/profile/me", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bannerUrl: croppedUrl }),
+        });
+        toast.success("Cover banner updated! 🎨");
+        router.refresh();
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      try {
+        await fetch("/api/profile/me", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ avatarUrl: croppedUrl }),
+        });
+        toast.success("Profile photo updated! 📸");
+        router.refresh();
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
   return (
     <div className="min-h-screen pb-24 text-foreground select-none">
+      {/* Image Crop & Resize Modal */}
+      {cropModalOpen && (
+        <ImageCropModal
+          isOpen={cropModalOpen}
+          onClose={() => setCropModalOpen(false)}
+          imageUrl={cropImageUrl}
+          mode={cropMode}
+          onCropComplete={handleCropCompleted}
+        />
+      )}
+
       {/* Hidden Banner File Input */}
       <input
         ref={bannerInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         className="hidden"
-        onChange={handleBannerUpload}
+        onChange={handleBannerFileSelected}
+      />
+
+      {/* Hidden PFP File Input */}
+      <input
+        ref={pfpInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={handlePfpFileSelected}
       />
 
       {/* ─── Sticky Minimal Top Header Bar ─── */}
@@ -241,15 +324,31 @@ export function ProfileClientView({
 
             {/* Banner Change Button for Owner */}
             {isOwnProfile && (
-              <button
-                type="button"
-                onClick={() => bannerInputRef.current?.click()}
-                disabled={isUploadingBanner}
-                className="absolute top-3 right-3 size-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-md"
-                title="Change cover banner"
-              >
-                <Camera className="size-4" />
-              </button>
+              <div className="absolute top-3 right-3 flex items-center gap-2">
+                {profile.bannerUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCropImageUrl(profile.bannerUrl || "");
+                      setCropMode("banner");
+                      setCropModalOpen(true);
+                    }}
+                    className="size-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-md"
+                    title="Reposition / Crop Banner"
+                  >
+                    <Move className="size-3.5" />
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => bannerInputRef.current?.click()}
+                  className="size-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-md"
+                  title="Change cover banner"
+                >
+                  <Camera className="size-4" />
+                </button>
+              </div>
             )}
           </div>
 
@@ -260,7 +359,9 @@ export function ProfileClientView({
               {/* Clickable Profile Picture */}
               <div className="relative group">
                 <div
-                  onClick={() => setShowAvatarMenu(true)}
+                  onClick={() => {
+                    if (isOwnProfile) setShowAvatarMenu(true);
+                  }}
                   className="relative size-24 sm:size-28 rounded-full border-4 border-card shadow-2xl cursor-pointer overflow-hidden bg-background group-hover:opacity-95 transition-opacity"
                 >
                   <Avatar className="size-full">
@@ -271,9 +372,11 @@ export function ProfileClientView({
                   </Avatar>
 
                   {/* Camera overlay indicator on hover */}
-                  <div className="absolute inset-0 bg-black/35 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Camera className="size-5 text-white" />
-                  </div>
+                  {isOwnProfile && (
+                    <div className="absolute inset-0 bg-black/35 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Camera className="size-5 text-white" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Verified Blue Star Badge */}
@@ -298,13 +401,10 @@ export function ProfileClientView({
                       <Edit3 className="size-3.5" /> Edit Profile
                     </Link>
 
-                    <Link
-                      href="/handler/sign-out"
+                    <SignOutButton
+                      variant="icon"
                       className="flex items-center justify-center rounded-2xl border border-border/70 bg-muted/20 size-9 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-                      title="Sign Out"
-                    >
-                      <LogOut className="size-4" />
-                    </Link>
+                    />
                   </>
                 ) : (
                   <Link
@@ -675,7 +775,7 @@ export function ProfileClientView({
                   type="button"
                   onClick={() => {
                     setShowAvatarMenu(false);
-                    setShowPhotoLightbox(profile.avatarUrl);
+                    setShowPhotoLightbox(profile.avatarUrl || null);
                   }}
                   className="w-full py-2.5 px-3.5 rounded-2xl border border-border/80 bg-muted/20 hover:bg-muted/50 text-xs font-bold text-foreground flex items-center gap-2.5 cursor-pointer transition-colors"
                 >
@@ -686,14 +786,33 @@ export function ProfileClientView({
 
               {isOwnProfile && (
                 <>
-                  <Link
-                    href="/app/profile/edit"
-                    onClick={() => setShowAvatarMenu(false)}
+                  {profile.avatarUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAvatarMenu(false);
+                        setCropImageUrl(profile.avatarUrl || "");
+                        setCropMode("avatar");
+                        setCropModalOpen(true);
+                      }}
+                      className="w-full py-2.5 px-3.5 rounded-2xl border border-border/80 bg-muted/20 hover:bg-muted/50 text-xs font-bold text-foreground flex items-center gap-2.5 cursor-pointer transition-colors"
+                    >
+                      <Move className="size-4 text-primary" />
+                      <span>Resize &amp; Crop Avatar</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAvatarMenu(false);
+                      pfpInputRef.current?.click();
+                    }}
                     className="w-full py-2.5 px-3.5 rounded-2xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-2.5 cursor-pointer transition-colors shadow-xs"
                   >
                     <Upload className="size-4" />
-                    <span>Upload New Photo in Editor</span>
-                  </Link>
+                    <span>Upload &amp; Crop New Photo</span>
+                  </button>
 
                   <button
                     type="button"

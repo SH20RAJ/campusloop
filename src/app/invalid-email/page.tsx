@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ShieldAlertIcon } from "lucide-react";
 
+import { SignOutButton } from "@/components/ui/sign-out-button";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { redirect } from "next/navigation";
 
@@ -46,12 +47,11 @@ export default async function InvalidEmailPage() {
           >
             Continue in Viewer Mode 👀
           </Link>
-          <Link
-            href="/handler/sign-out"
+          <SignOutButton
             className="flex w-full items-center justify-center rounded-lg border border-border bg-background h-10 px-4 text-sm font-medium text-foreground shadow-sm hover:bg-muted transition-colors cursor-pointer"
           >
-            Sign Out &amp; Use College Email
-          </Link>
+            <span>Sign Out &amp; Use College Email</span>
+          </SignOutButton>
         </div>
       </div>
     </div>

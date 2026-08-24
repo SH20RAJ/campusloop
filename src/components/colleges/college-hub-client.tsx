@@ -190,7 +190,7 @@ export function CollegeHubClient({
   const shortName = college.name.split(",")[0];
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24 px-3 sm:px-4 pt-3 gap-6 select-none">
+    <main className="mx-auto flex w-full max-w-4xl flex-col min-h-screen pb-24 px-3 sm:px-6 pt-3 gap-6 select-none">
       {/* ─── Grand Airbnb/LinkedIn Hero Header ─── */}
       <CollegeHeroHeader
         college={college}

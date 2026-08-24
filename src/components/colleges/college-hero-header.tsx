@@ -97,11 +97,13 @@ export function CollegeHeroHeader({
       {/* ─── Grand Panoramic College Banner & Header Card ─── */}
       <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm">
         {/* Banner Area */}
-        <div className="relative h-44 sm:h-52 w-full bg-muted/40 overflow-hidden">
+        <div className="relative h-48 sm:h-60 w-full bg-muted/40 overflow-hidden">
           {college.bannerUrl ? (
             <img
               src={college.bannerUrl}
               alt={`${college.name} Campus Banner`}
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
               className="w-full h-full object-cover"
             />
           ) : (
@@ -109,10 +111,10 @@ export function CollegeHeroHeader({
           )}
 
           {/* Clean Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-black/30 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-black/20 to-black/50" />
 
           {/* Badges on Top-Right of Banner */}
-          <div className="absolute top-3 right-3 flex flex-wrap items-center gap-1.5">
+          <div className="absolute top-3 right-3 flex flex-wrap items-center gap-1.5 z-10">
             {isEnrolledHere && (
               <span className="text-[11px] font-black px-2.5 py-1 rounded-full bg-primary text-primary-foreground backdrop-blur-md flex items-center gap-1 shadow-md">
                 🎓 Your Campus
@@ -127,7 +129,7 @@ export function CollegeHeroHeader({
           </div>
 
           {/* Live Pulse Ticker (Subtle Pill in Top Left) */}
-          <div className="absolute top-3 left-3 hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 text-white/90 backdrop-blur-md border border-white/10 text-[11px] font-semibold">
+          <div className="absolute top-3 left-3 hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 text-white/90 backdrop-blur-md border border-white/10 text-[11px] font-semibold z-10">
             <span className="size-2 rounded-full bg-emerald-400 animate-ping" />
             <span>{studentCount * 3 + 12} batchmates active this week</span>
           </div>
@@ -144,6 +146,8 @@ export function CollegeHeroHeader({
                   <img
                     src={college.logoUrl}
                     alt={college.name}
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                     className="w-full h-full object-contain"
                   />
                 ) : (

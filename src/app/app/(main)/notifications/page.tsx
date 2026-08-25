@@ -7,6 +7,7 @@ import { Bell, Heart, MessageSquare, Sparkles, ArrowRight, Compass } from "lucid
 import Link from "next/link";
 import { Metadata } from "next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -45,45 +46,52 @@ export default async function NotificationsPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/90 px-4 py-4 backdrop-blur-xl border-b border-border flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-black tracking-tight flex items-center gap-2 text-foreground">
-            <Bell className="h-5 w-5 text-primary" /> Notifications
-          </h1>
-          <p className="text-xs text-muted-foreground">Catch up on student likes, comments, & matches.</p>
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24 select-none">
+      {/* Header (Matching Reference 1 Notifications Top Bar) */}
+      <header className="sticky top-0 z-40 bg-background/85 px-4 py-3.5 backdrop-blur-xl border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="size-7 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+            <Bell className="size-4" />
+          </div>
+          <div>
+            <h1 className="text-base font-black tracking-tight text-foreground">Notifications</h1>
+            <p className="text-[10px] text-muted-foreground font-semibold">Likes, replies, and student matches</p>
+          </div>
         </div>
         {list.length > 0 && (
-          <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-            {list.length} Recent
+          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+            {list.length} New
           </span>
         )}
       </header>
 
-      {/* List */}
-      <div className="px-4 py-6 space-y-3">
+      {/* List (Matching Reference 1 Notification Row Items) */}
+      <div className="px-3 sm:px-4 py-4 space-y-2">
         {list.map((n) => {
-          let icon = <Bell className="h-3.5 w-3.5 text-muted-foreground" />;
+          let icon = <Bell className="h-3 w-3 text-muted-foreground" />;
           let bgClass = "bg-muted";
-          let message = "interacted with your profile.";
+          let message = "interacted with your campus profile.";
           let href = "#";
+          let actionLabel = "View";
 
           if (n.type === "LIKE") {
-            icon = <Heart className="h-3.5 w-3.5 text-rose-500 fill-rose-500" />;
+            icon = <Heart className="h-3 w-3 text-rose-500 fill-rose-500" />;
             bgClass = "bg-rose-500/10 border-rose-500/25";
             message = "upvoted your post.";
             href = `/app/post/${n.referenceId}`;
+            actionLabel = "View Post";
           } else if (n.type === "COMMENT") {
-            icon = <MessageSquare className="h-3.5 w-3.5 text-blue-500 fill-blue-500" />;
+            icon = <MessageSquare className="h-3 w-3 text-blue-500 fill-blue-500" />;
             bgClass = "bg-blue-500/10 border-blue-500/25";
             message = "commented on your post.";
             href = `/app/post/${n.referenceId}`;
+            actionLabel = "Reply";
           } else if (n.type === "MATCH") {
-            icon = <Sparkles className="h-3.5 w-3.5 text-primary" />;
+            icon = <Sparkles className="h-3 w-3 text-primary" />;
             bgClass = "bg-primary/10 border-primary/25";
-            message = "matched with you! Send them a DM.";
+            message = "matched with you on Campus Dating!";
             href = `/app/chat`;
+            actionLabel = "Chat";
           }
 
           const actorName = n.actor?.displayName || "A Student";
@@ -93,19 +101,20 @@ export default async function NotificationsPage() {
           return (
             <div 
               key={n.id} 
-              className={`flex items-center justify-between gap-4 p-4 rounded-2xl border bg-card hover:bg-card/80 transition-all ${
-                !n.isRead ? 'border-primary/30 bg-primary/5 shadow-xs' : 'border-border/60'
-              }`}
+              className={cn(
+                "flex items-center justify-between gap-3 p-3.5 rounded-2xl border bg-card hover:bg-muted/30 transition-all",
+                !n.isRead ? "border-primary/30 bg-primary/5 shadow-2xs" : "border-border/60 shadow-2xs"
+              )}
             >
-              <div className="flex items-center gap-3.5 min-w-0">
+              <div className="flex items-center gap-3 min-w-0">
                 <div className="relative shrink-0">
-                  <Avatar className="h-10 w-10 border border-border/60 shadow-xs">
+                  <Avatar className="size-10 rounded-2xl border border-border/80 shadow-2xs">
                     <AvatarImage src={actorAvatar} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold rounded-2xl">
                       {actorName[0]}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full border border-background flex items-center justify-center ${bgClass}`}>
+                  <div className={cn("absolute -bottom-1 -right-1 size-4.5 rounded-full border-2 border-card flex items-center justify-center", bgClass)}>
                     {icon}
                   </div>
                 </div>
@@ -115,10 +124,10 @@ export default async function NotificationsPage() {
                     <Link href={`/@${actorUsername}`} className="font-bold hover:text-primary hover:underline">
                       {actorName}
                     </Link>{" "}
-                    <span className="text-muted-foreground">{message}</span>
+                    <span className="text-muted-foreground font-medium">{message}</span>
                   </p>
-                  <span className="text-[10px] text-muted-foreground/80 block mt-1">
-                    {new Date(n.createdAt).toLocaleDateString()} • {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <span className="text-[10px] text-muted-foreground/70 block mt-0.5">
+                    {new Date(n.createdAt).toLocaleDateString([], { month: "short", day: "numeric" })} · {new Date(n.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
               </div>
@@ -126,9 +135,9 @@ export default async function NotificationsPage() {
               {href !== "#" && (
                 <Link
                   href={href}
-                  className="h-8 w-8 rounded-xl border border-border/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all shrink-0"
+                  className="px-3 py-1.5 rounded-xl border border-border/70 bg-muted/30 hover:bg-muted text-foreground text-[11px] font-bold transition-all shrink-0 active:scale-95"
                 >
-                  <ArrowRight className="h-4 w-4" />
+                  {actionLabel}
                 </Link>
               )}
             </div>

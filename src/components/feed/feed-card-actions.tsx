@@ -33,64 +33,66 @@ export function FeedCardActions({
   }
 
   return (
-    <div className="flex items-center justify-between px-3 sm:px-5 py-1 sm:py-2 border-t border-border/40 text-muted-foreground select-none touch-manipulation">
-      {/* Upvote Button */}
+    <div className="flex items-center justify-between px-3 sm:px-5 py-2 border-t border-border/40 text-muted-foreground select-none touch-manipulation">
+      {/* Upvote Button (Triangle / Heart with Count) */}
       <button
         onClick={onVote}
         className={cn(
-          "flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 px-2 text-xs font-semibold hover:text-rose-500 transition-all active:scale-90 active:opacity-75 group cursor-pointer",
-          userVote === 1 && "text-rose-500"
+          "flex min-h-[44px] items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all active:scale-95 group cursor-pointer",
+          userVote === 1
+            ? "text-rose-500 bg-rose-500/10"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
         )}
         aria-label="Upvote post"
       >
         <AnimateIcon animateOnHover animation="path">
           <Heart
             className={cn(
-              "h-4.5 w-4.5 transition-all duration-300 group-hover:scale-110",
-              userVote === 1 && "fill-rose-500 text-rose-500 scale-110"
+              "size-4.5 transition-all duration-300 group-hover:scale-110",
+              userVote === 1 && "fill-rose-500 text-rose-500"
             )}
           />
         </AnimateIcon>
-        <span className="tabular-nums">{votesCount}</span>
+        <span className="tabular-nums font-bold text-xs">{votesCount}</span>
       </button>
 
-      {/* Comment Link */}
+      {/* Comment Button with Count */}
       <Link
         href={`/app/post/${post.id}`}
-        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 px-2 text-xs font-semibold hover:text-primary transition-all active:scale-90 active:opacity-75 group cursor-pointer"
+        className="flex min-h-[44px] items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all active:scale-95 group cursor-pointer"
         aria-label="Comments"
       >
         <AnimateIcon animateOnHover animation="path">
-          <MessageCircle className="h-4.5 w-4.5 transition-transform group-hover:scale-110" />
+          <MessageCircle className="size-4.5 transition-transform group-hover:scale-110" />
         </AnimateIcon>
-        <span className="tabular-nums">{post.commentsCount}</span>
+        <span className="tabular-nums font-bold text-xs">{post.commentsCount}</span>
       </Link>
 
-      {/* Instant 1-Tap Repost Button */}
+      {/* Repost Button */}
       <button
         onClick={triggerRepostAnimation}
-        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 px-2 text-xs font-semibold hover:text-emerald-500 transition-all active:scale-90 active:opacity-75 group cursor-pointer"
-        title="Instant Repost to Feed"
+        className="flex min-h-[44px] items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 transition-all active:scale-95 group cursor-pointer"
+        title="Instant Repost to Campus Feed"
       >
         <Repeat2
           className={cn(
-            "h-4.5 w-4.5 transition-all duration-500 group-hover:scale-110 text-muted-foreground group-hover:text-emerald-500",
+            "size-4.5 transition-all duration-500 group-hover:scale-110",
             repostSpin && "rotate-360 text-emerald-500 scale-125"
           )}
         />
-        <span className="text-[10px] hidden sm:inline group-hover:text-emerald-500">Repost</span>
+        <span className="text-xs font-bold hidden sm:inline">Repost</span>
       </button>
 
       {/* Share Button */}
       <button
         onClick={onShare}
-        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 px-2 text-xs font-semibold hover:text-primary transition-all active:scale-90 active:opacity-75 group cursor-pointer"
+        className="flex min-h-[44px] items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all active:scale-95 group cursor-pointer"
         aria-label="Share post"
       >
         <AnimateIcon animateOnHover animation="path">
-          <Share2 className="h-4.5 w-4.5 transition-transform group-hover:scale-110" />
+          <Share2 className="size-4.5 transition-transform group-hover:scale-110" />
         </AnimateIcon>
-        <span className="text-[10px] hidden sm:inline">Share</span>
+        <span className="text-xs font-bold hidden sm:inline">Share</span>
       </button>
     </div>
   );

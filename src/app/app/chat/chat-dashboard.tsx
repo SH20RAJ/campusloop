@@ -113,14 +113,17 @@ export function ChatDashboard({
           activeConversationId ? "hidden md:flex" : "flex"
         )}
       >
-        {/* Search Header */}
+        {/* Search Header (Matching Reference 2 Messenger Top Bar) */}
         <div className="p-4 border-b border-border space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
-              <MessageSquareIcon className="size-5 text-primary" /> Direct Messages
-            </h2>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted px-2 py-0.5 rounded-full border border-border">
-              {conversations?.length || 0} Chats
+            <div className="flex items-center gap-2">
+              <div className="size-7 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                <MessageSquareIcon className="size-4" />
+              </div>
+              <h1 className="text-base font-black tracking-tight text-foreground">Messenger</h1>
+            </div>
+            <span className="text-[10px] font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
+              {conversations?.length || 0}
             </span>
           </div>
 
@@ -128,7 +131,7 @@ export function ChatDashboard({
             <SearchIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search campus students..."
+              placeholder="Search students..."
               value={searchQuery}
               onChange={handleSearchChange}
               className="w-full pl-9 pr-4 py-2 text-xs font-semibold bg-muted/50 rounded-xl border border-border/60 focus:border-primary focus:bg-background outline-none transition-all"
@@ -187,17 +190,24 @@ export function ChatDashboard({
                           : "hover:bg-muted/50 text-muted-foreground"
                       )}
                     >
-                      <Avatar className="size-10 border border-border shrink-0">
-                        <AvatarImage src={other?.avatarUrl || ""} />
-                        <AvatarFallback className="font-bold">{initial}</AvatarFallback>
-                      </Avatar>
+                      <div className="relative shrink-0">
+                        <Avatar className="size-11 border border-border/80 shadow-2xs">
+                          <AvatarImage src={other?.avatarUrl || ""} />
+                          <AvatarFallback className="font-bold text-xs">{initial}</AvatarFallback>
+                        </Avatar>
+                        <span className="absolute bottom-0 right-0 size-3 rounded-full bg-emerald-500 border-2 border-card" />
+                      </div>
+
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline mb-0.5">
-                          <p className={cn("text-xs font-bold truncate", isActive ? "text-primary" : "text-foreground")}>
+                          <p className={cn("text-xs font-bold truncate", isActive ? "text-primary font-black" : "text-foreground")}>
                             {name}
                           </p>
+                          <span className="text-[10px] text-muted-foreground/70 shrink-0 ml-1">
+                            {conv.lastMessage ? "Active" : "New"}
+                          </span>
                         </div>
-                        <p className="text-[11px] truncate leading-normal text-muted-foreground">
+                        <p className="text-[11px] truncate leading-normal text-muted-foreground font-medium">
                           {conv.lastMessage ? conv.lastMessage.body : "Start conversation..."}
                         </p>
                       </div>

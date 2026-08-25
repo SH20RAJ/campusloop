@@ -37,57 +37,61 @@ export function FeedCardHeader({
   const avatarUrl = post.isAnonymous ? "" : getAvatarUrl(post.author?.avatarUrl, post.author?.username ?? "student");
 
   return (
-    <div className="p-5 pb-2 flex items-center justify-between">
+    <div className="p-4 sm:p-5 pb-2 flex items-start justify-between gap-2">
       <div className="flex items-center gap-3 min-w-0">
         {!post.isAnonymous ? (
           <Link href={`/@${authorHandle}`}>
-            <Avatar className="h-10 w-10 border hover:opacity-80 transition-opacity shrink-0">
+            <Avatar className="size-10 rounded-2xl border border-border/60 hover:opacity-80 transition-opacity shrink-0 shadow-2xs">
               <AvatarImage src={avatarUrl || ""} />
-              <AvatarFallback>{avatarFallback}</AvatarFallback>
+              <AvatarFallback className="rounded-2xl font-bold text-xs">{avatarFallback}</AvatarFallback>
             </Avatar>
           </Link>
         ) : (
-          <Avatar className="h-10 w-10 border shrink-0">
+          <Avatar className="size-10 rounded-2xl border border-border/60 shrink-0 bg-muted/40 shadow-2xs">
             <AvatarImage src={avatarUrl || ""} />
-            <AvatarFallback>{avatarFallback}</AvatarFallback>
+            <AvatarFallback className="rounded-2xl font-bold text-xs">{avatarFallback}</AvatarFallback>
           </Avatar>
         )}
         <div className="flex flex-col min-w-0">
-          <span className="text-sm font-semibold flex items-center gap-1 truncate">
+          <div className="flex items-center gap-1 min-w-0">
             {!post.isAnonymous ? (
               <Link href={`/@${authorHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer flex items-center gap-1 truncate">
-                <span className="truncate">{authorName}</span>
+                <span className="truncate font-bold text-sm text-foreground">{authorName}</span>
                 {(post.author && (post.author.points >= 150 || post.author.role === "ADMIN")) && (
                   <span title="Verified Campus Star (Unlocked at 150+ LP)">
-                    <svg className="size-3.5 text-blue-500 fill-blue-500/20 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="size-3.5 text-blue-500 fill-blue-500 shrink-0" viewBox="0 0 24 24">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                     </svg>
                   </span>
                 )}
               </Link>
             ) : (
-              authorName
+              <span className="font-bold text-sm text-foreground truncate">{authorName}</span>
             )}
-          </span>
-          <span className="text-xs text-muted-foreground truncate">
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground truncate">
             {!post.isAnonymous ? (
               <Link href={`/@${authorHandle}`} className="hover:text-primary transition-colors hover:underline cursor-pointer">
                 @{authorHandle}
               </Link>
             ) : (
-              `@${authorHandle}`
+              <span>@{authorHandle}</span>
             )}
-            {" "}• <Link href={`/app/college/${post.institution?.slug || post.institutionId}`} className="hover:text-primary transition-colors hover:underline">{post.institution.name}</Link>
-            <span className="text-muted-foreground/60 text-[10px]">• {formatTimeAgo(post.createdAt)}</span>
-            {post.isEdited && <span className="text-[10px] text-muted-foreground/70 ml-1 font-normal">(edited)</span>}
-          </span>
+            <span>•</span>
+            <Link href={`/app/college/${post.institution?.slug || post.institutionId}`} className="hover:text-primary transition-colors hover:underline truncate max-w-[140px]">
+              {post.institution?.name?.split(",")[0] || "Campus"}
+            </Link>
+            <span className="text-[10px] text-muted-foreground/70">• {formatTimeAgo(post.createdAt)}</span>
+            {post.isEdited && <span className="text-[10px] text-muted-foreground/70 ml-0.5">(edited)</span>}
+          </div>
         </div>
       </div>
       
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-1.5 shrink-0">
         {post.community && (
           <Link href={`/app/communities/${post.community.id}`}>
-            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full border bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20 transition-colors cursor-pointer">
+            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md badge-tag-purple hover:opacity-85 transition-opacity cursor-pointer">
               c/{post.community.name}
             </span>
           </Link>
@@ -98,26 +102,26 @@ export function FeedCardHeader({
             onClick={(e) => e.stopPropagation()}
           >
             <span className={cn(
-              "text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 hover:opacity-85 transition-opacity cursor-pointer",
-              post.type === "CONFESSION" && "bg-pink-500/10 text-pink-500 border-pink-500/20",
-              post.type === "POLL" && "bg-blue-500/10 text-blue-500 border-blue-500/20",
-              post.type === "QUESTION" && "bg-orange-500/10 text-orange-500 border-orange-500/20"
+              "text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md flex items-center gap-1 hover:opacity-85 transition-opacity cursor-pointer",
+              post.type === "CONFESSION" && "badge-tag-rose",
+              post.type === "POLL" && "badge-tag-cyan",
+              post.type === "QUESTION" && "badge-tag-peach"
             )}>
               {post.type === "CONFESSION" && (
                 <>
-                  <Lock className="h-2.5 w-2.5" />
+                  <Lock className="size-2.5" />
                   <span>Confession</span>
                 </>
               )}
               {post.type === "POLL" && (
                 <>
-                  <BarChart3 className="h-2.5 w-2.5" />
+                  <BarChart3 className="size-2.5" />
                   <span>Poll</span>
                 </>
               )}
               {post.type === "QUESTION" && (
                 <>
-                  <HelpCircle className="h-2.5 w-2.5" />
+                  <HelpCircle className="size-2.5" />
                   <span>Question</span>
                 </>
               )}
@@ -127,12 +131,16 @@ export function FeedCardHeader({
 
         {/* More Options Dropdown */}
         <div className="relative">
-          <button 
-            onClick={() => setShowMenu(!showMenu)}
-            className="rounded-full p-1.5 hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMenu(!showMenu);
+            }}
+            className="size-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
             aria-label="More options"
           >
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal className="size-4" />
           </button>
           
           {showMenu && (

@@ -82,7 +82,7 @@ export function CommentItem({
       <div className="shrink-0 pt-0.5">
         {!isAnon ? (
           <Link href={`/@${handle}`}>
-            <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border border-border hover:opacity-85 transition-opacity">
+            <Avatar className="size-8 rounded-xl border border-border hover:opacity-85 transition-opacity">
               <AvatarImage src={avatarUrl || ""} />
               <AvatarFallback className="text-[10px] font-bold bg-primary/10 text-primary">
                 {fallback}
@@ -90,7 +90,7 @@ export function CommentItem({
             </Avatar>
           </Link>
         ) : (
-          <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border border-border">
+          <Avatar className="size-8 rounded-xl border border-border">
             <AvatarFallback className="text-[10px] font-bold bg-muted text-muted-foreground">
               {fallback}
             </AvatarFallback>
@@ -99,16 +99,16 @@ export function CommentItem({
       </div>
 
       <div className="flex-1 min-w-0 space-y-1">
-        {/* Facebook-Style Comment Bubble */}
-        <div className="rounded-2xl bg-muted/40 hover:bg-muted/60 transition-colors p-3 border border-border/50 space-y-1">
+        {/* Comment Bubble (Matching Reference 3 Thread Replies) */}
+        <div className="rounded-2xl bg-card hover:border-border transition-colors p-3.5 border border-border/60 space-y-1.5 shadow-2xs">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 min-w-0">
               {!isAnon ? (
                 <Link
                   href={`/@${handle}`}
-                  className="font-extrabold text-foreground hover:underline truncate text-xs flex items-center gap-1"
+                  className="font-bold text-foreground hover:underline truncate text-xs flex items-center gap-1"
                 >
-                  <span>{displayName}</span>
+                  <span className="truncate">{displayName}</span>
                   {isVerified && (
                     <span className="text-blue-500 text-[10px] font-bold" title="Verified Student">
                       ✓
@@ -116,14 +116,14 @@ export function CommentItem({
                   )}
                 </Link>
               ) : (
-                <span className="font-extrabold text-foreground truncate text-xs">
+                <span className="font-bold text-foreground truncate text-xs">
                   {displayName} 🙈
                 </span>
               )}
               <span className="text-muted-foreground/60 text-[10px]">@{handle}</span>
             </div>
 
-            <span className="text-muted-foreground/50 text-[10px] shrink-0">
+            <span className="text-muted-foreground/60 text-[10px] shrink-0 font-medium">
               {formatTimeAgo(comment.createdAt)}
             </span>
           </div>
@@ -133,27 +133,27 @@ export function CommentItem({
           </div>
         </div>
 
-        {/* Facebook-Style Comment Actions (Like / Reply) */}
-        <div className="flex items-center gap-3 px-2 text-[11px] font-bold text-muted-foreground select-none">
+        {/* Comment Actions (Like / Reply) */}
+        <div className="flex items-center gap-4 px-2 text-[11px] font-bold text-muted-foreground select-none">
           <button
             type="button"
             onClick={handleToggleLike}
             className={cn(
-              "hover:text-rose-500 transition-colors flex items-center gap-1 cursor-pointer",
+              "hover:text-rose-500 transition-colors flex items-center gap-1.5 cursor-pointer py-0.5",
               liked && "text-rose-500 font-extrabold"
             )}
           >
-            <Heart className={cn("size-3", liked && "fill-rose-500 text-rose-500")} />
-            <span>{likesCount > 0 ? `${likesCount} Likes` : "Like"}</span>
+            <Heart className={cn("size-3.5", liked && "fill-rose-500 text-rose-500")} />
+            <span>{likesCount > 0 ? `${likesCount}` : "Like"}</span>
           </button>
 
           {depth < 3 && (
             <button
               type="button"
               onClick={() => onReply(comment.id)}
-              className="hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"
+              className="hover:text-primary transition-colors flex items-center gap-1.5 cursor-pointer py-0.5"
             >
-              <Reply className="size-3" />
+              <Reply className="size-3.5" />
               <span>Reply</span>
             </button>
           )}

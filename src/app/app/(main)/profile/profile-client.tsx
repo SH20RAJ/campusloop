@@ -322,10 +322,10 @@ export function ProfileClientView({
       </div>
 
       <main className="space-y-4 max-w-2xl mx-auto px-3 sm:px-4 pt-3">
-        {/* ─── LinkedIn-Style Profile Hero Card ─── */}
+        {/* ─── Profile Hero Card (Inspired by Reference 1 Center Screen) ─── */}
         <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm">
           {/* Cover Banner Photo */}
-          <div className="relative h-32 sm:h-44 w-full bg-gradient-to-r from-orange-500/25 via-primary/30 to-amber-500/25 overflow-hidden">
+          <div className="relative h-36 sm:h-48 w-full bg-aurora-gradient overflow-hidden">
             {profile.bannerUrl ? (
               <img
                 src={profile.bannerUrl}
@@ -333,7 +333,7 @@ export function ProfileClientView({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+              <div className="absolute inset-0 bg-aurora-glow opacity-60" />
             )}
 
             {/* Banner Change Button for Owner */}
@@ -376,11 +376,11 @@ export function ProfileClientView({
                   onClick={() => {
                     if (isOwnProfile) setShowAvatarMenu(true);
                   }}
-                  className="relative size-24 sm:size-28 rounded-full border-4 border-card shadow-2xl cursor-pointer overflow-hidden bg-background group-hover:opacity-95 transition-opacity"
+                  className="relative size-24 sm:size-28 rounded-3xl border-4 border-card shadow-2xl cursor-pointer overflow-hidden bg-background group-hover:opacity-95 transition-opacity"
                 >
-                  <Avatar className="size-full">
-                    <AvatarImage src={profile.avatarUrl || ""} />
-                    <AvatarFallback className="text-3xl font-black bg-primary/10 text-primary">
+                  <Avatar className="size-full rounded-3xl">
+                    <AvatarImage src={profile.avatarUrl || ""} className="rounded-3xl object-cover" />
+                    <AvatarFallback className="text-3xl font-black bg-primary/10 text-primary rounded-3xl">
                       {profile.displayName[0]?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -410,20 +410,24 @@ export function ProfileClientView({
                   <>
                     <Link
                       href="/app/profile/edit"
-                      className="flex items-center justify-center gap-1.5 rounded-2xl bg-primary text-primary-foreground h-9 px-4 text-xs font-bold shadow-xs hover:bg-primary/90 transition-all cursor-pointer"
+                      className="flex items-center justify-center gap-1.5 rounded-full bg-foreground text-background h-9 px-5 text-xs font-bold shadow-xs hover:opacity-90 transition-all cursor-pointer"
                     >
                       <Edit3 className="size-3.5" /> Edit Profile
                     </Link>
 
-                    <SignOutButton
-                      variant="icon"
-                      className="flex items-center justify-center rounded-2xl border border-border/70 bg-muted/20 size-9 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-                    />
+                    <button
+                      type="button"
+                      onClick={handleShareVibe}
+                      className="flex items-center justify-center rounded-full border border-border/80 bg-muted/30 size-9 text-foreground hover:bg-muted transition-colors cursor-pointer"
+                      title="Share Profile"
+                    >
+                      <Share2 className="size-4" />
+                    </button>
                   </>
                 ) : (
                   <Link
                     href={`/app/chat?userId=${profile.id}`}
-                    className="flex items-center justify-center gap-1.5 rounded-2xl bg-primary text-primary-foreground h-9 px-5 text-xs font-bold shadow-md hover:bg-primary/95 transition-all cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground h-9 px-5 text-xs font-bold shadow-md hover:bg-primary/95 transition-all cursor-pointer"
                   >
                     <MessageSquare className="size-3.5" /> Message
                   </Link>
@@ -567,23 +571,36 @@ export function ProfileClientView({
               {profile.bio}
             </p>
 
-            {/* Interest Tags */}
+            {/* Interest Tags (Styled as Reference 1 Pastel Badges) */}
             {profile.interests && profile.interests.length > 0 && (
               <div className="flex flex-wrap gap-1.5 pt-2 border-t border-border/40">
-                {profile.interests.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-xl border border-border/60 bg-muted/40 px-2.5 py-1 text-[11px] font-bold text-muted-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
+                {profile.interests.map((tag, idx) => {
+                  const tagStyles = [
+                    "badge-tag-peach",
+                    "badge-tag-cyan",
+                    "badge-tag-purple",
+                    "badge-tag-rose",
+                    "badge-tag-emerald",
+                  ];
+                  const styleClass = tagStyles[idx % tagStyles.length];
+                  return (
+                    <span
+                      key={tag}
+                      className={cn(
+                        "rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wider",
+                        styleClass
+                      )}
+                    >
+                      {tag}
+                    </span>
+                  );
+                })}
               </div>
             )}
           </div>
         )}
 
-        {/* ─── LinkedIn-Style Clout Analytics Card ─── */}
+        {/* ─── Campus Clout Analytics Card ─── */}
         <div className="rounded-3xl border border-border/80 bg-card p-5 space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
@@ -613,45 +630,55 @@ export function ProfileClientView({
           </div>
         </div>
 
-        {/* ─── Profile Navigation Tabs ─── */}
-        <div className="flex items-center gap-2 border-b border-border/60 pb-1 text-xs font-bold pt-1">
+        {/* ─── Profile Navigation Underline Tabs (Inspired by Reference 1) ─── */}
+        <div className="flex items-center gap-6 border-b border-border/60 text-xs font-bold pt-2 px-1">
           <button
             type="button"
             onClick={() => setActiveTab("posts")}
             className={cn(
-              "px-4 py-2 rounded-2xl transition-all cursor-pointer border",
+              "relative pb-3 transition-colors cursor-pointer text-xs font-bold",
               activeTab === "posts"
-                ? "bg-primary text-primary-foreground border-primary shadow-xs"
-                : "bg-card/40 text-muted-foreground border-border/40 hover:text-foreground"
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
-            Activity ({posts.length})
+            <span>Activity ({posts.length})</span>
+            {activeTab === "posts" && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
+            )}
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("photos")}
             className={cn(
-              "px-4 py-2 rounded-2xl transition-all cursor-pointer border flex items-center gap-1.5",
+              "relative pb-3 transition-colors cursor-pointer text-xs font-bold flex items-center gap-1.5",
               activeTab === "photos"
-                ? "bg-primary text-primary-foreground border-primary shadow-xs"
-                : "bg-card/40 text-muted-foreground border-border/40 hover:text-foreground"
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <Camera className="size-3.5" /> Gallery ({candidatePhotos.length})
+            <Camera className="size-3.5" />
+            <span>Gallery ({candidatePhotos.length})</span>
+            {activeTab === "photos" && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
+            )}
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("clout")}
             className={cn(
-              "px-4 py-2 rounded-2xl transition-all cursor-pointer border",
+              "relative pb-3 transition-colors cursor-pointer text-xs font-bold",
               activeTab === "clout"
-                ? "bg-primary text-primary-foreground border-primary shadow-xs"
-                : "bg-card/40 text-muted-foreground border-border/40 hover:text-foreground"
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
-            LP Perks
+            <span>LP Perks</span>
+            {activeTab === "clout" && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
+            )}
           </button>
         </div>
 

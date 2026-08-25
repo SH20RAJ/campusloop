@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Check,
   Zap,
+  Cake,
 } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
@@ -86,7 +87,28 @@ export function RightSidebar() {
         </div>
       </div>
 
-      {/* ─── 2. Suggested Campus Peers ─── */}
+      {/* ─── 2. Minimal Campus Birthdays Shortcut ─── */}
+      <Link
+        href="/app/birthdays"
+        className="flex items-center justify-between p-3 rounded-2xl bg-card hover:bg-muted/40 transition-all shadow-2xs group cursor-pointer"
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="size-7 rounded-full bg-pink-500/10 text-pink-500 flex items-center justify-center shrink-0">
+            <Cake className="size-3.5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5">
+              <span>Campus Birthdays</span>
+            </p>
+            <p className="text-[10px] text-muted-foreground truncate">
+              Celebrations, wishes &amp; DOB
+            </p>
+          </div>
+        </div>
+        <ArrowUpRight className="size-3 text-muted-foreground/60 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
+      </Link>
+
+      {/* ─── 3. Suggested Campus Peers ─── */}
       {suggestedPeers && suggestedPeers.length > 0 && (
         <div className="rounded-2xl bg-card p-4 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">

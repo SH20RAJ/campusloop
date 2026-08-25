@@ -28,6 +28,7 @@ import {
   Wrench,
   PartyPopper,
   ChevronUp,
+  Cake,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -200,6 +201,15 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                     >
                       <Sliders className="size-3.5 text-blue-500" />
                       <span>Edit Profile & Photos</span>
+                    </Link>
+
+                    <Link
+                      href="/app/birthdays"
+                      onClick={() => setShowProfileMenu(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
+                    >
+                      <Cake className="size-3.5 text-pink-500" />
+                      <span>Campus Birthdays</span>
                     </Link>
 
                     <Link

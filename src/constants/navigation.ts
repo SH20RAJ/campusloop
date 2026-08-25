@@ -45,7 +45,6 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
   { icon: Users, href: "/app/communities", label: "Communities" },
   { icon: Sparkles, href: "/app/dating", label: "Matches" },
   { icon: MessageSquare, href: "/app/chat", label: "Messages" },
-  { icon: PartyPopper, href: "/app/birthdays", label: "Birthdays" },
   { icon: Bell, href: "/app/notifications", label: "Notifications" },
   { icon: UserCircle, href: "/app/profile", label: "Profile" },
 ];

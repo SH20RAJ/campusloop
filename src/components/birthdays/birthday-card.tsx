@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Cake, Sparkles, MessageCircle, ShieldCheck } from "lucide-react";
+import { Cake, Sparkles, MessageCircle, ShieldCheck, Heart } from "lucide-react";
 import Link from "next/link";
 import confetti from "canvas-confetti";
+import { toast } from "sonner";
 
 interface BirthdayCardProps {
   student: {
@@ -29,6 +31,8 @@ const MONTH_NAMES = [
 ];
 
 export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
+  const [wished, setWished] = useState(false);
+
   function handleConfetti(e: React.MouseEvent) {
     e.stopPropagation();
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -36,11 +40,16 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
     const y = (rect.top + rect.height / 2) / window.innerHeight;
 
     confetti({
-      particleCount: 40,
-      spread: 60,
+      particleCount: 50,
+      spread: 70,
       origin: { x, y },
-      colors: ["#ec4899", "#8b5cf6", "#3b82f6", "#f59e0b"],
+      colors: ["#ec4899", "#8b5cf6", "#3b82f6", "#f59e0b", "#10b981"],
     });
+
+    if (!wished) {
+      setWished(true);
+      toast.success(`🎉 Wished @${student.username} a Happy Birthday!`);
+    }
   }
 
   const birthDateFormatted = student.birthMonth && student.birthDay
@@ -51,41 +60,43 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
 
   return (
     <div
-      className={`group relative flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-200 ${
+      className={`group relative flex items-center justify-between p-3.5 rounded-3xl transition-all duration-300 ${
         isToday
-          ? "bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-transparent border-pink-500/30 shadow-xs hover:border-pink-500/50"
-          : "bg-card border-border/60 hover:border-border hover:bg-muted/30"
+          ? "bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-amber-500/5 border border-pink-500/30 shadow-xs hover:border-pink-500/50"
+          : "bg-card hover:bg-muted/40 shadow-2xs"
       }`}
     >
       <Link href={`/@${student.username}`} className="flex items-center gap-3 min-w-0 flex-1">
         <div className="relative shrink-0">
-          <Avatar className="size-11 border-2 border-background shadow-xs group-hover:scale-105 transition-transform">
-            <AvatarImage src={student.avatarUrl || ""} />
-            <AvatarFallback className="font-bold text-sm bg-primary/10 text-primary">
+          <Avatar className="size-11 rounded-full border-2 border-background shadow-xs group-hover:scale-105 transition-transform">
+            <AvatarImage src={student.avatarUrl || ""} className="rounded-full object-cover" />
+            <AvatarFallback className="font-bold text-sm bg-primary/10 text-primary rounded-full">
               {(student.displayName?.[0] || "S").toUpperCase()}
             </AvatarFallback>
           </Avatar>
           {isToday && (
-            <span className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full bg-pink-500 text-white shadow-xs text-[10px]">
+            <span className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full bg-pink-500 text-white shadow-xs text-[10px] animate-bounce">
               🎂
             </span>
           )}
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-1.5">
             <h4 className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">
               {student.displayName}
             </h4>
-            <ShieldCheck className="size-3 text-blue-500 shrink-0" />
+            <span className="text-blue-500 text-[10px] font-black" title="Verified Student">✓</span>
           </div>
+
           <p className="text-[11px] text-muted-foreground truncate">
             @{student.username}
             {student.course && ` · ${student.course}`}
           </p>
+
           {student.institution && (
-            <p className="text-[10px] text-muted-foreground/80 truncate mt-0.5">
-              🏛️ {student.institution.name}
+            <p className="text-[10px] text-muted-foreground/80 truncate">
+              🏛️ {student.institution.name.split(",")[0]}
             </p>
           )}
         </div>
@@ -97,15 +108,20 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
             <button
               type="button"
               onClick={handleConfetti}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-pink-500/15 border border-pink-500/30 text-pink-500 text-xs font-bold hover:bg-pink-500/25 active:scale-95 transition-all cursor-pointer shadow-xs"
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95 ${
+                wished
+                  ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
+                  : "bg-pink-500 text-white hover:bg-pink-600 shadow-pink-500/20"
+              }`}
               title="Pop confetti"
             >
-              <Sparkles className="size-3.5" />
-              <span>🎉 Wish</span>
+              {wished ? <Heart className="size-3.5 fill-emerald-500" /> : <Sparkles className="size-3.5" />}
+              <span>{wished ? "Wished!" : "🎉 Wish"}</span>
             </button>
+
             <Link
               href={`/app/chat?userId=${student.id}`}
-              className="flex size-8 items-center justify-center rounded-xl border border-border bg-card text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors cursor-pointer"
+              className="flex size-8 items-center justify-center rounded-full bg-muted/60 hover:bg-muted text-foreground hover:text-primary transition-colors cursor-pointer"
               title="Send DM birthday wish"
             >
               <MessageCircle className="size-4" />
@@ -113,12 +129,16 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
           </div>
         ) : (
           <div className="text-right">
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-foreground bg-muted/60 px-2 py-0.5 rounded-lg border border-border/60">
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-foreground bg-muted/60 px-2.5 py-1 rounded-full">
               <Cake className="size-3 text-pink-500" /> {birthDateFormatted}
             </span>
             {student.daysUntil !== undefined && (
-              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">
-                {student.daysUntil === 1 ? "Tomorrow" : `In ${student.daysUntil} days`}
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-semibold">
+                {student.daysUntil === 0
+                  ? "Today! 🎉"
+                  : student.daysUntil === 1
+                  ? "Tomorrow"
+                  : `In ${student.daysUntil} days`}
               </p>
             )}
           </div>

@@ -6,7 +6,8 @@ import { useFeed } from "@/hooks/use-feed";
 import { useColleges } from "@/hooks/use-colleges";
 import { FeedCard } from "@/components/ui/feed-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles, HelpCircle, Heart, Flame, School, Search, TrendingUp, Lightbulb } from "lucide-react";
+import { Sparkles, HelpCircle, Heart, Flame, School, Search, TrendingUp, Lightbulb, Cake } from "lucide-react";
+import Link from "next/link";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
 import { cn } from "@/lib/utils";
 import { FeaturedCampusCard } from "@/components/discover/featured-campus-card";
@@ -73,8 +74,16 @@ export function DiscoverFeed() {
               </span>
               Discover
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">What's happening across all campuses.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">What&apos;s happening across all campuses.</p>
           </div>
+
+          <Link
+            href="/app/birthdays"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-500/10 hover:bg-pink-500/20 text-pink-600 dark:text-pink-400 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+          >
+            <Cake className="size-3.5" />
+            <span>Birthdays</span>
+          </Link>
         </div>
 
         {/* College Selector Bar */}

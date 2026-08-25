@@ -42,6 +42,47 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
     toast.success("Opening WhatsApp share!");
   }
 
+  async function handleNativeShare() {
+    if (!canvasRef.current || typeof window === "undefined" || !navigator.share) {
+      handleCopyLink();
+      return;
+    }
+
+    try {
+      // Try sharing canvas image file if navigator.canShare supports files
+      canvasRef.current.toBlob(async (blob) => {
+        if (blob) {
+          const file = new File([blob], `campusloop-story-${post.id}.png`, { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                title: "CampusLoop Story",
+                text: `Check out this campus story: ${postUrl}`,
+                files: [file],
+              });
+              return;
+            } catch {
+              // Fallback to text share
+            }
+          }
+        }
+
+        // Fallback text share
+        try {
+          await navigator.share({
+            title: "CampusLoop",
+            text: `Check out this campus post on CampusLoop: "${post.body.slice(0, 100)}..."`,
+            url: postUrl,
+          });
+        } catch {
+          handleCopyLink();
+        }
+      }, "image/png");
+    } catch {
+      handleCopyLink();
+    }
+  }
+
   function handleCopyLink() {
     navigator.clipboard.writeText(postUrl);
     setCopied(true);
@@ -225,26 +266,35 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
         <div className="grid grid-cols-2 gap-2.5 pt-1">
           <button
             onClick={handleShareWhatsApp}
-            className="py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-500 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+            className="py-2.5 min-h-[44px] rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-500 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
           >
-            <MessageCircle className="h-4 w-4" /> Share to WhatsApp
+            <MessageCircle className="h-4 w-4" /> WhatsApp
           </button>
 
           <button
-            onClick={handleDownloadStoryImage}
-            className="py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+            onClick={handleNativeShare}
+            className="py-2.5 min-h-[44px] rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
           >
-            <Download className="h-4 w-4" /> Download Story Image
+            <Share2 className="h-4 w-4" /> Share via Apps
           </button>
         </div>
 
-        <button
-          onClick={handleCopyLink}
-          className="w-full py-2 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs font-semibold hover:bg-muted transition-all cursor-pointer flex items-center justify-center gap-2"
-        >
-          {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-          {copied ? "Link Copied!" : "Copy Direct Link"}
-        </button>
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            onClick={handleDownloadStoryImage}
+            className="py-2.5 min-h-[40px] rounded-xl border border-border/70 bg-card text-foreground text-xs font-semibold hover:bg-muted active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Download className="h-4 w-4" /> Save Image
+          </button>
+
+          <button
+            onClick={handleCopyLink}
+            className="py-2.5 min-h-[40px] rounded-xl border border-border/70 bg-card text-foreground text-xs font-semibold hover:bg-muted active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
+            {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? "Copied!" : "Copy Link"}
+          </button>
+        </div>
       </div>
     </div>
   );

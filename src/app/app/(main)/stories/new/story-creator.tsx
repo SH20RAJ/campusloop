@@ -152,7 +152,7 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-black select-none">
+    <div className="fixed inset-0 z-50 flex flex-col bg-black select-none h-screen h-[100dvh] pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] touch-manipulation">
       {/* Hidden file input */}
       <input
         ref={fileInputRef}

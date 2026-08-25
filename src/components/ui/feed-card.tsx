@@ -81,8 +81,31 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
       clickTimeoutRef.current = null;
     }
     if (userVote !== 1) handleVote();
+    if (typeof window !== "undefined" && typeof navigator.vibrate === "function") {
+      navigator.vibrate(15);
+    }
     setShowDoubleTapHeart(true);
     setTimeout(() => setShowDoubleTapHeart(false), 900);
+  }
+
+  async function handleSharePost() {
+    const postUrl = typeof window !== "undefined" ? `${window.location.origin}/app/post/${post.id}` : `https://campusloop.space/app/post/${post.id}`;
+    if (typeof window !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: "CampusLoop Post",
+          text: `Check out this campus post: "${post.body.slice(0, 100)}${post.body.length > 100 ? "..." : ""}"`,
+          url: postUrl,
+        });
+        return;
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          setShowShareStoryModal(true);
+        }
+        return;
+      }
+    }
+    setShowShareStoryModal(true);
   }
 
   async function handleExecuteRepost(withCommentary: boolean) {
@@ -135,7 +158,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
         currentUserId={currentUserId}
         onOpenRepostModal={() => setShowRepostModal(true)}
         onOpenReportModal={() => setShowReport(true)}
-        onShare={() => setShowShareStoryModal(true)}
+        onShare={handleSharePost}
       />
 
       {/* Content Body */}
@@ -179,7 +202,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
         votesCount={votesCount}
         onVote={handleVote}
         onInstantRepost={() => handleExecuteRepost(false)}
-        onShare={() => setShowShareStoryModal(true)}
+        onShare={handleSharePost}
       />
 
       {/* Dialog Modals */}

@@ -135,7 +135,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   const authorName = rawPost.isAnonymous ? "Anonymous Student" : rawPost.author?.displayName || "Student";
 
   return (
-    <main className="mx-auto flex w-full flex-col min-h-screen max-w-2xl bg-background text-foreground pb-24">
+    <main className="mx-auto flex w-full flex-col min-h-screen max-w-2xl bg-background text-foreground pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
       {/* DiscussionForumPosting JSON-LD Schema */}
       <script
         type="application/ld+json"

@@ -176,11 +176,25 @@ export function ProfileClientView({
     setTimeout(() => setCopiedHandle(false), 2000);
   }
 
-  function handleShareVibe() {
+  async function handleShareVibe() {
     const branchText = profile.branch ? `• Discipline: ${profile.branch}\n` : "";
-    const shareText = `⚡️ Connect with @${profile.username} on CampusLoop:\n• Campus: ${campusShort}\n${branchText}• Clout Rank: ${tier.tierName} (Level ${tier.level})\n• Loop Points: ${points} LP 🔥\n\nView student profile: https://campusloop.space/@${profile.username}`;
+    const shareText = `⚡️ Connect with @${profile.username} on CampusLoop:\n• Campus: ${campusShort}\n${branchText}• Clout Rank: ${tier.tierName} (Level ${tier.level})\n• Loop Points: ${points} LP 🔥`;
+    const profileUrl = `https://campusloop.space/@${profile.username}`;
 
-    navigator.clipboard.writeText(shareText);
+    if (typeof window !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${profile.displayName} on CampusLoop`,
+          text: shareText,
+          url: profileUrl,
+        });
+        return;
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+      }
+    }
+
+    navigator.clipboard.writeText(`${shareText}\n\nView student profile: ${profileUrl}`);
     toast.success("Profile link & Vibe Card copied! Share on WhatsApp 🚀");
   }
 
@@ -245,7 +259,7 @@ export function ProfileClientView({
   }
 
   return (
-    <div className="min-h-screen pb-24 text-foreground select-none">
+    <div className="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom,0px))] text-foreground select-none touch-manipulation">
       {/* Image Crop & Resize Modal */}
       {cropModalOpen && (
         <ImageCropModal

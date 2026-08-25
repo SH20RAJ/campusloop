@@ -105,7 +105,7 @@ export function ChatDashboard({
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
+    <div className="flex h-screen h-[100dvh] w-full overflow-hidden bg-background">
       {/* ─── Inbox / Conversation List ─── */}
       <div
         className={cn(

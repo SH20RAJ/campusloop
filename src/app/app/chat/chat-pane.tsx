@@ -199,7 +199,7 @@ export function ChatPane({
       {/* Message Input Box with sticky bottom padding for mobile safe area */}
       <form
         onSubmit={handleSend}
-        className="border-t border-border bg-card p-3 md:p-4 flex gap-2 items-center shrink-0 mb-16 md:mb-0"
+        className="border-t border-border bg-card p-3 md:p-4 flex gap-2 items-center shrink-0 mb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:mb-0 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] md:pb-4 touch-manipulation"
       >
         <input
           type="text"
@@ -207,12 +207,13 @@ export function ChatPane({
           value={msgText}
           onChange={(e) => setMsgText(e.target.value)}
           required
-          className="flex h-10 flex-1 rounded-xl border border-border/80 bg-muted/30 px-3.5 py-2 text-xs font-semibold shadow-xs placeholder:text-muted-foreground focus:border-primary focus:bg-background outline-none transition-all"
+          className="flex h-11 md:h-10 flex-1 rounded-xl border border-border/80 bg-muted/40 px-4 py-2 text-sm md:text-xs font-semibold shadow-xs placeholder:text-muted-foreground focus:border-primary focus:bg-background outline-none transition-all"
         />
         <button
           type="submit"
           disabled={isSending || !msgText.trim()}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md transition-transform active:scale-95 disabled:opacity-50 cursor-pointer"
+          aria-label="Send message"
+          className="flex h-11 w-11 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md transition-transform active:scale-95 disabled:opacity-50 cursor-pointer"
         >
           <SendIcon className="size-4" />
         </button>

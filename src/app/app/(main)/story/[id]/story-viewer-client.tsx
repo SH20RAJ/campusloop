@@ -39,8 +39,9 @@ export function StoryViewerClient({
   const [replyText, setReplyText] = useState("");
   const [isReplying, setIsReplying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Auto-progress bar timer & auto-advance
+  // Auto-progress bar timer & auto-advance (pauses on touch/mouse hold)
   useEffect(() => {
     setProgress(0);
     const interval = 50;
@@ -48,6 +49,8 @@ export function StoryViewerClient({
     const step = (interval / duration) * 100;
 
     const timer = setInterval(() => {
+      if (isPaused) return;
+
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
@@ -63,7 +66,7 @@ export function StoryViewerClient({
     }, interval);
 
     return () => clearInterval(timer);
-  }, [story.id, nextStoryId, router]);
+  }, [story.id, nextStoryId, router, isPaused]);
 
   // Keyboard left/right arrow navigation
   useEffect(() => {
@@ -89,12 +92,27 @@ export function StoryViewerClient({
       setLiked(false);
     } else {
       setLiked(true);
+      if (typeof window !== "undefined" && typeof navigator.vibrate === "function") {
+        navigator.vibrate(15);
+      }
       toast.success(`Sent ❤️ to @${story.author.username}`);
     }
   }
 
-  function handleShare() {
+  async function handleShare() {
     const url = `https://campusloop.space/app/story/${story.id}`;
+    if (typeof window !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${story.author.displayName}'s Campus Vibe`,
+          text: `Check out this 24h campus vibe from @${story.author.username} on CampusLoop:`,
+          url,
+        });
+        return;
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+      }
+    }
     navigator.clipboard.writeText(url);
     toast.success("Story link copied to clipboard! 🚀");
   }
@@ -132,7 +150,7 @@ export function StoryViewerClient({
   const bgClass = story.backgroundColor || "bg-gradient-to-tr from-violet-600 to-indigo-600";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-95 md:bg-opacity-80 backdrop-blur-md select-none p-0 md:p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-95 md:bg-opacity-80 backdrop-blur-md select-none p-0 md:p-4 touch-manipulation">
       {/* Prev Arrow Button (Desktop) */}
       <button
         onClick={() => prevStoryId ? router.push(`/app/story/${prevStoryId}`) : router.push("/app")}
@@ -142,23 +160,34 @@ export function StoryViewerClient({
         <ChevronLeft className="size-6" />
       </button>
 
-      <div className="relative w-full max-w-md aspect-[9/16] h-full md:h-[90vh] md:max-h-[850px] bg-neutral-950 flex flex-col justify-between p-4 md:rounded-3xl overflow-hidden shadow-2xl">
+      <div 
+        className="relative w-full max-w-md aspect-[9/16] h-full h-[100dvh] md:h-[90vh] md:max-h-[850px] bg-neutral-950 flex flex-col justify-between p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] pt-[calc(1rem+env(safe-area-inset-top,0px))] md:rounded-3xl overflow-hidden shadow-2xl"
+        onPointerDown={() => setIsPaused(true)}
+        onPointerUp={() => setIsPaused(false)}
+        onPointerLeave={() => setIsPaused(false)}
+      >
         {/* Left & Right Tappable Zones for Mobile Touch */}
         <div
-          onClick={() => prevStoryId ? router.push(`/app/story/${prevStoryId}`) : router.push("/app")}
-          className="absolute left-0 top-16 bottom-20 w-1/3 z-10 cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            prevStoryId ? router.push(`/app/story/${prevStoryId}`) : router.push("/app");
+          }}
+          className="absolute left-0 top-16 bottom-24 w-1/3 z-10 cursor-pointer"
           title="Previous story"
         />
         <div
-          onClick={() => nextStoryId ? router.push(`/app/story/${nextStoryId}`) : router.push("/app")}
-          className="absolute right-0 top-16 bottom-20 w-1/3 z-10 cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            nextStoryId ? router.push(`/app/story/${nextStoryId}`) : router.push("/app");
+          }}
+          className="absolute right-0 top-16 bottom-24 w-1/3 z-10 cursor-pointer"
           title="Next story"
         />
 
         {/* Fullscreen Story Canvas */}
         <div
           className={cn(
-            "absolute inset-0 flex flex-col justify-between p-6 text-white transition-all duration-300 pointer-events-none",
+            "absolute inset-0 flex flex-col justify-between p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] text-white transition-all duration-300 pointer-events-none",
             bgClass
           )}
         >

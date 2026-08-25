@@ -109,7 +109,7 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
   }, [loadMoreRef, isReachingEnd, isLoadingMore, isError, setSize]);
 
   return (
-    <main className="mx-auto flex w-full flex-col min-h-screen max-w-2xl bg-background text-foreground pb-20">
+    <main className="mx-auto flex w-full flex-col min-h-screen max-w-2xl bg-background text-foreground pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]">
       <FeedHeader
         scope={scope}
         onScopeChange={handleScopeChange}

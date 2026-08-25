@@ -60,6 +60,9 @@ function TopCard({
 
   function fireSwipe(direction: "like" | "pass") {
     setExitX(direction === "like" ? 400 : -400);
+    if (typeof window !== "undefined" && typeof navigator.vibrate === "function") {
+      navigator.vibrate(15);
+    }
     // Give the exit animation a beat before advancing the deck
     setTimeout(() => onSwipe(direction), 180);
   }

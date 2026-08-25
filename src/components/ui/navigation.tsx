@@ -327,8 +327,17 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
 
       {/* ─── Full Mobile Navigation Drawer Sheet ─── */}
       {showMobileMenu && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-md md:hidden animate-in fade-in select-none">
-          <div className="max-h-[88vh] w-full rounded-t-[32px] border-t border-border bg-card p-5 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
+        <div 
+          className="fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-md md:hidden animate-in fade-in select-none"
+          onClick={() => setShowMobileMenu(false)}
+        >
+          <div 
+            className="max-h-[88vh] max-h-[88dvh] w-full rounded-t-[32px] border-t border-border bg-card p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Sheet Drag/Pull Pill Indicator */}
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30 mx-auto mb-3 shrink-0" />
+
             {/* Drawer Header with Profile */}
             <div className="flex items-center justify-between pb-4 border-b border-border/60">
               {profile ? (
@@ -337,7 +346,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
                   onClick={() => setShowMobileMenu(false)}
                   className="flex items-center gap-3 min-w-0"
                 >
-                  <Avatar className="size-11 border-2 border-primary/30">
+                  <Avatar className="size-11 border-2 border-primary/30 shrink-0">
                     <AvatarImage src={profile.avatarUrl || ""} />
                     <AvatarFallback className="font-bold">{profile.displayName[0]}</AvatarFallback>
                   </Avatar>
@@ -357,6 +366,7 @@ export function Navigation({ profile, isAdmin, isViewer }: NavigationProps) {
                 type="button"
                 onClick={() => setShowMobileMenu(false)}
                 className="rounded-full p-2 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                aria-label="Close menu"
               >
                 <X className="size-5" />
               </button>

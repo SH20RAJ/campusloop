@@ -33,12 +33,12 @@ export function FeedCardActions({
   }
 
   return (
-    <div className="flex items-center justify-between px-5 py-3 border-t border-border/40 text-muted-foreground select-none">
+    <div className="flex items-center justify-between px-3 sm:px-5 py-1 sm:py-2 border-t border-border/40 text-muted-foreground select-none touch-manipulation">
       {/* Upvote Button */}
       <button
         onClick={onVote}
         className={cn(
-          "flex items-center gap-1.5 text-xs font-semibold hover:text-rose-500 transition-all active:scale-90 active:opacity-75 group cursor-pointer",
+          "flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 px-2 text-xs font-semibold hover:text-rose-500 transition-all active:scale-90 active:opacity-75 group cursor-pointer",
           userVote === 1 && "text-rose-500"
         )}
         aria-label="Upvote post"
@@ -46,7 +46,7 @@ export function FeedCardActions({
         <AnimateIcon animateOnHover animation="path">
           <Heart
             className={cn(
-              "h-4 w-4 transition-all duration-300 group-hover:scale-110",
+              "h-4.5 w-4.5 transition-all duration-300 group-hover:scale-110",
               userVote === 1 && "fill-rose-500 text-rose-500 scale-110"
             )}
           />
@@ -57,11 +57,11 @@ export function FeedCardActions({
       {/* Comment Link */}
       <Link
         href={`/app/post/${post.id}`}
-        className="flex items-center gap-1.5 text-xs font-semibold hover:text-primary transition-all active:scale-90 active:opacity-75 group cursor-pointer"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 px-2 text-xs font-semibold hover:text-primary transition-all active:scale-90 active:opacity-75 group cursor-pointer"
         aria-label="Comments"
       >
         <AnimateIcon animateOnHover animation="path">
-          <MessageCircle className="h-4 w-4 transition-transform group-hover:scale-110" />
+          <MessageCircle className="h-4.5 w-4.5 transition-transform group-hover:scale-110" />
         </AnimateIcon>
         <span className="tabular-nums">{post.commentsCount}</span>
       </Link>
@@ -69,12 +69,12 @@ export function FeedCardActions({
       {/* Instant 1-Tap Repost Button */}
       <button
         onClick={triggerRepostAnimation}
-        className="flex items-center gap-1.5 text-xs font-semibold hover:text-emerald-500 transition-all active:scale-90 active:opacity-75 group cursor-pointer"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 px-2 text-xs font-semibold hover:text-emerald-500 transition-all active:scale-90 active:opacity-75 group cursor-pointer"
         title="Instant Repost to Feed"
       >
         <Repeat2
           className={cn(
-            "h-4 w-4 transition-all duration-500 group-hover:scale-110 text-muted-foreground group-hover:text-emerald-500",
+            "h-4.5 w-4.5 transition-all duration-500 group-hover:scale-110 text-muted-foreground group-hover:text-emerald-500",
             repostSpin && "rotate-360 text-emerald-500 scale-125"
           )}
         />
@@ -84,11 +84,11 @@ export function FeedCardActions({
       {/* Share Button */}
       <button
         onClick={onShare}
-        className="flex items-center gap-1.5 text-xs font-semibold hover:text-primary transition-all active:scale-90 active:opacity-75 group cursor-pointer"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 px-2 text-xs font-semibold hover:text-primary transition-all active:scale-90 active:opacity-75 group cursor-pointer"
         aria-label="Share post"
       >
         <AnimateIcon animateOnHover animation="path">
-          <Share2 className="h-4 w-4 transition-transform group-hover:scale-110" />
+          <Share2 className="h-4.5 w-4.5 transition-transform group-hover:scale-110" />
         </AnimateIcon>
         <span className="text-[10px] hidden sm:inline">Share</span>
       </button>

@@ -160,7 +160,7 @@ export function PostComments({ postId }: { postId: string }) {
           <MessageSquare className="size-4 text-primary" />
           Campus Discussion
           {!isLoading && (
-            <span className="text-[10px] font-bold text-muted-foreground bg-muted/60 border border-border/40 rounded-full px-2 py-0.5 normal-case tracking-normal">
+            <span className="text-[10px] font-bold text-muted-foreground bg-muted/60 rounded-full px-2.5 py-0.5 normal-case tracking-normal">
               {(comments || []).length} Comments
             </span>
           )}
@@ -174,10 +174,10 @@ export function PostComments({ postId }: { postId: string }) {
       {/* ─── Facebook-Style Rich Comment Box ─── */}
       <form
         onSubmit={handlePostComment}
-        className="bg-card border border-border/80 p-3.5 rounded-3xl shadow-sm space-y-3 focus-within:border-primary/60 transition-colors"
+        className="bg-card p-4 rounded-3xl shadow-2xs space-y-3 transition-colors"
       >
         <div className="flex items-start gap-3">
-          <Avatar className="size-8 border border-border shrink-0 mt-0.5">
+          <Avatar className="size-8 shrink-0 mt-0.5">
             <AvatarImage src={isAnonymous ? "" : profile?.avatarUrl || ""} />
             <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary">
               {isAnonymous ? "🙈" : profile?.displayName?.[0] || "U"}
@@ -204,7 +204,7 @@ export function PostComments({ postId }: { postId: string }) {
 
             {/* Comment image preview */}
             {commentImage && (
-              <div className="relative inline-block rounded-2xl overflow-hidden border border-border shadow-xs max-w-[140px] max-h-[140px]">
+              <div className="relative inline-block rounded-2xl overflow-hidden shadow-xs max-w-[140px] max-h-[140px]">
                 <img src={commentImage} alt="Comment attachment" className="w-full h-full object-cover" />
                 <button
                   type="button"
@@ -219,20 +219,20 @@ export function PostComments({ postId }: { postId: string }) {
         </div>
 
         {/* Action Toolbar */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/40">
+        <div className="flex items-center justify-between pt-1">
           <div className="flex items-center gap-2">
             {/* Anonymous Toggle */}
             <button
               type="button"
               onClick={() => setIsAnonymous(!isAnonymous)}
-              className={`text-xs font-bold px-3 py-1 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`text-xs font-bold px-3 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                 isAnonymous
-                  ? "bg-pink-500/10 text-pink-500 border-pink-500/30 shadow-2xs"
-                  : "bg-muted/30 text-muted-foreground hover:text-foreground border-border/50"
+                  ? "bg-pink-500/10 text-pink-500 shadow-2xs"
+                  : "bg-muted/50 text-muted-foreground hover:text-foreground"
               }`}
             >
               <Lock className="size-3" />
-              <span>{isAnonymous ? "Anon Mode 🙈" : "Public"}</span>
+              <span>{isAnonymous ? "Anon Mode" : "Public"}</span>
             </button>
 
             {/* Photo Attachment */}
@@ -240,7 +240,7 @@ export function PostComments({ postId }: { postId: string }) {
               type="button"
               disabled={isUploadingImage}
               onClick={() => fileInputRef.current?.click()}
-              className="text-xs font-bold px-2.5 py-1 rounded-xl border border-border/50 bg-muted/30 text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
+              className="text-xs font-bold px-2.5 py-1 rounded-xl bg-muted/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
             >
               {isUploadingImage ? (
                 <Loader2 className="size-3.5 animate-spin text-primary" />
@@ -254,7 +254,7 @@ export function PostComments({ postId }: { postId: string }) {
             <button
               type="button"
               onClick={() => setShowGifPicker(true)}
-              className="text-xs font-bold px-2.5 py-1 rounded-xl border border-primary/25 bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1"
+              className="text-xs font-bold px-2.5 py-1 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1"
             >
               <span className="text-[10px] font-black leading-none">GIF</span>
             </button>
@@ -295,7 +295,7 @@ export function PostComments({ postId }: { postId: string }) {
           </div>
         ) : topLevelComments.length > 0 ? (
           topLevelComments.map((comment) => (
-            <div key={comment.id} className="space-y-2 bg-card/60 border border-border/60 rounded-3xl p-3.5 shadow-2xs">
+            <div key={comment.id} className="space-y-2 bg-card rounded-3xl p-3.5 shadow-2xs">
               <CommentItem
                 comment={comment}
                 onReply={(id) => setReplyingToId(id)}

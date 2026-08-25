@@ -174,17 +174,17 @@ export default async function PostDetailPage({ params }: PostPageProps) {
       />
 
       {/* Header with back button & college breadcrumb */}
-      <div className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60 px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/20 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/app"
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/80 bg-card hover:bg-muted transition-colors cursor-pointer shrink-0 shadow-2xs"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted/50 hover:bg-muted text-foreground transition-colors cursor-pointer shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div className="min-w-0">
             <h1 className="text-xs font-black uppercase tracking-wider text-foreground truncate">
-              {post.type === "CONFESSION" ? "🤫 Campus Confession" : post.type === "POLL" ? "📊 Student Poll" : "💬 Discussion"}
+              {post.type === "CONFESSION" ? "Campus Confession" : post.type === "POLL" ? "Student Poll" : "Discussion"}
             </h1>
             {rawPost.institution && (
               <Link
@@ -199,7 +199,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
 
         {!user && (
           <Link href="/join">
-            <button className="rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:opacity-95 shadow-sm shadow-primary/20 transition-all cursor-pointer">
+            <button className="rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:opacity-95 shadow-xs transition-all cursor-pointer">
               Join Campus
             </button>
           </Link>
@@ -216,16 +216,16 @@ export default async function PostDetailPage({ params }: PostPageProps) {
         ) : (
           <div className="space-y-4">
             {/* Read-Only Comments List for Guests & Crawlers */}
-            <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+            <div className="rounded-3xl bg-card p-4 space-y-3 shadow-2xs">
               <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
                 Discussion ({post.commentsCount})
               </h3>
               <div className="space-y-2.5">
                 {post.comments?.map((comment) => (
-                  <div key={comment.id} className="rounded-xl border border-border/50 bg-muted/20 p-3 space-y-1">
+                  <div key={comment.id} className="rounded-2xl bg-muted/40 p-3.5 space-y-1">
                     <div className="flex items-center justify-between text-xs font-bold">
                       <span className="text-foreground">
-                        {comment.isAnonymous ? "Anonymous Student 🙈" : comment.author?.displayName || "Student"}
+                        {comment.isAnonymous ? "Anonymous Student" : comment.author?.displayName || "Student"}
                       </span>
                       <span className="text-[10px] text-muted-foreground font-normal">
                         {new Date(comment.createdAt).toLocaleDateString()}

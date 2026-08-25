@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     images: [
       {
-        url: "/logo.png",
+        url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
         alt: "Campus Social Network",
@@ -21,9 +21,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Campus Social Network | CampusLoop",
     description: "Join your campus social network, share confessions, drop polls, and stay anonymous.",
-    images: ["/logo.png"],
+    images: ["https://campusloop.space/og-image.png"],
   },
 };
+
 
 export default function AppPage() {
   const jsonLd = {

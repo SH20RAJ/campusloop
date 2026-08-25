@@ -20,14 +20,24 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "https://campusloop.space/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Campus Match & Dating | CampusLoop",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Campus Match & Dating | CampusLoop",
     description: "Connect with verified college students in a safe, student-only environment.",
+    images: ["https://campusloop.space/og-image.png"],
   },
   robots: { index: true, follow: true },
 };
+
 
 export default function DatingPage() {
   const jsonLd = {

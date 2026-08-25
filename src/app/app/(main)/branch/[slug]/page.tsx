@@ -26,14 +26,24 @@ export async function generateMetadata({ params }: BranchPageProps): Promise<Met
       siteName: "CampusLoop",
       locale: "en_IN",
       type: "website",
+      images: [
+        {
+          url: "https://campusloop.space/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: `${title} | CampusLoop`,
       description,
+      images: ["https://campusloop.space/og-image.png"],
     },
     robots: { index: true, follow: true },
   };
+
 }
 
 export default async function BranchDirectoryPage({ params }: BranchPageProps) {

@@ -16,9 +16,16 @@ export const metadata: Metadata = {
     description: "Connect with verified students across Indian colleges. Share confessions, polls, and discussions.",
     url: "https://campusloop.space/app",
     siteName: "CampusLoop",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "CampusLoop" }],
+    images: [{ url: "https://campusloop.space/og-image.png", width: 1200, height: 630, alt: "CampusLoop" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CampusLoop | Student Social Network",
+    description: "Connect with verified students across Indian colleges. Share confessions, polls, and discussions.",
+    images: ["https://campusloop.space/og-image.png"],
   },
 };
+
 
 export default async function MainLayout({
   children,

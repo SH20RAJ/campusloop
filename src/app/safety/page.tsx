@@ -24,14 +24,24 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "https://campusloop.space/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Safety & Community Standards | CampusLoop",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Safety & Community Standards | CampusLoop",
     description: "Learn how CampusLoop protects students with zero-tolerance anti-ragging and AI safety shields.",
+    images: ["https://campusloop.space/og-image.png"],
   },
   robots: { index: true, follow: true },
 };
+
 
 export default function SafetyPage() {
   const jsonLd = {

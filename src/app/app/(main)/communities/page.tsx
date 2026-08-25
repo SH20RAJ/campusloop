@@ -24,14 +24,24 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "https://campusloop.space/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Student Communities & Sub-Hubs | CampusLoop",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Student Communities & Sub-Hubs | CampusLoop",
     description: "Browse interest groups and student communities on CampusLoop.",
+    images: ["https://campusloop.space/og-image.png"],
   },
   robots: { index: true, follow: true },
 };
+
 
 export default async function CommunitiesPage() {
   const user = await getCachedAuthUser();

@@ -21,14 +21,24 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "https://campusloop.space/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Campus Directory & Colleges | CampusLoop",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Campus Directory & Colleges | CampusLoop",
     description: "Browse and search over 1,350+ verified colleges in India on CampusLoop.",
+    images: ["https://campusloop.space/og-image.png"],
   },
   robots: { index: true, follow: true },
 };
+
 
 export default function CollegesPage() {
   const jsonLd = {

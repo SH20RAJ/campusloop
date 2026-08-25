@@ -20,14 +20,24 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "https://campusloop.space/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "About Us | CampusLoop",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "About Us | CampusLoop",
     description: "Learn more about CampusLoop — the verified student-only campus social network.",
+    images: ["https://campusloop.space/og-image.png"],
   },
   robots: { index: true, follow: true },
 };
+
 
 export default function AboutPage() {
   const jsonLd = {

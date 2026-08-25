@@ -46,14 +46,24 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       url,
       siteName: "CampusLoop",
       type: "article",
+      images: [
+        {
+          url: "https://campusloop.space/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: snippet,
+      images: ["https://campusloop.space/og-image.png"],
     },
     robots: { index: true, follow: true },
   };
+
 }
 
 export default async function PostDetailPage({ params }: PostPageProps) {

@@ -62,15 +62,16 @@ export async function generateMetadata({ params }: VanityProfileProps): Promise<
       type: "profile",
       images: profile?.avatarUrl
         ? [{ url: profile.avatarUrl, alt: profile.displayName }]
-        : [{ url: "https://campusloop.space/logo.png", alt: title }],
+        : [{ url: "https://campusloop.space/og-image.png", alt: title, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary",
       title,
       description,
-      images: profile?.avatarUrl ? [profile.avatarUrl] : ["https://campusloop.space/logo.png"],
+      images: profile?.avatarUrl ? [profile.avatarUrl] : ["https://campusloop.space/og-image.png"],
     },
   };
+
 }
 
 export default async function VanityProfilePage({ params }: VanityProfileProps) {

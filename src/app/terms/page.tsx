@@ -24,14 +24,24 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "https://campusloop.space/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Terms of Service | CampusLoop",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Terms of Service | CampusLoop",
     description: "Terms of Service, Intermediary Guidelines, and user agreement for CampusLoop.",
+    images: ["https://campusloop.space/og-image.png"],
   },
   robots: { index: true, follow: true },
 };
+
 
 export default function TermsPage() {
   const jsonLd = {

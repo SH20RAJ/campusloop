@@ -4,6 +4,8 @@ import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { Toaster } from "sonner";
 import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
+import { SWRProvider } from "@/components/providers/swr-provider";
+import { OfflineIndicator } from "@/components/ui/offline-indicator";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -177,9 +179,12 @@ export default function RootLayout({
       <body className="antialiased font-sans">
         <HexclaveProvider app={hexclaveServerApp}>
           <HexclaveTheme>
-            {children}
-            <PWAInstallBanner />
-            <Toaster position="top-center" richColors />
+            <SWRProvider>
+              <OfflineIndicator />
+              {children}
+              <PWAInstallBanner />
+              <Toaster position="top-center" richColors />
+            </SWRProvider>
           </HexclaveTheme>
         </HexclaveProvider>
       </body>

@@ -3,26 +3,11 @@
 import { useState } from "react";
 import { Globe, ListFilter, School } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const SORT_TABS = [
-  { id: "for_you", label: "🔥 For You" },
-  { id: "latest", label: "Latest" },
-  { id: "trending", label: "Trending" },
-  { id: "top_voted", label: "Top Voted" },
-  { id: "most_discussed", label: "Discussed" },
-];
-
-const VISIBILITY_OPTIONS = [
-  { id: "all", label: "All" },
-  { id: "anonymous", label: "Anonymous" },
-  { id: "public", label: "Public" },
-];
-
-const CATEGORY_OPTIONS = [
-  { id: "ALL", label: "All" },
-  { id: "CONFESSION", label: "Confess" },
-  { id: "POLL", label: "Polls" },
-];
+import {
+  FEED_SORT_TABS as SORT_TABS,
+  FEED_VISIBILITY_OPTIONS as VISIBILITY_OPTIONS,
+  FEED_CATEGORY_OPTIONS as CATEGORY_OPTIONS,
+} from "@/constants";
 
 interface FeedHeaderProps {
   scope: "CAMPUS" | "GLOBAL";

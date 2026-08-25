@@ -4,24 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import { Search, X, Sparkles, Loader2, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GifItem } from "@/app/api/gifs/search/route";
+import { GIF_POPULAR_TAGS } from "@/constants";
 
 interface GifPickerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectGif: (gifUrl: string) => void;
 }
-
-const POPULAR_TAGS = [
-  { id: "trending", label: "🔥 Trending", query: "" },
-  { id: "tea", label: "☕ Campus Tea", query: "spilling tea drama" },
-  { id: "exam", label: "📚 Exam Mood", query: "exam studying stressed" },
-  { id: "lol", label: "😂 Dead LOL", query: "laughing meme" },
-  { id: "shocked", label: "😱 Shocked", query: "shocked reaction" },
-  { id: "party", label: "🎉 Fest Vibe", query: "college party dance" },
-  { id: "crush", label: "💘 Crush", query: "crush flirt romantic" },
-  { id: "tired", label: "😴 8 AM Class", query: "tired sleepy morning" },
-  { id: "agree", label: "💯 Facts", query: "agree yes nod facts" },
-];
 
 export function GifPickerModal({
   isOpen,
@@ -134,7 +123,7 @@ export function GifPickerModal({
 
           {/* Tag Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-            {POPULAR_TAGS.map((tag) => (
+            {GIF_POPULAR_TAGS.map((tag) => (
               <button
                 key={tag.id}
                 type="button"

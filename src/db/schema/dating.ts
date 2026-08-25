@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
 import { id, createdAt } from "./common";
 import { userProfiles } from "./users";
 
@@ -19,6 +19,7 @@ export const swipes = pgTable(
   },
   (table) => [
     uniqueIndex("swipes_swiper_target_idx").on(table.swiperId, table.targetId),
+    index("swipes_target_direction_idx").on(table.targetId, table.direction),
   ]
 );
 

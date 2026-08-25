@@ -18,6 +18,7 @@ export const stories = pgTable(
   (table) => [
     index("stories_user_idx").on(table.userId),
     index("stories_expires_idx").on(table.expiresAt),
+    index("stories_user_expires_idx").on(table.userId, table.expiresAt),
   ]
 );
 

@@ -51,7 +51,10 @@ export const posts = pgTable(
   (table) => [
     index("posts_institution_status_created_idx").on(table.institutionId, table.status, table.createdAt),
     index("posts_scope_status_created_idx").on(table.scope, table.status, table.createdAt),
-    index("posts_author_idx").on(table.authorId),
+    index("posts_author_created_idx").on(table.authorId, table.createdAt),
+    index("posts_type_status_created_idx").on(table.type, table.status, table.createdAt),
+    index("posts_community_status_created_idx").on(table.communityId, table.status, table.createdAt),
+    index("posts_repost_idx").on(table.repostOfId),
   ],
 );
 
@@ -72,7 +75,11 @@ export const comments = pgTable(
     createdAt,
     updatedAt,
   },
-  (table) => [index("comments_post_created_idx").on(table.postId, table.createdAt)],
+  (table) => [
+    index("comments_post_created_idx").on(table.postId, table.createdAt),
+    index("comments_parent_created_idx").on(table.parentId, table.createdAt),
+    index("comments_author_idx").on(table.authorId),
+  ],
 );
 
 export const pollOptions = pgTable(
@@ -122,7 +129,10 @@ export const votes = pgTable(
     value: integer("value").notNull(),
     createdAt,
   },
-  (table) => [uniqueIndex("votes_user_post_idx").on(table.userId, table.postId)],
+  (table) => [
+    uniqueIndex("votes_user_post_idx").on(table.userId, table.postId),
+    index("votes_post_idx").on(table.postId),
+  ],
 );
 
 export type Post = typeof posts.$inferSelect;

@@ -35,9 +35,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SignOutButton } from "@/components/ui/sign-out-button";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import type { UserProfile } from "@/db/schema";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
-import { BrandLogo } from "@/components/ui/brand-logo";
+import {
+  DESKTOP_NAV_ITEMS,
+  MOBILE_BOTTOM_ITEMS,
+  FULL_MOBILE_DRAWER_LINKS,
+} from "@/constants";
 
 interface NavigationProps {
   profile?: UserProfile;
@@ -52,78 +57,20 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const desktopNavItems = [
-    { icon: Home, href: "/app", label: "Home" },
-    { icon: Compass, href: "/app/discover", label: "Discover" },
-    { icon: School, href: "/app/colleges", label: "Colleges" },
-    { icon: Users, href: "/app/communities", label: "Communities" },
-    ...(isViewer
-      ? []
-      : [
-          { icon: Sparkles, href: "/app/dating", label: "Matches" },
-          { icon: MessageSquare, href: "/app/chat", label: "Messages" },
-          { icon: PartyPopper, href: "/app/birthdays", label: "Birthdays" },
-        ]),
-    { icon: Bell, href: "/app/notifications", label: "Notifications" },
-    { icon: UserCircle, href: "/app/profile", label: "Profile" },
+    ...DESKTOP_NAV_ITEMS.filter((item) => {
+      if (isViewer && ["/app/dating", "/app/chat", "/app/birthdays"].includes(item.href)) {
+        return false;
+      }
+      return true;
+    }),
   ];
 
   if (isAdmin) {
     desktopNavItems.push({ icon: Shield, href: "/admin", label: "Admin Console" });
   }
 
-  const mobileBottomItems = [
-    { icon: Home, href: "/app", label: "Home" },
-    { icon: Compass, href: "/app/discover", label: "Discover" },
-    { icon: Plus, href: "/app/post/new", label: "" },
-    { icon: MessageSquare, href: "/app/chat", label: "Chat" },
-    { icon: Menu, href: "#menu", label: "Menu", isTrigger: true },
-  ];
-
-  const fullMobileDrawerLinks = [
-    {
-      group: "Primary Campus",
-      items: [
-        { icon: Home, href: "/app", label: "Campus Feed", desc: "Live discussions & confessions" },
-        { icon: Compass, href: "/app/discover", label: "Discover Hub", desc: "Explore colleges & trending tags" },
-        { icon: Sparkles, href: "/app/dating", label: "Campus Matches", desc: "Swipe verified college students", badge: "Hot" },
-        { icon: PartyPopper, href: "/app/birthdays", label: "Birthdays & DOB", desc: "Today's campus celebrations", badge: "New" },
-        { icon: MessageSquare, href: "/app/chat", label: "Direct Messages", desc: "Private student chat" },
-        { icon: Bell, href: "/app/notifications", label: "Notifications", desc: "Upvotes, comments & matches" },
-      ],
-    },
-    {
-      group: "Campus Utility",
-      items: [
-        { icon: ShoppingBag, href: "/app/hashtag/BuySell", label: "Buy / Sell / Exchange", desc: "Books, tech, cycles & dorm items" },
-        { icon: Search, href: "/app/hashtag/LostAndFound", label: "Lost & Found", desc: "Report or claim campus belongings" },
-        { icon: HomeIcon, href: "/app/hashtag/Roommates", label: "Roommate / Flat Finder", desc: "Find hostel & flat roommates" },
-        { icon: Car, href: "/app/hashtag/RideShare", label: "Ride Sharing", desc: "Carpool to metro or station" },
-        { icon: Gift, href: "/app/hashtag/FreeStuff", label: "Free Stuff", desc: "Giveaways & free student gear" },
-        { icon: Wrench, href: "/app/hashtag/CampusHelp", label: "Need / Can Help", desc: "Peer tutoring, lab help & notes" },
-      ],
-    },
-    {
-      group: "Social & Vibes",
-      items: [
-        { icon: PartyPopper, href: "/app/hashtag/CampusMemes", label: "Memes & Banter", desc: "Hostel tea & campus humor" },
-        { icon: PartyPopper, href: "/app/hashtag/CampusEvents", label: "Events & Fests", desc: "Cultural fests, hackathons & gigs" },
-        { icon: Users, href: "/app/communities", label: "Sub-Hubs & Clubs", desc: "Interest communities & branches" },
-        { icon: Heart, href: "/app/confessions", label: "Confessions", desc: "Anonymous campus thoughts" },
-        { icon: School, href: "/app/colleges", label: "College Directory", desc: "1,350+ indexed Indian colleges" },
-      ],
-    },
-    {
-      group: "Account & System",
-      items: [
-        { icon: UserCircle, href: "/app/profile", label: "My Profile", desc: "View LP clout & badges" },
-        { icon: Download, href: "#install", label: "Install Campus App", desc: "Add to home screen for 2x speed", badge: "PWA" },
-        { icon: Sliders, href: "/app/settings", label: "Settings", desc: "Preferences & privacy" },
-        { icon: Layers, href: "/overview", label: "Strategic Overview", desc: "Architecture & TAM brief" },
-        { icon: FileText, href: "/pitch", label: "Pitch Deck", desc: "Investor presentation & metrics" },
-        { icon: HelpCircle, href: "/safety", label: "Safety Center", desc: "Anti-harassment guidelines" },
-      ],
-    },
-  ];
+  const mobileBottomItems = MOBILE_BOTTOM_ITEMS;
+  const fullMobileDrawerLinks = FULL_MOBILE_DRAWER_LINKS;
 
   return (
     <>

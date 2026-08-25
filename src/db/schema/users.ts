@@ -53,6 +53,8 @@ export const userProfiles = pgTable(
     uniqueIndex("user_profiles_user_id_idx").on(table.userId),
     uniqueIndex("user_profiles_username_idx").on(table.username),
     index("user_profiles_institution_idx").on(table.institutionId),
+    index("user_profiles_points_idx").on(table.points),
+    index("user_profiles_branch_idx").on(table.branch),
   ],
 );
 

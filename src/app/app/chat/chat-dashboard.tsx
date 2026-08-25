@@ -109,20 +109,20 @@ export function ChatDashboard({
       {/* ─── Inbox / Conversation List ─── */}
       <div
         className={cn(
-          "w-full md:w-80 flex flex-col bg-card border-r border-border h-full shrink-0",
+          "w-full md:w-80 flex flex-col bg-card border-r border-border/20 h-full shrink-0",
           activeConversationId ? "hidden md:flex" : "flex"
         )}
       >
         {/* Search Header (Matching Reference 2 Messenger Top Bar) */}
-        <div className="p-4 border-b border-border space-y-3">
+        <div className="p-4 border-b border-border/20 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="size-7 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+              <div className="size-7 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                 <MessageSquareIcon className="size-4" />
               </div>
               <h1 className="text-base font-black tracking-tight text-foreground">Messenger</h1>
             </div>
-            <span className="text-[10px] font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
+            <span className="text-[10px] font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
               {conversations?.length || 0}
             </span>
           </div>
@@ -134,13 +134,13 @@ export function ChatDashboard({
               placeholder="Search students..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full pl-9 pr-4 py-2 text-xs font-semibold bg-muted/50 rounded-xl border border-border/60 focus:border-primary focus:bg-background outline-none transition-all"
+              className="w-full pl-9 pr-4 py-2 text-xs font-semibold bg-muted/40 rounded-xl focus:bg-background outline-none transition-all"
             />
           </div>
         </div>
 
         {/* Conversation List / Search Results */}
-        <div className="flex-1 overflow-y-auto divide-y divide-border/40 pb-20 md:pb-4">
+        <div className="flex-1 overflow-y-auto divide-y divide-border/15 pb-20 md:pb-4">
           {searchQuery ? (
             <div className="p-2 space-y-1">
               <span className="text-[10px] uppercase font-black tracking-wider text-muted-foreground px-2 block mb-2">
@@ -153,9 +153,9 @@ export function ChatDashboard({
                   onClick={() => startConversation(user.id)}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted text-left transition-colors cursor-pointer"
                 >
-                  <Avatar className="size-9 border border-border shrink-0">
+                  <Avatar className="size-9 shrink-0">
                     <AvatarImage src={user.avatarUrl || ""} />
-                    <AvatarFallback className="font-bold">{user.displayName[0]}</AvatarFallback>
+                    <AvatarFallback className="font-bold bg-primary/10 text-primary">{user.displayName[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-foreground truncate">{user.displayName}</p>
@@ -186,16 +186,16 @@ export function ChatDashboard({
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left transition-all cursor-pointer",
                         isActive
-                          ? "bg-primary/10 border border-primary/30 text-primary shadow-xs"
-                          : "hover:bg-muted/50 text-muted-foreground"
+                          ? "bg-primary/10 text-primary"
+                          : "hover:bg-muted/40 text-muted-foreground"
                       )}
                     >
                       <div className="relative shrink-0">
-                        <Avatar className="size-11 border border-border/80 shadow-2xs">
+                        <Avatar className="size-11">
                           <AvatarImage src={other?.avatarUrl || ""} />
-                          <AvatarFallback className="font-bold text-xs">{initial}</AvatarFallback>
+                          <AvatarFallback className="font-bold text-xs bg-primary/10 text-primary">{initial}</AvatarFallback>
                         </Avatar>
-                        <span className="absolute bottom-0 right-0 size-3 rounded-full bg-emerald-500 border-2 border-card" />
+                        <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 border-2 border-card" />
                       </div>
 
                       <div className="flex-1 min-w-0">

@@ -48,9 +48,9 @@ export default async function NotificationsPage() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24 select-none">
       {/* Header (Matching Reference 1 Notifications Top Bar) */}
-      <header className="sticky top-0 z-40 bg-background/85 px-4 py-3.5 backdrop-blur-xl border-b border-border flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-background/85 px-4 py-3.5 backdrop-blur-xl border-b border-border/20 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="size-7 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+          <div className="size-7 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
             <Bell className="size-4" />
           </div>
           <div>
@@ -59,7 +59,7 @@ export default async function NotificationsPage() {
           </div>
         </div>
         {list.length > 0 && (
-          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
             {list.length} New
           </span>
         )}
@@ -76,19 +76,19 @@ export default async function NotificationsPage() {
 
           if (n.type === "LIKE") {
             icon = <Heart className="h-3 w-3 text-rose-500 fill-rose-500" />;
-            bgClass = "bg-rose-500/10 border-rose-500/25";
+            bgClass = "bg-rose-500/10 text-rose-500";
             message = "upvoted your post.";
             href = `/app/post/${n.referenceId}`;
             actionLabel = "View Post";
           } else if (n.type === "COMMENT") {
             icon = <MessageSquare className="h-3 w-3 text-blue-500 fill-blue-500" />;
-            bgClass = "bg-blue-500/10 border-blue-500/25";
+            bgClass = "bg-blue-500/10 text-blue-500";
             message = "commented on your post.";
             href = `/app/post/${n.referenceId}`;
             actionLabel = "Reply";
           } else if (n.type === "MATCH") {
             icon = <Sparkles className="h-3 w-3 text-primary" />;
-            bgClass = "bg-primary/10 border-primary/25";
+            bgClass = "bg-primary/10 text-primary";
             message = "matched with you on Campus Dating!";
             href = `/app/chat`;
             actionLabel = "Chat";
@@ -102,13 +102,13 @@ export default async function NotificationsPage() {
             <div 
               key={n.id} 
               className={cn(
-                "flex items-center justify-between gap-3 p-3.5 rounded-2xl border bg-card hover:bg-muted/30 transition-all",
-                !n.isRead ? "border-primary/30 bg-primary/5 shadow-2xs" : "border-border/60 shadow-2xs"
+                "flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-card hover:bg-muted/40 transition-all",
+                !n.isRead ? "bg-primary/5 shadow-2xs" : "shadow-2xs"
               )}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="relative shrink-0">
-                  <Avatar className="size-10 rounded-2xl border border-border/80 shadow-2xs">
+                  <Avatar className="size-10 rounded-2xl">
                     <AvatarImage src={actorAvatar} />
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold rounded-2xl">
                       {actorName[0]}
@@ -135,7 +135,7 @@ export default async function NotificationsPage() {
               {href !== "#" && (
                 <Link
                   href={href}
-                  className="px-3 py-1.5 rounded-xl border border-border/70 bg-muted/30 hover:bg-muted text-foreground text-[11px] font-bold transition-all shrink-0 active:scale-95"
+                  className="px-3.5 py-1.5 rounded-xl bg-muted/50 hover:bg-muted text-foreground text-[11px] font-bold transition-all shrink-0 active:scale-95"
                 >
                   {actionLabel}
                 </Link>

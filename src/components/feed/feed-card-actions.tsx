@@ -33,7 +33,7 @@ export function FeedCardActions({
   }
 
   return (
-    <div className="flex items-center justify-between px-3 sm:px-5 py-2 border-t border-border/40 text-muted-foreground select-none touch-manipulation">
+    <div className="flex items-center justify-between px-3 sm:px-5 py-1.5 text-muted-foreground select-none touch-manipulation">
       {/* Upvote Button (Triangle / Heart with Count) */}
       <button
         onClick={onVote}

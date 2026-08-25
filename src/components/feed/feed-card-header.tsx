@@ -41,15 +41,15 @@ export function FeedCardHeader({
       <div className="flex items-center gap-3 min-w-0">
         {!post.isAnonymous ? (
           <Link href={`/@${authorHandle}`}>
-            <Avatar className="size-10 rounded-2xl border border-border/60 hover:opacity-80 transition-opacity shrink-0 shadow-2xs">
+            <Avatar className="size-10 rounded-2xl hover:opacity-85 transition-opacity shrink-0">
               <AvatarImage src={avatarUrl || ""} />
-              <AvatarFallback className="rounded-2xl font-bold text-xs">{avatarFallback}</AvatarFallback>
+              <AvatarFallback className="rounded-2xl font-bold text-xs bg-primary/10 text-primary">{avatarFallback}</AvatarFallback>
             </Avatar>
           </Link>
         ) : (
-          <Avatar className="size-10 rounded-2xl border border-border/60 shrink-0 bg-muted/40 shadow-2xs">
+          <Avatar className="size-10 rounded-2xl shrink-0 bg-muted/50">
             <AvatarImage src={avatarUrl || ""} />
-            <AvatarFallback className="rounded-2xl font-bold text-xs">{avatarFallback}</AvatarFallback>
+            <AvatarFallback className="rounded-2xl font-bold text-xs bg-muted text-muted-foreground">{avatarFallback}</AvatarFallback>
           </Avatar>
         )}
         <div className="flex flex-col min-w-0">

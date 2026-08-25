@@ -422,60 +422,50 @@
     content: '';
   }
 
-  /* Pastel Tag Badges (Inspired by 2026 Reference App Design) */
+  /* Pastel Tag Badges (Clean, borderless pills matching reference) */
   .badge-tag-peach {
     background-color: #FFF3EB;
     color: #B45309;
-    border: 1px solid rgba(245, 158, 11, 0.2);
   }
   .dark .badge-tag-peach {
     background-color: rgba(217, 119, 6, 0.15);
     color: #FCD34D;
-    border: 1px solid rgba(245, 158, 11, 0.3);
   }
 
   .badge-tag-cyan {
     background-color: #E6FFFA;
     color: #0F766E;
-    border: 1px solid rgba(20, 184, 166, 0.2);
   }
   .dark .badge-tag-cyan {
-    background-color: rgba(15, 118, 110, 0.2);
+    background-color: rgba(15, 118, 110, 0.18);
     color: #5EEAD4;
-    border: 1px solid rgba(20, 184, 166, 0.3);
   }
 
   .badge-tag-purple {
     background-color: #F3E8FF;
     color: #7E22CE;
-    border: 1px solid rgba(168, 85, 247, 0.2);
   }
   .dark .badge-tag-purple {
-    background-color: rgba(126, 34, 206, 0.2);
+    background-color: rgba(126, 34, 206, 0.18);
     color: #D8B4FE;
-    border: 1px solid rgba(168, 85, 247, 0.3);
   }
 
   .badge-tag-rose {
     background-color: #FFE4E6;
     color: #BE123C;
-    border: 1px solid rgba(244, 63, 94, 0.2);
   }
   .dark .badge-tag-rose {
-    background-color: rgba(190, 18, 60, 0.2);
+    background-color: rgba(190, 18, 60, 0.18);
     color: #FDA4AF;
-    border: 1px solid rgba(244, 63, 94, 0.3);
   }
 
   .badge-tag-emerald {
     background-color: #ECFDF5;
     color: #047857;
-    border: 1px solid rgba(16, 185, 129, 0.2);
   }
   .dark .badge-tag-emerald {
-    background-color: rgba(4, 120, 87, 0.2);
+    background-color: rgba(4, 120, 87, 0.18);
     color: #6EE7B7;
-    border: 1px solid rgba(16, 185, 129, 0.3);
   }
 
   /* Vibrant Sunset Aurora Gradient (Matching Inspired Menu & Profile Reference) */

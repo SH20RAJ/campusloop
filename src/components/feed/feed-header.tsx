@@ -51,7 +51,7 @@ export function FeedHeader({
         </div>
 
         {/* Scope selection pill */}
-        <div className="flex rounded-full bg-muted/60 p-0.5 border border-border/50 text-[11px] font-bold">
+        <div className="flex rounded-full bg-muted/50 p-1 text-[11px] font-bold">
           <button
             onClick={() => onScopeChange("CAMPUS")}
             className={cn(
@@ -76,7 +76,7 @@ export function FeedHeader({
       </div>
 
       {/* Underline Category & Sort Tabs (Matching Reference 2 Segmented Tabs) */}
-      <div className="flex items-center justify-between gap-3 border-t border-border/30 pt-2 -mb-1 touch-manipulation">
+      <div className="flex items-center justify-between gap-3 pt-2 -mb-1 touch-manipulation">
         {/* Sort links */}
         <div className="flex items-center gap-4 text-xs font-semibold text-muted-foreground overflow-x-auto no-scrollbar py-1">
           {SORT_TABS.map((s) => {
@@ -103,10 +103,10 @@ export function FeedHeader({
         <button
           onClick={() => setShowFilters(!showFilters)}
           className={cn(
-            "flex h-7 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[10px] font-bold border transition-all cursor-pointer active:scale-95 mb-2",
+            "flex h-7 shrink-0 items-center gap-1.5 rounded-full px-3 text-[10px] font-bold transition-all cursor-pointer active:scale-95 mb-2",
             showFilters || activeFiltersCount > 1
-              ? "border-primary/30 bg-primary/10 text-primary"
-              : "border-border/60 text-muted-foreground hover:bg-muted/50"
+              ? "bg-primary/10 text-primary"
+              : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
           aria-label="Filter feed"
         >

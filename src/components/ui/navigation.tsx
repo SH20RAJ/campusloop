@@ -217,7 +217,7 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
       </aside>
 
       {/* ─── Mobile Bottom Bar ─── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/80 bg-background/95 backdrop-blur-xl px-2 md:hidden shadow-lg touch-manipulation select-none">
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/20 bg-background/85 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
         {mobileBottomItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -228,7 +228,7 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
               <Link
                 key="create"
                 href="/app/post/new"
-                className="flex size-10 items-center justify-center rounded-2xl bg-foreground text-background shadow-md border-none active:scale-90 transition-transform cursor-pointer"
+                className="flex size-10 items-center justify-center rounded-2xl bg-foreground text-background shadow-xs active:scale-90 transition-transform cursor-pointer"
                 aria-label="Create post"
               >
                 <Plus className="size-5 stroke-[2.5]" />
@@ -246,7 +246,7 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                 aria-label="Open menu"
               >
                 {profile?.avatarUrl ? (
-                  <Avatar className="size-6 border border-border shrink-0">
+                  <Avatar className="size-6 shrink-0">
                     <AvatarImage src={profile.avatarUrl} />
                     <AvatarFallback className="text-[9px] font-bold">{(profile.displayName?.[0] || "U").toUpperCase()}</AvatarFallback>
                   </Avatar>
@@ -270,7 +270,7 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
               <div className="relative">
                 <Icon className={cn("size-5 transition-colors", isActive ? "stroke-[2.5]" : "stroke-[1.8]")} />
                 {item.href === "/app/chat" && (
-                  <span className="absolute -top-1 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-rose-500 text-[8px] font-black text-white shadow-xs">
+                  <span className="absolute -top-1 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-rose-500 text-[8px] font-black text-white">
                     1
                   </span>
                 )}
@@ -291,18 +291,18 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
           onClick={() => setShowMobileMenu(false)}
         >
           <div 
-            className="max-h-[90vh] max-h-[90dvh] w-full rounded-t-[32px] border-t border-border bg-card p-4 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200"
+            className="max-h-[90vh] max-h-[90dvh] w-full rounded-t-[32px] bg-card p-4 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Sheet Drag/Pull Pill Indicator */}
             <div className="w-10 h-1 rounded-full bg-muted-foreground/30 mx-auto mb-3 shrink-0" />
 
             {/* Aurora Gradient Welcome Card */}
-            <div className="relative overflow-hidden rounded-2xl bg-aurora-gradient p-4 text-white shadow-lg mb-3 shrink-0">
+            <div className="relative overflow-hidden rounded-2xl bg-aurora-gradient p-4 text-white shadow-md mb-3 shrink-0">
               <div className="relative z-10 space-y-1">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="size-7 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
+                    <div className="size-7 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
                       <Sparkles className="size-3.5 text-white" />
                     </div>
                     <span className="text-xs font-black tracking-wider uppercase text-white/90">CampusLoop</span>
@@ -310,7 +310,7 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
 
                   <div className="flex items-center gap-1.5">
                     {profile && (
-                      <span className="rounded-full bg-white/20 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-black text-white border border-white/30">
+                      <span className="rounded-full bg-white/20 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-black text-white">
                         🔥 {profile.points || 0} LP
                       </span>
                     )}

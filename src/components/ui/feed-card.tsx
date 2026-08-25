@@ -126,7 +126,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card text-card-foreground shadow-xs hover:border-border/80 transition-all relative overflow-hidden">
+    <div className="rounded-3xl bg-card text-card-foreground shadow-2xs hover:shadow-xs transition-all relative overflow-hidden border border-border/40">
       {/* Double Tap Heart Pop Overlay */}
       <AnimatePresence>
         {showDoubleTapHeart && (
@@ -167,12 +167,12 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
         onClick={handleCardClick}
         onDoubleClick={handleDoubleTap}
       >
-        <RichText content={post.body} className="text-sm md:text-base leading-relaxed text-foreground" />
+        <RichText content={post.body} className="text-sm md:text-base leading-relaxed text-foreground font-normal" />
 
         {/* Embedded Original Quoted Post */}
         {post.repostOf && (
           <Link href={`/app/post/${post.repostOf.id}`} onClick={(e) => e.stopPropagation()}>
-            <div className="mt-3 rounded-2xl border border-border/60 bg-muted/20 hover:bg-muted/30 transition-colors p-3.5 text-xs space-y-1.5 cursor-pointer">
+            <div className="mt-3 rounded-2xl bg-muted/40 hover:bg-muted/60 transition-colors p-3.5 text-xs space-y-1.5 cursor-pointer">
               <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
                 <span className="font-bold text-foreground">@{post.repostOf.author?.username || "student"}</span>
                 {post.repostOf.institution?.name && (

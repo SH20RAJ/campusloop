@@ -290,7 +290,7 @@ export function ProfileClientView({
       />
 
       {/* ─── Sticky Minimal Top Header Bar ─── */}
-      <div className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-xl shadow-xs">
+      <div className="sticky top-0 z-30 border-b border-border/20 bg-background/85 backdrop-blur-xl">
         <div className="flex items-center justify-between h-14 px-4 max-w-2xl mx-auto">
           <button
             type="button"
@@ -313,7 +313,7 @@ export function ProfileClientView({
             <button
               type="button"
               onClick={handleShareVibe}
-              className="flex items-center gap-1 text-[11px] font-bold text-foreground hover:text-primary transition-colors cursor-pointer bg-muted/40 hover:bg-muted px-2.5 py-1 rounded-xl border border-border/60"
+              className="flex items-center gap-1 text-[11px] font-bold text-foreground hover:text-primary transition-colors cursor-pointer bg-muted/50 hover:bg-muted px-3 py-1 rounded-xl"
             >
               <Share2 className="size-3.5" /> Share
             </button>
@@ -323,7 +323,7 @@ export function ProfileClientView({
 
       <main className="space-y-4 max-w-2xl mx-auto px-3 sm:px-4 pt-3">
         {/* ─── Profile Hero Card (Inspired by Reference 1 Center Screen) ─── */}
-        <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm">
+        <div className="relative overflow-hidden rounded-3xl bg-card shadow-2xs">
           {/* Cover Banner Photo */}
           <div className="relative h-36 sm:h-48 w-full bg-aurora-gradient overflow-hidden">
             {profile.bannerUrl ? (
@@ -376,7 +376,7 @@ export function ProfileClientView({
                   onClick={() => {
                     if (isOwnProfile) setShowAvatarMenu(true);
                   }}
-                  className="relative size-24 sm:size-28 rounded-3xl border-4 border-card shadow-2xl cursor-pointer overflow-hidden bg-background group-hover:opacity-95 transition-opacity"
+                  className="relative size-24 sm:size-28 rounded-3xl border-4 border-card shadow-xl cursor-pointer overflow-hidden bg-background group-hover:opacity-95 transition-opacity"
                 >
                   <Avatar className="size-full rounded-3xl">
                     <AvatarImage src={profile.avatarUrl || ""} className="rounded-3xl object-cover" />
@@ -418,7 +418,7 @@ export function ProfileClientView({
                     <button
                       type="button"
                       onClick={handleShareVibe}
-                      className="flex items-center justify-center rounded-full border border-border/80 bg-muted/30 size-9 text-foreground hover:bg-muted transition-colors cursor-pointer"
+                      className="flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted size-9 text-foreground transition-colors cursor-pointer"
                       title="Share Profile"
                     >
                       <Share2 className="size-4" />
@@ -442,11 +442,11 @@ export function ProfileClientView({
                   {profile.displayName}
                 </h2>
                 {profile.role === "ADMIN" && (
-                  <span className="rounded-full bg-destructive/10 border border-destructive/30 text-destructive text-[9px] font-black px-2 py-0.5 flex items-center gap-1">
+                  <span className="rounded-full bg-destructive/10 text-destructive text-[9px] font-black px-2 py-0.5 flex items-center gap-1">
                     <Shield className="size-3" /> ADMIN
                   </span>
                 )}
-                <span className="rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black px-2.5 py-0.5">
+                <span className="rounded-full bg-primary/10 text-primary text-[10px] font-black px-2.5 py-0.5">
                   {tier.tierName} (Lvl {tier.level})
                 </span>
               </div>
@@ -486,7 +486,7 @@ export function ProfileClientView({
             </div>
 
             {/* Quick Stats Pill Bar */}
-            <div className="flex items-center gap-4 py-2 px-3.5 rounded-2xl bg-muted/30 border border-border/50 text-xs font-semibold text-muted-foreground">
+            <div className="flex items-center gap-4 py-2 px-3.5 rounded-2xl bg-muted/40 text-xs font-semibold text-muted-foreground">
               <span className="text-foreground">
                 <strong className="text-foreground font-black">{posts.length}</strong> Posts
               </span>
@@ -503,7 +503,7 @@ export function ProfileClientView({
         </div>
 
         {/* ─── LinkedIn-Style Education & Academic Card ─── */}
-        <div className="rounded-3xl border border-border/80 bg-card p-5 shadow-xs space-y-3.5">
+        <div className="rounded-3xl bg-card p-5 shadow-2xs space-y-3.5">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <GraduationCap className="size-4 text-primary" /> Campus & Academic Discipline
@@ -516,7 +516,7 @@ export function ProfileClientView({
           </div>
 
           <div className="flex items-start gap-3.5 pt-1">
-            <div className="flex size-11 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-xl shrink-0 shadow-2xs">
+            <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-xl shrink-0">
               {branchIcon}
             </div>
 
@@ -555,7 +555,7 @@ export function ProfileClientView({
 
         {/* ─── LinkedIn-Style About & Bio Card ─── */}
         {profile.bio && (
-          <div className="rounded-3xl border border-border/80 bg-card p-5 shadow-xs space-y-2.5">
+          <div className="rounded-3xl bg-card p-5 shadow-2xs space-y-2.5">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                 <Briefcase className="size-3.5 text-primary" /> About
@@ -573,7 +573,7 @@ export function ProfileClientView({
 
             {/* Interest Tags (Styled as Reference 1 Pastel Badges) */}
             {profile.interests && profile.interests.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-2 border-t border-border/40">
+              <div className="flex flex-wrap gap-1.5 pt-2">
                 {profile.interests.map((tag, idx) => {
                   const tagStyles = [
                     "badge-tag-peach",
@@ -601,7 +601,7 @@ export function ProfileClientView({
         )}
 
         {/* ─── Campus Clout Analytics Card ─── */}
-        <div className="rounded-3xl border border-border/80 bg-card p-5 space-y-3 shadow-xs">
+        <div className="rounded-3xl bg-card p-5 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <TrendingUp className="size-3.5 text-amber-500" /> Campus Clout & Analytics
@@ -616,7 +616,7 @@ export function ProfileClientView({
                 {points} / {tier.maxPoints + 1} LP
               </span>
             </div>
-            <div className="h-2 w-full rounded-full bg-muted overflow-hidden border border-border/40">
+            <div className="h-2 w-full rounded-full bg-muted/60 overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-primary via-orange-500 to-amber-500 transition-all duration-500"
                 style={{ width: `${Math.min(100, Math.round((points / (tier.maxPoints + 1)) * 100))}%` }}
@@ -631,7 +631,7 @@ export function ProfileClientView({
         </div>
 
         {/* ─── Profile Navigation Underline Tabs (Inspired by Reference 1) ─── */}
-        <div className="flex items-center gap-6 border-b border-border/60 text-xs font-bold pt-2 px-1">
+        <div className="flex items-center gap-6 border-b border-border/20 text-xs font-bold pt-2 px-1">
           <button
             type="button"
             onClick={() => setActiveTab("posts")}

@@ -1,10 +1,10 @@
 import { getDb } from "@/db";
-import { communities, communityMembers, userProfiles, posts } from "@/db/schema";
-import { eq, or, and } from "drizzle-orm";
+import { posts } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
-import { hexclaveServerApp } from "@/hexclave/server";
 import { CommunityHeader } from "@/components/communities/community-header";
 import { CommunitySettingsClient } from "@/components/communities/community-settings-client";
+import { getCachedAuthUser, getCachedUserProfile, getCachedCommunity } from "@/lib/server-cache";
 import { Metadata } from "next";
 
 interface PageProps {
@@ -13,10 +13,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const db = getDb();
-  const comm = await db.query.communities.findFirst({
-    where: or(eq(communities.id, id), eq(communities.slug, id)),
-  });
+  const comm = await getCachedCommunity(id);
 
   if (!comm) {
     return {
@@ -34,34 +31,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CommunitySettingsPage({ params }: PageProps) {
   const { id } = await params;
 
-  const user = await hexclaveServerApp.getUser();
+  const user = await getCachedAuthUser();
   if (!user) redirect("/join");
 
-  const db = getDb();
-  const profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
+  // Parallelize user profile and community lookup with request cache
+  const [profile, comm] = await Promise.all([
+    getCachedUserProfile(user.id),
+    getCachedCommunity(id),
+  ]);
 
   if (!profile) redirect("/app/onboarding");
-
-  // Fetch community
-  const comm = await db.query.communities.findFirst({
-    where: or(eq(communities.id, id), eq(communities.slug, id)),
-    with: {
-      members: true,
-      creator: {
-        columns: {
-          id: true,
-          username: true,
-          displayName: true,
-        },
-      },
-    },
-  });
-
-  if (!comm) {
-    notFound();
-  }
+  if (!comm) notFound();
 
   const userMembership = comm.members.find((m) => m.userId === profile.id);
   const isMember = Boolean(userMembership && userMembership.status === "ACTIVE");
@@ -72,6 +52,7 @@ export default async function CommunitySettingsPage({ params }: PageProps) {
     redirect(`/app/communities/${comm.slug || comm.id}`);
   }
 
+  const db = getDb();
   // Count community posts
   const postsCount = (
     await db.query.posts.findMany({
@@ -81,6 +62,7 @@ export default async function CommunitySettingsPage({ params }: PageProps) {
   ).length;
 
   const activeMembersCount = comm.members.filter((m) => m.status === "ACTIVE").length;
+
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col min-h-screen pb-24 px-3 sm:px-4 pt-3 gap-5 select-none">

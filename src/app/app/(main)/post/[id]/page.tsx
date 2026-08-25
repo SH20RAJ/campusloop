@@ -1,15 +1,12 @@
-import { getDb } from "@/db";
-import { posts, userProfiles } from "@/db/schema";
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
 import { PostComments } from "./post-comments";
-import { hexclaveServerApp } from "@/hexclave/server";
 import { sanitizeAnonRow } from "@/lib/anonymity";
 import type { FeedPost } from "@/hooks/use-feed";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Lock } from "lucide-react";
+import { getCachedAuthUser, getCachedUserProfile, getCachedPostDetail } from "@/lib/server-cache";
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -17,11 +14,7 @@ interface PostPageProps {
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { id } = await params;
-  const db = getDb();
-  const post = await db.query.posts.findFirst({
-    where: eq(posts.id, id),
-    with: { author: true, institution: true },
-  });
+  const post = await getCachedPostDetail(id);
 
   if (!post) {
     return {
@@ -53,13 +46,11 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       url,
       siteName: "CampusLoop",
       type: "article",
-      // Inherits build-time OG card from src/app/opengraph-image.tsx
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: snippet,
-      // Inherits build-time OG card from src/app/opengraph-image.tsx
     },
     robots: { index: true, follow: true },
   };
@@ -67,38 +58,17 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 
 export default async function PostDetailPage({ params }: PostPageProps) {
   const { id } = await params;
-  const user = await hexclaveServerApp.getUser();
-  const db = getDb();
+  const user = await getCachedAuthUser();
 
-  const rawPost = await db.query.posts.findFirst({
-    where: eq(posts.id, id),
-    with: {
-      author: true,
-      institution: true,
-      votes: true,
-      comments: {
-        with: {
-          author: true,
-        },
-      },
-      pollOptions: {
-        with: {
-          votes: true,
-        },
-      },
-    },
-  });
+  // Fetch post and profile in parallel with deduplicated cache
+  const [rawPost, profile] = await Promise.all([
+    getCachedPostDetail(id),
+    user ? getCachedUserProfile(user.id) : Promise.resolve(null),
+  ]);
 
   if (!rawPost) {
     notFound();
   }
-
-  // Fetch current user profile if authenticated
-  const profile = user
-    ? await db.query.userProfiles.findFirst({
-        where: eq(userProfiles.userId, user.id),
-      })
-    : null;
 
   // Format post to match FeedPost type required by FeedCard
   const votesCount = rawPost.votes.reduce((acc, vote) => acc + vote.value, 0);

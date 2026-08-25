@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { Navigation } from "@/components/ui/navigation";
 import { RightSidebar } from "@/components/ui/right-sidebar";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { getDb } from "@/db";
-import { userProfiles, institutions } from "@/db/schema";
-import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { isViewerProfile } from "@/lib/viewer";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
   title: {
@@ -28,25 +25,19 @@ export default async function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await hexclaveServerApp.getUser();
+  const user = await getCachedAuthUser();
   
   if (!user) {
     redirect("/join");
   }
 
-  const db = getDb();
-  const profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
+  const profile = await getCachedUserProfile(user.id);
 
   if (!profile || !profile.onboardingCompleted) {
     redirect("/app/onboarding");
   }
 
-  const college = profile.institutionId
-    ? await db.query.institutions.findFirst({ where: eq(institutions.id, profile.institutionId) })
-    : null;
-
+  const college = profile.institution;
   const viewerMode = await isViewerProfile(profile);
 
   return (
@@ -77,3 +68,4 @@ export default async function MainLayout({
     </div>
   );
 }
+

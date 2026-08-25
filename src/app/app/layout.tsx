@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { getDb } from "@/db";
-import { userProfiles } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 /**
  * Default for everything behind auth: stay out of search indexes.
@@ -23,38 +20,12 @@ export default async function AppRootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await hexclaveServerApp.getUser();
+  const user = await getCachedAuthUser();
   if (!user) {
     redirect("/join");
   }
 
-  const db = getDb();
-
-  // If there are 0 users, auto-create the first user as ADMIN
-  const profilesCount = await db.select({ count: sql<number>`count(*)` }).from(userProfiles);
-  if (profilesCount[0]?.count === 0) {
-    const fallbackInst = await db.query.institutions.findFirst();
-    if (fallbackInst) {
-      const email = user.primaryEmail || "admin@campusloop.com";
-      const username = email.split("@")[0] || "admin";
-      
-      await db.insert(userProfiles).values({
-        userId: user.id,
-        username,
-        displayName: "Admin",
-        institutionId: fallbackInst.id,
-        onboardingCompleted: true,
-        role: "ADMIN",
-        status: "ACTIVE",
-      });
-      
-      redirect("/admin");
-    }
-  }
-
-  let profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
+  const profile = await getCachedUserProfile(user.id);
 
   if (profile?.role === "ADMIN") {
     return <>{children}</>;
@@ -70,12 +41,6 @@ export default async function AppRootLayout({
     redirect("/invalid-email");
   }
 
-  // Non-whitelisted domains are no longer rejected here: they proceed to
-  // onboarding and get a read-only Viewer Mode profile (see lib/viewer.ts).
-
-  // Profile check: We do NOT auto-create profiles here.
-  // If the profile does not exist or onboardingCompleted is false,
-  // the user is directed to /app/onboarding by the page/layout guards.
-
   return <>{children}</>;
 }
+

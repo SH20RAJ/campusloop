@@ -1,12 +1,12 @@
 import { getDb } from "@/db";
-import { institutions, posts, userProfiles } from "@/db/schema";
+import { institutions, posts } from "@/db/schema";
 import { eq, or, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import { hexclaveServerApp } from "@/hexclave/server";
 import { sanitizeAnonRow } from "@/lib/anonymity";
 import type { FeedPost } from "@/hooks/use-feed";
 import { Metadata } from "next";
 import { CollegeHubClient } from "@/components/colleges/college-hub-client";
+import { getCachedAuthUser, getCachedUserProfile, getCachedInstitution } from "@/lib/server-cache";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -14,10 +14,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const db = getDb();
-  const college = await db.query.institutions.findFirst({
-    where: or(eq(institutions.slug, id), eq(institutions.id, id)),
-  });
+  const college = await getCachedInstitution(id);
 
   if (!college) {
     return {
@@ -26,22 +23,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = `${college.name} Rank & Campus Hub | CampusLoop`;
-  const description = `Explore live rankings, verified student leaderboards, confessions, and sub-community posts for ${college.name} (${college.district || college.state}).`;
-  const url = `https://campusloop.space/college/${college.slug || college.id}`;
+  const title = `${college.name} Campus Hub | CampusLoop`;
+  const description = `Connect with verified students at ${college.name} (${college.district || college.state || "India"}). Confessions, clubs, campus Q&A, and live feed.`;
+  const url = `https://campusloop.space/app/college/${college.slug || college.id}`;
 
   return {
     title,
     description,
     keywords: [
       college.name,
-      `${college.name} rankings`,
+      `${college.name} campus`,
       `${college.name} students`,
-      `${college.name} confessions`,
-      `${college.name} placements`,
-      `${college.name} cutoffs`,
-      college.state || "Indian Colleges",
-      "CampusLoop college hub",
+      "college confessions",
+      "campus life India",
+      "verified student network",
     ],
     alternates: {
       canonical: url,
@@ -65,22 +60,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function MainCollegePage({ params }: PageProps) {
   const { id } = await params;
-  const user = await hexclaveServerApp.getUser();
+  const user = await getCachedAuthUser();
   const db = getDb();
 
-  const profile = user
-    ? await db.query.userProfiles.findFirst({
-        where: eq(userProfiles.userId, user.id),
-      })
-    : null;
-
-  // Query college by slug or id
-  const college = await db.query.institutions.findFirst({
-    where: or(eq(institutions.slug, id), eq(institutions.id, id)),
-    with: {
-      profiles: true,
-    },
-  });
+  // Fetch profile and institution in parallel with deduplicated request cache
+  const [profile, college] = await Promise.all([
+    user ? getCachedUserProfile(user.id) : Promise.resolve(null),
+    getCachedInstitution(id),
+  ]);
 
   if (!college) {
     notFound();

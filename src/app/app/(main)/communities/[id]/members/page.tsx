@@ -1,10 +1,10 @@
 import { getDb } from "@/db";
-import { communities, communityMembers, userProfiles, posts } from "@/db/schema";
-import { eq, or, desc } from "drizzle-orm";
+import { posts } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
-import { hexclaveServerApp } from "@/hexclave/server";
 import { CommunityHeader } from "@/components/communities/community-header";
 import { CommunityMembersClient } from "@/components/communities/community-members-client";
+import { getCachedAuthUser, getCachedUserProfile, getCachedCommunity } from "@/lib/server-cache";
 import { Metadata } from "next";
 
 interface PageProps {
@@ -13,10 +13,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const db = getDb();
-  const comm = await db.query.communities.findFirst({
-    where: or(eq(communities.id, id), eq(communities.slug, id)),
-  });
+  const comm = await getCachedCommunity(id);
 
   if (!comm) {
     return {
@@ -37,49 +34,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CommunityMembersPage({ params }: PageProps) {
   const { id } = await params;
 
-  const user = await hexclaveServerApp.getUser();
+  const user = await getCachedAuthUser();
   if (!user) redirect("/join");
 
-  const db = getDb();
-  const profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
+  // Parallelize user profile and community lookup with request cache
+  const [profile, comm] = await Promise.all([
+    getCachedUserProfile(user.id),
+    getCachedCommunity(id),
+  ]);
 
   if (!profile) redirect("/app/onboarding");
+  if (!comm) notFound();
 
-  // Fetch community
-  const comm = await db.query.communities.findFirst({
-    where: or(eq(communities.id, id), eq(communities.slug, id)),
-    with: {
-      members: {
-        with: {
-          user: {
-            columns: {
-              id: true,
-              username: true,
-              displayName: true,
-              avatarUrl: true,
-              points: true,
-              branch: true,
-              year: true,
-            },
-          },
-        },
-      },
-      creator: {
-        columns: {
-          id: true,
-          username: true,
-          displayName: true,
-        },
-      },
-    },
-  });
-
-  if (!comm) {
-    notFound();
-  }
-
+  const db = getDb();
   // Count community posts
   const postsCount = (
     await db.query.posts.findMany({
@@ -87,6 +54,7 @@ export default async function CommunityMembersPage({ params }: PageProps) {
       columns: { id: true },
     })
   ).length;
+
 
   const userMembership = comm.members.find((m) => m.userId === profile.id);
   const isMember = Boolean(userMembership && userMembership.status === "ACTIVE");

@@ -213,22 +213,20 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
       {/* Main Container */}
       <main className="flex-1 w-full max-w-xl px-4 pt-20 mx-auto space-y-4">
-        {/* Profile Card with Cover Banner */}
-        <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-lg">
-          <div className="relative h-28 sm:h-36 w-full bg-gradient-to-r from-orange-500/25 via-primary/30 to-amber-500/25 overflow-hidden">
-            {profile.bannerUrl ? (
+        {/* Profile Card with Aurora Mesh Banner (Reference 1 & 2) */}
+        <div className="relative overflow-hidden rounded-3xl bg-card shadow-lg">
+          <div className="relative h-36 sm:h-44 w-full bg-aurora-mesh overflow-hidden">
+            {profile.bannerUrl && (
               <img src={profile.bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
-            ) : (
-              <div className="absolute inset-0 bg-grid-pattern opacity-30" />
             )}
           </div>
 
           <div className="px-5 pb-5 pt-0 space-y-3">
             <div className="flex items-end justify-between -mt-12 sm:-mt-14">
               <div className="relative">
-                <Avatar className="size-20 sm:size-24 border-4 border-card shadow-2xl bg-background">
-                  <AvatarImage src={profile.avatarUrl || ""} />
-                  <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary">
+                <Avatar className="size-22 sm:size-24 rounded-full border-4 border-card shadow-2xl bg-background">
+                  <AvatarImage src={profile.avatarUrl || ""} className="rounded-full object-cover" />
+                  <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary rounded-full">
                     {profile.displayName[0]?.toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -239,22 +237,47 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                 )}
               </div>
 
-              <span className="rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black px-2.5 py-1">
-                {tier.tierName} · {profile.points || 0} LP
-              </span>
+              <Link
+                href="/join?mode=signup"
+                className="rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-xs font-bold text-primary shadow-2xs hover:bg-primary/10 transition-all cursor-pointer"
+              >
+                🛡️ Verify to connect
+              </Link>
             </div>
 
             <div className="space-y-1">
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
-                {profile.displayName}
-              </h2>
-              <p className="text-xs sm:text-sm font-semibold text-foreground/90 leading-snug">
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-black tracking-tight text-foreground">
+                  {profile.displayName}
+                </h2>
+                {(profile.points || 0) >= 150 && (
+                  <span className="text-blue-500 font-bold" title="Verified Campus Star">
+                    ✓
+                  </span>
+                )}
+              </div>
+
+              {/* Stats Row (Exact match to Reference: Following / Followers / LP) */}
+              <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground pt-0.5">
+                <span>
+                  <strong className="text-foreground font-black">{(profile.referralCount || 0) + 6}</strong> Following
+                </span>
+                <span>
+                  <strong className="text-foreground font-black">{((profile.points || 0) * 2) + 24}</strong> Followers
+                </span>
+                <span>
+                  <strong className="text-foreground font-black">{profile.points || 0}</strong> LP Clout
+                </span>
+              </div>
+
+              <p className="text-xs sm:text-sm font-semibold text-foreground/90 leading-snug pt-1">
                 {profile.headline || (
                   profile.branch && profile.course
                     ? `${profile.course} in ${profile.branch} @ ${campusShort}`
                     : `Student @ ${campusShort}`
                 )}
               </p>
+
               <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium pt-0.5">
                 <span>@{profile.username}</span>
                 <span>•</span>
@@ -265,13 +288,13 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
         </div>
 
         {/* Education & Discipline Card */}
-        <div className="rounded-3xl border border-border/80 bg-card p-5 shadow-xs space-y-3">
+        <div className="rounded-3xl bg-card p-5 shadow-xs space-y-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
             <School className="size-4 text-primary" /> Campus & Academic Discipline
           </h3>
 
           <div className="flex items-start gap-3.5 pt-1">
-            <div className="flex size-11 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-xl shrink-0">
+            <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-xl shrink-0">
               {branchIcon}
             </div>
             <div className="min-w-0 flex-1 space-y-1">
@@ -287,7 +310,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
         {/* About Card */}
         {profile.bio && (
-          <div className="rounded-3xl border border-border/80 bg-card p-5 shadow-xs space-y-2">
+          <div className="rounded-3xl bg-card p-5 shadow-xs space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">About</h3>
             <p className="text-xs text-foreground/90 font-medium leading-relaxed whitespace-pre-wrap">
               {profile.bio}
@@ -296,8 +319,8 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
         )}
 
         {/* Locked Teaser CTA */}
-        <div className="rounded-3xl border border-dashed border-border/80 bg-card/60 p-6 text-center space-y-4 shadow-sm">
-          <div className="size-11 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto border border-primary/20">
+        <div className="rounded-3xl bg-card/60 p-6 text-center space-y-4 shadow-sm border border-border/40">
+          <div className="size-11 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto">
             <Lock className="size-5" />
           </div>
           <div className="space-y-1">
@@ -308,12 +331,12 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
           </div>
           <div className="flex gap-2.5 justify-center pt-1">
             <Link href="/join?mode=signin">
-              <button className="rounded-xl border border-input h-9 px-4 text-xs font-bold hover:bg-muted text-foreground transition-all cursor-pointer">
+              <button className="rounded-full border border-border/80 h-9 px-5 text-xs font-bold hover:bg-muted text-foreground transition-all cursor-pointer">
                 Sign In
               </button>
             </Link>
             <Link href="/join?mode=signup">
-              <button className="rounded-xl bg-primary h-9 px-4 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
+              <button className="rounded-full bg-primary h-9 px-5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
                 Verify & Join
               </button>
             </Link>

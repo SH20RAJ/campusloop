@@ -173,36 +173,40 @@ export default async function PostDetailPage({ params }: PostPageProps) {
         }}
       />
 
-      {/* Header with back button & college breadcrumb */}
+      {/* Header (Exact match to Reference 3 Thread Top Bar) */}
       <div className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/20 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/app"
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted/50 hover:bg-muted text-foreground transition-colors cursor-pointer shrink-0"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/50 hover:bg-muted text-foreground transition-colors cursor-pointer shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div className="min-w-0">
-            <h1 className="text-xs font-black uppercase tracking-wider text-foreground truncate">
-              {post.type === "CONFESSION" ? "Campus Confession" : post.type === "POLL" ? "Student Poll" : "Discussion"}
+            <h1 className="text-sm font-black tracking-tight text-foreground truncate">
+              Thread
             </h1>
             {rawPost.institution && (
               <Link
                 href={`/app/college/${rawPost.institution.slug || rawPost.institution.id}`}
-                className="text-[10px] text-primary font-bold hover:underline truncate block"
+                className="text-[10px] text-muted-foreground font-medium hover:text-primary truncate block"
               >
-                {rawPost.institution.name.split(",")[0]} Hub →
+                {rawPost.institution.name.split(",")[0]}
               </Link>
             )}
           </div>
         </div>
 
-        {!user && (
+        {!user ? (
           <Link href="/join">
-            <button className="rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground hover:opacity-95 shadow-xs transition-all cursor-pointer">
+            <button className="rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground hover:opacity-95 shadow-xs transition-all cursor-pointer">
               Join Campus
             </button>
           </Link>
+        ) : (
+          <span className="text-[10px] font-bold text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-full">
+            {post.type === "CONFESSION" ? "🙈 Confession" : post.type === "POLL" ? "📊 Poll" : "💬 Discussion"}
+          </span>
         )}
       </div>
 

@@ -468,13 +468,22 @@
     color: #6EE7B7;
   }
 
-  /* Vibrant Sunset Aurora Gradient (Matching Inspired Menu & Profile Reference) */
+  /* Vibrant Sunset Aurora Gradient & Mesh (Matching Inspired Menu & Profile Reference) */
   .bg-aurora-gradient {
-    background: linear-gradient(135deg, #FF4500 0%, #E11D48 40%, #7C3AED 75%, #312E81 100%);
+    background: linear-gradient(145deg, #2e0854 0%, #4c1d95 25%, #7c3aed 45%, #e11d48 70%, #ea580c 90%, #f59e0b 100%);
+  }
+
+  .bg-aurora-mesh {
+    background: radial-gradient(at 100% 0%, #4338ca 0px, transparent 50%),
+                radial-gradient(at 20% 0%, #7c3aed 0px, transparent 50%),
+                radial-gradient(at 0% 50%, #db2777 0px, transparent 50%),
+                radial-gradient(at 100% 100%, #ea580c 0px, transparent 50%),
+                radial-gradient(at 0% 100%, #f97316 0px, transparent 50%),
+                linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
   }
 
   .bg-aurora-glow {
-    background: radial-gradient(circle at top right, rgba(255, 69, 0, 0.8), rgba(225, 29, 72, 0.6) 35%, rgba(124, 58, 237, 0.4) 70%, transparent);
+    background: radial-gradient(circle at top right, rgba(249, 115, 22, 0.8), rgba(225, 29, 72, 0.6) 35%, rgba(124, 58, 237, 0.5) 70%, transparent);
   }
 
   @keyframes shimmer-swipe {

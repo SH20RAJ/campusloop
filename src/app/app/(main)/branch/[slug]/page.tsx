@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { BranchDirectoryClient } from "./branch-client";
-import { findBranchBySlug } from "@/lib/academic-constants";
+import { findBranchBySlug } from "@/constants";
 
 interface BranchPageProps {
   params: Promise<{ slug: string }>;

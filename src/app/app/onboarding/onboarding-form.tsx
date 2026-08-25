@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sparkles, User, ShieldCheck, Check, AlertCircle, Upload, Loader2, GraduationCap, Tag, Cake, Lock } from "lucide-react";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { DEGREE_CATEGORIES, getBranchesForDegree } from "@/lib/academic-constants";
+import { DEGREE_CATEGORIES, getBranchesForDegree } from "@/constants";
 import { toast } from "sonner";
 
 const POPULAR_INTERESTS = [

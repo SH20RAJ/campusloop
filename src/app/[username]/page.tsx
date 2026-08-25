@@ -11,7 +11,7 @@ import { Lock, School } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedPost } from "@/hooks/use-feed";
 import { getCloutTier } from "@/lib/gamification";
-import { getBranchIcon } from "@/lib/academic-constants";
+import { getBranchIcon } from "@/constants";
 
 interface VanityProfileProps {
   params: Promise<{ username: string }>;

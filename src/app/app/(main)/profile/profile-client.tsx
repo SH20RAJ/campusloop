@@ -35,7 +35,7 @@ import { toast } from "sonner";
 import type { FeedPost } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
 import { getCloutTier } from "@/lib/gamification";
-import { slugifyBranch, getBranchIcon } from "@/lib/academic-constants";
+import { slugifyBranch, getBranchIcon } from "@/constants";
 
 interface ProfileClientViewProps {
   profile: {

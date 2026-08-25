@@ -3,7 +3,7 @@ import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, and, or, sql, desc, type SQL, ilike } from "drizzle-orm";
-import { findBranchBySlug } from "@/lib/academic-constants";
+import { findBranchBySlug } from "@/constants";
 
 export const dynamic = "force-dynamic";
 

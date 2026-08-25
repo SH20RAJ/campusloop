@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetcher } from "@/lib/api";
 import { getAvatarUrl } from "@/lib/utils";
 import type { UserProfile, Institution } from "@/db/schema";
-import { getBranchIcon } from "@/lib/academic-constants";
+import { getBranchIcon } from "@/constants";
 
 type BranchStudent = UserProfile & { institution?: Institution | null };
 

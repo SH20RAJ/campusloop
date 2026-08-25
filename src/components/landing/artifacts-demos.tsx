@@ -889,41 +889,32 @@ function ArtifactCard({
 
   return (
     <motion.button
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{
-        duration: 0.55,
-        delay: (index % 4) * 0.07 + Math.floor(index / 4) * 0.12,
+        duration: 0.45,
+        delay: (index % 4) * 0.05 + Math.floor(index / 4) * 0.08,
         ease: [0.16, 1, 0.3, 1],
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
       aria-label={`Preview ${artifact.title}`}
-      className="group relative cursor-pointer rounded-2xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group relative cursor-pointer rounded-3xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       <div
         className={cn(
-          "relative flex min-h-[210px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-card p-5",
-          "shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
-          artifact.borderGlow
+          "relative flex min-h-[210px] flex-col overflow-hidden rounded-3xl bg-card p-5 sm:p-6",
+          "shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
         )}
       >
         {/* Ambient gradient wash */}
         <div
           className={cn(
-            "pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-gradient-to-br blur-3xl transition-opacity duration-500",
+            "pointer-events-none absolute -right-8 -top-8 size-36 rounded-full bg-gradient-to-br blur-3xl transition-opacity duration-500",
             artifact.color,
-            isHovered ? "opacity-80" : "opacity-35"
-          )}
-        />
-        {/* Hairline accent that sweeps in on hover */}
-        <div
-          className={cn(
-            "absolute left-0 top-0 h-[2px] w-full origin-left scale-x-0 bg-gradient-to-r transition-transform duration-500 ease-out",
-            artifact.accent,
-            "group-hover:scale-x-100"
+            isHovered ? "opacity-90" : "opacity-25"
           )}
         />
 
@@ -931,9 +922,9 @@ function ArtifactCard({
         <div className="relative flex items-start justify-between">
           <div
             className={cn(
-              "flex size-11 items-center justify-center rounded-xl border border-black/[0.04] shadow-sm transition-shadow duration-300 dark:border-white/[0.06]",
+              "flex size-11 items-center justify-center rounded-2xl transition-all duration-300",
               artifact.iconBg,
-              "group-hover:shadow-md"
+              "group-hover:scale-105 shadow-2xs"
             )}
           >
             <motion.div
@@ -945,23 +936,24 @@ function ArtifactCard({
             </motion.div>
           </div>
 
-          <span className="font-mono text-[10px] font-medium tracking-widest text-muted-foreground/50 transition-colors duration-300 group-hover:text-muted-foreground">
+          <span className="font-mono text-[11px] font-bold tracking-widest text-muted-foreground/40 transition-colors duration-300 group-hover:text-muted-foreground">
             {String(index + 1).padStart(2, "0")}
           </span>
         </div>
 
         {/* Content pinned to bottom */}
-        <div className="relative mt-auto pt-8">
-          <h3 className="font-heading text-[15px] font-semibold tracking-tight text-foreground">
-            {artifact.title}
+        <div className="relative mt-auto pt-6">
+          <h3 className="text-[15px] font-black tracking-tight text-foreground flex items-center justify-between">
+            <span>{artifact.title}</span>
+            <ArrowUpRight className="size-4 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
           </h3>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          <p className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-2">
             {artifact.description}
           </p>
-          <span className="mt-3 flex translate-y-1 items-center gap-1 text-[11px] font-semibold text-primary opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            Try live preview
-            <ArrowUpRight className="size-3" />
-          </span>
+          <div className="mt-3 flex items-center gap-1 text-[11px] font-bold text-primary opacity-0 -translate-x-1 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-200">
+            <span>Live preview</span>
+            <span>→</span>
+          </div>
         </div>
       </div>
     </motion.button>
@@ -1006,63 +998,61 @@ function OverlayModal({
           onClick={onClose}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" />
 
           {/* Modal */}
           <motion.div
             key={artifact.id}
-            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            initial={{ opacity: 0, scale: 0.94, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 20 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, scale: 0.94, y: 16 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-lg"
           >
-            <Card className="max-h-[85vh] overflow-y-auto shadow-2xl">
-              <CardContent className="space-y-5">
-                {/* Header */}
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "flex size-10 items-center justify-center rounded-lg",
-                        artifact.iconBg
-                      )}
-                    >
-                      <artifact.icon className="size-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-heading text-base font-semibold tracking-tight">
-                        {artifact.title}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        Click around — this is a live preview
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={onClose}
-                    className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                    aria-label="Close demo"
+            <div className="max-h-[85vh] overflow-y-auto rounded-3xl bg-card p-6 shadow-2xl space-y-5 border border-border/30">
+              {/* Header */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={cn(
+                      "flex size-10 items-center justify-center rounded-2xl shadow-2xs",
+                      artifact.iconBg
+                    )}
                   >
-                    <X className="size-3.5" />
-                  </button>
+                    <artifact.icon className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black tracking-tight text-foreground">
+                      {artifact.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      Click around — this is a live interactive demo
+                    </p>
+                  </div>
                 </div>
+                <button
+                  onClick={onClose}
+                  className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted/50 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  aria-label="Close demo"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
 
-                {/* Divider */}
-                <div className="border-t border-border/60" />
+              {/* Divider */}
+              <div className="border-t border-border/20" />
 
-                {/* Demo Content */}
-                <DemoContent id={artifact.id} />
+              {/* Demo Content */}
+              <DemoContent id={artifact.id} />
 
-                {/* Footer */}
-                <div className="border-t border-border/60 pt-3">
-                  <p className="text-center text-[10px] text-muted-foreground">
-                    This is a preview. Real content lives inside the campus loop.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+              {/* Footer */}
+              <div className="border-t border-border/20 pt-3">
+                <p className="text-center text-[10px] font-medium text-muted-foreground">
+                  Interactive preview. Live content streams inside verified campus feeds.
+                </p>
+              </div>
+            </div>
           </motion.div>
         </motion.div>
       )}
@@ -1080,24 +1070,22 @@ export function ArtifactsShowcase() {
     : null;
 
   return (
-    <section className="relative border-t border-border/60">
-      {/* Section-level ambient tint */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(99,102,241,0.06),transparent)] dark:bg-[radial-gradient(60%_100%_at_50%_0%,rgba(129,140,248,0.08),transparent)]" />
-      <div className="mx-auto w-full max-w-6xl px-6 py-24">
-        <Reveal className="max-w-2xl space-y-4 pb-14">
-          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            What you can create
-            <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 font-mono text-[10px] tracking-normal text-muted-foreground">
-              8 formats
+    <section className="relative">
+      <div className="mx-auto w-full max-w-6xl px-6 py-20">
+        <Reveal className="max-w-2xl space-y-3 pb-12">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">
+              What you can create
             </span>
-          </p>
-          <h2 className="text-balance text-3xl font-bold tracking-tight md:text-[2.75rem] md:leading-[1.1]">
-            Eight ways to shape the loop.
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 font-bold text-[10px] text-primary">
+              8 Expressive Formats
+            </span>
+          </div>
+          <h2 className="text-balance text-3xl font-black tracking-tight sm:text-4xl md:text-[2.6rem] md:leading-[1.15] text-foreground">
+            Eight expressive ways to spark campus chatter.
           </h2>
-          <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-            Every post on CampusLoop is an artifact with its own personality.
-            Click any card to open a live, interactive preview — from anonymous
-            whispers to campus-wide polls.
+          <p className="max-w-xl text-sm leading-relaxed text-muted-foreground font-medium">
+            From anonymous confessions to instant polls and student memes — every format has its own interactive personality. Click any card below to test live.
           </p>
         </Reveal>
 
@@ -1112,22 +1100,21 @@ export function ArtifactsShowcase() {
           ))}
         </div>
 
-        {/* Bottom stripe */}
-        <Reveal delay={0.15} className="pt-12">
-          <div className="relative overflow-hidden rounded-xl border border-border/60 bg-muted/20 px-6 py-5">
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
+        {/* Bottom Minimal Capsule */}
+        <Reveal delay={0.15} className="pt-10">
+          <div className="relative overflow-hidden rounded-3xl bg-card p-5 sm:p-6 shadow-2xs">
             <div className="relative flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                <span className="font-semibold text-foreground">One account.</span>{" "}
-                Every artifact. Zero compromises on privacy.
+              <p className="text-xs font-semibold text-muted-foreground">
+                <strong className="text-foreground font-bold">One Verified Student Account.</strong>{" "}
+                Total pseudonymity on confessions. Zero spam.
               </p>
-              <span className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-primary">
+              <div className="flex shrink-0 items-center gap-2 text-xs font-bold text-primary">
                 <span className="relative flex size-2">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary/60" />
-                  <span className="relative inline-flex size-2 rounded-full bg-primary" />
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/60" />
+                  <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
                 </span>
-                All verified
-              </span>
+                Verified College Network
+              </div>
             </div>
           </div>
         </Reveal>

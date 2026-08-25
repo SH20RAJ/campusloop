@@ -77,7 +77,7 @@ export function CollegeHeroHeader({
       <div className="flex items-center justify-between">
         <Link
           href="/colleges"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-card border border-border/70 px-3 py-1.5 rounded-xl shadow-2xs"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-muted/50 hover:bg-muted px-3.5 py-1.5 rounded-xl"
         >
           <ArrowLeft className="size-3.5" /> All 1,350+ Campus Hubs
         </Link>
@@ -86,7 +86,7 @@ export function CollegeHeroHeader({
           <button
             type="button"
             onClick={handleShareCollege}
-            className="flex items-center gap-1.5 text-xs font-bold text-foreground hover:text-primary transition-colors cursor-pointer bg-card border border-border/70 px-3 py-1.5 rounded-xl shadow-2xs"
+            className="flex items-center gap-1.5 text-xs font-bold text-foreground hover:text-primary transition-colors cursor-pointer bg-muted/50 hover:bg-muted px-3.5 py-1.5 rounded-xl"
           >
             {copied ? <Check className="size-3.5 text-emerald-500" /> : <Share2 className="size-3.5 text-primary" />}
             <span>{copied ? "Copied!" : "Share Campus"}</span>
@@ -95,7 +95,7 @@ export function CollegeHeroHeader({
       </div>
 
       {/* ─── Grand Panoramic College Banner & Header Card ─── */}
-      <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl bg-card shadow-2xs">
         {/* Banner Area */}
         <div className="relative h-48 sm:h-60 w-full bg-muted/40 overflow-hidden">
           {college.bannerUrl ? (
@@ -120,7 +120,7 @@ export function CollegeHeroHeader({
                 🎓 Your Campus
               </span>
             )}
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-black/60 text-white backdrop-blur-md border border-white/10 flex items-center gap-1 shadow-md">
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-black/60 text-white backdrop-blur-md flex items-center gap-1 shadow-md">
               <Trophy className="size-3 text-amber-400" /> #{stateRank} in {college.state || "State"}
             </span>
             <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/90 text-white backdrop-blur-md flex items-center gap-1 shadow-md">
@@ -129,7 +129,7 @@ export function CollegeHeroHeader({
           </div>
 
           {/* Live Pulse Ticker (Subtle Pill in Top Left) */}
-          <div className="absolute top-3 left-3 hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 text-white/90 backdrop-blur-md border border-white/10 text-[11px] font-semibold z-10">
+          <div className="absolute top-3 left-3 hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 text-white/90 backdrop-blur-md text-[11px] font-semibold z-10">
             <span className="size-2 rounded-full bg-emerald-400 animate-ping" />
             <span>{studentCount * 3 + 12} batchmates active this week</span>
           </div>
@@ -141,7 +141,7 @@ export function CollegeHeroHeader({
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 -mt-14 sm:-mt-16">
             <div className="flex items-end gap-3.5 min-w-0">
               {/* College Official Crest / Logo */}
-              <div className="size-20 sm:size-24 rounded-2xl bg-card border-2 border-border shadow-2xl p-1.5 shrink-0 flex items-center justify-center overflow-hidden z-10">
+              <div className="size-20 sm:size-24 rounded-2xl bg-card shadow-xl p-1.5 shrink-0 flex items-center justify-center overflow-hidden z-10">
                 {college.logoUrl ? (
                   <img
                     src={college.logoUrl}
@@ -203,7 +203,7 @@ export function CollegeHeroHeader({
                   }
                   target="_blank"
                   rel="noreferrer"
-                  className="h-9 px-3 rounded-xl border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0 shadow-2xs"
+                  className="h-9 px-3 rounded-xl bg-muted/50 hover:bg-muted text-foreground text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
                   title="Official Website"
                 >
                   <Globe className="size-3.5 text-muted-foreground" />
@@ -222,7 +222,7 @@ export function CollegeHeroHeader({
 
           {/* ─── Metric Badges Row ─── */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
-            <div className="rounded-2xl border border-border/60 bg-muted/20 p-3 space-y-0.5">
+            <div className="rounded-2xl bg-muted/40 p-3.5 space-y-0.5 shadow-2xs">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-500 flex items-center gap-1">
                 <Award className="size-3" /> Collective Clout
               </span>
@@ -232,7 +232,7 @@ export function CollegeHeroHeader({
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border/60 bg-muted/20 p-3 space-y-0.5">
+            <div className="rounded-2xl bg-muted/40 p-3.5 space-y-0.5 shadow-2xs">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-500 flex items-center gap-1">
                 <Users className="size-3" /> Verified Students
               </span>
@@ -242,7 +242,7 @@ export function CollegeHeroHeader({
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border/60 bg-muted/20 p-3 space-y-0.5">
+            <div className="rounded-2xl bg-muted/40 p-3.5 space-y-0.5 shadow-2xs">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-500 flex items-center gap-1">
                 <Flame className="size-3" /> Active Threads
               </span>
@@ -252,7 +252,7 @@ export function CollegeHeroHeader({
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border/60 bg-muted/20 p-3 space-y-0.5">
+            <div className="rounded-2xl bg-muted/40 p-3.5 space-y-0.5 shadow-2xs">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-500 flex items-center gap-1">
                 <Calendar className="size-3" /> Legacy
               </span>

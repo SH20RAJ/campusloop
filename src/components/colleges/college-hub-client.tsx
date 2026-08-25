@@ -203,7 +203,7 @@ export function CollegeHubClient({
       />
 
       {/* ─── Sticky Glassmorphic Multi-Tab Subpage Router ─── */}
-      <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2.5 bg-background/85 backdrop-blur-xl border-b border-border/60">
+      <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2.5 bg-background/85 backdrop-blur-xl border-b border-border/20">
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
           {/* Tab 1: Feed & Discussions */}
           <button
@@ -212,13 +212,13 @@ export function CollegeHubClient({
             className={cn(
               "px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5",
               activeTab === "feed"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
             <Sparkles className="size-3.5" />
             <span>Discourse &amp; Feed</span>
-            <span className={cn("text-[10px] px-1.5 py-0.2 rounded-full", activeTab === "feed" ? "bg-white/20 text-white" : "bg-muted text-muted-foreground")}>
+            <span className={cn("text-[10px] px-1.5 py-0.2 rounded-full", activeTab === "feed" ? "bg-white/20 text-white" : "bg-muted/80 text-muted-foreground")}>
               {posts.length}
             </span>
           </button>
@@ -230,13 +230,13 @@ export function CollegeHubClient({
             className={cn(
               "px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5",
               activeTab === "students"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
             <Trophy className="size-3.5 text-amber-500" />
             <span>Hall of Fame</span>
-            <span className={cn("text-[10px] px-1.5 py-0.2 rounded-full", activeTab === "students" ? "bg-white/20 text-white" : "bg-muted text-muted-foreground")}>
+            <span className={cn("text-[10px] px-1.5 py-0.2 rounded-full", activeTab === "students" ? "bg-white/20 text-white" : "bg-muted/80 text-muted-foreground")}>
               {students.length}
             </span>
           </button>
@@ -248,8 +248,8 @@ export function CollegeHubClient({
             className={cn(
               "px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5",
               activeTab === "reality"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
             <Building2 className="size-3.5 text-rose-500" />
@@ -263,8 +263,8 @@ export function CollegeHubClient({
             className={cn(
               "px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5",
               activeTab === "clubs"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
             <Users className="size-3.5 text-blue-500" />
@@ -278,8 +278,8 @@ export function CollegeHubClient({
             className={cn(
               "px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5",
               activeTab === "battle"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
             <Swords className="size-3.5 text-rose-500" />
@@ -300,7 +300,7 @@ export function CollegeHubClient({
                 placeholder={`Search confessions, polls, and topics in ${shortName}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-11 pl-10 pr-4 rounded-2xl border border-border/80 bg-card text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all shadow-2xs"
+                className="w-full h-11 pl-10 pr-4 rounded-2xl bg-muted/40 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:bg-card transition-all"
               />
               {searchQuery && (
                 <button
@@ -323,7 +323,7 @@ export function CollegeHubClient({
                     "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                     categoryFilter === "ALL"
                       ? "bg-foreground text-background shadow-2xs"
-                      : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   All ({posts.length})
@@ -335,10 +335,10 @@ export function CollegeHubClient({
                     "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                     categoryFilter === "CONFESSION"
                       ? "bg-foreground text-background shadow-2xs"
-                      : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
-                  🤫 Confessions
+                  Confessions
                 </button>
                 <button
                   type="button"
@@ -347,10 +347,10 @@ export function CollegeHubClient({
                     "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                     categoryFilter === "QUESTION"
                       ? "bg-foreground text-background shadow-2xs"
-                      : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
-                  ❓ Ask Seniors
+                  Questions
                 </button>
                 <button
                   type="button"
@@ -359,10 +359,10 @@ export function CollegeHubClient({
                     "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                     categoryFilter === "POLL"
                       ? "bg-foreground text-background shadow-2xs"
-                      : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
-                  📊 Polls
+                  Polls
                 </button>
                 <button
                   type="button"
@@ -371,10 +371,10 @@ export function CollegeHubClient({
                     "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                     categoryFilter === "EVENT"
                       ? "bg-foreground text-background shadow-2xs"
-                      : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
-                  🎪 Fests &amp; Events
+                  Events &amp; Fests
                 </button>
               </div>
 

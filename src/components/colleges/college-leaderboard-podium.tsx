@@ -80,7 +80,7 @@ export function CollegeLeaderboardPodium({
     <div className="space-y-6 select-none animate-in fade-in">
       {/* ─── 3D Hall of Fame Clout Podium (Top 3 Students) ─── */}
       {students.length >= 3 && (
-        <div className="rounded-3xl border border-border/80 bg-gradient-to-b from-card via-card/80 to-muted/30 p-6 shadow-sm space-y-6 overflow-hidden relative">
+        <div className="rounded-3xl bg-gradient-to-b from-card via-card/80 to-muted/30 p-6 shadow-2xs space-y-6 overflow-hidden relative">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <h3 className="text-xs font-black uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
@@ -90,7 +90,7 @@ export function CollegeLeaderboardPodium({
                 Top student creators and community leaders on {collegeName.split(",")[0]}.
               </p>
             </div>
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
               Season 1 Live
             </span>
           </div>
@@ -113,7 +113,7 @@ export function CollegeLeaderboardPodium({
                   <p className="text-xs font-bold text-foreground truncate">{top2.displayName}</p>
                   <p className="text-[10px] text-muted-foreground truncate">@{top2.username}</p>
                 </div>
-                <div className="w-full mt-2 rounded-t-2xl bg-gradient-to-t from-slate-500/20 to-slate-400/30 border-t border-x border-slate-400/40 p-2 text-center h-20 flex flex-col items-center justify-center shadow-inner">
+                <div className="w-full mt-2 rounded-t-2xl bg-gradient-to-t from-slate-500/20 to-slate-400/30 p-2 text-center h-20 flex flex-col items-center justify-center shadow-inner">
                   <span className="text-xs font-black text-foreground">{top2.points || 0}</span>
                   <span className="text-[9px] font-bold text-muted-foreground">LP</span>
                 </div>
@@ -142,7 +142,7 @@ export function CollegeLeaderboardPodium({
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">@{top1.username}</p>
                 </div>
-                <div className="w-full mt-2 rounded-t-2xl bg-gradient-to-t from-amber-500/25 to-amber-400/40 border-t border-x border-amber-400/60 p-2.5 text-center h-28 flex flex-col items-center justify-center shadow-inner">
+                <div className="w-full mt-2 rounded-t-2xl bg-gradient-to-t from-amber-500/25 to-amber-400/40 p-2.5 text-center h-28 flex flex-col items-center justify-center shadow-inner">
                   <span className="text-sm font-black text-amber-600 dark:text-amber-400">{top1.points || 0}</span>
                   <span className="text-[10px] font-extrabold text-amber-700/80 dark:text-amber-300">CAMPUS ICON</span>
                 </div>
@@ -165,7 +165,7 @@ export function CollegeLeaderboardPodium({
                   <p className="text-xs font-bold text-foreground truncate">{top3.displayName}</p>
                   <p className="text-[10px] text-muted-foreground truncate">@{top3.username}</p>
                 </div>
-                <div className="w-full mt-2 rounded-t-2xl bg-gradient-to-t from-amber-700/20 to-amber-600/30 border-t border-x border-amber-700/40 p-2 text-center h-16 flex flex-col items-center justify-center shadow-inner">
+                <div className="w-full mt-2 rounded-t-2xl bg-gradient-to-t from-amber-700/20 to-amber-600/30 p-2 text-center h-16 flex flex-col items-center justify-center shadow-inner">
                   <span className="text-xs font-black text-foreground">{top3.points || 0}</span>
                   <span className="text-[9px] font-bold text-muted-foreground">LP</span>
                 </div>
@@ -186,7 +186,7 @@ export function CollegeLeaderboardPodium({
               placeholder={`Search ${students.length} verified students in ${collegeName.split(",")[0]}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-10 pr-4 rounded-2xl border border-border/80 bg-card text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all shadow-2xs"
+              className="w-full h-11 pl-10 pr-4 rounded-2xl bg-muted/40 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:bg-card transition-all"
             />
             {searchQuery && (
               <button
@@ -211,7 +211,7 @@ export function CollegeLeaderboardPodium({
                   "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                   selectedBranch === "ALL"
                     ? "bg-primary text-primary-foreground shadow-xs"
-                    : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/60"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 All Departments ({students.length})
@@ -225,7 +225,7 @@ export function CollegeLeaderboardPodium({
                     "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                     selectedBranch === b
                       ? "bg-primary text-primary-foreground shadow-xs"
-                      : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/60"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   {b}
@@ -245,7 +245,7 @@ export function CollegeLeaderboardPodium({
                   "px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer",
                   selectedYear === yr
                     ? "bg-foreground text-background shadow-2xs"
-                    : "bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 {yr === "ALL" ? "All Years" : `Year ${yr}`}
@@ -271,15 +271,15 @@ export function CollegeLeaderboardPodium({
             const tier = getCloutTier(student.points || 0);
             return (
               <Link key={student.id} href={`/@${student.username}`}>
-                <div className="group rounded-2xl border border-border/80 bg-card p-3.5 hover:border-primary/40 hover:bg-muted/30 transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
+                <div className="group rounded-2xl bg-card p-3.5 hover:bg-muted/40 transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
                   <div className="flex items-center gap-3 min-w-0">
                     <span className="text-xs font-black text-muted-foreground/60 w-5 text-center shrink-0">
                       #{index + 1}
                     </span>
 
-                    <Avatar className="size-10 border border-border group-hover:scale-105 transition-transform shrink-0">
+                    <Avatar className="size-10 group-hover:scale-105 transition-transform shrink-0">
                       <AvatarImage src={student.avatarUrl || ""} />
-                      <AvatarFallback className="font-bold text-xs">{student.displayName[0]}</AvatarFallback>
+                      <AvatarFallback className="font-bold text-xs bg-primary/10 text-primary">{student.displayName[0]}</AvatarFallback>
                     </Avatar>
 
                     <div className="min-w-0 space-y-0.5">

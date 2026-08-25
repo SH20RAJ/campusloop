@@ -46,27 +46,25 @@ export function RightSidebar() {
     const inviteText = `yo, ${college} is live on CampusLoop. verified students only, join our campus feed: https://campusloop.space/join?invite=${username} 🔥`;
     navigator.clipboard.writeText(inviteText);
     setCopied(true);
-    toast.success("Invite link copied! Share with your college WhatsApp group 🚀");
+    toast.success("Invite link copied! Share with your batchmates 🚀");
     setTimeout(() => setCopied(false), 2500);
   }
 
   return (
     <aside className="sticky top-20 space-y-4 text-foreground w-full select-none">
-      {/* ─── 1. My Campus Clout & Tier Card ─── */}
-      <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-card p-4 space-y-3 shadow-xs">
-        {/* Subtle Violet Ambient Glow */}
-        <div className="absolute -top-10 -right-10 size-28 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
-
-        <div className="flex items-center justify-between relative z-10">
-          <span className="text-xs font-black text-foreground flex items-center gap-1.5">
-            <Trophy className="size-3.5 text-amber-500" /> My Clout
-          </span>
-          <span className="text-[10px] font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20 flex items-center gap-1">
-            <Zap className="size-2.5 fill-primary" /> {points} LP · {tier.tierName}
+      {/* ─── 1. Minimal Campus Clout Capsule ─── */}
+      <div className="rounded-2xl bg-card p-4 space-y-2.5 shadow-2xs">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <Trophy className="size-3.5 text-amber-500" />
+            <span className="text-xs font-black text-foreground">Campus Clout</span>
+          </div>
+          <span className="text-[10px] font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+            <Zap className="size-2.5 fill-primary" /> {points} LP · {tier.tierName.split(" ")[0]}
           </span>
         </div>
 
-        <div className="space-y-1.5 relative z-10">
+        <div className="space-y-1">
           <div className="h-1.5 w-full rounded-full bg-muted/60 overflow-hidden">
             <div
               className="h-full rounded-full bg-gradient-to-r from-primary via-violet-500 to-indigo-500 transition-all duration-500"
@@ -79,7 +77,7 @@ export function RightSidebar() {
             </span>
             <span>
               {points >= 150 ? (
-                <span className="text-primary font-bold">Verified Star 🔵</span>
+                <span className="text-blue-500 font-bold">Verified Star ✓</span>
               ) : (
                 `${150 - points} LP to Star`
               )}
@@ -90,7 +88,7 @@ export function RightSidebar() {
 
       {/* ─── 2. Suggested Campus Peers ─── */}
       {suggestedPeers && suggestedPeers.length > 0 && (
-        <div className="rounded-2xl border border-border/70 bg-card p-4 space-y-3 shadow-xs">
+        <div className="rounded-2xl bg-card p-4 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black text-foreground flex items-center gap-1.5">
               <Sparkles className="size-3.5 text-primary" /> Suggested Peers
@@ -110,7 +108,7 @@ export function RightSidebar() {
                   href={`/@${peer.username}`}
                   className="flex items-center gap-2.5 min-w-0 group flex-1"
                 >
-                  <Avatar className="size-8 border border-border/80 shrink-0">
+                  <Avatar className="size-8 shrink-0">
                     <AvatarImage src={peer.avatarUrl || ""} />
                     <AvatarFallback className="text-[10px] font-bold bg-primary/10 text-primary">
                       {peer.displayName[0]}
@@ -133,7 +131,7 @@ export function RightSidebar() {
 
                 <Link
                   href={`/app/chat?userId=${peer.id}`}
-                  className="size-7 rounded-lg bg-muted/60 hover:bg-primary hover:text-primary-foreground text-muted-foreground flex items-center justify-center transition-colors shrink-0 shadow-2xs"
+                  className="size-7 rounded-full bg-muted/50 hover:bg-primary hover:text-primary-foreground text-muted-foreground flex items-center justify-center transition-colors shrink-0"
                   title="Direct Message"
                 >
                   <MessageCircle className="size-3.5" />
@@ -145,7 +143,7 @@ export function RightSidebar() {
       )}
 
       {/* ─── 3. Trending Campus Hubs ─── */}
-      <div className="rounded-2xl border border-border/70 bg-card p-4 space-y-2.5 shadow-xs">
+      <div className="rounded-2xl bg-card p-4 space-y-2.5 shadow-2xs">
         <div className="flex items-center justify-between">
           <span className="text-xs font-black text-foreground flex items-center gap-1.5">
             <Flame className="size-3.5 text-rose-500" /> Trending Campuses
@@ -178,7 +176,7 @@ export function RightSidebar() {
       </div>
 
       {/* ─── 4. Quick WhatsApp Class Invite ─── */}
-      <div className="rounded-2xl border border-dashed border-primary/30 bg-gradient-to-br from-primary/5 via-card to-indigo-500/5 p-3.5 space-y-2 text-center">
+      <div className="rounded-2xl bg-gradient-to-br from-primary/5 via-card to-indigo-500/5 p-3.5 space-y-2 text-center shadow-2xs">
         <p className="text-[11px] text-muted-foreground leading-relaxed">
           Invite batchmates to unlock Verified Campus Star (+20 LP/invite).
         </p>

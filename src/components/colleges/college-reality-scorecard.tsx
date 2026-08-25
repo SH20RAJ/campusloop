@@ -108,87 +108,59 @@ export function CollegeRealityScorecard({
   ];
 
   return (
-    <div className="space-y-6 select-none animate-in fade-in">
-      {/* ─── Grand Aspirant Reality Hero Card ─── */}
-      <div className="rounded-3xl border border-border/80 bg-gradient-to-br from-card via-card to-muted/20 p-6 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="space-y-1">
-            <span className="text-[10px] font-black uppercase tracking-wider text-primary px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 flex items-center gap-1 w-fit">
-              <Sparkles className="size-3" /> Unfiltered Student Lens
-            </span>
-            <h2 className="text-base sm:text-lg font-black text-foreground">
-              The Reality of {shortName} for JEE / NEET Aspirants
-            </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Real metrics, genuine pros &amp; cons, and student-voted ratings crowdsourced from {studentCount}+ verified students.
-            </p>
-          </div>
+    <div className="space-y-4 select-none animate-in fade-in">
+      {/* ─── Institutional Overview & Key Facts ─── */}
+      <div className="rounded-3xl bg-card p-5 space-y-3 shadow-2xs">
+        <div className="flex items-center justify-between">
+          <h4 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
+            <Building2 className="size-4 text-primary" /> Campus Facts &amp; Accreditation
+          </h4>
+          {extraData?.wikipediaUrl && (
+            <a
+              href={extraData.wikipediaUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
+            >
+              <span>Wikipedia</span>
+              <span>↗</span>
+            </a>
+          )}
+        </div>
 
-          <button
-            type="button"
-            onClick={onAskSeniorClick}
-            className="px-4 py-2.5 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0"
-          >
-            <MessageSquare className="size-3.5" />
-            <span>Ask a Mesra Senior</span>
-          </button>
+        {description && (
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {description}
+          </p>
+        )}
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
+          {nirfRank && (
+            <div className="rounded-2xl bg-muted/40 p-3">
+              <span className="text-[10px] text-muted-foreground font-bold uppercase block">NIRF Rank</span>
+              <span className="text-sm font-black text-amber-500">#{nirfRank}</span>
+            </div>
+          )}
+          {extraData?.campusAcreage && (
+            <div className="rounded-2xl bg-muted/40 p-3">
+              <span className="text-[10px] text-muted-foreground font-bold uppercase block">Campus Area</span>
+              <span className="text-sm font-black text-foreground">{extraData.campusAcreage}</span>
+            </div>
+          )}
+          {extraData?.naacGrade && (
+            <div className="rounded-2xl bg-muted/40 p-3">
+              <span className="text-[10px] text-muted-foreground font-bold uppercase block">NAAC Grade</span>
+              <span className="text-sm font-black text-emerald-500">{extraData.naacGrade}</span>
+            </div>
+          )}
+          {extraData?.affiliation && (
+            <div className="rounded-2xl bg-muted/40 p-3">
+              <span className="text-[10px] text-muted-foreground font-bold uppercase block">Accreditation</span>
+              <span className="text-xs font-bold text-foreground truncate block">{extraData.affiliation}</span>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* ─── Institutional Overview & Fast Facts ─── */}
-      {(description || nirfRank || extraData) && (
-        <div className="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 space-y-3 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h4 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
-              <Building2 className="size-4 text-primary" /> Verified Campus Overview &amp; Accreditation
-            </h4>
-            {extraData?.wikipediaUrl && (
-              <a
-                href={extraData.wikipediaUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
-              >
-                <span>Wikipedia</span>
-                <span>↗</span>
-              </a>
-            )}
-          </div>
-
-          {description && (
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {description}
-            </p>
-          )}
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
-            {nirfRank && (
-              <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
-                <span className="text-[10px] text-muted-foreground font-bold uppercase block">NIRF Rank</span>
-                <span className="text-sm font-black text-amber-500">#{nirfRank}</span>
-              </div>
-            )}
-            {extraData?.campusAcreage && (
-              <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
-                <span className="text-[10px] text-muted-foreground font-bold uppercase block">Campus Size</span>
-                <span className="text-sm font-black text-foreground">{extraData.campusAcreage}</span>
-              </div>
-            )}
-            {extraData?.naacGrade && (
-              <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
-                <span className="text-[10px] text-muted-foreground font-bold uppercase block">NAAC Grade</span>
-                <span className="text-sm font-black text-emerald-500">{extraData.naacGrade}</span>
-              </div>
-            )}
-            {extraData?.affiliation && (
-              <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5">
-                <span className="text-[10px] text-muted-foreground font-bold uppercase block">Accreditation</span>
-                <span className="text-xs font-bold text-foreground truncate block">{extraData.affiliation}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* ─── Ratings Scorecard Grid ─── */}
       <div className="grid gap-3 sm:grid-cols-2">
@@ -197,11 +169,11 @@ export function CollegeRealityScorecard({
           return (
             <div
               key={i}
-              className="rounded-2xl border border-border/80 bg-card p-4 space-y-3 shadow-2xs hover:border-border transition-all"
+              className="rounded-3xl bg-card p-4 space-y-2.5 shadow-2xs"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className={cn("p-2 rounded-xl bg-muted/40 border border-border/60", r.color)}>
+                  <div className={cn("p-2 rounded-xl bg-muted/40", r.color)}>
                     <Icon className="size-4" />
                   </div>
                   <div className="min-w-0">
@@ -210,9 +182,9 @@ export function CollegeRealityScorecard({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-xl border border-amber-500/20 shrink-0">
+                <div className="flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-full shrink-0 font-black text-xs">
                   <Star className="size-3.5 fill-amber-500 text-amber-500" />
-                  <span className="text-xs font-black">{r.score}</span>
+                  <span>{r.score}</span>
                   <span className="text-[9px] font-bold text-muted-foreground">/5</span>
                 </div>
               </div>

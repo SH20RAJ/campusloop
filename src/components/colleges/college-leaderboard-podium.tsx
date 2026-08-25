@@ -77,21 +77,21 @@ export function CollegeLeaderboardPodium({
   }, [sortedStudents, searchQuery, selectedBranch, selectedYear]);
 
   return (
-    <div className="space-y-6 select-none animate-in fade-in">
-      {/* ─── 3D Hall of Fame Clout Podium (Top 3 Students) ─── */}
+    <div className="space-y-5 select-none animate-in fade-in">
+      {/* ─── Campus Leaderboard Top 3 Students ─── */}
       {students.length >= 3 && (
-        <div className="rounded-3xl bg-gradient-to-b from-card via-card/80 to-muted/30 p-6 shadow-2xs space-y-6 overflow-hidden relative">
+        <div className="rounded-3xl bg-card p-6 shadow-2xs space-y-6 overflow-hidden relative">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <h3 className="text-xs font-black uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
-                <Crown className="size-4 text-amber-500" /> Campus Clout Champions
+                <Crown className="size-4 text-amber-500" /> Top Campus Clout Leaders
               </h3>
               <p className="text-[11px] text-muted-foreground">
-                Top student creators and community leaders on {collegeName.split(",")[0]}.
+                Top student contributors and peer leaders in {collegeName.split(",")[0]}.
               </p>
             </div>
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
-              Season 1 Live
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+              Active Leaders
             </span>
           </div>
 
@@ -101,11 +101,11 @@ export function CollegeLeaderboardPodium({
             {top2 && (
               <Link href={`/@${top2.username}`} className="group flex flex-col items-center cursor-pointer">
                 <div className="relative mb-2">
-                  <Avatar className="size-14 sm:size-16 border-2 border-slate-300 shadow-md group-hover:scale-105 transition-transform">
-                    <AvatarImage src={top2.avatarUrl || ""} />
+                  <Avatar className="size-14 sm:size-16 rounded-full border-2 border-slate-300 shadow-md group-hover:scale-105 transition-transform">
+                    <AvatarImage src={top2.avatarUrl || ""} className="rounded-full object-cover" />
                     <AvatarFallback className="font-bold text-xs">{top2.displayName[0]}</AvatarFallback>
                   </Avatar>
-                  <span className="absolute -top-2 -right-1 size-6 rounded-full bg-slate-300 text-slate-900 flex items-center justify-center font-black text-xs shadow-md">
+                  <span className="absolute -top-1 -right-1 size-5 rounded-full bg-slate-300 text-slate-900 flex items-center justify-center font-black text-[10px] shadow-md">
                     2
                   </span>
                 </div>
@@ -113,7 +113,7 @@ export function CollegeLeaderboardPodium({
                   <p className="text-xs font-bold text-foreground truncate">{top2.displayName}</p>
                   <p className="text-[10px] text-muted-foreground truncate">@{top2.username}</p>
                 </div>
-                <div className="w-full mt-2 rounded-t-2xl bg-gradient-to-t from-slate-500/20 to-slate-400/30 p-2 text-center h-20 flex flex-col items-center justify-center shadow-inner">
+                <div className="w-full mt-2 rounded-t-2xl bg-muted/40 p-2 text-center h-16 flex flex-col items-center justify-center">
                   <span className="text-xs font-black text-foreground">{top2.points || 0}</span>
                   <span className="text-[9px] font-bold text-muted-foreground">LP</span>
                 </div>
@@ -124,14 +124,11 @@ export function CollegeLeaderboardPodium({
             {top1 && (
               <Link href={`/@${top1.username}`} className="group flex flex-col items-center cursor-pointer -mt-4">
                 <div className="relative mb-2">
-                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-amber-500 animate-bounce">
-                    <Crown className="size-6 fill-amber-500" />
-                  </div>
-                  <Avatar className="size-18 sm:size-20 border-4 border-amber-400 shadow-xl group-hover:scale-105 transition-transform">
-                    <AvatarImage src={top1.avatarUrl || ""} />
+                  <Avatar className="size-18 sm:size-20 rounded-full border-4 border-amber-400 shadow-xl group-hover:scale-105 transition-transform">
+                    <AvatarImage src={top1.avatarUrl || ""} className="rounded-full object-cover" />
                     <AvatarFallback className="font-black text-sm bg-amber-500/10 text-amber-600">{top1.displayName[0]}</AvatarFallback>
                   </Avatar>
-                  <span className="absolute -bottom-1 right-0 size-7 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center font-black text-xs shadow-lg">
+                  <span className="absolute -bottom-0.5 right-0 size-6 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center font-black text-xs shadow-lg">
                     1
                   </span>
                 </div>
@@ -142,9 +139,9 @@ export function CollegeLeaderboardPodium({
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">@{top1.username}</p>
                 </div>
-                <div className="w-full mt-2 rounded-t-2xl bg-gradient-to-t from-amber-500/25 to-amber-400/40 p-2.5 text-center h-28 flex flex-col items-center justify-center shadow-inner">
+                <div className="w-full mt-2 rounded-t-2xl bg-amber-500/15 p-2.5 text-center h-24 flex flex-col items-center justify-center">
                   <span className="text-sm font-black text-amber-600 dark:text-amber-400">{top1.points || 0}</span>
-                  <span className="text-[10px] font-extrabold text-amber-700/80 dark:text-amber-300">CAMPUS ICON</span>
+                  <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300">CAMPUS ICON</span>
                 </div>
               </Link>
             )}
@@ -153,11 +150,11 @@ export function CollegeLeaderboardPodium({
             {top3 && (
               <Link href={`/@${top3.username}`} className="group flex flex-col items-center cursor-pointer">
                 <div className="relative mb-2">
-                  <Avatar className="size-14 sm:size-16 border-2 border-amber-700 shadow-md group-hover:scale-105 transition-transform">
-                    <AvatarImage src={top3.avatarUrl || ""} />
+                  <Avatar className="size-14 sm:size-16 rounded-full border-2 border-amber-700 shadow-md group-hover:scale-105 transition-transform">
+                    <AvatarImage src={top3.avatarUrl || ""} className="rounded-full object-cover" />
                     <AvatarFallback className="font-bold text-xs">{top3.displayName[0]}</AvatarFallback>
                   </Avatar>
-                  <span className="absolute -top-2 -right-1 size-6 rounded-full bg-amber-700 text-white flex items-center justify-center font-black text-xs shadow-md">
+                  <span className="absolute -top-1 -right-1 size-5 rounded-full bg-amber-700 text-white flex items-center justify-center font-black text-[10px] shadow-md">
                     3
                   </span>
                 </div>
@@ -165,7 +162,7 @@ export function CollegeLeaderboardPodium({
                   <p className="text-xs font-bold text-foreground truncate">{top3.displayName}</p>
                   <p className="text-[10px] text-muted-foreground truncate">@{top3.username}</p>
                 </div>
-                <div className="w-full mt-2 rounded-t-2xl bg-gradient-to-t from-amber-700/20 to-amber-600/30 p-2 text-center h-16 flex flex-col items-center justify-center shadow-inner">
+                <div className="w-full mt-2 rounded-t-2xl bg-muted/30 p-2 text-center h-14 flex flex-col items-center justify-center">
                   <span className="text-xs font-black text-foreground">{top3.points || 0}</span>
                   <span className="text-[9px] font-bold text-muted-foreground">LP</span>
                 </div>
@@ -176,42 +173,40 @@ export function CollegeLeaderboardPodium({
       )}
 
       {/* ─── Search & Department Filtering Controls ─── */}
-      <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row items-center gap-2.5">
-          {/* Search Box */}
-          <div className="relative w-full">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder={`Search ${students.length} verified students in ${collegeName.split(",")[0]}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-10 pr-4 rounded-2xl bg-muted/40 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:bg-card transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground hover:text-foreground"
-              >
-                Clear
-              </button>
-            )}
-          </div>
+      <div className="space-y-2.5">
+        {/* Search Box */}
+        <div className="relative w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder={`Search ${students.length} verified students in ${collegeName.split(",")[0]}...`}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-10 pl-9 pr-8 rounded-full border border-border/50 bg-card text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary transition-all shadow-2xs"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
+            >
+              Clear
+            </button>
+          )}
         </div>
 
         {/* Branch & Year Filter Pills */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {branches.length > 0 && (
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
               <button
                 type="button"
                 onClick={() => setSelectedBranch("ALL")}
                 className={cn(
-                  "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
+                  "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shadow-2xs",
                   selectedBranch === "ALL"
-                    ? "bg-primary text-primary-foreground shadow-xs"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-foreground text-background font-black"
+                    : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 All Departments ({students.length})
@@ -222,10 +217,10 @@ export function CollegeLeaderboardPodium({
                   type="button"
                   onClick={() => setSelectedBranch(b)}
                   className={cn(
-                    "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
+                    "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shadow-2xs",
                     selectedBranch === b
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      ? "bg-foreground text-background font-black"
+                      : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   {b}
@@ -242,10 +237,10 @@ export function CollegeLeaderboardPodium({
                 type="button"
                 onClick={() => setSelectedYear(yr)}
                 className={cn(
-                  "px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer",
+                  "px-2.5 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer shadow-2xs",
                   selectedYear === yr
-                    ? "bg-foreground text-background shadow-2xs"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-foreground text-background font-black"
+                    : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 {yr === "ALL" ? "All Years" : `Year ${yr}`}

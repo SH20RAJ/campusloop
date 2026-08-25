@@ -78,23 +78,23 @@ export function CollegeClubsView({ collegeName }: CollegeClubsViewProps) {
   const shortName = collegeName.split(",")[0];
 
   return (
-    <div className="space-y-6 select-none animate-in fade-in">
+    <div className="space-y-4 select-none animate-in fade-in">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
-            <Users className="size-4 text-primary" /> Active Clubs &amp; Chapters in {shortName}
+            <Users className="size-4 text-primary" /> Clubs &amp; Societies in {shortName}
           </h3>
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            Explore student-led societies, technical chapters, and cultural teams.
+            Student-led technical societies, cultural clubs, and student chapters.
           </p>
         </div>
 
         <Link
           href="/app/communities"
-          className="px-3 py-1.5 rounded-xl border border-border/80 bg-card text-xs font-bold text-foreground hover:bg-muted transition-colors flex items-center gap-1.5 shrink-0 shadow-2xs"
+          className="px-3.5 py-1.5 rounded-full border border-border/80 bg-card text-xs font-bold text-foreground hover:bg-muted transition-colors flex items-center gap-1.5 shrink-0 shadow-2xs"
         >
           <Plus className="size-3.5 text-primary" />
-          <span>Browse All</span>
+          <span>All Communities</span>
         </Link>
       </div>
 
@@ -103,10 +103,10 @@ export function CollegeClubsView({ collegeName }: CollegeClubsViewProps) {
           const Icon = club.icon;
           return (
             <Link key={idx} href={`/app/hashtag/${club.tag}`}>
-              <div className="rounded-2xl border border-border/80 bg-card p-4 hover:border-primary/40 hover:bg-muted/30 transition-all cursor-pointer space-y-3 shadow-2xs group">
+              <div className="rounded-3xl bg-card p-4 hover:bg-muted/40 transition-all cursor-pointer space-y-2.5 shadow-2xs group">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2.5 rounded-2xl bg-gradient-to-br ${club.color} border shadow-inner`}>
+                    <div className="p-2.5 rounded-2xl bg-muted/40 text-primary">
                       <Icon className="size-5" />
                     </div>
                     <div>
@@ -118,7 +118,7 @@ export function CollegeClubsView({ collegeName }: CollegeClubsViewProps) {
                     </div>
                   </div>
 
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground shrink-0 border border-border/60">
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-muted/60 text-muted-foreground shrink-0">
                     {club.members}+ members
                   </span>
                 </div>
@@ -127,8 +127,8 @@ export function CollegeClubsView({ collegeName }: CollegeClubsViewProps) {
                   {club.description}
                 </p>
 
-                <div className="pt-1 flex items-center justify-between text-[10px] font-bold text-primary">
-                  <span>View #{club.tag} Discussions</span>
+                <div className="pt-0.5 flex items-center justify-between text-[10px] font-bold text-primary">
+                  <span>#{club.tag}</span>
                   <span>Explore →</span>
                 </div>
               </div>

@@ -1,0 +1,125 @@
+import { getDb } from "@/db";
+import { communities, communityMembers, userProfiles, posts } from "@/db/schema";
+import { eq, or, desc } from "drizzle-orm";
+import { notFound, redirect } from "next/navigation";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { CommunityHeader } from "@/components/communities/community-header";
+import { CommunityMembersClient } from "@/components/communities/community-members-client";
+import { Metadata } from "next";
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const db = getDb();
+  const comm = await db.query.communities.findFirst({
+    where: or(eq(communities.id, id), eq(communities.slug, id)),
+  });
+
+  if (!comm) {
+    return {
+      title: "Community Members | CampusLoop",
+    };
+  }
+
+  return {
+    title: `c/${comm.name} Members & Leaders | CampusLoop`,
+    description: `Browse verified student members, leaders, and moderators in c/${comm.name} on CampusLoop.`,
+    alternates: {
+      canonical: `https://campusloop.space/app/communities/${comm.slug || comm.id}/members`,
+    },
+    robots: { index: false, follow: false },
+  };
+}
+
+export default async function CommunityMembersPage({ params }: PageProps) {
+  const { id } = await params;
+
+  const user = await hexclaveServerApp.getUser();
+  if (!user) redirect("/join");
+
+  const db = getDb();
+  const profile = await db.query.userProfiles.findFirst({
+    where: eq(userProfiles.userId, user.id),
+  });
+
+  if (!profile) redirect("/app/onboarding");
+
+  // Fetch community
+  const comm = await db.query.communities.findFirst({
+    where: or(eq(communities.id, id), eq(communities.slug, id)),
+    with: {
+      members: {
+        with: {
+          user: {
+            columns: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatarUrl: true,
+              points: true,
+              branch: true,
+              year: true,
+            },
+          },
+        },
+      },
+      creator: {
+        columns: {
+          id: true,
+          username: true,
+          displayName: true,
+        },
+      },
+    },
+  });
+
+  if (!comm) {
+    notFound();
+  }
+
+  // Count community posts
+  const postsCount = (
+    await db.query.posts.findMany({
+      where: eq(posts.communityId, comm.id),
+      columns: { id: true },
+    })
+  ).length;
+
+  const userMembership = comm.members.find((m) => m.userId === profile.id);
+  const isMember = Boolean(userMembership && userMembership.status === "ACTIVE");
+  const isAdmin = Boolean(comm.creatorId === profile.id || userMembership?.role === "ADMIN");
+  const memberStatus = userMembership?.status || "NONE";
+  const activeMembersCount = comm.members.filter((m) => m.status === "ACTIVE").length;
+
+  const formattedMembers = comm.members.map((m) => ({
+    id: m.id,
+    userId: m.userId,
+    role: m.role || "MEMBER",
+    status: m.status || "ACTIVE",
+    createdAt: m.createdAt,
+    user: m.user,
+  }));
+
+  return (
+    <main className="mx-auto flex w-full max-w-3xl flex-col min-h-screen pb-24 px-3 sm:px-4 pt-3 gap-5 select-none">
+      <CommunityHeader
+        community={comm}
+        membersCount={activeMembersCount}
+        postsCount={postsCount}
+        isMember={isMember}
+        isAdmin={isAdmin}
+        memberStatus={memberStatus}
+      />
+
+      <CommunityMembersClient
+        communityId={comm.id}
+        communityName={comm.name}
+        members={formattedMembers}
+        isAdmin={isAdmin}
+      />
+    </main>
+  );
+}

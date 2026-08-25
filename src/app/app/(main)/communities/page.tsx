@@ -3,7 +3,7 @@ import { communities, posts, userProfiles } from "@/db/schema";
 import { eq, desc, isNotNull } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { CommunitiesClientView, Community } from "./communities-client";
+import { CommunitiesIndexClient, CommunityItem } from "@/components/communities/communities-index-client";
 import { FeedPost } from "@/hooks/use-feed";
 import { Metadata } from "next";
 
@@ -111,10 +111,11 @@ export default async function CommunitiesPage() {
   }
 
   return (
-    <CommunitiesClientView
-      initialCommunities={allCommunities as unknown as Community[]}
+    <CommunitiesIndexClient
+      initialCommunities={allCommunities as unknown as CommunityItem[]}
       initialPosts={formattedPosts}
       profileId={profile.id}
     />
   );
 }
+

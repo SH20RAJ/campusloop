@@ -172,28 +172,43 @@ const recentCommentCountSql = sql<number>`coalesce((select count(*)::int from ${
 const hoursSinceSql = sql<number>`(extract(epoch from (now() - ${posts.createdAt})) / 3600.0)`;
 const trendingScoreSql = sql<number>`(${recentVoteScoreSql} * 3 + ${recentCommentCountSql} * 2)`;
 
-function getForYouScoreSql(userInstitutionId?: string | null, seenIds?: string[]) {
+function getForYouScoreSql(userInstitutionId?: string | null, seenIds?: string[], viewerProfileId?: string | null) {
 	const ownCollegeBonus = userInstitutionId
-		? sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 25.0 else 0.0 end)`
+		? sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 35.0 else 0.0 end)`
 		: sql<number>`0.0`;
 
 	const seenPenaltySql = seenIds && seenIds.length > 0
-		? sql<number>`(case when ${posts.id} in (${sql.raw(seenIds.slice(0, 80).map((id) => `'${id.replace(/'/g, "''")}'`).join(","))}) then -55.0 else 0.0 end)`
+		? sql<number>`(case when ${posts.id} in (${sql.raw(seenIds.slice(0, 100).map((id) => `'${id.replace(/'/g, "''")}'`).join(","))}) then -160.0 else 0.0 end)`
+		: sql<number>`0.0`;
+
+	const alreadyVotedPenaltySql = viewerProfileId
+		? sql<number>`(case when exists(select 1 from ${votes} where ${votes.postId} = ${posts.id} and ${votes.userId} = ${viewerProfileId}) then -120.0 else 0.0 end)`
+		: sql<number>`0.0`;
+
+	const alreadyCommentedPenaltySql = viewerProfileId
+		? sql<number>`(case when exists(select 1 from ${comments} where ${comments.postId} = ${posts.id} and ${comments.authorId} = ${viewerProfileId} and ${comments.status} = 'PUBLISHED') then -90.0 else 0.0 end)`
+		: sql<number>`0.0`;
+
+	const ownPostPenaltySql = viewerProfileId
+		? sql<number>`(case when ${posts.authorId} = ${viewerProfileId} then -80.0 else 0.0 end)`
 		: sql<number>`0.0`;
 
 	return sql<number>`(
 		${ownCollegeBonus}
 		+ ${seenPenaltySql}
-		+ (45.0 / power(${hoursSinceSql} + 1.2, 0.75))
-		+ (${voteScoreSql} * 3.5)
-		+ (${commentCountSql} * 2.5)
+		+ ${alreadyVotedPenaltySql}
+		+ ${alreadyCommentedPenaltySql}
+		+ ${ownPostPenaltySql}
+		+ (65.0 / power(${hoursSinceSql} + 1.0, 0.82))
+		+ (${recentVoteScoreSql} * 4.0)
+		+ (${recentCommentCountSql} * 3.0)
 		+ (case 
-			when ${posts.type} = 'POLL' then 8.0
-			when ${posts.type} = 'QUESTION' then 6.0
-			when ${posts.type} = 'CONFESSION' then 4.0
+			when ${posts.type} = 'POLL' then 10.0
+			when ${posts.type} = 'QUESTION' then 8.0
+			when ${posts.type} = 'CONFESSION' then 8.0
 			else 0.0 
 		end)
-		+ (random() * 18.0)
+		+ (random() * 20.0)
 	)`;
 }
 
@@ -210,13 +225,13 @@ export function normalizeApiFeedSort(value?: string | null): ApiFeedSort {
 	return "latest";
 }
 
-export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | null, seenIds?: string[]) {
+export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | null, seenIds?: string[], viewerProfileId?: string | null) {
 	const campusPrioritySql = userInstitutionId
 		? sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 1 else 0 end)`
 		: sql<number>`0`;
 
 	const seenPenaltySql = seenIds && seenIds.length > 0
-		? sql<number>`(case when ${posts.id} in (${sql.raw(seenIds.slice(0, 80).map((id) => `'${id.replace(/'/g, "''")}'`).join(","))}) then 0 else 1 end)`
+		? sql<number>`(case when ${posts.id} in (${sql.raw(seenIds.slice(0, 100).map((id) => `'${id.replace(/'/g, "''")}'`).join(","))}) then 0 else 1 end)`
 		: sql<number>`1`;
 
 	switch (sort) {
@@ -227,7 +242,7 @@ export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | n
 		case "trending":
 			return [desc(seenPenaltySql), desc(campusPrioritySql), desc(trendingScoreSql), desc(posts.createdAt), asc(posts.id)];
 		case "for_you": {
-			const forYouScore = getForYouScoreSql(userInstitutionId, seenIds);
+			const forYouScore = getForYouScoreSql(userInstitutionId, seenIds, viewerProfileId);
 			return [desc(forYouScore), desc(posts.createdAt), asc(posts.id)];
 		}
 		default:
@@ -249,6 +264,7 @@ export async function resolveFeedPage(options: {
 	offset: number;
 	userInstitutionId?: string | null;
 	seenIds?: string[];
+	viewerProfileId?: string | null;
 }) {
 	const db = getDb();
 
@@ -256,7 +272,7 @@ export async function resolveFeedPage(options: {
 		.select({ id: posts.id })
 		.from(posts)
 		.where(and(...options.conditions))
-		.orderBy(...getFeedOrderBy(options.sort, options.userInstitutionId, options.seenIds))
+		.orderBy(...getFeedOrderBy(options.sort, options.userInstitutionId, options.seenIds, options.viewerProfileId))
 		.limit(options.limit)
 		.offset(options.offset);
 

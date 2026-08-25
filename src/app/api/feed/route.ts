@@ -72,7 +72,15 @@ export async function GET(req: Request) {
       }
     }
 
-    const rawFeed = await resolveFeedPage({ conditions, sort, limit, offset, userInstitutionId: institutionId, seenIds });
+    const rawFeed = await resolveFeedPage({
+      conditions,
+      sort,
+      limit,
+      offset,
+      userInstitutionId: institutionId,
+      seenIds,
+      viewerProfileId: profileId,
+    });
     const feed = await formatApiFeedPosts(rawFeed, profileId);
 
     return NextResponse.json(feed);

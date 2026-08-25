@@ -4,9 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Message, UserProfile } from "@/db/schema";
-import { SendIcon, ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
+import { SendIcon, ArrowLeft, ShieldCheck, Sparkles, Smile } from "lucide-react";
 import Link from "next/link";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
+import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 
 type MessageWithSender = Message & {
   sender: UserProfile;
@@ -34,6 +35,7 @@ export function ChatPane({
   const [msgText, setMsgText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
+  const [showStickerPicker, setShowStickerPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // Poll for messages every 2 seconds
@@ -186,26 +188,26 @@ export function ChatPane({
             <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
               <div className={`flex gap-2 max-w-[80%] md:max-w-[70%] items-end ${isMe ? "flex-row-reverse" : "flex-row"}`}>
                 {!isMe && (
-                  <Avatar className="size-6 border shrink-0">
+                  <Avatar className="size-6 shrink-0">
                     <AvatarImage src={otherParticipant.avatarUrl || ""} />
-                    <AvatarFallback className="text-[8px] font-bold">{(otherParticipant.displayName?.[0] || "S").toUpperCase()}</AvatarFallback>
+                    <AvatarFallback className="text-[8px] font-bold bg-primary/10 text-primary">{(otherParticipant.displayName?.[0] || "S").toUpperCase()}</AvatarFallback>
                   </Avatar>
                 )}
 
                 <div
-                  className={`rounded-2xl text-xs shadow-xs overflow-hidden ${
+                  className={`rounded-2xl text-xs overflow-hidden ${
                     isDirectMedia
                       ? "p-1 bg-transparent border-0"
                       : isMe
                       ? "bg-primary text-primary-foreground rounded-br-xs font-medium px-3.5 py-2"
-                      : "bg-muted/70 text-foreground rounded-bl-xs border border-border font-medium px-3.5 py-2"
+                      : "bg-muted/70 text-foreground rounded-bl-xs font-medium px-3.5 py-2"
                   }`}
                 >
                   {isDirectMedia ? (
                     <img
                       src={msg.body.trim()}
-                      alt="Shared GIF"
-                      className="max-h-56 max-w-full rounded-2xl object-cover border border-border shadow-md"
+                      alt="Shared Media / Sticker"
+                      className="max-h-56 max-w-full rounded-2xl object-contain shadow-xs"
                       loading="lazy"
                     />
                   ) : (
@@ -222,12 +224,22 @@ export function ChatPane({
       {/* Message Input Box with sticky bottom padding for mobile safe area */}
       <form
         onSubmit={handleSend}
-        className="border-t border-border bg-card p-3 md:p-4 flex gap-2 items-center shrink-0 mb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:mb-0 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] md:pb-4 touch-manipulation"
+        className="border-t border-border/20 bg-card p-3 md:p-4 flex gap-2 items-center shrink-0 mb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:mb-0 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] md:pb-4 touch-manipulation"
       >
         <button
           type="button"
+          onClick={() => setShowStickerPicker(true)}
+          className="flex h-11 md:h-10 px-3 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-xs font-black text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors cursor-pointer gap-1"
+          title="Send Sticker"
+        >
+          <Smile className="size-3.5" />
+          <span className="hidden sm:inline text-[11px]">Sticker</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setShowGifPicker(true)}
-          className="flex h-11 md:h-10 px-2.5 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-muted/30 text-xs font-black text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+          className="flex h-11 md:h-10 px-2.5 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-xs font-black text-primary hover:bg-primary/20 transition-colors cursor-pointer"
           title="Send GIF"
         >
           GIF
@@ -238,7 +250,7 @@ export function ChatPane({
           placeholder="Type a campus message..."
           value={msgText}
           onChange={(e) => setMsgText(e.target.value)}
-          className="flex h-11 md:h-10 flex-1 rounded-xl border border-border/80 bg-muted/40 px-4 py-2 text-sm md:text-xs font-semibold shadow-xs placeholder:text-muted-foreground focus:border-primary focus:bg-background outline-none transition-all"
+          className="flex h-11 md:h-10 flex-1 rounded-xl bg-muted/40 px-4 py-2 text-sm md:text-xs font-semibold placeholder:text-muted-foreground focus:bg-background outline-none transition-all"
         />
         <button
           type="submit"
@@ -255,6 +267,13 @@ export function ChatPane({
         isOpen={showGifPicker}
         onClose={() => setShowGifPicker(false)}
         onSelectGif={(url) => sendMessage(url)}
+      />
+
+      {/* Sticker Picker Modal */}
+      <StickerPickerModal
+        isOpen={showStickerPicker}
+        onClose={() => setShowStickerPicker(false)}
+        onSelectSticker={(sticker) => sendMessage(sticker.url)}
       />
     </div>
   );

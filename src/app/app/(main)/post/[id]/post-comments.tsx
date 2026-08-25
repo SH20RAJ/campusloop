@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import useSWR from "swr";
-import { MessageSquare, Lock, Image as ImageIcon, X, Loader2, Send, Sparkles } from "lucide-react";
+import { MessageSquare, Lock, Image as ImageIcon, X, Loader2, Send, Sparkles, Smile } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { CommentItem, CommentWithAuthor } from "@/components/post/comment-item";
@@ -11,6 +11,7 @@ import { uploadImageToImgBB } from "@/lib/upload";
 import { useProfile } from "@/hooks/use-profile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
+import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 
 export function PostComments({ postId }: { postId: string }) {
   const { profile } = useProfile();
@@ -25,6 +26,7 @@ export function PostComments({ postId }: { postId: string }) {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
+  const [showStickerPicker, setShowStickerPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
@@ -258,6 +260,16 @@ export function PostComments({ postId }: { postId: string }) {
             >
               <span className="text-[10px] font-black leading-none">GIF</span>
             </button>
+
+            {/* Sticker Attachment */}
+            <button
+              type="button"
+              onClick={() => setShowStickerPicker(true)}
+              className="text-xs font-bold px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors cursor-pointer flex items-center gap-1"
+            >
+              <Smile className="size-3.5" />
+              <span className="text-[10px] font-black leading-none hidden sm:inline">Sticker</span>
+            </button>
           </div>
 
           {/* Send Comment Button */}
@@ -283,6 +295,16 @@ export function PostComments({ postId }: { postId: string }) {
         onSelectGif={(url) => {
           setCommentImage(url);
           toast.success("GIF selected! ✨");
+        }}
+      />
+
+      {/* Sticker Picker Modal */}
+      <StickerPickerModal
+        isOpen={showStickerPicker}
+        onClose={() => setShowStickerPicker(false)}
+        onSelectSticker={(sticker) => {
+          setCommentImage(sticker.url);
+          toast.success(`Attached "${sticker.name}" sticker! ✨`);
         }}
       />
 

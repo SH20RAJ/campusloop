@@ -52,7 +52,7 @@ export function useFeed(
     if (pageIndex === 0) {
       const seenIds = getSeenPostIds();
       if (seenIds.length > 0) {
-        url.searchParams.set("seenIds", seenIds.slice(0, 30).join(","));
+        url.searchParams.set("seenIds", seenIds.slice(0, 50).join(","));
       }
     }
 
@@ -79,7 +79,7 @@ export function useFeed(
   // Track impressions when feed items load
   useEffect(() => {
     if (feed && feed.length > 0) {
-      markPostsAsSeen(feed.slice(0, 15).map((p) => p.id));
+      markPostsAsSeen(feed.slice(0, 25).map((p) => p.id));
     }
   }, [feed]);
 

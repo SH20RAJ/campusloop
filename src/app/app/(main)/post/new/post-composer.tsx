@@ -28,6 +28,7 @@ import { PollOptionsEditor } from "@/components/post/poll-options-editor";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
+import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 
 export type PostType = "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
 
@@ -39,6 +40,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showGifPicker, setShowGifPicker] = useState(false);
+  const [showStickerPicker, setShowStickerPicker] = useState(false);
 
   const [postType, setPostType] = useState<PostType>("NORMAL");
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
@@ -418,8 +420,12 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         )}
 
         {/* Formatting + trending tags strip */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-border/40 px-4 py-2">
-          <PostComposerToolbar editor={editor} onOpenGifPicker={() => setShowGifPicker(true)} />
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-border/20 px-4 py-2">
+          <PostComposerToolbar
+            editor={editor}
+            onOpenGifPicker={() => setShowGifPicker(true)}
+            onOpenStickerPicker={() => setShowStickerPicker(true)}
+          />
           <div className="flex items-center gap-1.5">
             {TRENDING_TAGS.map((tag) => (
               <button
@@ -435,7 +441,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         </div>
 
         {/* "Add to your post" row (FB-style) */}
-        <div className="mx-4 mb-3 mt-1 flex items-center justify-between rounded-2xl border border-border/70 px-3 py-2">
+        <div className="mx-4 mb-3 mt-1 flex items-center justify-between rounded-2xl bg-muted/40 px-3 py-2">
           <span className="hidden text-xs font-bold text-foreground sm:block">Add to your post</span>
           <div className="flex flex-1 items-center justify-around gap-1 sm:flex-none sm:justify-end sm:gap-0.5">
             {/* eslint-disable-next-line react-hooks/refs -- fileInputRef is only touched inside click handlers */}
@@ -478,14 +484,14 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
 
         {/* Anonymity hint */}
         {anonActive && (
-          <div className="mx-4 mb-3 flex items-center gap-2 rounded-2xl border border-violet-500/20 bg-violet-500/5 px-3 py-2 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+          <div className="mx-4 mb-3 flex items-center gap-2 rounded-2xl bg-violet-500/10 px-3 py-2 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
             <VenetianMask className="size-4 shrink-0" />
             Your identity is sealed — this will show as “Anonymous Student”.
           </div>
         )}
 
         {/* Submit */}
-        <div className="border-t border-border/40 p-3">
+        <div className="border-t border-border/20 p-3">
           <button
             type="submit"
             disabled={isLoading || overLimit || isUploadingImage || (charCount === 0 && uploadedImages.length === 0)}
@@ -508,6 +514,13 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         isOpen={showGifPicker}
         onClose={() => setShowGifPicker(false)}
         onSelectGif={(url) => setUploadedImages((prev) => [...prev, url])}
+      />
+
+      {/* Sticker Picker Modal */}
+      <StickerPickerModal
+        isOpen={showStickerPicker}
+        onClose={() => setShowStickerPicker(false)}
+        onSelectSticker={(sticker) => setUploadedImages((prev) => [...prev, sticker.url])}
       />
 
       {/* Error notice */}

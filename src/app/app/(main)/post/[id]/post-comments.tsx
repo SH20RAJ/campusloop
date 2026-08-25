@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { useProfile } from "@/hooks/use-profile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 
 export function PostComments({ postId }: { postId: string }) {
   const { profile } = useProfile();
@@ -23,6 +24,7 @@ export function PostComments({ postId }: { postId: string }) {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showGifPicker, setShowGifPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
@@ -247,6 +249,15 @@ export function PostComments({ postId }: { postId: string }) {
               )}
               <span>Photo</span>
             </button>
+
+            {/* GIF Attachment */}
+            <button
+              type="button"
+              onClick={() => setShowGifPicker(true)}
+              className="text-xs font-bold px-2.5 py-1 rounded-xl border border-primary/25 bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1"
+            >
+              <span className="text-[10px] font-black leading-none">GIF</span>
+            </button>
           </div>
 
           {/* Send Comment Button */}
@@ -264,6 +275,16 @@ export function PostComments({ postId }: { postId: string }) {
           </button>
         </div>
       </form>
+
+      {/* GIF Picker Modal */}
+      <GifPickerModal
+        isOpen={showGifPicker}
+        onClose={() => setShowGifPicker(false)}
+        onSelectGif={(url) => {
+          setCommentImage(url);
+          toast.success("GIF selected! ✨");
+        }}
+      />
 
       {/* ─── Facebook-Style Comments Stream ─── */}
       <div className="space-y-3 pt-2">

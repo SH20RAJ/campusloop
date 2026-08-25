@@ -24,3 +24,6 @@ Yes, it got a major update!
 What's new in this version?
 Explaining your changes can help the moderation team assess whether or not your product should be featured. If you are unsure if your changes are significant and you don't want the post to go live, you may reach out to our support team.
 
+For You must show fresh feeds, currently its showing diff posts but not that intresting and also there is lots of repetition of posts... that I already have liked, commented or seen it.... create best system design for it....
+
+Also support stickets on chat, comments....

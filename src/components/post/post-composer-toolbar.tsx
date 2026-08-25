@@ -6,9 +6,10 @@ import { cn } from "@/lib/utils";
 
 interface PostComposerToolbarProps {
   editor: Editor | null;
+  onOpenGifPicker?: () => void;
 }
 
-export function PostComposerToolbar({ editor }: PostComposerToolbarProps) {
+export function PostComposerToolbar({ editor, onOpenGifPicker }: PostComposerToolbarProps) {
   if (!editor) return null;
 
   return (
@@ -62,6 +63,21 @@ export function PostComposerToolbar({ editor }: PostComposerToolbarProps) {
       >
         <Quote className="size-3.5" />
       </ToolbarChip>
+
+      {onOpenGifPicker && (
+        <>
+          <div className="mx-1 h-4 w-px bg-border/60 shrink-0" />
+          <button
+            type="button"
+            onClick={onOpenGifPicker}
+            aria-label="Add GIF"
+            title="Add Reaction GIF (GIPHY)"
+            className="flex items-center justify-center rounded-xl px-2.5 py-1 text-[10px] font-black tracking-wider bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all cursor-pointer select-none active:scale-95 shrink-0"
+          >
+            GIF
+          </button>
+        </>
+      )}
     </div>
   );
 }

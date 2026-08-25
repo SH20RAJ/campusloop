@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Message, UserProfile } from "@/db/schema";
 import { SendIcon, ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 
 type MessageWithSender = Message & {
   sender: UserProfile;
@@ -32,6 +33,7 @@ export function ChatPane({
 }: ChatPaneProps) {
   const [msgText, setMsgText] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [showGifPicker, setShowGifPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // Poll for messages every 2 seconds
@@ -46,13 +48,10 @@ export function ChatPane({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function handleSend(e: React.FormEvent) {
-    e.preventDefault();
-    if (!msgText.trim() || !conversationId || isSending) return;
+  async function sendMessage(bodyText: string) {
+    if (!bodyText.trim() || !conversationId || isSending) return;
 
     setIsSending(true);
-    const bodyText = msgText;
-    setMsgText("");
 
     // Optimistic Update
     const optimisticMessage: MessageWithSender = {
@@ -113,6 +112,14 @@ export function ChatPane({
     }
   }
 
+  async function handleSend(e: React.FormEvent) {
+    e.preventDefault();
+    if (!msgText.trim()) return;
+    const text = msgText;
+    setMsgText("");
+    await sendMessage(text);
+  }
+
   if (!conversationId || !otherParticipant) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-muted-foreground p-6 text-center">
@@ -170,6 +177,11 @@ export function ChatPane({
       <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-3">
         {messages?.map((msg) => {
           const isMe = msg.senderId === currentUserId;
+          const isDirectMedia =
+            /^https?:\/\/.+\.(gif|jpeg|jpg|png|webp)(\?.*)?$/i.test(msg.body.trim()) ||
+            msg.body.trim().startsWith("https://media.giphy.com/") ||
+            msg.body.trim().startsWith("https://i.giphy.com/");
+
           return (
             <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
               <div className={`flex gap-2 max-w-[80%] md:max-w-[70%] items-end ${isMe ? "flex-row-reverse" : "flex-row"}`}>
@@ -181,13 +193,24 @@ export function ChatPane({
                 )}
 
                 <div
-                  className={`rounded-2xl px-3.5 py-2 text-xs shadow-xs ${
-                    isMe
-                      ? "bg-primary text-primary-foreground rounded-br-xs font-medium"
-                      : "bg-muted/70 text-foreground rounded-bl-xs border border-border font-medium"
+                  className={`rounded-2xl text-xs shadow-xs overflow-hidden ${
+                    isDirectMedia
+                      ? "p-1 bg-transparent border-0"
+                      : isMe
+                      ? "bg-primary text-primary-foreground rounded-br-xs font-medium px-3.5 py-2"
+                      : "bg-muted/70 text-foreground rounded-bl-xs border border-border font-medium px-3.5 py-2"
                   }`}
                 >
-                  <p className="leading-relaxed whitespace-pre-wrap">{msg.body}</p>
+                  {isDirectMedia ? (
+                    <img
+                      src={msg.body.trim()}
+                      alt="Shared GIF"
+                      className="max-h-56 max-w-full rounded-2xl object-cover border border-border shadow-md"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <p className="leading-relaxed whitespace-pre-wrap">{msg.body}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -201,12 +224,20 @@ export function ChatPane({
         onSubmit={handleSend}
         className="border-t border-border bg-card p-3 md:p-4 flex gap-2 items-center shrink-0 mb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:mb-0 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] md:pb-4 touch-manipulation"
       >
+        <button
+          type="button"
+          onClick={() => setShowGifPicker(true)}
+          className="flex h-11 md:h-10 px-2.5 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-muted/30 text-xs font-black text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+          title="Send GIF"
+        >
+          GIF
+        </button>
+
         <input
           type="text"
           placeholder="Type a campus message..."
           value={msgText}
           onChange={(e) => setMsgText(e.target.value)}
-          required
           className="flex h-11 md:h-10 flex-1 rounded-xl border border-border/80 bg-muted/40 px-4 py-2 text-sm md:text-xs font-semibold shadow-xs placeholder:text-muted-foreground focus:border-primary focus:bg-background outline-none transition-all"
         />
         <button
@@ -218,6 +249,13 @@ export function ChatPane({
           <SendIcon className="size-4" />
         </button>
       </form>
+
+      {/* GIF Picker Modal */}
+      <GifPickerModal
+        isOpen={showGifPicker}
+        onClose={() => setShowGifPicker(false)}
+        onSelectGif={(url) => sendMessage(url)}
+      />
     </div>
   );
 }

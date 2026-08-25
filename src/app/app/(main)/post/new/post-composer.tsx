@@ -27,6 +27,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PollOptionsEditor } from "@/components/post/poll-options-editor";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
 import { uploadImageToImgBB } from "@/lib/upload";
+import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 
 export type PostType = "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
 
@@ -37,6 +38,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showGifPicker, setShowGifPicker] = useState(false);
 
   const [postType, setPostType] = useState<PostType>("NORMAL");
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
@@ -185,20 +187,31 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const addOns: {
     id: string;
     label: string;
-    icon: typeof ImageIcon;
+    icon: React.ElementType;
     color: string;
-    active: boolean;
+    active?: boolean;
     onClick: () => void;
     disabled?: boolean;
   }[] = [
     {
       id: "photo",
-      label: "Photo",
+      label: "Attach photo",
       icon: ImageIcon,
       color: "text-emerald-500",
       active: uploadedImages.length > 0,
       onClick: openFilePicker,
       disabled: isUploadingImage,
+    },
+    {
+      id: "gif",
+      label: "Attach GIF",
+      icon: () => (
+        <span className="text-[10px] font-black text-primary border border-primary/30 bg-primary/10 rounded-md px-1 py-0.5 leading-none">
+          GIF
+        </span>
+      ),
+      color: "text-primary",
+      onClick: () => setShowGifPicker(true),
     },
     {
       id: "poll",
@@ -406,7 +419,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
 
         {/* Formatting + trending tags strip */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-border/40 px-4 py-2">
-          <PostComposerToolbar editor={editor} />
+          <PostComposerToolbar editor={editor} onOpenGifPicker={() => setShowGifPicker(true)} />
           <div className="flex items-center gap-1.5">
             {TRENDING_TAGS.map((tag) => (
               <button
@@ -475,7 +488,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         <div className="border-t border-border/40 p-3">
           <button
             type="submit"
-            disabled={isLoading || overLimit || isUploadingImage || charCount === 0}
+            disabled={isLoading || overLimit || isUploadingImage || (charCount === 0 && uploadedImages.length === 0)}
             className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/95 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? (
@@ -489,6 +502,13 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
           </button>
         </div>
       </div>
+
+      {/* GIF Picker Modal */}
+      <GifPickerModal
+        isOpen={showGifPicker}
+        onClose={() => setShowGifPicker(false)}
+        onSelectGif={(url) => setUploadedImages((prev) => [...prev, url])}
+      />
 
       {/* Error notice */}
       {error && (

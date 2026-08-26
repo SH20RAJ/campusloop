@@ -34,23 +34,23 @@ export async function GET() {
       return NextResponse.json([]);
     }
 
-    // Query those conversations including their participants and messages
+    // Query conversations with participants and recent messages
     const rawConversations = await db.query.conversations.findMany({
       where: inArray(conversations.id, conversationIds),
       with: {
         participants: {
           with: {
             user: true,
-          }
+          },
         },
         messages: {
           orderBy: [desc(messages.createdAt)],
-          limit: 1,
-        }
-      }
+          limit: 15,
+        },
+      },
     });
 
-    // Format the response payload
+    // Format the response payload with WhatsApp style unread counting
     const formatted = rawConversations
       .map((conv) => {
         const otherParticipant = conv.participants.find((p) => p.userId !== profile.id)?.user;
@@ -58,15 +58,29 @@ export async function GET() {
 
         if (!otherParticipant) return null;
 
+        const unreadCount = conv.messages.filter(
+          (m) => m.senderId !== profile.id && !m.readAt
+        ).length;
+
         return {
           id: conv.id,
           createdAt: conv.createdAt,
           updatedAt: conv.updatedAt,
           otherParticipant,
-          lastMessage,
+          unreadCount,
+          lastMessage: lastMessage
+            ? {
+                id: lastMessage.id,
+                body: lastMessage.body,
+                senderId: lastMessage.senderId,
+                readAt: lastMessage.readAt,
+                createdAt: lastMessage.createdAt,
+              }
+            : null,
         };
       })
       .filter((c): c is NonNullable<typeof c> => c !== null);
+
 
     // Sort by last message date (or creation date)
     formatted.sort((a, b) => {

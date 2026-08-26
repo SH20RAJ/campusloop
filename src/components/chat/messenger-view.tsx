@@ -12,6 +12,8 @@ import {
   Plus,
   Loader2,
   Users2,
+  CheckCheck,
+  Check,
 } from "lucide-react";
 import { MessengerPane } from "./messenger-pane";
 import { cn } from "@/lib/utils";
@@ -21,9 +23,12 @@ type ConversationWithDetail = {
   createdAt: string;
   updatedAt: string;
   otherParticipant: UserProfile;
+  unreadCount?: number;
   lastMessage: {
     id: string;
     body: string;
+    senderId?: string;
+    readAt?: string | Date | null;
     createdAt: string;
   } | null;
 };
@@ -52,7 +57,7 @@ export function MessengerView({
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // SWR for conversations list (polls every 2.5s for real-time inbox sync)
+  // SWR for conversations list (polls every 2.5s for real-time WhatsApp inbox sync)
   const { data: conversations, mutate: mutateConvs } = useSWR<ConversationWithDetail[]>(
     "/api/chat",
     fetcher,
@@ -147,13 +152,13 @@ export function MessengerView({
         <div className="p-3.5 sm:p-4 border-b border-border/30 space-y-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-2xs">
+              <div className="size-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-2xs">
                 <MessageSquare className="size-4.5" />
               </div>
-              <h1 className="text-base font-black tracking-tight text-foreground">Messages</h1>
+              <h1 className="text-base font-black tracking-tight text-foreground">Chats</h1>
             </div>
 
-            <span className="text-[10px] font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
+            <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
               {conversations?.length || 0} Chats
             </span>
           </div>
@@ -166,7 +171,7 @@ export function MessengerView({
               placeholder="Search students to message..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full h-9 pl-9 pr-4 rounded-full border border-border/50 bg-muted/30 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary transition-all"
+              className="w-full h-9 pl-9 pr-4 rounded-full border border-border/50 bg-muted/30 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-emerald-500 transition-all"
             />
           </div>
         </div>
@@ -206,7 +211,7 @@ export function MessengerView({
                   </div>
                   <button
                     type="button"
-                    className="size-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold hover:bg-primary hover:text-primary-foreground transition-all shrink-0"
+                    className="size-7 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all shrink-0"
                   >
                     <Plus className="size-3.5" />
                   </button>
@@ -224,7 +229,8 @@ export function MessengerView({
             {conversations?.map((conv) => {
               const other = conv.otherParticipant;
               const isSelected = conv.id === activeConversationId;
-              const hasUnread = false;
+              const unread = conv.unreadCount || 0;
+              const isLastMe = conv.lastMessage?.senderId === currentUserId;
 
               return (
                 <div
@@ -256,15 +262,44 @@ export function MessengerView({
                         <ShieldCheck className="size-3 text-blue-500 shrink-0" />
                       </p>
                       {conv.lastMessage && (
-                        <span className="text-[10px] text-muted-foreground font-semibold shrink-0">
+                        <span
+                          className={cn(
+                            "text-[10px] font-semibold shrink-0",
+                            unread > 0 ? "text-emerald-600 dark:text-emerald-400 font-bold" : "text-muted-foreground"
+                          )}
+                        >
                           {formatRelativeTime(conv.lastMessage.createdAt)}
                         </span>
                       )}
                     </div>
 
-                    <p className="text-[11px] text-muted-foreground truncate leading-tight">
-                      {conv.lastMessage?.body || "Start a campus chat..."}
-                    </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1 min-w-0">
+                        {/* WhatsApp Seen Tick Indicator on last message */}
+                        {isLastMe && conv.lastMessage && (
+                          conv.lastMessage.readAt ? (
+                            <CheckCheck className="size-3.5 text-sky-400 shrink-0" />
+                          ) : (
+                            <CheckCheck className="size-3.5 text-muted-foreground shrink-0" />
+                          )
+                        )}
+                        <p
+                          className={cn(
+                            "text-[11px] truncate leading-tight",
+                            unread > 0 ? "text-foreground font-bold" : "text-muted-foreground font-medium"
+                          )}
+                        >
+                          {conv.lastMessage?.body || "Start a campus chat..."}
+                        </p>
+                      </div>
+
+                      {/* WhatsApp Green Unread Badge */}
+                      {unread > 0 && (
+                        <span className="size-5 rounded-full bg-emerald-500 text-white text-[10px] font-black flex items-center justify-center shrink-0 shadow-2xs animate-in zoom-in-75">
+                          {unread}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

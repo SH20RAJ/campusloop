@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { messages, userProfiles, conversations } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, and, isNull, ne } from "drizzle-orm";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +28,18 @@ export async function GET(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
 
+    // Auto-mark peer's messages as read (Seen status)
+    await db
+      .update(messages)
+      .set({ readAt: new Date() })
+      .where(
+        and(
+          eq(messages.conversationId, id),
+          ne(messages.senderId, profile.id),
+          isNull(messages.readAt)
+        )
+      );
+
     const chatMessages = await db.query.messages.findMany({
       where: eq(messages.conversationId, id),
       orderBy: [asc(messages.createdAt)],
@@ -42,6 +54,7 @@ export async function GET(req: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
 
 export async function POST(req: Request, { params }: RouteParams) {
   try {

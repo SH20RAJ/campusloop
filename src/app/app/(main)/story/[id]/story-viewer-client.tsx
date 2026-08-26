@@ -239,7 +239,7 @@ export function StoryViewerClient({
           {/* Center: Story Text Content */}
           <div className="flex-1 flex flex-col justify-center items-center text-center px-4 relative z-20 pointer-events-auto">
             <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-relaxed max-w-[290px] break-words whitespace-pre-wrap select-text drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
-              {story.text || "Campus Vibe ✨"}
+              {story.text || "Campus Vibe"}
             </h2>
           </div>
 

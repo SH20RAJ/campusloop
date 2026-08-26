@@ -71,7 +71,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
 
       if (!res.ok) throw new Error("Failed to save settings");
 
-      toast.success("Settings saved successfully! ✨");
+      toast.success("Settings saved successfully!");
       router.refresh();
     } catch {
       toast.error("Could not save settings. Please try again.");

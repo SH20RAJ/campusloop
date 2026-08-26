@@ -202,7 +202,7 @@ export function DatingAppClient() {
                         : "border-white/10 bg-white/5 text-white/50 hover:text-white"
                     }`}
                   >
-                    {g === "MALE" ? "👨 Male" : g === "FEMALE" ? "👩 Female" : "✨ Other"}
+                    {g === "MALE" ? "👨 Male" : g === "FEMALE" ? "👩 Female" : "🌈 Other"}
                   </button>
                 ))}
               </div>

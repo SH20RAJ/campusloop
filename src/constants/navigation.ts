@@ -3,7 +3,6 @@ import {
   Compass,
   School,
   Users,
-  Sparkles,
   MessageSquare,
   PartyPopper,
   Bell,
@@ -16,6 +15,7 @@ import {
   Gift,
   Wrench,
   Heart,
+  Plus,
   Sliders,
   Layers,
   FileText,
@@ -43,7 +43,7 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
   { icon: Compass, href: "/app/discover", label: "Discover" },
   { icon: School, href: "/app/colleges", label: "Colleges" },
   { icon: Users, href: "/app/communities", label: "Communities" },
-  { icon: Sparkles, href: "/app/dating", label: "Matches" },
+  { icon: Heart, href: "/app/dating", label: "Matches" },
   { icon: MessageSquare, href: "/app/chat", label: "Messages" },
   { icon: Bell, href: "/app/notifications", label: "Notifications" },
   { icon: UserCircle, href: "/app/profile", label: "Profile" },
@@ -52,11 +52,10 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
 export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
   { icon: Home, href: "/app", label: "Home" },
   { icon: Compass, href: "/app/discover", label: "Discover" },
-  { icon: Sparkles, href: "/app/post/new", label: "" },
+  { icon: Plus, href: "/app/post/new", label: "" },
   { icon: MessageSquare, href: "/app/chat", label: "Chat" },
   { icon: UserCircle, href: "/app/profile", label: "Profile" },
 ];
-
 
 export const FULL_MOBILE_DRAWER_LINKS: NavGroup[] = [
   {
@@ -64,12 +63,13 @@ export const FULL_MOBILE_DRAWER_LINKS: NavGroup[] = [
     items: [
       { icon: Home, href: "/app", label: "Campus Feed", desc: "Live discussions & confessions" },
       { icon: Compass, href: "/app/discover", label: "Discover Hub", desc: "Explore colleges & trending tags" },
-      { icon: Sparkles, href: "/app/dating", label: "Campus Matches", desc: "Swipe verified college students", badge: "Hot" },
+      { icon: Heart, href: "/app/dating", label: "Campus Matches", desc: "Swipe verified college students", badge: "Hot" },
       { icon: PartyPopper, href: "/app/birthdays", label: "Birthdays & DOB", desc: "Today's campus celebrations", badge: "New" },
       { icon: MessageSquare, href: "/app/chat", label: "Direct Messages", desc: "Private student chat" },
       { icon: Bell, href: "/app/notifications", label: "Notifications", desc: "Upvotes, comments & matches" },
     ],
   },
+
   {
     group: "Campus Utility",
     items: [

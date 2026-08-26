@@ -149,7 +149,7 @@ export function ImageCropModal({
       const uploaded = await uploadImageToImgBB(file);
       const finalUrl = uploaded.displayUrl || uploaded.url;
 
-      toast.success("Image cropped & updated! ✨", { id: "crop-upload" });
+      toast.success("Image cropped & updated!", { id: "crop-upload" });
       onCropComplete(finalUrl);
       onClose();
     } catch (err) {

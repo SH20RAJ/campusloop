@@ -141,7 +141,7 @@ export function EditCollegeModal({
       if (data.thumbnailUrl && !logoUrl) setLogoUrl(data.thumbnailUrl);
       if (data.originalImageUrl && !bannerUrl) setBannerUrl(data.originalImageUrl);
 
-      toast.success("Auto-fetched data from Wikipedia! ✨", { id: "enrich" });
+      toast.success("Auto-fetched data from Wikipedia!", { id: "enrich" });
     } catch {
       toast.error("Failed to auto-fetch Wikipedia data", { id: "enrich" });
     } finally {

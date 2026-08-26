@@ -7,37 +7,25 @@ import { UserProfile } from "@/db/schema";
 import {
   Search,
   MessageSquare,
-  Sparkles,
   ShieldCheck,
   Plus,
   Loader2,
   Users2,
   CheckCheck,
-  Check,
 } from "lucide-react";
 import { MessengerPane } from "./messenger-pane";
 import { cn } from "@/lib/utils";
+import {
+  CachedConversation,
+  getCachedConversations,
+  setCachedConversations,
+} from "@/lib/chat-cache";
 
-type ConversationWithDetail = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  otherParticipant: UserProfile;
-  unreadCount?: number;
-  lastMessage: {
-    id: string;
-    body: string;
-    senderId?: string;
-    readAt?: string | Date | null;
-    createdAt: string;
-  } | null;
+const fetcher = async <T,>(url: string): Promise<T> => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch");
+  return res.json() as Promise<T>;
 };
-
-const fetcher = <T,>(url: string): Promise<T> =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch");
-    return res.json() as Promise<T>;
-  });
 
 interface MessengerViewProps {
   currentUserId: string;
@@ -57,13 +45,24 @@ export function MessengerView({
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  // Fast Hard Cache: Initial fallback from in-memory / local storage cache for 0ms instant display
+  const initialCache = getCachedConversations();
+
   // SWR for conversations list (polls every 2.5s for real-time WhatsApp inbox sync)
-  const { data: conversations, mutate: mutateConvs } = useSWR<ConversationWithDetail[]>(
+  const { data: conversations, mutate: mutateConvs } = useSWR<CachedConversation[]>(
     "/api/chat",
     fetcher,
-    { refreshInterval: 2500, revalidateOnFocus: true }
+    {
+      fallbackData: initialCache || undefined,
+      refreshInterval: 2500,
+      revalidateOnFocus: true,
+      onSuccess: (data) => {
+        if (data) setCachedConversations(data);
+      },
+    }
   );
 
+  // If initialConversationId is provided or active conversation is unset, pick the first or match
   const activeConv = conversations?.find((c) => c.id === activeConversationId);
   const activeParticipant = activeConv ? activeConv.otherParticipant : null;
 
@@ -125,15 +124,20 @@ export function MessengerView({
 
   function formatRelativeTime(dateVal: string) {
     try {
-      const diffMs = Date.now() - new Date(dateVal).getTime();
+      const d = new Date(dateVal);
+      const now = new Date();
+      const diffMs = now.getTime() - d.getTime();
       const mins = Math.floor(diffMs / 60000);
       if (mins < 1) return "Just now";
       if (mins < 60) return `${mins}m`;
       const hours = Math.floor(mins / 60);
-      if (hours < 24) return `${hours}h`;
+      if (hours < 24 && d.getDate() === now.getDate()) {
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
       const days = Math.floor(hours / 24);
+      if (days === 1) return "Yesterday";
       if (days < 7) return `${days}d`;
-      return new Date(dateVal).toLocaleDateString([], { month: "short", day: "numeric" });
+      return d.toLocaleDateString([], { month: "short", day: "numeric" });
     } catch {
       return "";
     }
@@ -225,7 +229,7 @@ export function MessengerView({
           </div>
         ) : (
           /* Conversation Inbox List */
-          <div className="flex-1 overflow-y-auto p-2 space-y-1 divide-y divide-border/20">
+          <div className="flex-1 overflow-y-auto p-2 space-y-1">
             {conversations?.map((conv) => {
               const other = conv.otherParticipant;
               const isSelected = conv.id === activeConversationId;
@@ -237,10 +241,10 @@ export function MessengerView({
                   key={conv.id}
                   onClick={() => setActiveConversationId(conv.id)}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-2xl transition-all cursor-pointer group",
+                    "flex items-center gap-3 p-3 rounded-2xl transition-all cursor-pointer group border-l-3",
                     isSelected
-                      ? "bg-muted shadow-2xs"
-                      : "hover:bg-muted/40"
+                      ? "bg-muted/90 dark:bg-muted/50 border-emerald-500 shadow-2xs"
+                      : "border-transparent hover:bg-muted/40"
                   )}
                 >
                   {/* Avatar with Online indicator */}
@@ -257,7 +261,7 @@ export function MessengerView({
                   {/* Body & Snippet */}
                   <div className="min-w-0 flex-1 space-y-0.5">
                     <div className="flex items-center justify-between gap-1">
-                      <p className="text-xs font-black text-foreground truncate flex items-center gap-1">
+                      <p className={cn("text-xs truncate flex items-center gap-1", isSelected ? "font-black text-foreground" : "font-bold text-foreground")}>
                         <span>{other.displayName}</span>
                         <ShieldCheck className="size-3 text-blue-500 shrink-0" />
                       </p>
@@ -265,7 +269,7 @@ export function MessengerView({
                         <span
                           className={cn(
                             "text-[10px] font-semibold shrink-0",
-                            unread > 0 ? "text-emerald-600 dark:text-emerald-400 font-bold" : "text-muted-foreground"
+                            unread > 0 ? "text-emerald-500 font-bold" : "text-muted-foreground"
                           )}
                         >
                           {formatRelativeTime(conv.lastMessage.createdAt)}

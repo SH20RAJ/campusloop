@@ -51,7 +51,7 @@ const FONTS = [
 const ALIGNMENTS = ["center", "left", "right"] as const;
 type Alignment = (typeof ALIGNMENTS)[number];
 
-const STICKERS = ["🔥", "👀", "🤫", "💯", "❤️", "🍿", "🎓", "🎉", "😭", "💀", "✨", "☕"];
+const STICKERS = ["🔥", "👀", "🤫", "💯", "❤️", "🍿", "🎓", "🎉", "😭", "💀", "🚀", "☕"];
 
 const MAX_CHARS = 120;
 
@@ -91,12 +91,13 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
     setSelectedStickers((prev) => {
       if (prev.includes(sticker)) return prev.filter((s) => s !== sticker);
       if (prev.length >= 3) {
-        toast.warning("Max 3 stickers — keep it clean ✨");
+        toast.warning("Max 3 stickers — keep it clean");
         return prev;
       }
       return [...prev, sticker];
     });
   }
+
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

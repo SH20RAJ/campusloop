@@ -294,7 +294,7 @@ export function PostComments({ postId }: { postId: string }) {
         onClose={() => setShowGifPicker(false)}
         onSelectGif={(url) => {
           setCommentImage(url);
-          toast.success("GIF selected! ✨");
+          toast.success("GIF selected!");
         }}
       />
 
@@ -304,7 +304,7 @@ export function PostComments({ postId }: { postId: string }) {
         onClose={() => setShowStickerPicker(false)}
         onSelectSticker={(sticker) => {
           setCommentImage(sticker.url);
-          toast.success(`Attached "${sticker.name}" sticker! ✨`);
+          toast.success(`Attached "${sticker.name}" sticker!`);
         }}
       />
 

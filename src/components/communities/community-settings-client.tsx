@@ -111,7 +111,7 @@ export function CommunitySettingsClient({ community }: CommunitySettingsClientPr
         rules: validRules.length > 0 ? JSON.stringify(validRules) : undefined,
       });
 
-      toast.success("Community settings updated successfully! ✨");
+      toast.success("Community settings updated successfully!");
       router.push(`/app/communities/${community.slug || community.id}`);
     } catch (err: unknown) {
       toast.error((err as Error)?.message || "Failed to update settings");

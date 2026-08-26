@@ -13,7 +13,7 @@ export interface StickerCategory {
 }
 
 export const STICKER_CATEGORIES: StickerCategory[] = [
-  { id: "all", name: "All Stickers", icon: "✨" },
+  { id: "all", name: "All Stickers", icon: "🔥" },
   { id: "campus", name: "Campus Tea", icon: "☕" },
   { id: "exams", name: "Exam Stress", icon: "📚" },
   { id: "coding", name: "Dev & Hustle", icon: "💻" },

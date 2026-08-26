@@ -7,12 +7,13 @@ import {
   School,
   Heart,
   MessageSquare,
-  Sparkles,
+  Flame,
   Users,
   Bell,
   Plus,
   UserCircle,
   Shield,
+
   Sliders,
   Menu,
   X,
@@ -227,10 +228,11 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                         onClick={() => setShowProfileMenu(false)}
                         className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
                       >
-                        <Sparkles className="size-3.5 text-amber-500" />
+                        <Flame className="size-3.5 text-amber-500" />
                         <span>Post 24h Campus Vibe</span>
                       </Link>
                     )}
+
 
                     <div className="border-t border-border/20 pt-1">
                       <SignOutButton variant="menu-item" />
@@ -376,8 +378,9 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                 <div className="flex items-start justify-between pt-2">
                   <div className="space-y-3">
                     <div className="flex size-11 items-center justify-center rounded-2xl bg-white/20 shadow-md backdrop-blur-md">
-                      <Sparkles className="size-6 text-white" />
+                      <Flame className="size-6 text-white" />
                     </div>
+
                     <div className="space-y-1">
                       <h2 className="text-2xl font-black tracking-tight text-white leading-tight">
                         Welcome<br />to CampusLoop

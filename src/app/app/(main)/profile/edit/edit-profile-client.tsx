@@ -211,7 +211,7 @@ export function EditProfileClient() {
         throw new Error(data.error || "Failed to update profile.");
       }
 
-      toast.success("Profile & dating photos saved! ✨");
+      toast.success("Profile & dating photos saved!");
       await mutate();
       router.push("/app/profile");
     } catch (err) {

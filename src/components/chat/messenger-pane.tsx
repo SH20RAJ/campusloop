@@ -299,6 +299,13 @@ export function MessengerPane({
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-1.5 shrink-0">
+            <Link
+              href="/app"
+              className="text-[11px] font-bold text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-full hover:bg-muted transition-all cursor-pointer"
+            >
+              Feed
+            </Link>
+
             <button
               type="button"
               onClick={() => setSearchInChat((prev) => !prev)}
@@ -318,6 +325,7 @@ export function MessengerPane({
               Profile
             </Link>
           </div>
+
         </div>
       </header>
 

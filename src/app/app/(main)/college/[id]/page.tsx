@@ -74,14 +74,23 @@ export default async function MainCollegePage({ params }: PageProps) {
   const db = getDb();
 
   // Fetch profile and institution in parallel with deduplicated request cache
-  const [profile, college] = await Promise.all([
+  let [profile, college] = await Promise.all([
     user ? getCachedUserProfile(user.id) : Promise.resolve(null),
     getCachedInstitution(id),
   ]);
 
+  if (!college && id === "viewer-hub") {
+    college = await db.query.institutions.findFirst({
+      with: {
+        profiles: true,
+      },
+    }) ?? null;
+  }
+
   if (!college) {
     notFound();
   }
+
 
   // Fetch posts from this college
   const collegePosts = await db.query.posts.findMany({

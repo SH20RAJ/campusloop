@@ -18,8 +18,10 @@ ShieldCheck,
 Users2,
 } from "lucide-react";
 import { useEffect,useState } from "react";
+import Link from "next/link";
 import useSWR from "swr";
 import { MessengerPane } from "./messenger-pane";
+
 
 const fetcher = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url);
@@ -156,16 +158,32 @@ export function MessengerView({
         <div className="p-3.5 sm:p-4 border-b border-border/30 space-y-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
+              <Link
+                href="/app"
+                className="size-8 rounded-xl bg-muted/60 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                title="Back to Campus Feed"
+              >
+                <img src="/logo.png" alt="CampusLoop" className="size-5 object-contain" />
+              </Link>
               <div className="size-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-2xs">
                 <MessageSquare className="size-4.5" />
               </div>
               <h1 className="text-base font-black tracking-tight text-foreground">Chats</h1>
             </div>
 
-            <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
-              {conversations?.length || 0} Chats
-            </span>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/app"
+                className="text-[11px] font-bold text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-full bg-muted/50 hover:bg-muted transition-all"
+              >
+                Feed
+              </Link>
+              <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                {conversations?.length || 0}
+              </span>
+            </div>
           </div>
+
 
           {/* Search Bar */}
           <div className="relative w-full">

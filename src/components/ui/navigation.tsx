@@ -6,28 +6,27 @@ import { BrandLogo } from "@/components/ui/brand-logo";
 import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import {
-DESKTOP_NAV_ITEMS,
-FULL_MOBILE_DRAWER_LINKS,
-MOBILE_BOTTOM_ITEMS,
-} from "@/constants";
+import { DESKTOP_NAV_ITEMS,MOBILE_BOTTOM_ITEMS } from "@/constants";
 import type { UserProfile } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import { AnimatePresence,motion } from "framer-motion";
 import {
+Bell,
 Cake,
 ChevronUp,
-FileText,
+Compass,
 Flame,
-HelpCircle,
-Layers,
+Heart,
+Home,
+Menu,
 MessageSquare,
 Plus,
+School,
 Shield,
-
 Sliders,
 UserCircle,
-X
+Users,
+X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -59,24 +58,89 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
   }
 
   const mobileBottomItems = MOBILE_BOTTOM_ITEMS;
-  const fullMobileDrawerLinks = FULL_MOBILE_DRAWER_LINKS;
+
+  const mobileDrawerItems = [
+    { icon: Home, href: "/app", label: "Home Feed" },
+    { icon: Compass, href: "/app/discover", label: "Discover" },
+    { icon: Heart, href: "/app/dating", label: "Matches / Dating" },
+    { icon: Users, href: "/app/communities", label: "Communities" },
+    { icon: School, href: "/app/colleges", label: "Colleges" },
+    { icon: Cake, href: "/app/birthdays", label: "Campus Birthdays" },
+    { icon: Flame, href: "/app/confessions", label: "Confessions" },
+    { icon: MessageSquare, href: "/app/chat", label: "Messages" },
+    { icon: Bell, href: "/app/notifications", label: "Notifications" },
+    { icon: UserCircle, href: "/app/profile", label: "Profile" },
+    { icon: Sliders, href: "/app/settings", label: "Settings" },
+  ];
 
   return (
     <>
-      {/* ─── Enhanced Desktop Sidebar with AnimateUI ─── */}
+      {/* ─── Top Mobile Header with Drawer Trigger ─── */}
+      {!pathname.startsWith("/app/chat") &&
+        !pathname.startsWith("/app/stories/new") &&
+        !pathname.startsWith("/app/story/") && (
+          <header className="sticky top-0 z-40 flex h-13 w-full items-center justify-between border-b border-border/30 bg-background/85 px-4 backdrop-blur-xl md:hidden select-none">
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setShowMobileMenu(true)}
+                className="flex size-9 items-center justify-center rounded-xl bg-muted/50 text-foreground hover:bg-muted transition-colors cursor-pointer"
+                aria-label="Open menu"
+              >
+                <Menu className="size-4.5" />
+              </button>
+
+              <Link href="/app" className="flex items-center gap-2">
+                <img
+                  src="/logo.png"
+                  alt="CampusLoop"
+                  className="size-7 object-contain drop-shadow-2xs"
+                />
+                <span className="text-sm font-black tracking-tight text-foreground">
+                  Campus<span className="text-primary font-black">Loop</span>
+                </span>
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Link
+                href="/app/chat"
+                className="flex size-8 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors relative"
+                aria-label="Direct messages"
+              >
+                <MessageSquare className="size-4" />
+              </Link>
+
+              <Link
+                href="/app/notifications"
+                className="flex size-8 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Notifications"
+              >
+                <Bell className="size-4" />
+              </Link>
+
+              <ThemeToggle className="size-8 rounded-full border-none bg-transparent hover:bg-muted" />
+            </div>
+          </header>
+        )}
+
+      {/* ─── Desktop Sidebar ─── */}
       <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border/20 bg-background/85 backdrop-blur-2xl py-5 px-3.5 md:flex md:flex-col justify-between overflow-y-auto select-none">
         <div className="space-y-4">
           {/* Logo & Campus Tag */}
           <div className="px-2 pb-1 flex items-center justify-between">
             <BrandLogo href="/app" size="md" />
             {collegeName && (
-              <span className="text-[9px] font-black uppercase tracking-wider text-muted-foreground/80 bg-muted/50 px-2 py-0.5 rounded-full truncate max-w-[90px]" title={collegeName}>
+              <span
+                className="text-[9px] font-black uppercase tracking-wider text-muted-foreground/80 bg-muted/50 px-2 py-0.5 rounded-full truncate max-w-[90px]"
+                title={collegeName}
+              >
                 {collegeName.split(" ")[0]}
               </span>
             )}
           </div>
 
-          {/* Navigation Links with AnimateUI & Sliding Active Indicator */}
+          {/* Navigation Links with Sliding Active Indicator */}
           <nav className="space-y-1 relative">
             {desktopNavItems.map((item) => {
               const isActive = pathname === item.href;
@@ -92,7 +156,6 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  {/* Sliding Active Pill */}
                   {isActive && (
                     <motion.div
                       layoutId="sidebar-active-indicator"
@@ -115,7 +178,6 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                     <span className="truncate">{item.label}</span>
                   </div>
 
-                  {/* Micro-Badges */}
                   {item.href === "/app/chat" && (
                     <span className="relative z-10 size-2 rounded-full bg-rose-500 shadow-xs" />
                   )}
@@ -132,11 +194,7 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
 
         {/* Bottom Actions & User Profile Capsule */}
         <div className="space-y-3 pt-3 border-t border-border/20">
-          {isViewer ? (
-            <div className="rounded-2xl bg-amber-500/10 px-3.5 py-2 text-[10px] font-semibold leading-relaxed text-amber-600 dark:text-amber-400">
-              👀 Viewer Mode — join with your college email to post &amp; chat.
-            </div>
-          ) : (
+          {!isViewer && (
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link href="/app/post/new" className="block">
                 <Button className="w-full bg-foreground text-background hover:opacity-90 font-black py-2.5 rounded-2xl text-xs cursor-pointer border-none shadow-xs transition-all flex items-center justify-center gap-1.5">
@@ -156,7 +214,6 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                 />
               )}
 
-              {/* Animated Popover Menu */}
               <AnimatePresence>
                 {showProfileMenu && (
                   <motion.div
@@ -181,12 +238,12 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                     </Link>
 
                     <Link
-                      href="/app/profile/edit"
+                      href="/app/dating"
                       onClick={() => setShowProfileMenu(false)}
                       className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
                     >
-                      <Sliders className="size-3.5 text-blue-500" />
-                      <span>Edit Profile & Photos</span>
+                      <Heart className="size-3.5 text-rose-500" />
+                      <span>Campus Matches</span>
                     </Link>
 
                     <Link
@@ -206,18 +263,6 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                       <Sliders className="size-3.5 text-muted-foreground" />
                       <span>Settings</span>
                     </Link>
-
-                    {!isViewer && (
-                      <Link
-                        href="/app/stories/new"
-                        onClick={() => setShowProfileMenu(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
-                      >
-                        <Flame className="size-3.5 text-amber-500" />
-                        <span>Post 24h Campus Vibe</span>
-                      </Link>
-                    )}
-
 
                     <div className="border-t border-border/20 pt-1">
                       <SignOutButton variant="menu-item" />
@@ -243,7 +288,12 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                     <p className="truncate text-xs font-black text-foreground">{profile.displayName}</p>
                     <p className="truncate text-[9px] text-muted-foreground">@{profile.username}</p>
                   </div>
-                  <ChevronUp className={cn("size-3.5 text-muted-foreground transition-transform duration-200", showProfileMenu && "rotate-180")} />
+                  <ChevronUp
+                    className={cn(
+                      "size-3.5 text-muted-foreground transition-transform duration-200",
+                      showProfileMenu && "rotate-180"
+                    )}
+                  />
                 </button>
 
                 <div className="flex items-center gap-1 shrink-0">
@@ -256,13 +306,15 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
         </div>
       </aside>
 
-      {/* ─── Mobile Bottom Bar (Hidden inside chat and story fullscreen screens) ─── */}
+      {/* ─── Mobile Bottom Bar ─── */}
       {!pathname.startsWith("/app/chat") &&
         !pathname.startsWith("/app/stories/new") &&
         !pathname.startsWith("/app/story/") && (
-          <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/20 bg-background/85 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
+          <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/20 bg-background/90 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
             {mobileBottomItems.map((item) => {
-              const isActive = pathname === item.href || (item.href === "/app/profile" && pathname.startsWith("/app/profile"));
+              const isActive =
+                pathname === item.href ||
+                (item.href === "/app/profile" && pathname.startsWith("/app/profile"));
               const Icon = item.icon;
 
               if (item.label === "") {
@@ -271,10 +323,10 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                   <Link
                     key="create"
                     href="/app/post/new"
-                    className="flex size-10 items-center justify-center rounded-2xl bg-foreground text-background shadow-xs active:scale-90 transition-transform cursor-pointer"
+                    className="flex size-9 items-center justify-center rounded-2xl bg-foreground text-background shadow-xs active:scale-90 transition-transform cursor-pointer"
                     aria-label="Create post"
                   >
-                    <Plus className="size-5 stroke-[2.5]" />
+                    <Plus className="size-4.5 stroke-[2.5]" />
                   </Link>
                 );
               }
@@ -291,12 +343,24 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                   >
                     <div className="relative">
                       {profile?.avatarUrl ? (
-                        <Avatar className={cn("size-6 shrink-0 transition-all", isActive && "ring-2 ring-primary ring-offset-1 ring-offset-background")}>
+                        <Avatar
+                          className={cn(
+                            "size-5.5 shrink-0 transition-all",
+                            isActive && "ring-2 ring-primary ring-offset-1 ring-offset-background"
+                          )}
+                        >
                           <AvatarImage src={profile.avatarUrl} />
-                          <AvatarFallback className="text-[9px] font-bold">{(profile.displayName?.[0] || "U").toUpperCase()}</AvatarFallback>
+                          <AvatarFallback className="text-[8px] font-bold">
+                            {(profile.displayName?.[0] || "U").toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                       ) : (
-                        <Icon className={cn("size-5 transition-colors", isActive ? "stroke-[2.5]" : "stroke-[1.8]")} />
+                        <Icon
+                          className={cn(
+                            "size-5 transition-colors",
+                            isActive ? "stroke-[2.5]" : "stroke-[1.8]"
+                          )}
+                        />
                       )}
                     </div>
                     <span className="mt-0.5 text-[9px] font-bold">Profile</span>
@@ -317,12 +381,12 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                   )}
                 >
                   <div className="relative">
-                    <Icon className={cn("size-5 transition-colors", isActive ? "stroke-[2.5]" : "stroke-[1.8]")} />
-                    {item.href === "/app/chat" && (
-                      <span className="absolute -top-1 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-rose-500 text-[8px] font-black text-white">
-                        1
-                      </span>
-                    )}
+                    <Icon
+                      className={cn(
+                        "size-5 transition-colors",
+                        isActive ? "stroke-[2.5]" : "stroke-[1.8]"
+                      )}
+                    />
                   </div>
                   <span className="mt-0.5 text-[9px] font-bold">{item.label}</span>
                   {isActive && (
@@ -334,44 +398,38 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
           </div>
         )}
 
-
-      {/* ─── Full Mobile Aurora Slide-Out Drawer (Exact match to Reference 1 & 3) ─── */}
+      {/* ─── Mobile Slide-Out Drawer ─── */}
       <AnimatePresence>
         {showMobileMenu && (
           <div className="fixed inset-0 z-50 flex md:hidden select-none">
-            {/* Backdrop Blur */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.2 }}
               className="absolute inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setShowMobileMenu(false)}
             />
 
-            {/* Slide-out Aurora Menu */}
             <motion.aside
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 380, damping: 36 }}
-              className="relative z-10 flex h-full w-[84%] max-w-[320px] flex-col justify-between overflow-y-auto bg-aurora-mesh p-6 text-white shadow-2xl"
+              transition={{ type: "spring", stiffness: 400, damping: 36 }}
+              className="relative z-10 flex h-full w-[82%] max-w-[300px] flex-col justify-between overflow-y-auto bg-card p-5 text-foreground shadow-2xl border-r border-border/40"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="space-y-7">
-                {/* Header: 4-Petal Loop Logo + Welcome to CampusLoop */}
-                <div className="flex items-start justify-between pt-2">
-                  <div className="space-y-3">
-                    <div className="flex size-11 items-center justify-center rounded-2xl bg-white/20 shadow-md backdrop-blur-md">
-                      <Flame className="size-6 text-white" />
-                    </div>
-
-                    <div className="space-y-1">
-                      <h2 className="text-2xl font-black tracking-tight text-white leading-tight">
-                        Welcome<br />to CampusLoop
+              <div className="space-y-5">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-border/30 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <img src="/logo.png" alt="CampusLoop" className="size-8 object-contain" />
+                    <div>
+                      <h2 className="text-sm font-black tracking-tight text-foreground">
+                        Campus<span className="text-primary font-black">Loop</span>
                       </h2>
-                      <p className="text-xs text-white/80 font-medium truncate max-w-[200px]">
-                        {collegeName || "Verified Campus Network"}
+                      <p className="text-[10px] text-muted-foreground font-medium truncate max-w-[170px]">
+                        {collegeName || "Verified Campus"}
                       </p>
                     </div>
                   </div>
@@ -379,150 +437,64 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                   <button
                     type="button"
                     onClick={() => setShowMobileMenu(false)}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-white/80 hover:bg-white/30 hover:text-white transition-colors cursor-pointer"
+                    className="flex size-7 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                     aria-label="Close menu"
                   >
                     <X className="size-4" />
                   </button>
                 </div>
 
-                {/* Primary Quick Links List */}
-                <nav className="space-y-1.5 pt-2">
-                  <Link
-                    href="/app/settings"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3.5 px-3 py-2.5 rounded-2xl text-sm font-bold text-white/90 hover:bg-white/15 hover:text-white transition-all cursor-pointer"
-                  >
-                    <Sliders className="size-4.5 text-white/80" />
-                    <span>Settings</span>
-                  </Link>
-
-                  <Link
-                    href="/contact"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3.5 px-3 py-2.5 rounded-2xl text-sm font-bold text-white/90 hover:bg-white/15 hover:text-white transition-all cursor-pointer"
-                  >
-                    <HelpCircle className="size-4.5 text-white/80" />
-                    <span>Support</span>
-                  </Link>
-
-                  <Link
-                    href="/about"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3.5 px-3 py-2.5 rounded-2xl text-sm font-bold text-white/90 hover:bg-white/15 hover:text-white transition-all cursor-pointer"
-                  >
-                    <Layers className="size-4.5 text-white/80" />
-                    <span>About</span>
-                  </Link>
-
-                  <Link
-                    href="/terms"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3.5 px-3 py-2.5 rounded-2xl text-sm font-bold text-white/90 hover:bg-white/15 hover:text-white transition-all cursor-pointer"
-                  >
-                    <FileText className="size-4.5 text-white/80" />
-                    <span>Legals & Safety</span>
-                  </Link>
-
-                  <Link
-                    href="/safety"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3.5 px-3 py-2.5 rounded-2xl text-sm font-bold text-white/90 hover:bg-white/15 hover:text-white transition-all cursor-pointer"
-                  >
-                    <HelpCircle className="size-4.5 text-white/80" />
-                    <span>FAQ</span>
-                  </Link>
-
-                  <Link
-                    href="/contact"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3.5 px-3 py-2.5 rounded-2xl text-sm font-bold text-white/90 hover:bg-white/15 hover:text-white transition-all cursor-pointer"
-                  >
-                    <MessageSquare className="size-4.5 text-white/80" />
-                    <span>Give feedback</span>
-                  </Link>
+                {/* Navigation Links */}
+                <nav className="space-y-1">
+                  {mobileDrawerItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.href;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setShowMobileMenu(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer",
+                          isActive
+                            ? "bg-primary text-primary-foreground shadow-2xs"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <Icon className="size-4 shrink-0" />
+                        <span>{item.label}</span>
+                      </Link>
+                    );
+                  })}
                 </nav>
-
-                {/* Sub-Hubs & Communities Section (Exact match to Reference 1 & 3) */}
-                <div className="space-y-2.5 pt-2 border-t border-white/15">
-                  <p className="px-3 text-[10px] font-black uppercase tracking-widest text-white/60">
-                    Your Communities
-                  </p>
-                  <div className="space-y-1">
-                    <Link
-                      href="/app/communities"
-                      onClick={() => setShowMobileMenu(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-2xl hover:bg-white/15 transition-all text-xs font-bold text-white cursor-pointer"
-                    >
-                      <div className="flex size-7 items-center justify-center rounded-xl bg-emerald-500/80 text-white font-bold text-[11px] shadow-xs">
-                        🌱
-                      </div>
-                      <span className="truncate">Campus Ecological</span>
-                    </Link>
-
-                    <Link
-                      href="/app/communities"
-                      onClick={() => setShowMobileMenu(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-2xl hover:bg-white/15 transition-all text-xs font-bold text-white cursor-pointer"
-                    >
-                      <div className="flex size-7 items-center justify-center rounded-xl bg-blue-500/80 text-white font-bold text-[11px] shadow-xs">
-                        ⚡
-                      </div>
-                      <span className="truncate">Tech & Dev Loop</span>
-                    </Link>
-
-                    <Link
-                      href="/app/communities"
-                      onClick={() => setShowMobileMenu(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-2xl hover:bg-white/15 transition-all text-xs font-bold text-white cursor-pointer"
-                    >
-                      <div className="flex size-7 items-center justify-center rounded-xl bg-amber-500/80 text-white font-bold text-[11px] shadow-xs">
-                        🎨
-                      </div>
-                      <span className="truncate">Fest & Cultural Hub</span>
-                    </Link>
-
-                    <Link
-                      href="/app/communities"
-                      onClick={() => setShowMobileMenu(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-white/70 hover:text-white transition-colors cursor-pointer"
-                    >
-                      <Plus className="size-4" />
-                      <span>Explore all communities</span>
-                    </Link>
-                  </div>
-                </div>
               </div>
 
-              {/* Bottom Profile Row in Aurora Drawer */}
-              <div className="pt-6 border-t border-white/15 flex items-center justify-between">
+              {/* Bottom Profile / Auth Row */}
+              <div className="pt-4 border-t border-border/30 flex items-center justify-between">
                 {profile ? (
-                  <Link
-                    href="/app/profile"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-2.5 min-w-0 hover:opacity-90 transition-opacity"
-                  >
-                    <Avatar className="size-9 border-2 border-white/40 shadow-sm shrink-0">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Avatar className="size-8 shrink-0">
                       <AvatarImage src={profile.avatarUrl || ""} />
-                      <AvatarFallback className="font-bold text-xs bg-white text-primary">
-                        {(profile.displayName?.[0] || "U").toUpperCase()}
+                      <AvatarFallback className="text-[9px] font-bold">
+                        {profile.displayName[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0">
-                      <p className="text-xs font-black text-white truncate">{profile.displayName}</p>
-                      <p className="text-[10px] text-white/75 truncate">@{profile.username}</p>
+                      <p className="truncate text-xs font-black text-foreground">{profile.displayName}</p>
+                      <p className="truncate text-[9px] text-muted-foreground">@{profile.username}</p>
                     </div>
-                  </Link>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <ThemeToggle className="size-8 rounded-xl bg-white/20 text-white border-none" />
                   </div>
+                ) : (
+                  <Link
+                    href="/join"
+                    onClick={() => setShowMobileMenu(false)}
+                    className="text-xs font-bold text-primary hover:underline"
+                  >
+                    Join Campus
+                  </Link>
                 )}
 
-                <div className="flex items-center gap-2">
-                  {profile && <ThemeToggle className="size-8 rounded-xl bg-white/20 text-white border-none hover:bg-white/30" />}
-                  <SignOutButton />
-                </div>
+                <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted" />
               </div>
             </motion.aside>
           </div>

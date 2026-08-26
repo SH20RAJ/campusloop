@@ -7,27 +7,36 @@ import { FeedSkeleton } from "@/components/ui/skeleton-card";
 import { useColleges } from "@/hooks/use-colleges";
 import { useFeed } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
-import { Cake,Flame,Heart,HelpCircle,Lightbulb,School,Search,Sparkles,TrendingUp } from "lucide-react";
-import { AnimatePresence,motion } from "motion/react";
+import {
+  Cake,
+  Compass,
+  Flame,
+  Heart,
+  HelpCircle,
+  School,
+  Search,
+  Users,
+} from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useEffect,useMemo,useRef,useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const TABS = [
   { id: "TRENDING", label: "Trending", icon: Flame },
   { id: "CONFESSION", label: "Confessions", icon: Heart },
   { id: "QUESTION", label: "Questions", icon: HelpCircle },
+  { id: "COLLEGES", label: "Colleges", icon: School },
 ] as const;
 
 export function DiscoverFeed() {
-  const [activeTab, setActiveTab] = useState<"TRENDING" | "CONFESSION" | "QUESTION">("TRENDING");
+  const [activeTab, setActiveTab] = useState<"TRENDING" | "CONFESSION" | "QUESTION" | "COLLEGES">("TRENDING");
   const [selectedCollegeId, setSelectedCollegeId] = useState<string | null>(null);
   const [collegeSearch, setCollegeSearch] = useState("");
-  const [showCollegeSearch, setShowCollegeSearch] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const feedType = activeTab === "TRENDING" ? undefined : activeTab;
+  const feedType = activeTab === "TRENDING" || activeTab === "COLLEGES" ? undefined : activeTab;
   const { feed, isLoading: feedLoading, isLoadingMore, isReachingEnd, setSize } = useFeed("GLOBAL", feedType);
-  const { colleges, isLoading: collegesLoading } = useColleges(50);
+  const { colleges, isLoading: collegesLoading } = useColleges(60);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -63,129 +72,65 @@ export function DiscoverFeed() {
   }, [colleges, collegeSearch]);
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen">
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-40 bg-background/80 px-4 pt-4 pb-0 backdrop-blur-xl border-b border-border space-y-4">
+      <header className="sticky top-0 z-40 bg-background/85 px-4 pt-3.5 pb-0 backdrop-blur-xl border-b border-border/40 space-y-3">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-              <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Sparkles className="size-4" />
-              </span>
-              Discover
-            </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">What&apos;s happening across all campuses.</p>
+          <div className="flex items-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Compass className="size-4" />
+            </div>
+            <h1 className="text-base font-black tracking-tight text-foreground">Discover</h1>
           </div>
+
+          <span className="text-[10px] font-bold text-muted-foreground">All India Campuses</span>
+        </div>
+
+        {/* ─── Fast Exploration Category Quick Hub (Interlinking all key sections) ─── */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          <Link
+            href="/app/dating"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold shrink-0 transition-colors shadow-2xs"
+          >
+            <Heart className="size-3.5" />
+            <span>Matches</span>
+          </Link>
+
+          <Link
+            href="/app/communities"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold shrink-0 transition-colors shadow-2xs"
+          >
+            <Users className="size-3.5" />
+            <span>Communities</span>
+          </Link>
+
+          <Link
+            href="/app/colleges"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold shrink-0 transition-colors shadow-2xs"
+          >
+            <School className="size-3.5" />
+            <span>Colleges</span>
+          </Link>
 
           <Link
             href="/app/birthdays"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-500/10 hover:bg-pink-500/20 text-pink-600 dark:text-pink-400 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/10 hover:bg-pink-500/20 text-pink-600 dark:text-pink-400 text-xs font-bold shrink-0 transition-colors shadow-2xs"
           >
             <Cake className="size-3.5" />
             <span>Birthdays</span>
           </Link>
-        </div>
 
-        {/* College Selector Bar */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-              <School className="size-3" /> Explore Campuses
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  setShowCollegeSearch(!showCollegeSearch);
-                  if (!showCollegeSearch) setTimeout(() => searchRef.current?.focus(), 100);
-                }}
-                className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              >
-                <Search className="size-3" />
-                {showCollegeSearch ? "Close" : "Search"}
-              </button>
-              {selectedCollege && (
-                <button
-                  onClick={() => {
-                    setSelectedCollegeId(null);
-                    setCollegeSearch("");
-                  }}
-                  className="text-[10px] font-semibold text-primary hover:underline cursor-pointer"
-                >
-                  Clear filter
-                </button>
-              )}
-            </div>
-          </div>
-
-          <AnimatePresence>
-            {showCollegeSearch && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="relative pb-2">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                  <input
-                    ref={searchRef}
-                    type="text"
-                    value={collegeSearch}
-                    onChange={(e) => setCollegeSearch(e.target.value)}
-                    placeholder="Search by name, state, or city..."
-                    className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-xs placeholder:text-muted-foreground/60 focus:border-primary/30 focus:outline-none"
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none relative">
-            <button
-              onClick={() => {
-                setSelectedCollegeId(null);
-                setCollegeSearch("");
-              }}
-              className={cn(
-                "relative shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer",
-                selectedCollegeId === null
-                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                  : "bg-card text-muted-foreground border-border hover:text-foreground"
-              )}
-            >
-              All Campuses
-            </button>
-            {collegesLoading ? (
-              <div className="flex gap-2">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-7 w-20 rounded-full shrink-0" />
-                ))}
-              </div>
-            ) : (
-              (collegeSearch ? searchedColleges : colleges)?.slice(0, 20).map((col) => (
-                <button
-                  key={col.id}
-                  onClick={() => {
-                    setSelectedCollegeId(col.id);
-                    setCollegeSearch("");
-                    setShowCollegeSearch(false);
-                  }}
-                  className={cn(
-                    "relative shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer",
-                    selectedCollegeId === col.id
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "bg-card text-muted-foreground border-border hover:text-foreground"
-                  )}
-                >
-                  {col.name}
-                </button>
-              ))
-            )}
-          </div>
+          <Link
+            href="/app/confessions"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold shrink-0 transition-colors shadow-2xs"
+          >
+            <Flame className="size-3.5" />
+            <span>Confessions</span>
+          </Link>
         </div>
 
         {/* Animated Tabs */}
-        <div className="relative flex border-b border-border">
+        <div className="relative flex border-b border-border/30">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -194,12 +139,12 @@ export function DiscoverFeed() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "relative flex-1 pb-3 pt-1 text-center text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer",
-                  isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground/70"
+                  "relative flex-1 pb-2.5 pt-1 text-center text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer",
+                  isActive ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 <Icon className={cn("size-3.5", isActive && "text-primary")} />
-                {tab.label}
+                <span>{tab.label}</span>
                 {isActive && (
                   <motion.div
                     layoutId="discover-tab-indicator"
@@ -213,62 +158,90 @@ export function DiscoverFeed() {
         </div>
       </header>
 
-      {/* Featured Campuses Grid */}
-      <AnimatePresence mode="wait">
-        {!selectedCollegeId && !feedLoading && (
-          <motion.div
-            key="featured-campuses"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="px-4 pt-6 pb-2"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="size-4 text-primary" />
-              <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
-                Featured Campuses
-              </h2>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {(collegeSearch ? searchedColleges : colleges)?.slice(0, 6).map((college, i) => (
-                <FeaturedCampusCard key={college.id} college={college} index={i} />
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Feed Section */}
-      <div className="flex flex-col px-4 pt-4 pb-24 gap-4">
-        {feedLoading ? (
-          <FeedSkeleton />
-        ) : filteredFeed && filteredFeed.length > 0 ? (
-          <AnimatePresence mode="popLayout">
-            {filteredFeed.map((post) => (
-              <motion.div
-                key={post.id}
-                layout
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16, scale: 0.98 }}
-              >
-                <FeedCard post={post} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        ) : (
-          <div className="text-center py-16 border border-dashed border-border rounded-2xl bg-card/50 px-6 space-y-2">
-            <Lightbulb className="size-8 text-amber-500 mx-auto" />
-            <h3 className="font-semibold text-foreground text-sm">No posts found</h3>
-            <p className="text-xs text-muted-foreground max-w-[240px] mx-auto">
-              Be the first from this campus to share something on CampusLoop!
-            </p>
+      {/* ─── Dedicated Colleges Tab View ─── */}
+      {activeTab === "COLLEGES" ? (
+        <div className="px-4 py-4 space-y-4">
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+            <input
+              ref={searchRef}
+              type="text"
+              value={collegeSearch}
+              onChange={(e) => setCollegeSearch(e.target.value)}
+              placeholder="Search 1,350+ Indian colleges..."
+              className="w-full h-10 rounded-full border border-border/50 bg-muted/40 pl-9 pr-4 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary transition-all"
+            />
           </div>
-        )}
-        {/* Infinite-scroll sentinel */}
-        <div ref={loadMoreRef} aria-hidden />
-      </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {collegesLoading ? (
+              <div className="col-span-2 space-y-2">
+                <Skeleton className="h-24 w-full rounded-2xl" />
+                <Skeleton className="h-24 w-full rounded-2xl" />
+              </div>
+            ) : searchedColleges.length > 0 ? (
+              searchedColleges.slice(0, 16).map((college, i) => (
+                <FeaturedCampusCard key={college.id} college={college} index={i} />
+              ))
+            ) : (
+              <div className="col-span-2 py-12 text-center text-xs text-muted-foreground">
+                No college hubs found matching &ldquo;{collegeSearch}&rdquo;.
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col px-4 pt-3 pb-24 gap-3.5">
+
+          {selectedCollege && (
+            <div className="flex items-center justify-between p-2.5 rounded-2xl bg-primary/10 border border-primary/20">
+              <span className="text-xs font-bold text-primary truncate">
+                Filtered by {selectedCollege.name}
+              </span>
+              <button
+                onClick={() => setSelectedCollegeId(null)}
+                className="text-[11px] font-bold text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                Clear
+              </button>
+            </div>
+          )}
+
+          {feedLoading ? (
+            <FeedSkeleton />
+          ) : filteredFeed && filteredFeed.length > 0 ? (
+            <AnimatePresence mode="popLayout">
+              {filteredFeed.map((post) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <FeedCard post={post} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-2 text-muted-foreground">
+              <Compass className="size-10 text-muted-foreground/40" />
+              <p className="text-xs font-bold text-foreground">No posts found in this feed</p>
+              <p className="text-[11px]">Be the first from your campus to share a story or confession.</p>
+            </div>
+          )}
+
+          {/* Infinite Scroll Trigger */}
+          <div ref={loadMoreRef} className="py-4 text-center">
+            {isLoadingMore && <FeedSkeleton />}
+            {isReachingEnd && filteredFeed && filteredFeed.length > 0 && (
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                You&apos;ve reached the end of the feed
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

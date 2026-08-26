@@ -269,73 +269,84 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
         </div>
       </aside>
 
-      {/* ─── Mobile Bottom Bar ─── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/20 bg-background/85 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
-        {mobileBottomItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
+      {/* ─── Mobile Bottom Bar (Hidden inside chat and story fullscreen screens) ─── */}
+      {!pathname.startsWith("/app/chat") &&
+        !pathname.startsWith("/app/stories/new") &&
+        !pathname.startsWith("/app/story/") && (
+          <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/20 bg-background/85 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
+            {mobileBottomItems.map((item) => {
+              const isActive = pathname === item.href || (item.href === "/app/profile" && pathname.startsWith("/app/profile"));
+              const Icon = item.icon;
 
-          if (item.label === "") {
-            if (isViewer) return null;
-            return (
-              <Link
-                key="create"
-                href="/app/post/new"
-                className="flex size-10 items-center justify-center rounded-2xl bg-foreground text-background shadow-xs active:scale-90 transition-transform cursor-pointer"
-                aria-label="Create post"
-              >
-                <Plus className="size-5 stroke-[2.5]" />
-              </Link>
-            );
-          }
+              if (item.label === "") {
+                if (isViewer) return null;
+                return (
+                  <Link
+                    key="create"
+                    href="/app/post/new"
+                    className="flex size-10 items-center justify-center rounded-2xl bg-foreground text-background shadow-xs active:scale-90 transition-transform cursor-pointer"
+                    aria-label="Create post"
+                  >
+                    <Plus className="size-5 stroke-[2.5]" />
+                  </Link>
+                );
+              }
 
-          if (item.isTrigger) {
-            return (
-              <button
-                key="menu-trigger"
-                type="button"
-                onClick={() => setShowMobileMenu(true)}
-                className="group flex flex-col items-center justify-center flex-1 h-full py-1 text-muted-foreground hover:text-foreground active:scale-95 transition-transform cursor-pointer"
-                aria-label="Open menu"
-              >
-                {profile?.avatarUrl ? (
-                  <Avatar className="size-6 shrink-0">
-                    <AvatarImage src={profile.avatarUrl} />
-                    <AvatarFallback className="text-[9px] font-bold">{(profile.displayName?.[0] || "U").toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <Icon className="size-5 transition-colors stroke-[2]" />
-                )}
-                <span className="mt-0.5 text-[9px] font-bold">Menu</span>
-              </button>
-            );
-          }
+              if (item.href === "/app/profile") {
+                return (
+                  <Link
+                    key="profile"
+                    href="/app/profile"
+                    className={cn(
+                      "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
+                      isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <div className="relative">
+                      {profile?.avatarUrl ? (
+                        <Avatar className={cn("size-6 shrink-0 transition-all", isActive && "ring-2 ring-primary ring-offset-1 ring-offset-background")}>
+                          <AvatarImage src={profile.avatarUrl} />
+                          <AvatarFallback className="text-[9px] font-bold">{(profile.displayName?.[0] || "U").toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      ) : (
+                        <Icon className={cn("size-5 transition-colors", isActive ? "stroke-[2.5]" : "stroke-[1.8]")} />
+                      )}
+                    </div>
+                    <span className="mt-0.5 text-[9px] font-bold">Profile</span>
+                    {isActive && (
+                      <div className="absolute bottom-1 size-1 rounded-full bg-foreground" />
+                    )}
+                  </Link>
+                );
+              }
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
-                isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <div className="relative">
-                <Icon className={cn("size-5 transition-colors", isActive ? "stroke-[2.5]" : "stroke-[1.8]")} />
-                {item.href === "/app/chat" && (
-                  <span className="absolute -top-1 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-rose-500 text-[8px] font-black text-white">
-                    1
-                  </span>
-                )}
-              </div>
-              <span className="mt-0.5 text-[9px] font-bold">{item.label}</span>
-              {isActive && (
-                <div className="absolute bottom-1 size-1 rounded-full bg-foreground" />
-              )}
-            </Link>
-          );
-        })}
-      </div>
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
+                    isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <div className="relative">
+                    <Icon className={cn("size-5 transition-colors", isActive ? "stroke-[2.5]" : "stroke-[1.8]")} />
+                    {item.href === "/app/chat" && (
+                      <span className="absolute -top-1 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-rose-500 text-[8px] font-black text-white">
+                        1
+                      </span>
+                    )}
+                  </div>
+                  <span className="mt-0.5 text-[9px] font-bold">{item.label}</span>
+                  {isActive && (
+                    <div className="absolute bottom-1 size-1 rounded-full bg-foreground" />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        )}
+
 
       {/* ─── Full Mobile Aurora Slide-Out Drawer (Exact match to Reference 1 & 3) ─── */}
       <AnimatePresence>

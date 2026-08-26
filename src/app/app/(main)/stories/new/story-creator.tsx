@@ -18,14 +18,19 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { mutate } from "swr";
 import { uploadImageToImgBB } from "@/lib/upload";
 
 interface StoryCreatorProps {
   profile: {
+    id: string;
     displayName: string;
+    username: string;
     avatarUrl: string | null;
+    institution?: { name: string } | null;
   };
 }
+
 
 const GRADIENTS = [
   { id: "purple-indigo", class: "bg-gradient-to-tr from-violet-600 to-indigo-600", label: "Classic Indigo" },
@@ -126,15 +131,56 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
         : stickersStr
       : storyText.trim();
 
+    const storyPayload = {
+      text: fullText || null,
+      mediaUrl: mediaUrl || null,
+      backgroundColor: `${selectedGrad.class} ${selectedFont.class} text-${textAlign}`,
+    };
+
+    // Optimistic Update: Immediately inject story into global SWR cache
+    const optimisticStoryItem = {
+      id: `temp-${Date.now()}`,
+      mediaUrl: storyPayload.mediaUrl,
+      text: storyPayload.text,
+      backgroundColor: storyPayload.backgroundColor,
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    };
+
+    mutate(
+      "/api/stories",
+      (currentGroups: any[] = []) => {
+        const existingIdx = currentGroups.findIndex((g) => g?.user?.id === profile.id);
+        if (existingIdx >= 0) {
+          const updated = [...currentGroups];
+          updated[existingIdx] = {
+            ...updated[existingIdx],
+            stories: [optimisticStoryItem, ...(updated[existingIdx].stories || [])],
+          };
+          return updated;
+        }
+        return [
+          {
+            user: {
+              id: profile.id,
+              displayName: profile.displayName,
+              username: profile.username,
+              avatarUrl: profile.avatarUrl,
+              institution: profile.institution,
+            },
+            stories: [optimisticStoryItem],
+          },
+          ...currentGroups,
+        ];
+      },
+      false
+    );
+
     try {
       const res = await fetch("/api/stories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: fullText || null,
-          mediaUrl: mediaUrl || null,
-          backgroundColor: `${selectedGrad.class} ${selectedFont.class} text-${textAlign}`,
-        }),
+        body: JSON.stringify(storyPayload),
       });
 
       if (!res.ok) {
@@ -143,13 +189,15 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
       }
 
       toast.success("Story shared! Live for 24h 🔥");
+      mutate("/api/stories");
       router.push("/app");
-      router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
+      mutate("/api/stories");
       setIsPosting(false);
     }
   }
+
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-black select-none h-screen h-[100dvh] pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] touch-manipulation">

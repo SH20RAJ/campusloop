@@ -54,8 +54,9 @@ export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
   { icon: Compass, href: "/app/discover", label: "Discover" },
   { icon: Sparkles, href: "/app/post/new", label: "" },
   { icon: MessageSquare, href: "/app/chat", label: "Chat" },
-  { icon: UserCircle, href: "#menu", label: "Menu", isTrigger: true },
+  { icon: UserCircle, href: "/app/profile", label: "Profile" },
 ];
+
 
 export const FULL_MOBILE_DRAWER_LINKS: NavGroup[] = [
   {

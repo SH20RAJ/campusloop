@@ -1,8 +1,8 @@
 "use server";
 
-import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 

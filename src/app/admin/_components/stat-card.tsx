@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 type StatCardProps = {
 	label: string;

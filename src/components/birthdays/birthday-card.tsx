@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Cake, Sparkles, MessageCircle, ShieldCheck, Heart } from "lucide-react";
-import Link from "next/link";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import confetti from "canvas-confetti";
+import { Cake,Heart,MessageCircle,Sparkles } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface BirthdayCardProps {

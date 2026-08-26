@@ -1,5 +1,5 @@
-import { ContactClient } from "./contact-client";
 import { Metadata } from "next";
+import { ContactClient } from "./contact-client";
 
 export const metadata: Metadata = {
   title: "Contact Support & Grievance Redressal | CampusLoop",

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { X, Search, Sparkles, Smile } from "lucide-react";
-import { CAMPUS_STICKERS, STICKER_CATEGORIES, CampusSticker } from "@/constants/stickers";
+import { CAMPUS_STICKERS,CampusSticker,STICKER_CATEGORIES } from "@/constants/stickers";
 import { cn } from "@/lib/utils";
+import { Search,Smile,Sparkles,X } from "lucide-react";
+import { useMemo,useState } from "react";
 
 interface StickerPickerModalProps {
   isOpen: boolean;

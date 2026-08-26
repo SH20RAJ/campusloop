@@ -1,7 +1,7 @@
-import Link from "next/link";
+import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
+import { AlertOctagon,ArrowLeft,Flag,Heart,PhoneCall,ShieldAlert,ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
-import { ArrowLeft, Heart, ShieldAlert, ShieldCheck, Flag, PhoneCall, AlertOctagon } from "lucide-react";
-import { MarketingHeader, MarketingFooter } from "@/components/marketing/system";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Safety & Community Standards | CampusLoop",

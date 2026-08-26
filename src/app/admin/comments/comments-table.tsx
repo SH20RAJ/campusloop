@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { deleteComment } from "./actions";
-import { revealAnonymousAuthor, type RevealedIdentity } from "../anonymity-actions";
-import { SearchIcon, ChevronLeft, ChevronRight, Trash2, Eye } from "lucide-react";
-import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { ChevronLeft,ChevronRight,Eye,SearchIcon,Trash2 } from "lucide-react";
+import { useRouter,useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { revealAnonymousAuthor,type RevealedIdentity } from "../anonymity-actions";
+import { deleteComment } from "./actions";
 
 interface CommentRow {
   id: string;

@@ -1,14 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import useSWR from "swr";
-import { ArrowLeft, Heart, SlidersHorizontal, RotateCcw, Globe, Loader2, Camera } from "lucide-react";
-import { toast } from "sonner";
-import { fetcher } from "@/lib/api";
-import { useProfile } from "@/hooks/use-profile";
-import { SwipeDeck, SwipeActions, type Candidate } from "@/components/dating/swipe-deck";
 import { DatingMatchModal } from "@/components/dating/dating-match-modal";
+import { SwipeActions,SwipeDeck,type Candidate } from "@/components/dating/swipe-deck";
+import { useProfile } from "@/hooks/use-profile";
+import { fetcher } from "@/lib/api";
+import { ArrowLeft,Camera,Globe,Heart,Loader2,RotateCcw,SlidersHorizontal } from "lucide-react";
+import Link from "next/link";
+import { useCallback,useEffect,useMemo,useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 
 type MatchResult = {
   matched: boolean;

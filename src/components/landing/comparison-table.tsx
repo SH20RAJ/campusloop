@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X, ShieldCheck, Sparkles } from "lucide-react";
+import { Check,ShieldCheck,Sparkles,X } from "lucide-react";
 import { Reveal } from "./reveal";
 
 const COMPARISONS = [

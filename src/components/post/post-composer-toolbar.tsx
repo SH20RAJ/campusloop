@@ -1,8 +1,8 @@
 "use client";
 
-import { Bold, Italic, List, Heading2, Code, Quote, Smile } from "lucide-react";
-import { Editor } from "@tiptap/react";
 import { cn } from "@/lib/utils";
+import { Editor } from "@tiptap/react";
+import { Bold,Code,Heading2,Italic,List,Quote,Smile } from "lucide-react";
 
 interface PostComposerToolbarProps {
   editor: Editor | null;

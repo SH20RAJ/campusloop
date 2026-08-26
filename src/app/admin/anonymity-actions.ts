@@ -1,7 +1,7 @@
 "use server";
 
 import { getDb } from "@/db";
-import { anonIdentityVault, comments, moderationActions, posts, userProfiles } from "@/db/schema";
+import { anonIdentityVault,comments,moderationActions,posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { openSealedIdentity } from "@/lib/anonymity";
 import { eq } from "drizzle-orm";

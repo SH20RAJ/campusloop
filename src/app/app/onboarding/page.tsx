@@ -1,6 +1,6 @@
-import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
-import { userProfiles, institutionDomains } from "@/db/schema";
+import { institutionDomains,userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";

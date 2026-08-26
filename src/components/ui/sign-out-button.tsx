@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useUser } from "@hexclave/next";
-import { LogOut, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUser } from "@hexclave/next";
+import { Loader2,LogOut } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface SignOutButtonProps {

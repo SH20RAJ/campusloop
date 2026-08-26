@@ -1,27 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import type { Institution,UserProfile } from "@/db/schema";
+import { useColleges } from "@/hooks/use-colleges";
+import { useProfile } from "@/hooks/use-profile";
+import { fetcher } from "@/lib/api";
+import { getCloutTier } from "@/lib/gamification";
 import {
-  Flame,
-  ArrowUpRight,
-  UserPlus,
-  Sparkles,
-  Trophy,
-  MessageCircle,
-  ShieldCheck,
-  Check,
-  Zap,
-  Cake,
+ArrowUpRight,
+Cake,
+Check,
+Flame,
+MessageCircle,
+ShieldCheck,
+Sparkles,
+Trophy,
+UserPlus,
+Zap,
 } from "lucide-react";
 import Link from "next/link";
-import useSWR from "swr";
+import { useState } from "react";
 import { toast } from "sonner";
-import { getCloutTier } from "@/lib/gamification";
-import { useProfile } from "@/hooks/use-profile";
-import { useColleges } from "@/hooks/use-colleges";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { UserProfile, Institution } from "@/db/schema";
-import { fetcher } from "@/lib/api";
+import useSWR from "swr";
 
 type SuggestedPeer = UserProfile & { institution?: Institution | null };
 

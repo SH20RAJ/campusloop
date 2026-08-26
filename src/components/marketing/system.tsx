@@ -1,9 +1,9 @@
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { BrandLogo } from "@/components/ui/brand-logo";
+import { buttonVariants } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { cn } from "@/lib/utils";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export const BRAND_GRADIENT = "bg-gradient-to-r from-indigo-500 via-violet-600 to-purple-600";
 

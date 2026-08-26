@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Users, Hash, Gift, ArrowRight, Check, Heart, Sparkles, UserPlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ArrowRight,Check,Gift,Hash,Heart,Sparkles,UserPlus,Users } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
 
 // ──────── 1. Suggested Communities Widget ────────

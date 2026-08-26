@@ -1,7 +1,7 @@
 "use client";
 
+import { ArrowUpRight,CheckCircle2,MapPin,School,Trophy } from "lucide-react";
 import Link from "next/link";
-import { School, MapPin, ArrowUpRight, Trophy, CheckCircle2 } from "lucide-react";
 
 export interface CollegeItem {
   id: string;

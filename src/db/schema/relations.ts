@@ -1,12 +1,12 @@
 import { relations } from "drizzle-orm";
-import { institutions, institutionDomains } from "./institutions";
-import { userProfiles } from "./users";
-import { posts, comments, pollOptions, pollVotes, votes } from "./posts";
-import { conversations, conversationParticipants, messages } from "./chat";
+import { conversationParticipants,conversations,messages } from "./chat";
+import { communities,communityMembers } from "./communities";
 import { swipes } from "./dating";
-import { communities, communityMembers } from "./communities";
+import { institutionDomains,institutions } from "./institutions";
 import { notifications } from "./notifications";
+import { comments,pollOptions,pollVotes,posts,votes } from "./posts";
 import { stories } from "./stories";
+import { userProfiles } from "./users";
 
 export const institutionsRelations = relations(institutions, ({ many }) => ({
   domains: many(institutionDomains),

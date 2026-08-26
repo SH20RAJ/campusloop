@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "motion/react";
-import { Heart, MessageCircle, Lock } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card,CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Heart,Lock,MessageCircle } from "lucide-react";
+import {
+motion,
+useMotionValue,
+useReducedMotion,
+useSpring,
+useTransform,
+} from "motion/react";
+import { useState } from "react";
 
 const POLL_OPTIONS = [
   { id: "nescafe", text: "Nescafe booth", votes: 212 },

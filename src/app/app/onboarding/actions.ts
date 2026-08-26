@@ -1,13 +1,13 @@
 "use server";
 
-import { hexclaveServerApp } from "@/hexclave/server";
 import { getDb } from "@/db";
-import { userProfiles, institutionDomains } from "@/db/schema";
-import { redirect } from "next/navigation";
-import { eq, sql } from "drizzle-orm";
-import { cookies } from "next/headers";
-import { validateDisplayName, validateUsername } from "@/lib/validation";
+import { institutionDomains,userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { validateDisplayName,validateUsername } from "@/lib/validation";
 import { getViewerInstitutionId } from "@/lib/viewer";
+import { eq,sql } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function completeOnboarding(formData: FormData) {
   const user = await hexclaveServerApp.getUser();

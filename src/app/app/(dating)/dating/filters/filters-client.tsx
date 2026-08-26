@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import useSWR from "swr";
-import { ArrowLeft, RotateCcw, Loader2, Check } from "lucide-react";
-import { toast } from "sonner";
 import { fetcher } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { ArrowLeft,Check,Loader2,RotateCcw } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 
 type Prefs = {
   gender: "DEFAULT" | "MALE" | "FEMALE" | "ALL";

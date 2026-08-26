@@ -1,13 +1,13 @@
+import { CommunityFeedView } from "@/components/communities/community-feed-view";
+import { CommunityHeader } from "@/components/communities/community-header";
 import { getDb } from "@/db";
 import { posts } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
-import { notFound, redirect } from "next/navigation";
 import { FeedPost } from "@/hooks/use-feed";
 import { sanitizeAnonRow } from "@/lib/anonymity";
-import { CommunityHeader } from "@/components/communities/community-header";
-import { CommunityFeedView } from "@/components/communities/community-feed-view";
-import { getCachedAuthUser, getCachedUserProfile, getCachedCommunity } from "@/lib/server-cache";
+import { getCachedAuthUser,getCachedCommunity,getCachedUserProfile } from "@/lib/server-cache";
+import { desc,eq } from "drizzle-orm";
 import { Metadata } from "next";
+import { notFound,redirect } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ id: string }>;

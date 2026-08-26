@@ -1,7 +1,7 @@
-import { asc, eq } from "drizzle-orm";
+import { asc,eq } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { institutionDomains, institutions } from "@/db/schema";
+import { institutionDomains,institutions } from "@/db/schema";
 
 export type InstitutionOption = {
 	id: string;

@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
 /**
  * Viewer-Only Mode

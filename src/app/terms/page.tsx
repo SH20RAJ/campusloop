@@ -1,7 +1,7 @@
-import Link from "next/link";
+import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
+import { AlertTriangle,ArrowLeft,Ban,FileText,Mail,MapPin,Scale,Shield,UserCheck } from "lucide-react";
 import type { Metadata } from "next";
-import { ArrowLeft, Scale, Shield, AlertTriangle, UserCheck, FileText, Ban, Mail, MapPin } from "lucide-react";
-import { MarketingHeader, MarketingFooter } from "@/components/marketing/system";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Terms of Service | CampusLoop",

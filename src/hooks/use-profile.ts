@@ -1,5 +1,5 @@
+import { fetcher,updateProfile as updateProfileApi } from "@/lib/api";
 import useSWR from "swr";
-import { fetcher, updateProfile as updateProfileApi } from "@/lib/api";
 
 export interface UserProfileData {
   id: string;

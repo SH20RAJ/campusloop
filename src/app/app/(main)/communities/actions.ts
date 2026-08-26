@@ -1,9 +1,9 @@
 "use server";
 
 import { getDb } from "@/db";
-import { communities, communityMembers, userProfiles } from "@/db/schema";
+import { communities,communityMembers,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, and, sql } from "drizzle-orm";
+import { and,eq,sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export interface CreateCommunityInput {

@@ -1,14 +1,14 @@
 "use client";
 
 import {
-	Area,
-	AreaChart,
-	CartesianGrid,
-	Legend,
-	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis,
+Area,
+AreaChart,
+CartesianGrid,
+Legend,
+ResponsiveContainer,
+Tooltip,
+XAxis,
+YAxis,
 } from "recharts";
 
 export type ActivityDatum = {

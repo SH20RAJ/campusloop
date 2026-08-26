@@ -1,10 +1,10 @@
 "use client";
 
-import { X, ChevronLeft, ChevronRight, Send, Heart } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { ChevronLeft,ChevronRight,Heart,Send,X } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface Story {
   id: string;

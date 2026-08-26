@@ -1,12 +1,12 @@
-import { notFound } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
-import { PostComments } from "./post-comments";
-import { sanitizeAnonRow } from "@/lib/anonymity";
 import type { FeedPost } from "@/hooks/use-feed";
+import { sanitizeAnonRow } from "@/lib/anonymity";
+import { getCachedAuthUser,getCachedPostDetail,getCachedUserProfile } from "@/lib/server-cache";
+import { ArrowLeft,Lock } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Lock } from "lucide-react";
-import { getCachedAuthUser, getCachedUserProfile, getCachedPostDetail } from "@/lib/server-cache";
+import { notFound } from "next/navigation";
+import { PostComments } from "./post-comments";
 
 interface PostPageProps {
   params: Promise<{ id: string }>;

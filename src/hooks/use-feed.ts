@@ -1,7 +1,7 @@
-import useSWRInfinite from "swr/infinite";
+import { Institution,Post,UserProfile } from "@/db/schema";
+import { getSeenPostIds,markPostsAsSeen } from "@/lib/seen-posts";
 import { useEffect } from "react";
-import { Post, UserProfile, Institution } from "@/db/schema";
-import { getSeenPostIds, markPostsAsSeen } from "@/lib/seen-posts";
+import useSWRInfinite from "swr/infinite";
 
 export type FeedPost = Post & {
   // Stripped to null by the server for anonymous posts.

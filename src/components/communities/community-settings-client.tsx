@@ -1,23 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import {
-  Settings,
-  ArrowLeft,
-  Globe,
-  Lock,
-  EyeOff,
-  Plus,
-  Trash2,
-  CheckCircle2,
-  Loader2,
-  ShieldCheck,
-} from "lucide-react";
 import { updateCommunitySettings } from "@/app/app/(main)/communities/actions";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import {
+CheckCircle2,
+EyeOff,
+Globe,
+Loader2,
+Lock,
+Plus,
+Trash2
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const CATEGORIES = [
   "Tech & Coding",

@@ -1,34 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import {
-  BarChart3,
-  HelpCircle,
-  Sparkles,
-  Calendar,
-  Search,
-  Lock,
-  Clock,
-  Users,
-  ArrowUpRight,
-  X,
-  Heart,
-  MessageCircle,
-  Share2,
-  ThumbsUp,
-  UserPlus,
-  ShieldCheck,
-  ShieldAlert,
-  Check,
-  Eye,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Avatar,AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Reveal } from "./reveal";
 import { cn } from "@/lib/utils";
+import {
+ArrowUpRight,
+BarChart3,
+Calendar,
+Check,
+Clock,
+Eye,
+Heart,
+HelpCircle,
+Lock,
+MessageCircle,
+Search,
+Share2,
+ShieldAlert,
+ShieldCheck,
+Sparkles,
+ThumbsUp,
+UserPlus,
+Users,
+X,
+} from "lucide-react";
+import { AnimatePresence,motion } from "motion/react";
+import { useEffect,useState } from "react";
+import { Reveal } from "./reveal";
 
 // ──────── Artifact Config ────────
 

@@ -1,25 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import {
-  Users2,
-  ArrowLeft,
-  Globe,
-  Lock,
-  EyeOff,
-  Sparkles,
-  ShieldCheck,
-  Plus,
-  Trash2,
-  CheckCircle2,
-  Loader2,
-  HelpCircle,
-} from "lucide-react";
 import { createCommunity } from "@/app/app/(main)/communities/actions";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import {
+ArrowLeft,
+CheckCircle2,
+EyeOff,
+Globe,
+Loader2,
+Lock,
+Plus,
+Sparkles,
+Trash2,
+Users2
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const CATEGORIES = [
   "Tech & Coding",

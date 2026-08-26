@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { reports, userProfiles, posts } from "@/db/schema";
+import { posts,reports,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, sql } from "drizzle-orm";
+import { eq,sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
 interface RouteParams {
   params: Promise<{ id: string }>;

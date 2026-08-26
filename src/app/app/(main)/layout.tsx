@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
 import { Navigation } from "@/components/ui/navigation";
 import { RightSidebar } from "@/components/ui/right-sidebar";
-import { redirect } from "next/navigation";
+import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
 import { isViewerProfile } from "@/lib/viewer";
-import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: {

@@ -1,7 +1,7 @@
 import { comments } from "@/db/schema";
-import { desc, ilike, sql } from "drizzle-orm";
-import { CommentsTable } from "./comments-table";
+import { desc,ilike,sql } from "drizzle-orm";
 import { Metadata } from "next";
+import { CommentsTable } from "./comments-table";
 
 import { resolveAdminSession } from "../_lib/guard";
 

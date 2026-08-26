@@ -1,6 +1,6 @@
+import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 /**
  * Default for everything behind auth: stay out of search indexes.

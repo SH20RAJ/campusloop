@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useRef } from "react";
-import useSWR from "swr";
-import { MessageSquare, Lock, Image as ImageIcon, X, Loader2, Send, Sparkles, Smile } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
-import { CommentItem, CommentWithAuthor } from "@/components/post/comment-item";
-import { toast } from "sonner";
-import { uploadImageToImgBB } from "@/lib/upload";
-import { useProfile } from "@/hooks/use-profile";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CommentItem,CommentWithAuthor } from "@/components/post/comment-item";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
+import { useProfile } from "@/hooks/use-profile";
+import { fetcher } from "@/lib/api";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { Image as ImageIcon,Loader2,Lock,MessageSquare,Send,Smile,Sparkles,X } from "lucide-react";
+import { useRef,useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 
 export function PostComments({ postId }: { postId: string }) {
   const { profile } = useProfile();

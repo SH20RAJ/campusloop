@@ -1,5 +1,5 @@
-import { pgTable, text, uniqueIndex, boolean, integer, timestamp } from "drizzle-orm/pg-core";
-import { id, createdAt, updatedAt } from "./common";
+import { boolean,integer,pgTable,text,uniqueIndex } from "drizzle-orm/pg-core";
+import { createdAt,id,updatedAt } from "./common";
 import { userProfiles } from "./users";
 
 export const communities = pgTable(

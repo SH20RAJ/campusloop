@@ -1,5 +1,5 @@
-import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { id, createdAt } from "./common";
+import { index,pgTable,text,timestamp } from "drizzle-orm/pg-core";
+import { createdAt,id } from "./common";
 import { userProfiles } from "./users";
 
 export const stories = pgTable(

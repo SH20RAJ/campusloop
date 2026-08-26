@@ -1,13 +1,13 @@
+import { CheckCircle2,ShieldAlert,XCircle } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle2, XCircle, ShieldAlert } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-import { approvePendingPost, rejectPendingPost } from "../posts/actions";
 import { resolveAdminSession } from "../_lib/guard";
 import { getPendingReviewPosts } from "../_lib/queries";
+import { approvePendingPost,rejectPendingPost } from "../posts/actions";
 
 export const metadata: Metadata = {
 	title: "Review Queue | CampusLoop Admin",

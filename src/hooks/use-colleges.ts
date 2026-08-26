@@ -1,6 +1,6 @@
-import useSWR from "swr";
 import { fetcher } from "@/lib/api";
 import { useMemo } from "react";
+import useSWR from "swr";
 
 export interface College {
   id: string;

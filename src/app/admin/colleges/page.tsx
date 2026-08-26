@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import Link from "next/link";
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
-import { Plus } from "lucide-react";
 import { desc } from "drizzle-orm";
+import { Plus } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { CollegesTable } from "./colleges-table";
 
 export const dynamic = "force-dynamic";

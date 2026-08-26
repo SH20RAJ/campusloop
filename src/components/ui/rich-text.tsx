@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import { ExternalLink,X,ZoomIn } from "lucide-react";
 import Link from "next/link";
-import { ExternalLink, X, ZoomIn } from "lucide-react";
+import React,{ useState } from "react";
 
 interface RichTextProps {
   content: string;

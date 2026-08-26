@@ -1,7 +1,7 @@
 "use client";
 
-import { X, Send, Repeat2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Repeat2,Send,X } from "lucide-react";
 
 interface RepostModalProps {
   isOpen: boolean;

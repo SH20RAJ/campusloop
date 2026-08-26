@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Search, MessageSquare, School, Users, Hash, Sparkles } from "lucide-react";
-import Link from "next/link";
-import { Input } from "@/components/ui/input";
 import { FeedCard } from "@/components/ui/feed-card";
+import { Input } from "@/components/ui/input";
 import { FeedPost } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
+import { Hash,MessageSquare,School,Search,Sparkles,Users } from "lucide-react";
+import Link from "next/link";
+import { useEffect,useState } from "react";
 
 interface UserItem {
   id: string;

@@ -1,8 +1,8 @@
 "use server";
 
 import {
-	institutions,
-	institutionDomains,
+institutionDomains,
+institutions,
 } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { updateProfile } from "./actions";
 import { Edit2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { updateProfile } from "./actions";
 
 interface EditProfileDialogProps {
   initialDisplayName: string;

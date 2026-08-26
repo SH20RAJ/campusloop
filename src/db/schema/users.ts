@@ -1,15 +1,15 @@
 import { sql } from "drizzle-orm";
 import {
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgTable,
-  text,
-  uniqueIndex,
-  type AnyPgColumn,
+boolean,
+index,
+integer,
+jsonb,
+pgTable,
+text,
+uniqueIndex,
+type AnyPgColumn,
 } from "drizzle-orm/pg-core";
-import { id, createdAt, updatedAt, userRoleEnum, userStatusEnum } from "./common";
+import { createdAt,id,updatedAt,userRoleEnum,userStatusEnum } from "./common";
 import { institutions } from "./institutions";
 
 export const userProfiles = pgTable(

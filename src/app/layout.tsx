@@ -1,11 +1,11 @@
-import type { Metadata, Viewport } from "next";
-import "./globals.css";
-import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { Toaster } from "sonner";
-import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
 import { SWRProvider } from "@/components/providers/swr-provider";
+import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
 import { OfflineIndicator } from "@/components/ui/offline-indicator";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { HexclaveProvider,HexclaveTheme } from "@hexclave/next";
+import type { Metadata,Viewport } from "next";
+import { Toaster } from "sonner";
+import "./globals.css";
 
 export const viewport: Viewport = {
   themeColor: [

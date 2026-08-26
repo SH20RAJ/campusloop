@@ -1,5 +1,5 @@
-import { index, integer, jsonb, pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
-import { id, createdAt, updatedAt } from "./common";
+import { index,integer,jsonb,pgEnum,pgTable,text,uniqueIndex } from "drizzle-orm/pg-core";
+import { createdAt,id,updatedAt } from "./common";
 
 export const institutionDomainTypeEnum = pgEnum("institution_domain_type", [
   "WEBSITE",

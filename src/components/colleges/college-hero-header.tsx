@@ -1,22 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import {
-  School,
-  Globe,
-  Calendar,
-  ArrowLeft,
-  Users,
-  Trophy,
-  Award,
-  Share2,
-  MessageSquarePlus,
-  Flame,
-  CheckCircle2,
-  MapPin,
-  Check,
+ArrowLeft,
+Check,
+Globe,
+MapPin,
+MessageSquarePlus,
+School,
+Share2
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface CollegeHeroHeaderProps {

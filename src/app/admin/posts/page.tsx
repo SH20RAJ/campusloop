@@ -1,10 +1,10 @@
-import { and, count, desc, eq, ilike, type SQL } from "drizzle-orm";
+import { and,count,desc,eq,ilike,type SQL } from "drizzle-orm";
 import { Metadata } from "next";
 
 import { posts } from "@/db/schema";
 
-import { PostsTable } from "./posts-table";
 import { resolveAdminSession } from "../_lib/guard";
+import { PostsTable } from "./posts-table";
 
 export const metadata: Metadata = {
 	title: "Admin Posts | CampusLoop",

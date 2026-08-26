@@ -1,23 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { SignOutButton } from "@/components/ui/sign-out-button";
 import { getAvatarUrl } from "@/lib/utils";
-import { toast } from "sonner";
 import {
-  User,
-  ShieldCheck,
-  RotateCcw,
-  Sparkles,
-  Bell,
-  Sliders,
-  Check,
-  School,
-  Lock,
+Bell,
+Check,
+Lock,
+RotateCcw,
+School,
+ShieldCheck,
+Sliders,
+Sparkles,
+User,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { SignOutButton } from "@/components/ui/sign-out-button";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface SettingsClientProps {
   profile: {

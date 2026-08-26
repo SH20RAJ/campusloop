@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Award, Zap, Sparkles, Trophy, ArrowRight, Star } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Reveal } from "./reveal";
+import { Card,CardContent } from "@/components/ui/card";
+import { ArrowRight,Award,Sparkles,Star,Trophy,Zap } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { Reveal } from "./reveal";
 
 const TOP_CAMPUSES = [
   { rank: 1, name: "BITS Pilani", points: 48250, badge: "#1 Active Campus" },

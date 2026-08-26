@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Navigation } from "@/components/ui/navigation";
-import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
+import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {

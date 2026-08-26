@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { deleteCollege, addDomain, removeDomain } from "./actions";
-import { Trash2Icon, PlusIcon, Edit3, Search, School, Globe } from "lucide-react";
-import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { EditCollegeModal, CollegeEditData } from "./edit-college-modal";
+import { Edit3,Globe,PlusIcon,School,Search,Trash2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useMemo,useState } from "react";
+import { toast } from "sonner";
+import { addDomain,deleteCollege,removeDomain } from "./actions";
+import { CollegeEditData,EditCollegeModal } from "./edit-college-modal";
 
 interface CollegeRow {
   id: string;

@@ -1,8 +1,8 @@
 "use client";
 
+import { RefreshCw,TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
-import { RefreshCw, TriangleAlert } from "lucide-react";
 
 export default function AdminError({
 	error,

@@ -1,21 +1,21 @@
 "use client";
 
-import {
-  School,
-  MessageSquare,
-  Heart,
-  Users,
-  FileText,
-  MessageCircle,
-  Clock,
-  BarChart3,
-  Lock,
-  ShieldCheck,
-  ShieldAlert,
-  ChevronDown,
-} from "lucide-react";
-import { NumberTicker } from "@/components/ui/number-ticker";
 import { Reveal } from "@/components/landing/reveal";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import {
+BarChart3,
+ChevronDown,
+Clock,
+FileText,
+Heart,
+Lock,
+MessageCircle,
+MessageSquare,
+School,
+ShieldAlert,
+ShieldCheck,
+Users,
+} from "lucide-react";
 
 // ──────── Section 1: Stats & Numbers ────────
 

@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { anonIdentityVault, comments, userProfiles, posts, notifications } from "@/db/schema";
+import { anonIdentityVault,comments,notifications,posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { deriveAnonHandle,sealIdentity } from "@/lib/anonymity";
 import { runSafetyCheck } from "@/lib/moderation/rules";
-import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
-import { eq, and, asc, sql } from "drizzle-orm";
-import { randomUUID } from "node:crypto";
 import { rejectViewerWrite } from "@/lib/viewer";
+import { and,asc,eq,sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 
 interface RouteParams {
   params: Promise<{ id: string }>;

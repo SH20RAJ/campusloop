@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { Globe, ListFilter, School } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
-  FEED_SORT_TABS as SORT_TABS,
-  FEED_VISIBILITY_OPTIONS as VISIBILITY_OPTIONS,
-  FEED_CATEGORY_OPTIONS as CATEGORY_OPTIONS,
+FEED_CATEGORY_OPTIONS as CATEGORY_OPTIONS,
+FEED_SORT_TABS as SORT_TABS,
+FEED_VISIBILITY_OPTIONS as VISIBILITY_OPTIONS,
 } from "@/constants";
+import { cn } from "@/lib/utils";
+import { Globe,ListFilter,School } from "lucide-react";
+import { useState } from "react";
 
 interface FeedHeaderProps {
   scope: "CAMPUS" | "GLOBAL";

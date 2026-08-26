@@ -1,9 +1,9 @@
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { eq } from "drizzle-orm";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { SettingsClient } from "./settings-client";
 
 export const dynamic = "force-dynamic";

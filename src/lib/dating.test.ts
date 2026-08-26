@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe,expect,it } from "vitest";
 import {
-  computeCompatibility,
-  resolveGenderPreference,
-  sharedInterestsBetween,
-  type CompatibilityProfile,
+computeCompatibility,
+resolveGenderPreference,
+sharedInterestsBetween,
+type CompatibilityProfile,
 } from "./dating";
 
 function profile(overrides: Partial<CompatibilityProfile> = {}): CompatibilityProfile {

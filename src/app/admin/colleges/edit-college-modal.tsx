@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import {
-  X,
-  Upload,
-  Image as ImageIcon,
-  Sparkles,
-  Loader2,
-  Globe,
-  School,
-  Trophy,
-  Save,
-} from "lucide-react";
-import { toast } from "sonner";
-import { uploadImageToImgBB } from "@/lib/upload";
-import { updateCollegeDetails } from "./actions";
 import { fetchCollegeWikipediaSummary } from "@/lib/college-enricher";
+import { uploadImageToImgBB } from "@/lib/upload";
+import {
+Globe,
+Image as ImageIcon,
+Loader2,
+Save,
+School,
+Sparkles,
+Trophy,
+Upload,
+X,
+} from "lucide-react";
+import { useEffect,useRef,useState } from "react";
+import { toast } from "sonner";
+import { updateCollegeDetails } from "./actions";
 
 export interface CollegeEditData {
   id: string;

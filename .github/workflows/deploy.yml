@@ -1,0 +1,47 @@
+name: Build & Deploy CampusLoop to Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build & Deploy to Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun Environment
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile || bun install
+
+      - name: TypeScript Type Check
+        run: bunx tsc --noEmit
+
+      - name: Build & Deploy to Cloudflare Workers
+        run: bun run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DB_URL: ${{ secrets.DB_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_HEXCLAVE_API_URL: ${{ secrets.NEXT_PUBLIC_HEXCLAVE_API_URL }}
+          NEXT_PUBLIC_HEXCLAVE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_HEXCLAVE_PROJECT_ID }}
+          HEXCLAVE_PROJECT_ID: ${{ secrets.HEXCLAVE_PROJECT_ID }}
+          HEXCLAVE_SECRET_SERVER_KEY: ${{ secrets.HEXCLAVE_SECRET_SERVER_KEY }}
+          ANON_PEPPER: ${{ secrets.ANON_PEPPER }}
+          ANON_VAULT_SECRET: ${{ secrets.ANON_VAULT_SECRET }}
+          IMGBB_API_KEY: ${{ secrets.IMGBB_API_KEY }}
+          NEXT_PUBLIC_IMGBB_API_KEY: ${{ secrets.NEXT_PUBLIC_IMGBB_API_KEY }}
+          ADMIN_PASSKEY: ${{ secrets.ADMIN_PASSKEY }}
+          ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET }}
+          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+          NEXT_PUBLIC_GIPHY_API_KEY: ${{ secrets.NEXT_PUBLIC_GIPHY_API_KEY }}

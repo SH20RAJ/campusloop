@@ -1,41 +1,37 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Shield,
-  MessageSquare,
-  Copy,
-  Trophy,
-  Edit3,
-  ArrowUpRight,
-  Briefcase,
-  GraduationCap,
-  MapPin,
-  TrendingUp,
-  Upload,
-  Loader2,
-  ArrowLeft,
-  Share2,
-  Camera,
-  Check,
-  Flame,
-  Calendar,
-  Sparkles,
-  X,
-  Eye,
-  Move,
-} from "lucide-react";
-import { SignOutButton } from "@/components/ui/sign-out-button";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { FeedCard } from "@/components/ui/feed-card";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
+import { getBranchIcon,slugifyBranch } from "@/constants";
+import type { FeedPost } from "@/hooks/use-feed";
+import { getCloutTier } from "@/lib/gamification";
+import { cn } from "@/lib/utils";
+import {
+ArrowLeft,
+ArrowUpRight,
+Briefcase,
+Calendar,
+Camera,
+Check,
+Edit3,
+Eye,
+GraduationCap,
+Loader2,
+MessageSquare,
+Move,
+Share2,
+Shield,
+Sparkles,
+TrendingUp,
+Trophy,
+Upload,
+X
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FeedCard } from "@/components/ui/feed-card";
+import { useCallback,useEffect,useRef,useState } from "react";
 import { toast } from "sonner";
-import type { FeedPost } from "@/hooks/use-feed";
-import { cn } from "@/lib/utils";
-import { getCloutTier } from "@/lib/gamification";
-import { slugifyBranch, getBranchIcon } from "@/constants";
 
 interface ProfileClientViewProps {
   profile: {

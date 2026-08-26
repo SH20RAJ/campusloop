@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import {
-  Crown,
-  Search,
-  Users,
-} from "lucide-react";
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { getCloutTier } from "@/lib/gamification";
 import { cn } from "@/lib/utils";
+import {
+Crown,
+Search,
+Users,
+} from "lucide-react";
+import Link from "next/link";
+import { useMemo,useState } from "react";
 
 interface StudentItem {
   id: string;

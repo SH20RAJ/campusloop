@@ -1,7 +1,7 @@
 "use client";
 
+import { AlertTriangle,RefreshCw,Sparkles } from "lucide-react";
 import Link from "next/link";
-import { AlertTriangle, RefreshCw, Sparkles } from "lucide-react";
 
 export function FeedEmptyState() {
   return (

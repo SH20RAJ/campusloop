@@ -1,11 +1,11 @@
+import { CommunitiesIndexClient,CommunityItem } from "@/components/communities/communities-index-client";
 import { getDb } from "@/db";
-import { communities, posts } from "@/db/schema";
-import { desc, isNotNull } from "drizzle-orm";
-import { redirect } from "next/navigation";
-import { CommunitiesIndexClient, CommunityItem } from "@/components/communities/communities-index-client";
+import { communities,posts } from "@/db/schema";
 import { FeedPost } from "@/hooks/use-feed";
-import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
+import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
+import { desc,isNotNull } from "drizzle-orm";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Student Communities & Sub-Hubs | CampusLoop",

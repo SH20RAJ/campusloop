@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { deletePost } from "@/app/app/(main)/post/actions";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { FeedPost } from "@/hooks/use-feed";
+import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
+import { BarChart3,Flag,HelpCircle,Link2,Lock,MoreHorizontal,Repeat2,Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MoreHorizontal, Lock, BarChart3, HelpCircle, Repeat2, Link2, Flag, Trash2 } from "lucide-react";
-import { cn, getAvatarUrl, formatTimeAgo } from "@/lib/utils";
+import { useState } from "react";
 import { toast } from "sonner";
-import { deletePost } from "@/app/app/(main)/post/actions";
-import { FeedPost } from "@/hooks/use-feed";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface FeedCardHeaderProps {
   post: FeedPost;

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { FeedPost } from "@/hooks/use-feed";
+import { useState } from "react";
 
 interface PollCardProps {
   post: FeedPost;

@@ -1,52 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { AnimateIcon } from "@/components/animate-ui/icons/icon";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { BrandLogo } from "@/components/ui/brand-logo";
+import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/ui/sign-out-button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
-  Home,
-  Compass,
-  School,
-  Heart,
-  MessageSquare,
-  Flame,
-  Users,
-  Bell,
-  Plus,
-  UserCircle,
-  Shield,
+DESKTOP_NAV_ITEMS,
+FULL_MOBILE_DRAWER_LINKS,
+MOBILE_BOTTOM_ITEMS,
+} from "@/constants";
+import type { UserProfile } from "@/db/schema";
+import { cn } from "@/lib/utils";
+import { AnimatePresence,motion } from "framer-motion";
+import {
+Cake,
+ChevronUp,
+FileText,
+Flame,
+HelpCircle,
+Layers,
+MessageSquare,
+Plus,
+Shield,
 
-  Sliders,
-  Menu,
-  X,
-  FileText,
-  HelpCircle,
-  Layers,
-  Download,
-  ShoppingBag,
-  Search,
-  Home as HomeIcon,
-  Car,
-  Gift,
-  Wrench,
-  PartyPopper,
-  ChevronUp,
-  Cake,
+Sliders,
+UserCircle,
+X
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { SignOutButton } from "@/components/ui/sign-out-button";
-import { BrandLogo } from "@/components/ui/brand-logo";
-import type { UserProfile } from "@/db/schema";
-import { AnimateIcon } from "@/components/animate-ui/icons/icon";
-import {
-  DESKTOP_NAV_ITEMS,
-  MOBILE_BOTTOM_ITEMS,
-  FULL_MOBILE_DRAWER_LINKS,
-} from "@/constants";
+import { useState } from "react";
 
 interface NavigationProps {
   profile?: UserProfile;

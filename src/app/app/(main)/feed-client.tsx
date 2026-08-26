@@ -1,23 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useFeed, useStories } from "@/hooks/use-feed";
-import { FeedCard } from "@/components/ui/feed-card";
-import { StoryRing } from "@/components/ui/story-ring";
-import {
-  InlineCommunitiesWidget,
-  InlineDatingWidget,
-  InlineHashtagsWidget,
-  InlineReferralWidget,
-} from "@/components/ui/inline-feed-widgets";
-import { Plus } from "lucide-react";
-import { FeedSkeleton } from "@/components/ui/skeleton-card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Link from "next/link";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useProfile } from "@/hooks/use-profile";
 import { FeedHeader } from "@/components/feed/feed-header";
-import { FeedCaughtUpCard, FeedEmptyState, FeedErrorState } from "@/components/feed/feed-state-cards";
+import { FeedCaughtUpCard,FeedEmptyState,FeedErrorState } from "@/components/feed/feed-state-cards";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { FeedCard } from "@/components/ui/feed-card";
+import {
+InlineCommunitiesWidget,
+InlineDatingWidget,
+InlineHashtagsWidget,
+InlineReferralWidget,
+} from "@/components/ui/inline-feed-widgets";
+import { FeedSkeleton } from "@/components/ui/skeleton-card";
+import { StoryRing } from "@/components/ui/story-ring";
+import { useFeed,useStories } from "@/hooks/use-feed";
+import { useProfile } from "@/hooks/use-profile";
+import { Plus } from "lucide-react";
+import Link from "next/link";
+import { usePathname,useRouter,useSearchParams } from "next/navigation";
+import { useEffect,useState } from "react";
 
 export function FeedClient({ forcedType }: { forcedType?: string }) {
   const router = useRouter();

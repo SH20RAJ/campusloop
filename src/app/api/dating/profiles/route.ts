@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { userProfiles, swipes } from "@/db/schema";
+import { swipes,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, and, ne, notInArray, type SQL } from "drizzle-orm";
-import { rejectViewerWrite, getViewerInstitutionId } from "@/lib/viewer";
-import { computeCompatibility, resolveGenderPreference } from "@/lib/dating";
+import { computeCompatibility,resolveGenderPreference } from "@/lib/dating";
+import { getViewerInstitutionId,rejectViewerWrite } from "@/lib/viewer";
+import { and,eq,ne,notInArray,type SQL } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

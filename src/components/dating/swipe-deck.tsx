@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+import { cn,getAvatarUrl } from "@/lib/utils";
+import { AnimatePresence,motion,useMotionValue,useTransform } from "framer-motion";
 import {
-  Heart,
-  X,
-  School,
-  ShieldCheck,
-  Sparkles,
-  GraduationCap,
-  UserRound,
+GraduationCap,
+Heart,
+School,
+ShieldCheck,
+Sparkles,
+UserRound,
+X,
 } from "lucide-react";
 import Link from "next/link";
-import { cn, getAvatarUrl } from "@/lib/utils";
+import { useEffect,useState } from "react";
 
 export type Candidate = {
   id: string;

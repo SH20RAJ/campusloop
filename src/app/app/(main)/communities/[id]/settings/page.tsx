@@ -1,11 +1,11 @@
-import { getDb } from "@/db";
-import { posts } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { notFound, redirect } from "next/navigation";
 import { CommunityHeader } from "@/components/communities/community-header";
 import { CommunitySettingsClient } from "@/components/communities/community-settings-client";
-import { getCachedAuthUser, getCachedUserProfile, getCachedCommunity } from "@/lib/server-cache";
+import { getDb } from "@/db";
+import { posts } from "@/db/schema";
+import { getCachedAuthUser,getCachedCommunity,getCachedUserProfile } from "@/lib/server-cache";
+import { eq } from "drizzle-orm";
 import { Metadata } from "next";
+import { notFound,redirect } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ id: string }>;

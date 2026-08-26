@@ -1,5 +1,5 @@
-import { index, pgTable, text } from "drizzle-orm/pg-core";
-import { id, createdAt, updatedAt, reportTargetTypeEnum, reportStatusEnum } from "./common";
+import { index,pgTable,text } from "drizzle-orm/pg-core";
+import { createdAt,id,reportStatusEnum,reportTargetTypeEnum,updatedAt } from "./common";
 import { userProfiles } from "./users";
 
 export const reports = pgTable(

@@ -1,25 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import {
-  Users2,
-  Plus,
-  Search,
-  Lock,
-  Globe,
-  EyeOff,
-  Flame,
-  ShieldCheck,
-  TrendingUp,
-  Award,
-  Sparkles,
-  Compass,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
-import { FeedPost } from "@/hooks/use-feed";
 import { FeedCard } from "@/components/ui/feed-card";
+import { FeedPost } from "@/hooks/use-feed";
+import { cn } from "@/lib/utils";
+import {
+Compass,
+EyeOff,
+Flame,
+Globe,
+Lock,
+Plus,
+Search,
+ShieldCheck,
+Sparkles,
+Users2
+} from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 export interface CommunityItem {
   id: string;

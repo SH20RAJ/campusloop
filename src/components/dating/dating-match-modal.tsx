@@ -1,9 +1,9 @@
 "use client";
 
-import { Sparkles, MessageCircle } from "lucide-react";
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { MessageCircle,Sparkles } from "lucide-react";
+import Link from "next/link";
 
 interface MatchResult {
   matched: boolean;

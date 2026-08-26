@@ -1,5 +1,5 @@
-import { FeedClient } from "./feed-client";
 import { Metadata } from "next";
+import { FeedClient } from "./feed-client";
 
 export const metadata: Metadata = {
   title: "Campus Feed",

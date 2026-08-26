@@ -1,9 +1,9 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll,describe,expect,it } from "vitest";
 
 import {
-	deriveAnonHandle,
-	openSealedIdentity,
-	sealIdentity,
+deriveAnonHandle,
+openSealedIdentity,
+sealIdentity,
 } from "./anonymity";
 
 beforeAll(() => {

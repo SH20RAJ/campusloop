@@ -1,5 +1,5 @@
-import { index, jsonb, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
-import { id, createdAt, updatedAt } from "./common";
+import { index,jsonb,pgTable,text,timestamp,uniqueIndex } from "drizzle-orm/pg-core";
+import { createdAt,id,updatedAt } from "./common";
 import { userProfiles } from "./users";
 
 export const conversations = pgTable(

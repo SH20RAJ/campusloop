@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { completeOnboarding } from "./actions";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sparkles, User, ShieldCheck, Check, AlertCircle, Upload, Loader2, GraduationCap, Tag, Cake, Lock } from "lucide-react";
-import { validateDisplayName, validateUsername } from "@/lib/validation";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { DEGREE_CATEGORIES,getBranchesForDegree } from "@/constants";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { DEGREE_CATEGORIES, getBranchesForDegree } from "@/constants";
+import { validateDisplayName,validateUsername } from "@/lib/validation";
+import { AlertCircle,Cake,Check,GraduationCap,Loader2,Lock,ShieldCheck,Sparkles,Tag,Upload,User } from "lucide-react";
+import { useRef,useState } from "react";
 import { toast } from "sonner";
+import { completeOnboarding } from "./actions";
 
 const POPULAR_INTERESTS = [
   "Tech & Coding",

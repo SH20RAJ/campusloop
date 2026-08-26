@@ -1,9 +1,9 @@
 import "server-only";
 
-import { and, count, desc, eq, gte, sql } from "drizzle-orm";
+import { and,count,desc,eq,gte,sql } from "drizzle-orm";
 
+import { anonIdentityVault,comments,institutions,moderationActions,posts,reports,userProfiles,votes } from "@/db/schema";
 import type { Db } from "./db-context";
-import { anonIdentityVault, comments, institutions, moderationActions, posts, reports, userProfiles, votes } from "@/db/schema";
 
 export type DashboardStats = {
 	totalUsers: number;

@@ -1,16 +1,16 @@
 import {
-  boolean,
-  index,
-  integer,
-  pgEnum,
-  pgTable,
-  text,
-  uniqueIndex,
-  type AnyPgColumn,
+boolean,
+index,
+integer,
+pgEnum,
+pgTable,
+text,
+uniqueIndex,
+type AnyPgColumn,
 } from "drizzle-orm/pg-core";
-import { id, createdAt, updatedAt, contentStatusEnum } from "./common";
-import { userProfiles } from "./users";
+import { contentStatusEnum,createdAt,id,updatedAt } from "./common";
 import { institutions } from "./institutions";
+import { userProfiles } from "./users";
 
 export const postTypeEnum = pgEnum("post_type", [
   "NORMAL",

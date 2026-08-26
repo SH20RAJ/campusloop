@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest,NextResponse } from "next/server";
 
 const GIPHY_API_KEY =
   process.env.GIPHY_API_KEY ||

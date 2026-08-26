@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, ne, and, desc, sql } from "drizzle-orm";
 import { getViewerInstitutionId } from "@/lib/viewer";
+import { and,desc,eq,ne,sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

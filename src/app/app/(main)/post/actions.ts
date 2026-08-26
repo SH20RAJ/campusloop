@@ -1,7 +1,7 @@
 "use server";
 
 import { getDb } from "@/db";
-import { posts, userProfiles, votes, comments, pollOptions, pollVotes } from "@/db/schema";
+import { comments,pollOptions,pollVotes,posts,userProfiles,votes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";

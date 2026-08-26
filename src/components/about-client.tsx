@@ -1,25 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { 
-  CheckCircle, 
-  XCircle, 
-  ShieldCheck, 
-  ShieldAlert, 
-  ArrowRight, 
-  Heart, 
-  Sparkles, 
-  Coins, 
-  Zap, 
-  Shield, 
-  Check, 
-  Info,
-  ChevronDown,
-  Lock,
-  Smartphone
+import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
+import {
+ArrowRight,
+Check,
+CheckCircle,
+ChevronDown,
+Coins,
+Heart,
+Info,
+Lock,
+Shield,
+ShieldAlert,
+ShieldCheck,
+Smartphone,
+Sparkles,
+XCircle,
+Zap
 } from "lucide-react";
+import React,{ useEffect,useState } from "react";
 import { toast } from "sonner";
-import { MarketingHeader, MarketingFooter } from "@/components/marketing/system";
 
 // Whitelisted Indian institutions for the mock verification tool
 const whitelistedColleges = [

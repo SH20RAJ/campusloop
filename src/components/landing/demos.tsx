@@ -1,22 +1,22 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import {
-  Heart,
-  X,
-  ShieldCheck,
-  ShieldAlert,
-  MessageSquare,
-  Vote,
-  UserPlus,
-  MailCheck,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card,CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+Heart,
+MailCheck,
+MessageSquare,
+ShieldAlert,
+ShieldCheck,
+UserPlus,
+Vote,
+X,
+} from "lucide-react";
+import { AnimatePresence,motion } from "motion/react";
+import { useRef,useState } from "react";
 
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const PHONE_RE = /\b\d{10}\b/g;

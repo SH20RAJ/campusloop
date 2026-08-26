@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { X, Heart, Send, Share2, ChevronLeft, ChevronRight } from "lucide-react";
-import { toast } from "sonner";
-import Link from "next/link";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { ChevronLeft,ChevronRight,Heart,Send,Share2,X } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect,useState } from "react";
+import { toast } from "sonner";
 
 interface StoryViewerClientProps {
   story: {

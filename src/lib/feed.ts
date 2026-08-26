@@ -1,7 +1,7 @@
-import { and, asc, desc, eq, inArray, or, sql, type SQL } from "drizzle-orm";
+import { and,asc,desc,eq,inArray,or,sql,type SQL } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { comments, institutions, posts, reports, userProfiles, votes } from "@/db/schema";
+import { comments,institutions,posts,reports,userProfiles,votes } from "@/db/schema";
 
 export type FeedPost = {
 	id: string;

@@ -16,15 +16,15 @@ export const metadata: Metadata = {
 };
 
 import {
-	ArrowLeft,
-	FileText,
-	Ghost,
-	LayoutDashboard,
-	MessageSquare,
-	School,
-	ScrollText,
-	ShieldAlert,
-	Users,
+ArrowLeft,
+FileText,
+Ghost,
+LayoutDashboard,
+MessageSquare,
+School,
+ScrollText,
+ShieldAlert,
+Users,
 } from "lucide-react";
 
 

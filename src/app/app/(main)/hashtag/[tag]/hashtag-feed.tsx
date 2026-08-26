@@ -1,12 +1,12 @@
 "use client";
 
-import { useFeed } from "@/hooks/use-feed";
 import { FeedCard } from "@/components/ui/feed-card";
-import { ArrowLeft, Hash, TrendingUp } from "lucide-react";
+import { FeedSkeleton } from "@/components/ui/skeleton-card";
+import { useFeed } from "@/hooks/use-feed";
+import { ArrowLeft,Hash,TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
-import { FeedSkeleton } from "@/components/ui/skeleton-card";
+import { useEffect,useState } from "react";
 
 export default function HashtagFeed() {
   const params = useParams();

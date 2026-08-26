@@ -1,21 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Star,
-  Sparkles,
-  CheckCircle2,
-  AlertTriangle,
-  HelpCircle,
-  MessageSquare,
-  ChevronDown,
-  Building2,
-  Utensils,
-  PartyPopper,
-  Code,
-  Briefcase,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+AlertTriangle,
+Briefcase,
+Building2,
+CheckCircle2,
+ChevronDown,
+Code,
+HelpCircle,
+PartyPopper,
+Star,
+Utensils
+} from "lucide-react";
+import { useState } from "react";
 
 interface CollegeRealityScorecardProps {
   collegeName: string;

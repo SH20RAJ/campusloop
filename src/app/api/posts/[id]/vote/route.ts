@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { votes, userProfiles, posts, notifications } from "@/db/schema";
+import { notifications,posts,userProfiles,votes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, and } from "drizzle-orm";
 import { rejectViewerWrite } from "@/lib/viewer";
+import { and,eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
 interface RouteParams {
   params: Promise<{ id: string }>;

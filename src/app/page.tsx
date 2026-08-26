@@ -1,36 +1,36 @@
-import Link from "next/link";
-import type { Metadata } from "next";
-import {
-  ShieldCheck,
-  MailCheck,
-  School,
-  HeartHandshake,
-  ArrowRight,
-} from "lucide-react";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  MarketingHeader,
-  MarketingFooter,
-  GradientText,
-  CTABand,
-} from "@/components/marketing/system";
-import { Card, CardContent } from "@/components/ui/card";
-import { Reveal } from "@/components/landing/reveal";
-import { HeroPreview } from "@/components/landing/hero-preview";
-import { Marquee } from "@/components/ui/marquee";
-import {
-  ConfessionDemo,
-  MatchDemo,
-  PointsDemo,
-  VerifyDemo,
-} from "@/components/landing/demos";
-import { MatchmakingShowcase } from "@/components/landing/matchmaking-demo";
-import { LeaderboardShowcase } from "@/components/landing/leaderboard-demo";
-import { ComparisonShowcase } from "@/components/landing/comparison-table";
 import { AmbassadorShowcase } from "@/components/landing/ambassador-demo";
 import { ArtifactsShowcase } from "@/components/landing/artifacts-demos";
-import { StatsSection, IntegrationsSection, SafetySection, TestimonialsSection, FAQSection, HowItWorksSection } from "@/components/landing/extra-sections";
+import { ComparisonShowcase } from "@/components/landing/comparison-table";
+import {
+ConfessionDemo,
+MatchDemo,
+PointsDemo,
+VerifyDemo,
+} from "@/components/landing/demos";
+import { FAQSection,HowItWorksSection,IntegrationsSection,SafetySection,StatsSection,TestimonialsSection } from "@/components/landing/extra-sections";
+import { HeroPreview } from "@/components/landing/hero-preview";
+import { LeaderboardShowcase } from "@/components/landing/leaderboard-demo";
+import { MatchmakingShowcase } from "@/components/landing/matchmaking-demo";
+import { Reveal } from "@/components/landing/reveal";
+import {
+CTABand,
+GradientText,
+MarketingFooter,
+MarketingHeader,
+} from "@/components/marketing/system";
+import { buttonVariants } from "@/components/ui/button";
+import { Card,CardContent } from "@/components/ui/card";
+import { Marquee } from "@/components/ui/marquee";
+import { hexclaveServerApp } from "@/hexclave/server";
+import {
+ArrowRight,
+HeartHandshake,
+MailCheck,
+School,
+ShieldCheck,
+} from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 

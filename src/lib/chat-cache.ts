@@ -1,6 +1,6 @@
 "use client";
 
-import { Message, UserProfile } from "@/db/schema";
+import { Message,UserProfile } from "@/db/schema";
 
 export type ReactionItem = { emoji: string; userId: string; userDisplayName?: string };
 

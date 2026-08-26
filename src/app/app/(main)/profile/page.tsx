@@ -1,11 +1,11 @@
 import { getDb } from "@/db";
-import { posts, userProfiles } from "@/db/schema";
-import { eq, desc, and } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { Metadata } from "next";
-import { ProfileClientView } from "./profile-client";
 import { FeedPost } from "@/hooks/use-feed";
+import { and,desc,eq } from "drizzle-orm";
+import { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { ProfileClientView } from "./profile-client";
 
 export const metadata: Metadata = {
   title: "Profile | CampusLoop",

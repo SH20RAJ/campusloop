@@ -1,5 +1,5 @@
+import { neon,NeonDbError,type NeonQueryFunction } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { neon, NeonDbError, type NeonQueryFunction } from "@neondatabase/serverless";
 import * as schema from "./schema";
 
 const MAX_DB_RETRIES = 2;

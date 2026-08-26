@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Search, X, Sparkles, Loader2, Image as ImageIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { GifItem } from "@/app/api/gifs/search/route";
 import { GIF_POPULAR_TAGS } from "@/constants";
+import { cn } from "@/lib/utils";
+import { Image as ImageIcon,Loader2,Search,Sparkles,X } from "lucide-react";
+import { useEffect,useRef,useState } from "react";
 
 interface GifPickerModalProps {
   isOpen: boolean;

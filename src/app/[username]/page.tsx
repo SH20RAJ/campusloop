@@ -1,17 +1,17 @@
-import { getDb } from "@/db";
-import { posts, userProfiles, institutions } from "@/db/schema";
-import { eq, desc, and } from "drizzle-orm";
-import { notFound } from "next/navigation";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { Metadata } from "next";
-import { ProfileClientView } from "../app/(main)/profile/profile-client";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { Navigation } from "@/components/ui/navigation";
-import Link from "next/link";
-import { Lock, School } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getBranchIcon } from "@/constants";
+import { getDb } from "@/db";
+import { institutions,posts,userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { FeedPost } from "@/hooks/use-feed";
 import { getCloutTier } from "@/lib/gamification";
-import { getBranchIcon } from "@/constants";
+import { and,desc,eq } from "drizzle-orm";
+import { Lock,School } from "lucide-react";
+import { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ProfileClientView } from "../app/(main)/profile/profile-client";
 
 interface VanityProfileProps {
   params: Promise<{ username: string }>;

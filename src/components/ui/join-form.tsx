@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { SignIn, SignUp, useUser } from "@hexclave/next";
-import { useSearchParams } from "next/navigation";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { Sparkles, ShieldCheck, UserPlus, ArrowRight, LayoutDashboard } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useProfile } from "@/hooks/use-profile";
+import { cn } from "@/lib/utils";
+import { SignIn,SignUp,useUser } from "@hexclave/next";
+import { ArrowRight,LayoutDashboard,ShieldCheck,Sparkles,UserPlus } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect,useState } from "react";
 
 interface ReferrerProfile {
   id: string;

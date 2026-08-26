@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "motion/react";
-import { Heart, X, Sparkles, ShieldCheck, Check, MessageSquare, Flame } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card,CardContent } from "@/components/ui/card";
+import { Check,Flame,Heart,MessageSquare,ShieldCheck,Sparkles,X } from "lucide-react";
+import { AnimatePresence,motion } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { Reveal } from "./reveal";
 
 const MOCK_PROFILES = [

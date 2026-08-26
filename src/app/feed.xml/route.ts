@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { posts } from "@/db/schema";
-import { desc, and, eq } from "drizzle-orm";
+import { and,desc,eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {

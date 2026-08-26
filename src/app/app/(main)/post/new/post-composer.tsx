@@ -1,34 +1,34 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import {
-  School,
-  Globe,
-  AlertTriangle,
-  Users,
-  ChevronDown,
-  Image as ImageIcon,
-  X,
-  Loader2,
-  Lock,
-  BarChart3,
-  HelpCircle,
-  VenetianMask,
-  Check,
-} from "lucide-react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { useCommunities } from "@/hooks/use-communities";
-import { useProfile } from "@/hooks/use-profile";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PollOptionsEditor } from "@/components/post/poll-options-editor";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
-import { uploadImageToImgBB } from "@/lib/upload";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
+import { useCommunities } from "@/hooks/use-communities";
+import { useProfile } from "@/hooks/use-profile";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { cn } from "@/lib/utils";
+import { EditorContent,useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import {
+AlertTriangle,
+BarChart3,
+Check,
+ChevronDown,
+Globe,
+HelpCircle,
+Image as ImageIcon,
+Loader2,
+Lock,
+School,
+Users,
+VenetianMask,
+X,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef,useState } from "react";
+import { toast } from "sonner";
 
 export type PostType = "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
 

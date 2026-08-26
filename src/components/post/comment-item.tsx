@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Reply, Heart } from "lucide-react";
-import Link from "next/link";
-import { Comment } from "@/db/schema";
-import { getAvatarUrl, formatTimeAgo } from "@/lib/utils";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { RichText } from "@/components/ui/rich-text";
-import { cn } from "@/lib/utils";
+import { Comment } from "@/db/schema";
+import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { Heart,Reply } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 export type CommentWithAuthor = Omit<Comment, "createdAt" | "updatedAt"> & {
   createdAt: Date | string;

@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import { PostComposer } from "./post-composer";
-import { Sparkles, ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { isViewerProfile } from "@/lib/viewer";
+import { eq } from "drizzle-orm";
+import { ArrowLeft,Sparkles } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { PostComposer } from "./post-composer";
 
 export const metadata: Metadata = {
   title: "Create Post | CampusLoop",

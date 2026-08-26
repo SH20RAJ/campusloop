@@ -1,34 +1,33 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import useSWR from "swr";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserProfile } from "@/db/schema";
-import {
-  Send,
-  ArrowLeft,
-  ShieldCheck,
-  Smile,
-  CheckCheck,
-  Check,
-  Image as ImageIcon,
-  Search,
-  X,
-  Loader2,
-  CornerDownRight,
-  User,
-} from "lucide-react";
-import Link from "next/link";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
+import { UserProfile } from "@/db/schema";
+import {
+CachedMessage,
+getCachedMessages,
+setCachedMessages,
+} from "@/lib/chat-cache";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
-  CachedMessage,
-  getCachedMessages,
-  setCachedMessages,
-} from "@/lib/chat-cache";
+ArrowLeft,
+CheckCheck,
+CornerDownRight,
+Image as ImageIcon,
+Loader2,
+Search,
+Send,
+ShieldCheck,
+Smile,
+User,
+X
+} from "lucide-react";
+import Link from "next/link";
+import { useEffect,useRef,useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 
 const fetcher = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url);

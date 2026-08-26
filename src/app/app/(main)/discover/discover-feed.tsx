@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { useFeed } from "@/hooks/use-feed";
-import { useColleges } from "@/hooks/use-colleges";
+import { FeaturedCampusCard } from "@/components/discover/featured-campus-card";
 import { FeedCard } from "@/components/ui/feed-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles, HelpCircle, Heart, Flame, School, Search, TrendingUp, Lightbulb, Cake } from "lucide-react";
-import Link from "next/link";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
+import { useColleges } from "@/hooks/use-colleges";
+import { useFeed } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
-import { FeaturedCampusCard } from "@/components/discover/featured-campus-card";
+import { Cake,Flame,Heart,HelpCircle,Lightbulb,School,Search,Sparkles,TrendingUp } from "lucide-react";
+import { AnimatePresence,motion } from "motion/react";
+import Link from "next/link";
+import { useEffect,useMemo,useRef,useState } from "react";
 
 const TABS = [
   { id: "TRENDING", label: "Trending", icon: Flame },

@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { HexclaveHandler } from "@hexclave/next";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
 	title: "Sign In",

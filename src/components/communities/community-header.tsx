@@ -1,26 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions";
+import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
+import { cn } from "@/lib/utils";
+import {
+ArrowLeft,
+Check,
+EyeOff,
+Globe,
+Lock,
+MessageSquare,
+Settings,
+Share2,
+ShieldCheck,
+Users
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  ArrowLeft,
-  Lock,
-  Globe,
-  EyeOff,
-  Share2,
-  Check,
-  Settings,
-  ShieldCheck,
-  Sparkles,
-  Users,
-  MessageSquare,
-  FileText,
-} from "lucide-react";
-import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
-import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions";
+import { useState } from "react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 interface CommunityHeaderProps {
   community: {

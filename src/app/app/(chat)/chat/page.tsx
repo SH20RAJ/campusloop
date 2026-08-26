@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
-import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { MessengerView } from "@/components/chat/messenger-view";
+import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
+import { redirect } from "next/navigation";
 
 interface ChatPageProps {
   searchParams: Promise<{

@@ -2,11 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
-import { comments, moderationActions } from "@/db/schema";
+import { comments,moderationActions } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-import { getAdminDb, requireAdminProfile } from "../_lib/guard";
 import type { Db } from "../_lib/db-context";
+import { getAdminDb,requireAdminProfile } from "../_lib/guard";
 
 export async function deleteComment(commentId: string) {
 	const db = await getAdminDb();

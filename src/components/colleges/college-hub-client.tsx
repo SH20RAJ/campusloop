@@ -1,30 +1,24 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { FeedCard } from "@/components/ui/feed-card";
+import type { FeedPost } from "@/hooks/use-feed";
+import { cn } from "@/lib/utils";
 import {
-  Sparkles,
-  Users,
-  Trophy,
-  Swords,
-  Search,
-  ArrowUpDown,
-  Lock,
-  Plus,
-  Compass,
-  Building2,
-  Loader2,
-  Hash,
+ArrowUpDown,
+Compass,
+Hash,
+Loader2,
+Lock,
+Plus,
+Search
 } from "lucide-react";
 import Link from "next/link";
-import { FeedCard } from "@/components/ui/feed-card";
+import { useRouter } from "next/navigation";
+import { useCallback,useEffect,useMemo,useRef,useState } from "react";
+import { CollegeClubsView } from "./college-clubs-view";
 import { CollegeHeroHeader } from "./college-hero-header";
 import { CollegeLeaderboardPodium } from "./college-leaderboard-podium";
 import { CollegeRealityScorecard } from "./college-reality-scorecard";
-import { CollegeInterBattle } from "./college-inter-battle";
-import { CollegeClubsView } from "./college-clubs-view";
-import { cn } from "@/lib/utils";
-import type { FeedPost } from "@/hooks/use-feed";
 
 interface StudentItem {
   id: string;

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import { FeedPost } from "@/hooks/use-feed";
-import { X, Download, Share2, MessageCircle, Copy, Check } from "lucide-react";
+import { Check,Copy,Download,MessageCircle,Share2,X } from "lucide-react";
+import { useEffect,useRef,useState } from "react";
 import { toast } from "sonner";
 
 interface ShareStoryModalProps {

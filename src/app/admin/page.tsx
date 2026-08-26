@@ -1,34 +1,34 @@
+import { desc,eq } from "drizzle-orm";
+import {
+Activity,
+EyeOff,
+FileText,
+Ghost,
+GraduationCap,
+ShieldAlert,
+Sparkles,
+TrendingUp,
+UserCheck,
+Users,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-	Activity,
-	EyeOff,
-	FileText,
-	Ghost,
-	GraduationCap,
-	ShieldAlert,
-	Sparkles,
-	TrendingUp,
-	UserCheck,
-	Users,
-} from "lucide-react";
-import { desc, eq } from "drizzle-orm";
 
 export const metadata: Metadata = {
 	title: "Dashboard",
 };
 
-import { institutions, posts, userProfiles } from "@/db/schema";
+import { institutions,posts,userProfiles } from "@/db/schema";
 
 import { ActivityChart } from "./_components/activity-chart";
 import { StatCard } from "./_components/stat-card";
 import { resolveAdminSession } from "./_lib/guard";
 import {
-	getActivitySeries,
-	getDashboardStats,
-	getRecentAuditLog,
-	getTopColleges,
-	getTotalEngagement,
+getActivitySeries,
+getDashboardStats,
+getRecentAuditLog,
+getTopColleges,
+getTotalEngagement,
 } from "./_lib/queries";
 
 export const dynamic = "force-dynamic";

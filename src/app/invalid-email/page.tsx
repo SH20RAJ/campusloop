@@ -1,6 +1,6 @@
+import { ShieldAlertIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ShieldAlertIcon } from "lucide-react";
 
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import { hexclaveServerApp } from "@/hexclave/server";

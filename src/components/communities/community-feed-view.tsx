@@ -1,22 +1,20 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import Link from "next/link";
-import {
-  Flame,
-  Clock,
-  Trophy,
-  MessageSquare,
-  Lock,
-  Sparkles,
-  ShieldCheck,
-  Compass,
-  ArrowUpDown,
-} from "lucide-react";
-import { FeedPost } from "@/hooks/use-feed";
-import { FeedCard } from "@/components/ui/feed-card";
 import { PostComposer } from "@/app/app/(main)/post/new/post-composer";
+import { FeedCard } from "@/components/ui/feed-card";
+import { FeedPost } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
+import {
+Clock,
+Compass,
+Flame,
+Lock,
+MessageSquare,
+ShieldCheck,
+Sparkles,
+Trophy
+} from "lucide-react";
+import { useMemo,useState } from "react";
 
 interface CommunityFeedViewProps {
   community: {

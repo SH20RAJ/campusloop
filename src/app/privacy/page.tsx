@@ -1,7 +1,7 @@
-import Link from "next/link";
+import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
+import { ArrowLeft,Database,EyeOff,Key,Lock,Mail,ShieldCheck,UserCheck } from "lucide-react";
 import type { Metadata } from "next";
-import { ArrowLeft, Lock, EyeOff, Key, Database, UserCheck, ShieldCheck, Mail } from "lucide-react";
-import { MarketingHeader, MarketingFooter } from "@/components/marketing/system";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | CampusLoop",

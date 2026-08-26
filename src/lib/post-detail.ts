@@ -1,7 +1,7 @@
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and,asc,eq,sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { comments, institutions, pollOptions, pollVotes, posts, reports, userProfiles, votes } from "@/db/schema";
+import { comments,institutions,pollOptions,pollVotes,posts,reports,userProfiles,votes } from "@/db/schema";
 import type { FeedPost } from "@/lib/feed";
 
 export type DetailComment = {

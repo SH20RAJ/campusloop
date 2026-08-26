@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { keepPost, deletePost, hidePost, dismissReport } from "./actions";
-import { revealAnonymousAuthor, type RevealedIdentity } from "../anonymity-actions";
-import { CheckIcon, Trash2Icon, EyeOff, XCircle, Eye } from "lucide-react";
-import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { CheckIcon,Eye,EyeOff,Trash2Icon,XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { revealAnonymousAuthor,type RevealedIdentity } from "../anonymity-actions";
+import { deletePost,dismissReport,hidePost,keepPost } from "./actions";
 
 interface ReportRow {
   id: string;

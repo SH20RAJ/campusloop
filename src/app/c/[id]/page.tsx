@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ id: string }>;

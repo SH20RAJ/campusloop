@@ -1,6 +1,6 @@
+import { ChevronLeft,ChevronRight,ScrollText } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, ScrollText } from "lucide-react";
 
 import { resolveAdminSession } from "../_lib/guard";
 import { getAuditPage } from "../_lib/queries";

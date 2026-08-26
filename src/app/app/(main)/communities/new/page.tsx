@@ -1,7 +1,7 @@
+import { CreateCommunityClient } from "@/components/communities/create-community-client";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { CreateCommunityClient } from "@/components/communities/create-community-client";
 
 export const metadata: Metadata = {
   title: "Create a Student Community | CampusLoop",

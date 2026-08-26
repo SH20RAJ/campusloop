@@ -1,5 +1,5 @@
-import { index, pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
-import { id, createdAt } from "./common";
+import { index,pgEnum,pgTable,text,uniqueIndex } from "drizzle-orm/pg-core";
+import { createdAt,id } from "./common";
 import { userProfiles } from "./users";
 
 export const swipeDirectionEnum = pgEnum("swipe_direction", ["LIKE", "PASS"]);

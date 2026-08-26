@@ -1,5 +1,5 @@
-import { PitchClient } from "./pitch-client";
 import { Metadata } from "next";
+import { PitchClient } from "./pitch-client";
 
 export const metadata: Metadata = {
   title: "Investor Pitch Deck | CampusLoop",

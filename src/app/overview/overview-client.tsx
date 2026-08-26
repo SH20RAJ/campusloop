@@ -1,25 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import {
-  ArrowLeft,
-  Sparkles,
-  ShieldCheck,
-  Users,
-  MessageSquare,
-  Heart,
-  School,
-  TrendingUp,
-  DollarSign,
-  Layers,
-  ExternalLink,
-  BookOpen,
-  CheckCircle2,
-  HelpCircle,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { MarketingHeader } from "@/components/marketing/system";
+import { AnimatePresence,motion } from "framer-motion";
+import {
+ArrowLeft,
+BookOpen,
+CheckCircle2,
+DollarSign,
+ExternalLink,
+Heart,
+HelpCircle,
+Layers,
+MessageSquare,
+School,
+ShieldCheck,
+Sparkles,
+TrendingUp,
+Users,
+} from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 const SECTIONS = [
   { id: "concept", label: "Core Motive", icon: Sparkles },

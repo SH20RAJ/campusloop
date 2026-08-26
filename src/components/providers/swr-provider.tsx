@@ -1,8 +1,8 @@
 "use client";
 
+import { SWR_STORAGE_KEY } from "@/constants";
 import React from "react";
 import { SWRConfig } from "swr";
-import { SWR_STORAGE_KEY } from "@/constants";
 
 let globalSwrMap: Map<string, any> | null = null;
 

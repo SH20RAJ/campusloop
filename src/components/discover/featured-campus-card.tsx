@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { MapPin, ArrowUpRight, Users } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { College } from "@/hooks/use-colleges";
+import { cn } from "@/lib/utils";
+import { ArrowUpRight,MapPin,Users } from "lucide-react";
+import Link from "next/link";
 
 interface FeaturedCampusCardProps {
   college: College;

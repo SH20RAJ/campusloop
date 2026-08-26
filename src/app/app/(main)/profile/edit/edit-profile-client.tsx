@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Sparkles, ArrowLeft, Save, ShieldCheck, Check, AlertCircle, Upload, Loader2, Image as ImageIcon, X, Plus, Camera, Cake, Lock, Move } from "lucide-react";
-import Link from "next/link";
-import { toast } from "sonner";
-import { getAvatarUrl } from "@/lib/utils";
-import { useProfile } from "@/hooks/use-profile";
-import { validateDisplayName, validateUsername } from "@/lib/validation";
-import { uploadImageToImgBB } from "@/lib/upload";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
+import { useProfile } from "@/hooks/use-profile";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { getAvatarUrl } from "@/lib/utils";
+import { validateDisplayName,validateUsername } from "@/lib/validation";
+import { AlertCircle,ArrowLeft,Cake,Camera,Check,Image as ImageIcon,Loader2,Lock,Move,Plus,Save,ShieldCheck,Sparkles,Upload,User,X } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect,useRef,useState } from "react";
+import { toast } from "sonner";
 
 const INTEREST_SUGGESTIONS = [
   "Tech & Coding",

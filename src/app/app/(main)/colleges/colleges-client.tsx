@@ -1,26 +1,26 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { AddCollegeModal } from "@/components/colleges/add-college-modal";
+import { CollegeHubCard,CollegeItem } from "@/components/colleges/college-hub-card";
+import { Button } from "@/components/ui/button";
+import { fetcher } from "@/lib/api";
 import {
-  Search,
-  School,
-  Plus,
-  Flame,
-  Trophy,
-  Sparkles,
-  X,
-  Building2,
-  ArrowRight,
-  Award,
-  Crown,
-  ChevronRight,
+ArrowRight,
+Award,
+Building2,
+ChevronRight,
+Crown,
+Flame,
+Plus,
+School,
+Search,
+Sparkles,
+Trophy,
+X,
 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { useEffect,useMemo,useState } from "react";
 import { toast } from "sonner";
-import { fetcher } from "@/lib/api";
-import { CollegeHubCard, CollegeItem } from "@/components/colleges/college-hub-card";
-import { AddCollegeModal } from "@/components/colleges/add-college-modal";
 
 const CATEGORY_FILTERS = [
   { id: "ALL", label: "All 1,350+ Hubs", icon: School },

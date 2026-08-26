@@ -1,28 +1,27 @@
-import {
-  Home,
-  Compass,
-  School,
-  Users,
-  MessageSquare,
-  PartyPopper,
-  Bell,
-  UserCircle,
-  Shield,
-  ShoppingBag,
-  Search,
-  Home as HomeIcon,
-  Car,
-  Gift,
-  Wrench,
-  Heart,
-  Plus,
-  Sliders,
-  Layers,
-  FileText,
-  HelpCircle,
-  Download,
-} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import {
+Bell,
+Car,
+Compass,
+Download,
+FileText,
+Gift,
+Heart,
+HelpCircle,
+Home,
+Home as HomeIcon,
+Layers,
+MessageSquare,
+PartyPopper,
+Plus,
+School,
+Search,
+ShoppingBag,
+Sliders,
+UserCircle,
+Users,
+Wrench
+} from "lucide-react";
 
 export interface NavItem {
   icon: LucideIcon;

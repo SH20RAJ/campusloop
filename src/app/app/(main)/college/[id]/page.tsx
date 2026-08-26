@@ -1,12 +1,12 @@
-import { getDb } from "@/db";
-import { institutions, posts } from "@/db/schema";
-import { eq, or, desc } from "drizzle-orm";
-import { notFound } from "next/navigation";
-import { sanitizeAnonRow } from "@/lib/anonymity";
-import type { FeedPost } from "@/hooks/use-feed";
-import { Metadata } from "next";
 import { CollegeHubClient } from "@/components/colleges/college-hub-client";
-import { getCachedAuthUser, getCachedUserProfile, getCachedInstitution } from "@/lib/server-cache";
+import { getDb } from "@/db";
+import { institutions,posts } from "@/db/schema";
+import type { FeedPost } from "@/hooks/use-feed";
+import { sanitizeAnonRow } from "@/lib/anonymity";
+import { getCachedAuthUser,getCachedInstitution,getCachedUserProfile } from "@/lib/server-cache";
+import { desc,eq } from "drizzle-orm";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ id: string }>;

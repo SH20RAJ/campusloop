@@ -1,5 +1,5 @@
-import useSWR from "swr";
 import { fetcher } from "@/lib/api";
+import useSWR from "swr";
 
 export interface Community {
   id: string;

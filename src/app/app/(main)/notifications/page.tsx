@@ -1,13 +1,13 @@
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { getDb } from "@/db";
-import { notifications, userProfiles } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { notifications,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { Bell, Heart, MessageSquare, Sparkles, ArrowRight, Compass } from "lucide-react";
-import Link from "next/link";
-import { Metadata } from "next";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { desc,eq } from "drizzle-orm";
+import { Bell,Compass,Heart,MessageSquare,Sparkles } from "lucide-react";
+import { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 

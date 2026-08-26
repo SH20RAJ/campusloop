@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Copy, Check, Gift, Sparkles, ArrowRight, ShieldCheck, Flame, Users } from "lucide-react";
-import { Reveal } from "./reveal";
+import { ArrowRight,Check,Copy,Flame,Gift,ShieldCheck,Sparkles,Users } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
+import { Reveal } from "./reveal";
 
 export function AmbassadorShowcase() {
   const [username, setUsername] = useState("shaswat");

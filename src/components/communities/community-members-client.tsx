@@ -1,22 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { approveJoinRequest,rejectJoinRequest } from "@/app/app/(main)/communities/actions";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import {
-  Users,
-  Shield,
-  Crown,
-  Search,
-  CheckCircle2,
-  XCircle,
-  UserCheck,
-  Clock,
-  Loader2,
+CheckCircle2,
+Clock,
+Crown,
+Loader2,
+Search,
+Users,
+XCircle
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { approveJoinRequest, rejectJoinRequest } from "@/app/app/(main)/communities/actions";
+import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 interface MemberItem {
   id: string;

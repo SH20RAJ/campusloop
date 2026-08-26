@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { cn } from "@/lib/utils";
 import {
-  Trophy,
-  Swords,
-  Flame,
-  Share2,
-  Check,
+Check,
+Flame,
+Share2,
+Swords,
+Trophy,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 interface CompetitorCollege {
   id: string;

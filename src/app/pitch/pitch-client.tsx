@@ -1,36 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import {
-  TrendingUp,
-  ExternalLink,
-  BookOpen,
-  ShieldCheck,
-  Layers,
-  MessagesSquare,
-  HeartHandshake,
-  Store,
-  Trophy,
-  Megaphone,
-  Ticket,
-  ShoppingBag,
-  BriefcaseBusiness,
-  Flame,
-  Ban,
-  Split,
-  EyeOff,
-} from "lucide-react";
-import {
-  MarketingHeader,
-  MarketingFooter,
-  Section,
-  SectionHeading,
-  GradientText,
-  StatCard,
-  CTABand,
-} from "@/components/marketing/system";
 import { Reveal } from "@/components/landing/reveal";
+import {
+CTABand,
+GradientText,
+MarketingFooter,
+MarketingHeader,
+Section,
+SectionHeading,
+StatCard,
+} from "@/components/marketing/system";
+import {
+Ban,
+BookOpen,
+BriefcaseBusiness,
+ExternalLink,
+EyeOff,
+Flame,
+HeartHandshake,
+Layers,
+Megaphone,
+MessagesSquare,
+ShieldCheck,
+ShoppingBag,
+Split,
+Store,
+Ticket,
+TrendingUp,
+Trophy,
+} from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 const PAIN_POINTS = [
   {

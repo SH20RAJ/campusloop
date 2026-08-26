@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe,expect,it } from "vitest";
 
-import { getCloutTier, isAutoVerified } from "./gamification";
-import { normalizeApiFeedSort, sortFeedPosts } from "./feed";
+import { normalizeApiFeedSort,sortFeedPosts } from "./feed";
+import { getCloutTier,isAutoVerified } from "./gamification";
 
 describe("getCloutTier", () => {
 	it("starts everyone at Bronze Rookie", () => {

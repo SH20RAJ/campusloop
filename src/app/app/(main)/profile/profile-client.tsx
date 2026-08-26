@@ -403,20 +403,25 @@ export function ProfileClientView({
               </div>
 
               {/* Right Side Pill: Verify Account or Verified Check */}
-              <div className="flex items-center gap-2 pb-1">
-                {points >= 150 ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3.5 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 shadow-2xs">
-                    <Check className="size-3.5 stroke-[2.5]" />
-                    <span>Verified Student</span>
-                  </span>
-                ) : isOwnProfile ? (
-                  <Link
-                    href="/app/settings"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3.5 py-1.5 text-xs font-bold text-primary shadow-2xs hover:bg-primary/10 transition-all cursor-pointer"
-                  >
-                    <span>🛡️ Verify account</span>
-                  </Link>
+                {isOwnProfile ? (
+                  <div className="flex items-center gap-2">
+                    {points < 150 && (
+                      <Link
+                        href="/app/settings"
+                        className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
+                      >
+                        <span>Get Verified</span>
+                      </Link>
+                    )}
+                    <Link
+                      href="/app/profile/edit"
+                      className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
+                    >
+                      <span>Edit Profile</span>
+                    </Link>
+                  </div>
                 ) : (
+
                   <div className="flex items-center gap-2">
                     <SecretCrushButton
                       targetId={profile.id}
@@ -430,11 +435,10 @@ export function ProfileClientView({
                     </Link>
                   </div>
                 )}
-
               </div>
-            </div>
 
             {/* Display Name & Role */}
+
             <div className="space-y-1 pt-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-2xl font-black tracking-tight text-foreground">

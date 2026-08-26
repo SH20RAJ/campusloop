@@ -170,16 +170,16 @@ export function DatingAppClient() {
         </div>
 
         <div className="flex items-center gap-1.5">
-          {/* Secret Crush Vault Trigger */}
-          <button
-            type="button"
-            onClick={() => setShowSecretCrushModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-black transition-all active:scale-95 cursor-pointer shadow-xs border border-rose-500/30"
-            title="Secret Crush Vault"
+          {/* Secret Crush Vault Link */}
+          <Link
+            href="/app/crush"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-xs border border-white/10"
+            title="Manage Secret Crush Vault"
           >
-            <Lock className="size-3.5" />
-            <span className="hidden sm:inline">Crush</span>
-          </button>
+            <Lock className="size-3.5 text-rose-400" />
+            <span className="hidden sm:inline">Crush Vault</span>
+          </Link>
+
 
           <Link
             href="/app/dating/likes"

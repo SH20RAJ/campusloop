@@ -1,26 +1,21 @@
 import type { LucideIcon } from "lucide-react";
 import {
 Bell,
-Car,
+Cake,
 Compass,
-Download,
-FileText,
-Gift,
+Flame,
 Heart,
 HelpCircle,
 Home,
-Home as HomeIcon,
-Layers,
+Lock,
 MessageSquare,
-PartyPopper,
+MoreHorizontal,
 Plus,
 School,
-Search,
-ShoppingBag,
+ShieldCheck,
 Sliders,
 UserCircle,
-Users,
-Wrench
+Users
 } from "lucide-react";
 
 export interface NavItem {
@@ -29,7 +24,7 @@ export interface NavItem {
   label: string;
   desc?: string;
   badge?: string;
-  isTrigger?: boolean;
+  badgeColor?: string;
 }
 
 export interface NavGroup {
@@ -37,68 +32,99 @@ export interface NavGroup {
   items: NavItem[];
 }
 
+/**
+ * Clean, minimal primary navigation items (Twitter / X style: 5-6 core items + More)
+ */
 export const DESKTOP_NAV_ITEMS: NavItem[] = [
   { icon: Home, href: "/app", label: "Home" },
-  { icon: Compass, href: "/app/discover", label: "Discover" },
-  { icon: School, href: "/app/colleges", label: "Colleges" },
-  { icon: Users, href: "/app/communities", label: "Communities" },
-  { icon: Heart, href: "/app/dating", label: "Matches" },
-  { icon: MessageSquare, href: "/app/chat", label: "Messages" },
+  { icon: Compass, href: "/app/discover", label: "Explore" },
   { icon: Bell, href: "/app/notifications", label: "Notifications" },
+  { icon: MessageSquare, href: "/app/chat", label: "Messages" },
+  { icon: Users, href: "/app/communities", label: "Communities" },
   { icon: UserCircle, href: "/app/profile", label: "Profile" },
+  { icon: MoreHorizontal, href: "/app/more", label: "More" },
 ];
 
+/**
+ * Mobile Bottom Floating Navigation
+ */
 export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
   { icon: Home, href: "/app", label: "Home" },
-  { icon: Compass, href: "/app/discover", label: "Discover" },
+  { icon: Compass, href: "/app/discover", label: "Explore" },
   { icon: Plus, href: "/app/post/new", label: "" },
   { icon: MessageSquare, href: "/app/chat", label: "Chat" },
-  { icon: UserCircle, href: "/app/profile", label: "Profile" },
+  { icon: MoreHorizontal, href: "/app/more", label: "More" },
 ];
 
-export const FULL_MOBILE_DRAWER_LINKS: NavGroup[] = [
+/**
+ * All secondary features grouped under the "More" parent hub
+ */
+export const MORE_HUB_SECTIONS: NavGroup[] = [
   {
-    group: "Primary Campus",
+    group: "Connections & Dating",
     items: [
-      { icon: Home, href: "/app", label: "Campus Feed", desc: "Live discussions & confessions" },
-      { icon: Compass, href: "/app/discover", label: "Discover Hub", desc: "Explore colleges & trending tags" },
-      { icon: Heart, href: "/app/dating", label: "Campus Matches", desc: "Swipe verified college students", badge: "Hot" },
-      { icon: PartyPopper, href: "/app/birthdays", label: "Birthdays & DOB", desc: "Today's campus celebrations", badge: "New" },
-      { icon: MessageSquare, href: "/app/chat", label: "Direct Messages", desc: "Private student chat" },
-      { icon: Bell, href: "/app/notifications", label: "Notifications", desc: "Upvotes, comments & matches" },
-    ],
-  },
-
-  {
-    group: "Campus Utility",
-    items: [
-      { icon: ShoppingBag, href: "/app/hashtag/BuySell", label: "Buy / Sell / Exchange", desc: "Books, tech, cycles & dorm items" },
-      { icon: Search, href: "/app/hashtag/LostAndFound", label: "Lost & Found", desc: "Report or claim campus belongings" },
-      { icon: HomeIcon, href: "/app/hashtag/Roommates", label: "Roommate / Flat Finder", desc: "Find hostel & flat roommates" },
-      { icon: Car, href: "/app/hashtag/RideShare", label: "Ride Sharing", desc: "Carpool to metro or station" },
-      { icon: Gift, href: "/app/hashtag/FreeStuff", label: "Free Stuff", desc: "Giveaways & free student gear" },
-      { icon: Wrench, href: "/app/hashtag/CampusHelp", label: "Need / Can Help", desc: "Peer tutoring, lab help & notes" },
-    ],
-  },
-  {
-    group: "Social & Vibes",
-    items: [
-      { icon: PartyPopper, href: "/app/hashtag/CampusMemes", label: "Memes & Banter", desc: "Hostel tea & campus humor" },
-      { icon: PartyPopper, href: "/app/hashtag/CampusEvents", label: "Events & Fests", desc: "Cultural fests, hackathons & gigs" },
-      { icon: Users, href: "/app/communities", label: "Sub-Hubs & Clubs", desc: "Interest communities & branches" },
-      { icon: Heart, href: "/app/confessions", label: "Confessions", desc: "Anonymous campus thoughts" },
-      { icon: School, href: "/app/colleges", label: "College Directory", desc: "1,350+ indexed Indian colleges" },
+      {
+        icon: Lock,
+        href: "/app/crush",
+        label: "Secret Crush",
+        desc: "5-slot intent-hidden campus crush vault",
+        badge: "5 Slots",
+        badgeColor: "bg-rose-500/10 text-rose-500 border-rose-500/20",
+      },
+      {
+        icon: Heart,
+        href: "/app/dating",
+        label: "Campus Match",
+        desc: "Swipe deck for 18+ verified students",
+        badge: "18+",
+        badgeColor: "bg-pink-500/10 text-pink-500 border-pink-500/20",
+      },
     ],
   },
   {
-    group: "Account & System",
+    group: "Campus Directories & Life",
     items: [
-      { icon: UserCircle, href: "/app/profile", label: "My Profile", desc: "View LP clout & badges" },
-      { icon: Download, href: "#install", label: "Install Campus App", desc: "Add to home screen for 2x speed", badge: "PWA" },
-      { icon: Sliders, href: "/app/settings", label: "Settings", desc: "Preferences & privacy" },
-      { icon: Layers, href: "/overview", label: "Strategic Overview", desc: "Architecture & TAM brief" },
-      { icon: FileText, href: "/pitch", label: "Pitch Deck", desc: "Investor presentation & metrics" },
-      { icon: HelpCircle, href: "/safety", label: "Safety Center", desc: "Anti-harassment guidelines" },
+      {
+        icon: School,
+        href: "/app/colleges",
+        label: "Colleges Directory",
+        desc: "1,350+ indexed Indian college hubs & rankings",
+      },
+      {
+        icon: Flame,
+        href: "/app/confessions",
+        label: "Campus Confessions",
+        desc: "Anonymous discussions with sealed identity escrow",
+      },
+      {
+        icon: Cake,
+        href: "/app/birthdays",
+        label: "Campus Birthdays",
+        desc: "Celebrate fellow classmates born today",
+      },
+    ],
+  },
+  {
+    group: "Account & Platform",
+    items: [
+      {
+        icon: Sliders,
+        href: "/app/settings",
+        label: "Settings",
+        desc: "Account privacy, verification & notifications",
+      },
+      {
+        icon: ShieldCheck,
+        href: "/safety",
+        label: "Safety & Privacy",
+        desc: "Verified student network guidelines & moderation",
+      },
+      {
+        icon: HelpCircle,
+        href: "/contact",
+        label: "Help & Feedback",
+        desc: "Reach out to CampusLoop core team",
+      },
     ],
   },
 ];

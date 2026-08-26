@@ -6,35 +6,22 @@ import { BrandLogo } from "@/components/ui/brand-logo";
 import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { DESKTOP_NAV_ITEMS,MOBILE_BOTTOM_ITEMS } from "@/constants";
+import { DESKTOP_NAV_ITEMS,MOBILE_BOTTOM_ITEMS } from "@/constants/navigation";
 import type { UserProfile } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import { AnimatePresence,motion } from "framer-motion";
 import {
 Bell,
-Cake,
-ChevronRight,
-ChevronUp,
-Compass,
-Flame,
-Headphones,
-Heart,
 HelpCircle,
-Home,
-Info,
 Menu,
 MessageSquare,
-MessageSquarePlus,
+MoreHorizontal,
 Plus,
-School,
-Shield,
 ShieldCheck,
 Sliders,
 UserCircle,
-Users,
-X,
+X
 } from "lucide-react";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -53,36 +40,16 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
 
   const desktopNavItems = [
     ...DESKTOP_NAV_ITEMS.filter((item) => {
-      if (isViewer && ["/app/dating", "/app/chat", "/app/birthdays"].includes(item.href)) {
+      if (isViewer && ["/app/chat"].includes(item.href)) {
         return false;
       }
       return true;
     }),
   ];
 
-  if (isAdmin) {
-    desktopNavItems.push({ icon: Shield, href: "/admin", label: "Admin Console" });
-  }
-
-  const mobileBottomItems = MOBILE_BOTTOM_ITEMS;
-
-  const mobileDrawerItems = [
-    { icon: Home, href: "/app", label: "Home Feed" },
-    { icon: Compass, href: "/app/discover", label: "Discover" },
-    { icon: Heart, href: "/app/dating", label: "Matches / Dating" },
-    { icon: Users, href: "/app/communities", label: "Communities" },
-    { icon: School, href: "/app/colleges", label: "Colleges" },
-    { icon: Cake, href: "/app/birthdays", label: "Campus Birthdays" },
-    { icon: Flame, href: "/app/confessions", label: "Confessions" },
-    { icon: MessageSquare, href: "/app/chat", label: "Messages" },
-    { icon: Bell, href: "/app/notifications", label: "Notifications" },
-    { icon: UserCircle, href: "/app/profile", label: "Profile" },
-    { icon: Sliders, href: "/app/settings", label: "Settings" },
-  ];
-
   return (
     <>
-      {/* ─── Top Mobile Header with Drawer Trigger ─── */}
+      {/* ─── Minimal Top Mobile Header ─── */}
       {!pathname.startsWith("/app/chat") &&
         !pathname.startsWith("/app/stories/new") &&
         !pathname.startsWith("/app/story/") && (
@@ -91,17 +58,26 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
               <button
                 type="button"
                 onClick={() => setShowMobileMenu(true)}
-                className="flex size-9 items-center justify-center rounded-xl bg-muted/50 text-foreground hover:bg-muted transition-colors cursor-pointer"
+                className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-foreground transition-colors cursor-pointer"
                 aria-label="Open menu"
               >
-                <Menu className="size-4.5" />
+                {profile?.avatarUrl ? (
+                  <Avatar className="size-7.5 border border-border/40">
+                    <AvatarImage src={profile.avatarUrl} />
+                    <AvatarFallback className="text-[10px] font-bold">
+                      {profile.displayName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Menu className="size-5 text-foreground" />
+                )}
               </button>
 
               <Link href="/app" className="flex items-center gap-2">
                 <img
                   src="/logo.png"
                   alt="CampusLoop"
-                  className="size-7 object-contain drop-shadow-2xs"
+                  className="size-7 object-contain"
                 />
                 <span className="text-sm font-black tracking-tight text-foreground">
                   Campus<span className="text-primary font-black">Loop</span>
@@ -109,37 +85,35 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
               </Link>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <Link
                 href="/app/chat"
-                className="flex size-8 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors relative"
+                className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Direct messages"
               >
-                <MessageSquare className="size-4" />
+                <MessageSquare className="size-4.5" />
               </Link>
 
               <Link
                 href="/app/notifications"
-                className="flex size-8 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Notifications"
               >
-                <Bell className="size-4" />
+                <Bell className="size-4.5" />
               </Link>
-
-              <ThemeToggle className="size-8 rounded-full border-none bg-transparent hover:bg-muted" />
             </div>
           </header>
         )}
 
-      {/* ─── Desktop Sidebar ─── */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border/20 bg-background/85 backdrop-blur-2xl py-5 px-3.5 md:flex md:flex-col justify-between overflow-y-auto select-none">
+      {/* ─── Desktop Twitter/X Style Sidebar ─── */}
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border/30 bg-background py-4 px-3 md:flex md:flex-col justify-between overflow-y-auto select-none">
         <div className="space-y-4">
-          {/* Logo & Campus Tag */}
-          <div className="px-2 pb-1 flex items-center justify-between">
+          {/* Logo */}
+          <div className="px-3 py-1 flex items-center justify-between">
             <BrandLogo href="/app" size="md" />
             {collegeName && (
               <span
-                className="text-[9px] font-black uppercase tracking-wider text-muted-foreground/80 bg-muted/50 px-2 py-0.5 rounded-full truncate max-w-[90px]"
+                className="text-[10px] font-bold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full truncate max-w-[95px]"
                 title={collegeName}
               >
                 {collegeName.split(" ")[0]}
@@ -147,181 +121,143 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
             )}
           </div>
 
-          {/* Navigation Links with Sliding Active Indicator */}
-          <nav className="space-y-1 relative">
+          {/* Primary Navigation Links */}
+          <nav className="space-y-1">
             {desktopNavItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/app" && pathname.startsWith(item.href));
               const Icon = item.icon;
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "group relative flex items-center justify-between rounded-2xl px-3.5 py-2.5 text-xs font-bold transition-colors cursor-pointer",
+                    "group relative flex items-center gap-4 rounded-full px-4 py-3 text-sm font-semibold transition-colors cursor-pointer",
                     isActive
-                      ? "text-foreground font-black"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "text-foreground font-black bg-muted/50"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
                   )}
                 >
-                  {isActive && (
-                    <motion.div
-                      layoutId="sidebar-active-indicator"
-                      className="absolute inset-0 rounded-2xl bg-muted/70 shadow-2xs z-0"
-                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                  <AnimateIcon animateOnHover animation="path">
+                    <Icon
+                      className={cn(
+                        "size-5.5 shrink-0 transition-transform duration-200 group-hover:scale-110",
+                        isActive
+                          ? "text-foreground stroke-[2.5]"
+                          : "text-muted-foreground group-hover:text-foreground stroke-[1.8]"
+                      )}
                     />
-                  )}
+                  </AnimateIcon>
 
-                  <div className="relative z-10 flex items-center gap-3 min-w-0">
-                    <AnimateIcon animateOnHover animation="path">
-                      <Icon
-                        className={cn(
-                          "size-4 shrink-0 transition-transform duration-200 group-hover:scale-110",
-                          isActive
-                            ? "text-primary stroke-[2.5]"
-                            : "text-muted-foreground group-hover:text-foreground stroke-[1.8]"
-                        )}
-                      />
-                    </AnimateIcon>
-                    <span className="truncate">{item.label}</span>
-                  </div>
-
-                  {item.href === "/app/chat" && (
-                    <span className="relative z-10 size-2 rounded-full bg-rose-500 shadow-xs" />
-                  )}
-                  {item.href === "/app/dating" && (
-                    <span className="relative z-10 text-[9px] font-black px-1.5 py-0.2 rounded-full bg-rose-500/10 text-rose-500">
-                      Hot
-                    </span>
-                  )}
+                  <span className="truncate">{item.label}</span>
                 </Link>
               );
             })}
           </nav>
-        </div>
 
-        {/* Bottom Actions & User Profile Capsule */}
-        <div className="space-y-3 pt-3 border-t border-border/20">
+          {/* Post Action Button */}
           {!isViewer && (
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <div className="pt-2 px-1">
               <Link href="/app/post/new" className="block">
-                <Button className="w-full bg-foreground text-background hover:opacity-90 font-black py-2.5 rounded-2xl text-xs cursor-pointer border-none shadow-xs transition-all flex items-center justify-center gap-1.5">
-                  <Plus className="size-4 stroke-[3]" />
-                  <span>Create Post</span>
+                <Button className="w-full h-11 bg-foreground text-background hover:opacity-90 font-black rounded-full text-sm cursor-pointer border-none shadow-sm transition-all flex items-center justify-center gap-2">
+                  <Plus className="size-4.5 stroke-[3]" />
+                  <span>Post</span>
                 </Button>
               </Link>
-            </motion.div>
-          )}
-
-          {profile && (
-            <div className="relative">
-              {showProfileMenu && (
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setShowProfileMenu(false)}
-                />
-              )}
-
-              <AnimatePresence>
-                {showProfileMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                    transition={{ duration: 0.15, ease: "easeOut" }}
-                    className="absolute bottom-14 left-0 right-0 z-50 rounded-3xl bg-card/95 backdrop-blur-2xl p-2 shadow-2xl space-y-1 border border-border/30"
-                  >
-                    <div className="px-3 py-2 border-b border-border/20">
-                      <p className="text-xs font-black text-foreground truncate">{profile.displayName}</p>
-                      <p className="text-[10px] text-muted-foreground truncate">@{profile.username}</p>
-                    </div>
-
-                    <Link
-                      href="/app/profile"
-                      onClick={() => setShowProfileMenu(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
-                    >
-                      <UserCircle className="size-3.5 text-primary" />
-                      <span>View Profile</span>
-                    </Link>
-
-                    <Link
-                      href="/app/dating"
-                      onClick={() => setShowProfileMenu(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
-                    >
-                      <Heart className="size-3.5 text-rose-500" />
-                      <span>Campus Matches</span>
-                    </Link>
-
-                    <Link
-                      href="/app/birthdays"
-                      onClick={() => setShowProfileMenu(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
-                    >
-                      <Cake className="size-3.5 text-pink-500" />
-                      <span>Campus Birthdays</span>
-                    </Link>
-
-                    <Link
-                      href="/app/settings"
-                      onClick={() => setShowProfileMenu(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
-                    >
-                      <Sliders className="size-3.5 text-muted-foreground" />
-                      <span>Settings</span>
-                    </Link>
-
-                    <div className="border-t border-border/20 pt-1">
-                      <SignOutButton variant="menu-item" />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* User Profile Pill Container */}
-              <div className="flex items-center justify-between gap-2 p-1.5 rounded-2xl bg-card hover:bg-muted/50 transition-colors shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer group"
-                >
-                  <Avatar className="size-8 shrink-0 group-hover:scale-105 transition-transform">
-                    <AvatarImage src={profile.avatarUrl || ""} />
-                    <AvatarFallback className="text-[9px] font-bold bg-primary/10 text-primary">
-                      {profile.displayName[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-black text-foreground">{profile.displayName}</p>
-                    <p className="truncate text-[9px] text-muted-foreground">@{profile.username}</p>
-                  </div>
-                  <ChevronUp
-                    className={cn(
-                      "size-3.5 text-muted-foreground transition-transform duration-200",
-                      showProfileMenu && "rotate-180"
-                    )}
-                  />
-                </button>
-
-                <div className="flex items-center gap-1 shrink-0">
-                  <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted/60" />
-                  <SignOutButton variant="icon" />
-                </div>
-              </div>
             </div>
           )}
         </div>
+
+        {/* Bottom User Capsule */}
+        {profile ? (
+          <div className="relative pt-2">
+            {showProfileMenu && (
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowProfileMenu(false)}
+              />
+            )}
+
+            <AnimatePresence>
+              {showProfileMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  className="absolute bottom-16 left-0 right-0 z-50 rounded-2xl bg-card border border-border/50 p-1.5 shadow-xl space-y-1"
+                >
+                  <Link
+                    href="/app/profile"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+                  >
+                    <UserCircle className="size-4 text-muted-foreground" />
+                    <span>View Profile</span>
+                  </Link>
+
+                  <Link
+                    href="/app/settings"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+                  >
+                    <Sliders className="size-4 text-muted-foreground" />
+                    <span>Settings</span>
+                  </Link>
+
+                  <div className="pt-1 border-t border-border/30 px-2 py-1 flex items-center justify-between">
+                    <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted" />
+                    <SignOutButton />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <button
+              type="button"
+              onClick={() => setShowProfileMenu((prev) => !prev)}
+              className="w-full flex items-center justify-between p-2.5 rounded-full hover:bg-muted/50 transition-colors cursor-pointer text-left group"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Avatar className="size-9.5 shrink-0 border border-border/40">
+                  <AvatarImage src={profile.avatarUrl || ""} />
+                  <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
+                    {profile.displayName[0]}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-black text-foreground">{profile.displayName}</p>
+                  <p className="truncate text-[10px] text-muted-foreground">@{profile.username}</p>
+                </div>
+              </div>
+
+              <MoreHorizontal className="size-4 text-muted-foreground group-hover:text-foreground shrink-0" />
+            </button>
+          </div>
+        ) : (
+          <div className="p-2">
+            <Link
+              href="/join"
+              className="block w-full py-2.5 text-center text-xs font-bold rounded-full bg-muted hover:bg-muted/80 text-foreground transition-colors"
+            >
+              Sign In
+            </Link>
+          </div>
+        )}
       </aside>
 
-      {/* ─── Mobile Bottom Bar ─── */}
+      {/* ─── Mobile Bottom Floating Navigation ─── */}
       {!pathname.startsWith("/app/chat") &&
         !pathname.startsWith("/app/stories/new") &&
         !pathname.startsWith("/app/story/") && (
-          <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/20 bg-background/90 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
-            {mobileBottomItems.map((item) => {
+          <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/30 bg-background/90 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
+            {MOBILE_BOTTOM_ITEMS.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.href === "/app/profile" && pathname.startsWith("/app/profile"));
+                (item.href !== "/app" && pathname.startsWith(item.href));
               const Icon = item.icon;
 
               if (item.label === "") {
@@ -330,50 +266,10 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                   <Link
                     key="create"
                     href="/app/post/new"
-                    className="flex size-9 items-center justify-center rounded-2xl bg-foreground text-background shadow-xs active:scale-90 transition-transform cursor-pointer"
+                    className="flex size-10 items-center justify-center rounded-full bg-foreground text-background shadow-xs active:scale-95 transition-transform cursor-pointer"
                     aria-label="Create post"
                   >
-                    <Plus className="size-4.5 stroke-[2.5]" />
-                  </Link>
-                );
-              }
-
-              if (item.href === "/app/profile") {
-                return (
-                  <Link
-                    key="profile"
-                    href="/app/profile"
-                    className={cn(
-                      "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
-                      isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <div className="relative">
-                      {profile?.avatarUrl ? (
-                        <Avatar
-                          className={cn(
-                            "size-5.5 shrink-0 transition-all",
-                            isActive && "ring-2 ring-primary ring-offset-1 ring-offset-background"
-                          )}
-                        >
-                          <AvatarImage src={profile.avatarUrl} />
-                          <AvatarFallback className="text-[8px] font-bold">
-                            {(profile.displayName?.[0] || "U").toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                      ) : (
-                        <Icon
-                          className={cn(
-                            "size-5 transition-colors",
-                            isActive ? "stroke-[2.5]" : "stroke-[1.8]"
-                          )}
-                        />
-                      )}
-                    </div>
-                    <span className="mt-0.5 text-[9px] font-bold">Profile</span>
-                    {isActive && (
-                      <div className="absolute bottom-1 size-1 rounded-full bg-foreground" />
-                    )}
+                    <Plus className="size-5 stroke-[2.5]" />
                   </Link>
                 );
               }
@@ -387,15 +283,13 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                     isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <div className="relative">
-                    <Icon
-                      className={cn(
-                        "size-5 transition-colors",
-                        isActive ? "stroke-[2.5]" : "stroke-[1.8]"
-                      )}
-                    />
-                  </div>
-                  <span className="mt-0.5 text-[9px] font-bold">{item.label}</span>
+                  <Icon
+                    className={cn(
+                      "size-5.5 transition-colors",
+                      isActive ? "stroke-[2.5]" : "stroke-[1.8]"
+                    )}
+                  />
+                  <span className="mt-0.5 text-[9px] font-semibold">{item.label}</span>
                   {isActive && (
                     <div className="absolute bottom-1 size-1 rounded-full bg-foreground" />
                   )}
@@ -405,270 +299,153 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
           </div>
         )}
 
-      {/* ─── Mobile Slide-Out Drawer (Matching Reference Mockup) ─── */}
+      {/* ─── Clean Minimal Twitter-Style Mobile Drawer ─── */}
       <AnimatePresence>
         {showMobileMenu && (
           <div className="fixed inset-0 z-50 flex md:hidden select-none">
-            {/* Backdrop Blur */}
+            {/* Dark Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="absolute inset-0 bg-black/75 backdrop-blur-md"
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setShowMobileMenu(false)}
             />
 
-            {/* Drawer Sheet */}
+            {/* Clean Sidebar Sheet */}
             <motion.aside
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 380, damping: 35 }}
-              className="relative z-10 flex h-full w-[86%] max-w-[340px] flex-col justify-between overflow-hidden bg-gradient-to-b from-[#1e1333] via-[#0f1224] to-[#0a0c16] text-white shadow-2xl border-r border-white/10 rounded-r-3xl"
+              transition={{ type: "spring", stiffness: 420, damping: 38 }}
+              className="relative z-10 flex h-full w-[80%] max-w-[290px] flex-col justify-between overflow-y-auto bg-card border-r border-border/40 text-foreground p-5 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Glowing Background Mesh Accents */}
-              <div className="pointer-events-none absolute -top-16 -left-16 size-56 rounded-full bg-purple-600/25 blur-3xl" />
-              <div className="pointer-events-none absolute top-1/3 -right-16 size-48 rounded-full bg-rose-600/15 blur-3xl" />
-              <div className="pointer-events-none absolute bottom-10 left-0 size-40 rounded-full bg-blue-600/15 blur-3xl" />
+              <div className="space-y-6">
+                {/* User Header Info */}
+                <div className="space-y-3 pb-4 border-b border-border/30">
+                  <div className="flex items-center justify-between">
+                    <Link
+                      href={profile ? "/app/profile" : "/join"}
+                      onClick={() => setShowMobileMenu(false)}
+                    >
+                      <Avatar className="size-11 border border-border/50 shadow-xs">
+                        <AvatarImage src={profile?.avatarUrl || ""} />
+                        <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
+                          {profile?.displayName?.[0] || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Link>
 
-              {/* Scrollable Drawer Content */}
-              <div className="relative z-10 flex-1 overflow-y-auto px-5 py-6 space-y-6 scrollbar-none">
-                {/* Header Branding & Welcome (Matching Reference Image) */}
-                <div className="flex items-start justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="size-10 rounded-2xl bg-white/10 backdrop-blur-md p-1.5 flex items-center justify-center border border-white/15 shadow-md">
-                        <img
-                          src="/logo.png"
-                          alt="CampusLoop"
-                          className="size-full object-contain drop-shadow"
-                        />
-                      </div>
-                      <span className="text-xs font-black uppercase tracking-widest text-white/70">
-                        CampusLoop
-                      </span>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMobileMenu(false)}
+                      className="size-8 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                      aria-label="Close menu"
+                    >
+                      <X className="size-4.5" />
+                    </button>
+                  </div>
 
+                  {profile ? (
                     <div>
-                      <h2 className="text-2xl font-black tracking-tight text-white leading-tight">
-                        {profile ? (
-                          <>
-                            Welcome, <br />
-                            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-rose-300 bg-clip-text text-transparent">
-                              {profile.displayName.split(" ")[0]}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            Welcome <br />
-                            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-rose-300 bg-clip-text text-transparent">
-                              to CampusLoop
-                            </span>
-                          </>
-                        )}
-                      </h2>
+                      <h3 className="text-sm font-black text-foreground truncate">{profile.displayName}</h3>
+                      <p className="text-xs text-muted-foreground truncate">@{profile.username}</p>
                       {collegeName && (
-                        <p className="mt-1 text-xs font-semibold text-white/60 truncate max-w-[220px] flex items-center gap-1">
-                          <School className="size-3 text-purple-400 shrink-0" />
-                          <span>{collegeName}</span>
+                        <p className="mt-1 text-[11px] text-muted-foreground font-medium truncate">
+                          {collegeName}
                         </p>
                       )}
                     </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="size-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-                    aria-label="Close menu"
-                  >
-                    <X className="size-4" />
-                  </button>
+                  ) : (
+                    <div>
+                      <h3 className="text-sm font-black text-foreground">Welcome to CampusLoop</h3>
+                      <p className="text-xs text-muted-foreground">Verified student network</p>
+                    </div>
+                  )}
                 </div>
 
-                {/* Primary Campus Navigation */}
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white/40 px-2.5">
-                    Campus Feed &amp; Explore
-                  </span>
-                  <nav className="space-y-1 pt-1">
-                    {[
-                      { icon: Home, href: "/app", label: "Home Feed" },
-                      { icon: Compass, href: "/app/discover", label: "Discover Campuses" },
-                      {
-                        icon: Heart,
-                        href: "/app/dating",
-                        label: "Campus Match (18+)",
-                        badge: "Secret Crush",
-                        badgeColor: "bg-rose-500/20 text-rose-300 border-rose-500/30",
-                      },
-                      { icon: Users, href: "/app/communities", label: "Communities & Clubs" },
-                      { icon: School, href: "/app/colleges", label: "Colleges Directory (1,350+)" },
-                      { icon: Flame, href: "/app/confessions", label: "Campus Confessions" },
-                      { icon: Cake, href: "/app/birthdays", label: "Birthdays" },
-                      { icon: MessageSquare, href: "/app/chat", label: "Messages" },
-                      { icon: Bell, href: "/app/notifications", label: "Notifications" },
-                    ].map((item) => {
-                      const Icon = item.icon;
-                      const isActive = pathname === item.href;
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setShowMobileMenu(false)}
-                          className={cn(
-                            "flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer",
-                            isActive
-                              ? "bg-white/15 text-white font-black shadow-xs border border-white/10 backdrop-blur-md"
-                              : "text-white/70 hover:text-white hover:bg-white/5"
-                          )}
-                        >
-                          <div className="flex items-center gap-3">
-                            <Icon
-                              className={cn(
-                                "size-4.5 shrink-0",
-                                isActive ? "text-purple-400 stroke-[2.5]" : "text-white/60"
-                              )}
-                            />
-                            <span>{item.label}</span>
-                          </div>
+                {/* Primary Navigation Menu */}
+                <nav className="space-y-1">
+                  {desktopNavItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive =
+                      pathname === item.href ||
+                      (item.href !== "/app" && pathname.startsWith(item.href));
 
-                          {item.badge && (
-                            <span
-                              className={cn(
-                                "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border",
-                                item.badgeColor
-                              )}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                </div>
-
-                {/* Sub-Section: "YOUR SPACES / SHORTCUTS" (Matching "YOUR PAGES" in reference) */}
-                <div className="space-y-1.5 pt-2 border-t border-white/10">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white/40 px-2.5">
-                    Your Spaces
-                  </span>
-                  <div className="space-y-1 pt-1">
-                    {collegeName ? (
+                    return (
                       <Link
-                        href={`/app/college/${profile?.institutionId || "my-hub"}`}
+                        key={item.href}
+                        href={item.href}
                         onClick={() => setShowMobileMenu(false)}
-                        className="flex items-center justify-between px-3 py-2 rounded-2xl text-xs font-bold text-white/80 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                        className={cn(
+                          "flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer",
+                          isActive
+                            ? "text-foreground bg-muted font-black"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
                       >
-                        <div className="flex items-center gap-2.5 truncate">
-                          <span className="size-2 rounded-full bg-emerald-400 shrink-0" />
-                          <span className="truncate">{collegeName} Hub</span>
-                        </div>
-                        <ChevronRight className="size-3.5 text-white/40 shrink-0" />
+                        <Icon
+                          className={cn(
+                            "size-5 shrink-0",
+                            isActive ? "text-foreground stroke-[2.5]" : "text-muted-foreground"
+                          )}
+                        />
+                        <span>{item.label}</span>
                       </Link>
-                    ) : null}
+                    );
+                  })}
+                </nav>
 
-                    <Link
-                      href="/app/dating"
-                      onClick={() => setShowMobileMenu(false)}
-                      className="flex items-center justify-between px-3 py-2 rounded-2xl text-xs font-bold text-white/80 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Heart className="size-3.5 text-rose-400" />
-                        <span>Secret Crush Vault</span>
-                      </div>
-                      <span className="text-[10px] font-bold text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded-full">
-                        5 Slots
-                      </span>
-                    </Link>
-
-                    <Link
-                      href="/app/communities/new"
-                      onClick={() => setShowMobileMenu(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-bold text-purple-300 hover:text-purple-200 hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                      <Plus className="size-3.5" />
-                      <span>+ Create Community</span>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Platform Support & Legal Options (Matching Exact Reference Mockup) */}
-                <div className="space-y-1 pt-2 border-t border-white/10">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white/40 px-2.5">
-                    Settings &amp; Support
+                {/* Secondary Quick Links */}
+                <div className="pt-4 border-t border-border/30 space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground px-3">
+                    Support &amp; Safety
                   </span>
-                  <div className="space-y-1 pt-1">
-                    {[
-                      { icon: Sliders, href: "/app/settings", label: "Settings" },
-                      { icon: Headphones, href: "/contact", label: "Support & Help" },
-                      { icon: Info, href: "/about", label: "About CampusLoop" },
-                      { icon: ShieldCheck, href: "/privacy", label: "Legals & Privacy" },
-                      { icon: HelpCircle, href: "/overview", label: "FAQ & Safety" },
-                      { icon: MessageSquarePlus, href: "/contact", label: "Give Feedback" },
-                    ].map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <Link
-                          key={item.href + item.label}
-                          href={item.href}
-                          onClick={() => setShowMobileMenu(false)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs font-medium text-white/70 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-                        >
-                          <Icon className="size-4 text-white/50 shrink-0" />
-                          <span>{item.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
+                  <Link
+                    href="/app/settings"
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+                  >
+                    <Sliders className="size-4" />
+                    <span>Settings</span>
+                  </Link>
+
+                  <Link
+                    href="/safety"
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+                  >
+                    <ShieldCheck className="size-4" />
+                    <span>Safety &amp; Rules</span>
+                  </Link>
+
+                  <Link
+                    href="/contact"
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+                  >
+                    <HelpCircle className="size-4" />
+                    <span>Help &amp; Feedback</span>
+                  </Link>
                 </div>
               </div>
 
-              {/* Bottom User Capsule & Sign Out Footer */}
-              <div className="relative z-10 border-t border-white/10 bg-black/20 backdrop-blur-xl p-4 flex items-center justify-between">
+              {/* Bottom Drawer Footer */}
+              <div className="pt-4 border-t border-border/30 flex items-center justify-between">
+                <ThemeToggle className="size-8 rounded-xl border-none bg-muted/50 hover:bg-muted" />
                 {profile ? (
-                  <Link
-                    href="/app/profile"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-90 transition-opacity"
-                  >
-                    <Avatar className="size-9 shrink-0 border border-white/20">
-                      <AvatarImage src={profile.avatarUrl || ""} />
-                      <AvatarFallback className="text-[10px] font-black bg-purple-600 text-white">
-                        {profile.displayName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="min-w-0">
-                      <p className="truncate text-xs font-black text-white">
-                        {profile.displayName}
-                      </p>
-                      <div className="flex items-center gap-1.5 text-[10px] text-white/60">
-                        <span className="truncate">@{profile.username}</span>
-                        <span>•</span>
-                        <span className="text-amber-300 font-black">
-                          {profile.points || 0} LP
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
+                  <SignOutButton />
                 ) : (
                   <Link
                     href="/join"
                     onClick={() => setShowMobileMenu(false)}
-                    className="text-xs font-bold text-purple-300 hover:text-purple-200"
+                    className="text-xs font-bold text-primary hover:underline"
                   >
-                    Join Campus
+                    Sign In
                   </Link>
                 )}
-
-                <div className="flex items-center gap-1.5 shrink-0 pl-2">
-                  <ThemeToggle className="size-8 rounded-xl border-none bg-white/5 hover:bg-white/15 text-white" />
-                  {profile && <SignOutButton />}
-                </div>
               </div>
             </motion.aside>
           </div>
@@ -677,4 +454,3 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
     </>
   );
 }
-

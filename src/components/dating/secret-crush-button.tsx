@@ -2,8 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { Heart,Loader2,Lock } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+
 
 interface SecretCrushButtonProps {
   targetId: string;
@@ -85,10 +87,13 @@ export function SecretCrushButton({
               </p>
             </div>
 
-            <div className="rounded-xl bg-muted/40 p-2.5 text-[10px] text-muted-foreground flex items-center justify-center gap-1">
+            <Link
+              href="/app/crush"
+              className="inline-flex items-center justify-center gap-1 rounded-xl bg-muted/50 p-2 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+            >
               <Lock className="size-3 text-rose-500" />
-              <span>Uses 1 of your 5 secret crush slots</span>
-            </div>
+              <span>Uses 1 of your 5 secret crush slots • Manage Vault</span>
+            </Link>
 
             <div className="flex gap-2 pt-1">
               <button
@@ -102,10 +107,10 @@ export function SecretCrushButton({
                 type="button"
                 disabled={isLoading}
                 onClick={handleCrush}
-                className="flex-1 py-2 rounded-full bg-rose-500 hover:bg-rose-600 text-white text-xs font-black shadow-xs transition-transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+                className="flex-1 py-2 rounded-full bg-foreground text-background hover:opacity-90 text-xs font-black shadow-xs transition-transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
-                {isLoading ? <Loader2 className="size-3.5 animate-spin" /> : <Heart className="size-3.5 fill-white" />}
-                <span>Lock In Crush</span>
+                {isLoading ? <Loader2 className="size-3.5 animate-spin" /> : <Heart className="size-3.5 fill-rose-500 text-rose-500" />}
+                <span>Lock In</span>
               </button>
             </div>
           </div>
@@ -114,3 +119,4 @@ export function SecretCrushButton({
     </>
   );
 }
+

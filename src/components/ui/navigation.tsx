@@ -13,21 +13,28 @@ import { AnimatePresence,motion } from "framer-motion";
 import {
 Bell,
 Cake,
+ChevronRight,
 ChevronUp,
 Compass,
 Flame,
+Headphones,
 Heart,
+HelpCircle,
 Home,
+Info,
 Menu,
 MessageSquare,
+MessageSquarePlus,
 Plus,
 School,
 Shield,
+ShieldCheck,
 Sliders,
 UserCircle,
 Users,
 X,
 } from "lucide-react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -398,103 +405,270 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
           </div>
         )}
 
-      {/* ─── Mobile Slide-Out Drawer ─── */}
+      {/* ─── Mobile Slide-Out Drawer (Matching Reference Mockup) ─── */}
       <AnimatePresence>
         {showMobileMenu && (
           <div className="fixed inset-0 z-50 flex md:hidden select-none">
+            {/* Backdrop Blur */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+              transition={{ duration: 0.25 }}
+              className="absolute inset-0 bg-black/75 backdrop-blur-md"
               onClick={() => setShowMobileMenu(false)}
             />
 
+            {/* Drawer Sheet */}
             <motion.aside
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 400, damping: 36 }}
-              className="relative z-10 flex h-full w-[82%] max-w-[300px] flex-col justify-between overflow-y-auto bg-card p-5 text-foreground shadow-2xl border-r border-border/40"
+              transition={{ type: "spring", stiffness: 380, damping: 35 }}
+              className="relative z-10 flex h-full w-[86%] max-w-[340px] flex-col justify-between overflow-hidden bg-gradient-to-b from-[#1e1333] via-[#0f1224] to-[#0a0c16] text-white shadow-2xl border-r border-white/10 rounded-r-3xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="space-y-5">
-                {/* Header */}
-                <div className="flex items-center justify-between border-b border-border/30 pb-3">
-                  <div className="flex items-center gap-2.5">
-                    <img src="/logo.png" alt="CampusLoop" className="size-8 object-contain" />
+              {/* Glowing Background Mesh Accents */}
+              <div className="pointer-events-none absolute -top-16 -left-16 size-56 rounded-full bg-purple-600/25 blur-3xl" />
+              <div className="pointer-events-none absolute top-1/3 -right-16 size-48 rounded-full bg-rose-600/15 blur-3xl" />
+              <div className="pointer-events-none absolute bottom-10 left-0 size-40 rounded-full bg-blue-600/15 blur-3xl" />
+
+              {/* Scrollable Drawer Content */}
+              <div className="relative z-10 flex-1 overflow-y-auto px-5 py-6 space-y-6 scrollbar-none">
+                {/* Header Branding & Welcome (Matching Reference Image) */}
+                <div className="flex items-start justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="size-10 rounded-2xl bg-white/10 backdrop-blur-md p-1.5 flex items-center justify-center border border-white/15 shadow-md">
+                        <img
+                          src="/logo.png"
+                          alt="CampusLoop"
+                          className="size-full object-contain drop-shadow"
+                        />
+                      </div>
+                      <span className="text-xs font-black uppercase tracking-widest text-white/70">
+                        CampusLoop
+                      </span>
+                    </div>
+
                     <div>
-                      <h2 className="text-sm font-black tracking-tight text-foreground">
-                        Campus<span className="text-primary font-black">Loop</span>
+                      <h2 className="text-2xl font-black tracking-tight text-white leading-tight">
+                        {profile ? (
+                          <>
+                            Welcome, <br />
+                            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-rose-300 bg-clip-text text-transparent">
+                              {profile.displayName.split(" ")[0]}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            Welcome <br />
+                            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-rose-300 bg-clip-text text-transparent">
+                              to CampusLoop
+                            </span>
+                          </>
+                        )}
                       </h2>
-                      <p className="text-[10px] text-muted-foreground font-medium truncate max-w-[170px]">
-                        {collegeName || "Verified Campus"}
-                      </p>
+                      {collegeName && (
+                        <p className="mt-1 text-xs font-semibold text-white/60 truncate max-w-[220px] flex items-center gap-1">
+                          <School className="size-3 text-purple-400 shrink-0" />
+                          <span>{collegeName}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setShowMobileMenu(false)}
-                    className="flex size-7 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    className="size-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
                     aria-label="Close menu"
                   >
                     <X className="size-4" />
                   </button>
                 </div>
 
-                {/* Navigation Links */}
-                <nav className="space-y-1">
-                  {mobileDrawerItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = pathname === item.href;
-                    return (
+                {/* Primary Campus Navigation */}
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/40 px-2.5">
+                    Campus Feed &amp; Explore
+                  </span>
+                  <nav className="space-y-1 pt-1">
+                    {[
+                      { icon: Home, href: "/app", label: "Home Feed" },
+                      { icon: Compass, href: "/app/discover", label: "Discover Campuses" },
+                      {
+                        icon: Heart,
+                        href: "/app/dating",
+                        label: "Campus Match (18+)",
+                        badge: "Secret Crush",
+                        badgeColor: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+                      },
+                      { icon: Users, href: "/app/communities", label: "Communities & Clubs" },
+                      { icon: School, href: "/app/colleges", label: "Colleges Directory (1,350+)" },
+                      { icon: Flame, href: "/app/confessions", label: "Campus Confessions" },
+                      { icon: Cake, href: "/app/birthdays", label: "Birthdays" },
+                      { icon: MessageSquare, href: "/app/chat", label: "Messages" },
+                      { icon: Bell, href: "/app/notifications", label: "Notifications" },
+                    ].map((item) => {
+                      const Icon = item.icon;
+                      const isActive = pathname === item.href;
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setShowMobileMenu(false)}
+                          className={cn(
+                            "flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer",
+                            isActive
+                              ? "bg-white/15 text-white font-black shadow-xs border border-white/10 backdrop-blur-md"
+                              : "text-white/70 hover:text-white hover:bg-white/5"
+                          )}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Icon
+                              className={cn(
+                                "size-4.5 shrink-0",
+                                isActive ? "text-purple-400 stroke-[2.5]" : "text-white/60"
+                              )}
+                            />
+                            <span>{item.label}</span>
+                          </div>
+
+                          {item.badge && (
+                            <span
+                              className={cn(
+                                "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                                item.badgeColor
+                              )}
+                            >
+                              {item.badge}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </div>
+
+                {/* Sub-Section: "YOUR SPACES / SHORTCUTS" (Matching "YOUR PAGES" in reference) */}
+                <div className="space-y-1.5 pt-2 border-t border-white/10">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/40 px-2.5">
+                    Your Spaces
+                  </span>
+                  <div className="space-y-1 pt-1">
+                    {collegeName ? (
                       <Link
-                        key={item.href}
-                        href={item.href}
+                        href={`/app/college/${profile?.institutionId || "my-hub"}`}
                         onClick={() => setShowMobileMenu(false)}
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer",
-                          isActive
-                            ? "bg-primary text-primary-foreground shadow-2xs"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                        )}
+                        className="flex items-center justify-between px-3 py-2 rounded-2xl text-xs font-bold text-white/80 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
                       >
-                        <Icon className="size-4 shrink-0" />
-                        <span>{item.label}</span>
+                        <div className="flex items-center gap-2.5 truncate">
+                          <span className="size-2 rounded-full bg-emerald-400 shrink-0" />
+                          <span className="truncate">{collegeName} Hub</span>
+                        </div>
+                        <ChevronRight className="size-3.5 text-white/40 shrink-0" />
                       </Link>
-                    );
-                  })}
-                </nav>
+                    ) : null}
+
+                    <Link
+                      href="/app/dating"
+                      onClick={() => setShowMobileMenu(false)}
+                      className="flex items-center justify-between px-3 py-2 rounded-2xl text-xs font-bold text-white/80 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Heart className="size-3.5 text-rose-400" />
+                        <span>Secret Crush Vault</span>
+                      </div>
+                      <span className="text-[10px] font-bold text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded-full">
+                        5 Slots
+                      </span>
+                    </Link>
+
+                    <Link
+                      href="/app/communities/new"
+                      onClick={() => setShowMobileMenu(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-2xl text-xs font-bold text-purple-300 hover:text-purple-200 hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                      <Plus className="size-3.5" />
+                      <span>+ Create Community</span>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Platform Support & Legal Options (Matching Exact Reference Mockup) */}
+                <div className="space-y-1 pt-2 border-t border-white/10">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/40 px-2.5">
+                    Settings &amp; Support
+                  </span>
+                  <div className="space-y-1 pt-1">
+                    {[
+                      { icon: Sliders, href: "/app/settings", label: "Settings" },
+                      { icon: Headphones, href: "/contact", label: "Support & Help" },
+                      { icon: Info, href: "/about", label: "About CampusLoop" },
+                      { icon: ShieldCheck, href: "/privacy", label: "Legals & Privacy" },
+                      { icon: HelpCircle, href: "/overview", label: "FAQ & Safety" },
+                      { icon: MessageSquarePlus, href: "/contact", label: "Give Feedback" },
+                    ].map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          key={item.href + item.label}
+                          href={item.href}
+                          onClick={() => setShowMobileMenu(false)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs font-medium text-white/70 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                          <Icon className="size-4 text-white/50 shrink-0" />
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
-              {/* Bottom Profile / Auth Row */}
-              <div className="pt-4 border-t border-border/30 flex items-center justify-between">
+              {/* Bottom User Capsule & Sign Out Footer */}
+              <div className="relative z-10 border-t border-white/10 bg-black/20 backdrop-blur-xl p-4 flex items-center justify-between">
                 {profile ? (
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <Avatar className="size-8 shrink-0">
+                  <Link
+                    href="/app/profile"
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-90 transition-opacity"
+                  >
+                    <Avatar className="size-9 shrink-0 border border-white/20">
                       <AvatarImage src={profile.avatarUrl || ""} />
-                      <AvatarFallback className="text-[9px] font-bold">
+                      <AvatarFallback className="text-[10px] font-black bg-purple-600 text-white">
                         {profile.displayName[0]}
                       </AvatarFallback>
                     </Avatar>
+
                     <div className="min-w-0">
-                      <p className="truncate text-xs font-black text-foreground">{profile.displayName}</p>
-                      <p className="truncate text-[9px] text-muted-foreground">@{profile.username}</p>
+                      <p className="truncate text-xs font-black text-white">
+                        {profile.displayName}
+                      </p>
+                      <div className="flex items-center gap-1.5 text-[10px] text-white/60">
+                        <span className="truncate">@{profile.username}</span>
+                        <span>•</span>
+                        <span className="text-amber-300 font-black">
+                          {profile.points || 0} LP
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ) : (
                   <Link
                     href="/join"
                     onClick={() => setShowMobileMenu(false)}
-                    className="text-xs font-bold text-primary hover:underline"
+                    className="text-xs font-bold text-purple-300 hover:text-purple-200"
                   >
                     Join Campus
                   </Link>
                 )}
 
-                <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted" />
+                <div className="flex items-center gap-1.5 shrink-0 pl-2">
+                  <ThemeToggle className="size-8 rounded-xl border-none bg-white/5 hover:bg-white/15 text-white" />
+                  {profile && <SignOutButton />}
+                </div>
               </div>
             </motion.aside>
           </div>
@@ -503,3 +677,4 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
     </>
   );
 }
+

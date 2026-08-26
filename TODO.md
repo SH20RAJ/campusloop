@@ -1,6 +1,7 @@
-http://localhost:3000/app/college/viewer-hub improve ui ux and listings here users, posts, communities all....
+# CampusLoop TODO & Feature Roadmap
 
-remove redundancy and modularise codebase....
-remove emojis from the codebase and only use svg icons, if possible
-
-Secret crush feature....
+- [x] Streamline college hub UI/UX (`/app/college/[id]`) and fallback for viewer-hub.
+- [x] Remove redundancy & modularize codebase (`bun run clean:imports`).
+- [x] Remove emojis and ✨ from codebase; standardize on clean Lucide SVG icons.
+- [x] Implement 💘 Secret Crush (Match Mode 18+) with 5-slot vault, intent-hidden matchmaking, profile action buttons, landing page demo, and pitch deck investor highlights.
+- [x] Update Cloudflare deployment credentials in GitHub Actions secrets for continuous automated CI/CD.

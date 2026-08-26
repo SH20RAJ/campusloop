@@ -8,18 +8,18 @@ import { useColleges } from "@/hooks/use-colleges";
 import { useFeed } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
 import {
-  Cake,
-  Compass,
-  Flame,
-  Heart,
-  HelpCircle,
-  School,
-  Search,
-  Users,
+Cake,
+Compass,
+Flame,
+Heart,
+HelpCircle,
+School,
+Search,
+Users,
 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence,motion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect,useMemo,useRef,useState } from "react";
 
 const TABS = [
   { id: "TRENDING", label: "Trending", icon: Flame },

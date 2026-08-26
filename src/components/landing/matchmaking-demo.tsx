@@ -257,6 +257,10 @@ export function MatchmakingShowcase() {
             <div className="space-y-3">
               {[
                 {
+                  title: "💘 Secret Crush (Intent-Hidden Matching)",
+                  desc: "Add up to 5 classmates secretly. They see nothing unless they add you too — zero embarrassment, pure mutual matches.",
+                },
+                {
                   title: "Campus & Inter-College Filters",
                   desc: "Match exclusively within your campus or expand to nearby colleges in your city.",
                 },
@@ -270,7 +274,7 @@ export function MatchmakingShowcase() {
                 },
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-3 rounded-lg border border-border bg-card p-3.5 shadow-sm">
-                  <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary mt-0.5">
+                  <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-rose-500/10 text-rose-500 mt-0.5">
                     <Check className="size-3.5" />
                   </div>
                   <div>
@@ -280,6 +284,7 @@ export function MatchmakingShowcase() {
                 </div>
               ))}
             </div>
+
 
             <div className="pt-1">
               <Link href="/join?mode=signup">

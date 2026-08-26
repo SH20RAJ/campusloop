@@ -1,5 +1,6 @@
 "use client";
 
+import { SecretCrushButton } from "@/components/dating/secret-crush-button";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
@@ -16,18 +17,20 @@ Camera,
 Check,
 Edit3,
 Eye,
+Flame,
 GraduationCap,
 Loader2,
 MessageSquare,
 Move,
 Share2,
 Shield,
-Sparkles,
+
 TrendingUp,
 Trophy,
 Upload,
 X
 } from "lucide-react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback,useEffect,useRef,useState } from "react";
@@ -414,13 +417,20 @@ export function ProfileClientView({
                     <span>🛡️ Verify account</span>
                   </Link>
                 ) : (
-                  <Link
-                    href={`/app/chat?userId=${profile.id}`}
-                    className="flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground h-9 px-5 text-xs font-bold shadow-md hover:bg-primary/95 transition-all cursor-pointer"
-                  >
-                    <MessageSquare className="size-3.5" /> Message
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <SecretCrushButton
+                      targetId={profile.id}
+                      targetName={profile.displayName}
+                    />
+                    <Link
+                      href={`/app/chat?userId=${profile.id}`}
+                      className="flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground h-9 px-4 text-xs font-bold shadow-md hover:bg-primary/95 transition-all cursor-pointer"
+                    >
+                      <MessageSquare className="size-3.5" /> Message
+                    </Link>
+                  </div>
                 )}
+
               </div>
             </div>
 
@@ -704,8 +714,9 @@ export function ProfileClientView({
             {posts.length === 0 && (
               <div className="text-center py-16 border border-dashed rounded-3xl border-border bg-card text-muted-foreground text-xs font-semibold space-y-2 p-6">
                 <div className="size-12 rounded-2xl bg-muted flex items-center justify-center mx-auto text-primary">
-                  <Sparkles className="size-6" />
+                  <Flame className="size-6" />
                 </div>
+
                 <p className="font-bold text-foreground">No posts published yet.</p>
                 {isOwnProfile && (
                   <Link
@@ -877,15 +888,16 @@ export function ProfileClientView({
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ avatarUrl: newAvatar }),
                       });
-                      toast.success("Generated new avatar! 🎨");
+                      toast.success("Generated new avatar!");
                       setShowAvatarMenu(false);
                       router.refresh();
                     }}
                     className="w-full py-2.5 px-3.5 rounded-2xl border border-border/80 bg-muted/20 hover:bg-muted/50 text-xs font-bold text-foreground flex items-center gap-2.5 cursor-pointer transition-colors"
                   >
-                    <Sparkles className="size-4 text-amber-500" />
+                    <Flame className="size-4 text-amber-500" />
                     <span>Generate Random Avatar</span>
                   </button>
+
                 </>
               )}
             </div>

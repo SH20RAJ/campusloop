@@ -1,12 +1,13 @@
 import { relations } from "drizzle-orm";
 import { conversationParticipants,conversations,messages } from "./chat";
 import { communities,communityMembers } from "./communities";
-import { swipes } from "./dating";
+import { secretCrushes,swipes } from "./dating";
 import { institutionDomains,institutions } from "./institutions";
 import { notifications } from "./notifications";
 import { comments,pollOptions,pollVotes,posts,votes } from "./posts";
 import { stories } from "./stories";
 import { userProfiles } from "./users";
+
 
 export const institutionsRelations = relations(institutions, ({ many }) => ({
   domains: many(institutionDomains),
@@ -187,3 +188,17 @@ export const storiesRelations = relations(stories, ({ one }) => ({
     references: [userProfiles.id],
   }),
 }));
+
+export const secretCrushesRelations = relations(secretCrushes, ({ one }) => ({
+  sender: one(userProfiles, {
+    fields: [secretCrushes.senderId],
+    references: [userProfiles.id],
+    relationName: "crush_sender",
+  }),
+  target: one(userProfiles, {
+    fields: [secretCrushes.targetId],
+    references: [userProfiles.id],
+    relationName: "crush_target",
+  }),
+}));
+

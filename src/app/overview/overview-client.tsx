@@ -8,13 +8,13 @@ BookOpen,
 CheckCircle2,
 DollarSign,
 ExternalLink,
+Flame,
 Heart,
 HelpCircle,
 Layers,
 MessageSquare,
 School,
 ShieldCheck,
-Sparkles,
 TrendingUp,
 Users,
 } from "lucide-react";
@@ -22,7 +22,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 const SECTIONS = [
-  { id: "concept", label: "Core Motive", icon: Sparkles },
+  { id: "concept", label: "Core Motive", icon: Flame },
+
   { id: "layers", label: "Product Layers", icon: Layers },
   { id: "density", label: "Network Moat", icon: ShieldCheck },
   { id: "market", label: "Market Size", icon: TrendingUp },
@@ -197,16 +198,17 @@ export function OverviewClient() {
                     ],
                   },
                   {
-                    title: "3. Connection & Matchmaking Layer",
+                    title: "3. Connection & Matchmaking Layer (18+)",
                     icon: Heart,
                     color: "text-rose-500",
                     points: [
-                      "Swipe deck for verified student matches",
+                      "💘 Secret Crush: Intent-hidden matchmaking with 5-slot vault",
+                      "Swipe deck for 18+ verified student matches",
                       "Gender & campus radius scope filters",
-                      "Direct messaging (DMs) with typing indicators",
-                      "Instant match celebration overlay",
+                      "Direct messaging (DMs) & automatic mutual reveal",
                     ],
                   },
+
                   {
                     title: "4. Campus Utility & Communities",
                     icon: School,

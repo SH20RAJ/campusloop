@@ -1,11 +1,13 @@
 "use client";
 
 import { DatingMatchModal } from "@/components/dating/dating-match-modal";
+import { SecretCrushModal } from "@/components/dating/secret-crush-modal";
 import { SwipeActions,SwipeDeck,type Candidate } from "@/components/dating/swipe-deck";
 import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
-import { ArrowLeft,Camera,Globe,Heart,Loader2,RotateCcw,SlidersHorizontal } from "lucide-react";
+import { ArrowLeft,Camera,Globe,Heart,Loader2,Lock,RotateCcw,SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
+
 import { useCallback,useEffect,useMemo,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -27,6 +29,7 @@ export function DatingAppClient() {
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [deckIndex, setDeckIndex] = useState(0);
   const [lastSwipedId, setLastSwipedId] = useState<string | null>(null);
+  const [showSecretCrushModal, setShowSecretCrushModal] = useState(false);
 
   const [selectedGenderGate, setSelectedGenderGate] = useState<"MALE" | "FEMALE" | "OTHER">("MALE");
   const [isSavingGender, setIsSavingGender] = useState(false);
@@ -49,13 +52,17 @@ export function DatingAppClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ targetId, direction }),
       });
-      if (res.ok) {
-        const result = (await res.json()) as MatchResult;
-        if (result.matched) setMatchResult(result);
-        return result;
+      if (!res.ok) throw new Error("Swipe failed");
+      const result = (await res.json()) as MatchResult;
+      setLastSwipedId(targetId);
+      setDeckIndex((prev) => prev + 1);
+
+      if (result.matched) {
+        setMatchResult(result);
       }
-    } catch (err) {
-      console.error("[dating] swipe error:", err);
+      return result;
+    } catch {
+      toast.error("Swipe failed — please try again.");
     }
     return null;
   }, []);
@@ -66,7 +73,6 @@ export function DatingAppClient() {
       if (!current) return;
 
       void sendSwipe(current.id, direction === "like" ? "LIKE" : "PASS");
-      setLastSwipedId(current.id);
       setDeckIndex((i) => {
         const next = i + 1;
         if (candidates.length - next <= 3) void mutate();
@@ -82,10 +88,10 @@ export function DatingAppClient() {
       const res = await fetch(`/api/dating/swipe?targetId=${encodeURIComponent(lastSwipedId)}`, {
         method: "DELETE",
       });
-      if (res.ok) {
-        setDeckIndex((i) => Math.max(0, i - 1));
-        setLastSwipedId(null);
-      }
+      if (!res.ok) throw new Error("Rewind failed");
+      setDeckIndex((i) => Math.max(0, i - 1));
+      setLastSwipedId(null);
+      toast.success("Rewound last profile");
     } catch {
       toast.error("Couldn't undo");
     }
@@ -154,11 +160,27 @@ export function DatingAppClient() {
           <ArrowLeft className="size-5" />
         </Link>
 
-        <h1 className="bg-gradient-to-r from-rose-400 to-pink-500 bg-clip-text text-lg font-black tracking-tight text-transparent">
-          Campus Match
-        </h1>
+        <div className="flex items-center gap-1.5">
+          <h1 className="bg-gradient-to-r from-rose-400 to-pink-500 bg-clip-text text-lg font-black tracking-tight text-transparent">
+            Campus Match
+          </h1>
+          <span className="text-[9px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded-full">
+            18+
+          </span>
+        </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {/* Secret Crush Vault Trigger */}
+          <button
+            type="button"
+            onClick={() => setShowSecretCrushModal(true)}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-black transition-all active:scale-95 cursor-pointer shadow-xs border border-rose-500/30"
+            title="Secret Crush Vault"
+          >
+            <Lock className="size-3.5" />
+            <span className="hidden sm:inline">Crush</span>
+          </button>
+
           <Link
             href="/app/dating/likes"
             aria-label="Likes you"
@@ -180,6 +202,12 @@ export function DatingAppClient() {
           </Link>
         </div>
       </header>
+
+      {/* Secret Crush Modal */}
+      <SecretCrushModal
+        isOpen={showSecretCrushModal}
+        onClose={() => setShowSecretCrushModal(false)}
+      />
 
       {/* ─── Deck ─── */}
       <main className="flex min-h-0 flex-1 flex-col pb-[max(env(safe-area-inset-bottom),1rem)]">

@@ -1,4 +1,4 @@
-import { index,pgEnum,pgTable,text,uniqueIndex } from "drizzle-orm/pg-core";
+import { boolean,index,pgEnum,pgTable,text,timestamp,uniqueIndex } from "drizzle-orm/pg-core";
 import { createdAt,id } from "./common";
 import { userProfiles } from "./users";
 
@@ -25,3 +25,27 @@ export const swipes = pgTable(
 
 export type Swipe = typeof swipes.$inferSelect;
 export type NewSwipe = typeof swipes.$inferInsert;
+
+export const secretCrushes = pgTable(
+  "secret_crushes",
+  {
+    id: id(),
+    senderId: text("sender_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    targetId: text("target_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    isMutual: boolean("is_mutual").default(false).notNull(),
+    matchedAt: timestamp("matched_at"),
+    createdAt,
+  },
+  (table) => [
+    uniqueIndex("secret_crushes_sender_target_idx").on(table.senderId, table.targetId),
+    index("secret_crushes_target_idx").on(table.targetId),
+    index("secret_crushes_sender_idx").on(table.senderId),
+  ]
+);
+
+export type SecretCrush = typeof secretCrushes.$inferSelect;
+export type NewSecretCrush = typeof secretCrushes.$inferInsert;

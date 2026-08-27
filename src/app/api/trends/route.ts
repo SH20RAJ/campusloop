@@ -27,9 +27,15 @@ export interface NewsItem {
 
 export async function GET(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
+    let user = null;
+    try {
+      user = await hexclaveServerApp.getUser();
+    } catch {
+      // Unauthenticated or public viewer
+    }
     const { searchParams } = new URL(req.url);
     const requestedScope = searchParams.get("scope") === "GLOBAL" ? "GLOBAL" : "CAMPUS";
+
 
     const db = getDb();
     let userInstitutionId: string | null = null;
@@ -52,11 +58,11 @@ export async function GET(req: Request) {
       conditions.push(eq(posts.institutionId, userInstitutionId));
     }
 
-    // Query recent published posts
+    // Query published posts (up to 300 to aggregate full trends)
     const recentPosts = await db.query.posts.findMany({
       where: and(...conditions),
       orderBy: [desc(posts.createdAt)],
-      limit: 100,
+      limit: 300,
       with: {
         author: true,
         institution: true,
@@ -84,45 +90,62 @@ export async function GET(req: Request) {
       }
     }
 
-    // Fallback campus tags if post count is low
-    const defaultCampusTags = [
-      { tag: "#CampusPlacements", category: "Academics & Careers", count: 24 },
-      { tag: "#EndSemExams", category: "Exam Season", count: 19 },
-      { tag: "#SecretCrushVault", category: "Campus Match", count: 15 },
-      { tag: "#HostelLife", category: "Hostel & Mess", count: 12 },
-      { tag: "#TechFest2026", category: "Clubs & Events", count: 9 },
-    ];
+    // If campus scope has fewer than 5 hashtags, backfill with real global hashtags from the DB
+    if (hashtagMap.size < 5) {
+      const globalPosts = await db.query.posts.findMany({
+        where: eq(posts.status, "PUBLISHED"),
+        orderBy: [desc(posts.createdAt)],
+        limit: 300,
+      });
 
-    for (const fallback of defaultCampusTags) {
-      if (!hashtagMap.has(fallback.tag)) {
-        hashtagMap.set(fallback.tag, {
-          count: fallback.count,
-          category: requestedScope === "CAMPUS" ? `Trending in ${collegeName}` : "Trending in India",
-        });
+      for (const post of globalPosts) {
+        const text = post.body || "";
+        const matches = text.match(/#([a-zA-Z0-9_\u0900-\u097F]+)/g);
+        if (matches) {
+          for (const rawTag of matches) {
+            const cleanTag = rawTag.trim();
+            if (!hashtagMap.has(cleanTag)) {
+              hashtagMap.set(cleanTag, {
+                count: 1,
+                category: "Trending in India",
+              });
+            } else if (hashtagMap.get(cleanTag)?.category === "Trending in India") {
+              const item = hashtagMap.get(cleanTag)!;
+              item.count += 1;
+            }
+          }
+        }
       }
     }
 
     // Sort hashtags by count descending
     const sortedHashtags = Array.from(hashtagMap.entries())
       .sort((a, b) => b[1].count - a[1].count)
-      .slice(0, 5);
+      .slice(0, 10);
 
     const trends: TrendItem[] = sortedHashtags.map(([tag, data]) => ({
       category: data.category,
       topic: tag,
       postCount: data.count,
-      formattedCount: data.count >= 1000 ? `${(data.count / 1000).toFixed(1)}K posts` : `${data.count} posts`,
+      formattedCount: data.count === 1 ? "1 post" : `${data.count} posts`,
       href: `/app/hashtag/${encodeURIComponent(tag.replace(/^#/, ""))}`,
     }));
 
-    // 2. Extract Top News / Discussions (highest votes + comments)
-    const newsItems: NewsItem[] = recentPosts
+    // 2. Extract Top News / Discussions (highest engagement)
+    const newsSource = recentPosts.length > 0 ? recentPosts : await db.query.posts.findMany({
+      where: eq(posts.status, "PUBLISHED"),
+      orderBy: [desc(posts.createdAt)],
+      limit: 50,
+      with: { author: true, institution: true, votes: true, comments: true },
+    });
+
+    const newsItems: NewsItem[] = newsSource
       .map((p) => {
         const score = (p.votes || []).length + (p.comments || []).length * 2;
         return { post: p, score };
       })
       .sort((a, b) => b.score - a.score)
-      .slice(0, 3)
+      .slice(0, 4)
       .map(({ post: p }) => {
         const title = p.title || p.body.slice(0, 80) + (p.body.length > 80 ? "..." : "");
         const postTotal = (p.votes || []).length + (p.comments || []).length;
@@ -132,7 +155,7 @@ export async function GET(req: Request) {
           headline: title,
           category: `Campus Buzz · ${inst}`,
           timeAgo: "Trending now",
-          postCount: `${postTotal + 12} interactions`,
+          postCount: `${postTotal} interactions`,
           authorName: p.isAnonymous ? "Anonymous Student" : p.author?.displayName || "Student",
           authorAvatar: p.isAnonymous ? null : p.author?.avatarUrl || null,
           href: `/app/post/${p.id}`,

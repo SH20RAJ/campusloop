@@ -9,7 +9,14 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
+    let user = null;
+    try {
+      user = await hexclaveServerApp.getUser();
+    } catch {
+      // Unauthenticated or public viewer
+    }
+
+
 
     const { searchParams } = new URL(req.url);
     const scope = searchParams.get("scope") as "CAMPUS" | "GLOBAL" | null;
@@ -53,8 +60,10 @@ export async function GET(req: Request) {
     }
 
     if (hashtag) {
-      conditions.push(sql`${posts.body} ILIKE ${`%#${hashtag}%`}`);
+      const cleanHashtag = decodeURIComponent(hashtag).replace(/^#/, "").trim();
+      conditions.push(sql`${posts.body} ILIKE ${`%#${cleanHashtag}%`}`);
     }
+
 
     const authorId = searchParams.get("authorId");
     const authorUsername = searchParams.get("authorUsername");

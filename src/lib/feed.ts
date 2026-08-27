@@ -226,29 +226,40 @@ export function normalizeApiFeedSort(value?: string | null): ApiFeedSort {
 }
 
 export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | null, seenIds?: string[], viewerProfileId?: string | null) {
-	const campusPrioritySql = userInstitutionId
-		? sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 1 else 0 end)`
-		: sql<number>`0`;
+	const orderClauses: (SQL | ReturnType<typeof desc> | ReturnType<typeof asc>)[] = [];
 
-	const seenPenaltySql = seenIds && seenIds.length > 0
-		? sql<number>`(case when ${posts.id} in (${sql.raw(seenIds.slice(0, 100).map((id) => `'${id.replace(/'/g, "''")}'`).join(","))}) then 0 else 1 end)`
-		: sql<number>`1`;
+	if (seenIds && seenIds.length > 0) {
+		const escaped = seenIds.slice(0, 100).map((id) => `'${id.replace(/'/g, "''")}'`).join(",");
+		orderClauses.push(desc(sql<number>`(case when ${posts.id} in (${sql.raw(escaped)}) then 0 else 1 end)`));
+	}
+
+	if (userInstitutionId) {
+		orderClauses.push(desc(sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 1 else 0 end)`));
+	}
 
 	switch (sort) {
 		case "top_voted":
-			return [desc(seenPenaltySql), desc(campusPrioritySql), desc(voteScoreSql), desc(posts.createdAt), asc(posts.id)];
+			orderClauses.push(desc(voteScoreSql));
+			break;
 		case "most_discussed":
-			return [desc(seenPenaltySql), desc(campusPrioritySql), desc(commentCountSql), desc(posts.createdAt), asc(posts.id)];
+			orderClauses.push(desc(commentCountSql));
+			break;
 		case "trending":
-			return [desc(seenPenaltySql), desc(campusPrioritySql), desc(trendingScoreSql), desc(posts.createdAt), asc(posts.id)];
+			orderClauses.push(desc(trendingScoreSql));
+			break;
 		case "for_you": {
 			const forYouScore = getForYouScoreSql(userInstitutionId, seenIds, viewerProfileId);
-			return [desc(forYouScore), desc(posts.createdAt), asc(posts.id)];
+			orderClauses.push(desc(forYouScore));
+			break;
 		}
 		default:
-			return [desc(seenPenaltySql), desc(campusPrioritySql), desc(posts.createdAt), asc(posts.id)];
+			break;
 	}
+
+	orderClauses.push(desc(posts.createdAt), asc(posts.id));
+	return orderClauses;
 }
+
 
 type HydratedFeedPost = Awaited<ReturnType<typeof resolveFeedPage>>[number];
 

@@ -2,6 +2,7 @@ import { getDb } from "@/db";
 import { swipes,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { computeCompatibility,resolveGenderPreference } from "@/lib/dating";
+import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
 import { getViewerInstitutionId,rejectViewerWrite } from "@/lib/viewer";
 import { and,eq,ne,notInArray,type SQL } from "drizzle-orm";
 import { NextResponse } from "next/server";
@@ -93,9 +94,13 @@ export async function GET(req: Request) {
       },
     });
 
+    const isDicebear = (url?: string | null) => !url || url.includes("dicebear.com");
+
     const scoredCandidates = rawCandidates.map((cand) => {
-      const candPhotos =
-        cand.photos && cand.photos.length > 0 ? cand.photos : cand.avatarUrl ? [cand.avatarUrl] : [];
+      const fallbackSet = getDatingCandidatePhotoSet(cand.gender, cand.id || cand.username);
+      const validPhotos = (cand.photos || []).filter((p) => !isDicebear(p));
+      const candPhotos = validPhotos.length > 0 ? validPhotos : fallbackSet.photos;
+      const candAvatar = !isDicebear(cand.avatarUrl) ? cand.avatarUrl : fallbackSet.avatar;
 
       const { score, sharedInterests } = computeCompatibility(
         profile,
@@ -107,7 +112,7 @@ export async function GET(req: Request) {
         id: cand.id,
         displayName: cand.displayName,
         username: cand.username,
-        avatarUrl: cand.avatarUrl,
+        avatarUrl: candAvatar,
         photos: candPhotos,
         bio: cand.bio,
         gender: cand.gender,

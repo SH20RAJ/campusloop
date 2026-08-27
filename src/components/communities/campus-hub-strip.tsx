@@ -13,6 +13,8 @@ PackageSearch,
 ShoppingBag
 } from "lucide-react";
 
+import Link from "next/link";
+
 export type HubTabType =
   | "all"
   | "discussions"
@@ -24,9 +26,9 @@ export type HubTabType =
   | "academics";
 
 interface CampusHubStripProps {
-  activeTab: HubTabType;
-  onSelectTab: (tab: HubTabType) => void;
-  onOpenCreateModal: (tab: HubTabType) => void;
+  activeTab?: HubTabType | "clubs";
+  onSelectTab?: (tab: HubTabType) => void;
+  onOpenCreateModal?: (tab: HubTabType) => void;
 }
 
 export const CAMPUS_HUBS = [
@@ -34,6 +36,7 @@ export const CAMPUS_HUBS = [
     id: "lost_found" as HubTabType,
     title: "Lost & Found",
     description: "Keys, IDs, earphones & items",
+    href: "/app/lost-and-found",
     icon: PackageSearch,
     gradient: "from-rose-500/20 via-rose-500/10 to-transparent",
     border: "border-rose-500/30",
@@ -44,6 +47,7 @@ export const CAMPUS_HUBS = [
     id: "marketplace" as HubTabType,
     title: "Buy & Sell",
     description: "Cycles, coolers, textbooks & notes",
+    href: "/app/marketplace",
     icon: ShoppingBag,
     gradient: "from-emerald-500/20 via-emerald-500/10 to-transparent",
     border: "border-emerald-500/30",
@@ -54,6 +58,7 @@ export const CAMPUS_HUBS = [
     id: "gaming" as HubTabType,
     title: "Gaming Arena",
     description: "Valorant, Chess & BGMI lobbies",
+    href: "/app/gaming",
     icon: Gamepad2,
     gradient: "from-purple-500/20 via-purple-500/10 to-transparent",
     border: "border-purple-500/30",
@@ -64,6 +69,7 @@ export const CAMPUS_HUBS = [
     id: "rideshare" as HubTabType,
     title: "Ride Share",
     description: "Station & airport cab splits",
+    href: "/app/rideshare",
     icon: Car,
     gradient: "from-sky-500/20 via-sky-500/10 to-transparent",
     border: "border-sky-500/30",
@@ -74,6 +80,7 @@ export const CAMPUS_HUBS = [
     id: "housing" as HubTabType,
     title: "Housing & Flats",
     description: "PGs, flatmates & rooms",
+    href: "/app/housing",
     icon: Home,
     gradient: "from-amber-500/20 via-amber-500/10 to-transparent",
     border: "border-amber-500/30",
@@ -84,6 +91,7 @@ export const CAMPUS_HUBS = [
     id: "academics" as HubTabType,
     title: "Notes & PYQs",
     description: "Semester papers & cheat sheets",
+    href: "/app/academics",
     icon: BookOpen,
     gradient: "from-indigo-500/20 via-indigo-500/10 to-transparent",
     border: "border-indigo-500/30",
@@ -97,43 +105,36 @@ export function CampusHubStrip({
   onSelectTab,
   onOpenCreateModal,
 }: CampusHubStripProps) {
-  function handleCardClick(tab: HubTabType) {
+  function handleCardClick() {
     sounds.tap();
     haptics.light();
-    onSelectTab(tab);
   }
 
   return (
-    <section className="space-y-3 px-4 pt-3 select-none">
+    <section className="space-y-2.5 px-4 pt-3 select-none">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Compass className="size-4 text-primary" />
           <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-            Campus Hubs & Services
+            Campus Utility Hubs
           </h2>
         </div>
-        {activeTab !== "all" && activeTab !== "discussions" && (
-          <button
-            type="button"
-            onClick={() => onOpenCreateModal(activeTab)}
-            className="text-[11px] font-black text-primary hover:underline cursor-pointer flex items-center gap-1"
-          >
-            <span>+ Post in this Hub</span>
-          </button>
-        )}
+        <span className="text-[11px] font-bold text-muted-foreground/70">
+          Dedicated Services
+        </span>
       </div>
 
-      {/* Horizontal Scrollable Hub Cards */}
+      {/* Horizontal Scrollable Hub Cards linking to dedicated pages */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 overflow-x-auto pb-1 scrollbar-none">
         {CAMPUS_HUBS.map((hub) => {
           const isActive = activeTab === hub.id;
           const Icon = hub.icon;
 
           return (
-            <button
+            <Link
               key={hub.id}
-              type="button"
-              onClick={() => handleCardClick(hub.id)}
+              href={hub.href}
+              onClick={handleCardClick}
               className={cn(
                 "flex flex-col items-start p-3 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group active:scale-98",
                 isActive
@@ -158,9 +159,9 @@ export function CampusHubStrip({
                 >
                   <Icon className="size-4" />
                 </div>
-                {isActive && (
-                  <span className="size-2 rounded-full bg-primary animate-pulse" />
-                )}
+                <span className="text-[10px] text-muted-foreground/80 font-bold group-hover:text-foreground transition-colors">
+                  Open →
+                </span>
               </div>
 
               <div className="relative z-10 space-y-0.5 min-w-0 w-full">
@@ -171,7 +172,7 @@ export function CampusHubStrip({
                   {hub.description}
                 </p>
               </div>
-            </button>
+            </Link>
           );
         })}
       </div>

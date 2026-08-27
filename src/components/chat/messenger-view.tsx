@@ -64,7 +64,7 @@ export function MessengerView({
   const initialCache = getCachedConversations();
 
   // SWR for conversations list (polls every 2.5s for real-time WhatsApp inbox sync)
-  const { data: conversations, mutate: mutateConvs } = useSWR<CachedConversation[]>(
+  const { data: conversations, isLoading: isLoadingConvs, mutate: mutateConvs } = useSWR<CachedConversation[]>(
     "/api/chat",
     fetcher,
     {
@@ -359,7 +359,26 @@ export function MessengerView({
         ) : (
           /* Conversation Inbox List */
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
-            {filteredConversations.map((conv) => {
+            {!conversations && isLoadingConvs ? (
+              <div className="space-y-1.5 p-1">
+                {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 p-3 rounded-2xl border border-border/10 bg-muted/10 animate-pulse"
+                  >
+                    <div className="size-11 rounded-full bg-muted/60 shrink-0" />
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="h-3.5 w-24 bg-muted/60 rounded-full" />
+                        <div className="h-2.5 w-8 bg-muted/40 rounded-full" />
+                      </div>
+                      <div className="h-2.5 w-3/4 bg-muted/40 rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              filteredConversations.map((conv) => {
               const other = conv.otherParticipant;
               if (!other) return null;
 
@@ -443,7 +462,7 @@ export function MessengerView({
                   </div>
                 </div>
               );
-            })}
+            }))}
 
             {filteredConversations.length === 0 && (
               <div className="py-16 text-center space-y-3 px-4">

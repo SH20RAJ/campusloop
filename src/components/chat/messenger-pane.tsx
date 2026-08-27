@@ -76,11 +76,21 @@ export function MessengerPane({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Auto-resize textarea to fit content (from 1 line up to 5 lines)
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const newHeight = Math.min(Math.max(el.scrollHeight, 40), 140);
+    el.style.height = `${newHeight}px`;
+  }, [msgText]);
 
   // Fast Hard Cache: Initial fallback from in-memory / local storage cache for 0ms instant display
   const initialCache = conversationId ? getCachedMessages(conversationId) : null;
 
-  const { data: messages, mutate } = useSWR<CachedMessage[]>(
+  const { data: messages, isLoading, mutate } = useSWR<CachedMessage[]>(
     conversationId ? `/api/chat/${conversationId}/messages` : null,
     fetcher,
     {
@@ -198,24 +208,60 @@ export function MessengerPane({
     }
   }
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+  async function sendImageFile(file: File) {
     if (!file || !conversationId) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload or paste an image file");
+      return;
+    }
 
     setIsUploadingImage(true);
     try {
-      toast.loading("Sending photo...", { id: "chat-img" });
+      toast.loading("Sending image sticker...", { id: "chat-img" });
       const res = await uploadImageToImgBB(file);
       const url = res.displayUrl || res.url;
       await sendMessage(url);
-      toast.success("Photo sent", { id: "chat-img" });
+      toast.success("Image sent!", { id: "chat-img" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to upload photo", {
+      toast.error(err instanceof Error ? err.message : "Failed to upload image", {
         id: "chat-img",
       });
     } finally {
       setIsUploadingImage(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      sendImageFile(file);
+    }
+  }
+
+  function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          toast.info("Sending sticker / image...");
+          sendImageFile(file);
+          return;
+        }
+      }
+    }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0 && files[0].type.startsWith("image/")) {
+      sendImageFile(files[0]);
     }
   }
 
@@ -266,13 +312,19 @@ export function MessengerPane({
     setComingSoonCallType(type);
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (!msgText.trim()) return;
-      const text = msgText;
-      setMsgText("");
-      sendMessage(text);
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      if (!isMobile) {
+        e.preventDefault();
+        if (!msgText.trim()) return;
+        const text = msgText;
+        setMsgText("");
+        sendMessage(text);
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+        }
+      }
     }
   }
 
@@ -282,6 +334,10 @@ export function MessengerPane({
     const text = msgText;
     setMsgText("");
     sendMessage(text);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.focus();
+    }
   }
 
   function formatTime(dateVal: string | Date) {
@@ -476,9 +532,59 @@ export function MessengerPane({
       )}
 
       {/* ─── Messages Feed Viewport ─── */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 space-y-3">
+      <div
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleDrop}
+        className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 space-y-3"
+      >
         <div className="max-w-3xl mx-auto w-full space-y-3">
-          {filteredMessages?.map((msg, idx) => {
+          {!messages || (messages.length === 0 && isLoading) ? (
+            /* Animated Message Bubbles Skeleton */
+            <div className="space-y-4 py-2">
+              <div className="flex justify-start items-end gap-2">
+                <div className="size-6 rounded-full bg-muted/60 shrink-0 mb-1" />
+                <div className="space-y-1">
+                  <div className="h-12 w-56 sm:w-72 rounded-2xl rounded-tl-xs bg-muted/60 animate-pulse" />
+                  <div className="h-2 w-12 rounded-full bg-muted/40 ml-1" />
+                </div>
+              </div>
+              <div className="flex justify-end items-end gap-2">
+                <div className="space-y-1 flex flex-col items-end">
+                  <div className="h-10 w-44 sm:w-60 rounded-2xl rounded-tr-xs bg-primary/25 animate-pulse" />
+                  <div className="h-2 w-10 rounded-full bg-muted/40 mr-1" />
+                </div>
+              </div>
+              <div className="flex justify-start items-end gap-2">
+                <div className="size-6 rounded-full bg-muted/60 shrink-0 mb-1" />
+                <div className="space-y-1">
+                  <div className="h-28 sm:h-36 w-52 sm:w-64 rounded-2xl rounded-tl-xs bg-muted/60 animate-pulse" />
+                  <div className="h-2 w-14 rounded-full bg-muted/40 ml-1" />
+                </div>
+              </div>
+              <div className="flex justify-end items-end gap-2">
+                <div className="space-y-1 flex flex-col items-end">
+                  <div className="h-14 w-52 sm:w-72 rounded-2xl rounded-tr-xs bg-primary/25 animate-pulse" />
+                  <div className="h-2 w-12 rounded-full bg-muted/40 mr-1" />
+                </div>
+              </div>
+              <div className="flex justify-start items-end gap-2">
+                <div className="size-6 rounded-full bg-muted/60 shrink-0 mb-1" />
+                <div className="space-y-1">
+                  <div className="h-9 w-36 sm:w-48 rounded-2xl rounded-tl-xs bg-muted/60 animate-pulse" />
+                  <div className="h-2 w-10 rounded-full bg-muted/40 ml-1" />
+                </div>
+              </div>
+            </div>
+          ) : filteredMessages && filteredMessages.length === 0 ? (
+            <div className="py-16 text-center text-xs text-muted-foreground space-y-2">
+              <div className="size-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-2xs">
+                <Smile className="size-6" />
+              </div>
+              <p className="font-bold text-foreground">Say hello to {otherParticipant.displayName}!</p>
+              <p className="text-[11px] text-muted-foreground">Type a message, paste keyboard stickers, or share campus memories.</p>
+            </div>
+          ) : (
+            filteredMessages?.map((msg, idx) => {
             const isMe = msg.senderId === currentUserId;
             const isDirectMedia =
               /^https?:\/\/.+\.(gif|jpeg|jpg|png|webp)(\?.*)?$/i.test(msg.body.trim()) ||
@@ -744,7 +850,7 @@ export function MessengerPane({
                 </div>
               </div>
             );
-          })}
+          }))}
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -774,13 +880,19 @@ export function MessengerPane({
       )}
 
       {/* ─── Messenger Bottom Input Bar (WhatsApp Layout) ─── */}
-      <footer className="border-t border-border/40 bg-card px-3 sm:px-4 py-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] shrink-0 z-20">
+      <footer className="border-t border-border/40 bg-card/95 backdrop-blur-md px-2.5 sm:px-4 py-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shrink-0 z-20">
+        {isUploadingImage && (
+          <div className="max-w-4xl mx-auto mb-2 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-bold animate-pulse">
+            <Loader2 className="size-3.5 animate-spin" />
+            <span>Uploading and sending image / sticker...</span>
+          </div>
+        )}
         <form
           onSubmit={handleSendSubmit}
-          className="max-w-3xl mx-auto w-full flex items-center gap-2"
+          className="max-w-4xl mx-auto w-full flex items-end gap-1.5 sm:gap-2"
         >
           {/* Action Attachments */}
-          <div className="flex items-center gap-0.5 shrink-0">
+          <div className="flex items-center gap-0.5 shrink-0 mb-0.5">
             <button
               type="button"
               onClick={() => setShowStickerPicker(true)}
@@ -814,14 +926,16 @@ export function MessengerPane({
             </button>
           </div>
 
-          {/* Text Input */}
-          <input
-            type="text"
+          {/* Multi-line Auto-Expanding Textarea with Keyboard Sticker & Image Paste Support */}
+          <textarea
+            ref={textareaRef}
+            rows={1}
             placeholder="Type a message..."
             value={msgText}
             onChange={(e) => setMsgText(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex h-10 flex-1 rounded-full bg-muted/40 dark:bg-[#1e293b] px-4 py-2 text-xs sm:text-sm font-semibold placeholder:text-muted-foreground/60 focus:bg-background border border-border/40 outline-none focus:border-primary transition-all"
+            onPaste={handlePaste}
+            className="flex min-h-[40px] max-h-36 flex-1 resize-none rounded-2xl bg-muted/40 dark:bg-[#1e293b] px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-medium placeholder:text-muted-foreground/60 focus:bg-background border border-border/40 outline-none focus:border-primary transition-all leading-relaxed scrollbar-none"
           />
 
           {/* Voice Memo Button or Send Button */}
@@ -830,7 +944,7 @@ export function MessengerPane({
               type="submit"
               disabled={isSending}
               aria-label="Send message"
-              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs transition-transform active:scale-90 cursor-pointer"
+              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs transition-transform active:scale-90 cursor-pointer mb-0.5"
             >
               <Send className="size-4" />
             </button>
@@ -839,7 +953,7 @@ export function MessengerPane({
               type="button"
               onClick={handleSendVoiceMemo}
               aria-label="Record voice memo"
-              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted/60 hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-all cursor-pointer shadow-xs active:scale-90"
+              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted/60 hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-all cursor-pointer shadow-xs active:scale-90 mb-0.5"
               title="Click to send voice note"
             >
               <Mic className="size-4.5" />

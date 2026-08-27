@@ -354,63 +354,153 @@ export function DatingSkeleton() {
   );
 }
 
-// ──────── 11. Chat Skeleton ────────
+// ──────── 11. Chat Skeletons (Responsive & Mobile-Optimized) ────────
 
-export function ChatSkeleton() {
+export function ChatInboxSkeleton() {
   return (
-    <div className="flex h-full w-full overflow-hidden select-none">
-      {/* Left Inbox List */}
-      <div className="w-80 lg:w-96 border-r border-border/30 p-4 space-y-3 shrink-0">
+    <div className="flex flex-col h-full w-full bg-card select-none overflow-hidden">
+      {/* Top Header */}
+      <div className="p-3.5 sm:p-4 border-b border-border/30 space-y-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="flex items-center justify-between">
-          <Skeleton className="h-6 w-20 rounded-lg" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="size-8 rounded-xl" />
+            <Skeleton className="size-8 rounded-xl" />
+            <Skeleton className="h-5 w-20 rounded-md" />
+          </div>
           <Skeleton className="h-5 w-12 rounded-full" />
         </div>
+        {/* Search */}
         <Skeleton className="h-9 w-full rounded-full" />
-        <div className="space-y-2 pt-2">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-2xl border border-border/20">
-              <Skeleton className="size-11 rounded-full shrink-0" />
-              <div className="space-y-2 flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <Skeleton className="h-3.5 w-24 rounded-full" />
-                  <Skeleton className="h-2.5 w-8 rounded-full" />
-                </div>
-                <Skeleton className="h-2.5 w-3/4 rounded-full" />
-              </div>
-            </div>
-          ))}
+        {/* Filter Pills */}
+        <div className="flex items-center gap-2 pt-0.5">
+          <Skeleton className="h-6 w-14 rounded-full" />
+          <Skeleton className="h-6 w-18 rounded-full" />
+          <Skeleton className="h-6 w-18 rounded-full" />
         </div>
       </div>
 
-      {/* Right Chat Thread */}
-      <div className="flex-1 flex flex-col h-full bg-muted/10 p-6 space-y-4">
-        <div className="flex items-center justify-between pb-4 border-b border-border/30">
-          <div className="flex items-center gap-3">
-            <Skeleton className="size-10 rounded-full" />
-            <div className="space-y-1.5">
-              <Skeleton className="h-4 w-32 rounded-full" />
-              <Skeleton className="h-2.5 w-20 rounded-full" />
+      {/* Conversation list */}
+      <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 p-3 rounded-2xl border border-border/10 bg-muted/10"
+          >
+            <div className="relative shrink-0">
+              <Skeleton className="size-11 rounded-full" />
+              <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-muted-foreground/30 ring-2 ring-card" />
+            </div>
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-3.5 w-28 rounded-full" />
+                <Skeleton className="h-2.5 w-8 rounded-full" />
+              </div>
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-3 w-44 rounded-full" />
+                {i % 2 === 0 && <Skeleton className="size-4 rounded-full" />}
+              </div>
             </div>
           </div>
-          <Skeleton className="h-8 w-20 rounded-full" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function ChatThreadSkeleton() {
+  return (
+    <div className="flex flex-col h-full w-full bg-background select-none overflow-hidden">
+      {/* Sticky Header Skeleton */}
+      <div className="border-b border-border/40 bg-card/95 backdrop-blur-md px-3 sm:px-4 py-2.5 pt-[max(0.6rem,env(safe-area-inset-top))] flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <Skeleton className="size-8 rounded-full sm:hidden" />
+          <div className="relative">
+            <Skeleton className="size-10 rounded-full" />
+            <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-muted-foreground/30 ring-2 ring-card" />
+          </div>
+          <div className="space-y-1.5">
+            <Skeleton className="h-4 w-28 sm:w-36 rounded-full" />
+            <Skeleton className="h-2.5 w-16 sm:w-20 rounded-full" />
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="size-8 rounded-full" />
+          <Skeleton className="size-8 rounded-full" />
+          <Skeleton className="size-8 rounded-full hidden sm:block" />
+        </div>
+      </div>
+
+      {/* Message Stream Bubbles Skeleton */}
+      <div className="flex-1 overflow-hidden px-3 sm:px-6 py-4 space-y-4">
+        {/* Incoming */}
+        <div className="flex justify-start items-end gap-2">
+          <Skeleton className="size-6 rounded-full shrink-0 mb-1" />
+          <div className="space-y-1">
+            <Skeleton className="h-12 w-56 sm:w-72 rounded-2xl rounded-tl-xs bg-muted/60" />
+            <Skeleton className="h-2 w-12 rounded-full ml-1" />
+          </div>
         </div>
 
-        <div className="flex-1 space-y-4 py-4">
-          <div className="flex justify-start">
-            <Skeleton className="h-12 w-64 rounded-2xl rounded-tl-xs" />
-          </div>
-          <div className="flex justify-end">
-            <Skeleton className="h-10 w-48 rounded-2xl rounded-tr-xs bg-primary/20" />
-          </div>
-          <div className="flex justify-start">
-            <Skeleton className="h-16 w-80 rounded-2xl rounded-tl-xs" />
-          </div>
-          <div className="flex justify-end">
-            <Skeleton className="h-14 w-72 rounded-2xl rounded-tr-xs bg-primary/20" />
+        {/* Outgoing */}
+        <div className="flex justify-end items-end gap-2">
+          <div className="space-y-1 flex flex-col items-end">
+            <Skeleton className="h-10 w-44 sm:w-60 rounded-2xl rounded-tr-xs bg-primary/25" />
+            <Skeleton className="h-2 w-10 rounded-full mr-1" />
           </div>
         </div>
 
-        <Skeleton className="h-12 w-full rounded-full" />
+        {/* Incoming with media */}
+        <div className="flex justify-start items-end gap-2">
+          <Skeleton className="size-6 rounded-full shrink-0 mb-1" />
+          <div className="space-y-1">
+            <Skeleton className="h-32 sm:h-44 w-52 sm:w-64 rounded-2xl rounded-tl-xs bg-muted/70" />
+            <Skeleton className="h-2 w-14 rounded-full ml-1" />
+          </div>
+        </div>
+
+        {/* Outgoing reply */}
+        <div className="flex justify-end items-end gap-2">
+          <div className="space-y-1 flex flex-col items-end">
+            <Skeleton className="h-16 w-52 sm:w-80 rounded-2xl rounded-tr-xs bg-primary/25" />
+            <Skeleton className="h-2 w-12 rounded-full mr-1" />
+          </div>
+        </div>
+
+        {/* Incoming short */}
+        <div className="flex justify-start items-end gap-2">
+          <Skeleton className="size-6 rounded-full shrink-0 mb-1" />
+          <div className="space-y-1">
+            <Skeleton className="h-9 w-32 sm:w-48 rounded-2xl rounded-tl-xs bg-muted/60" />
+            <Skeleton className="h-2 w-10 rounded-full ml-1" />
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Composer Skeleton */}
+      <div className="border-t border-border/40 bg-card px-3 sm:px-4 py-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shrink-0">
+        <div className="max-w-4xl mx-auto flex items-center gap-2">
+          <div className="flex items-center gap-1 shrink-0">
+            <Skeleton className="size-8 rounded-xl" />
+            <Skeleton className="size-8 rounded-xl" />
+            <Skeleton className="size-8 rounded-xl" />
+          </div>
+          <Skeleton className="h-10 flex-1 rounded-2xl" />
+          <Skeleton className="size-10 rounded-full shrink-0" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ChatSkeleton() {
+  return (
+    <div className="flex h-full w-full overflow-hidden select-none bg-background">
+      {/* On phone: show Inbox skeleton full width. On desktop: show dual pane */}
+      <div className="w-full md:w-80 lg:w-96 border-r border-border/30 h-full shrink-0 flex flex-col">
+        <ChatInboxSkeleton />
+      </div>
+      <div className="hidden md:flex flex-1 flex-col h-full">
+        <ChatThreadSkeleton />
       </div>
     </div>
   );

@@ -70,7 +70,6 @@ export function CrushClient() {
   const crushes = data?.crushes || [];
   const usedSlots = data?.usedSlots || 0;
   const maxSlots = data?.maxSlots || 5;
-  const remainingSlots = data?.remainingSlots ?? 5;
   const receivedCrushesCount = data?.receivedCrushesCount || 0;
 
   // Build fixed 5-slot array

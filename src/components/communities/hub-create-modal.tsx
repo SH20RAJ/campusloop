@@ -35,40 +35,40 @@ export function HubCreateModal({
   // Lost & Found
   const [lfType, setLfType] = useState<"LOST" | "FOUND">("LOST");
   const [location, setLocation] = useState("");
-  const [reward, setReward] = useState("");
+  const [reward] = useState("");
 
   // Marketplace
   const [price, setPrice] = useState("");
   const [condition, setCondition] = useState("GOOD");
-  const [category, setCategory] = useState("Cycles");
-  const [hostelLocation, setHostelLocation] = useState("");
+  const [category] = useState("Cycles");
+  const [hostelLocation] = useState("");
 
   // Gaming
   const [gameName, setGameName] = useState("Valorant");
-  const [mode, setMode] = useState("5v5");
-  const [rankTier, setRankTier] = useState("");
+  const [mode] = useState("5v5");
+  const [rankTier] = useState("");
   const [gamerTag, setGamerTag] = useState("");
-  const [slotsTotal, setSlotsTotal] = useState("5");
-  const [scheduledAt, setScheduledAt] = useState("Tonight 10:30 PM");
+  const [slotsTotal] = useState("5");
+  const [scheduledAt] = useState("Tonight 10:30 PM");
 
   // Ride Share
-  const [origin, setOrigin] = useState("Campus Gate");
+  const [origin] = useState("Campus Gate");
   const [destination, setDestination] = useState("Ranchi Railway Station");
-  const [departureTime, setDepartureTime] = useState("Tomorrow 6:00 AM");
-  const [totalSeats, setTotalSeats] = useState("4");
+  const [departureTime] = useState("Tomorrow 6:00 AM");
+  const [totalSeats] = useState("4");
   const [pricePerSeat, setPricePerSeat] = useState("75");
 
   // Housing
-  const [rentPerMonth, setRentPerMonth] = useState("4500");
-  const [distanceFromCampus, setDistanceFromCampus] = useState("5 min walk");
-  const [occupancyType, setOccupancyType] = useState("SINGLE_ROOM");
-  const [genderPreference, setGenderPreference] = useState("ANY");
+  const [rentPerMonth] = useState("4500");
+  const [distanceFromCampus] = useState("5 min walk");
+  const [occupancyType] = useState("SINGLE_ROOM");
+  const [genderPreference] = useState("ANY");
 
   // Academics
   const [subjectCode, setSubjectCode] = useState("CS201");
-  const [subjectName, setSubjectName] = useState("Data Structures");
-  const [branch, setBranch] = useState("Computer Science");
-  const [semester, setSemester] = useState("3");
+  const [subjectName] = useState("Data Structures");
+  const [branch] = useState("Computer Science");
+  const [semester] = useState("3");
   const [driveUrl, setDriveUrl] = useState("");
 
   if (!isOpen) return null;

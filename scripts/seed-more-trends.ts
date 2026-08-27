@@ -1,9 +1,9 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../src/db/schema";
-import { comments, institutions, pollOptions, posts, userProfiles, votes } from "../src/db/schema";
+import { comments, pollOptions, posts, userProfiles, votes } from "../src/db/schema";
 import { loadLocalEnv } from "../src/lib/load-env";
-import { eq, ilike } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 loadLocalEnv();
 

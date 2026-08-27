@@ -19,7 +19,7 @@ ShieldCheck,
 Users2
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname,useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback,useEffect,useMemo,useState } from "react";
 import useSWR from "swr";
 import { MessengerPane } from "./messenger-pane";
@@ -44,7 +44,6 @@ export function MessengerView({
   initialConversationId,
 }: MessengerViewProps) {
   const router = useRouter();
-  const pathname = usePathname();
 
   const [activeConversationId, setActiveConversationId] = useState<string | null>(
     initialConversationId || null

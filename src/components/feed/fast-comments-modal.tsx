@@ -215,9 +215,6 @@ export function FastCommentsModal({
   };
 
   const commentsList = comments || [];
-  const authorName = post.isAnonymous
-    ? "Anonymous Student"
-    : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous
     ? post.pseudonym || "anonymous"
     : post.author?.username || "student";

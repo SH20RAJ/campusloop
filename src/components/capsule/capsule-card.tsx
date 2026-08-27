@@ -23,7 +23,6 @@ interface CapsuleCardProps {
 
 export function CapsuleCard({
   capsule,
-  currentUserId,
   onOpenBuryModal,
 }: CapsuleCardProps) {
   const [showEntries, setShowEntries] = useState(capsule.isUnlocked);

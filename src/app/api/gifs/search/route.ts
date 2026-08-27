@@ -1,10 +1,12 @@
 import { NextRequest,NextResponse } from "next/server";
 
+// No hardcoded fallback: a real key used to live here, which put it in the
+// public git history and in every build.
 const GIPHY_API_KEY =
   process.env.GIPHY_API_KEY ||
   process.env.GIFY_API_KEY ||
   process.env.NEXT_PUBLIC_GIPHY_API_KEY ||
-  "loN8atQ6BGxIhFkhbTqsdGR7WScDzDgf";
+  "";
 
 export interface GifItem {
   id: string;

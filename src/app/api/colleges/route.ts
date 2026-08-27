@@ -1,5 +1,6 @@
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { and,desc,eq,ilike,or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -72,8 +73,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    // Institutions are referenced by every profile, so only signed-in
+    // students may add one — this used to accept anonymous writes.
+    const user = await hexclaveServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const db = getDb();
-    const body = (await request.json()) as {
+    const body = (await request.json().catch(() => ({}))) as {
       name?: string;
       state?: string;
       district?: string;
@@ -85,13 +93,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "College name is required" }, { status: 400 });
     }
 
-    const cleanName = name.trim();
+    const cleanName = name.trim().slice(0, 160);
+    if (cleanName.length < 3) {
+      return NextResponse.json({ error: "College name is too short" }, { status: 400 });
+    }
     const slug = cleanName
       .toLowerCase()
       .replace(/&/g, "and")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 80);
+
+    // Return the existing hub instead of creating a near-duplicate
+    const existing = await db.query.institutions.findFirst({
+      where: eq(institutions.slug, slug),
+    });
+    if (existing) {
+      return NextResponse.json(existing);
+    }
 
     const aisheCode = `CUSTOM_${Date.now().toString().slice(-8)}`;
 
@@ -101,9 +120,9 @@ export async function POST(request: Request) {
         aisheCode,
         name: cleanName,
         slug,
-        state: state?.trim() || "India",
-        district: district?.trim() || null,
-        website: website?.trim() || null,
+        state: state?.trim().slice(0, 80) || "India",
+        district: district?.trim().slice(0, 80) || null,
+        website: website?.trim().slice(0, 200) || null,
         country: "India",
         source: "user_added",
       })

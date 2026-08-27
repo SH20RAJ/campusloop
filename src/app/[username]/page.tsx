@@ -8,7 +8,6 @@ import { institutions,posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { FeedPost } from "@/hooks/use-feed";
 import { getFollowCounts,getFollowState } from "@/lib/follows";
-import { getCloutTier } from "@/lib/gamification";
 import { and,desc,eq } from "drizzle-orm";
 import { Lock,School } from "lucide-react";
 import { Metadata } from "next";
@@ -197,7 +196,6 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
   // If not authenticated, render LinkedIn-style public card
   const publicFollowCounts = await getFollowCounts(profile.id);
-  const tier = getCloutTier(profile.points || 0);
   const branchIcon = getBranchIcon(profile.branch || profile.course);
   const institutionName = profile.institution?.name || "Indian Institute of Technology";
   const campusShort = institutionName.split(",")[0];

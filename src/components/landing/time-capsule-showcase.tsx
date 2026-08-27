@@ -5,11 +5,8 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  Archive,
   CheckCircle2,
-  Clock,
   Eye,
-  FileText,
   Hourglass,
   Lock,
   Unlock,

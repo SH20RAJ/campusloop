@@ -1,4 +1,4 @@
-const CACHE_NAME = "campusloop-shell-v3";
+const CACHE_NAME = "campusloop-shell-v4";
 const STATIC_SHELL = [
   "/",
   "/app",
@@ -99,9 +99,12 @@ self.addEventListener("fetch", (event) => {
         .catch(() => {
           return caches.match(request).then((cached) => {
             if (cached) return cached;
-            return new Response(JSON.stringify({ error: "Offline mode", cached: true }), {
-              headers: { "Content-Type": "application/json" },
-              status: 200,
+            // 503, not 200: callers check `res.ok`, so a fake success here
+            // made offline look like an empty successful response.
+            return new Response(JSON.stringify({ error: "Offline", offline: true }), {
+              headers: { "Content-Type": "application/json", "Retry-After": "5" },
+              status: 503,
+              statusText: "Offline",
             });
           });
         })

@@ -53,7 +53,6 @@ export function CommunityHeader({
   postsCount,
   isMember,
   isAdmin,
-  memberStatus = "NONE",
 }: CommunityHeaderProps) {
   const pathname = usePathname();
   const [copied, setCopied] = useState(false);

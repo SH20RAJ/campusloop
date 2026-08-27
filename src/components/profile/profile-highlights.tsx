@@ -26,11 +26,9 @@ interface ProfileHighlightsProps {
   isOwnProfile: boolean;
 }
 
-export function ProfileHighlights({ userId, username, isOwnProfile }: ProfileHighlightsProps) {
+export function ProfileHighlights({ userId, isOwnProfile }: ProfileHighlightsProps) {
   const router = useRouter();
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
-  const [activeHighlight, setActiveHighlight] = useState<HighlightItem | null>(null);
 
   const { data: highlights, mutate: mutateHighlights } = useSWR<HighlightItem[]>(
     `/api/highlights?userId=${userId}`,

@@ -91,8 +91,6 @@ export function CommunitiesIndexClient({
   const isEmpty = data?.[0]?.items?.length === 0;
   const isReachingEnd =
     isEmpty || (data && data[data.length - 1]?.hasMore === false);
-  const isLoadingMore =
-    isValidating && data && typeof data[size - 1] === "undefined";
 
   // Infinite Scroll Sentinel Intersection Observer
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -118,13 +116,6 @@ export function CommunitiesIndexClient({
       if (currentSentinel) observer.unobserve(currentSentinel);
     };
   }, [activeTab, isReachingEnd, isValidating, setSize]);
-
-  // Joined Communities for Clubs tab
-  const joinedCommunities = useMemo(() => {
-    return initialCommunities.filter((c) =>
-      c.members.some((m) => m.userId === profileId)
-    );
-  }, [initialCommunities, profileId]);
 
   // Filtered communities list for clubs tab
   const filteredCommunities = useMemo(() => {
@@ -155,7 +146,7 @@ export function CommunitiesIndexClient({
     setShowCreateHubModal(true);
   }
 
-  function handleItemCreated(newItem: any) {
+  function handleItemCreated() {
     mutate();
   }
 

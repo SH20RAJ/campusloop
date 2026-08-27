@@ -23,9 +23,8 @@ interface CapsuleClientProps {
 export function CapsuleClient({
   initialCapsules,
   profileId,
-  collegeName,
 }: CapsuleClientProps) {
-  const { data, mutate, isValidating } = useSWR<{ capsules: any[] }>("/api/capsules", fetcher, {
+  const { data, mutate } = useSWR<{ capsules: any[] }>("/api/capsules", fetcher, {
     fallbackData: { capsules: initialCapsules },
     revalidateOnFocus: false,
   });

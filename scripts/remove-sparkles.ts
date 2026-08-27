@@ -27,12 +27,8 @@ for (const file of files) {
     // Replace Sparkles with Zap (or appropriate) in lucide-react imports
     // If Zap already exists, just remove Sparkles
     if (content.includes("Sparkles")) {
-      content = content.replace(/\bSparkles,\s*/g, (match) => {
-        return "";
-      });
-      content = content.replace(/,\s*Sparkles\b/g, (match) => {
-        return "";
-      });
+      content = content.replace(/\bSparkles,\s*/g, "");
+      content = content.replace(/,\s*Sparkles\b/g, "");
       content = content.replace(/\bSparkles\b/g, "Zap");
 
       // Ensure Zap is imported if used

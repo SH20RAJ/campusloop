@@ -86,7 +86,7 @@ const MONTHS = [
 export function BirthdaysClient() {
   const router = useRouter();
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("CAMPUS");
-  const [searchDate, setSearchDate] = useState("");
+  const [searchDate] = useState("");
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);

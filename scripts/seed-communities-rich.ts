@@ -6,7 +6,7 @@
  * Run: bun run scripts/seed-communities-rich.ts
  */
 import { getDb } from "../src/db";
-import { comments, communities, communityMembers, pollOptions, posts, userProfiles, votes } from "../src/db/schema";
+import { comments, communities, communityMembers, pollOptions, posts, votes } from "../src/db/schema";
 import { loadLocalEnv } from "../src/lib/load-env";
 import { eq } from "drizzle-orm";
 

@@ -75,7 +75,6 @@ export function CollegeHubClient({
   college,
   initialPosts,
   students,
-  relatedColleges,
   collectivePoints,
   currentUserId,
   isEnrolledHere,

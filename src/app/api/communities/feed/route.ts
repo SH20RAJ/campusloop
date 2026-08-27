@@ -35,7 +35,6 @@ export async function GET(req: NextRequest) {
     const tab = searchParams.get("tab") || "all";
     const cursor = searchParams.get("cursor"); // ISO timestamp string
     const limit = Math.min(20, Math.max(5, parseInt(searchParams.get("limit") || "12", 10)));
-    const institutionId = profile.institutionId || undefined;
 
     const cursorDate = cursor ? new Date(cursor) : undefined;
 

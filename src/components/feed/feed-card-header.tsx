@@ -3,7 +3,7 @@
 import { archivePost,deletePost } from "@/app/app/(main)/post/actions";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { FeedPost } from "@/hooks/use-feed";
-import { formatTimeAgo,getAvatarUrl } from "@/lib/utils";
+import { formatTimeAgo } from "@/lib/utils";
 import {
 Archive,
 Flag,
@@ -55,8 +55,6 @@ export function FeedCardHeader({
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
-  const avatarFallback = post.isAnonymous ? "🙈" : (post.author?.displayName?.[0] ?? "S");
-  const avatarUrl = post.isAnonymous ? "" : getAvatarUrl(post.author?.avatarUrl, post.author?.username ?? "student");
   const isVerified = Boolean(!post.isAnonymous && ((post.author?.points || 0) >= 150 || post.author?.role === "ADMIN"));
 
   return (

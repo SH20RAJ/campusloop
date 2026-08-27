@@ -35,7 +35,7 @@ interface NavigationProps {
   isViewer?: boolean;
 }
 
-export function Navigation({ profile, collegeName, isAdmin, isViewer }: NavigationProps) {
+export function Navigation({ profile, collegeName, isViewer }: NavigationProps) {
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);

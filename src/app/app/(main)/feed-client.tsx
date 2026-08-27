@@ -115,9 +115,7 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     isValidating,
     isReachingEnd,
     isError,
-    size,
     setSize,
-    mutate,
     refresh,
   } = useFeed(scope, type, sort, visibility);
 

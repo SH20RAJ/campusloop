@@ -94,7 +94,7 @@ export function rankAndThreadComments(
   }
 
   // Sort child replies chronologically (natural conversational flow like Twitter threads)
-  for (const [parentId, replyList] of repliesMap.entries()) {
+  for (const replyList of repliesMap.values()) {
     replyList.sort(
       (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );

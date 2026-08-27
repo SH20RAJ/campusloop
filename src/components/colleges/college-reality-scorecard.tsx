@@ -33,11 +33,9 @@ interface CollegeRealityScorecardProps {
 
 export function CollegeRealityScorecard({
   collegeName,
-  studentCount,
   nirfRank,
   description,
   extraData,
-  onAskSeniorClick,
 }: CollegeRealityScorecardProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 

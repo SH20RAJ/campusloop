@@ -18,7 +18,7 @@ export function SignOutButton({
   variant = "button",
   showText = true,
 }: SignOutButtonProps) {
-  const user = useUser({ or: "return-null" });
+  useUser({ or: "return-null" });
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   async function handleSignOut(e: React.MouseEvent) {

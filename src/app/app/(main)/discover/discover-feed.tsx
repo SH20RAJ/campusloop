@@ -63,7 +63,7 @@ export function DiscoverFeed() {
   const [followedIds, setFollowedIds] = useState<Record<string, boolean>>({});
 
   // Dynamic trends from API
-  const { data: trendsData, isLoading: trendsLoading } = useSWR<TrendsResponse>(
+  const { data: trendsData } = useSWR<TrendsResponse>(
     `/api/trends?scope=${scope}`,
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 20000 }

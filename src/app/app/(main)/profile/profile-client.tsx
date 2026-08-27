@@ -98,7 +98,6 @@ export function ProfileClientView({
   const [activeTab, setActiveTab] = useState<"posts" | "photos" | "clout" | "archived">("posts");
   const [archivedPosts, setArchivedPosts] = useState<FeedPost[]>([]);
   const [isLoadingArchived, setIsLoadingArchived] = useState(false);
-  const [copiedHandle, setCopiedHandle] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showPhotoLightbox, setShowPhotoLightbox] = useState<string | null>(null);
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
@@ -210,7 +209,6 @@ export function ProfileClientView({
   }, [hasMore, isLoadingMore, loadMorePosts]);
 
   const points = profile.points || 0;
-  const referrals = profile.referralCount || 0;
   const tier = getCloutTier(points);
 
   const candidatePhotos =
@@ -225,17 +223,6 @@ export function ProfileClientView({
 
   const institutionName = profile.institution?.name || "Indian Institute of Technology";
   const campusShort = institutionName.split(",")[0];
-  const campusLocation = profile.institution?.state
-    ? `${profile.institution.district || ""}, ${profile.institution.state}`
-    : "India";
-
-  function handleCopyHandle() {
-    const handleUrl = `https://campusloop.space/@${profile.username}`;
-    navigator.clipboard.writeText(handleUrl);
-    setCopiedHandle(true);
-    toast.success(`Copied profile link: ${handleUrl}`);
-    setTimeout(() => setCopiedHandle(false), 2000);
-  }
 
   async function handleShareVibe() {
     const branchText = profile.branch ? `• Discipline: ${profile.branch}\n` : "";

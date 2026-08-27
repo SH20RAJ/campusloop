@@ -44,7 +44,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
 
   const desktopNavItems = [
     ...DESKTOP_NAV_ITEMS.filter((item) => {
-      if (isViewer && ["/app/chat"].includes(item.href)) {
+      if (isViewer && ["/app/chat", "/app/dating"].includes(item.href)) {
         return false;
       }
       return true;

@@ -39,6 +39,7 @@ export interface NavGroup {
 export const DESKTOP_NAV_ITEMS: NavItem[] = [
   { icon: Home, href: "/app", label: "Home" },
   { icon: Compass, href: "/app/discover", label: "Explore" },
+  { icon: Heart, href: "/app/dating", label: "Dating" },
   { icon: Bell, href: "/app/notifications", label: "Notifications" },
   { icon: MessageSquare, href: "/app/chat", label: "Messages" },
   { icon: Users, href: "/app/communities", label: "Communities" },

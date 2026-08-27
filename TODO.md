@@ -48,3 +48,20 @@
     - Clickable quoted snippet preview box with quotes and clean border.
     - 1-click "Mark all as read" in sticky glass header.
     - Polished contextual empty states for every category with direct action buttons.
+
+- [x] **Signature Repost Celebration, Zero-Latency Audio/Haptic Engine & PWA Suite**:
+  - **Repost Ting Sound & Celebratory Animation**:
+    - Dual-tone crystalline "Ting!" chime synthesized on-the-fly via pure Web Audio API (`AudioContext`) with bell overtones at 1760 Hz & 2637 Hz.
+    - Fullscreen emerald rotating `Repeat2` pop overlay with glowing pulse and celebratory badge.
+    - High-energy emerald & mint confetti particle burst via `canvas-confetti`.
+  - **Zero-Latency Web Audio Engine (`src/lib/sounds.ts`)**:
+    - 100% offline, zero external audio asset files, zero network latency.
+    - Synthesized sounds: `ting()` (repost & publish), `pop()` (heart like & double tap), `send()` (message & comment whoosh), `tap()` (tabs & filter pills), `match()` (secret crush & dating chord arpeggio), and `archive()` (metallic latch).
+  - **Physical Haptic Feedback Engine (`src/lib/haptics.ts`)**:
+    - Tactile vibration patterns via `navigator.vibrate`: `repost()` celebratory rhythm, `heartbeat()` double-pulse for heart likes, `light()` micro-tap, `success()` alert, and `match()` multi-burst.
+  - **PWA Supercharged Experience**:
+    - **Badging API**: Synchronizes unread notifications count directly to home screen / dock app badge via `navigator.setAppBadge(unreadCount)`.
+    - **Network Cues**: Real-time `online` & `offline` listeners triggering audio/haptics and status warnings.
+    - **Manifest App Shortcuts**: Quick access to Campus Feed, Chat, Dating, Post, and Notifications.
+    - **PWA Install Banner**: Native installation drawer with 1-click prompt and iOS Safari instructions modal.
+

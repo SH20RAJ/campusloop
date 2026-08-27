@@ -1,6 +1,8 @@
 "use client";
 
 import { FeedPost } from "@/hooks/use-feed";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import { Heart,MessageCircle,Repeat2,Share } from "lucide-react";
 import { useState } from "react";
@@ -35,7 +37,9 @@ export function FeedCardActions({
   function triggerRepostAnimation(e: React.MouseEvent) {
     e.stopPropagation();
     setRepostSpin(true);
-    setTimeout(() => setRepostSpin(false), 600);
+    sounds.ting();
+    haptics.repost();
+    setTimeout(() => setRepostSpin(false), 700);
     onInstantRepost();
   }
 

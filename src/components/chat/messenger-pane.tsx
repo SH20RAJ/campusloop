@@ -9,6 +9,8 @@ CachedMessage,
 getCachedMessages,
 setCachedMessages,
 } from "@/lib/chat-cache";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import {
@@ -144,6 +146,8 @@ export function MessengerPane({
     };
 
     setReplyingTo(null);
+    sounds.send();
+    haptics.success();
     mutate((prev) => {
       const updated = [...(prev || []), optimisticMessage];
       setCachedMessages(conversationId, updated);
@@ -195,6 +199,8 @@ export function MessengerPane({
     // Dismiss reaction menu
     setActiveReactionMsgId(null);
     setHoveredMsgId(null);
+    sounds.pop();
+    haptics.medium();
 
     mutate(
       (prev) =>

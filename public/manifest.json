@@ -90,6 +90,13 @@
       "description": "Private student chats",
       "url": "/app/chat",
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Notifications",
+      "short_name": "Alerts",
+      "description": "View replies, mentions, and campus alerts",
+      "url": "/app/notifications",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }

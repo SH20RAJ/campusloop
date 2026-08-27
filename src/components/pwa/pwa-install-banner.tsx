@@ -1,5 +1,8 @@
 "use client";
 
+import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { AnimatePresence,motion } from "framer-motion";
 import {
 Download,PlusSquare,Share,X,
@@ -13,12 +16,43 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PWAInstallBanner() {
+  const unreadCount = useUnreadNotificationsCount();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [showIOSModal, setShowIOSModal] = useState(false);
   const [, setInstalled] = useState(false);
+
+  // ─── PWA Badging API ───
+  useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      if ("setAppBadge" in navigator) {
+        if (unreadCount > 0) {
+          navigator.setAppBadge(unreadCount).catch(() => {});
+        } else if ("clearAppBadge" in navigator) {
+          navigator.clearAppBadge().catch(() => {});
+        }
+      }
+    }
+  }, [unreadCount]);
+
+  // ─── PWA Audio & Haptic Network Cues ───
+  useEffect(() => {
+    function handleOnline() {
+      sounds.ting();
+      haptics.success();
+    }
+    function handleOffline() {
+      haptics.heavy();
+    }
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     // Check if already running in standalone / PWA mode
@@ -64,10 +98,14 @@ export function PWAInstallBanner() {
   }, []);
 
   async function handleInstallClick() {
+    sounds.tap();
+    haptics.light();
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
       if (choice.outcome === "accepted") {
+        sounds.match();
+        haptics.match();
         setInstalled(true);
         setShowBanner(false);
       }
@@ -78,6 +116,8 @@ export function PWAInstallBanner() {
   }
 
   function handleDismiss() {
+    sounds.tap();
+    haptics.light();
     setShowBanner(false);
     setShowIOSModal(false);
     localStorage.setItem("cl_pwa_dismissed", String(Date.now()));

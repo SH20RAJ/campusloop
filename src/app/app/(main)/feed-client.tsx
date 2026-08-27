@@ -18,6 +18,8 @@ import { FeedPost,useFeed,useStories } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
 import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import type { TrendingHashtag } from "@/lib/trending-hashtags";
 import { Flame } from "lucide-react";
 import Link from "next/link";
@@ -171,6 +173,8 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     };
 
 
+    sounds.ting();
+    haptics.success();
     optimisticAddPost(optimisticPost);
     toast.success("Post published! 🎉");
 

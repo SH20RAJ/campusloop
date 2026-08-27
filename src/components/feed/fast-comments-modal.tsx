@@ -9,6 +9,8 @@ TriggerContext,
 import { RichText } from "@/components/ui/rich-text";
 import { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import { AnimatePresence,motion } from "framer-motion";
 import {
@@ -165,6 +167,8 @@ export function FastCommentsModal({
     const updatedList = [...currentList, optimisticComment];
 
     // Optimistically update list
+    sounds.send();
+    haptics.success();
     mutate(updatedList, false);
     setCommentText("");
     setIsSubmitting(true);

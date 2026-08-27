@@ -1,6 +1,8 @@
 "use client";
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
 Bookmark,
@@ -124,11 +126,12 @@ export function StoryViewerClient({
     setLikesCount(nextCount);
 
     if (nextLiked) {
+      sounds.pop();
+      haptics.heartbeat();
       setShowHeartBurst(true);
       setTimeout(() => setShowHeartBurst(false), 900);
-      if (typeof window !== "undefined" && typeof navigator.vibrate === "function") {
-        navigator.vibrate(20);
-      }
+    } else {
+      haptics.light();
     }
 
     try {
@@ -147,6 +150,8 @@ export function StoryViewerClient({
   }
 
   async function handleShare() {
+    sounds.tap();
+    haptics.light();
     const url = `https://campusloop.space/app/story/${story.id}`;
     if (typeof window !== "undefined" && navigator.share) {
       try {
@@ -168,6 +173,8 @@ export function StoryViewerClient({
     e.preventDefault();
     if (!replyText.trim() || isReplying) return;
 
+    sounds.send();
+    haptics.success();
     setIsReplying(true);
     try {
       // Send DM message to story author via chat endpoint

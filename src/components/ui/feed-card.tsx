@@ -9,7 +9,10 @@ import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { RichText } from "@/components/ui/rich-text";
 import { FeedPost } from "@/hooks/use-feed";
 import { repostPost,voteOnPost } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { getAvatarUrl } from "@/lib/utils";
+import confetti from "canvas-confetti";
 import { AnimatePresence,motion } from "framer-motion";
 import { Heart,Repeat2 } from "lucide-react";
 import Link from "next/link";
@@ -41,8 +44,8 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const [quoteThoughts, setQuoteThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
+  const [showRepostPop, setShowRepostPop] = useState(false);
   const [showLikesModal, setShowLikesModal] = useState(false);
-
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
@@ -54,6 +57,13 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
     const isUpvoted = userVote === 1;
     const newValue = isUpvoted ? 0 : 1;
     const newCount = isUpvoted ? votesCount - 1 : votesCount + 1;
+
+    if (newValue === 1) {
+      sounds.pop();
+      haptics.medium();
+    } else {
+      haptics.light();
+    }
 
     setUserVote(newValue);
     setVotesCount(newCount);
@@ -90,15 +100,16 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
       clearTimeout(clickTimeoutRef.current);
       clickTimeoutRef.current = null;
     }
+    sounds.pop();
+    haptics.heartbeat();
     if (userVote !== 1) handleVote();
-    if (typeof window !== "undefined" && typeof navigator.vibrate === "function") {
-      navigator.vibrate(15);
-    }
     setShowDoubleTapHeart(true);
     setTimeout(() => setShowDoubleTapHeart(false), 900);
   }
 
   async function handleSharePost() {
+    sounds.tap();
+    haptics.success();
     const postUrl = typeof window !== "undefined" ? `${window.location.origin}/app/post/${post.id}` : `https://campusloop.space/app/post/${post.id}`;
     if (typeof window !== "undefined" && navigator.share) {
       try {
@@ -122,6 +133,30 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
     setIsReposting(true);
     try {
       await repostPost(post.id, isQuote ? quoteThoughts : undefined);
+
+      // Play signature ting chime & trigger vibration rhythm
+      sounds.ting();
+      haptics.repost();
+
+      // Show emerald rotating pop animation
+      setShowRepostPop(true);
+      setTimeout(() => setShowRepostPop(false), 1000);
+
+      // Celebratory emerald confetti burst
+      try {
+        confetti({
+          particleCount: 45,
+          spread: 70,
+          origin: { y: 0.65 },
+          colors: ["#10b981", "#34d399", "#059669", "#6ee7b7", "#3b82f6"],
+          ticks: 180,
+          gravity: 1.1,
+          scalar: 0.9,
+          shapes: ["circle"],
+          disableForReducedMotion: true,
+        });
+      } catch {}
+
       toast.success(isQuote ? "Quote post published! 🔁" : "Post reposted to feed! 🔁");
       setShowRepostModal(false);
       setQuoteThoughts("");
@@ -147,6 +182,26 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
               className="relative"
             >
               <Heart className="h-20 w-20 fill-rose-500 text-rose-500 drop-shadow-[0_0_25px_rgba(244,63,94,0.8)]" />
+            </motion.div>
+          </div>
+        )}
+
+        {/* Repost Celebratory Pop Overlay with Ting & Emerald Animation */}
+        {showRepostPop && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none bg-emerald-500/10 backdrop-blur-[1px]">
+            <motion.div
+              initial={{ scale: 0.2, opacity: 0, rotate: -90 }}
+              animate={{ scale: [0.2, 1.35, 1.1], opacity: [0, 1, 0.95], rotate: [0, 180, 360] }}
+              exit={{ scale: 1.6, opacity: 0 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
+              className="relative flex flex-col items-center gap-2"
+            >
+              <div className="size-20 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center shadow-[0_0_35px_rgba(16,185,129,0.8)] backdrop-blur-md">
+                <Repeat2 className="size-11 text-emerald-400 stroke-[2.5]" />
+              </div>
+              <span className="text-xs font-black px-3 py-1 rounded-full bg-emerald-500 text-white shadow-lg uppercase tracking-wider">
+                Reposted! 🔁
+              </span>
             </motion.div>
           </div>
         )}

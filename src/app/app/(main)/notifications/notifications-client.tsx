@@ -6,6 +6,8 @@ NotificationItem,
 NotificationTab,
 useNotifications,
 } from "@/hooks/use-notifications";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
 AtSign,
@@ -142,10 +144,18 @@ export function NotificationsClient({
   }
 
   function handleItemClick(n: NotificationItem, href: string) {
+    sounds.tap();
+    haptics.light();
     if (!n.isRead) {
       markAsRead(n.id);
     }
     router.push(href);
+  }
+
+  function handleMarkAllAsRead() {
+    sounds.ting();
+    haptics.success();
+    markAllAsRead();
   }
 
   const tabs: { id: NotificationTab; label: string }[] = [
@@ -176,7 +186,7 @@ export function NotificationsClient({
           {effectiveUnread > 0 && (
             <button
               type="button"
-              onClick={markAllAsRead}
+              onClick={handleMarkAllAsRead}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer shadow-2xs active:scale-95"
               title="Mark all notifications as read"
             >
@@ -194,7 +204,11 @@ export function NotificationsClient({
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setActiveTab(tab.id);
+                }}
                 className={cn(
                   "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0",
                   isActive
@@ -318,6 +332,8 @@ export function NotificationsClient({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
+                      sounds.pop();
+                      haptics.medium();
                       markAsRead(n.id);
                     }}
                     className="size-6 rounded-full hover:bg-muted flex items-center justify-center text-primary hover:text-foreground transition-colors cursor-pointer"

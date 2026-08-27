@@ -2,6 +2,8 @@
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@/db/schema";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import {
 ArrowLeft,
 Flame,
@@ -112,8 +114,12 @@ export function CrushClient() {
       }
 
       if (resData.matched) {
+        sounds.match();
+        haptics.match();
         toast.success("💘 MUTUAL MATCH! You both secretly liked each other!");
       } else {
+        sounds.archive();
+        haptics.success();
         toast.success("Locked into your vault! 🔒 Intent is 100% hidden unless mutual.");
       }
 
@@ -129,6 +135,8 @@ export function CrushClient() {
   }
 
   async function handleRemoveCrush(crushId: string) {
+    sounds.tap();
+    haptics.light();
     setRemovingId(crushId);
     try {
       const res = await fetch(`/api/dating/crush?id=${crushId}`, {

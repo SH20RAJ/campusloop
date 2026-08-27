@@ -3,8 +3,10 @@ import { anonIdentityVault,pollOptions,posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { deriveAnonHandle,sealIdentity } from "@/lib/anonymity";
 import { runSafetyCheck } from "@/lib/moderation/rules";
+import { notifyMentions } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
 import { eq,sql } from "drizzle-orm";
+
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 
@@ -102,7 +104,15 @@ export async function POST(req: Request) {
       await db.insert(pollOptions).values(pollTexts.map((text) => ({ postId: newPost.id, text })));
     }
 
+    // Trigger @mention notifications asynchronously
+    notifyMentions({
+      text: body,
+      actorId: profile.id,
+      referenceId: newPost.id,
+    }).catch((err) => console.warn("Mention notification error:", err));
+
     return NextResponse.json(newPost, { status: 201 });
+
   } catch (error) {
     console.error("Error creating post:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

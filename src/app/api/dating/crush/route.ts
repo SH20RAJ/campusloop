@@ -210,18 +210,24 @@ export async function POST(req: NextRequest) {
       });
 
       // 4. Send match notifications to both users
-      await db.insert(notifications).values([
-        {
-          userId: targetId,
-          actorId: profile.id,
-          type: "MATCH",
-        },
-        {
-          userId: profile.id,
-          actorId: targetId,
-          type: "MATCH",
-        },
-      ]);
+      if (conversationId) {
+        await db.insert(notifications).values([
+          {
+            userId: targetId,
+            actorId: profile.id,
+            type: "MATCH",
+            referenceId: conversationId,
+            previewText: "It's a Mutual Secret Crush Match! 🎉 Say hello in chat.",
+          },
+          {
+            userId: profile.id,
+            actorId: targetId,
+            type: "MATCH",
+            referenceId: conversationId,
+            previewText: "It's a Mutual Secret Crush Match! 🎉 Say hello in chat.",
+          },
+        ]);
+      }
 
       return NextResponse.json({
         success: true,
@@ -237,12 +243,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // If not mutual yet: Send anonymous alert to target
+    // If not mutual yet: Send anonymous alert to target (intent strictly hidden!)
     await db.insert(notifications).values({
       userId: targetId,
-      actorId: profile.id, // Stored safely in db for moderation/safety, but experience is anonymous
-      type: "MATCH",
+      actorId: profile.id, // Stored safely in db for moderation/safety, but displayed as anonymous
+      type: "CRUSH_ALERT",
+      referenceId: "/app/crush",
+      previewText: "Someone from your campus added you to their Secret Crush vault! 🔒 Add your crushes to see if it's mutual.",
     });
+
 
     return NextResponse.json({
       success: true,

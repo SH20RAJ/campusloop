@@ -1,8 +1,10 @@
 import { getDb } from "@/db";
-import { notifications,posts,userProfiles,votes } from "@/db/schema";
+import { posts,userProfiles,votes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { createNotification } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
 import { and,eq } from "drizzle-orm";
+
 import { NextResponse } from "next/server";
 
 interface RouteParams {
@@ -70,15 +72,17 @@ export async function POST(req: Request, { params }: RouteParams) {
           // Anonymous posts have no addressable author — skip to avoid a
           // notification FK failure or an identity leak.
           if (targetPost && targetPost.authorId && targetPost.authorId !== profile.id) {
-            await db.insert(notifications).values({
+            createNotification({
               userId: targetPost.authorId,
               type: "LIKE",
               actorId: profile.id,
               referenceId: id,
-            });
+              previewText: targetPost.body,
+            }).catch((err) => console.warn("Like notification error:", err));
           }
         }
         return NextResponse.json({ message: "Vote cast", userVote: value });
+
       }
     }
 

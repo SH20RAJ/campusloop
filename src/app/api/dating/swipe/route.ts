@@ -80,9 +80,22 @@ export async function POST(req: Request) {
 
         // Insert notifications
         await db.insert(notifications).values([
-          { userId: profile.id, type: "MATCH", actorId: targetId, referenceId: newConv.id },
-          { userId: targetId, type: "MATCH", actorId: profile.id, referenceId: newConv.id }
+          {
+            userId: profile.id,
+            type: "MATCH",
+            actorId: targetId,
+            referenceId: newConv.id,
+            previewText: "You matched with each other on Campus Match! 🎉 Say hello in chat.",
+          },
+          {
+            userId: targetId,
+            type: "MATCH",
+            actorId: profile.id,
+            referenceId: newConv.id,
+            previewText: "You matched with each other on Campus Match! 🎉 Say hello in chat.",
+          },
         ]);
+
 
         // Send match greeting
         await db.insert(messages).values({

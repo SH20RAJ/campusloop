@@ -1,8 +1,10 @@
 import { getDb } from "@/db";
 import { posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { createNotification } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
 import { eq } from "drizzle-orm";
+
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -59,7 +61,19 @@ export async function POST(req: Request, { params }: RouteParams) {
       })
       .returning();
 
+    // Trigger REPOST notification to original author
+    if (originalPost.authorId && originalPost.authorId !== profile.id) {
+      createNotification({
+        userId: originalPost.authorId,
+        actorId: profile.id,
+        type: "REPOST",
+        referenceId: originalPost.id,
+        previewText: commentary || originalPost.body,
+      }).catch((err) => console.warn("Repost notification error:", err));
+    }
+
     return NextResponse.json(repostedPost, { status: 201 });
+
   } catch (error) {
     console.error("Error creating repost:", error);
     return NextResponse.json({ error: "Failed to create repost" }, { status: 500 });

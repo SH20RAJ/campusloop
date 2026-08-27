@@ -8,6 +8,7 @@ import { SignOutButton } from "@/components/ui/sign-out-button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { DESKTOP_NAV_ITEMS,MOBILE_BOTTOM_ITEMS } from "@/constants/navigation";
 import type { UserProfile } from "@/db/schema";
+import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { cn } from "@/lib/utils";
 import { AnimatePresence,motion } from "framer-motion";
 import {
@@ -26,6 +27,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+
 interface NavigationProps {
   profile?: UserProfile;
   collegeName?: string;
@@ -37,6 +39,8 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const unreadNotificationsCount = useUnreadNotificationsCount();
+
 
   const desktopNavItems = [
     ...DESKTOP_NAV_ITEMS.filter((item) => {
@@ -96,10 +100,13 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
 
               <Link
                 href="/app/notifications"
-                className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                className="relative flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Notifications"
               >
                 <Bell className="size-4.5" />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute top-2 right-2 size-2 rounded-full bg-[#1d9bf0]" />
+                )}
               </Link>
             </div>
           </header>
@@ -128,6 +135,7 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                 pathname === item.href ||
                 (item.href !== "/app" && pathname.startsWith(item.href));
               const Icon = item.icon;
+              const isNotifications = item.href === "/app/notifications";
 
               return (
                 <Link
@@ -140,22 +148,30 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
                   )}
                 >
-                  <AnimateIcon animateOnHover animation="path">
-                    <Icon
-                      className={cn(
-                        "size-5.5 shrink-0 transition-transform duration-200 group-hover:scale-110",
-                        isActive
-                          ? "text-foreground stroke-[2.5]"
-                          : "text-muted-foreground group-hover:text-foreground stroke-[1.8]"
-                      )}
-                    />
-                  </AnimateIcon>
+                  <div className="relative">
+                    <AnimateIcon animateOnHover animation="path">
+                      <Icon
+                        className={cn(
+                          "size-5.5 shrink-0 transition-transform duration-200 group-hover:scale-110",
+                          isActive
+                            ? "text-foreground stroke-[2.5]"
+                            : "text-muted-foreground group-hover:text-foreground stroke-[1.8]"
+                        )}
+                      />
+                    </AnimateIcon>
+                    {isNotifications && unreadNotificationsCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-[#1d9bf0] text-white text-[10px] font-black flex items-center justify-center border-2 border-background shadow-xs">
+                        {unreadNotificationsCount > 99 ? "99+" : unreadNotificationsCount}
+                      </span>
+                    )}
+                  </div>
 
                   <span className="truncate">{item.label}</span>
                 </Link>
               );
             })}
           </nav>
+
 
           {/* Post Action Button */}
           {!isViewer && (

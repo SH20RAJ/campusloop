@@ -1,10 +1,12 @@
 import { getDb } from "@/db";
-import { anonIdentityVault,comments,notifications,posts,userProfiles } from "@/db/schema";
+import { anonIdentityVault,comments,posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { deriveAnonHandle,sealIdentity } from "@/lib/anonymity";
 import { runSafetyCheck } from "@/lib/moderation/rules";
+import { cleanNotificationSnippet,createNotification,notifyMentions } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
 import { and,asc,eq,sql } from "drizzle-orm";
+
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 
@@ -137,18 +139,21 @@ export async function POST(req: Request, { params }: RouteParams) {
       console.warn("Points update warning:", err);
     }
 
-    // Trigger in-app notification safely without blocking the comment response
+    // Trigger in-app notifications safely without blocking the comment response
     try {
+      const snippet = cleanNotificationSnippet(body);
+
       if (parentId) {
         const parentComment = await db.query.comments.findFirst({
           where: eq(comments.id, parentId),
         });
         if (parentComment && parentComment.authorId && parentComment.authorId !== profile.id) {
-          await db.insert(notifications).values({
+          await createNotification({
             userId: parentComment.authorId,
             type: "REPLY",
             actorId: profile.id,
             referenceId: id,
+            previewText: snippet,
           });
         }
       } else {
@@ -156,17 +161,26 @@ export async function POST(req: Request, { params }: RouteParams) {
           where: eq(posts.id, id),
         });
         if (targetPost && targetPost.authorId && targetPost.authorId !== profile.id) {
-          await db.insert(notifications).values({
+          await createNotification({
             userId: targetPost.authorId,
             type: "COMMENT",
             actorId: profile.id,
             referenceId: id,
+            previewText: snippet,
           });
         }
       }
+
+      // Also trigger @mention notifications from comment body
+      notifyMentions({
+        text: body,
+        actorId: profile.id,
+        referenceId: id,
+      }).catch((err) => console.warn("Comment mention notification error:", err));
     } catch (notifErr) {
       console.warn("Notification insert warning:", notifErr);
     }
+
 
     return NextResponse.json(newComment, { status: 201 });
   } catch (error) {

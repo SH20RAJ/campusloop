@@ -78,4 +78,35 @@
   - **Database Seeding**:
     - Registered official campus hubs in `communities` and seeded authentic BIT Mesra content across all 6 tables.
 
+- [x] **Campus Time Capsule & Batch Legacy Vault (`/app/capsule`) — Breakthrough Unique Feature**:
+  - **Concept**: Digital institutional time machine where students and graduating batches seal predictions, convocation letters, photos, and memories with cryptographic countdown clocks.
+  - **Schema & Database**:
+    - `src/db/schema/time-capsule.ts`: `time_capsules` and `capsule_entries` tables with college institution scoping and categories (Convocation, Batch Memories, Predictions, Fest, Hostel).
+  - **APIs**:
+    - `GET /api/capsules`: Fetch institutional time capsules.
+    - `POST /api/capsules`: Create a new batch/milestone capsule.
+    - `POST /api/capsules/[id]/bury`: Bury an encrypted memory, letter, or prediction with anonymous pseudonym toggle.
+  - **UI/UX Suite**:
+    - `<CapsuleCountdown />`: Real-time Days, Hours, Minutes, and Seconds ticker.
+    - `<CapsuleBuryModal />`: Contextual modal for burying letters, predictions, and photos.
+    - `<CapsuleCard />`: Sealed vault countdown state and unlocked museum timeline wall.
+    - `/app/capsule`: Server page & client stream with filters (`All`, `Sealed`, `Unlocked`, `Convocation`, `Predictions`).
+    - Added to secondary navigation in `MORE_HUB_SECTIONS`.
+
+- [x] **Landing Page Overhaul Without Old/Stale Data (`/`)**:
+  - **Scanned Codebase & Removed Outdated Placeholders**:
+    - Replaced generic placeholder stats and stale copy with the true, modern, verified collegiate platform.
+  - **Overhauled 6-Pillar Bento Grid**:
+    - 1. Dynamic Feed & Repost Chimes.
+    - 2. 6 Dedicated Campus Hubs.
+    - 3. 18+ Campus Match & Secret Crush Vault.
+    - 4. Campus Time Capsule & Batch Legacy.
+    - 5. 24-Hour Stories & Highlights.
+    - 6. Loop Points & Clout Tiers.
+  - **New Interactive Showcase Sections**:
+    - `<CampusHubShowcase />`: Interactive 6-hub switcher demonstrating Lost & Found, Marketplace, Gaming, Ride Share, Housing, and Notes with live card actions.
+    - `<TimeCapsuleShowcase />`: Live countdown ticker, interactive prediction burial, and locked vs unlocked museum wall switcher.
+    - Up-to-date college enrollment marquee (1,350+ institutions).
+
+
 

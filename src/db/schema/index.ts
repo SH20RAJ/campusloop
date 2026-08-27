@@ -14,4 +14,5 @@ export * from "./posts";
 export * from "./relations";
 export * from "./rideshare";
 export * from "./stories";
+export * from "./time-capsule";
 export * from "./users";

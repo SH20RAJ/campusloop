@@ -12,6 +12,7 @@ import { notifications } from "./notifications";
 import { comments,pollOptions,pollVotes,posts,votes } from "./posts";
 import { ridesharePools } from "./rideshare";
 import { stories,storyHighlights,storyLikes } from "./stories";
+import { capsuleEntries,timeCapsules } from "./time-capsule";
 import { userProfiles } from "./users";
 
 
@@ -293,5 +294,29 @@ export const academicResourcesRelations = relations(academicResources, ({ one })
     references: [institutions.id],
   }),
 }));
+
+export const timeCapsulesRelations = relations(timeCapsules, ({ one, many }) => ({
+  creator: one(userProfiles, {
+    fields: [timeCapsules.creatorId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [timeCapsules.institutionId],
+    references: [institutions.id],
+  }),
+  entries: many(capsuleEntries),
+}));
+
+export const capsuleEntriesRelations = relations(capsuleEntries, ({ one }) => ({
+  capsule: one(timeCapsules, {
+    fields: [capsuleEntries.capsuleId],
+    references: [timeCapsules.id],
+  }),
+  author: one(userProfiles, {
+    fields: [capsuleEntries.authorId],
+    references: [userProfiles.id],
+  }),
+}));
+
 
 

@@ -1,5 +1,5 @@
-import { AmbassadorShowcase } from "@/components/landing/ambassador-demo";
 import { ArtifactsShowcase } from "@/components/landing/artifacts-demos";
+import { CampusHubShowcase } from "@/components/landing/campus-hub-showcase";
 import { ComparisonShowcase } from "@/components/landing/comparison-table";
 import {
 ConfessionDemo,
@@ -7,11 +7,16 @@ MatchDemo,
 PointsDemo,
 VerifyDemo,
 } from "@/components/landing/demos";
-import { FAQSection,HowItWorksSection,IntegrationsSection,SafetySection,StatsSection,TestimonialsSection } from "@/components/landing/extra-sections";
+import {
+FAQSection,
+SafetySection,
+StatsSection
+} from "@/components/landing/extra-sections";
 import { HeroPreview } from "@/components/landing/hero-preview";
 import { LeaderboardShowcase } from "@/components/landing/leaderboard-demo";
 import { MatchmakingShowcase } from "@/components/landing/matchmaking-demo";
 import { Reveal } from "@/components/landing/reveal";
+import { TimeCapsuleShowcase } from "@/components/landing/time-capsule-showcase";
 import {
 CTABand,
 GradientText,
@@ -22,26 +27,30 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card,CardContent } from "@/components/ui/card";
 import { Marquee } from "@/components/ui/marquee";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { cn } from "@/lib/utils";
 import {
 ArrowRight,
+Heart,
 HeartHandshake,
+Hourglass,
+Lock,
 MailCheck,
+Repeat2,
 School,
 ShieldCheck,
+ShoppingBag
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-
-import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://campusloop.space"),
   title: {
     default: "CampusLoop | Your Campus, Verified & Unfiltered",
-    template: "%s | CampusLoop"
+    template: "%s | CampusLoop",
   },
   description:
-    "CampusLoop is the verified student-only social network for Indian colleges. Sign up with your college email address to share anonymous confessions, settle canteen debates, swipe to match, and chat with classmates safely.",
+    "CampusLoop is the verified student-only campus network for 1,350+ Indian colleges. Gatekept by college email address to share anonymous confessions, settle canteen polls, trade on student marketplace, match safely, and lock batch time capsules.",
   applicationName: "CampusLoop",
   authors: [{ name: "CampusLoop Team", url: "https://campusloop.space/about" }],
   generator: "Next.js",
@@ -53,13 +62,12 @@ export const metadata: Metadata = {
     "college dating",
     "campus match",
     "Indian colleges",
-    "engineering college confessions",
-    "medical college network",
-    "college matchmaking",
-    "student discussion forum",
+    "campus marketplace",
+    "time capsule",
+    "BIT Mesra",
     "IIT confessions",
     "BITS confessions",
-    "NIT confessions"
+    "NIT Trichy",
   ],
   referrer: "origin-when-cross-origin",
   creator: "CampusLoop Inc.",
@@ -91,7 +99,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CampusLoop | Your Campus, Verified & Unfiltered",
     description:
-      "The verified student-only social network for Indian colleges. Confess anonymously, run campus polls, match, and chat safely with classmates.",
+      "The verified student-only social network for Indian colleges. Confess anonymously, run campus polls, trade on student hub, match, and chat safely with classmates.",
     url: "https://campusloop.space",
     siteName: "CampusLoop",
     locale: "en_IN",
@@ -116,7 +124,6 @@ export const metadata: Metadata = {
   verification: {
     google: "google-site-verification-id",
   },
-
   category: "social networking",
   classification: "Student Community Platform",
 };
@@ -133,24 +140,30 @@ const COLLEGES = [
   "IIT Kharagpur",
   "Christ University",
   "SRCC",
-  "RV College",
+  "RV College of Engineering",
+  "DTU Delhi",
+  "NSUT Delhi",
+  "Manipal Academy",
+  "IIIT Hyderabad",
+  "Thapar University",
+  "NIT Surathkal",
 ];
 
 const STEPS = [
   {
     icon: MailCheck,
-    title: "Verify your email",
-    body: "Sign up with your college address. One OTP proves the domain is yours.",
+    title: "Verify your college email",
+    body: "Sign up with your .ac.in or college address. One OTP proves your campus enrollment.",
   },
   {
     icon: School,
-    title: "Enter your campus",
-    body: "You land in a loop where every single account cleared the same check.",
+    title: "Enter your campus radius",
+    body: "You land in an isolated campus hub where every single account cleared the same check.",
   },
   {
     icon: HeartHandshake,
-    title: "Post, poll, match",
-    body: "Confess without a name, settle canteen debates, and meet people worth meeting.",
+    title: "Post, poll, trade & match",
+    body: "Confess without a name, trade cycles, form gaming lobbies, match with peers, and bury memories.",
   },
 ];
 
@@ -170,7 +183,7 @@ export default async function LandingPage() {
             applicationCategory: "SocialNetworking",
             operatingSystem: "Web",
             description:
-              "Verified student-only campus social network. Share confessions, drop polls, swipe to match across Indian colleges. Gatekept by college email.",
+              "Verified student-only campus social network. Share confessions, drop polls, trade on student hubs, and swipe to match across 1,350+ Indian colleges. Gatekept by college email.",
             offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
           }),
         }}
@@ -179,26 +192,29 @@ export default async function LandingPage() {
       <div className="flex min-h-screen flex-col bg-background text-foreground">
         <MarketingHeader isAuthenticated={isAuthenticated} />
 
-        {/* Hero */}
+        {/* ─── Hero Section ─── */}
         <section className="mx-auto grid w-full max-w-6xl items-center gap-12 px-6 pt-32 pb-20 lg:grid-cols-2 lg:gap-8 lg:pt-24 lg:pb-16">
           <div className="space-y-6">
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
               <ShieldCheck className="size-3.5" />
-              Verified students only
+              Verified students only · 1,350+ Indian Colleges
             </p>
             <h1 className="text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl">
               Your campus,
               <br />
-              <GradientText><em>unfiltered.</em></GradientText>
+              <GradientText>
+                <em>unfiltered.</em>
+              </GradientText>
             </h1>
             <p className="max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
-              The verified student network across 1,350+ Indian colleges.
-              Anonymous confessions, canteen polls, campus matching, and chat —
-              with zero recruiters, zero faculty, zero outsiders.
+              The verified collegiate network for India. Canteen polls, anonymous confessions, campus marketplace, 18+ student matching, and batch time capsules — with zero recruiters, zero faculty, and zero outsiders.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               {isAuthenticated ? (
-                <Link href="/app" className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}>
+                <Link
+                  href="/app"
+                  className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}
+                >
                   Open app
                   <ArrowRight className="size-4" />
                 </Link>
@@ -207,7 +223,7 @@ export default async function LandingPage() {
                   href="/handler/sign-up"
                   className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}
                 >
-                  Get verified
+                  Get verified with college email
                   <ArrowRight className="size-4" />
                 </Link>
               )}
@@ -221,24 +237,26 @@ export default async function LandingPage() {
 
             {!isAuthenticated && (
               <p className="text-xs font-medium text-muted-foreground">
-                JEE/NEET aspirant or just exploring?{" "}
-                <Link href="/handler/sign-up" className="font-bold text-primary hover:underline">
+                JEE/NEET aspirant or prospective student?{" "}
+                <Link
+                  href="/handler/sign-up"
+                  className="font-bold text-primary hover:underline"
+                >
                   Browse in Viewer Mode
                 </Link>{" "}
-
-                with any email — read-only, no college ID needed.
+                with any email — read-only, no college ID required.
               </p>
             )}
 
             <ul className="flex flex-wrap gap-x-5 gap-y-2 pt-1 text-xs font-semibold text-muted-foreground">
               <li className="flex items-center gap-1.5">
-                <ShieldCheck className="size-3.5 text-primary" /> College-email gated
+                <ShieldCheck className="size-3.5 text-primary" /> College-email gated (.ac.in)
               </li>
               <li className="flex items-center gap-1.5">
                 <School className="size-3.5 text-primary" /> 1,350+ colleges indexed
               </li>
               <li className="flex items-center gap-1.5">
-                <HeartHandshake className="size-3.5 text-primary" /> Anonymity, sealed &amp; safe
+                <Lock className="size-3.5 text-primary" /> Salted HMAC sealed identity
               </li>
             </ul>
           </div>
@@ -246,17 +264,31 @@ export default async function LandingPage() {
           <HeroPreview />
         </section>
 
-        {/* College marquee */}
+        {/* ─── College Marquee ─── */}
         <section className="overflow-hidden border-y border-border/60 py-8 bg-muted/5">
           <div className="pb-5 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 flex flex-col sm:flex-row items-center justify-center gap-x-2.5 gap-y-1 px-6">
-            <span>Colleges Enrolled: <strong className="text-primary font-extrabold text-sm tracking-normal">1,350+</strong> and adding more</span>
+            <span>
+              Colleges Enrolled:{" "}
+              <strong className="text-primary font-extrabold text-sm tracking-normal">
+                1,350+
+              </strong>{" "}
+              and adding more
+            </span>
             <span className="hidden sm:inline-block text-muted-foreground/30">•</span>
-            <span>Request your college by emailing <a href="mailto:mail@campusloop.space" className="text-primary hover:underline font-extrabold lowercase tracking-normal">mail@campusloop.space</a></span>
+            <span>
+              Request your college hub by emailing{" "}
+              <a
+                href="mailto:mail@campusloop.space"
+                className="text-primary hover:underline font-extrabold lowercase tracking-normal"
+              >
+                mail@campusloop.space
+              </a>
+            </span>
           </div>
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-background to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-background to-transparent" />
-            <Marquee pauseOnHover className="[--duration:30s] [--gap:3rem]">
+            <Marquee pauseOnHover className="[--duration:35s] [--gap:3rem]">
               {COLLEGES.map((name) => (
                 <span
                   key={name}
@@ -269,92 +301,150 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* Bento: what is inside */}
+        {/* ─── Bento: What Is Inside (Modern 6 Pillars) ─── */}
         <section id="inside" className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-24">
           <Reveal className="max-w-xl space-y-3 pb-12">
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
               Everything on campus, in one loop.
             </h2>
             <p className="text-base leading-relaxed text-muted-foreground">
-              Four ways to be loud without being known. Every widget below
-              works, so go ahead and touch things.
+              Built specifically for the realities of Indian college life — from midnight canteen Maggi debates to exam-night notes.
             </p>
           </Reveal>
 
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* 1. Dynamic Feed & Repost Chimes */}
             <Reveal className="lg:col-span-2">
-              <Card className="h-full bg-primary/[0.05] ring-primary/15">
-                <CardContent className="space-y-5">
-                  <div className="space-y-2">
-                    <h3 className="font-heading text-xl font-semibold">
-                      Confess without a name
-                    </h3>
-                    <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                      Spill what you cannot say out loud. The filter strips
-                      phone numbers and emails before your post ever saves, and
-                      your identity never leaves the hash.
-                    </p>
+              <Card className="h-full bg-primary/[0.04] border-primary/20">
+                <CardContent className="space-y-4 p-6">
+                  <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider">
+                    <Repeat2 className="size-4" />
+                    <span>Campus Feed &amp; Audio Celebrations</span>
                   </div>
+                  <h3 className="font-heading text-xl font-bold text-foreground">
+                    Confess without a name, repost with a chime
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Spill confessions safely with automatic client-side PII scrubbing. Settle debates with live polls, vote on trending topics, and celebrate quotes with crystalline Web Audio chimes and emerald confetti bursts.
+                  </p>
                   <ConfessionDemo />
                 </CardContent>
               </Card>
             </Reveal>
 
+            {/* 2. Campus Match & Secret Crush Vault */}
             <Reveal delay={0.1}>
-              <Card className="h-full bg-primary text-primary-foreground ring-primary">
-                <CardContent className="space-y-5">
-                  <div className="space-y-2">
-                    <h3 className="font-heading text-xl font-semibold">
-                      Match inside the gate
-                    </h3>
-                    <p className="text-sm leading-relaxed text-primary-foreground/80">
-                      Everyone here cleared the same email check. Swipe on real
-                      students, never on catfish.
-                    </p>
+              <Card className="h-full bg-card border-border/80">
+                <CardContent className="space-y-4 p-6">
+                  <div className="flex items-center gap-2 text-xs font-bold text-rose-500 uppercase tracking-wider">
+                    <Heart className="size-4" />
+                    <span>Campus Match &amp; Crush</span>
                   </div>
+                  <h3 className="font-heading text-xl font-bold text-foreground">
+                    Match inside the gate
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Swipe on real classmates who cleared the same college domain check. Plus, lock up to 5 campus crushes in our zero-doxxing vault where identity only reveals upon mutual lock!
+                  </p>
                   <MatchDemo />
                 </CardContent>
               </Card>
             </Reveal>
 
-            <Reveal delay={0.05} className="lg:col-span-3">
-              <Card className="h-full">
-                <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <h3 className="font-heading text-xl font-semibold">
-                      Loop Points reward the loud
-                    </h3>
-                    <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                      Campus reputation you can actually count. Earn it, rank
-                      up, lose it if you get reported.
-                    </p>
+            {/* 3. Campus Hubs & Marketplace */}
+            <Reveal delay={0.05}>
+              <Card className="h-full bg-card border-border/80">
+                <CardContent className="space-y-3 p-6">
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-500 uppercase tracking-wider">
+                    <ShoppingBag className="size-4" />
+                    <span>Student Services</span>
                   </div>
-                  <PointsDemo />
+                  <h3 className="font-heading text-lg font-bold text-foreground">
+                    Campus Hub &amp; Marketplace
+                  </h3>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    Lost &amp; found registry, buy/sell cycles and coolers in ₹, station cab pools, flatmates finder, and 5v5 gaming scrims.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 pt-2">
+                    {["Cycles & Drafters", "Valorant 5v5", "Lost IDs", "Cab Pools"].map((chip) => (
+                      <span key={chip} className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-muted text-foreground/80">
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </Reveal>
+
+            {/* 4. Campus Time Capsule (Unique!) */}
+            <Reveal delay={0.1}>
+              <Card className="h-full bg-amber-500/[0.04] border-amber-500/20">
+                <CardContent className="space-y-3 p-6">
+                  <div className="flex items-center gap-2 text-xs font-bold text-amber-500 uppercase tracking-wider">
+                    <Hourglass className="size-4" />
+                    <span>Unique Feature</span>
+                  </div>
+                  <h3 className="font-heading text-lg font-bold text-foreground">
+                    Batch Time Capsule Vault
+                  </h3>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    Bury predictions, letters, and memories for your future batch. Sealed cryptographically until Convocation Day with live countdown tickers.
+                  </p>
+                  <div className="rounded-xl bg-background/80 border border-border/40 p-2.5 text-xs text-center font-mono font-bold text-amber-500">
+                    <span>Unlocks in 280d 14h 32m ⏳</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Reveal>
+
+            {/* 5. Loop Points & Clout */}
+            <Reveal delay={0.15}>
+              <Card className="h-full bg-card border-border/80">
+                <CardContent className="space-y-3 p-6">
+                  <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider">
+                    <ShieldCheck className="size-4" />
+                    <span>Reputation System</span>
+                  </div>
+                  <h3 className="font-heading text-lg font-bold text-foreground">
+                    Loop Points Clout Tiers
+                  </h3>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    Campus reputation you can count. Earn Loop Points from upvotes and helpful notes to unlock Bronze Rookie, Gold Star, and the verified blue tick.
+                  </p>
+                  <div className="pt-2">
+                    <PointsDemo />
+                  </div>
                 </CardContent>
               </Card>
             </Reveal>
           </div>
         </section>
 
+        {/* ─── Interactive Campus Hub Showcase (New!) ─── */}
+        <CampusHubShowcase />
+
+        {/* ─── Exclusive Feature: Campus Time Capsule (New!) ─── */}
+        <TimeCapsuleShowcase />
+
+        {/* ─── Secret Crush & Matchmaking Showcase ─── */}
         <MatchmakingShowcase />
 
+        {/* ─── Polls & Questions Showcase ─── */}
         <ArtifactsShowcase />
 
+        {/* ─── Leaderboard & Campus Clout ─── */}
         <LeaderboardShowcase />
 
+        {/* ─── Stats & Numbers ─── */}
         <StatsSection />
 
+        {/* ─── Comparison Showcase (CampusLoop vs Telegram/WhatsApp/Reddit) ─── */}
         <ComparisonShowcase />
 
-        <IntegrationsSection />
-
-        <AmbassadorShowcase />
-
+        {/* ─── Safety & Privacy Escrow ─── */}
         <SafetySection />
 
-        <HowItWorksSection />
-
-        {/* Verification */}
+        {/* ─── How It Works & Verification ─── */}
         <section className="border-t border-border/60 bg-muted/30">
           <div className="mx-auto w-full max-w-6xl px-6 py-24">
             <Reveal className="max-w-xl space-y-3">
@@ -362,7 +452,7 @@ export default async function LandingPage() {
                 How verification works
               </p>
               <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-                Getting in takes one email.
+                Getting in takes one college email.
               </h2>
             </Reveal>
 
@@ -388,7 +478,7 @@ export default async function LandingPage() {
               <Card className="max-w-xl">
                 <CardContent className="space-y-3">
                   <h3 className="font-heading text-lg font-semibold">
-                    Check your domain
+                    Check your college domain
                   </h3>
                   <VerifyDemo />
                 </CardContent>
@@ -397,17 +487,16 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <TestimonialsSection />
-
+        {/* ─── FAQs ─── */}
         <FAQSection />
 
+        {/* ─── Final CTA Band ─── */}
         <CTABand
-          title="Your email is the ticket."
-          lede="Free for verified students. No outsiders, ever. Aspirants can watch from the stands in Viewer Mode."
+          title="Your college email is your key."
+          lede="Free for verified students. Zero recruiters, zero faculty, zero outsiders. JEE/NEET aspirants can watch from the stands in Viewer Mode."
           primaryHref={isAuthenticated ? "/app" : "/handler/sign-up"}
-          primaryLabel={isAuthenticated ? "Open app" : "Get verified"}
+          primaryLabel={isAuthenticated ? "Open app" : "Get verified now"}
           secondaryHref={isAuthenticated ? undefined : "/handler/sign-in"}
-
           secondaryLabel={isAuthenticated ? undefined : "Already verified? Sign in"}
         />
 

@@ -3,6 +3,7 @@
 import { FollowButton } from "@/components/profile/follow-button";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/utils";
+import { Users } from "lucide-react";
 import Link from "next/link";
 
 export interface FollowListItem {
@@ -15,6 +16,8 @@ export interface FollowListItem {
   points: number;
   institutionName: string | null;
   isFollowedByViewer: boolean;
+  isFriendOfViewer: boolean;
+  isMutualWithProfile: boolean;
   isViewer: boolean;
 }
 
@@ -53,7 +56,14 @@ export function FollowListRow({
               </span>
             )}
           </div>
-          <span className="text-xs font-semibold text-muted-foreground">@{user.username}</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-semibold text-muted-foreground">@{user.username}</span>
+            {user.isFriendOfViewer && !user.isViewer && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                <Users className="size-2.5" /> Friends
+              </span>
+            )}
+          </div>
         </Link>
         {subtitle && (
           <p className="text-xs text-muted-foreground leading-snug line-clamp-2 pt-0.5">{subtitle}</p>

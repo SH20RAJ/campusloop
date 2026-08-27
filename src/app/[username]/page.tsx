@@ -180,6 +180,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                 currentUserId={currentProfile.id}
                 followersCount={followState.followersCount}
                 followingCount={followState.followingCount}
+                friendsCount={followState.friendsCount}
                 isFollowedByViewer={followState.isFollowedByViewer}
               />
             </main>

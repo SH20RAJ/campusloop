@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { FOLLOW_LIST_PAGE_SIZE,getFollowListPage } from "@/lib/follows";
+import { FOLLOW_LIST_PAGE_SIZE,FollowDirection,getFollowListPage } from "@/lib/follows";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -12,7 +12,7 @@ import { NextResponse } from "next/server";
 export async function getFollowListResponse(
   request: Request,
   username: string,
-  direction: "followers" | "following",
+  direction: FollowDirection,
 ) {
   try {
     const db = getDb();

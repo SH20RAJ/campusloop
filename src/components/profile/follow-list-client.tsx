@@ -2,6 +2,7 @@
 
 import { FollowListItem,FollowListRow } from "@/components/profile/follow-list-row";
 import { fetcher } from "@/lib/api";
+import type { FollowDirection } from "@/lib/follows";
 import { cn } from "@/lib/utils";
 import { ArrowLeft,Loader2,Users } from "lucide-react";
 import Link from "next/link";
@@ -17,10 +18,11 @@ export interface FollowListPageData {
 interface FollowListClientProps {
   username: string;
   displayName: string;
-  direction: "followers" | "following";
+  direction: FollowDirection;
   initialPage: FollowListPageData;
   followersCount: number;
   followingCount: number;
+  friendsCount: number;
   isSignedIn: boolean;
 }
 
@@ -31,6 +33,7 @@ export function FollowListClient({
   initialPage,
   followersCount,
   followingCount,
+  friendsCount,
   isSignedIn,
 }: FollowListClientProps) {
   const getKey = (pageIndex: number, previousPageData: FollowListPageData | null) => {
@@ -88,9 +91,10 @@ export function FollowListClient({
     };
   }, [isReachingEnd, isValidating, setSize]);
 
-  const tabs = [
-    { id: "followers" as const, label: "Followers", count: followersCount },
-    { id: "following" as const, label: "Following", count: followingCount },
+  const tabs: { id: FollowDirection; label: string; count: number }[] = [
+    { id: "followers", label: "Followers", count: followersCount },
+    { id: "following", label: "Following", count: followingCount },
+    { id: "friends", label: "Friends", count: friendsCount },
   ];
 
   return (
@@ -112,7 +116,7 @@ export function FollowListClient({
           </div>
         </div>
 
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-3">
           {tabs.map((tab) => (
             <Link
               key={tab.id}
@@ -138,12 +142,16 @@ export function FollowListClient({
           <p className="text-sm font-bold text-foreground">
             {direction === "followers"
               ? `No one follows @${username} yet`
-              : `@${username} isn't following anyone yet`}
+              : direction === "following"
+              ? `@${username} isn't following anyone yet`
+              : `@${username} has no campus friends yet`}
           </p>
           <p className="text-xs text-muted-foreground max-w-xs">
             {direction === "followers"
               ? "Campus connections show up here as soon as students hit follow."
-              : "When they start following students, you'll see them here."}
+              : direction === "following"
+              ? "When they start following students, you'll see them here."
+              : "Friends appear once two students follow each other back."}
           </p>
         </div>
       ) : (

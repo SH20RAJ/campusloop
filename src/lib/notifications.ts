@@ -5,7 +5,7 @@ import { inArray,sql } from "drizzle-orm";
 export interface CreateNotificationParams {
   userId: string;
   actorId: string;
-  type: "LIKE" | "COMMENT" | "REPLY" | "MENTION" | "REPOST" | "MATCH" | "CRUSH_ALERT" | "MILESTONE" | "FOLLOW";
+  type: "LIKE" | "COMMENT" | "REPLY" | "MENTION" | "REPOST" | "MATCH" | "CRUSH_ALERT" | "MILESTONE" | "FOLLOW" | "FRIEND";
   referenceId?: string | null;
   previewText?: string | null;
 }

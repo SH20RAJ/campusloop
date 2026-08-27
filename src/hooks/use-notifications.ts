@@ -25,7 +25,8 @@ export interface NotificationItem {
     | "MILESTONE"
     | "STORY_LIKE"
     | "STORY_REPLY"
-    | "FOLLOW";
+    | "FOLLOW"
+    | "FRIEND";
   actorId: string;
   referenceId: string | null;
   previewText: string | null;

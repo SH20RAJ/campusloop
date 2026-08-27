@@ -22,6 +22,7 @@ ShieldCheck,
 Sparkles,
 Trophy,
 UserPlus,
+Users,
 Zap
 } from "lucide-react";
 import Link from "next/link";
@@ -130,6 +131,14 @@ export function NotificationsClient({
           icon: <UserPlus className="size-3.5 text-primary stroke-[2.5]" />,
           badgeBg: "bg-primary/15 border-primary/30 text-primary",
           actionText: "started following you",
+          href: n.referenceId ? `/@${n.referenceId}` : "/app",
+          actionLabel: "View profile",
+        };
+      case "FRIEND":
+        return {
+          icon: <Users className="size-3.5 text-emerald-500 stroke-[2.5]" />,
+          badgeBg: "bg-emerald-500/15 border-emerald-500/30 text-emerald-500",
+          actionText: "followed you back — you're campus friends now 🤝",
           href: n.referenceId ? `/@${n.referenceId}` : "/app",
           actionLabel: "View profile",
         };

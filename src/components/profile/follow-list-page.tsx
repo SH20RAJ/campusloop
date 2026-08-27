@@ -4,13 +4,13 @@ import { RightSidebar } from "@/components/ui/right-sidebar";
 import { getDb } from "@/db";
 import { institutions,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { getFollowCounts,getFollowListPage } from "@/lib/follows";
+import { FollowDirection,getFollowCounts,getFollowListPage } from "@/lib/follows";
 import { eq } from "drizzle-orm";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-type Direction = "followers" | "following";
+type Direction = FollowDirection;
 
 /** Vanity routes carry the leading "@" in the segment; strip it or 404. */
 function parseHandle(rawUsername: string): string | null {
@@ -25,13 +25,16 @@ export async function generateFollowListMetadata(
   const username = parseHandle(rawUsername);
   if (!username) return { title: "Profile" };
 
-  const label = direction === "followers" ? "Followers" : "Following";
+  const label =
+    direction === "followers" ? "Followers" : direction === "following" ? "Following" : "Friends";
   return {
     title: `@${username}'s ${label} | CampusLoop`,
     description:
       direction === "followers"
         ? `Students following @${username} on CampusLoop.`
-        : `Students @${username} follows on CampusLoop.`,
+        : direction === "following"
+        ? `Students @${username} follows on CampusLoop.`
+        : `Students who are mutual campus friends with @${username} on CampusLoop.`,
     alternates: { canonical: `https://campusloop.space/@${username}/${direction}` },
     robots: { index: false, follow: true },
   };
@@ -77,6 +80,7 @@ export async function FollowListPageView({
       initialPage={initialPage}
       followersCount={counts.followersCount}
       followingCount={counts.followingCount}
+      friendsCount={counts.friendsCount}
       isSignedIn={Boolean(currentProfile)}
     />
   );

@@ -87,13 +87,26 @@ export const follows = pgTable(
     followingId: text("following_id")
       .notNull()
       .references(() => userProfiles.id, { onDelete: "cascade" }),
+    /**
+     * True when the reverse edge also exists — i.e. the two students follow
+     * each other and are "friends". Denormalized so friend lists and counts
+     * are a single indexed scan instead of a self-join against follows.
+     * Maintained by followUser / unfollowUser in src/lib/follows.ts.
+     */
+    isMutual: boolean("is_mutual").default(false).notNull(),
     createdAt,
   },
   (table) => [
     uniqueIndex("follows_follower_following_idx").on(table.followerId, table.followingId),
+    // Reverse covering index: lets the mutual-edge lookup be index-only.
+    index("follows_following_follower_idx").on(table.followingId, table.followerId),
     // Keyset pagination for the follower / following list pages
     index("follows_following_created_idx").on(table.followingId, table.createdAt),
     index("follows_follower_created_idx").on(table.followerId, table.createdAt),
+    // Partial index — the friends list only ever scans mutual edges
+    index("follows_mutual_created_idx")
+      .on(table.followerId, table.createdAt)
+      .where(sql`${table.isMutual}`),
   ],
 );
 

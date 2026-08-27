@@ -4,6 +4,13 @@ import { and,desc,eq,inArray,lt,or,sql } from "drizzle-orm";
 
 export const FOLLOW_LIST_PAGE_SIZE = 20;
 
+/**
+ * "followers"  — students who follow this profile
+ * "following"  — students this profile follows
+ * "friends"    — mutual follows (both directions exist)
+ */
+export type FollowDirection = "followers" | "following" | "friends";
+
 export interface FollowListUser {
   id: string;
   username: string;
@@ -15,6 +22,8 @@ export interface FollowListUser {
   institutionName: string | null;
   followedAt: Date;
   isFollowedByViewer: boolean;
+  isFriendOfViewer: boolean;
+  isMutualWithProfile: boolean;
   isViewer: boolean;
 }
 
@@ -24,18 +33,24 @@ export interface FollowListPage {
   hasMore: boolean;
 }
 
-/**
- * Follower + following counts for a profile, in a single round trip.
- */
-export async function getFollowCounts(profileId: string): Promise<{
+export interface FollowCounts {
   followersCount: number;
   followingCount: number;
-}> {
+  friendsCount: number;
+}
+
+/**
+ * Follower / following / friend counts for a profile in a single round trip.
+ * Every branch is served by an index on follows, so this stays cheap as the
+ * graph grows.
+ */
+export async function getFollowCounts(profileId: string): Promise<FollowCounts> {
   const db = getDb();
   const [row] = await db
     .select({
       followersCount: sql<number>`count(*) filter (where ${follows.followingId} = ${profileId})::int`,
       followingCount: sql<number>`count(*) filter (where ${follows.followerId} = ${profileId})::int`,
+      friendsCount: sql<number>`count(*) filter (where ${follows.followerId} = ${profileId} and ${follows.isMutual})::int`,
     })
     .from(follows)
     .where(or(eq(follows.followingId, profileId), eq(follows.followerId, profileId)));
@@ -43,6 +58,7 @@ export async function getFollowCounts(profileId: string): Promise<{
   return {
     followersCount: row?.followersCount ?? 0,
     followingCount: row?.followingCount ?? 0,
+    friendsCount: row?.friendsCount ?? 0,
   };
 }
 
@@ -57,16 +73,116 @@ export async function isFollowing(followerId: string, followingId: string): Prom
 }
 
 /**
- * Counts plus the viewer's follow state for a profile. Used by profile pages so
- * they don't fire three separate queries for one header row.
+ * Counts plus the viewer's relationship to a profile. Used by profile pages so
+ * one header row costs two queries rather than four.
  */
 export async function getFollowState(profileId: string, viewerId?: string | null) {
-  const [counts, viewerFollows] = await Promise.all([
+  const db = getDb();
+
+  const [counts, edge] = await Promise.all([
     getFollowCounts(profileId),
-    viewerId && viewerId !== profileId ? isFollowing(viewerId, profileId) : Promise.resolve(false),
+    viewerId && viewerId !== profileId
+      ? db.query.follows.findFirst({
+          where: and(eq(follows.followerId, viewerId), eq(follows.followingId, profileId)),
+          columns: { id: true, isMutual: true },
+        })
+      : Promise.resolve(undefined),
   ]);
 
-  return { ...counts, isFollowedByViewer: viewerFollows };
+  return {
+    ...counts,
+    isFollowedByViewer: Boolean(edge),
+    isFriendOfViewer: Boolean(edge?.isMutual),
+  };
+}
+
+export interface FollowMutationResult {
+  isFollowing: boolean;
+  /** True only when this call created a brand new edge — used to gate notifications. */
+  created: boolean;
+  isFriend: boolean;
+}
+
+/**
+ * Create a follow edge and promote both edges to "friends" when the reverse
+ * edge already exists. The unique (follower_id, following_id) index makes a
+ * repeat call a no-op rather than a duplicate row.
+ */
+export async function followUser(
+  followerId: string,
+  followingId: string,
+): Promise<FollowMutationResult> {
+  const db = getDb();
+
+  const inserted = await db
+    .insert(follows)
+    .values({ followerId, followingId })
+    .onConflictDoNothing()
+    .returning({ id: follows.id });
+
+  // Flip both directions in one self-guarding statement: it only fires when
+  // both edges are present, so a partial write can never mark a false friend.
+  const promoted = await db.execute(sql`
+    UPDATE ${follows} f
+    SET is_mutual = TRUE
+    WHERE (
+        (f.follower_id = ${followerId} AND f.following_id = ${followingId})
+        OR (f.follower_id = ${followingId} AND f.following_id = ${followerId})
+      )
+      AND NOT f.is_mutual
+      AND EXISTS (
+        SELECT 1 FROM follows r
+        WHERE r.follower_id = ${followingId} AND r.following_id = ${followerId}
+      )
+      AND EXISTS (
+        SELECT 1 FROM follows r
+        WHERE r.follower_id = ${followerId} AND r.following_id = ${followingId}
+      )
+    RETURNING f.id
+  `);
+
+  const becameFriends = (promoted.rows?.length ?? 0) > 0;
+  const isFriend = becameFriends || (!inserted.length && (await areFriends(followerId, followingId)));
+
+  return { isFollowing: true, created: inserted.length > 0, isFriend };
+}
+
+/**
+ * Remove a follow edge. The reverse edge survives but is demoted out of
+ * "friends", since the relationship is no longer mutual.
+ */
+export async function unfollowUser(
+  followerId: string,
+  followingId: string,
+): Promise<FollowMutationResult> {
+  const db = getDb();
+
+  await db
+    .delete(follows)
+    .where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)));
+
+  await db
+    .update(follows)
+    .set({ isMutual: false })
+    .where(
+      and(
+        eq(follows.followerId, followingId),
+        eq(follows.followingId, followerId),
+        eq(follows.isMutual, true),
+      ),
+    );
+
+  return { isFollowing: false, created: false, isFriend: false };
+}
+
+export async function areFriends(a: string, b: string): Promise<boolean> {
+  if (a === b) return false;
+  const db = getDb();
+  const row = await db.query.follows.findFirst({
+    where: and(eq(follows.followerId, a), eq(follows.followingId, b), eq(follows.isMutual, true)),
+    columns: { id: true },
+  });
+  return Boolean(row);
 }
 
 /** Cursor is `<createdAt ISO>_<follow row id>`, keeping keyset pagination stable across ties. */
@@ -85,12 +201,12 @@ function decodeCursor(cursor?: string | null): { createdAt: Date; rowId: string 
 }
 
 /**
- * One page of a profile's followers ("followers") or the people it follows
- * ("following"), newest first.
+ * One page of a profile's followers, the people it follows, or its friends
+ * (mutual follows) — newest first.
  *
- * Runs two indexed queries at most: the keyset page itself, and a batched
- * lookup of which of those users the viewer already follows — so the row-level
- * follow buttons never turn into N+1 requests.
+ * Costs two indexed queries at most: the keyset page itself, and a batched
+ * lookup of the viewer's own edges to those users, so the row-level follow
+ * buttons never become N+1 requests.
  */
 export async function getFollowListPage({
   profileId,
@@ -100,7 +216,7 @@ export async function getFollowListPage({
   limit = FOLLOW_LIST_PAGE_SIZE,
 }: {
   profileId: string;
-  direction: "followers" | "following";
+  direction: FollowDirection;
   viewerId?: string | null;
   cursor?: string | null;
   limit?: number;
@@ -108,12 +224,17 @@ export async function getFollowListPage({
   const db = getDb();
   const pageSize = Math.min(Math.max(limit, 1), 50);
 
-  // "followers" walks rows pointing at this profile; "following" walks rows it owns.
+  // "followers" walks the rows pointing at this profile; "following" and
+  // "friends" walk the rows it owns — friends additionally filtered to mutual
+  // edges, which the follows_mutual_created_idx partial index serves directly.
   const anchorColumn = direction === "followers" ? follows.followingId : follows.followerId;
   const subjectColumn = direction === "followers" ? follows.followerId : follows.followingId;
 
   const decoded = decodeCursor(cursor);
   const conditions = [eq(anchorColumn, profileId)];
+  if (direction === "friends") {
+    conditions.push(eq(follows.isMutual, true));
+  }
   if (decoded) {
     conditions.push(
       or(
@@ -127,6 +248,7 @@ export async function getFollowListPage({
     .select({
       rowId: follows.id,
       followedAt: follows.createdAt,
+      isMutualWithProfile: follows.isMutual,
       id: userProfiles.id,
       username: userProfiles.username,
       displayName: userProfiles.displayName,
@@ -146,15 +268,17 @@ export async function getFollowListPage({
   const hasMore = rows.length > pageSize;
   const pageRows = hasMore ? rows.slice(0, pageSize) : rows;
 
-  // Batch the viewer's follow state for everyone on this page in one query.
-  let followedByViewer = new Set<string>();
+  // Batch the viewer's own edges to everyone on this page in one query.
+  const viewerEdges = new Map<string, boolean>();
   const otherIds = pageRows.map((r) => r.id).filter((id) => id !== viewerId);
   if (viewerId && otherIds.length > 0) {
     const existing = await db
-      .select({ followingId: follows.followingId })
+      .select({ followingId: follows.followingId, isMutual: follows.isMutual })
       .from(follows)
       .where(and(eq(follows.followerId, viewerId), inArray(follows.followingId, otherIds)));
-    followedByViewer = new Set(existing.map((r) => r.followingId));
+    for (const edge of existing) {
+      viewerEdges.set(edge.followingId, edge.isMutual);
+    }
   }
 
   const items: FollowListUser[] = pageRows.map((row) => ({
@@ -167,7 +291,9 @@ export async function getFollowListPage({
     points: row.points ?? 0,
     institutionName: row.institutionName ?? null,
     followedAt: row.followedAt,
-    isFollowedByViewer: followedByViewer.has(row.id),
+    isFollowedByViewer: viewerEdges.has(row.id),
+    isFriendOfViewer: viewerEdges.get(row.id) === true,
+    isMutualWithProfile: row.isMutualWithProfile,
     isViewer: row.id === viewerId,
   }));
 

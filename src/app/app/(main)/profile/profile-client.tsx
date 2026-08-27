@@ -79,6 +79,7 @@ interface ProfileClientViewProps {
   currentUserId?: string;
   followersCount?: number;
   followingCount?: number;
+  friendsCount?: number;
   isFollowedByViewer?: boolean;
 }
 
@@ -89,6 +90,7 @@ export function ProfileClientView({
   currentUserId,
   followersCount = 0,
   followingCount = 0,
+  friendsCount = 0,
   isFollowedByViewer = false,
 }: ProfileClientViewProps) {
   const router = useRouter();
@@ -533,6 +535,9 @@ export function ProfileClientView({
                 </Link>
                 <Link href={`/@${profile.username}/followers`} className="hover:underline">
                   <strong className="text-foreground font-black">{followers}</strong> Followers
+                </Link>
+                <Link href={`/@${profile.username}/friends`} className="hover:underline">
+                  <strong className="text-foreground font-black">{friendsCount}</strong> Friends
                 </Link>
                 <span>
                   <strong className="text-foreground font-black">{points}</strong> LP Clout

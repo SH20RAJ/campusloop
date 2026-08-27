@@ -105,6 +105,7 @@ export default async function ProfilePage({
       currentUserId={currentProfile.id}
       followersCount={followCounts.followersCount}
       followingCount={followCounts.followingCount}
+      friendsCount={followCounts.friendsCount}
     />
   );
 }

@@ -8,3 +8,6 @@
 
 
 Create the best system design possible for notification create a greate plan and impliment it in the ui ux of twitter.
+
+
+https://campusloop.space/app/discover this page is showing false data like a gashtag is trending and has 36 posts but on click it has 0 posts 

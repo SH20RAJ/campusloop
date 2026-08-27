@@ -92,3 +92,34 @@ From `src/components/marketing/system.tsx`:
 - Interactive icons need `aria-label`; decorative ones don't.
 - Keep `text-muted-foreground` on `bg-background`/`bg-card` only (contrast).
 - Focus states come from the shadcn defaults — don't remove outlines without replacing them.
+
+---
+
+## 9. In-App Feed & Post Card Architecture (Twitter / X Design)
+
+- **Flat Timeline Stream**: Posts are NOT bulky floating cards with separate shadows and background containers. They stream continuously within a centered `max-w-2xl` column with `border-x border-border/20` and 1px dividers (`border-b border-border/30 px-4 py-3.5`).
+- **2-Column Layout**:
+  - **Left column**: Circular 40px avatar (`size-10 rounded-full shrink-0`).
+  - **Right column**:
+    - Header line: Author display name (bold 15px, hover:underline), verified check (`#1d9bf0`), `@handle`, `·`, relative time (`2h`), and subtle three-dots menu.
+    - Minimal HR: `<hr className="border-t border-border/20 my-1.5" />` provides clean, defined separation before post content.
+    - Post body: Crisp 15px font, RichText hashtags and mentions (`text-[#1d9bf0]`).
+    - Media / Poll: `rounded-2xl border border-border/40 overflow-hidden mt-2.5`.
+    - Twitter Action Bar: Reply, Repost, Like (animated fill), Share with circular hover background states (`group-hover:bg-[#1d9bf0]/10`, `group-hover:bg-rose-500/10`, etc.) and tabular count figures.
+- **In-Between Feed Modules**: Modules like "Communities for you" or "Campus Match" render flat in the stream (`py-3 px-4 border-b border-border/30`) with circular icons and high-contrast pill buttons (`Join` / `Joined`).
+
+---
+
+## 10. Skeleton State Suite
+
+All loading placeholders in `src/components/ui/skeleton-card.tsx` match the exact page structures they represent:
+- `FeedSkeleton`: 4 Twitter 2-column post card skeletons with avatar, header, HR line, and action row.
+- `FeedLoadingMoreSkeleton`: 2 stream skeletons for infinite scrolling when fetching next page.
+- `PostDetailSkeleton`: Full post view with author, big body text lines, timestamp bar, reply composer, and thread comments with vertical connector lines.
+- `ProfileSkeleton`: Cover banner, avatar bar with -mt-12 offset, bio info, stats, tabs, and post stream.
+- `NotificationsSkeleton`: Twitter notifications stream with category icon on left, avatar, and preview cards.
+- `CommunitySkeleton`: Flat stream of community rows with circular avatars, stats, and join pill skeletons.
+- `CollegesSkeleton`: Directory search input and college hub cards with shields.
+- `DatingSkeleton`: Aspect-ratio swipe card deck with bio tags and action circles.
+- `SearchSkeleton`: Search input, tabs bar, LinkedIn-style student rows, and post skeletons.
+

@@ -1,70 +1,98 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
-ArrowRight,Check,Gift,Hash,Heart,UserPlus,Users,
-Zap
+ArrowRight,
+Flame,
+Gift,
+Hash,
+Heart,
+Users
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
-// ──────── 1. Suggested Communities Widget ────────
+// ──────── 1. Suggested Communities Widget (Twitter / X Timeline Style) ────────
 
 const SUGGESTED_COMMUNITIES = [
-  { id: "comm-1", name: "Coding@Campus", members: 142, desc: "LeetCode, hackathons & DSA" },
-  { id: "comm-2", name: "Canteen Tea & Gossip", members: 289, desc: "Canteen debates & campus spills" },
-  { id: "comm-3", name: "Exam Backlog Survivors", members: 310, desc: "Notes, pyqs & last minute prep" },
+  { id: "comm-1", name: "Coding & Devs", slug: "coding", members: 142, desc: "LeetCode, hackathons & open source" },
+  { id: "comm-2", name: "Canteen Tea & Gossip", slug: "canteen", members: 289, desc: "Campus debates & hostel stories" },
+  { id: "comm-3", name: "Exam Backlog Survivors", slug: "exams", members: 310, desc: "PYQs, formulas & last-minute prep" },
 ];
 
 export function InlineCommunitiesWidget() {
   const [joined, setJoined] = useState<Record<string, boolean>>({});
 
-  function toggleJoin(id: string) {
+  function toggleJoin(id: string, name: string) {
     setJoined((prev) => {
-      const isJoined = !prev[id];
-      if (isJoined) toast.success("Joined community!");
-      return { ...prev, [id]: isJoined };
+      const nextState = !prev[id];
+      if (nextState) {
+        toast.success(`Joined c/${name}! 🚀`);
+      }
+      return { ...prev, [id]: nextState };
     });
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
+    <div className="py-2.5 px-4 space-y-3 select-none">
+      {/* Module Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Users className="size-4" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-foreground leading-tight">Communities for You</h4>
-            <p className="text-[10px] text-muted-foreground">Join student circles on your campus</p>
-          </div>
+          <Users className="size-4 text-primary" />
+          <h3 className="text-[15px] font-black text-foreground tracking-tight">
+            Communities for you
+          </h3>
         </div>
-        <Link href="/app/communities" className="text-[11px] font-bold text-primary hover:underline flex items-center gap-0.5">
-          See All <ArrowRight className="size-3" />
+        <Link
+          href="/app/communities"
+          className="text-xs font-bold text-primary hover:underline flex items-center gap-0.5"
+        >
+          Show more
+          <ArrowRight className="size-3" />
         </Link>
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-3">
+      {/* Communities Stack */}
+      <div className="divide-y divide-border/25">
         {SUGGESTED_COMMUNITIES.map((comm) => (
-          <div key={comm.id} className="flex flex-col justify-between rounded-xl border border-border/60 bg-muted/30 p-3 space-y-2">
-            <div>
-              <p className="text-xs font-bold text-foreground leading-tight">{comm.name}</p>
-              <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">{comm.desc}</p>
+          <div
+            key={comm.id}
+            className="flex items-center justify-between gap-3 py-2.5 hover:bg-muted/20 transition-colors rounded-xl px-1"
+          >
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-xs shrink-0">
+                c/{comm.slug[0].toUpperCase()}
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <Link
+                  href={`/app/communities/${comm.id}`}
+                  className="font-bold text-sm text-foreground hover:underline truncate block"
+                >
+                  {comm.name}
+                </Link>
+                <p className="text-xs text-muted-foreground truncate">
+                  <span className="font-medium">c/{comm.slug}</span> · {comm.members} members
+                </p>
+                <p className="text-[11px] text-muted-foreground/80 truncate">
+                  {comm.desc}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center justify-between pt-1">
-              <span className="text-[9px] font-semibold text-muted-foreground">{comm.members} members</span>
-              <Button
-                size="sm"
-                variant={joined[comm.id] ? "default" : "outline"}
-                onClick={() => toggleJoin(comm.id)}
-                className="h-6 px-2 text-[10px] font-bold cursor-pointer"
-              >
-                {joined[comm.id] ? <Check className="size-2.5 mr-1" /> : <UserPlus className="size-2.5 mr-1" />}
-                {joined[comm.id] ? "Joined" : "Join"}
-              </Button>
-            </div>
+
+            <button
+              type="button"
+              onClick={() => toggleJoin(comm.id, comm.slug)}
+              className={cn(
+                "rounded-full px-4 py-1 text-xs font-black transition-all cursor-pointer shrink-0 shadow-2xs",
+                joined[comm.id]
+                  ? "border border-border/70 text-muted-foreground hover:border-destructive hover:text-destructive hover:bg-destructive/10"
+                  : "bg-foreground text-background hover:opacity-90 active:scale-95"
+              )}
+            >
+              {joined[comm.id] ? "Joined" : "Join"}
+            </button>
           </div>
         ))}
       </div>
@@ -76,42 +104,32 @@ export function InlineCommunitiesWidget() {
 
 export function InlineDatingWidget() {
   return (
-    <div className="rounded-2xl border border-pink-500/20 bg-gradient-to-r from-pink-500/5 via-card to-card p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div className="flex items-center gap-3.5">
-        {/* Student Avatars Stack */}
-        <div className="flex -space-x-2.5 shrink-0">
-          <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
-            alt="Verified Student"
-            className="size-9 rounded-full border-2 border-background object-cover shadow-sm"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80"
-            alt="Verified Student"
-            className="size-9 rounded-full border-2 border-background object-cover shadow-sm"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80"
-            alt="Verified Student"
-            className="size-9 rounded-full border-2 border-background object-cover shadow-sm"
-          />
+    <div className="py-3 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="size-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-500 shrink-0">
+          <Heart className="size-5 fill-pink-500 text-pink-500" />
         </div>
 
-        <div className="space-y-0.5">
-          <div className="flex items-center gap-1.5">
-            <h4 className="text-xs font-bold text-foreground">Campus Matchmaking</h4>
-            <Badge variant="outline" className="text-[9px] border-pink-500/30 text-pink-500 bg-pink-500/10 font-bold">Zero Catfish</Badge>
+        <div className="space-y-0.5 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-[14px] font-black text-foreground">
+              Campus Match &amp; Dating
+            </h4>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-600 dark:text-pink-400">
+              18+ Verified
+            </span>
           </div>
-          <p className="text-[11px] text-muted-foreground leading-snug">
-            Swipe on verified classmates from your university. Meet people worth meeting.
+          <p className="text-xs text-muted-foreground leading-snug truncate">
+            Connect with fellow students from your campus. Intent-hidden matchmaking.
           </p>
         </div>
       </div>
 
-      <Link href="/app/dating" className="shrink-0">
-        <Button size="sm" className="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-xs h-8 gap-1 shadow-sm cursor-pointer hover:opacity-95">
-          <Heart className="size-3.5 fill-white" /> Start Swiping
-        </Button>
+      <Link
+        href="/app/dating"
+        className="shrink-0 self-start sm:self-center px-4 py-1.5 rounded-full bg-pink-500 hover:bg-pink-600 text-white font-black text-xs transition-all shadow-2xs active:scale-95"
+      >
+        Explore Match
       </Link>
     </div>
   );
@@ -120,33 +138,42 @@ export function InlineDatingWidget() {
 // ──────── 3. Trending Hashtags Widget ────────
 
 const TRENDING_TAGS = [
-  { tag: "LateNightTea", posts: "128 posts" },
-  { tag: "CanteenDebate", posts: "94 posts" },
-  { tag: "EndsemSurvivors", posts: "210 posts" },
-  { tag: "HostelLife", posts: "156 posts" },
-  { tag: "ExamMemes", posts: "320 posts" },
+  { tag: "LateNightTea", count: "128 posts" },
+  { tag: "CanteenDebate", count: "94 posts" },
+  { tag: "EndsemSurvivors", count: "210 posts" },
+  { tag: "HostelLife", count: "156 posts" },
 ];
 
 export function InlineHashtagsWidget() {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-2.5">
-      <div className="flex items-center gap-2">
-        <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Hash className="size-4" />
+    <div className="py-2.5 px-4 space-y-2 select-none">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Flame className="size-4 text-orange-500" />
+          <h3 className="text-[15px] font-black text-foreground tracking-tight">
+            Trending on Campus
+          </h3>
         </div>
-        <div>
-          <h4 className="text-xs font-bold text-foreground leading-tight">Trending Campus Topics</h4>
-          <p className="text-[10px] text-muted-foreground">What everyone is talking about right now</p>
-        </div>
+        <Link
+          href="/app/discover"
+          className="text-xs font-bold text-primary hover:underline"
+        >
+          Explore
+        </Link>
       </div>
 
-      <div className="flex flex-wrap gap-1.5 pt-1">
+      <div className="grid grid-cols-2 gap-2 pt-1">
         {TRENDING_TAGS.map((item) => (
-          <Link key={item.tag} href={`/app/hashtag/${item.tag}`}>
-            <span className="inline-flex items-center gap-1 rounded-lg border border-border/60 bg-muted/40 px-2.5 py-1 text-xs font-bold text-foreground hover:border-primary/40 hover:text-primary transition-all cursor-pointer">
-              #{item.tag}
-              <span className="text-[9px] text-muted-foreground font-normal">({item.posts})</span>
-            </span>
+          <Link
+            key={item.tag}
+            href={`/app/hashtag/${item.tag}`}
+            className="flex items-center justify-between p-2.5 rounded-xl bg-muted/20 hover:bg-muted/40 transition-colors border border-border/30"
+          >
+            <div className="min-w-0">
+              <p className="font-bold text-xs text-foreground truncate">#{item.tag}</p>
+              <p className="text-[10px] text-muted-foreground">{item.count}</p>
+            </div>
+            <Hash className="size-3.5 text-muted-foreground/60 shrink-0" />
           </Link>
         ))}
       </div>
@@ -158,26 +185,35 @@ export function InlineHashtagsWidget() {
 
 export function InlineReferralWidget() {
   function handleCopy() {
-    navigator.clipboard.writeText("https://campusloop.space/join");
-    toast.success("CampusLoop link copied! Share it in your batch group 🚀");
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText("https://campusloop.space/handler/sign-up");
+      toast.success("CampusLoop invite link copied! 🚀");
+    }
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 select-none">
-      <div className="flex items-center gap-3">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
-          <Gift className="size-4.5" />
+    <div className="py-3 px-4 flex items-center justify-between gap-3 select-none">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="size-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 shrink-0">
+          <Gift className="size-5" />
         </div>
-        <div className="space-y-0.5 min-w-0 flex-1">
-          <h4 className="text-xs font-bold text-foreground truncate">Earn 20 LP per Verified Invite</h4>
-          <p className="text-[11px] text-muted-foreground leading-snug">
-            Bring your classmates onboard to unlock your Campus Ambassador rank!
+        <div className="min-w-0 space-y-0.5">
+          <h4 className="text-[14px] font-black text-foreground truncate">
+            Invite Classmates · Earn 20 LP
+          </h4>
+          <p className="text-xs text-muted-foreground truncate">
+            Unlock the verified campus star badge and boost your clout tier.
           </p>
         </div>
       </div>
-      <Button size="sm" onClick={handleCopy} variant="outline" className="shrink-0 font-bold text-xs h-8 gap-1.5 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer">
-        <Zap className="size-3.5" /> Copy Invite Link
-      </Button>
+
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="shrink-0 px-4 py-1.5 rounded-full border border-border text-foreground font-black text-xs hover:bg-muted/40 transition-all cursor-pointer active:scale-95 shadow-2xs"
+      >
+        Copy Link
+      </button>
     </div>
   );
 }

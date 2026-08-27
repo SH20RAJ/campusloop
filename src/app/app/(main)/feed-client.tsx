@@ -10,8 +10,9 @@ InlineDatingWidget,
 InlineHashtagsWidget,
 InlineReferralWidget,
 } from "@/components/ui/inline-feed-widgets";
-import { FeedSkeleton } from "@/components/ui/skeleton-card";
+import { FeedLoadingMoreSkeleton,FeedSkeleton } from "@/components/ui/skeleton-card";
 import { StoryRing } from "@/components/ui/story-ring";
+
 import { useFeed,useStories } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
 import Link from "next/link";
@@ -206,13 +207,11 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
 
             {/* Load more trigger anchor */}
             {!isReachingEnd && (
-              <div
-                ref={setLoadMoreRef}
-                className="flex items-center justify-center py-8 text-xs font-bold text-muted-foreground/80"
-              >
-                <span className="animate-pulse">Loading more posts...</span>
+              <div ref={setLoadMoreRef} className="w-full">
+                <FeedLoadingMoreSkeleton />
               </div>
             )}
+
 
             {isReachingEnd && <FeedCaughtUpCard />}
           </>

@@ -191,6 +191,9 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
             onShare={handleSharePost}
           />
 
+          {/* Minimal clean divider before post content */}
+          <hr className="border-t border-border/25 my-1.5" />
+
           {/* Content Body */}
           <div
             className="text-[15px] leading-normal text-foreground font-normal break-words pt-0.5"
@@ -199,6 +202,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
           >
             <RichText content={post.body} />
           </div>
+
 
           {/* Embedded Original Quoted Post */}
           {post.repostOf && (

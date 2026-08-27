@@ -1,23 +1,34 @@
 "use client";
 
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
+import { AcademicCard } from "@/components/communities/academic-card";
+import { CampusHubStrip,HubTabType } from "@/components/communities/campus-hub-strip";
+import { GamingLobbyCard } from "@/components/communities/gaming-lobby-card";
+import { HousingCard } from "@/components/communities/housing-card";
+import { HubCreateModal } from "@/components/communities/hub-create-modal";
+import { LostFoundCard } from "@/components/communities/lost-found-card";
+import { MarketplaceCard } from "@/components/communities/marketplace-card";
+import { RideshareCard } from "@/components/communities/rideshare-card";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { FeedPost } from "@/hooks/use-feed";
-import { cn } from "@/lib/utils";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn,getAvatarUrl } from "@/lib/utils";
 import {
-ArrowLeft,
-Flame,
+CheckCheck,
+Compass,
 Globe,
+Loader2,
 Lock,
 Plus,
 Search,
-Sparkles,
 Users
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo,useState } from "react";
+import { useEffect,useMemo,useRef,useState } from "react";
+import useSWRInfinite from "swr/infinite";
 
 export interface CommunityItem {
   id: string;
@@ -41,395 +52,379 @@ interface CommunitiesIndexClientProps {
   profileId: string;
 }
 
-const CATEGORIES = [
-  "All",
-  "Tech & Coding",
-  "Cultural & Arts",
-  "Academics & Placements",
-  "Gaming & Anime",
-  "General",
-];
+interface FeedPageResponse {
+  items: any[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}
 
 export function CommunitiesIndexClient({
   initialCommunities,
   initialPosts = [],
   profileId,
 }: CommunitiesIndexClientProps) {
-  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<HubTabType | "clubs">("all");
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [viewTab, setViewTab] = useState<"FOR_YOU" | "TRENDING_BUZZ" | "EXPLORE" | "JOINED">("FOR_YOU");
+  const [showCreateHubModal, setShowCreateHubModal] = useState(false);
+  const [hubToCreate, setHubToCreate] = useState<HubTabType>("lost_found");
 
+  // Filter keys for useSWRInfinite
+  const getKey = (pageIndex: number, previousPageData: FeedPageResponse | null) => {
+    if (activeTab === "clubs") return null; // Don't fetch feed when browsing clubs
+    if (previousPageData && !previousPageData.hasMore) return null; // Reached end
+    const cursor = pageIndex === 0 ? "" : previousPageData?.nextCursor || "";
+    return `/api/communities/feed?tab=${activeTab}&cursor=${encodeURIComponent(cursor)}&limit=10`;
+  };
+
+  const { data, size, setSize, isValidating, mutate } = useSWRInfinite<FeedPageResponse>(getKey, fetcher, {
+    revalidateFirstPage: false,
+    revalidateOnFocus: false,
+    dedupingInterval: 6000,
+  });
+
+  // Extract all loaded items across pages
+  const feedItems = useMemo(() => {
+    if (!data) return [];
+    return data.flatMap((page) => page?.items || []);
+  }, [data]);
+
+  const isEmpty = data?.[0]?.items?.length === 0;
+  const isReachingEnd =
+    isEmpty || (data && data[data.length - 1]?.hasMore === false);
+  const isLoadingMore =
+    isValidating && data && typeof data[size - 1] === "undefined";
+
+  // Infinite Scroll Sentinel Intersection Observer
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (activeTab === "clubs" || isReachingEnd || isValidating) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isReachingEnd && !isValidating) {
+          setSize((prev) => prev + 1);
+        }
+      },
+      { rootMargin: "400px" }
+    );
+
+    const currentSentinel = sentinelRef.current;
+    if (currentSentinel) {
+      observer.observe(currentSentinel);
+    }
+
+    return () => {
+      if (currentSentinel) observer.unobserve(currentSentinel);
+    };
+  }, [activeTab, isReachingEnd, isValidating, setSize]);
+
+  // Joined Communities for Clubs tab
   const joinedCommunities = useMemo(() => {
     return initialCommunities.filter((c) =>
       c.members.some((m) => m.userId === profileId)
     );
   }, [initialCommunities, profileId]);
 
-  // Algorithmic ranking of communities for "FOR YOU"
-  const recommendedCommunities = useMemo(() => {
-    const list = [...initialCommunities];
-    return list.sort((a, b) => {
-      // Prioritize non-joined with highest member count and points
-      const aJoined = a.members.some((m) => m.userId === profileId) ? 0 : 1;
-      const bJoined = b.members.some((m) => m.userId === profileId) ? 0 : 1;
-      if (aJoined !== bJoined) return bJoined - aJoined;
-      const scoreA = (a.points || 0) + a.members.length * 15;
-      const scoreB = (b.points || 0) + b.members.length * 15;
-      return scoreB - scoreA;
-    });
-  }, [initialCommunities, profileId]);
-
-  // Algorithmic trending community discussions
-  const trendingCommunityPosts = useMemo(() => {
-    const list = [...initialPosts];
-    return list.sort((a, b) => {
-      const now = Date.now();
-      const ageHoursA = Math.max(1, (now - new Date(a.createdAt).getTime()) / (3600 * 1000));
-      const ageHoursB = Math.max(1, (now - new Date(b.createdAt).getTime()) / (3600 * 1000));
-      const scoreA = (a.votesCount * 2 + a.commentsCount * 3 + 5) / Math.pow(ageHoursA, 0.75);
-      const scoreB = (b.votesCount * 2 + b.commentsCount * 3 + 5) / Math.pow(ageHoursB, 0.75);
-      return scoreB - scoreA;
-    });
-  }, [initialPosts]);
-
-  // Filtered communities for Explore and Joined tabs
+  // Filtered communities list for clubs tab
   const filteredCommunities = useMemo(() => {
-    const base = viewTab === "JOINED" ? joinedCommunities : initialCommunities;
-    return base.filter((c) => {
+    return initialCommunities.filter((c) => {
       if (c.privacy === "UNLISTED" && !c.members.some((m) => m.userId === profileId)) {
         return false;
       }
-      const matchesSearch =
-        c.name.toLowerCase().includes(search.toLowerCase()) ||
-        (c.description || "").toLowerCase().includes(search.toLowerCase()) ||
-        (c.category || "").toLowerCase().includes(search.toLowerCase());
-
-      if (selectedCategory !== "All") {
-        return matchesSearch && c.category.toLowerCase() === selectedCategory.toLowerCase();
+      if (search.trim()) {
+        const query = search.toLowerCase();
+        const matchesName = c.name.toLowerCase().includes(query);
+        const matchesDesc = (c.description || "").toLowerCase().includes(query);
+        return matchesName || matchesDesc;
       }
-      return matchesSearch;
+      return true;
     });
-  }, [initialCommunities, joinedCommunities, viewTab, profileId, search, selectedCategory]);
+  }, [initialCommunities, profileId, search]);
+
+  function handleTabChange(tab: HubTabType | "clubs") {
+    sounds.tap();
+    haptics.light();
+    setActiveTab(tab);
+  }
+
+  function handleOpenCreateModal(tab: HubTabType) {
+    sounds.tap();
+    haptics.light();
+    setHubToCreate(tab);
+    setShowCreateHubModal(true);
+  }
+
+  function handleItemCreated(newItem: any) {
+    mutate();
+  }
+
+  const tabs: { id: HubTabType | "clubs"; label: string }[] = [
+    { id: "all", label: "All Activity" },
+    { id: "lost_found", label: "Lost & Found" },
+    { id: "marketplace", label: "Buy & Sell" },
+    { id: "gaming", label: "Gaming Arena" },
+    { id: "rideshare", label: "Ride Share" },
+    { id: "housing", label: "Housing & Flats" },
+    { id: "academics", label: "Notes & PYQs" },
+    { id: "discussions", label: "Club Discussions" },
+    { id: "clubs", label: "Browse Student Clubs" },
+  ];
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen bg-background text-foreground pb-24 border-x border-border/30 select-none">
-      {/* ─── Sticky Twitter/X Header ─── */}
-      <header className="sticky top-0 z-40 bg-background/80 px-4 pt-2.5 backdrop-blur-xl border-b border-border/30 space-y-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="flex size-9 items-center justify-center rounded-full hover:bg-muted/70 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              aria-label="Back"
-            >
-              <ArrowLeft className="size-4.5" />
-            </button>
-            <div>
-              <h1 className="text-base font-black tracking-tight text-foreground">
-                Communities
-              </h1>
-              <p className="text-xs text-muted-foreground font-normal">
-                {initialCommunities.length} student-run sub-hubs &amp; circles
-              </p>
-            </div>
+    <div className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24 border-x border-border/20">
+      {/* ─── Sticky Header ─── */}
+      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xl border-b border-border/30">
+        <div className="flex items-center justify-between px-4 py-3.5">
+          <div className="space-y-0.5">
+            <h1 className="text-lg font-black tracking-tight text-foreground flex items-center gap-1.5">
+              <span>Campus Hub & Communities</span>
+            </h1>
+            <p className="text-[11px] text-muted-foreground font-medium">
+              Lost & Found, Buy/Sell, Gaming, Rides, Housing & Clubs
+            </p>
           </div>
 
-          <Link
-            href="/app/communities/new"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-xs active:scale-95"
-          >
-            <Plus className="size-3.5 stroke-[3]" />
-            <span>Create Hub</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleOpenCreateModal(activeTab === "clubs" ? "lost_found" : activeTab)}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/95 transition-all shadow-xs cursor-pointer active:scale-95"
+            >
+              <Plus className="size-3.5" />
+              <span className="hidden sm:inline">Post in Hub</span>
+            </button>
+            <Link
+              href="/app/communities/new"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-foreground text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95"
+            >
+              <Users className="size-3.5 text-primary" />
+              <span className="hidden sm:inline">New Club</span>
+            </Link>
+          </div>
         </div>
 
-        {/* ─── Twitter/X Segmented Tabs with Active Indicator ─── */}
-        <div className="flex border-b border-border/20 -mx-4 px-2">
-          {[
-            { id: "FOR_YOU", label: "For You" },
-            { id: "TRENDING_BUZZ", label: "Trending Buzz" },
-            { id: "EXPLORE", label: "Explore All" },
-            { id: "JOINED", label: `Joined (${joinedCommunities.length})` },
-          ].map((tab) => {
-            const isActive = viewTab === tab.id;
+        {/* ─── Filter Pills Bar ─── */}
+        <div className="flex items-center gap-1.5 px-4 pb-2.5 overflow-x-auto scrollbar-none">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setViewTab(tab.id as typeof viewTab)}
+                onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "relative flex-1 py-2.5 text-center text-xs transition-colors cursor-pointer flex flex-col items-center justify-center",
+                  "px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0",
                   isActive
-                    ? "text-foreground font-black"
-                    : "text-muted-foreground hover:text-foreground font-bold"
+                    ? "bg-foreground text-background font-black shadow-xs"
+                    : "bg-muted/40 hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border/40"
                 )}
               >
-                <span>{tab.label}</span>
-                {isActive && (
-                  <div className="absolute bottom-0 h-1 w-10 bg-primary rounded-full" />
-                )}
+                {tab.label}
               </button>
             );
           })}
         </div>
       </header>
 
-      {/* ─── TAB 1: FOR YOU (Algorithmic Personalized Discovery) ─── */}
-      {viewTab === "FOR_YOU" && (
-        <div className="flex flex-col divide-y divide-border/30">
-          {/* Featured Spotlight Hub Hero Card */}
-          {recommendedCommunities.length > 0 && (
-            <div className="relative border-b border-border/30 bg-card/20 overflow-hidden">
-              <div className="relative h-28 sm:h-36 w-full bg-neutral-900 overflow-hidden">
-                {recommendedCommunities[0].bannerUrl ? (
-                  <img
-                    src={recommendedCommunities[0].bannerUrl}
-                    alt={recommendedCommunities[0].name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-r from-neutral-900 via-neutral-950 to-neutral-900 relative">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
-                  </div>
-                )}
-                <span className="absolute top-2.5 left-3 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-primary border border-border/40 flex items-center gap-1">
-                  <Sparkles className="size-2.5" /> Featured Sub-Hub
-                </span>
-              </div>
-
-              <div className="p-4 pt-0">
-                <div className="flex items-end justify-between -mt-8 mb-2">
-                  <Avatar className="size-16 rounded-full border-4 border-background bg-card shadow-md">
-                    <AvatarImage src={recommendedCommunities[0].avatarUrl || ""} />
-                    <AvatarFallback className="bg-neutral-800 text-foreground font-black text-sm">
-                      {recommendedCommunities[0].name.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-
-                  <JoinCommunityButton
-                    communityId={recommendedCommunities[0].id}
-                    initialIsMember={recommendedCommunities[0].members.some((m) => m.userId === profileId)}
-                    className="h-8 px-4 text-xs font-black rounded-full shadow-xs"
-                  />
-                </div>
-
-                <Link href={`/app/communities/${recommendedCommunities[0].slug || recommendedCommunities[0].id}`} className="group block space-y-1">
-                  <h2 className="text-base font-black text-foreground group-hover:underline flex items-center gap-1.5">
-                    c/{recommendedCommunities[0].name}
-                  </h2>
-                  <p className="text-xs text-primary font-bold">
-                    {recommendedCommunities[0].category} · {recommendedCommunities[0].members.length} members
-                  </p>
-                  {recommendedCommunities[0].description && (
-                    <p className="text-xs text-foreground/80 font-normal line-clamp-2 leading-relaxed pt-0.5">
-                      {recommendedCommunities[0].description}
-                    </p>
-                  )}
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Suggested Circles List */}
-          <div className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black tracking-tight uppercase text-foreground flex items-center gap-1.5">
-                <Users className="size-3.5 text-primary" /> Circles You Might Like
-              </span>
-              <button
-                type="button"
-                onClick={() => setViewTab("EXPLORE")}
-                className="text-xs text-primary font-bold hover:underline cursor-pointer"
-              >
-                View all
-              </button>
-            </div>
-
-            <div className="divide-y divide-border/25">
-              {recommendedCommunities.slice(1, 4).map((c) => {
-                const isMember = c.members.some((m) => m.userId === profileId);
-                return (
-                  <div key={c.id} className="py-3 flex items-center justify-between gap-3">
-                    <Link
-                      href={`/app/communities/${c.slug || c.id}`}
-                      className="flex items-center gap-3 min-w-0 flex-1 group"
-                    >
-                      <Avatar className="size-11 rounded-full border border-border/40 shrink-0">
-                        <AvatarImage src={c.avatarUrl || ""} />
-                        <AvatarFallback className="bg-muted text-xs font-bold">
-                          {c.name.slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <p className="text-sm font-bold text-foreground group-hover:underline truncate">
-                          c/{c.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {c.category} · {c.members.length} members
-                        </p>
-                        {c.description && (
-                          <p className="text-xs text-muted-foreground/80 line-clamp-1">
-                            {c.description}
-                          </p>
-                        )}
-                      </div>
-                    </Link>
-
-                    <JoinCommunityButton
-                      communityId={c.id}
-                      initialIsMember={isMember}
-                      className="h-8 px-4 text-xs font-bold rounded-full shrink-0"
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Algorithmic In-Feed Discussions Section */}
-          <div className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black tracking-tight uppercase text-foreground flex items-center gap-1.5">
-                <Flame className="size-3.5 text-primary" /> Trending In Communities
-              </span>
-              <button
-                type="button"
-                onClick={() => setViewTab("TRENDING_BUZZ")}
-                className="text-xs text-primary font-bold hover:underline cursor-pointer"
-              >
-                More buzz
-              </button>
-            </div>
-
-            <div className="divide-y divide-border/25">
-              {trendingCommunityPosts.slice(0, 3).map((post) => (
-                <div key={post.id} className="pt-2">
-                  <FeedCard post={post} currentUserId={profileId} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* ─── Top 6 Campus Hubs Strip (Shown on All & Hub views) ─── */}
+      {activeTab !== "clubs" && (
+        <CampusHubStrip
+          activeTab={activeTab as HubTabType}
+          onSelectTab={(tab) => handleTabChange(tab)}
+          onOpenCreateModal={handleOpenCreateModal}
+        />
       )}
 
-      {/* ─── TAB 2: TRENDING BUZZ (Algorithmic Community Feed) ─── */}
-      {viewTab === "TRENDING_BUZZ" && (
-        <div className="flex flex-col divide-y divide-border/30">
-          {trendingCommunityPosts.length === 0 ? (
-            <div className="p-12 text-center text-sm text-muted-foreground">
-              No community posts found yet. Join a community and post something!
-            </div>
-          ) : (
-            trendingCommunityPosts.map((post) => (
-              <div key={post.id}>
-                <FeedCard post={post} currentUserId={profileId} />
-              </div>
+      {/* ─── Mode A: Infinite Scroll Feed (All, Lost&Found, Marketplace, Gaming, etc.) ─── */}
+      {activeTab !== "clubs" && (
+        <div className="divide-y divide-border/20 pt-2">
+          {feedItems.map((item: any) => {
+            switch (item.itemType) {
+              case "POST":
+                return (
+                  <FeedCard
+                    key={item.id}
+                    post={item.data}
+                    currentUserId={profileId}
+                  />
+                );
+              case "LOST_FOUND":
+                return (
+                  <LostFoundCard
+                    key={item.id}
+                    item={item.data}
+                    currentUserId={profileId}
+                  />
+                );
+              case "MARKETPLACE":
+                return (
+                  <MarketplaceCard
+                    key={item.id}
+                    item={item.data}
+                    currentUserId={profileId}
+                  />
+                );
+              case "GAMING":
+                return (
+                  <GamingLobbyCard
+                    key={item.id}
+                    item={item.data}
+                    currentUserId={profileId}
+                  />
+                );
+              case "RIDESHARE":
+                return (
+                  <RideshareCard
+                    key={item.id}
+                    item={item.data}
+                    currentUserId={profileId}
+                  />
+                );
+              case "HOUSING":
+                return (
+                  <HousingCard
+                    key={item.id}
+                    item={item.data}
+                    currentUserId={profileId}
+                  />
+                );
+              case "ACADEMICS":
+                return (
+                  <AcademicCard
+                    key={item.id}
+                    item={item.data}
+                    currentUserId={profileId}
+                  />
+                );
+              default:
+                return null;
+            }
+          })}
+
+          {/* Fallback initial posts if SWR hasn't loaded yet */}
+          {feedItems.length === 0 && !isValidating && initialPosts.length > 0 && activeTab === "all" && (
+            initialPosts.map((post) => (
+              <FeedCard key={post.id} post={post} currentUserId={profileId} />
             ))
           )}
+
+          {/* Loading Skeleton / Sentinel */}
+          <div ref={sentinelRef} className="py-6 flex justify-center items-center">
+            {isValidating ? (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold">
+                <Loader2 className="size-4 animate-spin text-primary" />
+                <span>Loading more campus content...</span>
+              </div>
+            ) : isReachingEnd && feedItems.length > 0 ? (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground/80 font-bold py-4">
+                <CheckCheck className="size-4 text-primary" />
+                <span>You're all caught up on this campus hub!</span>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Empty State */}
+          {!isValidating && feedItems.length === 0 && (
+            <div className="py-20 px-6 text-center max-w-sm mx-auto space-y-3">
+              <div className="size-14 rounded-3xl bg-muted/50 border border-border/40 flex items-center justify-center mx-auto text-muted-foreground">
+                <Compass className="size-7 text-primary" />
+              </div>
+              <h3 className="text-base font-black text-foreground">
+                No active listings yet
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Be the first verified classmate to post in this campus hub or request items!
+              </p>
+              <button
+                type="button"
+                onClick={() => handleOpenCreateModal(activeTab === "all" ? "lost_found" : activeTab as HubTabType)}
+                className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/95 transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                + Drop a Post
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* ─── TAB 3 & 4: EXPLORE & JOINED DIRECTORY ─── */}
-      {(viewTab === "EXPLORE" || viewTab === "JOINED") && (
+      {/* ─── Mode B: Student Interest Clubs & Communities Directory ─── */}
+      {activeTab === "clubs" && (
         <div className="p-4 space-y-4">
-          {/* Search Bar */}
-          <div className="relative w-full">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          {/* Search Box */}
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search communities by name or topic..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-10 pl-9 pr-4 rounded-full border border-border/50 bg-muted/40 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-foreground transition-all"
+              placeholder="Search student clubs, tech societies, anime & music groups..."
+              className="w-full rounded-2xl border border-border/60 bg-muted/20 pl-10 pr-4 py-2.5 text-xs text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
-          {/* Category Chips Horizontal Scroll */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                className={cn(
-                  "px-3.5 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
-                  selectedCategory === cat
-                    ? "bg-foreground text-background font-black shadow-2xs"
-                    : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+          {/* Communities Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            {filteredCommunities.map((c) => {
+              const isMember = c.members.some((m) => m.userId === profileId);
+              const avatar = getAvatarUrl(c.avatarUrl, c.name);
 
-          {/* Flat Community Rows (Twitter/X style) */}
-          <div className="divide-y divide-border/25 pt-1">
-            {filteredCommunities.length > 0 ? (
-              filteredCommunities.map((c) => {
-                const isMember = c.members.some((m) => m.userId === profileId);
-                const membersCount = c.members.length;
-
-                return (
-                  <div key={c.id} className="py-3.5 flex items-center justify-between gap-3 group">
-                    <Link
-                      href={`/app/communities/${c.slug || c.id}`}
-                      className="flex items-center gap-3.5 min-w-0 flex-1"
-                    >
-                      <Avatar className="size-12 rounded-full border border-border/40 shrink-0">
-                        <AvatarImage src={c.avatarUrl || ""} />
-                        <AvatarFallback className="bg-muted text-xs font-bold">
-                          {c.name.slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-sm font-bold text-foreground group-hover:underline truncate">
-                            c/{c.name}
-                          </p>
-                          {c.privacy === "PRIVATE" ? (
-                            <Lock className="size-3 text-muted-foreground shrink-0" />
-                          ) : (
-                            <Globe className="size-3 text-muted-foreground shrink-0" />
-                          )}
-                        </div>
-                        <p className="text-xs text-primary font-bold truncate">
-                          {c.category} · <span className="text-muted-foreground font-medium">{membersCount} members</span>
-                        </p>
-                        {c.description && (
-                          <p className="text-xs text-muted-foreground/80 line-clamp-1">
-                            {c.description}
-                          </p>
+              return (
+                <div
+                  key={c.id}
+                  className="rounded-2xl border border-border/40 bg-card p-4 space-y-3 hover:border-border/80 transition-all flex flex-col justify-between"
+                >
+                  <div className="flex items-start gap-3">
+                    <Avatar className="size-11 rounded-2xl border border-border/50 shrink-0">
+                      <AvatarImage src={avatar} />
+                      <AvatarFallback className="text-xs font-black bg-muted">
+                        {c.name[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <Link
+                          href={`/app/communities/${c.id}`}
+                          className="text-xs font-black text-foreground hover:underline truncate"
+                        >
+                          {c.name}
+                        </Link>
+                        {c.privacy === "PRIVATE" ? (
+                          <Lock className="size-3 text-amber-500 shrink-0" />
+                        ) : (
+                          <Globe className="size-3 text-muted-foreground/60 shrink-0" />
                         )}
                       </div>
-                    </Link>
+                      <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+                        {c.description || "Campus student community"}
+                      </p>
+                    </div>
+                  </div>
 
+                  <div className="flex items-center justify-between pt-2 border-t border-border/20 text-xs">
+                    <span className="text-[11px] font-bold text-muted-foreground flex items-center gap-1">
+                      <Users className="size-3" />
+                      <span>{c.members.length} members</span>
+                    </span>
                     <JoinCommunityButton
                       communityId={c.id}
                       initialIsMember={isMember}
-                      className="h-8 px-4 text-xs font-bold rounded-full shrink-0"
                     />
                   </div>
-                );
-              })
-            ) : (
-              <div className="p-12 text-center space-y-2">
-                <p className="text-sm font-bold text-foreground">
-                  {viewTab === "JOINED" ? "You haven't joined any sub-hubs yet" : "No communities found"}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {viewTab === "JOINED"
-                    ? "Explore the circles above to discover interest groups and campus societies."
-                    : "Try adjusting your search or category filter."}
-                </p>
-              </div>
-            )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
-    </main>
+
+      {/* ─── Hub Create Modal ─── */}
+      <HubCreateModal
+        isOpen={showCreateHubModal}
+        onClose={() => setShowCreateHubModal(false)}
+        defaultHub={hubToCreate}
+        onItemCreated={handleItemCreated}
+      />
+    </div>
   );
 }

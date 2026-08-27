@@ -1,10 +1,16 @@
 import { relations } from "drizzle-orm";
+import { academicResources } from "./academic-resources";
 import { conversationParticipants,conversations,messages } from "./chat";
 import { communities,communityMembers } from "./communities";
 import { secretCrushes,swipes } from "./dating";
+import { gamingLobbies } from "./gaming";
+import { housingListings } from "./housing";
 import { institutionDomains,institutions } from "./institutions";
+import { lostAndFoundItems } from "./lost-and-found";
+import { marketplaceItems } from "./marketplace";
 import { notifications } from "./notifications";
 import { comments,pollOptions,pollVotes,posts,votes } from "./posts";
+import { ridesharePools } from "./rideshare";
 import { stories,storyHighlights,storyLikes } from "./stories";
 import { userProfiles } from "./users";
 
@@ -221,4 +227,71 @@ export const secretCrushesRelations = relations(secretCrushes, ({ one }) => ({
     relationName: "crush_target",
   }),
 }));
+
+export const lostAndFoundItemsRelations = relations(lostAndFoundItems, ({ one }) => ({
+  author: one(userProfiles, {
+    fields: [lostAndFoundItems.authorId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [lostAndFoundItems.institutionId],
+    references: [institutions.id],
+  }),
+}));
+
+export const marketplaceItemsRelations = relations(marketplaceItems, ({ one }) => ({
+  seller: one(userProfiles, {
+    fields: [marketplaceItems.sellerId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [marketplaceItems.institutionId],
+    references: [institutions.id],
+  }),
+}));
+
+export const gamingLobbiesRelations = relations(gamingLobbies, ({ one }) => ({
+  host: one(userProfiles, {
+    fields: [gamingLobbies.hostId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [gamingLobbies.institutionId],
+    references: [institutions.id],
+  }),
+}));
+
+export const ridesharePoolsRelations = relations(ridesharePools, ({ one }) => ({
+  creator: one(userProfiles, {
+    fields: [ridesharePools.creatorId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [ridesharePools.institutionId],
+    references: [institutions.id],
+  }),
+}));
+
+export const housingListingsRelations = relations(housingListings, ({ one }) => ({
+  author: one(userProfiles, {
+    fields: [housingListings.authorId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [housingListings.institutionId],
+    references: [institutions.id],
+  }),
+}));
+
+export const academicResourcesRelations = relations(academicResources, ({ one }) => ({
+  uploader: one(userProfiles, {
+    fields: [academicResources.uploaderId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [academicResources.institutionId],
+    references: [institutions.id],
+  }),
+}));
+
 

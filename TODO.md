@@ -59,9 +59,23 @@
     - Synthesized sounds: `ting()` (repost & publish), `pop()` (heart like & double tap), `send()` (message & comment whoosh), `tap()` (tabs & filter pills), `match()` (secret crush & dating chord arpeggio), and `archive()` (metallic latch).
   - **Physical Haptic Feedback Engine (`src/lib/haptics.ts`)**:
     - Tactile vibration patterns via `navigator.vibrate`: `repost()` celebratory rhythm, `heartbeat()` double-pulse for heart likes, `light()` micro-tap, `success()` alert, and `match()` multi-burst.
-  - **PWA Supercharged Experience**:
-    - **Badging API**: Synchronizes unread notifications count directly to home screen / dock app badge via `navigator.setAppBadge(unreadCount)`.
-    - **Network Cues**: Real-time `online` & `offline` listeners triggering audio/haptics and status warnings.
-    - **Manifest App Shortcuts**: Quick access to Campus Feed, Chat, Dating, Post, and Notifications.
-    - **PWA Install Banner**: Native installation drawer with 1-click prompt and iOS Safari instructions modal.
+- [x] **Campus Hub Suite, Infinite Scroll & Multi-Schema Architecture (`/app/communities`)**:
+  - **Separate DB Schemas & Neon Tables**:
+    - `src/db/schema/lost-and-found.ts`: `lost_and_found_items` table with institution scoping, category, location, date, reward, claim, and resolution status.
+    - `src/db/schema/marketplace.ts`: `marketplace_items` table with price (₹), original price, condition, category, hostel delivery, and sold toggle.
+    - `src/db/schema/gaming.ts`: `gaming_lobbies` table for Valorant, Chess, BGMI, FIFA, CS2 with game mode, rank tier, gamer tag, and slots progress meter.
+    - `src/db/schema/rideshare.ts`: `rideshare_pools` table for railway/airport cab splits with origin/destination route, departure time, and seat reservation.
+    - `src/db/schema/housing.ts`: `housing_listings` table for flats & PGs with rent/mo, distance from campus gate, occupancy, and amenity chips.
+    - `src/db/schema/academic-resources.ts`: `academic_resources` table with subject code/name, branch, semester, PYQ/notes, and Google Drive links.
+  - **Paginated Infinite Scroll API (`GET /api/communities/feed`)**:
+    - Cursor-based pagination returning unified polymorphic feed (`POST`, `LOST_FOUND`, `MARKETPLACE`, `GAMING`, `RIDESHARE`, `HOUSING`, `ACADEMICS`).
+  - **Campus Hub Horizontal Bar (`CampusHubStrip`)**:
+    - 6 vibrant hub cards with unique gradients, live counters, and fast 1-click filter switching.
+  - **Custom Dedicated UI Cards**:
+    - `<LostFoundCard />`, `<MarketplaceCard />`, `<GamingLobbyCard />`, `<RideshareCard />`, `<HousingCard />`, `<AcademicCard />`.
+  - **Hub Creation Modal (`HubCreateModal`)**:
+    - Contextual input form supporting immediate publication to all 6 hubs with optimistic updates.
+  - **Database Seeding**:
+    - Registered official campus hubs in `communities` and seeded authentic BIT Mesra content across all 6 tables.
+
 

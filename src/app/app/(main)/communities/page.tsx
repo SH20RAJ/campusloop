@@ -69,8 +69,9 @@ export default async function CommunitiesPage() {
     db.query.posts.findMany({
       where: isNotNull(posts.communityId),
       orderBy: [desc(posts.createdAt)],
-      limit: 20,
+      limit: 40,
       with: {
+
         author: true,
         institution: true,
         community: true,

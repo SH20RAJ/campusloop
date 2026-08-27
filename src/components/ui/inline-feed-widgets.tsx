@@ -16,10 +16,11 @@ import { toast } from "sonner";
 // ──────── 1. Suggested Communities Widget (Twitter / X Timeline Style) ────────
 
 const SUGGESTED_COMMUNITIES = [
-  { id: "comm-1", name: "Coding & Devs", slug: "coding", members: 142, desc: "LeetCode, hackathons & open source" },
-  { id: "comm-2", name: "Canteen Tea & Gossip", slug: "canteen", members: 289, desc: "Campus debates & hostel stories" },
-  { id: "comm-3", name: "Exam Backlog Survivors", slug: "exams", members: 310, desc: "PYQs, formulas & last-minute prep" },
+  { id: "comm_music", name: "Music Jams & Dhwani", slug: "music-jams", members: 17, desc: "Acoustic jams, Bitotsav battle of bands, and indie chords 🎸" },
+  { id: "comm_coding", name: "Coders Club & Hackers", slug: "coders-club", members: 18, desc: "LeetCode daily grinds, system design & HackBIT squads 💻" },
+  { id: "comm_placements", name: "Placement & Career Prep", slug: "placement-prep", members: 15, desc: "Mock interviews, coding test patterns & alumni referrals 💼" },
 ];
+
 
 export function InlineCommunitiesWidget() {
   const [joined, setJoined] = useState<Record<string, boolean>>({});

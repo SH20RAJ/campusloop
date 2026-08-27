@@ -1,11 +1,10 @@
-import { CommunityFeedView } from "@/components/communities/community-feed-view";
-import { CommunityHeader } from "@/components/communities/community-header";
+import { CommunityDetailClient } from "@/components/communities/community-detail-client";
 import { getDb } from "@/db";
-import { posts } from "@/db/schema";
+import { communities,communityMembers,posts } from "@/db/schema";
 import { FeedPost } from "@/hooks/use-feed";
 import { sanitizeAnonRow } from "@/lib/anonymity";
 import { getCachedAuthUser,getCachedCommunity,getCachedUserProfile } from "@/lib/server-cache";
-import { desc,eq } from "drizzle-orm";
+import { desc,eq,ne } from "drizzle-orm";
 import { Metadata } from "next";
 import { notFound,redirect } from "next/navigation";
 
@@ -24,7 +23,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = `c/${comm.name} Sub-Hub | CampusLoop`;
-  const description = comm.description || `Join c/${comm.name} student sub-community on CampusLoop for hot posts, confessions, and campus discussions.`;
+  const description =
+    comm.description ||
+    `Join c/${comm.name} student sub-community on CampusLoop for hot posts, confessions, and campus discussions.`;
   const url = `https://campusloop.space/app/communities/${comm.slug || comm.id}`;
 
   return {
@@ -64,7 +65,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     robots: { index: comm.privacy === "PUBLIC", follow: comm.privacy === "PUBLIC" },
   };
-
 }
 
 export default async function CommunityDetailPage({ params }: PageProps) {
@@ -72,7 +72,6 @@ export default async function CommunityDetailPage({ params }: PageProps) {
 
   const user = await getCachedAuthUser();
   if (!user) redirect("/handler/sign-in");
-
 
   // Parallelize user profile and community lookup
   const [profile, comm] = await Promise.all([
@@ -86,26 +85,42 @@ export default async function CommunityDetailPage({ params }: PageProps) {
   const userMembership = comm.members.find((m) => m.userId === profile.id);
   const isMember = Boolean(userMembership && userMembership.status === "ACTIVE");
   const isAdmin = Boolean(comm.creatorId === profile.id || userMembership?.role === "ADMIN");
-  const memberStatus = userMembership?.status || "NONE";
   const activeMembersCount = comm.members.filter((m) => m.status === "ACTIVE").length;
 
   const db = getDb();
-  // Fetch community posts
-  const communityPosts = await db.query.posts.findMany({
-    where: eq(posts.communityId, comm.id),
-    orderBy: [desc(posts.createdAt)],
-    limit: 40,
-    with: {
-      author: true,
-      institution: true,
-      community: true,
-      votes: true,
-      comments: true,
-      pollOptions: {
-        with: { votes: true },
+
+  // Parallelize community posts, full members list, and related communities
+  const [communityPosts, allMembers, otherCommunities] = await Promise.all([
+    db.query.posts.findMany({
+      where: eq(posts.communityId, comm.id),
+      orderBy: [desc(posts.createdAt)],
+      limit: 50,
+      with: {
+        author: true,
+        institution: true,
+        community: true,
+        votes: true,
+        comments: true,
+        pollOptions: {
+          with: { votes: true },
+        },
       },
-    },
-  });
+    }),
+    db.query.communityMembers.findMany({
+      where: eq(communityMembers.communityId, comm.id),
+      limit: 30,
+      with: {
+        user: true,
+      },
+    }),
+    db.query.communities.findMany({
+      where: ne(communities.id, comm.id),
+      limit: 4,
+      with: {
+        members: true,
+      },
+    }),
+  ]);
 
   const formattedPosts = communityPosts.map((post) => {
     const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
@@ -134,9 +149,34 @@ export default async function CommunityDetailPage({ params }: PageProps) {
     } as unknown as FeedPost;
   });
 
+  const membersList = allMembers
+    .filter((m) => m.user)
+    .map((m) => ({
+      id: m.id,
+      role: m.role,
+      user: {
+        id: m.user.id,
+        username: m.user.username,
+        displayName: m.user.displayName,
+        avatarUrl: m.user.avatarUrl,
+        headline: m.user.headline,
+        points: m.user.points,
+      },
+    }));
+
+  const relatedCommunities = otherCommunities.map((c) => ({
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    description: c.description,
+    category: c.category,
+    avatarUrl: c.avatarUrl,
+    membersCount: c.members.length,
+    isMember: c.members.some((m) => m.userId === profile.id),
+  }));
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col min-h-screen pb-24 px-3 sm:px-4 pt-3 gap-5 select-none">
+    <>
       {/* Educational Organization / DiscussionForum JSON-LD Schema */}
       <script
         type="application/ld+json"
@@ -152,31 +192,32 @@ export default async function CommunityDetailPage({ params }: PageProps) {
         }}
       />
 
-      {/* Community Grand Header */}
-      <CommunityHeader
-        community={comm}
-        membersCount={activeMembersCount}
-        postsCount={formattedPosts.length}
-        isMember={isMember}
-        isAdmin={isAdmin}
-        memberStatus={memberStatus}
-      />
-
-      {/* Main Feed View */}
-      <CommunityFeedView
+      <CommunityDetailClient
         community={{
           id: comm.id,
-          slug: comm.slug,
           name: comm.name,
+          slug: comm.slug,
+          description: comm.description,
+          category: comm.category,
           privacy: comm.privacy,
-          allowAnonymousPosts: comm.allowAnonymousPosts,
+          avatarUrl: comm.avatarUrl,
+          bannerUrl: comm.bannerUrl,
+          points: comm.points,
           rules: comm.rules,
+          allowAnonymousPosts: comm.allowAnonymousPosts,
+          creatorId: comm.creatorId,
+          createdAt: comm.createdAt,
+          creator: comm.creator,
         }}
-        posts={formattedPosts}
-        isMember={isMember}
-        currentUserId={profile.id}
+        initialPosts={formattedPosts}
+        initialMembersCount={activeMembersCount}
+        initialIsMember={isMember}
+        isAdmin={isAdmin}
+        relatedCommunities={relatedCommunities}
+        membersList={membersList}
       />
-    </main>
+    </>
   );
 }
+
 

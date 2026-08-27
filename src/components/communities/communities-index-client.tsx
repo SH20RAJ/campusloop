@@ -1,19 +1,23 @@
 "use client";
 
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { FeedPost } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
 import {
 ArrowLeft,
+Flame,
 Globe,
 Lock,
 Plus,
-Search
+Search,
+Sparkles,
+Users
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo,useState } from "react";
 
 export interface CommunityItem {
   id: string;
@@ -40,11 +44,9 @@ interface CommunitiesIndexClientProps {
 const CATEGORIES = [
   "All",
   "Tech & Coding",
-  "Academics & Placements",
   "Cultural & Arts",
+  "Academics & Placements",
   "Gaming & Anime",
-  "Sports & Fitness",
-  "Memes & Culture",
   "General",
 ];
 
@@ -56,52 +58,80 @@ export function CommunitiesIndexClient({
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [viewTab, setViewTab] = useState<"EXPLORE" | "JOINED" | "FEED">("EXPLORE");
+  const [viewTab, setViewTab] = useState<"FOR_YOU" | "TRENDING_BUZZ" | "EXPLORE" | "JOINED">("FOR_YOU");
 
-  const joinedCommunities = initialCommunities.filter((c) =>
-    c.members.some((m) => m.userId === profileId)
-  );
+  const joinedCommunities = useMemo(() => {
+    return initialCommunities.filter((c) =>
+      c.members.some((m) => m.userId === profileId)
+    );
+  }, [initialCommunities, profileId]);
 
-  const activePool =
-    viewTab === "JOINED" ? joinedCommunities : initialCommunities;
+  // Algorithmic ranking of communities for "FOR YOU"
+  const recommendedCommunities = useMemo(() => {
+    const list = [...initialCommunities];
+    return list.sort((a, b) => {
+      // Prioritize non-joined with highest member count and points
+      const aJoined = a.members.some((m) => m.userId === profileId) ? 0 : 1;
+      const bJoined = b.members.some((m) => m.userId === profileId) ? 0 : 1;
+      if (aJoined !== bJoined) return bJoined - aJoined;
+      const scoreA = (a.points || 0) + a.members.length * 15;
+      const scoreB = (b.points || 0) + b.members.length * 15;
+      return scoreB - scoreA;
+    });
+  }, [initialCommunities, profileId]);
 
-  const filteredCommunities = activePool.filter((c) => {
-    // Hide UNLISTED communities unless the user is a member
-    const isMember = c.members.some((m) => m.userId === profileId);
-    if (c.privacy === "UNLISTED" && !isMember) {
-      return false;
-    }
+  // Algorithmic trending community discussions
+  const trendingCommunityPosts = useMemo(() => {
+    const list = [...initialPosts];
+    return list.sort((a, b) => {
+      const now = Date.now();
+      const ageHoursA = Math.max(1, (now - new Date(a.createdAt).getTime()) / (3600 * 1000));
+      const ageHoursB = Math.max(1, (now - new Date(b.createdAt).getTime()) / (3600 * 1000));
+      const scoreA = (a.votesCount * 2 + a.commentsCount * 3 + 5) / Math.pow(ageHoursA, 0.75);
+      const scoreB = (b.votesCount * 2 + b.commentsCount * 3 + 5) / Math.pow(ageHoursB, 0.75);
+      return scoreB - scoreA;
+    });
+  }, [initialPosts]);
 
-    const matchesSearch =
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      (c.description || "").toLowerCase().includes(search.toLowerCase()) ||
-      (c.category || "").toLowerCase().includes(search.toLowerCase());
+  // Filtered communities for Explore and Joined tabs
+  const filteredCommunities = useMemo(() => {
+    const base = viewTab === "JOINED" ? joinedCommunities : initialCommunities;
+    return base.filter((c) => {
+      if (c.privacy === "UNLISTED" && !c.members.some((m) => m.userId === profileId)) {
+        return false;
+      }
+      const matchesSearch =
+        c.name.toLowerCase().includes(search.toLowerCase()) ||
+        (c.description || "").toLowerCase().includes(search.toLowerCase()) ||
+        (c.category || "").toLowerCase().includes(search.toLowerCase());
 
-    if (selectedCategory !== "All") {
-      return matchesSearch && c.category.toLowerCase() === selectedCategory.toLowerCase();
-    }
-    return matchesSearch;
-  });
+      if (selectedCategory !== "All") {
+        return matchesSearch && c.category.toLowerCase() === selectedCategory.toLowerCase();
+      }
+      return matchesSearch;
+    });
+  }, [initialCommunities, joinedCommunities, viewTab, profileId, search, selectedCategory]);
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-24">
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen bg-background text-foreground pb-24 border-x border-border/30 select-none">
       {/* ─── Sticky Twitter/X Header ─── */}
-      <header className="sticky top-0 z-40 bg-background/85 px-4 pt-3 backdrop-blur-xl border-b border-border/30 space-y-3">
+      <header className="sticky top-0 z-40 bg-background/80 px-4 pt-2.5 backdrop-blur-xl border-b border-border/30 space-y-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              className="flex size-9 items-center justify-center rounded-full hover:bg-muted/70 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              aria-label="Back"
             >
               <ArrowLeft className="size-4.5" />
             </button>
             <div>
-              <h1 className="text-lg font-black tracking-tight text-foreground">
+              <h1 className="text-base font-black tracking-tight text-foreground">
                 Communities
               </h1>
-              <p className="text-[11px] text-muted-foreground font-medium">
-                {initialCommunities.length} campus interest groups &amp; clubs
+              <p className="text-xs text-muted-foreground font-normal">
+                {initialCommunities.length} student-run sub-hubs &amp; circles
               </p>
             </div>
           </div>
@@ -111,33 +141,34 @@ export function CommunitiesIndexClient({
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-xs active:scale-95"
           >
             <Plus className="size-3.5 stroke-[3]" />
-            <span>Create</span>
+            <span>Create Hub</span>
           </Link>
         </div>
 
-        {/* Twitter Tabs */}
-        <div className="flex border-b border-border/30">
+        {/* ─── Twitter/X Segmented Tabs with Active Indicator ─── */}
+        <div className="flex border-b border-border/20 -mx-4 px-2">
           {[
-            { id: "EXPLORE", label: "Explore Hubs" },
+            { id: "FOR_YOU", label: "For You" },
+            { id: "TRENDING_BUZZ", label: "Trending Buzz" },
+            { id: "EXPLORE", label: "Explore All" },
             { id: "JOINED", label: `Joined (${joinedCommunities.length})` },
-            { id: "FEED", label: "Community Feed" },
           ].map((tab) => {
             const isActive = viewTab === tab.id;
             return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setViewTab(tab.id as "EXPLORE" | "JOINED" | "FEED")}
+                onClick={() => setViewTab(tab.id as typeof viewTab)}
                 className={cn(
-                  "relative flex-1 pb-3 pt-1 text-center text-xs font-bold transition-colors cursor-pointer",
+                  "relative flex-1 py-2.5 text-center text-xs transition-colors cursor-pointer flex flex-col items-center justify-center",
                   isActive
                     ? "text-foreground font-black"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
+                    : "text-muted-foreground hover:text-foreground font-bold"
                 )}
               >
                 <span>{tab.label}</span>
                 {isActive && (
-                  <div className="absolute -bottom-px left-0 right-0 h-0.5 bg-foreground rounded-full" />
+                  <div className="absolute bottom-0 h-1 w-10 bg-primary rounded-full" />
                 )}
               </button>
             );
@@ -145,8 +176,163 @@ export function CommunitiesIndexClient({
         </div>
       </header>
 
-      {/* ─── DIRECTORY VIEW (Explore / Joined) ─── */}
-      {viewTab !== "FEED" ? (
+      {/* ─── TAB 1: FOR YOU (Algorithmic Personalized Discovery) ─── */}
+      {viewTab === "FOR_YOU" && (
+        <div className="flex flex-col divide-y divide-border/30">
+          {/* Featured Spotlight Hub Hero Card */}
+          {recommendedCommunities.length > 0 && (
+            <div className="relative border-b border-border/30 bg-card/20 overflow-hidden">
+              <div className="relative h-28 sm:h-36 w-full bg-neutral-900 overflow-hidden">
+                {recommendedCommunities[0].bannerUrl ? (
+                  <img
+                    src={recommendedCommunities[0].bannerUrl}
+                    alt={recommendedCommunities[0].name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-neutral-900 via-neutral-950 to-neutral-900 relative">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
+                  </div>
+                )}
+                <span className="absolute top-2.5 left-3 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-primary border border-border/40 flex items-center gap-1">
+                  <Sparkles className="size-2.5" /> Featured Sub-Hub
+                </span>
+              </div>
+
+              <div className="p-4 pt-0">
+                <div className="flex items-end justify-between -mt-8 mb-2">
+                  <Avatar className="size-16 rounded-full border-4 border-background bg-card shadow-md">
+                    <AvatarImage src={recommendedCommunities[0].avatarUrl || ""} />
+                    <AvatarFallback className="bg-neutral-800 text-foreground font-black text-sm">
+                      {recommendedCommunities[0].name.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <JoinCommunityButton
+                    communityId={recommendedCommunities[0].id}
+                    initialIsMember={recommendedCommunities[0].members.some((m) => m.userId === profileId)}
+                    className="h-8 px-4 text-xs font-black rounded-full shadow-xs"
+                  />
+                </div>
+
+                <Link href={`/app/communities/${recommendedCommunities[0].slug || recommendedCommunities[0].id}`} className="group block space-y-1">
+                  <h2 className="text-base font-black text-foreground group-hover:underline flex items-center gap-1.5">
+                    c/{recommendedCommunities[0].name}
+                  </h2>
+                  <p className="text-xs text-primary font-bold">
+                    {recommendedCommunities[0].category} · {recommendedCommunities[0].members.length} members
+                  </p>
+                  {recommendedCommunities[0].description && (
+                    <p className="text-xs text-foreground/80 font-normal line-clamp-2 leading-relaxed pt-0.5">
+                      {recommendedCommunities[0].description}
+                    </p>
+                  )}
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Suggested Circles List */}
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black tracking-tight uppercase text-foreground flex items-center gap-1.5">
+                <Users className="size-3.5 text-primary" /> Circles You Might Like
+              </span>
+              <button
+                type="button"
+                onClick={() => setViewTab("EXPLORE")}
+                className="text-xs text-primary font-bold hover:underline cursor-pointer"
+              >
+                View all
+              </button>
+            </div>
+
+            <div className="divide-y divide-border/25">
+              {recommendedCommunities.slice(1, 4).map((c) => {
+                const isMember = c.members.some((m) => m.userId === profileId);
+                return (
+                  <div key={c.id} className="py-3 flex items-center justify-between gap-3">
+                    <Link
+                      href={`/app/communities/${c.slug || c.id}`}
+                      className="flex items-center gap-3 min-w-0 flex-1 group"
+                    >
+                      <Avatar className="size-11 rounded-full border border-border/40 shrink-0">
+                        <AvatarImage src={c.avatarUrl || ""} />
+                        <AvatarFallback className="bg-muted text-xs font-bold">
+                          {c.name.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <p className="text-sm font-bold text-foreground group-hover:underline truncate">
+                          c/{c.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {c.category} · {c.members.length} members
+                        </p>
+                        {c.description && (
+                          <p className="text-xs text-muted-foreground/80 line-clamp-1">
+                            {c.description}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+
+                    <JoinCommunityButton
+                      communityId={c.id}
+                      initialIsMember={isMember}
+                      className="h-8 px-4 text-xs font-bold rounded-full shrink-0"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Algorithmic In-Feed Discussions Section */}
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black tracking-tight uppercase text-foreground flex items-center gap-1.5">
+                <Flame className="size-3.5 text-primary" /> Trending In Communities
+              </span>
+              <button
+                type="button"
+                onClick={() => setViewTab("TRENDING_BUZZ")}
+                className="text-xs text-primary font-bold hover:underline cursor-pointer"
+              >
+                More buzz
+              </button>
+            </div>
+
+            <div className="divide-y divide-border/25">
+              {trendingCommunityPosts.slice(0, 3).map((post) => (
+                <div key={post.id} className="pt-2">
+                  <FeedCard post={post} currentUserId={profileId} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── TAB 2: TRENDING BUZZ (Algorithmic Community Feed) ─── */}
+      {viewTab === "TRENDING_BUZZ" && (
+        <div className="flex flex-col divide-y divide-border/30">
+          {trendingCommunityPosts.length === 0 ? (
+            <div className="p-12 text-center text-sm text-muted-foreground">
+              No community posts found yet. Join a community and post something!
+            </div>
+          ) : (
+            trendingCommunityPosts.map((post) => (
+              <div key={post.id}>
+                <FeedCard post={post} currentUserId={profileId} />
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* ─── TAB 3 & 4: EXPLORE & JOINED DIRECTORY ─── */}
+      {(viewTab === "EXPLORE" || viewTab === "JOINED") && (
         <div className="p-4 space-y-4">
           {/* Search Bar */}
           <div className="relative w-full">
@@ -160,7 +346,7 @@ export function CommunitiesIndexClient({
             />
           </div>
 
-          {/* Categories Horizontal Scroll */}
+          {/* Category Chips Horizontal Scroll */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
             {CATEGORIES.map((cat) => (
               <button
@@ -168,10 +354,10 @@ export function CommunitiesIndexClient({
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
                 className={cn(
-                  "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shadow-2xs",
+                  "px-3.5 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                   selectedCategory === cat
-                    ? "bg-foreground text-background font-black"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-foreground text-background font-black shadow-2xs"
+                    : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 {cat}
@@ -179,87 +365,69 @@ export function CommunitiesIndexClient({
             ))}
           </div>
 
-          {/* Communities List */}
-          <div className="space-y-3 pt-1">
+          {/* Flat Community Rows (Twitter/X style) */}
+          <div className="divide-y divide-border/25 pt-1">
             {filteredCommunities.length > 0 ? (
               filteredCommunities.map((c) => {
                 const isMember = c.members.some((m) => m.userId === profileId);
                 const membersCount = c.members.length;
 
                 return (
-                  <div
-                    key={c.id}
-                    className="rounded-2xl border border-border/40 bg-card p-4 hover:border-border/80 transition-all flex flex-col justify-between space-y-3 shadow-xs group"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <Link
-                        href={`/app/communities/${c.slug || c.id}`}
-                        className="flex items-start gap-3 min-w-0 flex-1 group"
-                      >
-                        <div className="size-11 rounded-2xl bg-muted/60 border border-border/50 flex items-center justify-center text-foreground font-black text-sm shrink-0">
+                  <div key={c.id} className="py-3.5 flex items-center justify-between gap-3 group">
+                    <Link
+                      href={`/app/communities/${c.slug || c.id}`}
+                      className="flex items-center gap-3.5 min-w-0 flex-1"
+                    >
+                      <Avatar className="size-12 rounded-full border border-border/40 shrink-0">
+                        <AvatarImage src={c.avatarUrl || ""} />
+                        <AvatarFallback className="bg-muted text-xs font-bold">
                           {c.name.slice(0, 2).toUpperCase()}
-                        </div>
+                        </AvatarFallback>
+                      </Avatar>
 
-                        <div className="min-w-0 flex-1">
-                          <h3 className="text-sm font-black text-foreground group-hover:underline truncate">
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-sm font-bold text-foreground group-hover:underline truncate">
                             c/{c.name}
-                          </h3>
-                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground pt-0.5">
-                            <span>{membersCount} {membersCount === 1 ? "member" : "members"}</span>
-                            <span>·</span>
-                            <span className="truncate">{c.category || "General"}</span>
-                            {c.privacy === "PRIVATE" ? (
-                              <>
-                                <span>·</span>
-                                <span className="flex items-center gap-0.5 text-amber-500 font-semibold">
-                                  <Lock className="size-2.5" /> Private
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <span>·</span>
-                                <span className="flex items-center gap-0.5">
-                                  <Globe className="size-2.5" /> Public
-                                </span>
-                              </>
-                            )}
-                          </div>
+                          </p>
+                          {c.privacy === "PRIVATE" ? (
+                            <Lock className="size-3 text-muted-foreground shrink-0" />
+                          ) : (
+                            <Globe className="size-3 text-muted-foreground shrink-0" />
+                          )}
                         </div>
-                      </Link>
+                        <p className="text-xs text-primary font-bold truncate">
+                          {c.category} · <span className="text-muted-foreground font-medium">{membersCount} members</span>
+                        </p>
+                        {c.description && (
+                          <p className="text-xs text-muted-foreground/80 line-clamp-1">
+                            {c.description}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
 
-                      <JoinCommunityButton
-                        communityId={c.id}
-                        initialIsMember={isMember}
-                      />
-                    </div>
-
-                    {c.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                        {c.description}
-                      </p>
-                    )}
+                    <JoinCommunityButton
+                      communityId={c.id}
+                      initialIsMember={isMember}
+                      className="h-8 px-4 text-xs font-bold rounded-full shrink-0"
+                    />
                   </div>
                 );
               })
             ) : (
-              <div className="py-16 text-center text-xs text-muted-foreground">
-                No communities found matching your criteria.
+              <div className="p-12 text-center space-y-2">
+                <p className="text-sm font-bold text-foreground">
+                  {viewTab === "JOINED" ? "You haven't joined any sub-hubs yet" : "No communities found"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {viewTab === "JOINED"
+                    ? "Explore the circles above to discover interest groups and campus societies."
+                    : "Try adjusting your search or category filter."}
+                </p>
               </div>
             )}
           </div>
-        </div>
-      ) : (
-        /* ─── COMMUNITY FEED VIEW ─── */
-        <div className="p-4 space-y-4">
-          {initialPosts.length > 0 ? (
-            initialPosts.map((post) => (
-              <FeedCard key={post.id} post={post} />
-            ))
-          ) : (
-            <div className="py-16 text-center text-xs text-muted-foreground">
-              No posts in community feed yet. Join a community to see conversations here!
-            </div>
-          )}
         </div>
       )}
     </main>

@@ -22,7 +22,10 @@ export interface MentionHashtag {
   tag: string;
   count: number;
   formattedCount: string;
+  category?: string;
+  isHot?: boolean;
 }
+
 
 interface MentionsResponse {
   users: MentionUser[];
@@ -204,14 +207,27 @@ export function MentionSuggestions({
                   isSelected ? "bg-accent text-accent-foreground" : "hover:bg-muted/50"
                 )}
               >
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-black text-foreground truncate">
-                    {h.tag}
-                  </p>
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-black text-foreground truncate">
+                      {h.tag}
+                    </p>
+                    {h.isHot && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-primary/10 text-primary">
+                        HOT
+                      </span>
+                    )}
+                  </div>
+                  {h.category && (
+                    <p className="text-[10px] text-muted-foreground truncate">
+                      {h.category}
+                    </p>
+                  )}
                 </div>
                 <span className="text-[11px] text-muted-foreground shrink-0 font-medium">
                   {h.formattedCount}
                 </span>
+
               </button>
             );
           })}

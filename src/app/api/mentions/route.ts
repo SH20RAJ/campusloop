@@ -1,8 +1,10 @@
 import { getDb } from "@/db";
-import { posts,userProfiles } from "@/db/schema";
+import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { getTrendingHashtags } from "@/lib/trending-hashtags";
 import { desc,eq,ilike,or } from "drizzle-orm";
 import { NextResponse } from "next/server";
+
 
 export const dynamic = "force-dynamic";
 
@@ -73,57 +75,21 @@ export async function GET(req: Request) {
 
     // 2. Hashtags (#tags)
     if (type === "hashtags" || type === "all") {
-      const recentPosts = await db.query.posts.findMany({
-        where: eq(posts.status, "PUBLISHED"),
-        orderBy: [desc(posts.createdAt)],
-        limit: 80,
+      const trending = await getTrendingHashtags({
+        query: q,
+        campusId: viewerInstitutionId,
+        limit: 8,
       });
 
-      const tagMap = new Map<string, number>();
-
-      for (const p of recentPosts) {
-        const matches = (p.body || "").match(/#([a-zA-Z0-9_\u0900-\u097F]+)/g);
-        if (matches) {
-          for (const rawTag of matches) {
-            const clean = rawTag.toLowerCase();
-            tagMap.set(clean, (tagMap.get(clean) || 0) + 1);
-          }
-        }
-      }
-
-      // Default campus tags if few exist
-      const defaultCampusTags = [
-        { tag: "#EndSemExams", count: 28 },
-        { tag: "#PlacementSeason", count: 24 },
-        { tag: "#SecretCrushVault", count: 18 },
-        { tag: "#HostelLife", count: 15 },
-        { tag: "#CanteenGossip", count: 12 },
-        { tag: "#LateNightTea", count: 10 },
-        { tag: "#TechFest2026", count: 9 },
-      ];
-
-      for (const def of defaultCampusTags) {
-        const clean = def.tag.toLowerCase();
-        if (!tagMap.has(clean)) {
-          tagMap.set(clean, def.count);
-        }
-      }
-
-      const qLower = q.toLowerCase().replace(/^#/, "");
-      matchingHashtags = Array.from(tagMap.entries())
-        .filter(([t]) => !qLower || t.includes(qLower))
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 6)
-        .map(([rawTag, count]) => {
-          // Format tag nicely
-          const formatted = rawTag.startsWith("#") ? rawTag : `#${rawTag}`;
-          return {
-            tag: formatted,
-            count,
-            formattedCount: count >= 1000 ? `${(count / 1000).toFixed(1)}K posts` : `${count} posts`,
-          };
-        });
+      matchingHashtags = trending.map((t) => ({
+        tag: t.tag,
+        count: t.count,
+        formattedCount: t.formattedCount,
+        category: t.category,
+        isHot: t.isHot,
+      }));
     }
+
 
     return NextResponse.json({
       users: matchingUsers,

@@ -16,11 +16,16 @@ import { StoryRing } from "@/components/ui/story-ring";
 
 import { FeedPost,useFeed,useStories } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
+import { fetcher } from "@/lib/api";
 import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";
+import type { TrendingHashtag } from "@/lib/trending-hashtags";
+import { Flame } from "lucide-react";
 import Link from "next/link";
 import { usePathname,useRouter,useSearchParams } from "next/navigation";
 import { useEffect,useState } from "react";
 import { toast } from "sonner";
+import useSWR from "swr";
+
 
 
 export function FeedClient({ forcedType }: { forcedType?: string }) {
@@ -95,8 +100,16 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
   const { stories, mutate: mutateStories, isLoading: storiesLoading } = useStories();
   const { profile } = useProfile();
 
+  const { data: trendingData } = useSWR<{ trending: TrendingHashtag[] }>(
+    "/api/hashtags/trending?limit=8",
+    fetcher,
+    { dedupingInterval: 30000 }
+  );
+  const trendingTags = trendingData?.trending || [];
+
   const [quickText, setQuickText] = useState("");
   const [isQuickPosting, setIsQuickPosting] = useState(false);
+
 
   async function handleQuickPost(e: React.FormEvent) {
     e.preventDefault();
@@ -259,22 +272,42 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
                 className="w-full bg-transparent text-[15px] placeholder:text-muted-foreground/70 font-normal outline-none resize-none pt-2"
               />
               {quickText && (
-                <div className="flex items-center justify-between pt-1.5 border-t border-border/20">
-                  <Link
-                    href="/app/post/new"
-                    className="text-xs text-primary font-bold hover:underline cursor-pointer"
-                  >
-                    Open full editor (poll, photos, confession)
-                  </Link>
-                  <button
-                    type="submit"
-                    disabled={isQuickPosting || !quickText.trim()}
-                    className="px-4 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
-                  >
-                    {isQuickPosting ? "Posting..." : "Post"}
-                  </button>
+                <div className="space-y-2 pt-1 border-t border-border/20">
+                  {trendingTags.length > 0 && (
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                      <span className="text-[10px] font-black text-muted-foreground uppercase shrink-0 flex items-center gap-0.5">
+                        <Flame className="size-2.5 text-primary" />
+                      </span>
+                      {trendingTags.slice(0, 6).map((t) => (
+                        <button
+                          key={t.tag}
+                          type="button"
+                          onClick={() => setQuickText((prev) => `${prev.trim()} ${t.tag} `)}
+                          className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-muted/60 hover:bg-muted text-foreground border border-border/40 shrink-0 cursor-pointer transition-colors"
+                        >
+                          {t.tag}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <Link
+                      href="/app/post/new"
+                      className="text-xs text-primary font-bold hover:underline cursor-pointer"
+                    >
+                      Open full editor (poll, photos, confession)
+                    </Link>
+                    <button
+                      type="submit"
+                      disabled={isQuickPosting || !quickText.trim()}
+                      className="px-4 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
+                    >
+                      {isQuickPosting ? "Posting..." : "Post"}
+                    </button>
+                  </div>
                 </div>
               )}
+
             </div>
             {!quickText && (
               <div className="flex items-center gap-1.5 shrink-0 pt-1">

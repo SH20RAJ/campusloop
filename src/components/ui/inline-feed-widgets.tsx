@@ -1,5 +1,7 @@
 "use client";
 
+import { fetcher } from "@/lib/api";
+import type { TrendingHashtag } from "@/lib/trending-hashtags";
 import { cn } from "@/lib/utils";
 import {
 ArrowRight,
@@ -7,11 +9,13 @@ Flame,
 Gift,
 Hash,
 Heart,
-Users
+Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import useSWR from "swr";
+
 
 // ──────── 1. Suggested Communities Widget (Twitter / X Timeline Style) ────────
 
@@ -138,33 +142,44 @@ export function InlineDatingWidget() {
 
 // ──────── 3. Trending Hashtags Widget ────────
 
-const TRENDING_TAGS = [
-  { tag: "LateNightTea", count: "128 posts" },
-  { tag: "CanteenDebate", count: "94 posts" },
-  { tag: "EndsemSurvivors", count: "210 posts" },
-  { tag: "HostelLife", count: "156 posts" },
-];
-
 export function InlineHashtagsWidget() {
+  const { data } = useSWR<{ trending: TrendingHashtag[] }>(
+    "/api/hashtags/trending?limit=4",
+    fetcher,
+    { dedupingInterval: 30000 }
+  );
+
+  const tags = data?.trending && data.trending.length > 0
+    ? data.trending.map((t) => ({
+        tag: t.tag.replace(/^#/, ""),
+        count: t.formattedCount,
+      }))
+    : [
+        { tag: "HostelLife", count: "62 posts" },
+        { tag: "BITMesra", count: "39 posts" },
+        { tag: "Confession", count: "36 posts" },
+        { tag: "CampusHelp", count: "25 posts" },
+      ];
+
   return (
     <div className="py-2.5 px-4 space-y-2 select-none">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Flame className="size-4 text-orange-500" />
+          <Flame className="size-4 text-primary" />
           <h3 className="text-[15px] font-black text-foreground tracking-tight">
             Trending on Campus
           </h3>
         </div>
         <Link
           href="/app/discover"
-          className="text-xs font-bold text-primary hover:underline"
+          className="text-xs font-bold text-primary hover:underline cursor-pointer"
         >
           Explore
         </Link>
       </div>
 
       <div className="grid grid-cols-2 gap-2 pt-1">
-        {TRENDING_TAGS.map((item) => (
+        {tags.map((item) => (
           <Link
             key={item.tag}
             href={`/app/hashtag/${item.tag}`}
@@ -181,6 +196,7 @@ export function InlineHashtagsWidget() {
     </div>
   );
 }
+
 
 // ──────── 4. Referral / Ambassador Perk Widget ────────
 

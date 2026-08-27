@@ -21,11 +21,14 @@ import { cn } from "@/lib/utils";
 import { EditorContent,useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
+import { fetcher } from "@/lib/api";
+import type { TrendingHashtag } from "@/lib/trending-hashtags";
 import {
 AlertTriangle,
 BarChart3,
 Check,
 ChevronDown,
+Flame,
 Globe,
 HelpCircle,
 Image as ImageIcon,
@@ -39,13 +42,14 @@ X,
 import { useRouter } from "next/navigation";
 import { useRef,useState } from "react";
 import { toast } from "sonner";
+import useSWR from "swr";
 
 export type PostType = "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
 
-const TRENDING_TAGS = ["#LateNightTea", "#Confessions", "#CanteenGossip", "#ExamStress", "#LibraryVibes", "#HostelLife"];
 const MAX_CHARS = 2000;
 
 export function PostComposer({ communityId: initialCommunityId }: { communityId?: string }) {
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +71,16 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const { communities } = useCommunities();
   const { profile } = useProfile();
 
+
+  const { data: trendingHashtagsData } = useSWR<{ trending: TrendingHashtag[] }>(
+    "/api/hashtags/trending?limit=14",
+    fetcher,
+    { dedupingInterval: 30000 }
+  );
+  const trendingTags = trendingHashtagsData?.trending || [];
+
   const firstName = profile?.displayName?.split(" ")[0];
+
 
   const [mentionTrigger, setMentionTrigger] = useState<TriggerContext | null>(null);
 
@@ -509,26 +522,43 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
           </div>
         )}
 
-        {/* Formatting + trending tags strip */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-border/20 px-4 py-2">
-          <PostComposerToolbar
-            editor={editor}
-            onOpenGifPicker={() => setShowGifPicker(true)}
-            onOpenStickerPicker={() => setShowStickerPicker(true)}
-          />
-          <div className="flex items-center gap-1.5">
-            {TRENDING_TAGS.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => insertTag(tag)}
-                className="shrink-0 text-[11px] font-semibold text-primary/80 transition-colors hover:text-primary cursor-pointer"
-              >
-                {tag}
-              </button>
-            ))}
+        {/* Formatting + Dynamic Trending Tags Strip */}
+        <div className="flex flex-col gap-2 border-t border-border/20 px-4 py-2.5 bg-card/10">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <PostComposerToolbar
+              editor={editor}
+              onOpenGifPicker={() => setShowGifPicker(true)}
+              onOpenStickerPicker={() => setShowStickerPicker(true)}
+            />
           </div>
+
+          {/* Trending on Campus & X Hashtags Strip */}
+          {trendingTags.length > 0 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
+              <span className="text-[10px] font-black tracking-wider text-muted-foreground uppercase shrink-0 flex items-center gap-1 mr-0.5">
+                <Flame className="size-3 text-primary" /> Trending:
+              </span>
+              {trendingTags.map((item) => (
+                <button
+                  key={item.tag}
+                  type="button"
+                  onClick={() => insertTag(item.tag)}
+                  title={`${item.category} (${item.formattedCount})`}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-muted/40 hover:bg-muted text-foreground border border-border/40 hover:border-primary/50 transition-all cursor-pointer select-none active:scale-95 shrink-0"
+                >
+                  <span className="text-primary font-black">#</span>
+                  <span>{item.tag.replace(/^#/, "")}</span>
+                  {item.count > 0 && (
+                    <span className="text-[10px] text-muted-foreground font-normal">
+                      · {item.count}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
 
         {/* "Add to your post" row (FB-style) */}
         <div className="mx-4 mb-3 mt-1 flex items-center justify-between rounded-2xl bg-muted/40 px-3 py-2">

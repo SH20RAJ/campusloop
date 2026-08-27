@@ -1,6 +1,8 @@
 import { getDb } from "@/db";
-import { communities,institutions,posts,userProfiles } from "@/db/schema";
-import { desc,ilike,or } from "drizzle-orm";
+import { comments,communities,institutions,posts,userProfiles } from "@/db/schema";
+
+import { formatApiFeedPosts } from "@/lib/feed";
+import { and,desc,eq,ilike,or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -20,30 +22,31 @@ export async function GET(request: Request) {
 
     const searchPattern = `%${q.trim()}%`;
 
-    // 1. Search Posts
+    // 1. Search Posts (published only)
     const foundPosts = await db.query.posts.findMany({
-      where: or(ilike(posts.body, searchPattern), ilike(posts.title, searchPattern)),
-      limit: 10,
+      where: and(
+        eq(posts.status, "PUBLISHED"),
+        or(ilike(posts.body, searchPattern), ilike(posts.title, searchPattern))
+      ),
+      limit: 15,
       orderBy: [desc(posts.createdAt)],
       with: {
         author: true,
         institution: true,
+        community: true,
         votes: true,
-        comments: true,
+        comments: {
+          where: eq(comments.status, "PUBLISHED"),
+          orderBy: [desc(comments.createdAt)],
+          with: { author: true },
+        },
+        pollOptions: {
+          with: { votes: true },
+        },
       },
     });
 
-    const formattedPosts = foundPosts.map((post) => {
-      const safePost = post.isAnonymous ? { ...post, author: null } : post;
-      return {
-        ...safePost,
-        votesCount: post.votes.reduce((acc, v) => acc + v.value, 0),
-        commentsCount: post.comments.length,
-        userVote: 0,
-        votes: undefined,
-        comments: undefined,
-      };
-    });
+    const formattedPosts = await formatApiFeedPosts(foundPosts as any);
 
     // 2. Search Colleges
     const foundColleges = await db.query.institutions.findMany({
@@ -53,16 +56,17 @@ export async function GET(request: Request) {
         ilike(institutions.state, searchPattern),
         ilike(institutions.district, searchPattern)
       ),
-      limit: 8,
+      limit: 10,
     });
 
-    // 3. Search Users
+    // 3. Search Users (students)
     const foundUsers = await db.query.userProfiles.findMany({
       where: or(
         ilike(userProfiles.displayName, searchPattern),
-        ilike(userProfiles.username, searchPattern)
+        ilike(userProfiles.username, searchPattern),
+        ilike(userProfiles.officialName, searchPattern)
       ),
-      limit: 8,
+      limit: 10,
       with: {
         institution: true,
       },
@@ -74,7 +78,7 @@ export async function GET(request: Request) {
         ilike(communities.name, searchPattern),
         ilike(communities.description, searchPattern)
       ),
-      limit: 8,
+      limit: 10,
     });
 
     return NextResponse.json({

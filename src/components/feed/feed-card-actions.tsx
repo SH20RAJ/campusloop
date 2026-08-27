@@ -32,14 +32,20 @@ export function FeedCardActions({
 }: FeedCardActionsProps) {
 
   const [repostSpin, setRepostSpin] = useState(false);
+  const [hasReposted, setHasReposted] = useState(false);
   const displayCommentsCount = commentsCount ?? post.commentsCount;
 
   function triggerRepostAnimation(e: React.MouseEvent) {
     e.stopPropagation();
+    if (hasReposted) return;
+
+    // One quick 180° turn that settles into a persistent reposted state —
+    // the snap plus haptic is the reward, no overlay or confetti needed.
     setRepostSpin(true);
-    sounds.ting();
-    haptics.repost();
-    setTimeout(() => setRepostSpin(false), 700);
+    setHasReposted(true);
+    sounds.tap();
+    haptics.light();
+    setTimeout(() => setRepostSpin(false), 320);
     onInstantRepost();
   }
 
@@ -67,14 +73,19 @@ export function FeedCardActions({
       <button
         type="button"
         onClick={triggerRepostAnimation}
-        className="flex items-center gap-1.5 text-xs hover:text-emerald-500 transition-colors group cursor-pointer"
-        aria-label="Repost"
+        aria-pressed={hasReposted}
+        className={cn(
+          "flex items-center gap-1.5 text-xs transition-colors group cursor-pointer",
+          hasReposted ? "text-emerald-500" : "hover:text-emerald-500"
+        )}
+        aria-label={hasReposted ? "Reposted" : "Repost"}
       >
         <div className="size-8 rounded-full group-hover:bg-emerald-500/10 flex items-center justify-center transition-colors">
           <Repeat2
             className={cn(
-              "size-4.5 transition-transform duration-500",
-              repostSpin && "rotate-180 text-emerald-500 scale-110"
+              "size-4.5 transition-transform duration-300 ease-out",
+              repostSpin && "rotate-180 scale-115",
+              hasReposted && "text-emerald-500"
             )}
           />
         </div>

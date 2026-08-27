@@ -1,5 +1,5 @@
 import { Institution,Post,UserProfile } from "@/db/schema";
-import { feedPagesCache,feedSizeCache } from "@/lib/feed-mutations";
+import { feedPagesCache,feedSizeCache,getPendingFeedPosts } from "@/lib/feed-mutations";
 import { getSeenPostIds,markPostsAsSeen } from "@/lib/seen-posts";
 import { useCallback,useEffect } from "react";
 import useSWRInfinite from "swr/infinite";
@@ -121,8 +121,12 @@ export function useFeed(
   }, [cacheKey, mutate]);
 
   const rawFeed = (data || fallbackData)?.flat();
-  const feed = rawFeed
-    ? Array.from(new Map(rawFeed.map((post) => [post.id, post])).values())
+  // Posts published moments ago sit on top until the API starts returning
+  // them, so the author always sees their post land in the feed.
+  const pending = rawFeed ? getPendingFeedPosts() : [];
+  const merged = rawFeed ? [...pending, ...rawFeed] : undefined;
+  const feed = merged
+    ? Array.from(new Map(merged.map((post) => [post.id, post])).values())
     : undefined;
 
   // Track impressions when feed items load

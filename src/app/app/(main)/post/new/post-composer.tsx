@@ -13,16 +13,15 @@ import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { useCommunities } from "@/hooks/use-communities";
 import { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
+import { fetcher } from "@/lib/api";
 import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import type { TrendingHashtag } from "@/lib/trending-hashtags";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
-
-
 import { EditorContent,useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-
-import { fetcher } from "@/lib/api";
-import type { TrendingHashtag } from "@/lib/trending-hashtags";
 import {
 AlertTriangle,
 BarChart3,
@@ -35,6 +34,9 @@ Image as ImageIcon,
 Loader2,
 Lock,
 School,
+Smile,
+Sparkles,
+Type,
 Users,
 VenetianMask,
 X,
@@ -48,13 +50,44 @@ export type PostType = "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
 
 const MAX_CHARS = 2000;
 
-export function PostComposer({ communityId: initialCommunityId }: { communityId?: string }) {
+const POST_TYPES: { id: PostType; label: string; icon: React.ElementType; accent: string }[] = [
+  { id: "NORMAL", label: "Post", icon: Type, accent: "text-primary" },
+  { id: "POLL", label: "Poll", icon: BarChart3, accent: "text-blue-500" },
+  { id: "QUESTION", label: "Question", icon: HelpCircle, accent: "text-orange-500" },
+  { id: "CONFESSION", label: "Confession", icon: Lock, accent: "text-pink-500" },
+];
 
+interface PostComposerProps {
+  communityId?: string;
+  /** "page" is the full /app/post/new screen; "modal" embeds it in a dialog. */
+  variant?: "page" | "modal";
+  /** Community name to lock the composer to, hiding the audience picker. */
+  lockedCommunityName?: string;
+  onPublished?: (post: FeedPost) => void;
+  /**
+   * Fired when the server settles the publish, so embedders can reconcile their
+   * own list: the confirmed post on success, or null when it was reverted.
+   */
+  onPublishConfirmed?: (tempId: string, realPost: FeedPost | null) => void;
+  onCancel?: () => void;
+}
+
+export function PostComposer({
+  communityId: initialCommunityId,
+  variant = "page",
+  lockedCommunityName,
+  onPublished,
+  onPublishConfirmed,
+  onCancel,
+}: PostComposerProps) {
   const router = useRouter();
+  const isModal = variant === "modal";
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [showStickerPicker, setShowStickerPicker] = useState(false);
+  const [showFormatting, setShowFormatting] = useState(false);
 
   const [postType, setPostType] = useState<PostType>("NORMAL");
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
@@ -71,17 +104,14 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   const { communities } = useCommunities();
   const { profile } = useProfile();
 
-
   const { data: trendingHashtagsData } = useSWR<{ trending: TrendingHashtag[] }>(
     "/api/hashtags/trending?limit=14",
     fetcher,
-    { dedupingInterval: 30000 }
+    { dedupingInterval: 30000 },
   );
   const trendingTags = trendingHashtagsData?.trending || [];
 
   const firstName = profile?.displayName?.split(" ")[0];
-
-
   const [mentionTrigger, setMentionTrigger] = useState<TriggerContext | null>(null);
 
   const editor = useEditor({
@@ -89,8 +119,11 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     content: "",
     editorProps: {
       attributes: {
-        class:
-          "w-full min-h-[140px] sm:min-h-[170px] px-4 py-3 text-base leading-relaxed outline-none prose prose-base dark:prose-invert max-w-none",
+        class: cn(
+          "w-full outline-none prose prose-lg dark:prose-invert max-w-none",
+          "px-5 py-4 text-[17px] leading-relaxed",
+          isModal ? "min-h-[120px]" : "min-h-[180px] sm:min-h-[220px]",
+        ),
       },
     },
     onUpdate: ({ editor }) => {
@@ -115,17 +148,20 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     setMentionTrigger(null);
   }
 
-
   async function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
     setIsUploadingImage(true);
     try {
-      toast.loading("Uploading photo...", { id: "img-upload" });
-      const uploaded = await uploadImageToImgBB(file);
-      setUploadedImages((prev) => [...prev, uploaded.displayUrl || uploaded.url]);
-      toast.success("Photo attached! 📸", { id: "img-upload" });
+      toast.loading(files.length > 1 ? `Uploading ${files.length} photos...` : "Uploading photo...", {
+        id: "img-upload",
+      });
+      for (const file of files) {
+        const uploaded = await uploadImageToImgBB(file);
+        setUploadedImages((prev) => [...prev, uploaded.displayUrl || uploaded.url]);
+      }
+      toast.success(files.length > 1 ? "Photos attached 📸" : "Photo attached 📸", { id: "img-upload" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to upload image", { id: "img-upload" });
     } finally {
@@ -137,6 +173,12 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
   function handleRemoveImage(index: number) {
     setUploadedImages((prev) => prev.filter((_, i) => i !== index));
   }
+
+  const isConfession = postType === "CONFESSION";
+  const anonActive = isAnonymous || isConfession;
+  const overLimit = charCount > MAX_CHARS;
+  const hasContent = charCount > 0 || uploadedImages.length > 0;
+  const canPost = hasContent && !overLimit && !isLoading && !isUploadingImage;
 
   async function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault();
@@ -178,9 +220,8 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
       type: postType,
       scope,
       isAnonymous: anon,
-      pseudonym: anon ? (profile?.anonymousUsername || "Anonymous Student") : null,
+      pseudonym: anon ? profile?.anonymousUsername || "Anonymous Student" : null,
       title: null,
-
       status: "PUBLISHED",
       riskScore: 0,
       isEdited: false,
@@ -189,7 +230,6 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
       communityId: selectedCommunityId !== "NONE" ? selectedCommunityId : null,
       createdAt: new Date(),
       updatedAt: new Date(),
-
       votesCount: 0,
       commentsCount: 0,
       userVote: 0,
@@ -200,21 +240,24 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
       }) as unknown as FeedPost["institution"],
       pollOptions:
         postType === "POLL"
-          ? options.map((text, i) => ({
-              id: `opt_${i}`,
-              text,
-              votesCount: 0,
-              userVoted: false,
-            }))
+          ? options.map((text, i) => ({ id: `opt_${i}`, text, votesCount: 0, userVoted: false }))
           : undefined,
     };
 
-    // Optimistically insert post immediately at the top of the feed
+    // Show it at the top of the feed straight away
     optimisticAddPost(optimisticPost);
-    toast.success("Post published! 🎉");
-    router.push("/app");
+    sounds.pop();
+    haptics.success();
 
-    // Send API request in background
+    const toastId = `publish_${tempId}`;
+    toast.loading("Publishing your post...", { id: toastId });
+
+    if (isModal) {
+      onPublished?.(optimisticPost);
+    } else {
+      router.push("/app");
+    }
+
     fetch("/api/posts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -234,22 +277,34 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         }
         const serverPost = (await res.json()) as { id: string; createdAt?: string | Date };
 
-        confirmOptimisticPost(tempId, {
+        const confirmed = {
           ...optimisticPost,
           id: serverPost.id,
           createdAt: new Date(serverPost.createdAt || Date.now()),
+        };
+        confirmOptimisticPost(tempId, confirmed);
+        onPublishConfirmed?.(tempId, confirmed);
+
+        // Only now do we have a real id to link to.
+        toast.success("Post published", {
+          id: toastId,
+          description: "+5 LP earned · it's live at the top of your feed",
+          action: {
+            label: "View post",
+            onClick: () => router.push(`/app/post/${serverPost.id}`),
+          },
         });
       })
       .catch((err) => {
         console.error("Post publishing error:", err);
         revertOptimisticPost(tempId);
-        toast.error(err instanceof Error ? err.message : "Failed to publish post.");
+        onPublishConfirmed?.(tempId, null);
+        toast.error(err instanceof Error ? err.message : "Failed to publish post.", { id: toastId });
       })
       .finally(() => {
         setIsLoading(false);
       });
   }
-
 
   function handleOptionChange(index: number, value: string) {
     setPollOptions((prev) => {
@@ -269,108 +324,154 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
     setPollOptions((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function openFilePicker() {
+    fileInputRef.current?.click();
+  }
+
   function insertTag(tag: string) {
     editor?.commands.focus();
     editor?.commands.insertContent(`${tag} `);
   }
 
-  function openFilePicker() {
-    fileInputRef.current?.click();
+  function selectPostType(next: PostType) {
+    haptics.light();
+    setPostType((current) => {
+      const resolved = current === next && next !== "NORMAL" ? "NORMAL" : next;
+      if (resolved === "CONFESSION") setIsAnonymous(true);
+      return resolved;
+    });
   }
 
-  const isConfession = postType === "CONFESSION";
-  const anonActive = isAnonymous || isConfession;
-  const overLimit = charCount > MAX_CHARS;
-  const progressPercent = Math.min((charCount / MAX_CHARS) * 100, 100);
+  // ── Circular character meter (Twitter-style ring) ──
+  const ringRadius = 9;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const ringProgress = Math.min(charCount / MAX_CHARS, 1);
+  const remaining = MAX_CHARS - charCount;
 
-  const addOns: {
-    id: string;
-    label: string;
-    icon: React.ElementType;
-    color: string;
-    active?: boolean;
-    onClick: () => void;
-    disabled?: boolean;
-  }[] = [
+  const mediaActions = [
     {
       id: "photo",
-      label: "Attach photo",
+      label: "Photo",
       icon: ImageIcon,
-      color: "text-emerald-500",
-      active: uploadedImages.length > 0,
+      color: "text-emerald-500 hover:bg-emerald-500/10",
       onClick: openFilePicker,
       disabled: isUploadingImage,
+      loading: isUploadingImage,
     },
     {
       id: "gif",
-      label: "Attach GIF",
-      icon: () => (
-        <span className="text-[10px] font-black text-primary border border-primary/30 bg-primary/10 rounded-md px-1 py-0.5 leading-none">
-          GIF
-        </span>
-      ),
-      color: "text-primary",
+      label: "GIF",
+      icon: Sparkles,
+      color: "text-primary hover:bg-primary/10",
       onClick: () => setShowGifPicker(true),
     },
     {
-      id: "poll",
-      label: "Poll",
-      icon: BarChart3,
-      color: "text-blue-500",
-      active: postType === "POLL",
-      onClick: () => setPostType((t) => (t === "POLL" ? "NORMAL" : "POLL")),
+      id: "sticker",
+      label: "Sticker",
+      icon: Smile,
+      color: "text-amber-500 hover:bg-amber-500/10",
+      onClick: () => setShowStickerPicker(true),
     },
     {
-      id: "question",
-      label: "Question",
-      icon: HelpCircle,
-      color: "text-orange-500",
-      active: postType === "QUESTION",
-      onClick: () => setPostType((t) => (t === "QUESTION" ? "NORMAL" : "QUESTION")),
-    },
-    {
-      id: "confession",
-      label: "Confession",
-      icon: Lock,
-      color: "text-pink-500",
-      active: isConfession,
-      onClick: () => {
-        setPostType((t) => (t === "CONFESSION" ? "NORMAL" : "CONFESSION"));
-        setIsAnonymous(true);
-      },
+      id: "format",
+      label: "Formatting",
+      icon: Type,
+      color: cn("hover:bg-muted", showFormatting ? "text-foreground" : "text-muted-foreground"),
+      onClick: () => setShowFormatting((s) => !s),
     },
     {
       id: "anon",
-      label: "Anonymous",
+      label: anonActive ? "Anonymous on" : "Go anonymous",
       icon: VenetianMask,
-      color: "text-violet-500",
-      active: anonActive,
+      color: cn(
+        "hover:bg-violet-500/10",
+        anonActive ? "text-violet-500" : "text-muted-foreground hover:text-violet-500",
+      ),
       onClick: () => {
-        if (!isConfession) setIsAnonymous((a) => !a);
+        if (!isConfession) {
+          haptics.light();
+          setIsAnonymous((a) => !a);
+        }
       },
       disabled: isConfession,
     },
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 select-none">
-      {/* Hidden image file input */}
+    <form onSubmit={handleSubmit} className="select-none">
       <input
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
+        multiple
         className="hidden"
         onChange={handleImageFileChange}
       />
 
-      {/* ─── Create Post Card (Facebook-style) ─── */}
-      <div className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-xs">
-        {/* Identity row: avatar + name + audience pill */}
+      <div
+        className={cn(
+          "flex flex-col bg-card",
+          isModal ? "rounded-3xl overflow-hidden" : "min-h-[calc(100dvh-4rem)] sm:min-h-0 sm:rounded-3xl sm:border sm:border-border/70",
+        )}
+      >
+        {/* ─── Sticky top bar (Instagram editor style) ─── */}
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border/40 bg-card/95 px-4 py-3 backdrop-blur-xl">
+          <button
+            type="button"
+            onClick={() => (onCancel ? onCancel() : router.back())}
+            className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
+            aria-label="Cancel"
+          >
+            <X className="size-4.5" />
+          </button>
+
+          <p className="flex-1 text-center text-sm font-black tracking-tight text-foreground">
+            {lockedCommunityName ? `Post to c/${lockedCommunityName}` : "New post"}
+          </p>
+
+          <button
+            type="submit"
+            disabled={!canPost}
+            className={cn(
+              "flex h-9 min-w-[74px] items-center justify-center gap-1.5 rounded-full px-4 text-xs font-black transition-all cursor-pointer active:scale-95",
+              canPost
+                ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/95"
+                : "bg-muted text-muted-foreground cursor-not-allowed",
+            )}
+          >
+            {isLoading ? <Loader2 className="size-3.5 animate-spin" /> : <span>Post</span>}
+          </button>
+        </div>
+
+        {/* ─── Post type segmented chips ─── */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-border/30 px-4 py-2.5">
+          {POST_TYPES.map((t) => {
+            const active = postType === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => selectPostType(t.id)}
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-black transition-all cursor-pointer active:scale-95",
+                  active
+                    ? "bg-foreground text-background shadow-2xs"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <t.icon className={cn("size-3.5", active ? "" : t.accent)} />
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ─── Identity + audience row (Twitter style) ─── */}
         <div className="flex items-start gap-3 px-4 pt-4">
           <Avatar
             className={cn(
-              "size-10 shrink-0 border transition-all",
-              anonActive ? "border-violet-500/60 opacity-80 grayscale" : "border-border/60"
+              "size-11 shrink-0 border-2 transition-all",
+              anonActive ? "border-violet-500/60 opacity-80 grayscale" : "border-border/50",
             )}
           >
             <AvatarImage src={anonActive ? "" : profile?.avatarUrl || ""} />
@@ -379,102 +480,119 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
             </AvatarFallback>
           </Avatar>
 
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-foreground">
+          <div className="min-w-0 flex-1 pt-0.5">
+            <p className="truncate text-sm font-black text-foreground">
               {anonActive
-                ? (profile?.anonymousUsername ? `@${profile.anonymousUsername}` : "Anonymous Student")
+                ? profile?.anonymousUsername
+                  ? `@${profile.anonymousUsername}`
+                  : "Anonymous Student"
                 : profile?.displayName || "Student"}
             </p>
 
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              {lockedCommunityName ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-black text-primary">
+                  <Users className="size-3" /> c/{lockedCommunityName}
+                </span>
+              ) : (
+                <>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowAudienceMenu((s) => !s)}
+                      className="flex items-center gap-1 rounded-full border border-primary/25 bg-primary/5 px-2.5 py-1 text-[11px] font-black text-primary transition-colors hover:bg-primary/10 cursor-pointer"
+                    >
+                      {scope === "GLOBAL" ? <Globe className="size-3" /> : <School className="size-3" />}
+                      {scope === "GLOBAL" ? "All Colleges" : "My College"}
+                      <ChevronDown className="size-3 opacity-70" />
+                    </button>
 
-            <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              {/* Audience pill w/ dropdown (FB privacy-selector style) */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowAudienceMenu((s) => !s)}
-                  className="flex items-center gap-1 rounded-lg bg-muted/70 px-2 py-1 text-[11px] font-bold text-foreground transition-colors hover:bg-muted cursor-pointer"
-                >
-                  {scope === "GLOBAL" ? <Globe className="size-3" /> : <School className="size-3" />}
-                  {scope === "GLOBAL" ? "All Colleges" : "My College"}
-                  <ChevronDown className="size-3 text-muted-foreground" />
-                </button>
+                    {showAudienceMenu && (
+                      <>
+                        <div className="fixed inset-0 z-30" onClick={() => setShowAudienceMenu(false)} />
+                        <div className="absolute left-0 top-8 z-40 w-56 rounded-2xl border border-border bg-card p-1.5 shadow-xl">
+                          {(
+                            [
+                              {
+                                id: "GLOBAL" as const,
+                                icon: Globe,
+                                label: "All Colleges",
+                                desc: "Every campus across India",
+                              },
+                              {
+                                id: "CAMPUS" as const,
+                                icon: School,
+                                label: "My College",
+                                desc: profile?.institution?.name?.split(",")[0] || "Only your campus",
+                              },
+                            ]
+                          ).map((opt) => (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => {
+                                setScope(opt.id);
+                                setShowAudienceMenu(false);
+                              }}
+                              className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-colors hover:bg-muted cursor-pointer"
+                            >
+                              <opt.icon className="size-4 shrink-0 text-muted-foreground" />
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-xs font-bold text-foreground">
+                                  {opt.label}
+                                </span>
+                                <span className="block truncate text-[10px] text-muted-foreground">
+                                  {opt.desc}
+                                </span>
+                              </span>
+                              {scope === opt.id && <Check className="size-3.5 shrink-0 text-primary" />}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
 
-                {showAudienceMenu && (
-                  <>
-                    <div className="fixed inset-0 z-30" onClick={() => setShowAudienceMenu(false)} />
-                    <div className="absolute left-0 top-8 z-40 w-56 rounded-2xl border border-border bg-card p-1.5 shadow-xl">
-                      {(
-                        [
-                          {
-                            id: "GLOBAL" as const,
-                            icon: Globe,
-                            label: "All Colleges",
-                            desc: "Every campus across India",
-                          },
-                          {
-                            id: "CAMPUS" as const,
-                            icon: School,
-                            label: "My College",
-                            desc: profile?.institution?.name?.split(",")[0] || "Only your campus",
-                          },
-                        ]
-                      ).map((opt) => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => {
-                            setScope(opt.id);
-                            setShowAudienceMenu(false);
-                          }}
-                          className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-colors hover:bg-muted cursor-pointer"
-                        >
-                          <opt.icon className="size-4 shrink-0 text-muted-foreground" />
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-xs font-bold text-foreground">{opt.label}</span>
-                            <span className="block truncate text-[10px] text-muted-foreground">{opt.desc}</span>
-                          </span>
-                          {scope === opt.id && <Check className="size-3.5 shrink-0 text-primary" />}
-                        </button>
-                      ))}
+                  {communities && communities.length > 0 && (
+                    <div className="relative flex items-center">
+                      <Users className="pointer-events-none absolute left-2.5 size-3 text-muted-foreground" />
+                      <select
+                        value={selectedCommunityId}
+                        onChange={(e) => setSelectedCommunityId(e.target.value)}
+                        className="max-w-40 cursor-pointer appearance-none truncate rounded-full bg-muted/60 py-1 pl-7 pr-6 text-[11px] font-black text-foreground outline-none transition-colors hover:bg-muted"
+                      >
+                        <option value="NONE">Main Feed</option>
+                        {communities.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            c/{c.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-2 size-3 text-muted-foreground" />
                     </div>
-                  </>
-                )}
-              </div>
+                  )}
+                </>
+              )}
 
-              {/* Community pill */}
-              {communities && communities.length > 0 && (
-                <div className="relative flex items-center">
-                  <Users className="pointer-events-none absolute left-2 size-3 text-muted-foreground" />
-                  <select
-                    value={selectedCommunityId}
-                    onChange={(e) => setSelectedCommunityId(e.target.value)}
-                    className="appearance-none rounded-lg bg-muted/70 py-1 pl-6.5 pr-6 text-[11px] font-bold text-foreground outline-none transition-colors hover:bg-muted cursor-pointer max-w-40 truncate"
-                  >
-                    <option value="NONE">Main Feed</option>
-                    {communities.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        c/{c.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-1.5 size-3 text-muted-foreground" />
-                </div>
+              {anonActive && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/10 px-2.5 py-1 text-[11px] font-black text-violet-500">
+                  <VenetianMask className="size-3" /> Anonymous
+                </span>
               )}
             </div>
           </div>
         </div>
 
-        {/* Big borderless editor */}
-        <div className="relative">
+        {/* ─── Editor ─── */}
+        <div className="relative flex-1">
           <MentionSuggestions
             trigger={mentionTrigger}
             onSelect={handleSelectSuggestion}
             onClose={() => setMentionTrigger(null)}
-            className="top-12 left-4"
+            className="top-12 left-5"
           />
           {charCount === 0 && (
-            <span className="pointer-events-none absolute left-4 top-3 text-base text-muted-foreground/50">
+            <span className="pointer-events-none absolute left-5 top-4 text-[17px] text-muted-foreground/45">
               {isConfession
                 ? "Confess it. Nobody will ever know it's you... 🤫"
                 : postType === "QUESTION"
@@ -487,16 +605,20 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
           <EditorContent editor={editor} />
         </div>
 
-
-        {/* Image attachments — FB-style large grid */}
+        {/* ─── Media grid (Instagram style) ─── */}
         {uploadedImages.length > 0 && (
-          <div className={cn("gap-1.5 px-4 pb-3", uploadedImages.length === 1 ? "flex" : "grid grid-cols-2")}>
+          <div
+            className={cn(
+              "gap-1.5 px-4 pb-3",
+              uploadedImages.length === 1 ? "flex" : "grid grid-cols-3 sm:grid-cols-4",
+            )}
+          >
             {uploadedImages.map((imgUrl, i) => (
               <div
-                key={i}
+                key={`${imgUrl}-${i}`}
                 className={cn(
-                  "group relative overflow-hidden rounded-2xl border border-border",
-                  uploadedImages.length === 1 ? "max-h-80 w-full" : "aspect-square"
+                  "group relative overflow-hidden rounded-2xl border border-border/60 bg-muted",
+                  uploadedImages.length === 1 ? "max-h-[420px] w-full" : "aspect-square",
                 )}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -504,161 +626,182 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
                 <button
                   type="button"
                   onClick={() => handleRemoveImage(i)}
-                  className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-full bg-black/70 text-white backdrop-blur-sm transition-colors hover:bg-destructive cursor-pointer"
+                  className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-black/65 text-white backdrop-blur-sm transition-colors hover:bg-destructive cursor-pointer"
                   aria-label="Remove image"
                 >
-                  <X className="size-3.5" />
+                  <X className="size-3" />
                 </button>
               </div>
             ))}
+            {isUploadingImage && (
+              <div className="flex aspect-square items-center justify-center rounded-2xl border border-dashed border-border bg-muted/40">
+                <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              </div>
+            )}
           </div>
         )}
 
-        {/* Poll options */}
+        {/* ─── Poll options ─── */}
         {postType === "POLL" && (
-          <div className="px-4 pb-3">
-            <PollOptionsEditor
-              options={pollOptions}
-              onChange={handleOptionChange}
-              onAdd={addPollOption}
-              onRemove={removePollOption}
-            />
-          </div>
+          <PollOptionsEditor
+            options={pollOptions}
+            onChange={handleOptionChange}
+            onAdd={addPollOption}
+            onRemove={removePollOption}
+          />
         )}
 
-        {/* Formatting + Dynamic Trending Tags Strip */}
-        <div className="flex flex-col gap-2 border-t border-border/20 px-4 py-2.5 bg-card/10">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+        {/* ─── Optional rich-text toolbar ─── */}
+        {showFormatting && (
+          <div className="px-4 pb-2">
             <PostComposerToolbar
               editor={editor}
               onOpenGifPicker={() => setShowGifPicker(true)}
               onOpenStickerPicker={() => setShowStickerPicker(true)}
             />
           </div>
+        )}
 
-          {/* Trending on Campus & X Hashtags Strip */}
-          {trendingTags.length > 0 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
-              <span className="text-[10px] font-black tracking-wider text-muted-foreground uppercase shrink-0 flex items-center gap-1 mr-0.5">
-                <Flame className="size-3 text-primary" /> Trending:
-              </span>
-              {trendingTags.map((item) => (
-                <button
-                  key={item.tag}
-                  type="button"
-                  onClick={() => insertTag(item.tag)}
-                  title={`${item.category} (${item.formattedCount})`}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-muted/40 hover:bg-muted text-foreground border border-border/40 hover:border-primary/50 transition-all cursor-pointer select-none active:scale-95 shrink-0"
-                >
-                  <span className="text-primary font-black">#</span>
-                  <span>{item.tag.replace(/^#/, "")}</span>
-                  {item.count > 0 && (
-                    <span className="text-[10px] text-muted-foreground font-normal">
-                      · {item.count}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-
-        {/* "Add to your post" row (FB-style) */}
-        <div className="mx-4 mb-3 mt-1 flex items-center justify-between rounded-2xl bg-muted/40 px-3 py-2">
-          <span className="hidden text-xs font-bold text-foreground sm:block">Add to your post</span>
-          <div className="flex flex-1 items-center justify-around gap-1 sm:flex-none sm:justify-end sm:gap-0.5">
-            {/* eslint-disable-next-line react-hooks/refs -- fileInputRef is only touched inside click handlers */}
-            {addOns.map((addon) => (
+        {/* ─── Trending tags ─── */}
+        {trendingTags.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-border/25 px-4 py-2.5">
+            <span className="mr-0.5 flex shrink-0 items-center gap-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+              <Flame className="size-3 text-primary" /> Trending
+            </span>
+            {trendingTags.map((item) => (
               <button
-                key={addon.id}
+                key={item.tag}
                 type="button"
-                disabled={addon.disabled}
-                onClick={addon.onClick}
-                title={addon.label}
-                className={cn(
-                  "flex size-9 items-center justify-center rounded-full transition-all cursor-pointer active:scale-90 disabled:cursor-not-allowed disabled:opacity-40",
-                  addon.active ? "bg-muted ring-1 ring-border" : "hover:bg-muted/60"
-                )}
+                onClick={() => insertTag(item.tag)}
+                title={`${item.category} (${item.formattedCount})`}
+                className="inline-flex shrink-0 cursor-pointer select-none items-center gap-0.5 rounded-full border border-border/40 bg-muted/40 px-2.5 py-1 text-xs font-bold text-foreground transition-all hover:border-primary/50 hover:bg-muted active:scale-95"
               >
-                {addon.id === "photo" && isUploadingImage ? (
-                  <Loader2 className="size-5 animate-spin text-primary" />
-                ) : (
-                  <addon.icon className={cn("size-5", addon.color)} />
-                )}
+                <span className="font-black text-primary">#</span>
+                <span>{item.tag.replace(/^#/, "")}</span>
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Char meter (only when close to limit) */}
-        {charCount > MAX_CHARS - 400 && (
-          <div className="flex items-center justify-end gap-2 px-4 pb-2 text-xs">
-            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
-              <div
-                className={cn("h-full rounded-full transition-all", overLimit ? "bg-destructive" : "bg-primary")}
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <span className={cn("font-mono text-[10px] font-bold", overLimit ? "text-destructive" : "text-muted-foreground")}>
-              {charCount}/{MAX_CHARS}
-            </span>
-          </div>
         )}
 
-        {/* Anonymity hint */}
+        {/* ─── Anonymity notice ─── */}
         {anonActive && (
-          <div className="mx-4 mb-3 flex items-center gap-2 rounded-2xl bg-violet-500/10 px-3 py-2 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+          <div className="mx-4 mb-2 flex items-center gap-2 rounded-2xl bg-violet-500/10 px-3 py-2 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
             <VenetianMask className="size-4 shrink-0" />
             {profile?.anonymousUsername ? (
-              <span>Your identity is sealed — posting under anonymous persona <strong className="font-bold">@{profile.anonymousUsername}</strong>.</span>
+              <span>
+                Identity sealed — posting as{" "}
+                <strong className="font-black">@{profile.anonymousUsername}</strong>.
+              </span>
             ) : (
-              <span>Your identity is sealed — posting with anonymous handle (set a custom handle in Profile).</span>
+              <span>Identity sealed — posting with an anonymous handle.</span>
             )}
           </div>
         )}
 
+        {error && (
+          <div className="mx-4 mb-2 flex items-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-bold text-destructive">
+            <AlertTriangle className="size-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
-        {/* Submit */}
-        <div className="border-t border-border/20 p-3">
-          <button
-            type="submit"
-            disabled={isLoading || overLimit || isUploadingImage || (charCount === 0 && uploadedImages.length === 0)}
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/95 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                <span>Publishing...</span>
-              </>
-            ) : (
-              <span>{isConfession ? "Confess Anonymously" : "Post"} · +5 LP</span>
+        {/* ─── Sticky bottom action bar (Twitter style) ─── */}
+        <div className="sticky bottom-0 z-20 flex items-center gap-1 border-t border-border/40 bg-card/95 px-3 py-2.5 backdrop-blur-xl">
+          {/* eslint-disable-next-line react-hooks/refs -- fileInputRef is only touched inside click handlers */}
+          {mediaActions.map((action) => (
+            <button
+              key={action.id}
+              type="button"
+              title={action.label}
+              aria-label={action.label}
+              disabled={action.disabled}
+              onClick={action.onClick}
+              className={cn(
+                "flex size-9 cursor-pointer items-center justify-center rounded-full transition-all active:scale-90 disabled:cursor-not-allowed disabled:opacity-40",
+                action.color,
+              )}
+            >
+              {action.loading ? (
+                <Loader2 className="size-5 animate-spin" />
+              ) : (
+                <action.icon className="size-5" />
+              )}
+            </button>
+          ))}
+
+          <div className="ml-auto flex items-center gap-3">
+            {charCount > 0 && (
+              <div className="flex items-center gap-1.5">
+                {remaining <= 200 && (
+                  <span
+                    className={cn(
+                      "font-mono text-[11px] font-bold tabular-nums",
+                      overLimit ? "text-destructive" : "text-muted-foreground",
+                    )}
+                  >
+                    {remaining}
+                  </span>
+                )}
+                <svg width="24" height="24" viewBox="0 0 24 24" className="-rotate-90">
+                  <circle cx="12" cy="12" r={ringRadius} fill="none" strokeWidth="2.5" className="stroke-muted" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r={ringRadius}
+                    fill="none"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeDasharray={ringCircumference}
+                    strokeDashoffset={ringCircumference * (1 - ringProgress)}
+                    className={cn(
+                      "transition-all duration-200",
+                      overLimit
+                        ? "stroke-destructive"
+                        : remaining <= 200
+                        ? "stroke-amber-500"
+                        : "stroke-primary",
+                    )}
+                  />
+                </svg>
+              </div>
             )}
-          </button>
+
+            <div className="h-5 w-px bg-border/60" />
+
+            <button
+              type="submit"
+              disabled={!canPost}
+              className={cn(
+                "flex h-9 items-center justify-center gap-1.5 rounded-full px-5 text-xs font-black transition-all cursor-pointer active:scale-95",
+                canPost
+                  ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/95"
+                  : "bg-muted text-muted-foreground cursor-not-allowed",
+              )}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin" />
+                  <span>Posting</span>
+                </>
+              ) : (
+                <span>{isConfession ? "Confess" : "Post"} · +5 LP</span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* GIF Picker Modal */}
       <GifPickerModal
         isOpen={showGifPicker}
         onClose={() => setShowGifPicker(false)}
         onSelectGif={(url) => setUploadedImages((prev) => [...prev, url])}
       />
 
-      {/* Sticker Picker Modal */}
       <StickerPickerModal
         isOpen={showStickerPicker}
         onClose={() => setShowStickerPicker(false)}
         onSelectSticker={(sticker) => setUploadedImages((prev) => [...prev, sticker.url])}
       />
-
-      {/* Error notice */}
-      {error && (
-        <div className="flex items-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-bold text-destructive">
-          <AlertTriangle className="size-4 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
     </form>
   );
 }

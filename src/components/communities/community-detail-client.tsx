@@ -4,25 +4,30 @@ import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
+import { PostComposer } from "@/app/app/(main)/post/new/post-composer";
 import { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
 import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";
 import { cn } from "@/lib/utils";
 import {
 ArrowLeft,
+BarChart3,
 Check,
 Clock,
 Compass,
 Flame,
 Globe,
+Image as ImageIcon,
 Lock,
 MessageSquare,
 Settings,
 Share2,
 ShieldCheck,
+Sparkles,
 TrendingUp,
 Trophy,
-Users
+Users,
+VenetianMask
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -103,6 +108,8 @@ export function CommunityDetailClient({
   // Quick Composer State
   const [quickText, setQuickText] = useState("");
   const [isQuickPosting, setIsQuickPosting] = useState(false);
+  // Full composer (photos, GIFs, polls, confessions) opened as a modal
+  const [showFullComposer, setShowFullComposer] = useState(false);
 
   const identifier = community.slug || community.id;
 
@@ -545,34 +552,40 @@ export function CommunityDetailClient({
                     }}
                     className="w-full bg-transparent text-[15px] placeholder:text-muted-foreground/70 font-normal outline-none resize-none pt-2"
                   />
-                  {quickText && (
-                    <div className="flex items-center justify-between pt-1.5 border-t border-border/20">
-                      <Link
-                        href={`/app/post/new?communityId=${community.id}`}
-                        className="text-xs text-primary font-bold hover:underline cursor-pointer"
-                      >
-                        Open full editor (poll, photos)
-                      </Link>
-                      <button
-                        type="submit"
-                        disabled={isQuickPosting || !quickText.trim()}
-                        className="px-4 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
-                      >
-                        {isQuickPosting ? "Posting..." : "Post"}
-                      </button>
+                  <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-border/20">
+                    {/* Rich composer entry points — same tools as /app/post/new */}
+                    <div className="flex items-center gap-0.5">
+                      {[
+                        { id: "photo", label: "Add photo", icon: ImageIcon, color: "text-emerald-500 hover:bg-emerald-500/10" },
+                        { id: "gif", label: "Add GIF", icon: Sparkles, color: "text-primary hover:bg-primary/10" },
+                        { id: "poll", label: "Create poll", icon: BarChart3, color: "text-blue-500 hover:bg-blue-500/10" },
+                        { id: "anon", label: "Post anonymously", icon: VenetianMask, color: "text-violet-500 hover:bg-violet-500/10" },
+                      ].map((tool) => (
+                        <button
+                          key={tool.id}
+                          type="button"
+                          title={tool.label}
+                          aria-label={tool.label}
+                          onClick={() => setShowFullComposer(true)}
+                          className={cn(
+                            "flex size-8 items-center justify-center rounded-full transition-all cursor-pointer active:scale-90",
+                            tool.color,
+                          )}
+                        >
+                          <tool.icon className="size-4.5" />
+                        </button>
+                      ))}
                     </div>
-                  )}
-                </div>
-                {!quickText && (
-                  <div className="flex items-center gap-1.5 shrink-0 pt-1">
-                    <Link
-                      href={`/app/post/new?communityId=${community.id}`}
-                      className="px-4 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-2xs"
+
+                    <button
+                      type="submit"
+                      disabled={isQuickPosting || !quickText.trim()}
+                      className="px-4 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      Post
-                    </Link>
+                      {isQuickPosting ? "Posting..." : "Post"}
+                    </button>
                   </div>
-                )}
+                </div>
               </div>
             </form>
           ) : (
@@ -747,6 +760,37 @@ export function CommunityDetailClient({
           )}
         </div>
       )}
-    </main>
+    
+      {/* ─── Full Composer Modal — same tools as /app/post/new, locked to this hub ─── */}
+      {showFullComposer && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-0 backdrop-blur-sm sm:p-6"
+          onClick={() => setShowFullComposer(false)}
+        >
+          <div
+            className="w-full max-w-2xl sm:my-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <PostComposer
+              variant="modal"
+              communityId={community.id}
+              lockedCommunityName={community.name}
+              onCancel={() => setShowFullComposer(false)}
+              onPublished={(post) => {
+                setPosts((prev) => [post, ...prev]);
+                setShowFullComposer(false);
+              }}
+              onPublishConfirmed={(tempId, realPost) => {
+                setPosts((prev) =>
+                  realPost
+                    ? prev.map((p) => (p.id === tempId ? realPost : p))
+                    : prev.filter((p) => p.id !== tempId),
+                );
+              }}
+            />
+          </div>
+        </div>
+      )}
+</main>
   );
 }

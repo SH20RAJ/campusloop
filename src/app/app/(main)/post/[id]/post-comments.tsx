@@ -116,7 +116,7 @@ export function PostComments({
       postId,
       authorId: profile?.id || null,
       author: isAnonymous ? null : (profile || null),
-      pseudonym: isAnonymous ? "Anonymous Student" : null,
+      pseudonym: isAnonymous ? (profile?.anonymousUsername || "Anonymous Student") : null,
       parentId: null,
       body,
       isAnonymous,
@@ -157,8 +157,9 @@ export function PostComments({
       postId,
       authorId: profile?.id || null,
       author: replyIsAnon ? null : (profile || null),
-      pseudonym: replyIsAnon ? "Anonymous Student" : null,
+      pseudonym: replyIsAnon ? (profile?.anonymousUsername || "Anonymous Student") : null,
       parentId,
+
       body: replyBody.trim(),
       isAnonymous: replyIsAnon,
       status: "PUBLISHED",
@@ -249,9 +250,10 @@ export function PostComments({
               }}
               placeholder={
                 isAnonymous
-                  ? "Post your anonymous reply..."
+                  ? (profile?.anonymousUsername ? `Post anonymously as @${profile.anonymousUsername}...` : "Post your anonymous reply...")
                   : `Post your reply as @${profile?.username || "student"}...`
               }
+
               rows={2}
               className="w-full bg-transparent text-[15px] text-foreground placeholder:text-muted-foreground/60 outline-none resize-none font-normal leading-relaxed pt-1"
             />

@@ -2,8 +2,9 @@ import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { validateDisplayName,validateUsername } from "@/lib/validation";
-import { eq } from "drizzle-orm";
+import { and,eq,ne,sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
+
 
 export const dynamic = "force-dynamic";
 
@@ -64,13 +65,50 @@ export async function PATCH(req: Request) {
       bannerUrl?: string;
       photos?: string[];
       interests?: string[];
+      anonymousUsername?: string | null;
+      feedVisibility?: string;
     };
 
     const updateData: Partial<typeof userProfiles.$inferInsert> = {};
 
+    if (body.anonymousUsername !== undefined) {
+      if (body.anonymousUsername === null || body.anonymousUsername.trim() === "") {
+        updateData.anonymousUsername = null;
+      } else {
+        const trimmed = body.anonymousUsername.trim().toLowerCase().replace(/^@/, "");
+        if (!/^[a-z0-9_]{3,24}$/.test(trimmed)) {
+          return NextResponse.json(
+            { error: "Anonymous username must be 3-24 characters (letters, numbers, underscores only)" },
+            { status: 400 }
+          );
+        }
+
+        const taken = await db.query.userProfiles.findFirst({
+          where: and(
+            sql`LOWER(${userProfiles.anonymousUsername}) = ${trimmed}`,
+            ne(userProfiles.id, existingProfile.id)
+          ),
+        });
+
+        if (taken) {
+          return NextResponse.json(
+            { error: "This anonymous username is already claimed by another student" },
+            { status: 400 }
+          );
+        }
+
+        updateData.anonymousUsername = trimmed;
+      }
+    }
+
+    if (body.feedVisibility !== undefined) {
+      updateData.feedVisibility = body.feedVisibility === "NON_ANONYMOUS" ? "NON_ANONYMOUS" : "ALL";
+    }
+
     if (body.dob !== undefined) {
       updateData.dob = body.dob ? body.dob.trim() : null;
     }
+
 
     if (body.isDobPrivate !== undefined) {
       updateData.isDobPrivate = Boolean(body.isDobPrivate);

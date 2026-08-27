@@ -35,6 +35,16 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "api.dicebear.com" },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/c/:id",
+        destination: "/app/communities/:id",
+        permanent: true,
+      },
+    ];
+  },
 };
+
 
 export default nextConfig;

@@ -32,6 +32,7 @@ export async function GET(req: Request) {
 
     let profileId: string | null = null;
     let institutionId: string | null = null;
+    let userFeedVisibility: string | null = null;
 
     if (user) {
       const profile = await db.query.userProfiles.findFirst({
@@ -40,6 +41,7 @@ export async function GET(req: Request) {
       if (profile) {
         profileId = profile.id;
         institutionId = profile.institutionId;
+        userFeedVisibility = profile.feedVisibility;
       }
     }
 
@@ -53,11 +55,21 @@ export async function GET(req: Request) {
       conditions.push(eq(posts.type, type as (typeof posts.type.enumValues)[number]));
     }
 
-    if (visibility === "anonymous") {
+    const filterVisibility = visibility && visibility !== "all" 
+      ? visibility 
+      : (userFeedVisibility === "NON_ANONYMOUS" ? "non_anonymous" : "all");
+
+
+    if (filterVisibility === "anonymous") {
       conditions.push(eq(posts.isAnonymous, true));
-    } else if (visibility === "public") {
+    } else if (
+      filterVisibility === "public" ||
+      filterVisibility === "non_anonymous" ||
+      filterVisibility === "NON_ANONYMOUS"
+    ) {
       conditions.push(eq(posts.isAnonymous, false));
     }
+
 
     if (hashtag) {
       const cleanHashtag = decodeURIComponent(hashtag).replace(/^#/, "").trim();

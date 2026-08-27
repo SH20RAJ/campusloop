@@ -23,7 +23,10 @@ export interface UserProfileData {
   loopPoints: number;
   points?: number;
   referralCount?: number;
+  anonymousUsername?: string | null;
+  feedVisibility?: string;
   onboardingCompleted?: boolean;
+
   institutionId?: string | null;
   institution?: {
     id: string;

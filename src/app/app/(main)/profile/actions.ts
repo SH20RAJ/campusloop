@@ -10,7 +10,8 @@ export async function updateProfile(
   displayName: string,
   bio: string,
   username: string,
-  avatarUrl: string
+  avatarUrl: string,
+  anonymousUsername?: string | null
 ) {
   const user = await hexclaveServerApp.getUser();
   if (!user) {
@@ -36,6 +37,9 @@ export async function updateProfile(
   if (existingUser && existingUser.userId !== user.id) {
     throw new Error("Username is already taken");
   }
+
+  let cleanAnon = anonymousUsername ? anonymousUsername.trim().toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_]/g, "") : null;
+  if (cleanAnon && cleanAnon.length === 0) cleanAnon = null;
   
   await db
     .update(userProfiles)
@@ -44,9 +48,11 @@ export async function updateProfile(
       username: cleanUsername,
       bio,
       avatarUrl: avatarUrl || null,
+      anonymousUsername: cleanAnon,
       updatedAt: new Date()
     })
     .where(eq(userProfiles.userId, user.id));
+
 
   revalidatePath("/app/profile");
   revalidatePath("/app");

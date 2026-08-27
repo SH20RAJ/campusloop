@@ -11,13 +11,16 @@ import { cn } from "@/lib/utils";
 import {
 ArrowLeft,
 Check,
+Clock,
+Compass,
+Flame,
 Globe,
 Lock,
 MessageSquare,
 Settings,
 Share2,
 ShieldCheck,
-Sparkles,
+TrendingUp,
 Trophy,
 Users
 } from "lucide-react";
@@ -25,6 +28,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React,{ useMemo,useState } from "react";
 import { toast } from "sonner";
+
 
 export interface CommunityDetailProps {
   community: {
@@ -89,6 +93,8 @@ export function CommunityDetailClient({
   const { profile } = useProfile();
 
   const [activeTab, setActiveTab] = useState<"trending" | "latest" | "polls" | "members" | "rules">("trending");
+  const [redditSort, setRedditSort] = useState<"hot" | "new" | "top" | "rising" | "discussed">("hot");
+  const [topTimeWindow, setTopTimeWindow] = useState<"today" | "week" | "month" | "all">("all");
   const [isMember, setIsMember] = useState(initialIsMember);
   const [membersCount, setMembersCount] = useState(initialMembersCount);
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
@@ -109,25 +115,54 @@ export function CommunityDetailClient({
     }
   }, [community.rules]);
 
-  // Algorithmic Feed Sorting
+  // Reddit-Style Algorithmic Community Feed Sorting
   const filteredPosts = useMemo(() => {
     const list = [...posts];
-    if (activeTab === "latest") {
-      return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    }
     if (activeTab === "polls") {
       return list.filter((p) => p.type === "POLL" || p.type === "QUESTION");
     }
-    // "trending" / "hot": weighted score with recency
-    return list.sort((a, b) => {
-      const now = Date.now();
-      const ageHoursA = Math.max(1, (now - new Date(a.createdAt).getTime()) / (3600 * 1000));
-      const ageHoursB = Math.max(1, (now - new Date(b.createdAt).getTime()) / (3600 * 1000));
-      const scoreA = (a.votesCount * 2 + a.commentsCount * 3 + 5) / Math.pow(ageHoursA, 0.7);
-      const scoreB = (b.votesCount * 2 + b.commentsCount * 3 + 5) / Math.pow(ageHoursB, 0.7);
-      return scoreB - scoreA;
-    });
-  }, [posts, activeTab]);
+
+    const now = Date.now();
+
+    switch (redditSort) {
+      case "new":
+        return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      case "rising":
+        return list.sort((a, b) => {
+          const ageA = Math.max(1, (now - new Date(a.createdAt).getTime()) / (3600 * 1000));
+          const ageB = Math.max(1, (now - new Date(b.createdAt).getTime()) / (3600 * 1000));
+          const velA = (a.votesCount * 3 + a.commentsCount * 4 + 1) / ageA;
+          const velB = (b.votesCount * 3 + b.commentsCount * 4 + 1) / ageB;
+          return velB - velA;
+        });
+
+      case "discussed":
+        return list.sort((a, b) => (b.commentsCount || 0) - (a.commentsCount || 0));
+
+      case "top": {
+        let maxAgeMs = Infinity;
+        if (topTimeWindow === "today") maxAgeMs = 24 * 3600 * 1000;
+        else if (topTimeWindow === "week") maxAgeMs = 7 * 24 * 3600 * 1000;
+        else if (topTimeWindow === "month") maxAgeMs = 30 * 24 * 3600 * 1000;
+
+        const timeFiltered = list.filter((p) => now - new Date(p.createdAt).getTime() <= maxAgeMs);
+        const candidates = timeFiltered.length > 0 ? timeFiltered : list;
+        return candidates.sort((a, b) => (b.votesCount || 0) - (a.votesCount || 0));
+      }
+
+      case "hot":
+      default:
+        return list.sort((a, b) => {
+          const ageHoursA = Math.max(1, (now - new Date(a.createdAt).getTime()) / (3600 * 1000));
+          const ageHoursB = Math.max(1, (now - new Date(b.createdAt).getTime()) / (3600 * 1000));
+          const scoreA = (a.votesCount * 2 + a.commentsCount * 3 + 5) / Math.pow(ageHoursA, 0.7);
+          const scoreB = (b.votesCount * 2 + b.commentsCount * 3 + 5) / Math.pow(ageHoursB, 0.7);
+          return scoreB - scoreA;
+        });
+    }
+  }, [posts, activeTab, redditSort, topTimeWindow]);
+
 
   async function handleShareInvite() {
     const shareUrl = typeof window !== "undefined"
@@ -554,6 +589,109 @@ export function CommunityDetailClient({
             </div>
           )}
 
+          {/* ─── Reddit-Style Feed Sort Options Bar ─── */}
+          <div className="border-b border-border/30 px-4 py-2 bg-muted/15 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setRedditSort("hot");
+                  setActiveTab("trending");
+                }}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
+                  redditSort === "hot"
+                    ? "bg-primary text-primary-foreground shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                )}
+              >
+                <Flame className="size-3.5" />
+                <span>Hot</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setRedditSort("new");
+                  setActiveTab("latest");
+                }}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
+                  redditSort === "new"
+                    ? "bg-primary text-primary-foreground shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                )}
+              >
+                <Clock className="size-3.5" />
+                <span>New</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRedditSort("top")}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
+                  redditSort === "top"
+                    ? "bg-primary text-primary-foreground shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                )}
+              >
+                <Trophy className="size-3.5" />
+                <span>Top</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRedditSort("rising")}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
+                  redditSort === "rising"
+                    ? "bg-primary text-primary-foreground shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                )}
+              >
+                <TrendingUp className="size-3.5" />
+                <span>Rising</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRedditSort("discussed")}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
+                  redditSort === "discussed"
+                    ? "bg-primary text-primary-foreground shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                )}
+              >
+                <MessageSquare className="size-3.5" />
+                <span>Discussed</span>
+              </button>
+            </div>
+
+            {/* Reddit Top Time-Window Selector */}
+            {redditSort === "top" && (
+              <div className="flex items-center gap-1 text-[11px] font-bold">
+                <span className="text-muted-foreground">Range:</span>
+                {(["today", "week", "month", "all"] as const).map((range) => (
+                  <button
+                    key={range}
+                    type="button"
+                    onClick={() => setTopTimeWindow(range)}
+                    className={cn(
+                      "px-2 py-0.5 rounded-full uppercase tracking-wider text-[10px] transition-all cursor-pointer",
+                      topTimeWindow === range
+                        ? "bg-foreground text-background font-black"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {range === "today" ? "24h" : range === "week" ? "Week" : range === "month" ? "Month" : "All"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Feed Posts Stream */}
           {filteredPosts.length === 0 ? (
             <div className="p-12 text-center space-y-2">
@@ -573,12 +711,13 @@ export function CommunityDetailClient({
                     <div className="p-4 border-b border-border/30 bg-muted/10 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                          <Sparkles className="size-3.5 text-primary" /> Related Campus Hubs
+                          <Compass className="size-3.5 text-primary" /> Related Campus Hubs
                         </span>
                         <Link href="/app/communities" className="text-xs text-primary font-bold hover:underline">
                           See all
                         </Link>
                       </div>
+
 
                       <div className="grid gap-2 sm:grid-cols-2">
                         {relatedCommunities.slice(0, 2).map((rel) => (

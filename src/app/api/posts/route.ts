@@ -63,15 +63,17 @@ export async function POST(req: Request) {
     }
 
     // Anonymous posts carry NO author foreign key. The real profile id is
-    // AES-sealed into the identity vault; the post row only holds a stable
-    // HMAC pseudonym handle that cannot be reversed without the pepper.
-    // The vault row must exist BEFORE the post: an anonymous post whose
-    // identity was never escrowed can never be resolved by moderators.
+    // AES-sealed into the identity vault; the post row holds the student's custom
+    // anonymous username or falls back to the deterministic HMAC pseudonym handle.
+    const activePseudonym = profile.anonymousUsername
+      ? profile.anonymousUsername
+      : deriveAnonHandle(profile.id);
+
     if (anonymous) {
       await db
         .insert(anonIdentityVault)
         .values({
-          handle: deriveAnonHandle(profile.id),
+          handle: activePseudonym,
           sealedIdentity: sealIdentity(profile.id),
         })
         .onConflictDoNothing({ target: anonIdentityVault.handle });
@@ -82,7 +84,8 @@ export async function POST(req: Request) {
       .values({
         id: postId,
         authorId: anonymous ? null : profile.id,
-        pseudonym: anonymous ? deriveAnonHandle(profile.id) : null,
+        pseudonym: anonymous ? activePseudonym : null,
+
         institutionId: profile.institutionId,
         body,
         type: type || "NORMAL",

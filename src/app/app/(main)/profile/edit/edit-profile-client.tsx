@@ -7,9 +7,25 @@ import { uploadImageToImgBB } from "@/lib/upload";
 import { getAvatarUrl } from "@/lib/utils";
 import { validateDisplayName,validateUsername } from "@/lib/validation";
 import {
-AlertCircle,ArrowLeft,Cake,Camera,Check,Image as ImageIcon,Loader2,Lock,Move,Plus,Save,ShieldCheck,Upload,User,X,
-Zap
+AlertCircle,
+ArrowLeft,
+Cake,
+Camera,
+Check,
+Image as ImageIcon,
+Loader2,
+Lock,
+Move,
+Plus,
+Save,
+ShieldCheck,
+Upload,
+User,
+VenetianMask,
+X,
+Zap,
 } from "lucide-react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect,useRef,useState } from "react";
@@ -44,6 +60,7 @@ export function EditProfileClient() {
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
+  const [anonUsername, setAnonUsername] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -77,10 +94,12 @@ export function EditProfileClient() {
       setBio(profile.bio || "");
       setAvatarUrl(profile.avatarUrl || "");
       setBannerUrl(profile.bannerUrl || "");
+      setAnonUsername(profile.anonymousUsername || "");
       setPhotos(profile.photos || []);
       setInterests(profile.interests || []);
     }
   }, [profile]);
+
 
   function handleToggleInterest(tag: string) {
     setInterests((prev) =>
@@ -205,8 +224,10 @@ export function EditProfileClient() {
           bannerUrl,
           photos,
           interests,
+          anonymousUsername: anonUsername ? anonUsername.trim().toLowerCase().replace(/^@/, "") : null,
         }),
       });
+
 
       const data = (await res.json()) as { error?: string };
 
@@ -569,9 +590,52 @@ export function EditProfileClient() {
           </div>
         </div>
 
+        {/* ─── Anonymous Posting Persona (Custom Anonymous Username) ─── */}
+        <div className="space-y-4 rounded-2xl border border-primary/20 bg-primary/5 p-5 shadow-xs">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <VenetianMask className="size-4 text-primary" /> Anonymous Persona & Custom Username
+              </h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
+                Create a custom anonymous alias for confessions, polls, and anonymous questions. All your anonymous posts will appear under this username instead of a random ID. Your real identity remains 100% cryptographically sealed.
+              </p>
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full shrink-0">
+              Encrypted
+            </span>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-muted-foreground">Custom Anonymous Username</label>
+              {anonUsername && (
+                <span className="text-[10px] text-primary font-bold">
+                  Posts appear as: @{anonUsername.toLowerCase().replace(/^@/, "")}
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <span className="absolute left-3.5 top-2 text-xs font-bold text-muted-foreground">🎭 @</span>
+              <input
+                type="text"
+                value={anonUsername}
+                onChange={(e) => setAnonUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                placeholder="e.g. ghost_student, shadow_coder, campus_ninja"
+                maxLength={24}
+                className="w-full pl-10 pr-3.5 py-2 rounded-xl border border-border/60 bg-background text-xs font-semibold text-foreground outline-none transition-all focus:border-primary"
+              />
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              Leave blank to automatically use randomized cryptographic pseudonyms (e.g. anon_9a4f21b7).
+            </p>
+          </div>
+        </div>
+
         {/* ─── Academic Info with Presets ─── */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
           <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+
             <ShieldCheck className="size-3.5 text-blue-500" /> Academic & Campus Info
           </h3>
 

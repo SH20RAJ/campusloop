@@ -120,59 +120,32 @@ export function CollegeHeroHeader({
         </div>
 
         {/* Hero Content Body */}
-        <div className="px-5 pb-5 pt-0 space-y-3.5">
-          {/* Identity & Actions */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 -mt-12 sm:-mt-14">
-            <div className="flex items-end gap-3.5 min-w-0">
-              {/* College Logo / Crest */}
-              <div className="size-20 sm:size-24 rounded-2xl bg-card border-4 border-card shadow-xl p-1.5 shrink-0 flex items-center justify-center overflow-hidden z-10">
-                {college.logoUrl ? (
-                  <img
-                    src={college.logoUrl}
-                    alt={college.name}
-                    referrerPolicy="no-referrer"
-                    crossOrigin="anonymous"
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <div className="w-full h-full rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                    <School className="size-8" />
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-0.5 min-w-0 pb-1">
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground leading-tight">
-                  {college.name}
-                </h1>
-                <p className="text-xs font-semibold text-muted-foreground flex flex-wrap items-center gap-2">
-                  <span className="flex items-center gap-1 text-foreground/80">
-                    <MapPin className="size-3 text-primary shrink-0" />
-                    {college.district ? `${college.district}, ` : ""}
-                    {college.state || "India"}
-                  </span>
-                  {college.nirfRank && (
-                    <>
-                      <span>•</span>
-                      <span className="text-amber-500 font-bold">NIRF #{college.nirfRank}</span>
-                    </>
-                  )}
-                  {college.yearOfEstablishment && (
-                    <>
-                      <span>•</span>
-                      <span>Est. {college.yearOfEstablishment}</span>
-                    </>
-                  )}
-                </p>
-              </div>
+        <div className="px-5 pb-5 pt-0 relative space-y-3.5">
+          {/* Logo & Actions Top Row */}
+          <div className="flex items-end justify-between -mt-12 sm:-mt-14 gap-3">
+            {/* College Logo / Crest */}
+            <div className="size-20 sm:size-24 rounded-2xl bg-card border-4 border-card shadow-xl p-1.5 shrink-0 flex items-center justify-center overflow-hidden z-10">
+              {college.logoUrl ? (
+                <img
+                  src={college.logoUrl}
+                  alt={college.name}
+                  referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <div className="w-full h-full rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <School className="size-8" />
+                </div>
+              )}
             </div>
 
             {/* CTAs Row */}
-            <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 pb-1">
+            <div className="flex items-center gap-2 shrink-0 pb-1">
               <button
                 type="button"
                 onClick={onAskSeniorClick}
-                className="flex-1 sm:flex-none h-9 px-4 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="h-9 px-4 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <MessageSquarePlus className="size-3.5" />
                 <span>Ask Seniors</span>
@@ -195,6 +168,32 @@ export function CollegeHeroHeader({
                 </a>
               )}
             </div>
+          </div>
+
+          {/* College Identity & Metadata — rendered cleanly below banner and logo */}
+          <div className="space-y-1 pt-1">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground leading-tight">
+              {college.name}
+            </h1>
+            <p className="text-xs font-semibold text-muted-foreground flex flex-wrap items-center gap-2">
+              <span className="flex items-center gap-1 text-foreground/80">
+                <MapPin className="size-3 text-primary shrink-0" />
+                {college.district ? `${college.district}, ` : ""}
+                {college.state || "India"}
+              </span>
+              {college.nirfRank && (
+                <>
+                  <span>•</span>
+                  <span className="text-amber-500 font-bold">NIRF #{college.nirfRank}</span>
+                </>
+              )}
+              {college.yearOfEstablishment && (
+                <>
+                  <span>•</span>
+                  <span>Est. {college.yearOfEstablishment}</span>
+                </>
+              )}
+            </p>
           </div>
 
           {/* Description if present */}

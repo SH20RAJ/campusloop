@@ -2,16 +2,18 @@
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { SignOutButton } from "@/components/ui/sign-out-button";
-import { getAvatarUrl } from "@/lib/utils";
+import { cn,getAvatarUrl } from "@/lib/utils";
 import {
 Bell,
 Check,
+Globe,
 Lock,
 RotateCcw,
 School,
 ShieldCheck,
 Sliders,
 User,
+VenetianMask,
 Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -32,6 +34,8 @@ interface SettingsClientProps {
     role: string;
     points: number;
     institutionName: string;
+    anonymousUsername?: string | null;
+    feedVisibility?: string;
   };
 }
 
@@ -40,6 +44,10 @@ export function SettingsClient({ profile }: SettingsClientProps) {
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [bio, setBio] = useState(profile.bio || "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl);
+  const [anonUsername, setAnonUsername] = useState(profile.anonymousUsername || "");
+  const [feedVisibility, setFeedVisibility] = useState<"ALL" | "NON_ANONYMOUS">(
+    (profile.feedVisibility as "ALL" | "NON_ANONYMOUS") || "ALL"
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [defaultScope, setDefaultScope] = useState<"GLOBAL" | "CAMPUS">("GLOBAL");
   const [notifyUpvotes, setNotifyUpvotes] = useState(true);
@@ -53,12 +61,36 @@ export function SettingsClient({ profile }: SettingsClientProps) {
     toast.success("Avatar reset to personalized DiceBear SVG!");
   }
 
+  async function handleFeedVisibilityChange(mode: "ALL" | "NON_ANONYMOUS") {
+    setFeedVisibility(mode);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("campusloop_feed_visibility", mode);
+    }
+
+    try {
+      await fetch("/api/profile/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feedVisibility: mode }),
+      });
+      toast.success(
+        mode === "NON_ANONYMOUS"
+          ? "Mode set: Only non-anonymous posts are visible"
+          : "Mode set: All types of posts are visible"
+      );
+      router.refresh();
+    } catch {
+      toast.error("Could not save feed mode preference.");
+    }
+  }
+
   async function handleSaveSettings(e: React.FormEvent) {
     e.preventDefault();
     if (isSaving) return;
 
     setIsSaving(true);
     try {
+      const cleanAnon = anonUsername ? anonUsername.trim().toLowerCase().replace(/^@/, "") : null;
       const res = await fetch("/api/profile/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -66,19 +98,26 @@ export function SettingsClient({ profile }: SettingsClientProps) {
           displayName,
           bio,
           avatarUrl,
+          anonymousUsername: cleanAnon,
+          feedVisibility,
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to save settings");
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        throw new Error(data.error || "Failed to save settings");
+      }
+
 
       toast.success("Settings saved successfully!");
       router.refresh();
-    } catch {
-      toast.error("Could not save settings. Please try again.");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Could not save settings. Please try again.");
     } finally {
       setIsSaving(false);
     }
   }
+
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24 text-foreground">
@@ -145,6 +184,37 @@ export function SettingsClient({ profile }: SettingsClientProps) {
               />
             </div>
 
+            {/* Custom Anonymous Username */}
+            <div className="space-y-1.5 p-3.5 rounded-2xl border border-border/60 bg-muted/20">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <VenetianMask className="size-3.5 text-primary" /> Custom Anonymous Username
+                </label>
+                {anonUsername && (
+                  <span className="text-[10px] text-primary font-bold">
+                    @{anonUsername.toLowerCase()}
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                All your anonymous confessions, polls, and questions will appear under this username instead of a random anon ID.
+              </p>
+              <div className="relative pt-1">
+                <span className="absolute left-3.5 top-3.5 text-xs font-bold text-muted-foreground">🎭 @</span>
+                <input
+                  type="text"
+                  value={anonUsername}
+                  onChange={(e) => setAnonUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                  placeholder="e.g. ghost_student, shadow_coder, campus_ninja"
+                  maxLength={24}
+                  className="w-full pl-10 pr-3.5 py-2 rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus:border-primary transition-all"
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground/80">
+                Leave empty to use automatic randomized hash pseudonyms.
+              </p>
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-foreground">Bio / Campus Vibe</label>
               <textarea
@@ -167,12 +237,74 @@ export function SettingsClient({ profile }: SettingsClientProps) {
         </section>
 
         {/* Preferences Section */}
-        <section className="rounded-3xl border border-border/80 bg-card p-6 shadow-sm space-y-4">
+        <section className="rounded-3xl border border-border/80 bg-card p-6 shadow-sm space-y-5">
           <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
             <Sliders className="h-4 w-4 text-primary" /> Platform Preferences
           </h2>
 
-          <div className="space-y-3 pt-2">
+          <div className="space-y-4 pt-1">
+            {/* Feed Anonymity 2-Modes Toggler */}
+            <div className="p-4 rounded-2xl border border-border/60 bg-muted/20 space-y-3">
+              <div>
+                <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <Sliders className="size-3.5 text-primary" /> Feed Content & Anonymity Mode
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  Toggle feed display mode. Choose whether anonymous posts and confessions appear in your timeline.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                {/* Mode 1: All Posts Visible */}
+                <button
+                  type="button"
+                  onClick={() => handleFeedVisibilityChange("ALL")}
+                  className={cn(
+                    "p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 shadow-xs",
+                    feedVisibility === "ALL"
+                      ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary"
+                      : "border-border/60 bg-background/50 text-muted-foreground hover:border-border hover:text-foreground"
+                  )}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-xs font-black text-foreground flex items-center gap-1.5">
+                      <Globe className="size-3.5 text-primary" /> 1. All Types of Posts
+                    </span>
+                    {feedVisibility === "ALL" && (
+                      <Check className="size-3.5 text-primary stroke-[3]" />
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    All types of posts will be visible (Normal posts, Confessions, Polls, and Anonymous thoughts).
+                  </p>
+                </button>
+
+                {/* Mode 2: Only Non-Anonymous Posts Visible */}
+                <button
+                  type="button"
+                  onClick={() => handleFeedVisibilityChange("NON_ANONYMOUS")}
+                  className={cn(
+                    "p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 shadow-xs",
+                    feedVisibility === "NON_ANONYMOUS"
+                      ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary"
+                      : "border-border/60 bg-background/50 text-muted-foreground hover:border-border hover:text-foreground"
+                  )}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-xs font-black text-foreground flex items-center gap-1.5">
+                      <ShieldCheck className="size-3.5 text-emerald-500" /> 2. Only Non-Anonymous
+                    </span>
+                    {feedVisibility === "NON_ANONYMOUS" && (
+                      <Check className="size-3.5 text-primary stroke-[3]" />
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Only non-anonymous posts will be visible. Hides all anonymous confessions and pseudonymous posts.
+                  </p>
+                </button>
+              </div>
+            </div>
+
             <div className="flex items-center justify-between p-3.5 rounded-2xl border border-border/60 bg-muted/20">
               <div>
                 <p className="text-xs font-bold text-foreground">Default Feed Scope</p>
@@ -200,6 +332,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                 </button>
               </div>
             </div>
+
 
             <div className="flex items-center justify-between p-3.5 rounded-2xl border border-border/60 bg-muted/20">
               <div>

@@ -15,13 +15,13 @@ MessageSquare,
 Plus,
 Search,
 ShieldCheck,
-Users2,
+Users2
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect,useState } from "react";
+import { usePathname,useRouter } from "next/navigation";
+import { useCallback,useEffect,useMemo,useState } from "react";
 import useSWR from "swr";
 import { MessengerPane } from "./messenger-pane";
-
 
 const fetcher = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url);
@@ -35,17 +35,30 @@ interface MessengerViewProps {
   initialConversationId?: string;
 }
 
+type InboxFilter = "ALL" | "UNREAD" | "CAMPUS";
+
 export function MessengerView({
   currentUserId,
   initialTargetUserId,
   initialConversationId,
 }: MessengerViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [activeConversationId, setActiveConversationId] = useState<string | null>(
     initialConversationId || null
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<InboxFilter>("ALL");
+
+  // Keep state in sync if URL route changes to another /app/chat/[id]
+  useEffect(() => {
+    if (initialConversationId) {
+      setActiveConversationId(initialConversationId);
+    }
+  }, [initialConversationId]);
 
   // Fast Hard Cache: Initial fallback from in-memory / local storage cache for 0ms instant display
   const initialCache = getCachedConversations();
@@ -64,21 +77,46 @@ export function MessengerView({
     }
   );
 
-  // If initialConversationId is provided or active conversation is unset, pick the first or match
-  const activeConv = conversations?.find((c) => c.id === activeConversationId);
-  const activeParticipant = activeConv ? activeConv.otherParticipant : null;
+  // Auto-select first conversation on desktop if visiting /app/chat root
+  useEffect(() => {
+    if (
+      !initialConversationId &&
+      !activeConversationId &&
+      conversations &&
+      conversations.length > 0 &&
+      typeof window !== "undefined" &&
+      window.innerWidth >= 768
+    ) {
+      const firstId = conversations[0].id;
+      setActiveConversationId(firstId);
+      router.replace(`/app/chat/${firstId}`, { scroll: false });
+    }
+  }, [conversations, activeConversationId, initialConversationId, router]);
 
   // Auto-start or select conversation if targetUserId was provided via URL query
   useEffect(() => {
     if (!initialTargetUserId || !conversations) return;
 
-    const existing = conversations.find((c) => c.otherParticipant.id === initialTargetUserId);
+    const existing = conversations.find((c) => c.otherParticipant?.id === initialTargetUserId);
     if (existing) {
-      setActiveConversationId(existing.id);
+      handleSelectConversation(existing.id);
     } else {
       startConversation(initialTargetUserId);
     }
   }, [initialTargetUserId, conversations]);
+
+  const handleSelectConversation = useCallback(
+    (convId: string) => {
+      setActiveConversationId(convId);
+      router.push(`/app/chat/${convId}`, { scroll: false });
+    },
+    [router]
+  );
+
+  const handleBackToInbox = useCallback(() => {
+    setActiveConversationId(null);
+    router.push("/app/chat", { scroll: false });
+  }, [router]);
 
   async function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
     const query = e.target.value;
@@ -117,7 +155,7 @@ export function MessengerView({
 
       setSearchQuery("");
       setSearchResults([]);
-      setActiveConversationId(data.id);
+      handleSelectConversation(data.id);
       mutateConvs();
     } catch (err) {
       console.error(err);
@@ -145,6 +183,23 @@ export function MessengerView({
     }
   }
 
+  // Filter conversations
+  const filteredConversations = useMemo(() => {
+    if (!conversations) return [];
+    let list = [...conversations];
+
+    if (activeFilter === "UNREAD") {
+      list = list.filter((c) => (c.unreadCount || 0) > 0);
+    } else if (activeFilter === "CAMPUS") {
+      list = list.filter((c) => Boolean(c.otherParticipant?.institutionId));
+    }
+
+    return list;
+  }, [conversations, activeFilter]);
+
+  const activeConv = conversations?.find((c) => c.id === activeConversationId);
+  const activeParticipant = activeConv ? activeConv.otherParticipant : null;
+
   return (
     <div className="flex h-screen h-[100dvh] w-full overflow-hidden bg-background select-none">
       {/* ─── Inbox / Conversation List (Left Column) ─── */}
@@ -165,7 +220,7 @@ export function MessengerView({
               >
                 <img src="/logo.png" alt="CampusLoop" className="size-5 object-contain" />
               </Link>
-              <div className="size-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-2xs">
+              <div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-2xs">
                 <MessageSquare className="size-4.5" />
               </div>
               <h1 className="text-base font-black tracking-tight text-foreground">Chats</h1>
@@ -178,12 +233,11 @@ export function MessengerView({
               >
                 Feed
               </Link>
-              <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                 {conversations?.length || 0}
               </span>
             </div>
           </div>
-
 
           {/* Search Bar */}
           <div className="relative w-full">
@@ -193,8 +247,51 @@ export function MessengerView({
               placeholder="Search students to message..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full h-9 pl-9 pr-4 rounded-full border border-border/50 bg-muted/30 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-emerald-500 transition-all"
+              className="w-full h-9 pl-9 pr-4 rounded-full border border-border/50 bg-muted/30 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary transition-all"
             />
+          </div>
+
+          {/* WhatsApp-Style Filter Pills */}
+          <div className="flex items-center gap-1.5 pt-0.5 overflow-x-auto scrollbar-none">
+            <button
+              type="button"
+              onClick={() => setActiveFilter("ALL")}
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
+                activeFilter === "ALL"
+                  ? "bg-primary text-primary-foreground shadow-2xs"
+                  : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter("UNREAD")}
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                activeFilter === "UNREAD"
+                  ? "bg-primary text-primary-foreground shadow-2xs"
+                  : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              <span>Unread</span>
+              {conversations && conversations.filter((c) => (c.unreadCount || 0) > 0).length > 0 && (
+                <span className="size-1.5 rounded-full bg-amber-400" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter("CAMPUS")}
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
+                activeFilter === "CAMPUS"
+                  ? "bg-primary text-primary-foreground shadow-2xs"
+                  : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              Campus
+            </button>
           </div>
         </div>
 
@@ -233,7 +330,7 @@ export function MessengerView({
                   </div>
                   <button
                     type="button"
-                    className="size-7 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all shrink-0"
+                    className="size-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold hover:bg-primary hover:text-primary-foreground transition-all shrink-0"
                   >
                     <Plus className="size-3.5" />
                   </button>
@@ -248,8 +345,10 @@ export function MessengerView({
         ) : (
           /* Conversation Inbox List */
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
-            {conversations?.map((conv) => {
+            {filteredConversations.map((conv) => {
               const other = conv.otherParticipant;
+              if (!other) return null;
+
               const isSelected = conv.id === activeConversationId;
               const unread = conv.unreadCount || 0;
               const isLastMe = conv.lastMessage?.senderId === currentUserId;
@@ -257,15 +356,15 @@ export function MessengerView({
               return (
                 <div
                   key={conv.id}
-                  onClick={() => setActiveConversationId(conv.id)}
+                  onClick={() => handleSelectConversation(conv.id)}
                   className={cn(
                     "flex items-center gap-3 p-3 rounded-2xl transition-all cursor-pointer group border-l-3",
                     isSelected
-                      ? "bg-muted/90 dark:bg-muted/50 border-emerald-500 shadow-2xs"
+                      ? "bg-muted/90 dark:bg-muted/50 border-primary shadow-2xs"
                       : "border-transparent hover:bg-muted/40"
                   )}
                 >
-                  {/* Avatar with Online indicator */}
+                  {/* Avatar with Online presence indicator */}
                   <div className="relative shrink-0">
                     <Avatar className="size-11 border border-border/40 shadow-2xs">
                       <AvatarImage src={other.avatarUrl || ""} />
@@ -273,13 +372,18 @@ export function MessengerView({
                         {(other.displayName?.[0] || "S").toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 ring-2 ring-card" />
+                    <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 ring-2 ring-card shadow-xs" />
                   </div>
 
                   {/* Body & Snippet */}
                   <div className="min-w-0 flex-1 space-y-0.5">
                     <div className="flex items-center justify-between gap-1">
-                      <p className={cn("text-xs truncate flex items-center gap-1", isSelected ? "font-black text-foreground" : "font-bold text-foreground")}>
+                      <p
+                        className={cn(
+                          "text-xs truncate flex items-center gap-1",
+                          isSelected ? "font-black text-foreground" : "font-bold text-foreground"
+                        )}
+                      >
                         <span>{other.displayName}</span>
                         <ShieldCheck className="size-3 text-blue-500 shrink-0" />
                       </p>
@@ -287,7 +391,7 @@ export function MessengerView({
                         <span
                           className={cn(
                             "text-[10px] font-semibold shrink-0",
-                            unread > 0 ? "text-emerald-500 font-bold" : "text-muted-foreground"
+                            unread > 0 ? "text-primary font-bold" : "text-muted-foreground"
                           )}
                         >
                           {formatRelativeTime(conv.lastMessage.createdAt)}
@@ -315,9 +419,9 @@ export function MessengerView({
                         </p>
                       </div>
 
-                      {/* WhatsApp Green Unread Badge */}
+                      {/* CampusLoop Primary Unread Badge */}
                       {unread > 0 && (
-                        <span className="size-5 rounded-full bg-emerald-500 text-white text-[10px] font-black flex items-center justify-center shrink-0 shadow-2xs animate-in zoom-in-75">
+                        <span className="size-5 rounded-full bg-primary text-primary-foreground text-[10px] font-black flex items-center justify-center shrink-0 shadow-2xs animate-in zoom-in-75">
                           {unread}
                         </span>
                       )}
@@ -327,12 +431,14 @@ export function MessengerView({
               );
             })}
 
-            {conversations && conversations.length === 0 && (
+            {filteredConversations.length === 0 && (
               <div className="py-16 text-center space-y-3 px-4">
                 <div className="size-12 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto text-muted-foreground">
                   <Users2 className="size-6" />
                 </div>
-                <p className="text-xs font-bold text-foreground">No conversations yet</p>
+                <p className="text-xs font-bold text-foreground">
+                  {activeFilter === "UNREAD" ? "No unread messages" : "No conversations yet"}
+                </p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Search above to message classmates, study buddies, or campus matches.
                 </p>
@@ -353,7 +459,7 @@ export function MessengerView({
           conversationId={activeConversationId}
           otherParticipant={activeParticipant}
           currentUserId={currentUserId}
-          onBack={() => setActiveConversationId(null)}
+          onBack={handleBackToInbox}
         />
       </main>
     </div>

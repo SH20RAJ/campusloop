@@ -14,6 +14,7 @@ interface FeedCardActionsProps {
   onInstantRepost: () => void;
   onShare: () => void;
   onOpenComments?: () => void;
+  onOpenLikes?: () => void;
 }
 
 export function FeedCardActions({
@@ -25,7 +26,9 @@ export function FeedCardActions({
   onInstantRepost,
   onShare,
   onOpenComments,
+  onOpenLikes,
 }: FeedCardActionsProps) {
+
   const [repostSpin, setRepostSpin] = useState(false);
   const displayCommentsCount = commentsCount ?? post.commentsCount;
 
@@ -74,27 +77,41 @@ export function FeedCardActions({
       </button>
 
       {/* Like / Heart Action */}
-      <button
-        type="button"
-        onClick={onVote}
-        className={cn(
-          "flex items-center gap-1.5 text-xs transition-colors group cursor-pointer",
-          userVote === 1 ? "text-rose-500" : "hover:text-rose-500"
-        )}
-        aria-label="Like"
-      >
-        <div className="size-8 rounded-full group-hover:bg-rose-500/10 flex items-center justify-center transition-colors">
+      <div className="flex items-center gap-0.5">
+        <button
+          type="button"
+          onClick={onVote}
+          className={cn(
+            "size-8 rounded-full flex items-center justify-center transition-colors cursor-pointer group",
+            userVote === 1 ? "text-rose-500 hover:bg-rose-500/10" : "text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10"
+          )}
+          aria-label="Like"
+        >
           <Heart
             className={cn(
               "size-4.5 transition-transform group-hover:scale-110",
               userVote === 1 && "fill-rose-500 text-rose-500"
             )}
           />
-        </div>
+        </button>
         {votesCount > 0 && (
-          <span className="tabular-nums text-xs font-medium">{votesCount}</span>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenLikes?.();
+            }}
+            className={cn(
+              "tabular-nums text-xs font-semibold px-1 py-0.5 rounded-md hover:underline cursor-pointer transition-colors",
+              userVote === 1 ? "text-rose-500" : "text-muted-foreground hover:text-foreground"
+            )}
+            title="View who liked this post"
+          >
+            {votesCount}
+          </button>
         )}
-      </button>
+      </div>
+
 
       {/* Share Action */}
       <button

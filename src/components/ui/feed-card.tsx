@@ -4,6 +4,7 @@ import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
 import { FeedCardActions } from "@/components/feed/feed-card-actions";
 import { FeedCardHeader } from "@/components/feed/feed-card-header";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
+import { PostLikesModal } from "@/components/post/post-likes-modal";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { RichText } from "@/components/ui/rich-text";
 import { FeedPost } from "@/hooks/use-feed";
@@ -25,6 +26,7 @@ interface FeedCardProps {
   disableNavigation?: boolean;
 }
 
+
 export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardProps) {
   const router = useRouter();
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -39,6 +41,8 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const [quoteThoughts, setQuoteThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
+  const [showLikesModal, setShowLikesModal] = useState(false);
+
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
@@ -232,6 +236,24 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
             </div>
           )}
 
+          {/* Facebook / Twitter Style Liked By Row */}
+          {votesCount > 0 && disableNavigation && (
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowLikesModal(true);
+              }}
+              className="flex items-center gap-1.5 pt-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer group w-fit"
+            >
+              <div className="size-4 rounded-full bg-rose-500 flex items-center justify-center text-white shrink-0 shadow-2xs">
+                <Heart className="size-2.5 fill-white text-white" />
+              </div>
+              <span className="font-semibold group-hover:underline">
+                {votesCount === 1 ? "1 person liked this" : `${votesCount} people liked this`}
+              </span>
+            </div>
+          )}
+
           {/* Action Bar */}
           <FeedCardActions
             post={post}
@@ -242,12 +264,22 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
             onInstantRepost={() => handleExecuteRepost(false)}
             onShare={handleSharePost}
             onOpenComments={() => setShowCommentsModal(true)}
+            onOpenLikes={() => setShowLikesModal(true)}
           />
         </div>
       </div>
 
+      {/* Post Likes Modal (Facebook-style who liked list) */}
+      <PostLikesModal
+        postId={post.id}
+        isOpen={showLikesModal}
+        onClose={() => setShowLikesModal(false)}
+        currentUserId={currentUserId}
+      />
+
       {/* Fast Instagram-Style Comments Modal */}
       <FastCommentsModal
+
         post={post}
         isOpen={showCommentsModal}
         onClose={() => setShowCommentsModal(false)}

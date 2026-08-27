@@ -10,13 +10,15 @@ interface EditProfileDialogProps {
   initialBio: string | null;
   initialUsername: string;
   initialAvatarUrl: string | null;
+  initialAnonymousUsername?: string | null;
 }
 
 export function EditProfileDialog({
   initialDisplayName,
   initialBio,
   initialUsername,
-  initialAvatarUrl
+  initialAvatarUrl,
+  initialAnonymousUsername,
 }: EditProfileDialogProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +26,7 @@ export function EditProfileDialog({
   const [bio, setBio] = useState(initialBio || "");
   const [username, setUsername] = useState(initialUsername);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl || "");
+  const [anonUsername, setAnonUsername] = useState(initialAnonymousUsername || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +36,7 @@ export function EditProfileDialog({
     setError(null);
 
     try {
-      await updateProfile(displayName, bio, username, avatarUrl);
+      await updateProfile(displayName, bio, username, avatarUrl, anonUsername);
       setIsOpen(false);
       router.refresh();
     } catch (err) {
@@ -42,6 +45,7 @@ export function EditProfileDialog({
       setIsLoading(false);
     }
   }
+
 
   return (
     <>
@@ -84,6 +88,29 @@ export function EditProfileDialog({
               </div>
 
               <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Anonymous Persona Username
+                  </label>
+                  {anonUsername && (
+                    <span className="text-[10px] text-primary font-bold">
+                      @{anonUsername.toLowerCase()}
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. ghost_student (for anonymous posts & confessions)"
+                  value={anonUsername}
+                  onChange={(e) => setAnonUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                  className="w-full rounded-xl border border-border bg-muted/20 px-3.5 py-2 text-xs focus:ring-1 focus:ring-ring outline-none font-semibold"
+                />
+                <span className="text-[9px] text-muted-foreground block">
+                  All your anonymous confessions & posts will appear under this handle.
+                </span>
+              </div>
+
+              <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Profile Picture URL</label>
                 <input
                   type="text"
@@ -93,6 +120,7 @@ export function EditProfileDialog({
                   className="w-full rounded-xl border border-border bg-muted/20 px-3.5 py-2 text-xs focus:ring-1 focus:ring-ring outline-none font-semibold"
                 />
               </div>
+
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Bio</label>

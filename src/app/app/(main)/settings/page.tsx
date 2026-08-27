@@ -42,7 +42,10 @@ export default async function SettingsPage() {
         role: profile.role,
         points: profile.points,
         institutionName: profile.institution?.name || "Verified Campus",
+        anonymousUsername: profile.anonymousUsername,
+        feedVisibility: profile.feedVisibility,
       }}
     />
   );
 }
+

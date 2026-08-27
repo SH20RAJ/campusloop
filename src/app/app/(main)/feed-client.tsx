@@ -41,8 +41,10 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
   const sortParam = searchParams.get("sort") || "for_you";
   const [sort, setSortState] = useState<string>(sortParam);
   const [visibility, setVisibility] = useState<string>("all");
+  const { profile } = useProfile();
 
   useEffect(() => {
+
     if (forcedType) {
       setTypeState(forcedType);
       return;
@@ -84,6 +86,25 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
+  useEffect(() => {
+    const savedMode = typeof window !== "undefined" ? localStorage.getItem("campusloop_feed_visibility") : null;
+    const mode = profile?.feedVisibility || savedMode;
+    if (mode === "NON_ANONYMOUS") {
+      setVisibility("public");
+    } else if (mode === "ALL") {
+      setVisibility("all");
+    }
+  }, [profile?.feedVisibility]);
+
+  function handleVisibilityChange(newVis: string) {
+    setVisibility(newVis);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("campusloop_feed_visibility", newVis === "public" ? "NON_ANONYMOUS" : "ALL");
+    }
+  }
+
+
+
   const {
     feed,
     isLoading: feedLoading,
@@ -98,9 +119,9 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
   } = useFeed(scope, type, sort, visibility);
 
   const { stories, mutate: mutateStories, isLoading: storiesLoading } = useStories();
-  const { profile } = useProfile();
 
   const { data: trendingData } = useSWR<{ trending: TrendingHashtag[] }>(
+
     "/api/hashtags/trending?limit=8",
     fetcher,
     { dedupingInterval: 30000 }
@@ -215,8 +236,9 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
           type={type}
           onTypeChange={handleTypeChange}
           visibility={visibility}
-          onVisibilityChange={setVisibility}
+          onVisibilityChange={handleVisibilityChange}
           institutionSlug={profile?.institution?.slug || (profile?.institution?.name ? profile.institution.name.split(",")[0] : null)}
+
           onRefresh={refresh}
           isRefreshing={isValidating}
         />

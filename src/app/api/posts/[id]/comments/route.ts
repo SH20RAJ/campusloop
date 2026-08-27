@@ -92,13 +92,18 @@ export async function POST(req: Request, { params }: RouteParams) {
     let anonHandle: string | null = null;
 
     if (anonymous) {
-      try {
-        anonHandle = deriveAnonHandle(profile.id);
-      } catch (err) {
-        console.warn("Anonymity hashing fallback:", err);
-        anonHandle = `anon_${profile.id.slice(0, 8)}`;
+      if (profile.anonymousUsername) {
+        anonHandle = profile.anonymousUsername;
+      } else {
+        try {
+          anonHandle = deriveAnonHandle(profile.id);
+        } catch (err) {
+          console.warn("Anonymity hashing fallback:", err);
+          anonHandle = `anon_${profile.id.slice(0, 8)}`;
+        }
       }
     }
+
 
     // Direct sequential insert (no nested db.transaction which breaks in Neon HTTP driver)
     const [newComment] = await db

@@ -23,12 +23,13 @@ MessageSquare,
 Move,
 Share2,
 Shield,
-
 TrendingUp,
 Trophy,
 Upload,
-X
+VenetianMask,
+X,
 } from "lucide-react";
+
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -54,9 +55,12 @@ interface ProfileClientViewProps {
     points?: number | null;
     role?: string | null;
     status?: string | null;
+    anonymousUsername?: string | null;
+    feedVisibility?: string | null;
     photos?: string[] | null;
     interests?: string[] | null;
     referralCount?: number | null;
+
     createdAt?: Date | string | null;
     institution?: {
       id: string;
@@ -497,6 +501,18 @@ export function ProfileClientView({
                 </Link>
               </div>
             )}
+
+            {/* Custom Anonymous Username Badge (Private to Student) */}
+            {isOwnProfile && profile.anonymousUsername && (
+              <div className="flex items-center gap-1.5 pt-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-bold text-primary">
+                  <VenetianMask className="size-3.5 text-primary" />
+                  <span>Anonymous Persona: @{profile.anonymousUsername}</span>
+                </div>
+                <span className="text-[10px] text-muted-foreground">(only visible to you)</span>
+              </div>
+            )}
+
 
             {/* Campus Tags / Interest Badges (Exact match to Reference 2 Center Screen) */}
             {profile.interests && profile.interests.length > 0 && (

@@ -46,17 +46,21 @@ export const userProfiles = pgTable(
     referralCount: integer("referral_count").default(0).notNull(),
     referredById: text("referred_by_id").references((): AnyPgColumn => userProfiles.id, { onDelete: "set null" }),
     points: integer("points").default(0).notNull(),
+    anonymousUsername: text("anonymous_username"),
+    feedVisibility: text("feed_visibility").default("ALL").notNull(),
     createdAt,
     updatedAt,
   },
   (table) => [
     uniqueIndex("user_profiles_user_id_idx").on(table.userId),
     uniqueIndex("user_profiles_username_idx").on(table.username),
+    uniqueIndex("user_profiles_anon_username_idx").on(table.anonymousUsername),
     index("user_profiles_institution_idx").on(table.institutionId),
     index("user_profiles_points_idx").on(table.points),
     index("user_profiles_branch_idx").on(table.branch),
   ],
 );
+
 
 export const blocks = pgTable(
   "blocks",

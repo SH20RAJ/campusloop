@@ -1,6 +1,8 @@
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { Navigation } from "@/components/ui/navigation";
+import { RightSidebar } from "@/components/ui/right-sidebar";
 import { getBranchIcon } from "@/constants";
+
 import { getDb } from "@/db";
 import { institutions,posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
@@ -165,8 +167,8 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
             isAdmin={currentProfile.role === "ADMIN"} 
           />
 
-          <div className="flex md:pl-60 min-h-screen">
-            <main className="flex-1 w-full max-w-2xl px-0 py-0 pb-28 md:pb-0 mx-auto min-h-screen">
+          <div className="flex md:pl-64 min-h-screen">
+            <main className="flex-1 w-full max-w-2xl px-0 py-0 pb-28 md:pb-0 mx-auto min-h-screen border-r border-border/30">
               <ProfileClientView
                 profile={profile}
                 formattedPosts={formattedPosts as FeedPost[]}
@@ -174,9 +176,14 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                 currentUserId={currentProfile.id}
               />
             </main>
+
+            <aside className="hidden lg:block w-80 xl:w-[350px] shrink-0 px-4 py-3">
+              <RightSidebar />
+            </aside>
           </div>
         </div>
       );
+
     }
   }
 
@@ -212,10 +219,12 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="flex-1 w-full max-w-xl px-4 pt-20 mx-auto space-y-4">
-        {/* Profile Card with Aurora Mesh Banner (Reference 1 & 2) */}
-        <div className="relative overflow-hidden rounded-3xl bg-card shadow-lg">
+      {/* Main Container Layout */}
+      <div className="flex max-w-5xl mx-auto w-full pt-20 px-4 gap-6 items-start">
+        <main className="flex-1 w-full max-w-2xl space-y-4">
+          {/* Profile Card with Aurora Mesh Banner (Reference 1 & 2) */}
+          <div className="relative overflow-hidden rounded-3xl bg-card shadow-lg">
+
           <div className="relative h-36 sm:h-44 w-full bg-aurora-mesh overflow-hidden">
             {profile.bannerUrl && (
               <img src={profile.bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
@@ -344,6 +353,12 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
           </div>
         </div>
       </main>
+
+      <aside className="hidden lg:block w-80 shrink-0 sticky top-24">
+        <RightSidebar />
+      </aside>
     </div>
-  );
+  </div>
+);
 }
+

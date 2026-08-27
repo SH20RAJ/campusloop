@@ -178,8 +178,9 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
       type: postType,
       scope,
       isAnonymous: anon,
-      pseudonym: anon ? "Anonymous Student" : null,
+      pseudonym: anon ? (profile?.anonymousUsername || "Anonymous Student") : null,
       title: null,
+
       status: "PUBLISHED",
       riskScore: 0,
       isEdited: false,
@@ -380,8 +381,11 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
 
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-foreground">
-              {anonActive ? "Anonymous Student" : profile?.displayName || "Student"}
+              {anonActive
+                ? (profile?.anonymousUsername ? `@${profile.anonymousUsername}` : "Anonymous Student")
+                : profile?.displayName || "Student"}
             </p>
+
 
             <div className="mt-1 flex flex-wrap items-center gap-1.5">
               {/* Audience pill w/ dropdown (FB privacy-selector style) */}
@@ -606,9 +610,14 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
         {anonActive && (
           <div className="mx-4 mb-3 flex items-center gap-2 rounded-2xl bg-violet-500/10 px-3 py-2 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
             <VenetianMask className="size-4 shrink-0" />
-            Your identity is sealed — this will show as “Anonymous Student”.
+            {profile?.anonymousUsername ? (
+              <span>Your identity is sealed — posting under anonymous persona <strong className="font-bold">@{profile.anonymousUsername}</strong>.</span>
+            ) : (
+              <span>Your identity is sealed — posting with anonymous handle (set a custom handle in Profile).</span>
+            )}
           </div>
         )}
+
 
         {/* Submit */}
         <div className="border-t border-border/20 p-3">

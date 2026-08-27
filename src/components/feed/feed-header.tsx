@@ -6,8 +6,9 @@ FEED_SORT_TABS as SORT_TABS,
 FEED_VISIBILITY_OPTIONS as VISIBILITY_OPTIONS,
 } from "@/constants";
 import { cn } from "@/lib/utils";
-import { Globe,ListFilter,School } from "lucide-react";
+import { Globe,ListFilter,RotateCw,School } from "lucide-react";
 import { useState } from "react";
+
 
 interface FeedHeaderProps {
   scope: "CAMPUS" | "GLOBAL";
@@ -19,7 +20,10 @@ interface FeedHeaderProps {
   visibility: string;
   onVisibilityChange: (visibility: string) => void;
   institutionSlug?: string | null;
+  onRefresh?: () => Promise<unknown> | void;
+  isRefreshing?: boolean;
 }
+
 
 export function FeedHeader({
   scope,
@@ -31,6 +35,8 @@ export function FeedHeader({
   visibility,
   onVisibilityChange,
   institutionSlug,
+  onRefresh,
+  isRefreshing,
 }: FeedHeaderProps) {
   const [showFilters, setShowFilters] = useState(false);
 
@@ -50,31 +56,46 @@ export function FeedHeader({
           </h1>
         </div>
 
-        {/* Scope selection pill */}
-        <div className="flex rounded-full bg-muted/50 p-1 text-[11px] font-bold">
-          <button
-            onClick={() => onScopeChange("CAMPUS")}
-            className={cn(
-              "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
-              scope === "CAMPUS" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <School className="h-3 w-3" />
-            {/* <span className="truncate max-w-[120px]">{institutionSlug ? `${institutionSlug} Hub` : "Campus"}</span> */}
-            <span className="truncate max-w-[120px]">{institutionSlug ? `${institutionSlug.charAt(0).toUpperCase() + institutionSlug.slice(1)}` : "Campus"}</span>
-          </button>
-          <button
-            onClick={() => onScopeChange("GLOBAL")}
-            className={cn(
-              "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
-              scope === "GLOBAL" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Globe className="h-3 w-3" />
-            Global
-          </button>
+        <div className="flex items-center gap-2">
+          {onRefresh && (
+            <button
+              type="button"
+              onClick={() => onRefresh()}
+              disabled={isRefreshing}
+              className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors cursor-pointer active:scale-95"
+              title="Refresh feed"
+              aria-label="Refresh feed"
+            >
+              <RotateCw className={cn("size-3.5 transition-transform", isRefreshing && "animate-spin text-primary")} />
+            </button>
+          )}
+
+          {/* Scope selection pill */}
+          <div className="flex rounded-full bg-muted/50 p-1 text-[11px] font-bold">
+            <button
+              onClick={() => onScopeChange("CAMPUS")}
+              className={cn(
+                "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
+                scope === "CAMPUS" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <School className="h-3 w-3" />
+              <span className="truncate max-w-[120px]">{institutionSlug ? `${institutionSlug.charAt(0).toUpperCase() + institutionSlug.slice(1)}` : "Campus"}</span>
+            </button>
+            <button
+              onClick={() => onScopeChange("GLOBAL")}
+              className={cn(
+                "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
+                scope === "GLOBAL" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Globe className="h-3 w-3" />
+              Global
+            </button>
+          </div>
         </div>
       </div>
+
 
       {/* Twitter/X Style Segmented Sort Tabs */}
       <div className="flex items-center justify-between border-t border-border/25 pt-1 -mb-4 -mx-4 px-2">

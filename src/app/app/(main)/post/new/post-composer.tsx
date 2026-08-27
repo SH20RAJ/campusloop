@@ -11,9 +11,12 @@ TriggerContext,
 } from "@/components/ui/mention-autocomplete";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { useCommunities } from "@/hooks/use-communities";
+import { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
+import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
+
 
 import { EditorContent,useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -153,35 +156,86 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
       }
     }
 
-    try {
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          body,
-          type: postType,
-          scope,
-          isAnonymous: anon,
-          options: postType === "POLL" ? options : undefined,
-          communityId: selectedCommunityId !== "NONE" ? selectedCommunityId : undefined,
-        }),
+    const tempId = `temp_${Date.now()}`;
+    const optimisticPost: FeedPost = {
+      id: tempId,
+      authorId: profile?.id || "temp_author",
+      institutionId: profile?.institutionId || "inst_global",
+      body,
+      type: postType,
+      scope,
+      isAnonymous: anon,
+      pseudonym: anon ? "Anonymous Student" : null,
+      title: null,
+      status: "PUBLISHED",
+      riskScore: 0,
+      isEdited: false,
+      repostOfId: null,
+      repostComment: null,
+      communityId: selectedCommunityId !== "NONE" ? selectedCommunityId : null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+
+      votesCount: 0,
+      commentsCount: 0,
+      userVote: 0,
+      author: (anon ? null : profile) as unknown as FeedPost["author"],
+      institution: (profile?.institution || {
+        id: profile?.institutionId || "inst_global",
+        name: "Campus",
+      }) as unknown as FeedPost["institution"],
+      pollOptions:
+        postType === "POLL"
+          ? options.map((text, i) => ({
+              id: `opt_${i}`,
+              text,
+              votesCount: 0,
+              userVoted: false,
+            }))
+          : undefined,
+    };
+
+    // Optimistically insert post immediately at the top of the feed
+    optimisticAddPost(optimisticPost);
+    toast.success("Post published! 🎉");
+    router.push("/app");
+
+    // Send API request in background
+    fetch("/api/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        body,
+        type: postType,
+        scope,
+        isAnonymous: anon,
+        options: postType === "POLL" ? options : undefined,
+        communityId: selectedCommunityId !== "NONE" ? selectedCommunityId : undefined,
+      }),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const errData = (await res.json().catch(() => ({}))) as { error?: string };
+          throw new Error(errData?.error || "Failed to publish post");
+        }
+        const serverPost = (await res.json()) as { id: string; createdAt?: string | Date };
+
+        confirmOptimisticPost(tempId, {
+          ...optimisticPost,
+          id: serverPost.id,
+          createdAt: new Date(serverPost.createdAt || Date.now()),
+        });
+      })
+      .catch((err) => {
+        console.error("Post publishing error:", err);
+        revertOptimisticPost(tempId);
+        toast.error(err instanceof Error ? err.message : "Failed to publish post.");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-
-      const data = (await res.json()) as { error?: string };
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to create post.");
-      }
-
-      toast.success("Post published! 🎉");
-      router.push("/app");
-      router.refresh();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred while publishing.");
-    } finally {
-      setIsLoading(false);
-    }
   }
+
 
   function handleOptionChange(index: number, value: string) {
     setPollOptions((prev) => {

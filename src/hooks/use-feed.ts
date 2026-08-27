@@ -1,9 +1,11 @@
 import { Institution,Post,UserProfile } from "@/db/schema";
+import { feedPagesCache,feedSizeCache } from "@/lib/feed-mutations";
 import { getSeenPostIds,markPostsAsSeen } from "@/lib/seen-posts";
-import { useEffect } from "react";
+import { useCallback,useEffect } from "react";
 import useSWRInfinite from "swr/infinite";
 
 export type TopCommentPreview = {
+
   id: string;
   body: string;
   createdAt: Date | string;
@@ -53,12 +55,17 @@ const feedFetcher = async <T,>(url: string): Promise<T> => {
 const PAGE_LIMIT = 20;
 
 export function useFeed(
+
   scope: "CAMPUS" | "GLOBAL" = "CAMPUS",
   type?: string,
   sort?: string,
   visibility?: string,
   hashtag?: string,
 ) {
+  const cacheKey = `${scope}_${type || "ALL"}_${sort || "latest"}_${visibility || "all"}_${hashtag || ""}`;
+  const initialSize = feedSizeCache.get(cacheKey) || 1;
+  const fallbackData = feedPagesCache.get(cacheKey);
+
   const getKey = (pageIndex: number, previousPageData: FeedPost[] | null) => {
     if (previousPageData && previousPageData.length < PAGE_LIMIT) return null;
 
@@ -74,21 +81,46 @@ export function useFeed(
     return url.toString();
   };
 
-  const { data, error, size, setSize, isLoading, mutate } = useSWRInfinite<FeedPost[]>(
+  const { data, error, size, setSize, isLoading, isValidating, mutate } = useSWRInfinite<FeedPost[]>(
     getKey,
     feedFetcher,
     {
+      initialSize,
+      fallbackData,
       revalidateFirstPage: false,
+      revalidateAll: false,
+      revalidateIfStale: false,
       revalidateOnFocus: false,
-      revalidateIfStale: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 10000,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000,
       keepPreviousData: true,
     }
   );
 
+  // Sync cache on updates
+  useEffect(() => {
+    if (data && data.length > 0) {
+      feedPagesCache.set(cacheKey, data);
+    }
+  }, [cacheKey, data]);
 
-  const rawFeed = data ? data.flat() : undefined;
+  const handleSetSize = useCallback(
+    (sizeOrFn: number | ((size: number) => number)) => {
+      setSize((prev) => {
+        const next = typeof sizeOrFn === "function" ? sizeOrFn(prev) : sizeOrFn;
+        feedSizeCache.set(cacheKey, next);
+        return next;
+      });
+    },
+    [cacheKey, setSize]
+  );
+
+  const refresh = useCallback(async () => {
+    feedSizeCache.set(cacheKey, 1);
+    return mutate();
+  }, [cacheKey, mutate]);
+
+  const rawFeed = (data || fallbackData)?.flat();
   const feed = rawFeed
     ? Array.from(new Map(rawFeed.map((post) => [post.id, post])).values())
     : undefined;
@@ -109,12 +141,15 @@ export function useFeed(
     feed,
     isLoading,
     isLoadingMore,
+    isValidating,
     isReachingEnd,
     isError: error,
     size,
-    setSize,
+    setSize: handleSetSize,
     mutate,
+    refresh,
   };
 }
+
 
 export { useStories } from "./use-stories";

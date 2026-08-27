@@ -6,54 +6,70 @@ import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import {
-Check,
 MoreHorizontal,
 Search,
 ShieldCheck,
-UserPlus
+Users,
+X
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname,useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
 type SuggestedPeer = UserProfile & { institution?: Institution | null };
 
-const CAMPUS_TRENDS = [
-  {
-    category: "Trending in Campus",
-    topic: "#EndSemExams",
-    posts: "1.8K posts",
-    href: "/app/hashtag/EndSemExams",
-  },
-  {
-    category: "Campus Buzz • Placements",
-    topic: "#PlacementSeason",
-    posts: "940 posts",
-    href: "/app/hashtag/PlacementSeason",
-  },
-  {
-    category: "Campus Life • Secret Crush",
-    topic: "#SecretCrushVault",
-    posts: "620 posts",
-    href: "/app/crush",
-  },
-  {
-    category: "Trending • Confessions",
-    topic: "#HostelDiaries",
-    posts: "410 posts",
-    href: "/app/hashtag/HostelDiaries",
-  },
-];
+interface TrendItem {
+  category: string;
+  topic: string;
+  postCount: number;
+  formattedCount: string;
+  href: string;
+}
+
+interface NewsItem {
+  id: string;
+  headline: string;
+  category: string;
+  timeAgo: string;
+  postCount: string;
+  authorName?: string;
+  authorAvatar?: string | null;
+  href: string;
+}
+
+interface TrendsResponse {
+  trends: TrendItem[];
+  news: NewsItem[];
+  scope: string;
+  collegeName: string;
+}
+
+interface CommunityItemPreview {
+  id: string;
+  name: string;
+  category: string;
+  membersCount: number;
+}
 
 export function RightSidebar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { profile } = useProfile();
   const [searchQuery, setSearchQuery] = useState("");
-  const [copied, setCopied] = useState(false);
   const [followedIds, setFollowedIds] = useState<Record<string, boolean>>({});
+  const [showNewsCard, setShowNewsCard] = useState(true);
 
+  // Dynamic live trends based on current page
+  const scope = pathname.includes("discover") ? "GLOBAL" : "CAMPUS";
+  const { data: trendsData } = useSWR<TrendsResponse>(
+    `/api/trends?scope=${scope}`,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 20000 }
+  );
+
+  // Suggested peers from real database
   const { data: suggestedPeers } = useSWR<SuggestedPeer[]>(
     "/api/profile/suggested",
     fetcher,
@@ -69,16 +85,6 @@ export function RightSidebar() {
     router.push(`/app/search?q=${encodeURIComponent(searchQuery.trim())}`);
   }
 
-  function handleCopyInvite() {
-    const college = profile?.institution?.name?.split(",")[0] || "campus";
-    const username = profile?.username || "student";
-    const inviteText = `yo, ${college} is live on CampusLoop. verified students only, join our campus feed: https://campusloop.space/join?invite=${username} 🚀`;
-    navigator.clipboard.writeText(inviteText);
-    setCopied(true);
-    toast.success("Invite link copied to clipboard!");
-    setTimeout(() => setCopied(false), 2500);
-  }
-
   function handleFollowToggle(peerId: string, peerName: string) {
     setFollowedIds((prev) => {
       const nextState = !prev[peerId];
@@ -89,90 +95,149 @@ export function RightSidebar() {
     });
   }
 
+  const trends = trendsData?.trends || [];
+  const news = trendsData?.news || [];
+
+  const isCommunitiesPage = pathname.startsWith("/app/communities");
+
   return (
-    <aside className="sticky top-4 space-y-4 text-foreground w-full select-none">
-      {/* ─── 1. Twitter/X Style Search Bar ─── */}
+    <aside className="sticky top-3 space-y-3.5 text-foreground w-full select-none">
+      {/* ─── 1. Twitter/X Search Bar ─── */}
       <form onSubmit={handleSearch} className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground transition-colors group-focus-within:text-foreground" />
         <input
           type="text"
-          placeholder="Search CampusLoop"
+          placeholder="Search"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-10 pl-11 pr-4 rounded-full bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all"
+          className="w-full h-10.5 pl-11 pr-4 rounded-full bg-muted/60 border border-transparent focus:border-border/70 focus:bg-background text-[13px] font-normal placeholder:text-muted-foreground/70 outline-none transition-all"
         />
       </form>
 
-      {/* ─── 2. Twitter "Subscribe to Premium" / Get Verified Card ─── */}
+      {/* ─── 2. Twitter "Subscribe to Premium" / Verified Card ─── */}
       {!isVerified && (
         <div className="rounded-2xl border border-border/40 bg-card p-4 space-y-2 shadow-xs">
-          <h3 className="text-sm font-black tracking-tight text-foreground">
-            Get Verified on Campus
+          <h3 className="text-base font-black tracking-tight text-foreground">
+            Subscribe to Premium
           </h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Earn 150 Loop Points or invite classmates to unlock the verified blue tick and secret match vault.
+            Get verified student badge, unlock Secret Crush vault, and boost your campus reach.
           </p>
-          <div className="pt-1 flex items-center gap-2">
+          <div className="pt-1">
             <Link
               href="/app/settings"
-              className="inline-flex items-center justify-center rounded-full bg-foreground text-background px-4 py-2 text-xs font-black hover:opacity-90 transition-opacity cursor-pointer shadow-xs active:scale-95"
+              className="inline-flex items-center justify-center rounded-full bg-[#1d9bf0] text-white px-4 py-2 text-xs font-black hover:bg-[#1a8cd8] transition-all cursor-pointer shadow-xs active:scale-95"
             >
               Get Verified
             </Link>
-            <button
-              type="button"
-              onClick={handleCopyInvite}
-              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-border/60 bg-muted/40 hover:bg-muted px-3.5 py-2 text-xs font-bold text-foreground transition-colors cursor-pointer"
-            >
-              {copied ? <Check className="size-3 text-emerald-500" /> : <UserPlus className="size-3" />}
-              <span>{copied ? "Copied" : "Invite"}</span>
-            </button>
           </div>
         </div>
       )}
 
-      {/* ─── 3. Twitter "What's happening" Trends Card ─── */}
-      <div className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-xs divide-y divide-border/25">
-        <div className="px-4 py-3">
-          <h3 className="text-sm font-black tracking-tight text-foreground">
-            What&apos;s happening
-          </h3>
+      {/* ─── 3. Contextual Card: Today's News (Matching Screenshot 1 & 2) ─── */}
+      {showNewsCard && news.length > 0 && !isCommunitiesPage && (
+        <div className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-xs divide-y divide-border/20">
+          <div className="flex items-center justify-between px-4 pt-3.5 pb-2">
+            <h3 className="text-[15px] font-black tracking-tight text-foreground">
+              Today&apos;s News
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowNewsCard(false)}
+              className="size-6 rounded-full hover:bg-muted text-muted-foreground/60 hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+
+          {news.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href}
+              className="block px-4 py-3 hover:bg-muted/30 transition-colors group cursor-pointer"
+            >
+              <p className="text-[13px] font-black text-foreground group-hover:underline leading-snug line-clamp-2">
+                {item.headline}
+              </p>
+              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground pt-1">
+                <span>{item.timeAgo}</span>
+                <span>·</span>
+                <span className="truncate">{item.category}</span>
+                <span>·</span>
+                <span>{item.postCount}</span>
+              </div>
+            </Link>
+          ))}
         </div>
+      )}
 
-        {CAMPUS_TRENDS.map((trend) => (
+      {/* ─── 4. Contextual Card: What's Happening (Real Hashtags from DB) ─── */}
+      {!isCommunitiesPage && trends.length > 0 && (
+        <div className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-xs divide-y divide-border/20">
+          <div className="px-4 pt-3.5 pb-2">
+            <h3 className="text-[15px] font-black tracking-tight text-foreground">
+              What&apos;s happening
+            </h3>
+          </div>
+
+          {trends.map((trend) => (
+            <Link
+              key={trend.topic}
+              href={trend.href}
+              className="flex items-start justify-between px-4 py-2.5 hover:bg-muted/30 transition-colors group cursor-pointer"
+            >
+              <div className="space-y-0.5 min-w-0 flex-1">
+                <p className="text-[11px] text-muted-foreground font-medium truncate">
+                  {trend.category}
+                </p>
+                <p className="text-[13px] font-bold text-foreground group-hover:underline truncate">
+                  {trend.topic}
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  {trend.formattedCount}
+                </p>
+              </div>
+              <MoreHorizontal className="size-4 text-muted-foreground/50 group-hover:text-foreground shrink-0 mt-1" />
+            </Link>
+          ))}
+
           <Link
-            key={trend.topic}
-            href={trend.href}
-            className="flex items-start justify-between px-4 py-2.5 hover:bg-muted/35 transition-colors group cursor-pointer"
+            href="/app/discover"
+            className="block px-4 py-3 text-xs font-semibold text-primary hover:bg-muted/30 transition-colors"
           >
-            <div className="space-y-0.5 min-w-0 flex-1">
-              <p className="text-[11px] text-muted-foreground font-medium truncate">
-                {trend.category}
-              </p>
-              <p className="text-xs font-black text-foreground group-hover:text-primary transition-colors truncate">
-                {trend.topic}
-              </p>
-              <p className="text-[10px] text-muted-foreground/80">
-                {trend.posts}
-              </p>
-            </div>
-            <MoreHorizontal className="size-4 text-muted-foreground/40 group-hover:text-muted-foreground shrink-0 mt-0.5" />
+            Show more
           </Link>
-        ))}
+        </div>
+      )}
 
-        <Link
-          href="/app/discover"
-          className="block px-4 py-3 text-xs font-semibold text-primary hover:bg-muted/30 transition-colors"
-        >
-          Show more
-        </Link>
-      </div>
+      {/* ─── 5. Communities Page Contextual Card ─── */}
+      {isCommunitiesPage && (
+        <div className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-xs divide-y divide-border/20">
+          <div className="px-4 pt-3.5 pb-2 flex items-center justify-between">
+            <h3 className="text-[15px] font-black tracking-tight text-foreground flex items-center gap-2">
+              <Users className="size-4 text-primary" />
+              <span>Campus Sub-Hubs</span>
+            </h3>
+          </div>
 
-      {/* ─── 4. Twitter "Who to follow" Card ─── */}
+          <div className="p-4 text-xs text-muted-foreground leading-relaxed">
+            Create or join verified interest groups, research circles, and student clubs with batchmates.
+          </div>
+
+          <Link
+            href="/app/communities/new"
+            className="block px-4 py-3 text-xs font-black text-primary hover:bg-muted/30 transition-colors"
+          >
+            + Create New Community
+          </Link>
+        </div>
+      )}
+
+      {/* ─── 6. Twitter "Who to follow" (Real Database Peers) ─── */}
       {suggestedPeers && suggestedPeers.length > 0 && (
-        <div className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-xs divide-y divide-border/25">
-          <div className="px-4 py-3">
-            <h3 className="text-sm font-black tracking-tight text-foreground">
+        <div className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-xs divide-y divide-border/20">
+          <div className="px-4 pt-3.5 pb-2">
+            <h3 className="text-[15px] font-black tracking-tight text-foreground">
               Who to follow
             </h3>
           </div>
@@ -182,27 +247,27 @@ export function RightSidebar() {
             return (
               <div
                 key={peer.id}
-                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted/35 transition-colors"
+                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted/30 transition-colors"
               >
                 <Link
                   href={`/@${peer.username}`}
                   className="flex items-center gap-2.5 min-w-0 flex-1 group"
                 >
-                  <Avatar className="size-9 shrink-0 border border-border/40">
+                  <Avatar className="size-10 shrink-0 border border-border/40">
                     <AvatarImage src={peer.avatarUrl || ""} />
-                    <AvatarFallback className="text-[10px] font-bold bg-muted text-foreground">
+                    <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
                       {peer.displayName[0]}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-black text-foreground truncate group-hover:underline flex items-center gap-1">
+                    <p className="text-[13px] font-black text-foreground truncate group-hover:underline flex items-center gap-1">
                       <span>{peer.displayName}</span>
                       {peer.points >= 150 && (
-                        <ShieldCheck className="size-3 text-blue-500 shrink-0" />
+                        <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
                       )}
                     </p>
-                    <p className="text-[10px] text-muted-foreground truncate">
+                    <p className="text-[11px] text-muted-foreground truncate">
                       @{peer.username}
                     </p>
                   </div>
@@ -212,7 +277,7 @@ export function RightSidebar() {
                   type="button"
                   onClick={() => handleFollowToggle(peer.id, peer.displayName)}
                   className={cn(
-                    "rounded-full px-3.5 py-1.5 text-xs font-black transition-all cursor-pointer shrink-0 active:scale-95 shadow-2xs",
+                    "rounded-full px-4 py-1.5 text-xs font-black transition-all cursor-pointer shrink-0 active:scale-95 shadow-2xs",
                     isFollowed
                       ? "border border-border/60 bg-transparent text-foreground hover:border-destructive/40 hover:text-destructive"
                       : "bg-foreground text-background hover:opacity-90"
@@ -233,15 +298,17 @@ export function RightSidebar() {
         </div>
       )}
 
-      {/* ─── 5. Twitter Style Clean Footer ─── */}
-      <footer className="px-3 pt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-muted-foreground/60 leading-relaxed">
+      {/* ─── 7. Twitter Clean Muted Footer ─── */}
+      <footer className="px-3 pt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground/60 leading-relaxed">
         <Link href="/terms" className="hover:underline">Terms of Service</Link>
         <span>·</span>
         <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
         <span>·</span>
-        <Link href="/safety" className="hover:underline">Safety Guidelines</Link>
+        <Link href="/safety" className="hover:underline">Cookie Policy</Link>
         <span>·</span>
-        <Link href="/contact" className="hover:underline">Contact Support</Link>
+        <Link href="/about" className="hover:underline">Accessibility</Link>
+        <span>·</span>
+        <Link href="/contact" className="hover:underline">Contact</Link>
         <span>·</span>
         <span>© {new Date().getFullYear()} CampusLoop</span>
       </footer>

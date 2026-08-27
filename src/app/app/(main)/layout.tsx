@@ -68,9 +68,10 @@ export default async function MainLayout({
           )}
           {children}
         </main>
-        <aside className="hidden xl:block w-72 xl:w-80 shrink-0 border-l border-border/40 p-4">
+        <aside className="hidden lg:block w-80 xl:w-[350px] shrink-0 border-l border-border/30 px-4 py-3">
           <RightSidebar />
         </aside>
+
       </div>
     </div>
   );

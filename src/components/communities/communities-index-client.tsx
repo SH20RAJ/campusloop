@@ -5,18 +5,14 @@ import { FeedCard } from "@/components/ui/feed-card";
 import { FeedPost } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
 import {
-Compass,
-EyeOff,
-Flame,
+ArrowLeft,
 Globe,
 Lock,
 Plus,
-Search,
-ShieldCheck,
-Users2,
-Zap
+Search
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export interface CommunityItem {
@@ -43,12 +39,11 @@ interface CommunitiesIndexClientProps {
 
 const CATEGORIES = [
   "All",
-  "Joined",
   "Tech & Coding",
-  "Music & Arts",
+  "Academics & Placements",
+  "Cultural & Arts",
   "Gaming & Anime",
   "Sports & Fitness",
-  "Academics & Placements",
   "Memes & Culture",
   "General",
 ];
@@ -58,11 +53,19 @@ export function CommunitiesIndexClient({
   initialPosts = [],
   profileId,
 }: CommunitiesIndexClientProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [viewMode, setViewMode] = useState<"directory" | "feed">("directory");
+  const [viewTab, setViewTab] = useState<"EXPLORE" | "JOINED" | "FEED">("EXPLORE");
 
-  const filteredCommunities = initialCommunities.filter((c) => {
+  const joinedCommunities = initialCommunities.filter((c) =>
+    c.members.some((m) => m.userId === profileId)
+  );
+
+  const activePool =
+    viewTab === "JOINED" ? joinedCommunities : initialCommunities;
+
+  const filteredCommunities = activePool.filter((c) => {
     // Hide UNLISTED communities unless the user is a member
     const isMember = c.members.some((m) => m.userId === profileId);
     if (c.privacy === "UNLISTED" && !isMember) {
@@ -74,260 +77,189 @@ export function CommunitiesIndexClient({
       (c.description || "").toLowerCase().includes(search.toLowerCase()) ||
       (c.category || "").toLowerCase().includes(search.toLowerCase());
 
-    if (selectedCategory === "Joined") {
-      return matchesSearch && isMember;
-    }
     if (selectedCategory !== "All") {
       return matchesSearch && c.category.toLowerCase() === selectedCategory.toLowerCase();
     }
     return matchesSearch;
   });
 
-  function getInitialsGradient(name: string) {
-    const charCodeSum = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const gradients = [
-      "from-indigo-500 to-violet-500",
-      "from-purple-500 to-pink-500",
-      "from-blue-500 to-indigo-500",
-      "from-violet-500 to-fuchsia-500",
-      "from-fuchsia-500 to-rose-500",
-      "from-emerald-500 to-teal-500",
-      "from-orange-500 to-amber-500",
-      "from-cyan-500 to-blue-500",
-    ];
-    return gradients[charCodeSum % gradients.length];
-  }
-
-  const joinedCount = initialCommunities.filter((c) =>
-    c.members.some((m) => m.userId === profileId)
-  ).length;
-
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col min-h-screen pb-24 px-3 sm:px-4 pt-3 gap-5 select-none animate-in fade-in">
-      {/* ─── Hero Banner ─── */}
-      <div className="relative overflow-hidden rounded-3xl bg-card p-6 sm:p-7 shadow-2xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
-                <Users2 className="size-6 text-primary" /> Campus Communities
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-24">
+      {/* ─── Sticky Twitter/X Header ─── */}
+      <header className="sticky top-0 z-40 bg-background/85 px-4 pt-3 backdrop-blur-xl border-b border-border/30 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="size-4.5" />
+            </button>
+            <div>
+              <h1 className="text-lg font-black tracking-tight text-foreground">
+                Communities
               </h1>
-              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
-                Sub-Hubs
-              </span>
+              <p className="text-[11px] text-muted-foreground font-medium">
+                {initialCommunities.length} campus interest groups &amp; clubs
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground font-medium max-w-lg leading-relaxed">
-              Interest groups, student clubs, secret study branches, and campus discussion hubs.
-            </p>
           </div>
 
           <Link
             href="/app/communities/new"
-            className="px-4 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/95 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs shrink-0"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-xs active:scale-95"
           >
-            <Plus className="size-3.5" />
-            <span>Create Community</span>
+            <Plus className="size-3.5 stroke-[3]" />
+            <span>Create</span>
           </Link>
         </div>
 
-        {/* Metric Bar */}
-        <div className="flex items-center gap-4 pt-4 mt-4 border-t border-border/40 text-xs font-semibold text-muted-foreground">
-          <span className="text-foreground">
-            <strong className="text-foreground font-black">{initialCommunities.length}</strong> Total Hubs
-          </span>
-          <span>•</span>
-          <span className="text-foreground">
-            <strong className="text-foreground font-black">{joinedCount}</strong> Joined
-          </span>
-          <span>•</span>
-          <span className="text-foreground flex items-center gap-1">
-            <ShieldCheck className="size-3.5 text-emerald-500" /> Student Verified
-          </span>
+        {/* Twitter Tabs */}
+        <div className="flex border-b border-border/30">
+          {[
+            { id: "EXPLORE", label: "Explore Hubs" },
+            { id: "JOINED", label: `Joined (${joinedCommunities.length})` },
+            { id: "FEED", label: "Community Feed" },
+          ].map((tab) => {
+            const isActive = viewTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setViewTab(tab.id as "EXPLORE" | "JOINED" | "FEED")}
+                className={cn(
+                  "relative flex-1 pb-3 pt-1 text-center text-xs font-bold transition-colors cursor-pointer",
+                  isActive
+                    ? "text-foreground font-black"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
+                )}
+              >
+                <span>{tab.label}</span>
+                {isActive && (
+                  <div className="absolute -bottom-px left-0 right-0 h-0.5 bg-foreground rounded-full" />
+                )}
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </header>
 
-      {/* ─── View Toggle (Directory vs Feed) ─── */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1 bg-card rounded-full p-1 border border-border/60 shadow-2xs">
-          <button
-            type="button"
-            onClick={() => setViewMode("directory")}
-            className={cn(
-              "px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
-              viewMode === "directory"
-                ? "bg-foreground text-background font-black shadow-2xs"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Explore Hubs ({initialCommunities.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("feed")}
-            className={cn(
-              "px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
-              viewMode === "feed"
-                ? "bg-foreground text-background font-black shadow-2xs"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Flame className="size-3 text-amber-500" />
-            <span>Community Feed</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ─── DIRECTORY VIEW ─── */}
-      {viewMode === "directory" && (
-        <div className="space-y-4">
-          {/* Search & Category Pills */}
-          <div className="space-y-2.5">
-            <div className="relative w-full">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search communities by name, topic, or tags..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-10 pl-9 pr-8 rounded-full border border-border/50 bg-card text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary transition-all shadow-2xs"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-
-            {/* Categories */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setSelectedCategory(cat)}
-                  className={cn(
-                    "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shadow-2xs",
-                    selectedCategory === cat
-                      ? "bg-foreground text-background font-black"
-                      : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
-                  )}
-                >
-                  {cat === "Joined" ? `Joined (${joinedCount})` : cat}
-                </button>
-              ))}
-            </div>
+      {/* ─── DIRECTORY VIEW (Explore / Joined) ─── */}
+      {viewTab !== "FEED" ? (
+        <div className="p-4 space-y-4">
+          {/* Search Bar */}
+          <div className="relative w-full">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search communities by name or topic..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full h-10 pl-9 pr-4 rounded-full border border-border/50 bg-muted/40 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-foreground transition-all"
+            />
           </div>
 
-          {/* Communities Grid */}
-          <div className="grid gap-3 sm:grid-cols-2">
-            {filteredCommunities.map((c) => {
-              const isMember = c.members.some((m) => m.userId === profileId);
-              const membersCount = c.members.length;
+          {/* Categories Horizontal Scroll */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shadow-2xs",
+                  selectedCategory === cat
+                    ? "bg-foreground text-background font-black"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                )}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
 
-              return (
-                <div
-                  key={c.id}
-                  className="rounded-3xl bg-card p-4.5 hover:bg-muted/30 transition-all flex flex-col justify-between space-y-3.5 shadow-2xs group"
-                >
-                  <div className="space-y-3">
+          {/* Communities List */}
+          <div className="space-y-3 pt-1">
+            {filteredCommunities.length > 0 ? (
+              filteredCommunities.map((c) => {
+                const isMember = c.members.some((m) => m.userId === profileId);
+                const membersCount = c.members.length;
+
+                return (
+                  <div
+                    key={c.id}
+                    className="rounded-2xl border border-border/40 bg-card p-4 hover:border-border/80 transition-all flex flex-col justify-between space-y-3 shadow-xs group"
+                  >
                     <div className="flex items-start justify-between gap-3">
-                      <Link href={`/app/communities/${c.slug || c.id}`} className="flex items-center gap-3 min-w-0">
-                        <div
-                          className={`size-12 rounded-2xl bg-gradient-to-br ${getInitialsGradient(
-                            c.name
-                          )} flex items-center justify-center text-white text-base font-black shadow-md shrink-0`}
-                        >
+                      <Link
+                        href={`/app/communities/${c.slug || c.id}`}
+                        className="flex items-start gap-3 min-w-0 flex-1 group"
+                      >
+                        <div className="size-11 rounded-2xl bg-muted/60 border border-border/50 flex items-center justify-center text-foreground font-black text-sm shrink-0">
                           {c.name.slice(0, 2).toUpperCase()}
                         </div>
-                        <div className="min-w-0 space-y-0.5">
-                          <h3 className="text-sm font-extrabold text-foreground group-hover:text-primary transition-colors truncate">
+
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-sm font-black text-foreground group-hover:underline truncate">
                             c/{c.name}
                           </h3>
-                          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-semibold">
+                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground pt-0.5">
                             <span>{membersCount} {membersCount === 1 ? "member" : "members"}</span>
-                            <span>•</span>
-                            <span className="text-primary font-bold">{c.category || "General"}</span>
+                            <span>·</span>
+                            <span className="truncate">{c.category || "General"}</span>
+                            {c.privacy === "PRIVATE" ? (
+                              <>
+                                <span>·</span>
+                                <span className="flex items-center gap-0.5 text-amber-500 font-semibold">
+                                  <Lock className="size-2.5" /> Private
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span>·</span>
+                                <span className="flex items-center gap-0.5">
+                                  <Globe className="size-2.5" /> Public
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </Link>
 
-                      {/* Privacy Badge */}
-                      <div className="shrink-0">
-                        {c.privacy === "PRIVATE" ? (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                            <Lock className="size-2.5" /> Private
-                          </span>
-                        ) : c.privacy === "UNLISTED" ? (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center gap-1">
-                            <EyeOff className="size-2.5" /> Secret
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted/70 text-muted-foreground flex items-center gap-1">
-                            <Globe className="size-2.5" /> Public
-                          </span>
-                        )}
-                      </div>
+                      <JoinCommunityButton
+                        communityId={c.id}
+                        initialIsMember={isMember}
+                      />
                     </div>
 
                     {c.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed font-medium">
+                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                         {c.description}
                       </p>
                     )}
                   </div>
-
-                  <div className="flex items-center justify-between pt-1 border-t border-border/40 text-xs">
-                    <Link
-                      href={`/app/communities/${c.slug || c.id}`}
-                      className="font-bold text-primary hover:underline flex items-center gap-1"
-                    >
-                      <span>Enter Hub</span>
-                      <span>→</span>
-                    </Link>
-
-                    <JoinCommunityButton communityId={c.id} initialIsMember={isMember} />
-                  </div>
-                </div>
-              );
-            })}
-
-            {filteredCommunities.length === 0 && (
-              <div className="col-span-full py-16 text-center rounded-3xl bg-card text-muted-foreground text-xs font-semibold space-y-3 shadow-2xs">
-                <Compass className="size-8 mx-auto text-muted-foreground/40" />
-                <p className="font-bold text-foreground">No communities found in this category.</p>
-                <Link
-                  href="/app/communities/new"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold text-xs"
-                >
-                  <Plus className="size-3.5" />
-                  <span>Found This Community</span>
-                </Link>
+                );
+              })
+            ) : (
+              <div className="py-16 text-center text-xs text-muted-foreground">
+                No communities found matching your criteria.
               </div>
             )}
           </div>
         </div>
-      )}
-
-      {/* ─── COMMUNITY FEED VIEW ─── */}
-      {viewMode === "feed" && (
-        <div className="space-y-4">
-          <div className="flex flex-col gap-3.5">
-            {initialPosts.map((post) => (
-              <FeedCard key={post.id} post={post} currentUserId={profileId} />
-            ))}
-
-            {initialPosts.length === 0 && (
-              <div className="text-center py-16 rounded-3xl bg-card text-muted-foreground text-xs font-semibold space-y-2 shadow-2xs">
-                <Zap className="size-8 mx-auto text-muted-foreground/40" />
-                <p className="font-bold text-foreground">No community discussions posted yet.</p>
-                <p>Join a community to start the first conversation!</p>
-              </div>
-            )}
-          </div>
+      ) : (
+        /* ─── COMMUNITY FEED VIEW ─── */
+        <div className="p-4 space-y-4">
+          {initialPosts.length > 0 ? (
+            initialPosts.map((post) => (
+              <FeedCard key={post.id} post={post} />
+            ))
+          ) : (
+            <div className="py-16 text-center text-xs text-muted-foreground">
+              No posts in community feed yet. Join a community to see conversations here!
+            </div>
+          )}
         </div>
       )}
     </main>

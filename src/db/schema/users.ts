@@ -77,6 +77,26 @@ export const blocks = pgTable(
   (table) => [uniqueIndex("blocks_blocker_blocked_idx").on(table.blockerId, table.blockedUserId)],
 );
 
+export const follows = pgTable(
+  "follows",
+  {
+    id: id(),
+    followerId: text("follower_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    followingId: text("following_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    createdAt,
+  },
+  (table) => [
+    uniqueIndex("follows_follower_following_idx").on(table.followerId, table.followingId),
+    // Keyset pagination for the follower / following list pages
+    index("follows_following_created_idx").on(table.followingId, table.createdAt),
+    index("follows_follower_created_idx").on(table.followerId, table.createdAt),
+  ],
+);
+
 /**
  * Anonymous identity vault. Maps a pseudonym handle to the AES-256-GCM
  * sealed profile id of the real author. Deliberately has NO foreign key to
@@ -99,5 +119,7 @@ export const anonIdentityVault = pgTable(
 
 export type UserProfile = typeof userProfiles.$inferSelect;
 export type NewUserProfile = typeof userProfiles.$inferInsert;
+export type Follow = typeof follows.$inferSelect;
+export type NewFollow = typeof follows.$inferInsert;
 export type AnonIdentityVaultEntry = typeof anonIdentityVault.$inferSelect;
 export type NewAnonIdentityVaultEntry = typeof anonIdentityVault.$inferInsert;

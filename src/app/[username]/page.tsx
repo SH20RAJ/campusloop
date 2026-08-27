@@ -7,6 +7,7 @@ import { getDb } from "@/db";
 import { institutions,posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { FeedPost } from "@/hooks/use-feed";
+import { getFollowCounts,getFollowState } from "@/lib/follows";
 import { getCloutTier } from "@/lib/gamification";
 import { and,desc,eq } from "drizzle-orm";
 import { Lock,School } from "lucide-react";
@@ -155,9 +156,12 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
         };
       });
 
-      const college = currentProfile.institutionId 
-        ? await db.query.institutions.findFirst({ where: eq(institutions.id, currentProfile.institutionId) })
-        : null;
+      const [college, followState] = await Promise.all([
+        currentProfile.institutionId
+          ? db.query.institutions.findFirst({ where: eq(institutions.id, currentProfile.institutionId) })
+          : Promise.resolve(null),
+        getFollowState(profile.id, currentProfile.id),
+      ]);
 
       return (
         <div className="relative min-h-screen bg-background">
@@ -174,6 +178,9 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                 formattedPosts={formattedPosts as FeedPost[]}
                 isOwnProfile={isOwnProfile}
                 currentUserId={currentProfile.id}
+                followersCount={followState.followersCount}
+                followingCount={followState.followingCount}
+                isFollowedByViewer={followState.isFollowedByViewer}
               />
             </main>
 
@@ -188,6 +195,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
   }
 
   // If not authenticated, render LinkedIn-style public card
+  const publicFollowCounts = await getFollowCounts(profile.id);
   const tier = getCloutTier(profile.points || 0);
   const branchIcon = getBranchIcon(profile.branch || profile.course);
   const institutionName = profile.institution?.name || "Indian Institute of Technology";
@@ -269,12 +277,12 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
               {/* Stats Row (Exact match to Reference: Following / Followers / LP) */}
               <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground pt-0.5">
-                <span>
-                  <strong className="text-foreground font-black">{(profile.referralCount || 0) + 6}</strong> Following
-                </span>
-                <span>
-                  <strong className="text-foreground font-black">{((profile.points || 0) * 2) + 24}</strong> Followers
-                </span>
+                <Link href={`/@${profile.username}/following`} className="hover:underline">
+                  <strong className="text-foreground font-black">{publicFollowCounts.followingCount}</strong> Following
+                </Link>
+                <Link href={`/@${profile.username}/followers`} className="hover:underline">
+                  <strong className="text-foreground font-black">{publicFollowCounts.followersCount}</strong> Followers
+                </Link>
                 <span>
                   <strong className="text-foreground font-black">{profile.points || 0}</strong> LP Clout
                 </span>

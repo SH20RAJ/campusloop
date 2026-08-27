@@ -21,6 +21,7 @@ Repeat2,
 ShieldCheck,
 Sparkles,
 Trophy,
+UserPlus,
 Zap
 } from "lucide-react";
 import Link from "next/link";
@@ -123,6 +124,14 @@ export function NotificationsClient({
           actionText: "secretly added you to their Campus Crush vault 🔒",
           href: "/app/crush",
           actionLabel: "View vault",
+        };
+      case "FOLLOW":
+        return {
+          icon: <UserPlus className="size-3.5 text-primary stroke-[2.5]" />,
+          badgeBg: "bg-primary/15 border-primary/30 text-primary",
+          actionText: "started following you",
+          href: n.referenceId ? `/@${n.referenceId}` : "/app",
+          actionLabel: "View profile",
         };
       case "MILESTONE":
         return {

@@ -13,7 +13,7 @@ import { comments,pollOptions,pollVotes,posts,votes } from "./posts";
 import { ridesharePools } from "./rideshare";
 import { stories,storyHighlights,storyLikes } from "./stories";
 import { capsuleEntries,timeCapsules } from "./time-capsule";
-import { userProfiles } from "./users";
+import { follows,userProfiles } from "./users";
 
 
 export const institutionsRelations = relations(institutions, ({ many }) => ({
@@ -40,6 +40,21 @@ export const userProfilesRelations = relations(userProfiles, ({ one, many }) => 
   pollVotes: many(pollVotes),
   stories: many(stories),
   storyHighlights: many(storyHighlights),
+  followers: many(follows, { relationName: "profile_followers" }),
+  following: many(follows, { relationName: "profile_following" }),
+}));
+
+export const followsRelations = relations(follows, ({ one }) => ({
+  follower: one(userProfiles, {
+    fields: [follows.followerId],
+    references: [userProfiles.id],
+    relationName: "profile_following",
+  }),
+  following: one(userProfiles, {
+    fields: [follows.followingId],
+    references: [userProfiles.id],
+    relationName: "profile_followers",
+  }),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({

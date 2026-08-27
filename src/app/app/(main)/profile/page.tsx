@@ -1,6 +1,7 @@
 import { getDb } from "@/db";
 import { posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { getFollowCounts } from "@/lib/follows";
 import { FeedPost } from "@/hooks/use-feed";
 import { and,desc,eq } from "drizzle-orm";
 import { Metadata } from "next";
@@ -94,12 +95,16 @@ export default async function ProfilePage({
     };
   });
 
+  const followCounts = await getFollowCounts(profile.id);
+
   return (
     <ProfileClientView
       profile={profile}
       formattedPosts={formattedPosts as FeedPost[]}
       isOwnProfile={isOwnProfile}
       currentUserId={currentProfile.id}
+      followersCount={followCounts.followersCount}
+      followingCount={followCounts.followingCount}
     />
   );
 }

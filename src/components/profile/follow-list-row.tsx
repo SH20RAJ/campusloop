@@ -1,0 +1,74 @@
+"use client";
+
+import { FollowButton } from "@/components/profile/follow-button";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { getAvatarUrl } from "@/lib/utils";
+import Link from "next/link";
+
+export interface FollowListItem {
+  id: string;
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+  headline: string | null;
+  bio: string | null;
+  points: number;
+  institutionName: string | null;
+  isFollowedByViewer: boolean;
+  isViewer: boolean;
+}
+
+export function FollowListRow({
+  user,
+  showFollowButton,
+}: {
+  user: FollowListItem;
+  showFollowButton: boolean;
+}) {
+  const subtitle = user.headline || user.bio || user.institutionName;
+
+  return (
+    <li className="flex items-start gap-3 px-4 py-3.5 hover:bg-muted/40 transition-colors">
+      <Link href={`/@${user.username}`} className="shrink-0">
+        <Avatar className="size-11 rounded-full border border-border/60">
+          <AvatarImage
+            src={getAvatarUrl(user.avatarUrl, user.username)}
+            className="rounded-full object-cover"
+          />
+          <AvatarFallback className="bg-primary/10 text-primary font-black rounded-full">
+            {user.displayName[0]?.toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+      </Link>
+
+      <div className="min-w-0 flex-1">
+        <Link href={`/@${user.username}`} className="block group">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-black text-foreground truncate group-hover:underline">
+              {user.displayName}
+            </span>
+            {user.points >= 150 && (
+              <span className="text-blue-500 text-xs font-bold" title="Verified Campus Star">
+                ✓
+              </span>
+            )}
+          </div>
+          <span className="text-xs font-semibold text-muted-foreground">@{user.username}</span>
+        </Link>
+        {subtitle && (
+          <p className="text-xs text-muted-foreground leading-snug line-clamp-2 pt-0.5">{subtitle}</p>
+        )}
+      </div>
+
+      {showFollowButton && !user.isViewer && (
+        <FollowButton
+          username={user.username}
+          displayName={user.displayName}
+          initialIsFollowing={user.isFollowedByViewer}
+          size="sm"
+          className="mt-0.5 shrink-0"
+        />
+      )}
+    </li>
+  );
+}

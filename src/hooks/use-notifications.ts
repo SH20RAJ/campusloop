@@ -24,7 +24,8 @@ export interface NotificationItem {
     | "CRUSH_ALERT"
     | "MILESTONE"
     | "STORY_LIKE"
-    | "STORY_REPLY";
+    | "STORY_REPLY"
+    | "FOLLOW";
   actorId: string;
   referenceId: string | null;
   previewText: string | null;

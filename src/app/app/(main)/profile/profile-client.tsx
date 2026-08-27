@@ -2,6 +2,7 @@
 
 import { archivePost,deletePost } from "@/app/app/(main)/post/actions";
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
+import { FollowButton } from "@/components/profile/follow-button";
 import { ProfileHighlights } from "@/components/profile/profile-highlights";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
@@ -76,6 +77,9 @@ interface ProfileClientViewProps {
   formattedPosts: FeedPost[];
   isOwnProfile: boolean;
   currentUserId?: string;
+  followersCount?: number;
+  followingCount?: number;
+  isFollowedByViewer?: boolean;
 }
 
 export function ProfileClientView({
@@ -83,8 +87,12 @@ export function ProfileClientView({
   formattedPosts: initialPosts,
   isOwnProfile,
   currentUserId,
+  followersCount = 0,
+  followingCount = 0,
+  isFollowedByViewer = false,
 }: ProfileClientViewProps) {
   const router = useRouter();
+  const [followers, setFollowers] = useState(followersCount);
   const [activeTab, setActiveTab] = useState<"posts" | "photos" | "clout" | "archived">("posts");
   const [archivedPosts, setArchivedPosts] = useState<FeedPost[]>([]);
   const [isLoadingArchived, setIsLoadingArchived] = useState(false);
@@ -481,10 +489,20 @@ export function ProfileClientView({
                     />
                     <Link
                       href={`/app/chat?userId=${profile.id}`}
-                      className="flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground h-9 px-4 text-xs font-bold shadow-md hover:bg-primary/95 transition-all cursor-pointer"
+                      className="flex items-center justify-center gap-1.5 rounded-full border border-border bg-card h-9 px-4 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
                     >
                       <MessageSquare className="size-3.5" /> Message
                     </Link>
+                    <FollowButton
+                      username={profile.username}
+                      displayName={profile.displayName}
+                      initialIsFollowing={isFollowedByViewer}
+                      onChange={(nowFollowing, counts) =>
+                        setFollowers((prev) =>
+                          counts ? counts.followersCount : Math.max(prev + (nowFollowing ? 1 : -1), 0)
+                        )
+                      }
+                    />
                   </div>
                 )}
               </div>
@@ -510,12 +528,12 @@ export function ProfileClientView({
 
               {/* Stats Row (Exact match to Reference 1 & 2: 213 Following  781 Followers  3 Hubs) */}
               <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground pt-0.5">
-                <span>
-                  <strong className="text-foreground font-black">{referrals + 8}</strong> Following
-                </span>
-                <span>
-                  <strong className="text-foreground font-black">{points * 2 + 35}</strong> Followers
-                </span>
+                <Link href={`/@${profile.username}/following`} className="hover:underline">
+                  <strong className="text-foreground font-black">{followingCount}</strong> Following
+                </Link>
+                <Link href={`/@${profile.username}/followers`} className="hover:underline">
+                  <strong className="text-foreground font-black">{followers}</strong> Followers
+                </Link>
                 <span>
                   <strong className="text-foreground font-black">{points}</strong> LP Clout
                 </span>

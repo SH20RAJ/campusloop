@@ -40,7 +40,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function StoryPage({ params }: PageProps) {
   const { id } = await params;
   const user = await hexclaveServerApp.getUser();
-  if (!user) redirect("/join");
+  if (!user) redirect("/handler/sign-in");
+
 
   const db = getDb();
   const profile = await db.query.userProfiles.findFirst({

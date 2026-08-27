@@ -204,7 +204,7 @@ export default async function LandingPage() {
                 </Link>
               ) : (
                 <Link
-                  href="/join?mode=signup"
+                  href="/handler/sign-up"
                   className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}
                 >
                   Get verified
@@ -222,9 +222,10 @@ export default async function LandingPage() {
             {!isAuthenticated && (
               <p className="text-xs font-medium text-muted-foreground">
                 JEE/NEET aspirant or just exploring?{" "}
-                <Link href="/join?mode=signup" className="font-bold text-primary hover:underline">
+                <Link href="/handler/sign-up" className="font-bold text-primary hover:underline">
                   Browse in Viewer Mode
                 </Link>{" "}
+
                 with any email — read-only, no college ID needed.
               </p>
             )}
@@ -403,9 +404,10 @@ export default async function LandingPage() {
         <CTABand
           title="Your email is the ticket."
           lede="Free for verified students. No outsiders, ever. Aspirants can watch from the stands in Viewer Mode."
-          primaryHref={isAuthenticated ? "/app" : "/join?mode=signup"}
+          primaryHref={isAuthenticated ? "/app" : "/handler/sign-up"}
           primaryLabel={isAuthenticated ? "Open app" : "Get verified"}
-          secondaryHref={isAuthenticated ? undefined : "/join?mode=signin"}
+          secondaryHref={isAuthenticated ? undefined : "/handler/sign-in"}
+
           secondaryLabel={isAuthenticated ? undefined : "Already verified? Sign in"}
         />
 

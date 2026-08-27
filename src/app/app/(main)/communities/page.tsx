@@ -45,7 +45,8 @@ export const metadata: Metadata = {
 
 export default async function CommunitiesPage() {
   const user = await getCachedAuthUser();
-  if (!user) redirect("/join");
+  if (!user) redirect("/handler/sign-in");
+
 
   const db = getDb();
 

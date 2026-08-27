@@ -256,11 +256,12 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
         ) : (
           <div className="p-2">
             <Link
-              href="/join"
+              href="/handler/sign-in"
               className="block w-full py-2.5 text-center text-xs font-bold rounded-full bg-muted hover:bg-muted/80 text-foreground transition-colors"
             >
               Sign In
             </Link>
+
           </div>
         )}
       </aside>
@@ -455,12 +456,13 @@ export function Navigation({ profile, collegeName, isAdmin, isViewer }: Navigati
                   <SignOutButton />
                 ) : (
                   <Link
-                    href="/join"
+                    href="/handler/sign-in"
                     onClick={() => setShowMobileMenu(false)}
                     className="text-xs font-bold text-primary hover:underline"
                   >
                     Sign In
                   </Link>
+
                 )}
               </div>
             </motion.aside>

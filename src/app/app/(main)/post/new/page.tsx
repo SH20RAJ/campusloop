@@ -20,8 +20,9 @@ export const metadata: Metadata = {
 export default async function NewPostPage() {
   const user = await hexclaveServerApp.getUser();
   if (!user) {
-    redirect("/join");
+    redirect("/handler/sign-in");
   }
+
 
   const profile = await getDb().query.userProfiles.findFirst({
     where: eq(userProfiles.userId, user.id),

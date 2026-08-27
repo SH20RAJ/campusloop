@@ -21,8 +21,9 @@ export default async function ProfilePage({
 
   const user = await hexclaveServerApp.getUser();
   if (!user) {
-    redirect("/join");
+    redirect("/handler/sign-in");
   }
+
 
   const db = getDb();
   

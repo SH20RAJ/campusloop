@@ -35,8 +35,9 @@ export default async function MainLayout({
   const user = await getCachedAuthUser();
   
   if (!user) {
-    redirect("/join");
+    redirect("/handler/sign-in");
   }
+
 
   const profile = await getCachedUserProfile(user.id);
 

@@ -37,7 +37,8 @@ export default async function ChatLayout({
   children: React.ReactNode;
 }) {
   const user = await getCachedAuthUser();
-  if (!user) redirect("/join");
+  if (!user) redirect("/handler/sign-in");
+
 
   const profile = await getCachedUserProfile(user.id);
   if (!profile) redirect("/app/onboarding");

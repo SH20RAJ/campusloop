@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@hexclave/next";
 import { Loader2,LogOut } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
 interface SignOutButtonProps {
   className?: string;
@@ -28,21 +27,9 @@ export function SignOutButton({
     if (isSigningOut) return;
 
     setIsSigningOut(true);
-    toast.loading("Signing out...", { id: "signout-toast" });
-
-    try {
-      if (user) {
-        await user.signOut();
-      }
-      // Force cookie cleanup & hard navigate to break any router loop
-      document.cookie = "hexclave_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-      toast.success("Signed out successfully", { id: "signout-toast" });
-      window.location.href = "/join?mode=signin";
-    } catch (err) {
-      console.warn("Sign out completed with fallback redirect:", err);
-      window.location.href = "/join?mode=signin";
-    }
+    window.location.href = "/logout";
   }
+
 
   if (variant === "icon") {
     return (

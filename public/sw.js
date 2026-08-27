@@ -1,4 +1,4 @@
-const CACHE_NAME = "campusloop-shell-v2";
+const CACHE_NAME = "campusloop-shell-v3";
 const STATIC_SHELL = [
   "/",
   "/app",
@@ -129,4 +129,82 @@ self.addEventListener("fetch", (event) => {
         })
     );
   }
+});
+
+// ─── Web Push: wake, fetch, notify ───
+// Pushes arrive without a payload (VAPID-authenticated tickles), so the
+// content is pulled here over the student's own session. Nothing sensitive
+// ever passes through the push service.
+self.addEventListener("push", (event) => {
+  event.waitUntil(
+    (async () => {
+      let payload = null;
+
+      // Honour an inline payload if one is ever sent, otherwise go fetch.
+      if (event.data) {
+        try {
+          payload = event.data.json();
+        } catch {
+          payload = null;
+        }
+      }
+
+      if (!payload) {
+        try {
+          const res = await fetch("/api/notifications/latest", { credentials: "include" });
+          if (res.ok) {
+            const data = await res.json();
+            payload = data.notification;
+            if (typeof data.unreadCount === "number" && "setAppBadge" in self.navigator) {
+              self.navigator.setAppBadge(data.unreadCount).catch(() => {});
+            }
+          }
+        } catch {
+          payload = null;
+        }
+      }
+
+      const title = payload?.title || "CampusLoop";
+      const body = payload?.body || "You have a new campus notification";
+      const url = payload?.url || "/app/notifications";
+
+      await self.registration.showNotification(title, {
+        body,
+        icon: payload?.icon || "/icons/icon-192x192.png",
+        badge: "/icons/icon-192x192.png",
+        // Collapse repeats so a burst of activity is one entry, not a stack
+        tag: payload?.type || "campusloop",
+        renotify: true,
+        data: { url },
+      });
+    })()
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || "/app/notifications";
+
+  event.waitUntil(
+    (async () => {
+      const allClients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+
+      // Reuse an open tab when there is one rather than piling up windows
+      for (const client of allClients) {
+        if (client.url.includes(self.location.origin)) {
+          await client.focus();
+          if ("navigate" in client) {
+            try {
+              await client.navigate(targetUrl);
+            } catch {
+              /* focused tab is enough */
+            }
+          }
+          return;
+        }
+      }
+
+      await self.clients.openWindow(targetUrl);
+    })()
+  );
 });

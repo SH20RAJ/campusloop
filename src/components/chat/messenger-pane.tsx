@@ -12,6 +12,7 @@ setCachedMessages,
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
+import { isOnline,presenceLabel } from "@/lib/presence";
 import { cn } from "@/lib/utils";
 import {
 ArrowLeft,
@@ -284,6 +285,10 @@ export function MessengerPane({
     }
   }
 
+  // Presence is derived from the peer's heartbeat, not assumed
+  const presenceText = presenceLabel(otherParticipant?.lastSeenAt);
+  const viewerIsOnline = isOnline(otherParticipant?.lastSeenAt);
+
   if (!conversationId || !otherParticipant) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-muted-foreground p-6 text-center select-none bg-background">
@@ -352,11 +357,25 @@ export function MessengerPane({
                 <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
               </Link>
               <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1.5 font-medium">
-                <span className="text-emerald-500 font-bold flex items-center gap-1">
-                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Online
-                </span>
-                <span>•</span>
+                {presenceText && (
+                  <>
+                    <span
+                      className={cn(
+                        "font-bold flex items-center gap-1",
+                        viewerIsOnline ? "text-emerald-500" : "text-muted-foreground",
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "size-1.5 rounded-full",
+                          viewerIsOnline ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/50",
+                        )}
+                      />
+                      {presenceText}
+                    </span>
+                    <span>•</span>
+                  </>
+                )}
                 <span>@{otherParticipant.username}</span>
                 {otherParticipant.branch && (
                   <>

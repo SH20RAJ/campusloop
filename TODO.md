@@ -115,3 +115,6 @@
 - everyone is online in the chats fix that thing use the best backend design for it also can you add notification system in any possible
   way like normal browser notifications or if PWA has any default feature or anything else you can think of so that we can notify
   people..... also upgrade the notification system....
+  - update ui ux of https://campusloop.space/privacy and all other pages like new twitter like design system 
+  - add hover effects on Everything on campus, in one loop. section on landing page. make it very addictive.
+

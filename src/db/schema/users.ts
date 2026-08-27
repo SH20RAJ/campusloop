@@ -6,6 +6,7 @@ integer,
 jsonb,
 pgTable,
 text,
+timestamp,
 uniqueIndex,
 type AnyPgColumn,
 } from "drizzle-orm/pg-core";
@@ -48,6 +49,13 @@ export const userProfiles = pgTable(
     points: integer("points").default(0).notNull(),
     anonymousUsername: text("anonymous_username"),
     feedVisibility: text("feed_visibility").default("ALL").notNull(),
+    /**
+     * Heartbeat timestamp driving presence. "Online" is derived from this
+     * being recent rather than stored as a boolean, so a closed tab, a lost
+     * connection or a crashed worker all decay to offline on their own —
+     * there is no stale "true" left behind for anyone to clean up.
+     */
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }),
     createdAt,
     updatedAt,
   },
@@ -58,6 +66,7 @@ export const userProfiles = pgTable(
     index("user_profiles_institution_idx").on(table.institutionId),
     index("user_profiles_points_idx").on(table.points),
     index("user_profiles_branch_idx").on(table.branch),
+    index("user_profiles_last_seen_idx").on(table.lastSeenAt),
   ],
 );
 
@@ -111,6 +120,32 @@ export const follows = pgTable(
 );
 
 /**
+ * Web Push endpoints registered by a student's browsers. One row per device;
+ * the endpoint is the natural key, and a 404/410 from the push service means
+ * the subscription is dead and the row should be deleted.
+ */
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: id(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    userAgent: text("user_agent"),
+    failureCount: integer("failure_count").default(0).notNull(),
+    createdAt,
+    updatedAt,
+  },
+  (table) => [
+    uniqueIndex("push_subscriptions_endpoint_idx").on(table.endpoint),
+    index("push_subscriptions_user_idx").on(table.userId),
+  ],
+);
+
+/**
  * Anonymous identity vault. Maps a pseudonym handle to the AES-256-GCM
  * sealed profile id of the real author. Deliberately has NO foreign key to
  * user_profiles, so no SQL join can deanonymize content — resolution requires
@@ -134,5 +169,7 @@ export type UserProfile = typeof userProfiles.$inferSelect;
 export type NewUserProfile = typeof userProfiles.$inferInsert;
 export type Follow = typeof follows.$inferSelect;
 export type NewFollow = typeof follows.$inferInsert;
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type NewPushSubscription = typeof pushSubscriptions.$inferInsert;
 export type AnonIdentityVaultEntry = typeof anonIdentityVault.$inferSelect;
 export type NewAnonIdentityVaultEntry = typeof anonIdentityVault.$inferInsert;

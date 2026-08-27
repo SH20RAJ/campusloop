@@ -1,5 +1,6 @@
 import { getDb } from "@/db";
 import { notifications,userProfiles } from "@/db/schema";
+import { pushToUser } from "@/lib/push-dispatch";
 import { inArray,sql } from "drizzle-orm";
 
 export interface CreateNotificationParams {
@@ -59,6 +60,10 @@ export async function createNotification(params: CreateNotificationParams): Prom
       referenceId: params.referenceId || null,
       previewText: params.previewText ? cleanNotificationSnippet(params.previewText) : null,
     });
+
+    // Wake the recipient's devices; failures here never fail the write above.
+    await pushToUser(params.userId, params.type === "MATCH" ? "high" : "normal");
+
     return true;
   } catch (error) {
     console.error("Failed to create notification:", error);

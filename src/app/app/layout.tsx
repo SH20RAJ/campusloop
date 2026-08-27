@@ -1,3 +1,4 @@
+import { PresenceHeartbeat } from "@/components/pwa/presence-heartbeat";
 import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -29,7 +30,12 @@ export default async function AppRootLayout({
   const profile = await getCachedUserProfile(user.id);
 
   if (profile?.role === "ADMIN") {
-    return <>{children}</>;
+    return (
+      <>
+        <PresenceHeartbeat />
+        {children}
+      </>
+    );
   }
 
   const email = user.primaryEmail;
@@ -42,6 +48,11 @@ export default async function AppRootLayout({
     redirect("/invalid-email");
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <PresenceHeartbeat />
+      {children}
+    </>
+  );
 }
 

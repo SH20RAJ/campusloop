@@ -1,5 +1,6 @@
 "use client";
 
+import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import {
 NotificationItem,
@@ -240,6 +241,8 @@ export function NotificationsClient({
           })}
         </div>
       </header>
+
+      <PushNotificationToggle variant="banner" />
 
       {/* ─── Notification Items Feed ─── */}
       <div className="divide-y divide-border/20">

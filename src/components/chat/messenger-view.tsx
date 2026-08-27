@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { PresenceDot } from "@/components/ui/presence-dot";
 import { UserProfile } from "@/db/schema";
 import {
 CachedConversation,
@@ -372,7 +373,7 @@ export function MessengerView({
                         {(other.displayName?.[0] || "S").toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 ring-2 ring-card shadow-xs" />
+                    <PresenceDot lastSeenAt={other.lastSeenAt} />
                   </div>
 
                   {/* Body & Snippet */}

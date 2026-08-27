@@ -12,9 +12,11 @@ import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
 import { ShareStoryModal } from "./share-story-modal";
 
+import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
 import { FeedCardActions } from "@/components/feed/feed-card-actions";
 import { FeedCardHeader } from "@/components/feed/feed-card-header";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
+import { TopCommentCard } from "@/components/feed/top-comment-preview";
 import { RichText } from "@/components/ui/rich-text";
 
 interface FeedCardProps {
@@ -28,13 +30,16 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [userVote, setUserVote] = useState(post.userVote);
   const [votesCount, setVotesCount] = useState(post.votesCount);
+  const [commentsCount, setCommentsCount] = useState(post.commentsCount);
   const [isLoading, setIsLoading] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showRepostModal, setShowRepostModal] = useState(false);
   const [showShareStoryModal, setShowShareStoryModal] = useState(false);
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [quoteThoughts, setQuoteThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
+
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
@@ -195,14 +200,33 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
         )}
       </div>
 
+      {/* LinkedIn-Style Top/Trending Comment Preview */}
+      {post.topComment && (
+        <TopCommentCard
+          topComment={post.topComment}
+          commentsCount={commentsCount}
+          onClick={() => setShowCommentsModal(true)}
+        />
+      )}
+
       {/* Card Actions */}
       <FeedCardActions
         post={post}
         userVote={userVote}
         votesCount={votesCount}
+        commentsCount={commentsCount}
         onVote={handleVote}
         onInstantRepost={() => handleExecuteRepost(false)}
         onShare={handleSharePost}
+        onOpenComments={() => setShowCommentsModal(true)}
+      />
+
+      {/* Fast Instagram-Style Comments Modal */}
+      <FastCommentsModal
+        post={post}
+        isOpen={showCommentsModal}
+        onClose={() => setShowCommentsModal(false)}
+        onCommentCountChange={(newCount) => setCommentsCount(newCount)}
       />
 
       {/* Dialog Modals */}
@@ -230,3 +254,4 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
     </div>
   );
 }
+

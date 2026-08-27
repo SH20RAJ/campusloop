@@ -3,6 +3,21 @@ import { getSeenPostIds,markPostsAsSeen } from "@/lib/seen-posts";
 import { useEffect } from "react";
 import useSWRInfinite from "swr/infinite";
 
+export type TopCommentPreview = {
+  id: string;
+  body: string;
+  createdAt: Date | string;
+  isAnonymous: boolean;
+  pseudonym?: string | null;
+  author?: {
+    id?: string;
+    username?: string | null;
+    displayName?: string | null;
+    avatarUrl?: string | null;
+    points?: number | null;
+  } | null;
+};
+
 export type FeedPost = Post & {
   // Stripped to null by the server for anonymous posts.
   author: UserProfile | null;
@@ -12,6 +27,7 @@ export type FeedPost = Post & {
   votesCount: number;
   commentsCount: number;
   userVote: number;
+  topComment?: TopCommentPreview | null;
   pollOptions?: {
     id: string;
     text: string;
@@ -21,6 +37,7 @@ export type FeedPost = Post & {
   hasVotedPoll?: boolean;
   totalPollVotes?: number;
 };
+
 
 const fetcher = <T,>(url: string): Promise<T> =>
   fetch(url).then((res) => {

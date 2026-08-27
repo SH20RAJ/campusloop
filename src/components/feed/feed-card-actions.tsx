@@ -11,20 +11,25 @@ interface FeedCardActionsProps {
   post: FeedPost;
   userVote: number;
   votesCount: number;
+  commentsCount?: number;
   onVote: () => void;
   onInstantRepost: () => void;
   onShare: () => void;
+  onOpenComments?: () => void;
 }
 
 export function FeedCardActions({
   post,
   userVote,
   votesCount,
+  commentsCount,
   onVote,
   onInstantRepost,
   onShare,
+  onOpenComments,
 }: FeedCardActionsProps) {
   const [repostSpin, setRepostSpin] = useState(false);
+  const displayCommentsCount = commentsCount ?? post.commentsCount;
 
   function triggerRepostAnimation() {
     setRepostSpin(true);
@@ -56,17 +61,35 @@ export function FeedCardActions({
         <span className="tabular-nums font-bold text-xs">{votesCount}</span>
       </button>
 
-      {/* Comment Button with Count */}
-      <Link
-        href={`/app/post/${post.id}`}
-        className="flex min-h-[44px] items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all active:scale-95 group cursor-pointer"
-        aria-label="Comments"
-      >
-        <AnimateIcon animateOnHover animation="path">
-          <MessageCircle className="size-4.5 transition-transform group-hover:scale-110" />
-        </AnimateIcon>
-        <span className="tabular-nums font-bold text-xs">{post.commentsCount}</span>
-      </Link>
+      {/* Comment Button with Count (Opens Fast Comments Modal or Link fallback) */}
+      {onOpenComments ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenComments();
+          }}
+          className="flex min-h-[44px] items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all active:scale-95 group cursor-pointer"
+          aria-label="Comments"
+        >
+          <AnimateIcon animateOnHover animation="path">
+            <MessageCircle className="size-4.5 transition-transform group-hover:scale-110" />
+          </AnimateIcon>
+          <span className="tabular-nums font-bold text-xs">{displayCommentsCount}</span>
+        </button>
+      ) : (
+        <Link
+          href={`/app/post/${post.id}`}
+          className="flex min-h-[44px] items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all active:scale-95 group cursor-pointer"
+          aria-label="Comments"
+        >
+          <AnimateIcon animateOnHover animation="path">
+            <MessageCircle className="size-4.5 transition-transform group-hover:scale-110" />
+          </AnimateIcon>
+          <span className="tabular-nums font-bold text-xs">{displayCommentsCount}</span>
+        </Link>
+      )}
+
 
       {/* Repost Button */}
       <button

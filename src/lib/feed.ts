@@ -286,10 +286,17 @@ export async function resolveFeedPage(options: {
 			institution: true,
 			community: true,
 			votes: true,
-			comments: true,
+			comments: {
+				where: eq(comments.status, "PUBLISHED"),
+				orderBy: [desc(comments.createdAt)],
+				with: {
+					author: true,
+				},
+			},
 			pollOptions: {
 				with: { votes: true },
 			},
+
 		},
 	});
 
@@ -363,12 +370,47 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
 		const repostOf = post.repostOfId ? repostedPostsMap.get(post.repostOfId) || null : null;
 		const safeRepostOf = repostOf ? stripAuthorForAnonymity(repostOf) : null;
 
+		const publishedComments = commentsList.filter((c) => c && c.status === "PUBLISHED");
+		let topComment: {
+			id: string;
+			body: string;
+			createdAt: Date | string;
+			isAnonymous: boolean;
+			pseudonym?: string | null;
+			author?: {
+				id?: string;
+				username?: string | null;
+				displayName?: string | null;
+				avatarUrl?: string | null;
+				points?: number | null;
+			} | null;
+		} | null = null;
+
+		if (publishedComments.length > 0) {
+			const c = publishedComments[0];
+			topComment = {
+				id: c.id,
+				body: c.body,
+				createdAt: c.createdAt,
+				isAnonymous: c.isAnonymous,
+				pseudonym: c.pseudonym,
+				author: c.isAnonymous || !c.author ? null : {
+					id: c.author.id,
+					username: c.author.username,
+					displayName: c.author.displayName,
+					avatarUrl: c.author.avatarUrl,
+					points: c.author.points,
+				},
+			};
+		}
+
 		return {
 			...stripAuthorForAnonymity(post),
 			repostOf: safeRepostOf,
 			votesCount,
 			commentsCount,
 			userVote,
+			topComment,
 			pollOptions: formattedPollOptions,
 			hasVotedPoll,
 			totalPollVotes,
@@ -377,6 +419,7 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
 		};
 	});
 }
+
 
 export function sortFeedPosts<T extends { 
 	createdAt: Date | string; 
@@ -418,10 +461,11 @@ export function sortFeedPosts<T extends {
 				const hoursB = Math.max(0, (Date.now() - new Date(b.createdAt).getTime()) / (3600 * 1000));
 				const decayA = 45 / Math.pow(hoursA + 1.2, 0.75);
 				const decayB = 45 / Math.pow(hoursB + 1.2, 0.75);
-				const campusBonusA = userInstitutionId && a.institutionId === userInstitutionId ? 25 : 0;
-				const campusBonusB = userInstitutionId && b.institutionId === userInstitutionId ? 25 : 0;
+				const campusBonusA = userInstitutionId && a.institutionId === userInstitutionId ? 500 : 0;
+				const campusBonusB = userInstitutionId && b.institutionId === userInstitutionId ? 500 : 0;
 				const scoreA = campusBonusA + decayA + a.votesCount * 3.5 + a.commentsCount * 2.5;
 				const scoreB = campusBonusB + decayB + b.votesCount * 3.5 + b.commentsCount * 2.5;
+
 				if (scoreB !== scoreA) return scoreB - scoreA;
 				return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 			});

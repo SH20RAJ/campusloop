@@ -58,8 +58,9 @@ export async function GET(req: Request) {
 
     const authorId = searchParams.get("authorId");
     const authorUsername = searchParams.get("authorUsername");
-    const seenIdsParam = searchParams.get("seenIds");
+    const seenIdsParam = searchParams.get("seenIds") || req.headers.get("x-seen-ids");
     const seenIds = seenIdsParam ? seenIdsParam.split(",").map((s) => s.trim()).filter(Boolean) : undefined;
+
 
     if (authorId) {
       conditions.push(eq(posts.authorId, authorId));

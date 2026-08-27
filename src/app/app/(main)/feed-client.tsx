@@ -172,11 +172,12 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
 
       {/* ─── Main Feed Stream (Twitter-Style Flat Timeline) ─── */}
       <div className="flex flex-col">
-        {feedLoading && size === 1 ? (
+        {feedLoading && (!feed || feed.length === 0) ? (
           <FeedSkeleton />
-        ) : isError ? (
+        ) : isError && (!feed || feed.length === 0) ? (
           <FeedErrorState onRetry={() => mutate()} />
         ) : feed && feed.length > 0 ? (
+
           <>
             {feed.map((post, idx) => (
               <div key={post.id}>

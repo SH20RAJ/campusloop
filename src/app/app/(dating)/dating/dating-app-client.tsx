@@ -35,7 +35,17 @@ export function DatingAppClient() {
   const [isSavingGender, setIsSavingGender] = useState(false);
 
   // Saved DB preferences drive the deck server-side — no params needed.
-  const { data, error, isLoading, mutate } = useSWR<ProfilesResponse>("/api/dating/profiles", fetcher);
+  const { data, error, isLoading, mutate } = useSWR<ProfilesResponse>(
+    "/api/dating/profiles",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: true,
+      keepPreviousData: true,
+      dedupingInterval: 15000,
+    }
+  );
+
 
   const candidates = useMemo(() => data?.candidates ?? [], [data]);
   const remaining = useMemo(() => candidates.slice(deckIndex), [candidates, deckIndex]);

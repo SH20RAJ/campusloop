@@ -39,11 +39,16 @@ export type FeedPost = Post & {
 };
 
 
-const fetcher = <T,>(url: string): Promise<T> =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch");
-    return res.json() as Promise<T>;
-  });
+const feedFetcher = async <T,>(url: string): Promise<T> => {
+  const seenIds = getSeenPostIds();
+  const headers: Record<string, string> = {};
+  if (seenIds.length > 0) {
+    headers["x-seen-ids"] = seenIds.slice(0, 50).join(",");
+  }
+  const res = await fetch(url, { headers });
+  if (!res.ok) throw new Error("Failed to fetch feed");
+  return res.json() as Promise<T>;
+};
 
 const PAGE_LIMIT = 20;
 
@@ -66,27 +71,22 @@ export function useFeed(
     url.searchParams.set("page", String(pageIndex + 1));
     url.searchParams.set("limit", String(PAGE_LIMIT));
 
-    if (pageIndex === 0) {
-      const seenIds = getSeenPostIds();
-      if (seenIds.length > 0) {
-        url.searchParams.set("seenIds", seenIds.slice(0, 50).join(","));
-      }
-    }
-
     return url.toString();
   };
 
   const { data, error, size, setSize, isLoading, mutate } = useSWRInfinite<FeedPost[]>(
     getKey,
-    fetcher,
+    feedFetcher,
     {
       revalidateFirstPage: false,
       revalidateOnFocus: false,
-      revalidateIfStale: false,
-      revalidateOnReconnect: false,
+      revalidateIfStale: true,
+      revalidateOnReconnect: true,
+      dedupingInterval: 10000,
       keepPreviousData: true,
     }
   );
+
 
   const rawFeed = data ? data.flat() : undefined;
   const feed = rawFeed

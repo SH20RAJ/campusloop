@@ -58,9 +58,10 @@ export function SWRProvider({ children }: { children: React.ReactNode }) {
         provider: getLocalStorageProvider,
         revalidateOnFocus: false,
         revalidateOnReconnect: true,
-        revalidateIfStale: false,
-        dedupingInterval: 5000,
+        revalidateIfStale: true,
+        dedupingInterval: 10000,
         keepPreviousData: true,
+
       }}
     >
       {children}

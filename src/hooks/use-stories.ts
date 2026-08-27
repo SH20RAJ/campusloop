@@ -31,9 +31,13 @@ export function useStories() {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateIfStale: true,
+      keepPreviousData: true,
+      dedupingInterval: 15000,
       refreshInterval: 60000,
     }
   );
+
 
   return {
     stories: data || [],

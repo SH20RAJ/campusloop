@@ -8,7 +8,9 @@ export interface UserProfileData {
   username: string;
   avatarUrl: string | null;
   bannerUrl?: string | null;
+  role?: string | null;
   headline?: string | null;
+
   photos?: string[];
   gender: string | null;
   dob?: string | null;
@@ -36,9 +38,12 @@ export function useProfile() {
     fetcher,
     {
       revalidateOnFocus: false,
-      dedupingInterval: 10000,
+      revalidateIfStale: true,
+      keepPreviousData: true,
+      dedupingInterval: 15000,
     }
   );
+
 
   async function updateProfile(updatedFields: Partial<UserProfileData>) {
     try {

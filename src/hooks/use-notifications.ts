@@ -31,8 +31,14 @@ export function useNotifications(tab: "all" | "verified" | "mentions" = "all") {
   const { data, error, isLoading, mutate } = useSWR<NotificationsResponse>(
     `/api/notifications?tab=${tab}`,
     fetcher,
-    { revalidateOnFocus: true, dedupingInterval: 3000 }
+    {
+      revalidateOnFocus: true,
+      revalidateIfStale: true,
+      keepPreviousData: true,
+      dedupingInterval: 5000,
+    }
   );
+
 
   const notifications = data?.notifications || [];
   const unreadCount = data?.unreadCount || 0;

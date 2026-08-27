@@ -7,7 +7,12 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   experimental: {
+    staleTimes: {
+      dynamic: 180,
+      static: 600,
+    },
     optimizePackageImports: [
+
       "lucide-react",
       "framer-motion",
       "motion",

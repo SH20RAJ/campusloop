@@ -25,9 +25,12 @@ export function useColleges(limit = 100, page = 1) {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateIfStale: true,
+      keepPreviousData: true,
       dedupingInterval: 30000,
     }
   );
+
 
   const colleges = useMemo(() => {
     if (!data) return [];

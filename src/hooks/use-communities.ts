@@ -22,9 +22,12 @@ export function useCommunities() {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateIfStale: true,
+      keepPreviousData: true,
       dedupingInterval: 20000,
     }
   );
+
 
   return {
     communities: data || [],

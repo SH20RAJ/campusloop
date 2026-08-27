@@ -1,6 +1,7 @@
 "use client";
 
 import { MORE_HUB_SECTIONS } from "@/constants/navigation";
+import { useProfile } from "@/hooks/use-profile";
 import { cn } from "@/lib/utils";
 import { ArrowLeft,ChevronRight,Shield } from "lucide-react";
 import Link from "next/link";
@@ -10,8 +11,11 @@ interface MoreClientProps {
   isAdmin?: boolean;
 }
 
-export function MoreClient({ isAdmin }: MoreClientProps) {
+export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
   const router = useRouter();
+  const { profile } = useProfile();
+  const isAdmin = propIsAdmin ?? (profile?.role === "ADMIN");
+
 
   return (
     <div className="min-h-screen pb-24 text-foreground select-none max-w-2xl mx-auto px-4 pt-3 space-y-5">

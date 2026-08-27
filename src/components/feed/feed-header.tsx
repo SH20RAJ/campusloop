@@ -60,7 +60,8 @@ export function FeedHeader({
             )}
           >
             <School className="h-3 w-3" />
-            <span className="truncate max-w-[120px]">{institutionSlug ? `${institutionSlug} Hub` : "Campus"}</span>
+            {/* <span className="truncate max-w-[120px]">{institutionSlug ? `${institutionSlug} Hub` : "Campus"}</span> */}
+            <span className="truncate max-w-[120px]">{institutionSlug ? `${institutionSlug.charAt(0).toUpperCase() + institutionSlug.slice(1)}` : "Campus"}</span>
           </button>
           <button
             onClick={() => onScopeChange("GLOBAL")}

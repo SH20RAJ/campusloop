@@ -56,6 +56,11 @@ export function DatingAppClient() {
     (profile && !hasGenderSet) || (error as { error?: string } | undefined)?.error === "GENDER_REQUIRED";
 
   const sendSwipe = useCallback(async (targetId: string, direction: "LIKE" | "PASS") => {
+    // Advance the deck immediately — waiting on the round trip made every
+    // swipe feel like it stuck. Rolled back below if the request fails.
+    setLastSwipedId(targetId);
+    setDeckIndex((prev) => prev + 1);
+
     try {
       const res = await fetch("/api/dating/swipe", {
         method: "POST",
@@ -64,14 +69,14 @@ export function DatingAppClient() {
       });
       if (!res.ok) throw new Error("Swipe failed");
       const result = (await res.json()) as MatchResult;
-      setLastSwipedId(targetId);
-      setDeckIndex((prev) => prev + 1);
 
       if (result.matched) {
         setMatchResult(result);
       }
       return result;
     } catch {
+      setDeckIndex((prev) => Math.max(prev - 1, 0));
+      setLastSwipedId(null);
       toast.error("Swipe failed — please try again.");
     }
     return null;

@@ -11,6 +11,7 @@ InlineHashtagsWidget,
 InlineReferralWidget,
 } from "@/components/ui/inline-feed-widgets";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { FeedLoadingMoreSkeleton,FeedSkeleton } from "@/components/ui/skeleton-card";
 import { StoryRing } from "@/components/ui/story-ring";
 
@@ -396,6 +397,8 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
           )}
         </div>
       </main>
+
+      <ScrollToTop />
     </PullToRefresh>
   );
 }

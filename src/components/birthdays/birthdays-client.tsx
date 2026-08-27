@@ -106,6 +106,10 @@ export function BirthdaysClient() {
     if (!data) return;
     setIsUpdatingPrivacy(true);
     const newStatus = !data.currentUserIsPrivate;
+
+    // Flip the switch right away; revalidate once the server agrees.
+    mutate((prev) => (prev ? { ...prev, currentUserIsPrivate: newStatus } : prev), false);
+
     try {
       const res = await fetch("/api/profile/me", {
         method: "PATCH",
@@ -118,6 +122,7 @@ export function BirthdaysClient() {
       toast.success(newStatus ? "Birthday set to Private 🔒" : "Birthday is now Public to peers 🎉");
       mutate();
     } catch (err) {
+      mutate((prev) => (prev ? { ...prev, currentUserIsPrivate: !newStatus } : prev), false);
       toast.error(err instanceof Error ? err.message : "Error updating privacy");
     } finally {
       setIsUpdatingPrivacy(false);

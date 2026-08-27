@@ -78,8 +78,9 @@ export function SettingsClient({ profile }: SettingsClientProps) {
           ? "Mode set: Only non-anonymous posts are visible"
           : "Mode set: All types of posts are visible"
       );
-      router.refresh();
     } catch {
+      // Roll the toggle back to whatever the server still has
+      setFeedVisibility(mode === "NON_ANONYMOUS" ? "ALL" : "NON_ANONYMOUS");
       toast.error("Could not save feed mode preference.");
     }
   }

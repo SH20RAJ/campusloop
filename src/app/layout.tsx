@@ -1,5 +1,6 @@
 import { SWRProvider } from "@/components/providers/swr-provider";
 import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
+import { RouteProgress } from "@/components/ui/route-progress";
 import { OfflineIndicator } from "@/components/ui/offline-indicator";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { HexclaveProvider,HexclaveTheme } from "@hexclave/next";
@@ -189,6 +190,7 @@ export default function RootLayout({
         <HexclaveProvider app={hexclaveServerApp}>
           <HexclaveTheme>
             <SWRProvider>
+              <RouteProgress />
               <OfflineIndicator />
               {children}
               <PWAInstallBanner />

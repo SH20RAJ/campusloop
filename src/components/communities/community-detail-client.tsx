@@ -349,6 +349,10 @@ export function CommunityDetailClient({
             <JoinCommunityButton
               communityId={community.id}
               initialIsMember={isMember}
+              onMembershipChange={(joined) => {
+                setIsMember(joined);
+                setMembersCount((c) => Math.max(joined ? c + 1 : c - 1, 0));
+              }}
               className={cn(
                 "h-9 px-5 text-sm font-black rounded-full transition-all cursor-pointer shadow-xs active:scale-95",
                 isMember
@@ -598,6 +602,10 @@ export function CommunityDetailClient({
                 communityId={community.id}
                 initialIsMember={false}
                 className="h-8 px-4 text-xs font-bold rounded-full bg-foreground text-background hover:opacity-90"
+                onMembershipChange={(joined) => {
+                  setIsMember(joined);
+                  setMembersCount((c) => Math.max(joined ? c + 1 : c - 1, 0));
+                }}
               />
             </div>
           )}

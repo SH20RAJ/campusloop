@@ -153,23 +153,23 @@ export default async function PostDetailPage({ params }: PostPageProps) {
         }}
       />
 
-      {/* Header (Exact match to Reference 3 Thread Top Bar) */}
-      <div className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/20 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3 min-w-0">
+      {/* Twitter/X Style Sticky Top Header */}
+      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/30 px-4 py-2.5 flex items-center justify-between">
+        <div className="flex items-center gap-4 min-w-0">
           <Link
             href="/app"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/50 hover:bg-muted text-foreground transition-colors cursor-pointer shrink-0"
+            className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer shrink-0"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4.5" />
           </Link>
           <div className="min-w-0">
-            <h1 className="text-sm font-black tracking-tight text-foreground truncate">
-              Thread
+            <h1 className="text-base font-black tracking-tight text-foreground truncate">
+              Post
             </h1>
             {rawPost.institution && (
               <Link
                 href={`/app/college/${rawPost.institution.slug || rawPost.institution.id}`}
-                className="text-[10px] text-muted-foreground font-medium hover:text-primary truncate block"
+                className="text-[11px] text-muted-foreground font-medium hover:underline truncate block"
               >
                 {rawPost.institution.name.split(",")[0]}
               </Link>
@@ -179,25 +179,30 @@ export default async function PostDetailPage({ params }: PostPageProps) {
 
         {!user ? (
           <Link href="/join">
-            <button className="rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground hover:opacity-95 shadow-xs transition-all cursor-pointer">
+            <button className="rounded-full bg-foreground text-background px-4 py-1.5 text-xs font-black hover:opacity-90 shadow-xs transition-all cursor-pointer">
               Join Campus
             </button>
           </Link>
         ) : (
-          <span className="text-[10px] font-bold text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-full">
+          <span className="text-[11px] font-bold text-muted-foreground bg-muted/60 px-3 py-1 rounded-full border border-border/40">
             {post.type === "CONFESSION" ? "🙈 Confession" : post.type === "POLL" ? "📊 Poll" : "💬 Discussion"}
           </span>
         )}
-      </div>
+      </header>
 
-      <div className="flex flex-col px-4 pt-4 gap-4">
+      <div className="flex flex-col px-4 pt-3 gap-3">
         {/* Main Post Card */}
         <FeedCard post={post as FeedPost} currentUserId={profile?.id} disableNavigation />
 
         {/* Comments Section */}
         {profile ? (
-          <PostComments postId={id} />
+          <PostComments
+            postId={id}
+            postAuthorId={rawPost.authorId}
+            postAuthorHandle={rawPost.isAnonymous ? "anonymous" : rawPost.author?.username || "student"}
+          />
         ) : (
+
           <div className="space-y-4">
             {/* Read-Only Comments List for Guests & Crawlers */}
             <div className="rounded-3xl bg-card p-4 space-y-3 shadow-2xs">

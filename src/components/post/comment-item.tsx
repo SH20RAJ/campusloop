@@ -1,13 +1,17 @@
 "use client";
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import {
+detectMentionTrigger,
+MentionSuggestions,
+TriggerContext,
+} from "@/components/ui/mention-autocomplete";
 import { RichText } from "@/components/ui/rich-text";
 import { Comment } from "@/db/schema";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { Heart,Reply } from "lucide-react";
+import { Heart,MessageCircle,MoreHorizontal,ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef,useState } from "react";
 
 export type CommentWithAuthor = Omit<Comment, "createdAt" | "updatedAt"> & {
   createdAt: Date | string;
@@ -18,12 +22,15 @@ export type CommentWithAuthor = Omit<Comment, "createdAt" | "updatedAt"> & {
     displayName?: string | null;
     avatarUrl?: string | null;
     points?: number | null;
+    institutionId?: string | null;
   } | null;
 };
 
 interface CommentItemProps {
   comment: CommentWithAuthor;
   depth?: number;
+  isPostAuthor?: boolean;
+  hasReplies?: boolean;
   onReply: (id: string) => void;
   replyingToId: string | null;
   replyBody: string;
@@ -38,6 +45,8 @@ interface CommentItemProps {
 export function CommentItem({
   comment,
   depth = 0,
+  isPostAuthor = false,
+  hasReplies = false,
   onReply,
   replyingToId,
   replyBody,
@@ -50,6 +59,8 @@ export function CommentItem({
 }: CommentItemProps) {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
+  const [replyMentionTrigger, setReplyMentionTrigger] = useState<TriggerContext | null>(null);
+  const replyInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const isAnon = comment.isAnonymous;
   const displayName = isAnon ? "Anonymous Student" : comment.author?.displayName || "Student";
@@ -57,6 +68,8 @@ export function CommentItem({
   const fallback = isAnon ? "🙈" : (comment.author?.displayName?.[0] ?? "S").toUpperCase();
   const avatarUrl = isAnon ? "" : getAvatarUrl(comment.author?.avatarUrl, comment.author?.username ?? "student");
   const isVerified = Boolean(!isAnon && (comment.author?.points || 0) >= 150);
+
+  const isReplying = replyingToId === comment.id;
 
   function handleToggleLike() {
     if (liked) {
@@ -68,149 +81,215 @@ export function CommentItem({
     }
   }
 
+  function handleReplyInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    const val = e.target.value;
+    setReplyBody(val);
+    const cursor = e.target.selectionStart ?? val.length;
+    setReplyMentionTrigger(detectMentionTrigger(val, cursor));
+  }
+
+  function handleSelectReplySuggestion(replacement: string, trigger: TriggerContext) {
+    const before = replyBody.slice(0, trigger.startIndex);
+    const after = replyBody.slice(trigger.endIndex);
+    const newText = `${before}${replacement}${after}`;
+    setReplyBody(newText);
+    setReplyMentionTrigger(null);
+    setTimeout(() => {
+      if (replyInputRef.current) {
+        replyInputRef.current.focus();
+        const newPos = before.length + replacement.length;
+        replyInputRef.current.setSelectionRange(newPos, newPos);
+      }
+    }, 0);
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -6, scale: 0.99 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      className={`group relative flex gap-2.5 text-xs ${
-        depth > 0
-          ? "ml-6 sm:ml-9 pl-3 border-l-2 border-primary/20 mt-2"
-          : "pt-1"
-      }`}
-    >
-      <div className="shrink-0 pt-0.5">
-        {!isAnon ? (
-          <Link href={`/@${handle}`}>
-            <Avatar className="size-8 rounded-xl hover:opacity-85 transition-opacity">
-              <AvatarImage src={avatarUrl || ""} />
-              <AvatarFallback className="text-[10px] font-bold bg-primary/10 text-primary">
+    <div className="relative group">
+      {/* Twitter Vertical Thread Connector Line */}
+      {hasReplies && depth === 0 && (
+        <div className="absolute left-5 top-11 bottom-0 w-0.5 bg-border/40 -z-0" />
+      )}
+
+      <div
+        className={cn(
+          "flex gap-3 py-3 text-foreground transition-colors",
+          depth > 0 && "pl-8 sm:pl-10 relative before:absolute before:left-3.5 before:top-0 before:bottom-6 before:w-0.5 before:bg-border/40"
+        )}
+      >
+        {/* Avatar */}
+        <div className="shrink-0 relative z-10">
+          {!isAnon ? (
+            <Link href={`/@${handle}`}>
+              <Avatar className="size-9 rounded-full border border-border/40 hover:opacity-90 transition-opacity">
+                <AvatarImage src={avatarUrl || ""} />
+                <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
+                  {fallback}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+          ) : (
+            <Avatar className="size-9 rounded-full border border-border/40 bg-muted">
+              <AvatarFallback className="text-xs font-bold">
                 {fallback}
               </AvatarFallback>
             </Avatar>
-          </Link>
-        ) : (
-          <Avatar className="size-8 rounded-xl">
-            <AvatarFallback className="text-[10px] font-bold bg-muted text-muted-foreground">
-              {fallback}
-            </AvatarFallback>
-          </Avatar>
-        )}
-      </div>
-
-      <div className="flex-1 min-w-0 space-y-1">
-        {/* Comment Bubble (Matching Reference 3 Thread Replies) */}
-        <div className="rounded-2xl bg-card hover:bg-muted/30 transition-colors p-3.5 space-y-1.5 shadow-2xs">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              {!isAnon ? (
-                <Link
-                  href={`/@${handle}`}
-                  className="font-bold text-foreground hover:underline truncate text-xs flex items-center gap-1"
-                >
-                  <span className="truncate">{displayName}</span>
-                  {isVerified && (
-                    <span className="text-blue-500 text-[10px] font-bold" title="Verified Student">
-                      ✓
-                    </span>
-                  )}
-                </Link>
-              ) : (
-                <span className="font-bold text-foreground truncate text-xs">
-                  {displayName} 🙈
-                </span>
-              )}
-              <span className="text-muted-foreground/60 text-[10px]">@{handle}</span>
-            </div>
-
-            <span className="text-muted-foreground/60 text-[10px] shrink-0 font-medium">
-              {formatTimeAgo(comment.createdAt)}
-            </span>
-          </div>
-
-          <div className="text-xs text-foreground/90 leading-relaxed font-normal">
-            <RichText content={comment.body} />
-          </div>
-        </div>
-
-        {/* Comment Actions (Like / Reply) */}
-        <div className="flex items-center gap-4 px-2 text-[11px] font-bold text-muted-foreground select-none">
-          <button
-            type="button"
-            onClick={handleToggleLike}
-            className={cn(
-              "hover:text-rose-500 transition-colors flex items-center gap-1.5 cursor-pointer py-0.5",
-              liked && "text-rose-500 font-extrabold"
-            )}
-          >
-            <Heart className={cn("size-3.5", liked && "fill-rose-500 text-rose-500")} />
-            <span>{likesCount > 0 ? `${likesCount}` : "Like"}</span>
-          </button>
-
-          {depth < 3 && (
-            <button
-              type="button"
-              onClick={() => onReply(comment.id)}
-              className="hover:text-primary transition-colors flex items-center gap-1.5 cursor-pointer py-0.5"
-            >
-              <Reply className="size-3.5" />
-              <span>Reply</span>
-            </button>
           )}
         </div>
 
-        {/* Inline Facebook-Style Nested Reply Box */}
-        {replyingToId === comment.id && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="mt-2 space-y-2 bg-card p-3 rounded-2xl border border-border/80 shadow-xs"
-          >
-            <textarea
-              value={replyBody}
-              onChange={(e) => setReplyBody(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                  submitReply(comment.id);
+        {/* Comment Body & Header */}
+        <div className="flex-1 min-w-0 space-y-1.5">
+          {/* Header Row */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 flex-wrap text-[13px] leading-none">
+              {!isAnon ? (
+                <Link
+                  href={`/@${handle}`}
+                  className="font-bold text-foreground hover:underline truncate"
+                >
+                  {displayName}
+                </Link>
+              ) : (
+                <span className="font-bold text-foreground truncate">
+                  {displayName}
+                </span>
+              )}
+
+              {isVerified && (
+                <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
+              )}
+
+              {/* OP / Author Badge */}
+              {isPostAuthor && (
+                <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-black text-primary border border-primary/20">
+                  Author
+                </span>
+              )}
+
+              <span className="text-xs text-muted-foreground truncate">
+                @{handle}
+              </span>
+
+              <span className="text-muted-foreground/60">·</span>
+
+              <span className="text-xs text-muted-foreground/70 shrink-0">
+                {formatTimeAgo(comment.createdAt)}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className="size-7 rounded-full hover:bg-muted text-muted-foreground/50 hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <MoreHorizontal className="size-3.5" />
+            </button>
+          </div>
+
+          {/* Comment Content */}
+          <div className="text-[14px] leading-relaxed text-foreground break-words font-normal">
+            <RichText content={comment.body} />
+          </div>
+
+          {/* Action Row */}
+          <div className="flex items-center gap-6 pt-1 text-xs text-muted-foreground">
+            {/* Reply Button */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isReplying) {
+                  setReplyingToId(null);
+                } else {
+                  onReply(comment.id);
+                  setReplyBody(`@${handle} `);
                 }
               }}
-              placeholder={`Write a reply to @${handle}...`}
-              rows={2}
-              className="w-full rounded-xl border border-border/60 bg-muted/20 p-2.5 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary resize-none font-medium leading-relaxed"
-            />
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setReplyIsAnon(!replyIsAnon)}
-                className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border cursor-pointer transition-colors ${
-                  replyIsAnon
-                    ? "bg-pink-500/10 text-pink-500 border-pink-500/30"
-                    : "bg-muted/40 text-muted-foreground border-border/50"
-                }`}
-              >
-                {replyIsAnon ? "🔒 Anon Reply" : "👤 Public Reply"}
-              </button>
+              className="flex items-center gap-1.5 hover:text-[#1d9bf0] transition-colors cursor-pointer group/reply"
+            >
+              <div className="size-7 rounded-full group-hover/reply:bg-[#1d9bf0]/10 flex items-center justify-center transition-colors">
+                <MessageCircle className="size-4" />
+              </div>
+              <span className="text-[11px] font-semibold">Reply</span>
+            </button>
 
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setReplyingToId(null)}
-                  className="px-2.5 py-1 text-[11px] font-bold text-muted-foreground hover:text-foreground cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => submitReply(comment.id)}
-                  disabled={isSubmitting || !replyBody.trim()}
-                  className="px-3.5 py-1 text-[11px] font-bold rounded-xl bg-primary text-primary-foreground disabled:opacity-40 cursor-pointer shadow-xs active:scale-95 transition-all"
-                >
-                  {isSubmitting ? "Replying..." : "Reply"}
-                </button>
+            {/* Like / Heart Button */}
+            <button
+              type="button"
+              onClick={handleToggleLike}
+              className={cn(
+                "flex items-center gap-1.5 transition-colors cursor-pointer group/like",
+                liked ? "text-rose-500" : "hover:text-rose-500"
+              )}
+            >
+              <div className="size-7 rounded-full group-hover/like:bg-rose-500/10 flex items-center justify-center transition-colors">
+                <Heart className={cn("size-4", liked && "fill-rose-500 text-rose-500")} />
+              </div>
+              {likesCount > 0 && (
+                <span className="text-[11px] font-semibold">{likesCount}</span>
+              )}
+            </button>
+          </div>
+
+          {/* Inline Reply Composer */}
+          {isReplying && (
+            <div className="relative pt-2 space-y-2">
+              <MentionSuggestions
+                trigger={replyMentionTrigger}
+                onSelect={handleSelectReplySuggestion}
+                onClose={() => setReplyMentionTrigger(null)}
+                className="bottom-full mb-2 left-0"
+              />
+
+              <div className="rounded-2xl border border-border/60 bg-muted/30 p-3 space-y-2.5">
+                <p className="text-[11px] text-muted-foreground font-medium">
+                  Replying to <span className="text-primary font-bold">@{handle}</span>
+                </p>
+
+                <textarea
+                  ref={replyInputRef}
+                  value={replyBody}
+                  onChange={handleReplyInputChange}
+                  placeholder="Post your reply..."
+                  rows={2}
+                  className="w-full bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none resize-none leading-relaxed"
+                  autoFocus
+                />
+
+                <div className="flex items-center justify-between pt-1 border-t border-border/30">
+                  <button
+                    type="button"
+                    onClick={() => setReplyIsAnon(!replyIsAnon)}
+                    className={cn(
+                      "text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors cursor-pointer",
+                      replyIsAnon
+                        ? "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30"
+                        : "bg-muted/60 text-muted-foreground"
+                    )}
+                  >
+                    {replyIsAnon ? "🕶️ Anon" : "👤 Public"}
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setReplyingToId(null)}
+                      className="px-3 py-1 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isSubmitting || !replyBody.trim()}
+                      onClick={() => submitReply(comment.id)}
+                      className="px-3.5 py-1 rounded-full bg-foreground text-background text-xs font-black disabled:opacity-40 hover:opacity-90 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    >
+                      Reply
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </motion.div>
-        )}
+          )}
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

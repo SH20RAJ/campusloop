@@ -23,7 +23,7 @@ MessageSquare,
 Settings,
 Share2,
 ShieldCheck,
-Sparkles,
+Smile,
 TrendingUp,
 Trophy,
 Users,
@@ -561,7 +561,7 @@ export function CommunityDetailClient({
                     <div className="flex items-center gap-0.5">
                       {[
                         { id: "photo", label: "Add photo", icon: ImageIcon, color: "text-emerald-500 hover:bg-emerald-500/10" },
-                        { id: "gif", label: "Add GIF", icon: Sparkles, color: "text-primary hover:bg-primary/10" },
+                        { id: "gif", label: "Add GIF", icon: Smile, color: "text-primary hover:bg-primary/10" },
                         { id: "poll", label: "Create poll", icon: BarChart3, color: "text-blue-500 hover:bg-blue-500/10" },
                         { id: "anon", label: "Post anonymously", icon: VenetianMask, color: "text-violet-500 hover:bg-violet-500/10" },
                       ].map((tool) => (

@@ -66,7 +66,7 @@ export default async function CommunitySettingsPage({ params }: PageProps) {
 
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col min-h-screen pb-24 px-3 sm:px-4 pt-3 gap-5 select-none">
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen bg-background text-foreground pb-24 border-x border-border/30 select-none">
       <CommunityHeader
         community={comm}
         membersCount={activeMembersCount}
@@ -76,18 +76,20 @@ export default async function CommunitySettingsPage({ params }: PageProps) {
         memberStatus={userMembership?.status || "NONE"}
       />
 
-      <CommunitySettingsClient
-        community={{
-          id: comm.id,
-          slug: comm.slug,
-          name: comm.name,
-          description: comm.description,
-          category: comm.category,
-          privacy: comm.privacy,
-          allowAnonymousPosts: comm.allowAnonymousPosts,
-          rules: comm.rules,
-        }}
-      />
+      <div className="px-4 sm:px-5 py-4">
+        <CommunitySettingsClient
+          community={{
+            id: comm.id,
+            slug: comm.slug,
+            name: comm.name,
+            description: comm.description,
+            category: comm.category,
+            privacy: comm.privacy,
+            allowAnonymousPosts: comm.allowAnonymousPosts,
+            rules: comm.rules,
+          }}
+        />
+      </div>
     </main>
   );
 }

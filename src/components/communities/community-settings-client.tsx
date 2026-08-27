@@ -118,7 +118,7 @@ export function CommunitySettingsClient({ community }: CommunitySettingsClientPr
   return (
     <form onSubmit={handleSave} className="space-y-5 select-none animate-in fade-in">
       {/* Identity */}
-      <div className="rounded-3xl bg-card p-5 sm:p-6 shadow-2xs space-y-4">
+      <div className="rounded-2xl border border-border/60 bg-card p-5 sm:p-6 shadow-2xs space-y-4">
         <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
           1. General Details
         </h2>
@@ -170,7 +170,7 @@ export function CommunitySettingsClient({ community }: CommunitySettingsClientPr
       </div>
 
       {/* Privacy & Permissions */}
-      <div className="rounded-3xl bg-card p-5 sm:p-6 shadow-2xs space-y-4">
+      <div className="rounded-2xl border border-border/60 bg-card p-5 sm:p-6 shadow-2xs space-y-4">
         <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
           2. Privacy &amp; Anonymity
         </h2>
@@ -267,7 +267,7 @@ export function CommunitySettingsClient({ community }: CommunitySettingsClientPr
       </div>
 
       {/* Community Rules */}
-      <div className="rounded-3xl bg-card p-5 sm:p-6 shadow-2xs space-y-4">
+      <div className="rounded-2xl border border-border/60 bg-card p-5 sm:p-6 shadow-2xs space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
             3. Guidelines &amp; Rules

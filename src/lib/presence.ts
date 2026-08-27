@@ -1,13 +1,18 @@
-import { getDb } from "@/db";
-import { userProfiles } from "@/db/schema";
-import { and,eq,lt,or,sql } from "drizzle-orm";
+/**
+ * Presence helpers shared by server and client.
+ *
+ * Deliberately free of database imports: this module is pulled into client
+ * bundles (chat rows, the heartbeat hook), and importing the schema here
+ * drags `node:crypto` into the browser build. Server-only writes live in
+ * presence-server.ts.
+ */
 
 /** A student counts as online while their heartbeat is younger than this. */
 export const ONLINE_WINDOW_MS = 2 * 60 * 1000;
 /** Client heartbeat interval; the write is skipped if a fresher one exists. */
 export const HEARTBEAT_INTERVAL_MS = 60 * 1000;
 /** Don't write more often than this per user, however chatty the client is. */
-const WRITE_THROTTLE_SECONDS = 45;
+export const WRITE_THROTTLE_SECONDS = 45;
 
 export function isOnline(lastSeenAt?: Date | string | null): boolean {
   if (!lastSeenAt) return false;
@@ -38,26 +43,4 @@ export function presenceLabel(lastSeenAt?: Date | string | null): string | null 
   if (days === 1) return "Active yesterday";
   if (days < 7) return `Active ${days}d ago`;
   return "Active a while ago";
-}
-
-/**
- * Record a heartbeat. Throttled in SQL rather than in memory: the row is only
- * touched when the stored timestamp is already stale, so a tab heart-beating
- * every 60s costs at most one write per 45s per user, and several tabs from
- * the same student collapse into the same budget.
- */
-export async function recordHeartbeat(profileId: string): Promise<void> {
-  const db = getDb();
-  await db
-    .update(userProfiles)
-    .set({ lastSeenAt: new Date() })
-    .where(
-      and(
-        eq(userProfiles.id, profileId),
-        or(
-          sql`${userProfiles.lastSeenAt} IS NULL`,
-          lt(userProfiles.lastSeenAt, sql`now() - interval '${sql.raw(String(WRITE_THROTTLE_SECONDS))} seconds'`),
-        ),
-      ),
-    );
 }

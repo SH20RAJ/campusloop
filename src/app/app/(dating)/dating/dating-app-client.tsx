@@ -82,19 +82,31 @@ export function DatingAppClient() {
     return null;
   }, []);
 
+  // Preload upcoming card photos into browser memory for zero-lag mobile swiping
+  useEffect(() => {
+    if (!candidates || candidates.length === 0) return;
+    const nextBatch = candidates.slice(deckIndex, deckIndex + 5);
+    for (const c of nextBatch) {
+      for (const photo of c.photos || []) {
+        if (typeof window !== "undefined" && photo) {
+          const img = new Image();
+          img.src = photo;
+        }
+      }
+    }
+  }, [candidates, deckIndex]);
+
   const handleSwipe = useCallback(
     (direction: "like" | "pass") => {
       const current = remaining[0];
       if (!current) return;
 
+      if (candidates.length - (deckIndex + 1) <= 3) {
+        void mutate();
+      }
       void sendSwipe(current.id, direction === "like" ? "LIKE" : "PASS");
-      setDeckIndex((i) => {
-        const next = i + 1;
-        if (candidates.length - next <= 3) void mutate();
-        return next;
-      });
     },
-    [remaining, candidates.length, sendSwipe, mutate]
+    [remaining, candidates.length, deckIndex, sendSwipe, mutate]
   );
 
   const handleUndo = useCallback(async () => {

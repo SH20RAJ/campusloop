@@ -3,7 +3,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card,CardContent } from "@/components/ui/card";
-import { Check,Flame,Heart,MessageSquare,ShieldCheck,Sparkles,X } from "lucide-react";
+import {
+Check,Flame,Heart,MessageSquare,ShieldCheck,X,
+Zap
+} from "lucide-react";
 import { AnimatePresence,motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -209,7 +212,7 @@ export function MatchmakingShowcase() {
                     className="absolute inset-0 z-30 flex flex-col items-center justify-center rounded-xl bg-background/98 p-6 text-center shadow-xl border border-border"
                   >
                     <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <Sparkles className="size-6" />
+                      <Zap className="size-6" />
                     </div>
 
                     <h3 className="text-xl font-bold tracking-tight text-foreground">

@@ -11,8 +11,8 @@ Flame,
 Lock,
 MessageSquare,
 ShieldCheck,
-Sparkles,
-Trophy
+Trophy,
+Zap
 } from "lucide-react";
 import { useMemo,useState } from "react";
 
@@ -127,7 +127,7 @@ export function CommunityFeedView({
       {/* Sorting Control */}
       <div className="flex items-center justify-between px-1">
         <span className="text-xs font-black text-foreground flex items-center gap-1.5 uppercase tracking-wider">
-          <Sparkles className="size-3.5 text-primary" /> Feed ({sortedPosts.length})
+          <Zap className="size-3.5 text-primary" /> Feed ({sortedPosts.length})
         </span>
 
         <div className="flex items-center gap-1">

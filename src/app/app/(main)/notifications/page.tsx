@@ -4,7 +4,10 @@ import { notifications,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { cn } from "@/lib/utils";
 import { desc,eq } from "drizzle-orm";
-import { Bell,Compass,Heart,MessageSquare,Sparkles } from "lucide-react";
+import {
+Bell,Compass,Heart,MessageSquare,
+Zap
+} from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -101,7 +104,7 @@ export default async function NotificationsPage() {
             href = `/app/post/${n.referenceId}`;
             actionLabel = "Reply";
           } else if (n.type === "MATCH") {
-            icon = <Sparkles className="size-3 text-primary" />;
+            icon = <Zap className="size-3 text-primary" />;
             bgClass = "bg-primary/10 text-primary";
             message = "matched with you on Campus Dating!";
             href = `/app/chat`;

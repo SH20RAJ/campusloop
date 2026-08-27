@@ -13,9 +13,9 @@ PartyPopper,
 Plus,
 School,
 Search,
-Sparkles,
 Unlock,
 X,
+Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -374,7 +374,7 @@ export function BirthdaysClient() {
               <section className="space-y-2.5 pt-2">
                 <div className="flex items-center justify-between px-1">
                   <h2 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                    <Sparkles className="size-3.5 text-amber-500" />
+                    <Zap className="size-3.5 text-amber-500" />
                     <span>Upcoming Celebrations (Next 60 Days)</span>
                   </h2>
                   <span className="text-[10px] font-bold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">

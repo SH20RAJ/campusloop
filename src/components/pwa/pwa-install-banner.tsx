@@ -1,7 +1,10 @@
 "use client";
 
 import { AnimatePresence,motion } from "framer-motion";
-import { Download,PlusSquare,Share,Sparkles,X } from "lucide-react";
+import {
+Download,PlusSquare,Share,X,
+Zap
+} from "lucide-react";
 import { useEffect,useState } from "react";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -102,7 +105,7 @@ export function PWAInstallBanner() {
                 <div className="min-w-0">
                   <p className="text-xs font-black text-foreground flex items-center gap-1 truncate">
                     <span>Install CampusLoop</span>
-                    <Sparkles className="size-3 text-amber-500 shrink-0" />
+                    <Zap className="size-3 text-amber-500 shrink-0" />
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">
                     Add to home screen for 2x faster app feel

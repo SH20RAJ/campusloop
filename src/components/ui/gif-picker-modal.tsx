@@ -3,7 +3,10 @@
 import type { GifItem } from "@/app/api/gifs/search/route";
 import { GIF_POPULAR_TAGS } from "@/constants";
 import { cn } from "@/lib/utils";
-import { Image as ImageIcon,Loader2,Search,Sparkles,X } from "lucide-react";
+import {
+Image as ImageIcon,Loader2,Search,X,
+Zap
+} from "lucide-react";
 import { useEffect,useRef,useState } from "react";
 
 interface GifPickerModalProps {
@@ -77,7 +80,7 @@ export function GifPickerModal({
         <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-border/50">
           <div className="flex items-center gap-2">
             <div className="size-7 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-              <Sparkles className="size-4" />
+              <Zap className="size-4" />
             </div>
             <div>
               <h2 className="text-sm font-black tracking-tight text-foreground">Choose a GIF</h2>

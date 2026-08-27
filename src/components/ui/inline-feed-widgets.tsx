@@ -2,7 +2,10 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowRight,Check,Gift,Hash,Heart,Sparkles,UserPlus,Users } from "lucide-react";
+import {
+ArrowRight,Check,Gift,Hash,Heart,UserPlus,Users,
+Zap
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -173,7 +176,7 @@ export function InlineReferralWidget() {
         </div>
       </div>
       <Button size="sm" onClick={handleCopy} variant="outline" className="shrink-0 font-bold text-xs h-8 gap-1.5 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer">
-        <Sparkles className="size-3.5" /> Copy Invite Link
+        <Zap className="size-3.5" /> Copy Invite Link
       </Button>
     </div>
   );

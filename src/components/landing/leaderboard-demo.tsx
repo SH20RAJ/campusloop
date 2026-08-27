@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card,CardContent } from "@/components/ui/card";
-import { ArrowRight,Award,Sparkles,Star,Trophy,Zap } from "lucide-react";
+import { ArrowRight,Award,Star,Trophy,Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Reveal } from "./reveal";
@@ -97,7 +97,7 @@ export function LeaderboardShowcase() {
           <Reveal delay={0.1} className="lg:col-span-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-heading text-base font-bold flex items-center gap-2">
-                <Sparkles className="size-4 text-primary" /> Test Your Campus Rank Calculator
+                <Zap className="size-4 text-primary" /> Test Your Campus Rank Calculator
               </h3>
               <Badge variant="secondary" className="text-[10px]">Interactive Demo</Badge>
             </div>

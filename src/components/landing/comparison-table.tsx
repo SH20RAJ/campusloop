@@ -1,6 +1,9 @@
 "use client";
 
-import { Check,ShieldCheck,Sparkles,X } from "lucide-react";
+import {
+Check,ShieldCheck,X,
+Zap
+} from "lucide-react";
 import { Reveal } from "./reveal";
 
 const COMPARISONS = [
@@ -61,7 +64,7 @@ export function ComparisonShowcase() {
       <div className="mx-auto w-full max-w-6xl px-6">
         <Reveal className="mx-auto mb-12 max-w-xl text-center">
           <p className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <Sparkles className="size-3.5 text-primary" />
+            <Zap className="size-3.5 text-primary" />
             Built Different
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">

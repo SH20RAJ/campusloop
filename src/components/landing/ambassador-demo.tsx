@@ -1,6 +1,9 @@
 "use client";
 
-import { ArrowRight,Check,Copy,Flame,Gift,ShieldCheck,Sparkles,Users } from "lucide-react";
+import {
+ArrowRight,Check,Copy,Flame,Gift,ShieldCheck,Users,
+Zap
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -65,7 +68,7 @@ export function AmbassadorShowcase() {
             <div className="rounded-3xl border border-border/80 bg-card p-4 sm:p-6 shadow-sm space-y-4 max-w-full overflow-hidden">
               <div className="flex items-center justify-between border-b border-border/50 pb-3">
                 <span className="text-xs font-black text-primary uppercase tracking-wider flex items-center gap-1.5 truncate">
-                  <Sparkles className="size-3.5 shrink-0" /> Live Referral Link Generator
+                  <Zap className="size-3.5 shrink-0" /> Live Referral Link Generator
                 </span>
                 <span className="text-[10px] font-black bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full shrink-0">
                   +20 LP

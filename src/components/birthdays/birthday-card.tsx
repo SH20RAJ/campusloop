@@ -2,7 +2,8 @@
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import confetti from "canvas-confetti";
-import { Cake,Heart,MessageCircle,Sparkles } from "lucide-react";
+import { Cake,Heart,MessageCircle,Zap } from "lucide-react";
+
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -115,7 +116,7 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
               }`}
               title="Pop confetti"
             >
-              {wished ? <Heart className="size-3.5 fill-emerald-500" /> : <Sparkles className="size-3.5" />}
+              {wished ? <Heart className="size-3.5 fill-emerald-500" /> : <Zap className="size-3.5" />}
               <span>{wished ? "Wished!" : "🎉 Wish"}</span>
             </button>
 

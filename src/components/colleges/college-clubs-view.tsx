@@ -7,7 +7,6 @@ Code,
 Music,
 Plus,
 Rocket,
-Sparkles,
 Users,
 Zap,
 } from "lucide-react";
@@ -57,9 +56,10 @@ const BIT_MESRA_CLUBS = [
   {
     name: "EDC (Entrepreneurship Cell)",
     category: "Startups & Venture Incubation",
-    icon: Sparkles,
+    icon: Zap,
     color: "from-amber-500/20 to-yellow-500/20 text-amber-500 border-amber-500/30",
     members: 130,
+
     description: "Empowers student founders with seed grants, founder AMAs, and E-Summit Ranchi.",
     tag: "EDC",
   },

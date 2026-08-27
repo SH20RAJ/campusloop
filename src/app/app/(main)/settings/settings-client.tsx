@@ -11,8 +11,8 @@ RotateCcw,
 School,
 ShieldCheck,
 Sliders,
-Sparkles,
 User,
+Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -237,7 +237,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
         <section className="rounded-3xl border border-primary/20 bg-gradient-to-r from-primary/10 via-card to-card p-6 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" /> Loop Points & Star Badge
+              <Zap className="h-4 w-4 text-primary" /> Loop Points & Star Badge
             </h2>
             <span className="text-xs font-extrabold text-primary">{profile.points} LP</span>
           </div>

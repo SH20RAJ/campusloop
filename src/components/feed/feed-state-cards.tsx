@@ -1,13 +1,16 @@
 "use client";
 
-import { AlertTriangle,RefreshCw,Sparkles } from "lucide-react";
+import {
+AlertTriangle,RefreshCw,
+Zap
+} from "lucide-react";
 import Link from "next/link";
 
 export function FeedEmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center glass-card-dark rounded-3xl p-6 border border-border/40 my-4 mx-2">
       <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 mb-4">
-        <Sparkles className="h-6 w-6 text-muted-foreground/50" />
+        <Zap className="h-6 w-6 text-muted-foreground/50" />
       </div>
       <h3 className="font-semibold text-foreground text-sm">
         Your feed is quiet
@@ -24,7 +27,7 @@ export function FeedCaughtUpCard() {
     <div className="space-y-4 pt-4 pb-10">
       <div className="rounded-2xl border border-border/70 bg-card p-5 text-center space-y-3 shadow-sm">
         <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mx-auto">
-          <Sparkles className="size-5" />
+          <Zap className="size-5" />
         </div>
         <h4 className="text-xs font-bold text-foreground">You&apos;ve caught up on all posts! 🎉</h4>
         <p className="text-[11px] text-muted-foreground max-w-xs mx-auto leading-relaxed">

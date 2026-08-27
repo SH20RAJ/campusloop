@@ -6,7 +6,10 @@ import { useProfile } from "@/hooks/use-profile";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { getAvatarUrl } from "@/lib/utils";
 import { validateDisplayName,validateUsername } from "@/lib/validation";
-import { AlertCircle,ArrowLeft,Cake,Camera,Check,Image as ImageIcon,Loader2,Lock,Move,Plus,Save,ShieldCheck,Sparkles,Upload,User,X } from "lucide-react";
+import {
+AlertCircle,ArrowLeft,Cake,Camera,Check,Image as ImageIcon,Loader2,Lock,Move,Plus,Save,ShieldCheck,Upload,User,X,
+Zap
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect,useRef,useState } from "react";
@@ -224,7 +227,7 @@ export function EditProfileClient() {
   if (isProfileLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Sparkles className="size-6 animate-spin text-primary" />
+        <Zap className="size-6 animate-spin text-primary" />
       </div>
     );
   }
@@ -369,7 +372,7 @@ export function EditProfileClient() {
                 onClick={handleGenerateDiceBearAvatar}
                 className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer flex items-center gap-1.5"
               >
-                <Sparkles className="size-3.5" /> Randomize
+                <Zap className="size-3.5" /> Randomize
               </button>
             </div>
           </div>

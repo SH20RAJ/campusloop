@@ -6,10 +6,10 @@ FileText,
 Ghost,
 GraduationCap,
 ShieldAlert,
-Sparkles,
 TrendingUp,
 UserCheck,
 Users,
+Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -82,7 +82,7 @@ export default async function AdminDashboard() {
 				<StatCard label="Comments" value={stats.totalComments} icon={Activity} accent="violet" href="/admin/comments" />
 				<StatCard label="Anonymous Posts" value={stats.anonymousPosts} icon={Ghost} accent="primary" hint={`${stats.anonVaultEntries} sealed identities`} />
 				<StatCard label="Colleges" value={stats.colleges} icon={GraduationCap} accent="orange" href="/admin/colleges" />
-				<StatCard label="LP Circulating" value={stats.lpCirculating.toLocaleString()} icon={Sparkles} accent="violet" hint={`${engagement.votes.toLocaleString()} total votes`} />
+				<StatCard label="LP Circulating" value={stats.lpCirculating.toLocaleString()} icon={Zap} accent="violet" hint={`${engagement.votes.toLocaleString()} total votes`} />
 			</section>
 
 			<section className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-3">

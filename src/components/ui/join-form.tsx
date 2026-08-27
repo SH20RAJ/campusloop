@@ -4,7 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { useProfile } from "@/hooks/use-profile";
 import { cn } from "@/lib/utils";
 import { SignIn,SignUp,useUser } from "@hexclave/next";
-import { ArrowRight,LayoutDashboard,ShieldCheck,Sparkles,UserPlus } from "lucide-react";
+import {
+ArrowRight,LayoutDashboard,ShieldCheck,UserPlus,
+Zap
+} from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect,useState } from "react";
@@ -78,7 +81,7 @@ export function JoinForm() {
           variant="outline"
           className="rounded-full border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary backdrop-blur-md gap-1.5 shadow-xs"
         >
-          <Sparkles className="size-3.5 fill-primary text-primary" />
+          <Zap className="size-3.5 fill-primary text-primary" />
           <span>Verified Student Network</span>
         </Badge>
 

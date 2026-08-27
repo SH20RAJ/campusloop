@@ -3,7 +3,10 @@ import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { isViewerProfile } from "@/lib/viewer";
 import { eq } from "drizzle-orm";
-import { ArrowLeft,Sparkles } from "lucide-react";
+import {
+ArrowLeft,
+Zap
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -43,7 +46,7 @@ export default async function NewPostPage() {
           <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Post</span>
         </h1>
         <span className="flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-extrabold text-primary shadow-xs">
-          <Sparkles className="size-3" /> +5 LP
+          <Zap className="size-3" /> +5 LP
         </span>
       </header>
 

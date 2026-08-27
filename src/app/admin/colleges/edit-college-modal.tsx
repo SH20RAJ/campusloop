@@ -8,10 +8,10 @@ Image as ImageIcon,
 Loader2,
 Save,
 School,
-Sparkles,
 Trophy,
 Upload,
 X,
+Zap,
 } from "lucide-react";
 import { useEffect,useRef,useState } from "react";
 import { toast } from "sonner";
@@ -403,7 +403,7 @@ export function EditCollegeModal({
                   {isEnriching ? (
                     <Loader2 className="size-3 animate-spin" />
                   ) : (
-                    <Sparkles className="size-3" />
+                    <Zap className="size-3" />
                   )}
                   <span>Auto-Fetch from Wikipedia</span>
                 </button>

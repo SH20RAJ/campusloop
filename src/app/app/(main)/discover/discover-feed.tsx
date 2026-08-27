@@ -8,17 +8,15 @@ import { useColleges } from "@/hooks/use-colleges";
 import { useFeed } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
 import {
-Cake,
 Compass,
 Flame,
 Heart,
 HelpCircle,
 School,
 Search,
-Users,
+X,
 } from "lucide-react";
 import { AnimatePresence,motion } from "motion/react";
-import Link from "next/link";
 import { useEffect,useMemo,useRef,useState } from "react";
 
 const TABS = [
@@ -73,64 +71,19 @@ export function DiscoverFeed() {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-40 bg-background/85 px-4 pt-3.5 pb-0 backdrop-blur-xl border-b border-border/40 space-y-3">
+      {/* ─── Twitter/X Style Explore Header ─── */}
+      <header className="sticky top-0 z-40 bg-background/85 px-4 pt-3 backdrop-blur-xl border-b border-border/30 space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Compass className="size-4" />
-            </div>
-            <h1 className="text-base font-black tracking-tight text-foreground">Discover</h1>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-lg font-black tracking-tight text-foreground">Explore</h1>
           </div>
-
-          <span className="text-[10px] font-bold text-muted-foreground">All India Campuses</span>
+          <span className="text-[11px] font-bold text-muted-foreground">
+            All India Campuses
+          </span>
         </div>
 
-        {/* ─── Fast Exploration Category Quick Hub (Interlinking all key sections) ─── */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          <Link
-            href="/app/dating"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold shrink-0 transition-colors shadow-2xs"
-          >
-            <Heart className="size-3.5" />
-            <span>Matches</span>
-          </Link>
-
-          <Link
-            href="/app/communities"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold shrink-0 transition-colors shadow-2xs"
-          >
-            <Users className="size-3.5" />
-            <span>Communities</span>
-          </Link>
-
-          <Link
-            href="/app/colleges"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold shrink-0 transition-colors shadow-2xs"
-          >
-            <School className="size-3.5" />
-            <span>Colleges</span>
-          </Link>
-
-          <Link
-            href="/app/birthdays"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/10 hover:bg-pink-500/20 text-pink-600 dark:text-pink-400 text-xs font-bold shrink-0 transition-colors shadow-2xs"
-          >
-            <Cake className="size-3.5" />
-            <span>Birthdays</span>
-          </Link>
-
-          <Link
-            href="/app/confessions"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold shrink-0 transition-colors shadow-2xs"
-          >
-            <Flame className="size-3.5" />
-            <span>Confessions</span>
-          </Link>
-        </div>
-
-        {/* Animated Tabs */}
-        <div className="relative flex border-b border-border/30">
+        {/* Clean Twitter Style Animated Tabs */}
+        <div className="flex border-b border-border/30">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -139,16 +92,16 @@ export function DiscoverFeed() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "relative flex-1 pb-2.5 pt-1 text-center text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer",
-                  isActive ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground"
+                  "relative flex-1 pb-3 pt-1 text-center text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer",
+                  isActive ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
                 )}
               >
-                <Icon className={cn("size-3.5", isActive && "text-primary")} />
+                <Icon className={cn("size-3.5", isActive ? "text-primary" : "text-muted-foreground")} />
                 <span>{tab.label}</span>
                 {isActive && (
                   <motion.div
                     layoutId="discover-tab-indicator"
-                    className="absolute -bottom-px left-0 right-0 h-0.5 bg-primary rounded-full"
+                    className="absolute -bottom-px left-0 right-0 h-0.5 bg-foreground rounded-full"
                     transition={{ type: "spring", stiffness: 500, damping: 35 }}
                   />
                 )}
@@ -158,7 +111,7 @@ export function DiscoverFeed() {
         </div>
       </header>
 
-      {/* ─── Dedicated Colleges Tab View ─── */}
+      {/* ─── Colleges Directory View ─── */}
       {activeTab === "COLLEGES" ? (
         <div className="px-4 py-4 space-y-4">
           <div className="relative">
@@ -169,7 +122,7 @@ export function DiscoverFeed() {
               value={collegeSearch}
               onChange={(e) => setCollegeSearch(e.target.value)}
               placeholder="Search 1,350+ Indian colleges..."
-              className="w-full h-10 rounded-full border border-border/50 bg-muted/40 pl-9 pr-4 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary transition-all"
+              className="w-full h-10 rounded-full border border-border/50 bg-muted/40 pl-9 pr-4 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-foreground transition-all"
             />
           </div>
 
@@ -191,18 +144,18 @@ export function DiscoverFeed() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col px-4 pt-3 pb-24 gap-3.5">
-
+        <div className="flex flex-col px-4 pt-3 pb-24 gap-4">
+          {/* Active Filter Pill */}
           {selectedCollege && (
-            <div className="flex items-center justify-between p-2.5 rounded-2xl bg-primary/10 border border-primary/20">
-              <span className="text-xs font-bold text-primary truncate">
+            <div className="flex items-center justify-between p-2.5 rounded-2xl bg-card border border-border/60 shadow-xs">
+              <span className="text-xs font-bold text-foreground truncate">
                 Filtered by {selectedCollege.name}
               </span>
               <button
                 onClick={() => setSelectedCollegeId(null)}
-                className="text-[11px] font-bold text-muted-foreground hover:text-foreground cursor-pointer"
+                className="flex size-6 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
               >
-                Clear
+                <X className="size-3.5" />
               </button>
             </div>
           )}

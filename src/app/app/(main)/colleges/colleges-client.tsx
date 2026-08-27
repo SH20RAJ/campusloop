@@ -14,9 +14,9 @@ Flame,
 Plus,
 School,
 Search,
-Sparkles,
 Trophy,
 X,
+Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect,useMemo,useState } from "react";
@@ -26,7 +26,7 @@ const CATEGORY_FILTERS = [
   { id: "ALL", label: "All 1,350+ Hubs", icon: School },
   { id: "TRENDING", label: "🔥 Trending", icon: Flame },
   { id: "IIT_NIT", label: "🏛️ IITs & NITs", icon: Trophy },
-  { id: "NIRF", label: "⚡ NIRF Top 100", icon: Sparkles },
+  { id: "NIRF", label: "⚡ NIRF Top 100", icon: Zap },
   { id: "CENTRAL", label: "🎓 Central & Deemed", icon: Building2 },
 ];
 
@@ -235,7 +235,7 @@ export default function CollegesClient() {
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-xl">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-primary/10 text-primary border border-primary/20">
-              <Sparkles className="size-3" /> 1,350+ Accredited Indian Campuses
+              <Zap className="size-3" /> 1,350+ Accredited Indian Campuses
             </span>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground leading-tight">
               Never miss what matters across Indian colleges.
@@ -574,7 +574,7 @@ export default function CollegesClient() {
       <div className="rounded-3xl border border-primary/20 bg-gradient-to-r from-violet-600/10 via-indigo-600/10 to-purple-600/10 p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div className="space-y-1 text-center sm:text-left">
           <span className="text-[10px] font-black uppercase tracking-wider text-primary flex items-center justify-center sm:justify-start gap-1">
-            <Sparkles className="size-3" /> JEE &amp; NEET Aspirants Reality Desk
+            <Zap className="size-3" /> JEE &amp; NEET Aspirants Reality Desk
           </span>
           <h4 className="text-sm font-black text-foreground">
             Looking for genuine hostel tea, placement truth, and fest vibes?

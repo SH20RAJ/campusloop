@@ -7,9 +7,9 @@ GraduationCap,
 Heart,
 School,
 ShieldCheck,
-Sparkles,
 UserRound,
 X,
+Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect,useState } from "react";
@@ -145,7 +145,7 @@ function TopCard({
       {/* Top badges */}
       <div className="absolute inset-x-3 top-7 z-20 flex items-center justify-between">
         <span className="inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-black text-white backdrop-blur-md">
-          <Sparkles className="size-3 text-rose-400" /> {candidate.compatibilityScore}% match
+          <Zap className="size-3 text-rose-400" /> {candidate.compatibilityScore}% match
         </span>
         <div className="flex items-center gap-1.5">
           {candidate.likedYou && (

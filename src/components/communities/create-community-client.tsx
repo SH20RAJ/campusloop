@@ -10,9 +10,9 @@ Globe,
 Loader2,
 Lock,
 Plus,
-Sparkles,
 Trash2,
-Users2
+Users2,
+Zap
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -126,7 +126,7 @@ export function CreateCommunityClient() {
         {/* Founder LP Clout Perk */}
         <div className="mt-3 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between gap-3 text-xs">
           <span className="font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
-            <Sparkles className="size-4 text-amber-500 shrink-0" /> Founder Perk: +100 LP Clout
+            <Zap className="size-4 text-amber-500 shrink-0" /> Founder Perk: +100 LP Clout
           </span>
           <span className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold shrink-0">
             Instant Admin Role
@@ -367,7 +367,7 @@ export function CreateCommunityClient() {
             </>
           ) : (
             <>
-              <Sparkles className="size-4" />
+              <Zap className="size-4" />
               <span>Create Community &amp; Claim +100 LP</span>
             </>
           )}

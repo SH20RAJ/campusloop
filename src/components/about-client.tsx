@@ -14,7 +14,6 @@ Shield,
 ShieldAlert,
 ShieldCheck,
 Smartphone,
-Sparkles,
 XCircle,
 Zap
 } from "lucide-react";
@@ -236,7 +235,7 @@ export function AboutClient() {
         {/* ─── Hero Section ─── */}
         <section className="text-center space-y-6 py-8">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-bold text-primary">
-            <Sparkles className="h-3.5 w-3.5 animate-pulse" /> The Verified Campus Social Layer
+            <Zap className="h-3.5 w-3.5 animate-pulse" /> The Verified Campus Social Layer
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-none text-foreground">
             A Safe Digital Space For <br />
@@ -388,7 +387,7 @@ export function AboutClient() {
                 {hasMatch ? (
                   <div className="text-center p-4 bg-primary/5 rounded-2xl border border-primary/20 animate-fade-in w-full space-y-2">
                     <div className="flex justify-center gap-1">
-                      <Sparkles className="h-6 w-6 text-primary animate-bounce" />
+                      <Zap className="h-6 w-6 text-primary animate-bounce" />
                       <Heart className="h-6 w-6 text-rose-500 fill-rose-500 animate-pulse" />
                     </div>
                     <h4 className="text-xs font-black text-foreground">Congratulations!</h4>

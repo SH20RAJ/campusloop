@@ -2,7 +2,10 @@
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MessageCircle,Sparkles } from "lucide-react";
+import {
+MessageCircle,
+Zap
+} from "lucide-react";
 import Link from "next/link";
 
 interface MatchResult {
@@ -27,7 +30,7 @@ export function DatingMatchModal({ matchResult, onClose }: DatingMatchModalProps
       <div className="w-full max-w-sm rounded-3xl border border-primary/30 bg-card p-6 shadow-2xl text-center space-y-5 relative overflow-hidden">
         <div className="flex justify-center">
           <div className="h-16 w-16 rounded-full bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center shadow-lg animate-bounce">
-            <Sparkles className="h-8 w-8 text-white" />
+            <Zap className="h-8 w-8 text-white" />
           </div>
         </div>
 

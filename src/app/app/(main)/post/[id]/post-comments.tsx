@@ -8,7 +8,10 @@ import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { Image as ImageIcon,Loader2,Lock,MessageSquare,Send,Smile,Sparkles,X } from "lucide-react";
+import {
+Image as ImageIcon,Loader2,Lock,MessageSquare,Send,Smile,X,
+Zap
+} from "lucide-react";
 import { useRef,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -353,7 +356,7 @@ export function PostComments({ postId }: { postId: string }) {
           ))
         ) : (
           <div className="text-center py-12 rounded-3xl border border-dashed border-border bg-card text-xs text-muted-foreground space-y-2">
-            <Sparkles className="size-5 mx-auto text-muted-foreground/40" />
+            <Zap className="size-5 mx-auto text-muted-foreground/40" />
             <p className="font-bold text-foreground">No replies on this post yet.</p>
             <p className="text-[11px]">Be the first classmate to drop your thoughts!</p>
           </div>

@@ -4,7 +4,10 @@ import { FeedCard } from "@/components/ui/feed-card";
 import { Input } from "@/components/ui/input";
 import { FeedPost } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
-import { Hash,MessageSquare,School,Search,Sparkles,Users } from "lucide-react";
+import {
+Hash,MessageSquare,School,Search,Users,
+Zap
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect,useState } from "react";
 
@@ -224,7 +227,7 @@ export default function SearchClient() {
           {/* Zero Results State */}
           {totalResults === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed rounded-3xl border-border bg-card/40 p-6 space-y-2">
-              <Sparkles className="size-8 text-muted-foreground/40" />
+              <Zap className="size-8 text-muted-foreground/40" />
               <h3 className="text-sm font-bold text-foreground">No matches found</h3>
               <p className="text-xs text-muted-foreground max-w-xs">
                 We couldn't find anything matching "{query}". Try checking your spelling or search another keyword.
@@ -237,7 +240,7 @@ export default function SearchClient() {
         <div className="space-y-6 pt-4">
           <div className="rounded-2xl border border-border bg-card p-5 space-y-3 shadow-sm">
             <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="size-3.5 text-primary" /> Popular Campus Searches
+              <Zap className="size-3.5 text-primary" /> Popular Campus Searches
             </h3>
             <div className="flex flex-wrap gap-2">
               {["IIT Delhi", "BITS Pilani", "Confessions", "Canteen Tea", "Hostel Life", "Exam Backlogs"].map((s) => (

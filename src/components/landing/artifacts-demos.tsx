@@ -19,11 +19,11 @@ Search,
 Share2,
 ShieldAlert,
 ShieldCheck,
-Sparkles,
 ThumbsUp,
 UserPlus,
 Users,
 X,
+Zap,
 } from "lucide-react";
 import { AnimatePresence,motion } from "motion/react";
 import { useEffect,useState } from "react";
@@ -72,9 +72,10 @@ const ARTIFACTS = [
   },
   {
     id: "memes",
-    icon: Sparkles,
+    icon: Zap,
     title: "Memes",
     description: "Drop memes only your campus would truly get.",
+
     color: "from-pink-500/20 to-rose-500/20",
     borderGlow: "group-hover:border-pink-500/40 group-hover:shadow-pink-500/5",
     accent: "bg-pink-500",
@@ -386,7 +387,7 @@ function MemeDemo() {
       <div className="overflow-hidden rounded-lg border border-border bg-muted/20">
         <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-pink-500/10 via-rose-500/5 to-purple-500/10">
           <div className="flex flex-col items-center gap-2 text-center">
-            <Sparkles className="size-8 text-pink-400/60" />
+            <Zap className="size-8 text-pink-400/60" />
             <div className="space-y-1">
               <p className="text-sm font-bold leading-tight text-foreground/80">
                 When the professor says

@@ -4,7 +4,10 @@ import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { DEGREE_CATEGORIES,getBranchesForDegree } from "@/constants";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { validateDisplayName,validateUsername } from "@/lib/validation";
-import { AlertCircle,Cake,Check,GraduationCap,Loader2,Lock,ShieldCheck,Sparkles,Tag,Upload,User } from "lucide-react";
+import {
+AlertCircle,Cake,Check,GraduationCap,Loader2,Lock,ShieldCheck,Tag,Upload,User,
+Zap
+} from "lucide-react";
 import { useRef,useState } from "react";
 import { toast } from "sonner";
 import { completeOnboarding } from "./actions";
@@ -170,7 +173,7 @@ export function OnboardingForm({
             onClick={handleGenerateAvatar}
             className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
           >
-            <Sparkles className="size-3.5" /> Randomize
+            <Zap className="size-3.5" /> Randomize
           </button>
         </div>
       </div>

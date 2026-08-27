@@ -13,8 +13,8 @@ Lock,
 Plus,
 Search,
 ShieldCheck,
-Sparkles,
-Users2
+Users2,
+Zap
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -322,7 +322,7 @@ export function CommunitiesIndexClient({
 
             {initialPosts.length === 0 && (
               <div className="text-center py-16 rounded-3xl bg-card text-muted-foreground text-xs font-semibold space-y-2 shadow-2xs">
-                <Sparkles className="size-8 mx-auto text-muted-foreground/40" />
+                <Zap className="size-8 mx-auto text-muted-foreground/40" />
                 <p className="font-bold text-foreground">No community discussions posted yet.</p>
                 <p>Join a community to start the first conversation!</p>
               </div>

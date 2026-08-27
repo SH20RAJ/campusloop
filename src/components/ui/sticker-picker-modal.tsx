@@ -2,7 +2,10 @@
 
 import { CAMPUS_STICKERS,CampusSticker,STICKER_CATEGORIES } from "@/constants/stickers";
 import { cn } from "@/lib/utils";
-import { Search,Smile,Sparkles,X } from "lucide-react";
+import {
+Search,Smile,X,
+Zap
+} from "lucide-react";
 import { useMemo,useState } from "react";
 
 interface StickerPickerModalProps {
@@ -126,7 +129,7 @@ export function StickerPickerModal({
 
           {filteredStickers.length === 0 && (
             <div className="col-span-3 py-12 text-center text-xs text-muted-foreground space-y-1">
-              <Sparkles className="size-5 mx-auto text-muted-foreground/50" />
+              <Zap className="size-5 mx-auto text-muted-foreground/50" />
               <p className="font-bold text-foreground">No stickers match &ldquo;{searchQuery}&rdquo;</p>
               <p className="text-[10px]">Try searching &ldquo;chai&rdquo;, &ldquo;dead&rdquo;, &ldquo;exam&rdquo;, or &ldquo;fest&rdquo;</p>
             </div>

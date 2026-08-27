@@ -20,7 +20,6 @@ Lock,
 MessageCircle,
 Repeat2,
 ShieldCheck,
-Sparkles,
 Trophy,
 UserPlus,
 Users,
@@ -153,7 +152,7 @@ export function NotificationsClient({
         };
       default:
         return {
-          icon: <Sparkles className="size-3.5 text-primary" />,
+          icon: <Zap className="size-3.5 text-primary" />,
           badgeBg: "bg-primary/15 border-primary/30 text-primary",
           actionText: "interacted with you",
           href: "/app",

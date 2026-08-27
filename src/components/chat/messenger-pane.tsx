@@ -13,6 +13,8 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { isOnline,presenceLabel } from "@/lib/presence";
+import { PresenceDot } from "@/components/ui/presence-dot";
+import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
 import { cn } from "@/lib/utils";
 import {
 ArrowLeft,
@@ -69,6 +71,7 @@ export function MessengerPane({
   const [searchInChat, setSearchInChat] = useState(false);
   const [chatSearchQuery, setChatSearchQuery] = useState("");
   const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
+  const [comingSoonCallType, setComingSoonCallType] = useState<"voice" | "video" | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -98,6 +101,28 @@ export function MessengerPane({
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, chatSearchQuery]);
+
+  // Alert with native browser notification when new message arrives in background
+  const lastKnownMsgIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!messages || messages.length === 0) return;
+    const last = messages[messages.length - 1];
+    if (
+      lastKnownMsgIdRef.current &&
+      lastKnownMsgIdRef.current !== last.id &&
+      last.senderId !== currentUserId
+    ) {
+      sounds.pop();
+      haptics.light();
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+        triggerBrowserNotification(`CampusLoop: ${otherParticipant?.displayName || "New Message"}`, {
+          body: last.body,
+          url: `/app/chat/${conversationId}`,
+        });
+      }
+    }
+    lastKnownMsgIdRef.current = last.id;
+  }, [messages, currentUserId, otherParticipant, conversationId]);
 
   // Click outside to dismiss active locked reaction bar
   useEffect(() => {
@@ -236,12 +261,9 @@ export function MessengerPane({
   }
 
   function handleCallClick(type: "voice" | "video") {
-    toast.info(
-      `${type === "voice" ? "📞" : "📹"} CampusLoop ${
-        type === "voice" ? "Voice" : "Video"
-      } Room connecting to ${otherParticipant?.displayName}...`,
-      { duration: 3500 }
-    );
+    sounds.pop();
+    haptics.light();
+    setComingSoonCallType(type);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -344,7 +366,7 @@ export function MessengerPane({
                   {(otherParticipant.displayName?.[0] || "S").toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 ring-2 ring-card shadow-xs" />
+              <PresenceDot lastSeenAt={otherParticipant.lastSeenAt} />
             </Link>
 
             {/* Name & Branch / Presence status */}
@@ -357,25 +379,21 @@ export function MessengerPane({
                 <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
               </Link>
               <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1.5 font-medium">
-                {presenceText && (
-                  <>
-                    <span
-                      className={cn(
-                        "font-bold flex items-center gap-1",
-                        viewerIsOnline ? "text-emerald-500" : "text-muted-foreground",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "size-1.5 rounded-full",
-                          viewerIsOnline ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/50",
-                        )}
-                      />
-                      {presenceText}
-                    </span>
-                    <span>•</span>
-                  </>
-                )}
+                <span
+                  className={cn(
+                    "font-bold flex items-center gap-1 shrink-0",
+                    viewerIsOnline ? "text-emerald-500" : "text-muted-foreground",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full",
+                      viewerIsOnline ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/40",
+                    )}
+                  />
+                  {viewerIsOnline ? "Online" : presenceText || "Offline"}
+                </span>
+                <span>•</span>
                 <span>@{otherParticipant.username}</span>
                 {otherParticipant.branch && (
                   <>
@@ -843,6 +861,47 @@ export function MessengerPane({
         onClose={() => setShowStickerPicker(false)}
         onSelectSticker={(sticker) => sendMessage(sticker.url)}
       />
+
+      {/* Voice & Video Call Coming Soon Modal */}
+      {comingSoonCallType && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in-50">
+          <div className="w-full max-w-sm rounded-3xl bg-card border border-border/80 p-6 shadow-2xl space-y-4 text-center">
+            <div className="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner">
+              {comingSoonCallType === "voice" ? <Phone className="size-7" /> : <Video className="size-7" />}
+            </div>
+            <div className="space-y-1.5">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                Coming Soon
+              </span>
+              <h3 className="text-lg font-black text-foreground">
+                {comingSoonCallType === "voice" ? "Campus Voice Call" : "Campus Video Call"}
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                End-to-end encrypted peer-to-peer campus calling with {otherParticipant?.displayName} is currently in testing for verified college networks and will be rolling out in the next update!
+              </p>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setComingSoonCallType(null)}
+                className="flex-1 py-2.5 rounded-full border border-border/80 text-xs font-bold text-foreground hover:bg-muted transition-colors cursor-pointer"
+              >
+                Got it
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setComingSoonCallType(null);
+                  toast.success("We'll notify you when campus calls go live!");
+                }}
+                className="flex-1 py-2.5 rounded-full bg-primary text-xs font-black text-primary-foreground hover:bg-primary/95 shadow-md transition-all cursor-pointer"
+              >
+                Notify Me
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

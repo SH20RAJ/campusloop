@@ -52,7 +52,12 @@ interface NotificationsResponse {
   unreadCount: number;
 }
 
+import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
+import { useEffect, useRef } from "react";
+
 export function useNotifications(tab: NotificationTab = "all") {
+  const lastTopIdRef = useRef<string | null>(null);
+
   const { data, error, isLoading, mutate } = useSWR<NotificationsResponse>(
     `/api/notifications?tab=${tab}`,
     fetcher,
@@ -66,6 +71,30 @@ export function useNotifications(tab: NotificationTab = "all") {
 
   const notifications = data?.notifications || [];
   const unreadCount = data?.unreadCount || 0;
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && "setAppBadge" in navigator) {
+      if (unreadCount > 0) {
+        navigator.setAppBadge(unreadCount).catch(() => {});
+      } else if ("clearAppBadge" in navigator) {
+        navigator.clearAppBadge().catch(() => {});
+      }
+    }
+
+    if (data?.notifications && data.notifications.length > 0) {
+      const top = data.notifications[0];
+      if (lastTopIdRef.current && lastTopIdRef.current !== top.id && !top.isRead) {
+        if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+          const actorName = top.actor?.displayName || "A classmate";
+          triggerBrowserNotification(`CampusLoop: ${actorName}`, {
+            body: top.previewText || "Sent you a new campus notification",
+            url: "/app/notifications",
+          });
+        }
+      }
+      lastTopIdRef.current = top.id;
+    }
+  }, [data, unreadCount]);
 
   async function markAllAsRead() {
     // Optimistically mark all as read

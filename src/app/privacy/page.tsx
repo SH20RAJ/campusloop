@@ -1,7 +1,15 @@
-import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
-import { ArrowLeft,Database,EyeOff,Key,Lock,Mail,ShieldCheck,UserCheck } from "lucide-react";
+import { LegalNav } from "@/components/marketing/legal-nav";
+import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
+import {
+  Database,
+  EyeOff,
+  Key,
+  Lock,
+  Mail,
+  ShieldCheck,
+  UserCheck,
+} from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | CampusLoop",
@@ -42,7 +50,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 export default function PrivacyPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -59,156 +66,196 @@ export default function PrivacyPage() {
     },
     inLanguage: "en-IN",
     datePublished: "2026-01-01",
-    dateModified: "2026-08-24",
+    dateModified: "2026-08-28",
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground bg-grid-pattern relative overflow-x-hidden pb-12">
+    <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden select-none">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <MarketingHeader />
+      <LegalNav />
 
-      {/* Main Content */}
-      <main className="flex-1 w-full max-w-4xl px-4 sm:px-6 pt-28 pb-16 mx-auto space-y-10">
-        <div className="space-y-4 text-center sm:text-left">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Home
-          </Link>
+      {/* Main Content Container (Twitter / X Document Layout) */}
+      <main className="flex-1 w-full max-w-4xl px-4 sm:px-6 pt-10 pb-20 mx-auto space-y-8">
+        {/* Header Header & Badge */}
+        <div className="space-y-3 border-b border-border/40 pb-6">
           <div className="flex items-center gap-2 text-primary text-xs font-black uppercase tracking-wider">
-            <ShieldCheck className="size-4" /> Data Protection &amp; Confidentiality
+            <ShieldCheck className="size-4" />
+            <span>Data Protection &amp; Confidentiality Notice</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-foreground">
-            Privacy <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Policy</span>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
+            Privacy Policy
           </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl font-medium">
-            Last Updated: August 24, 2026. Formulated in accordance with the Digital Personal Data Protection Act, 2023 (DPDP Act) and the Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011.
-          </p>
-        </div>
-
-        {/* Commitment Banner */}
-        <div className="rounded-3xl border border-primary/30 bg-primary/5 p-5 sm:p-6 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
-            <Lock className="size-4" /> Privacy-First Architecture
+          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-muted-foreground font-medium">
+            <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-[11px] font-bold text-foreground">
+              DPDP Act 2023 Compliant
+            </span>
+            <span>•</span>
+            <span>Last Updated: August 28, 2026</span>
+            <span>•</span>
+            <span>CampusLoop Inc.</span>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            At CampusLoop, privacy is not a checkbox; it is our core engineering philosophy. We ensure verified campus access while guaranteeing that anonymous student discourse cannot be linked back to individual profiles by unauthorized third parties.
+        </div>
+
+        {/* Quick Jump Bar */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
+          {[
+            { id: "#data", label: "1. Data We Collect" },
+            { id: "#anon", label: "2. Cryptographic Anonymity" },
+            { id: "#rights", label: "3. Data Principal Rights" },
+            { id: "#security", label: "4. Security & Storage" },
+            { id: "#dpo", label: "5. Grievance & DPO" },
+          ].map((item) => (
+            <a
+              key={item.id}
+              href={item.id}
+              className="rounded-full border border-border/60 bg-card px-3 py-1 font-semibold text-muted-foreground hover:text-foreground hover:border-border transition-colors shrink-0"
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+
+        {/* Core Architecture Callout */}
+        <div className="rounded-2xl border border-primary/25 bg-primary/5 p-5 space-y-2">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
+            <Lock className="size-4" />
+            <span>Privacy-By-Design Architecture</span>
+          </div>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            At CampusLoop, privacy is not a decorative policy; it is our foundation. We enforce verified college email gating while guaranteeing that anonymous student discourse and confessions cannot be linked back to individual student records by unauthorized parties.
           </p>
         </div>
 
-        {/* Policy Sections */}
-        <div className="space-y-8 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-          {/* Section 1 */}
-          <section className="space-y-3 rounded-2xl border border-border/80 bg-card p-6 shadow-xs">
-            <h2 className="text-base sm:text-lg font-black text-foreground flex items-center gap-2">
-              <Database className="size-5 text-blue-500" /> 1. Data We Collect (Data Fiduciary Notice)
+        {/* Section 1 */}
+        <section id="data" className="space-y-4 scroll-mt-28 rounded-2xl border border-border/60 bg-card p-6 shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
+              <Database className="size-4.5" />
+            </span>
+            <h2 className="text-lg font-black text-foreground">
+              1. Data We Collect (Data Fiduciary Notice)
             </h2>
-            <p>
-              Under Section 5 of the DPDP Act 2023, we collect only the minimum data necessary to deliver verified campus connectivity:
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2 pt-2">
-              <div className="rounded-xl border border-border/60 bg-muted/20 p-3 space-y-1">
-                <span className="font-extrabold text-foreground text-xs block">📧 Institutional Email ID</span>
-                <p className="text-[11px] text-muted-foreground">
-                  Used solely to verify your affiliation with an accredited college domain (e.g. <code className="text-primary">.edu</code>, <code className="text-primary">.ac.in</code>). Never sold or shared with commercial marketers.
-                </p>
-              </div>
-              <div className="rounded-xl border border-border/60 bg-muted/20 p-3 space-y-1">
-                <span className="font-extrabold text-foreground text-xs block">👤 Student Profile Data</span>
-                <p className="text-[11px] text-muted-foreground">
-                  Display name, handle, batch, branch, graduation year, bio, and optional profile picture/banner uploaded by you.
-                </p>
-              </div>
-              <div className="rounded-xl border border-border/60 bg-muted/20 p-3 space-y-1">
-                <span className="font-extrabold text-foreground text-xs block">💬 User-Generated Posts &amp; Polls</span>
-                <p className="text-[11px] text-muted-foreground">
-                  Campus discussions, poll responses, comment threads, dating preferences, and community messages created on the platform.
-                </p>
-              </div>
-              <div className="rounded-xl border border-border/60 bg-muted/20 p-3 space-y-1">
-                <span className="font-extrabold text-foreground text-xs block">🛡️ Security &amp; Device Telemetry</span>
-                <p className="text-[11px] text-muted-foreground">
-                  Hashed session tokens, IP logs for DDoS mitigation, and worker error telemetry to prevent bot abuse and spam.
-                </p>
-              </div>
+          </div>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            Under Section 5 of the Digital Personal Data Protection Act, 2023, we collect only the minimal data strictly necessary to deliver verified, safe campus networking:
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 pt-1">
+            <div className="rounded-xl border border-border/40 bg-muted/20 p-3.5 space-y-1">
+              <span className="font-extrabold text-foreground text-xs block">📧 College Email ID</span>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Used solely to verify affiliation with an accredited college domain (e.g. <code className="text-primary font-mono">.ac.in</code>, <code className="text-primary font-mono">.edu</code>). Never sold or rented to commercial third parties.
+              </p>
             </div>
-          </section>
-
-          {/* Section 2 */}
-          <section className="space-y-3 rounded-2xl border border-border/80 bg-card p-6 shadow-xs">
-            <h2 className="text-base sm:text-lg font-black text-foreground flex items-center gap-2">
-              <EyeOff className="size-5 text-purple-500" /> 2. Cryptographic Anonymity Separation
-            </h2>
-            <p>
-              When you choose to publish a post or confession under <strong>Anonymous Mode 🙈</strong>:
-            </p>
-            <ul className="list-disc pl-5 space-y-1.5 text-xs text-foreground/80">
-              <li>The API and database layers strip relational pointers to your identity before sending data to the client feed.</li>
-              <li>Other students and campus administrators can never view the author&apos;s real name, email, or handle.</li>
-              <li>Anonymity is preserved across feed cards, comment lists, and poll votes.</li>
-            </ul>
-          </section>
-
-          {/* Section 3 */}
-          <section className="space-y-3 rounded-2xl border border-border/80 bg-card p-6 shadow-xs">
-            <h2 className="text-base sm:text-lg font-black text-foreground flex items-center gap-2">
-              <UserCheck className="size-5 text-emerald-500" /> 3. Your Rights as a Data Principal (DPDP Act 2023)
-            </h2>
-            <p>
-              As a Data Principal under the Digital Personal Data Protection Act, 2023, you are entitled to the following statutory rights:
-            </p>
-            <ul className="list-disc pl-5 space-y-1.5 text-xs text-foreground/80">
-              <li><strong>Right to Access:</strong> You can view and download all personal information associated with your account from your Profile Settings.</li>
-              <li><strong>Right to Correction:</strong> You can edit or correct your profile details, department, course, and headline at any time.</li>
-              <li><strong>Right to Erasure / Deletion:</strong> You have the right to request permanent deletion of your account and all associated personal data by emailing <a href="mailto:privacy@campusloop.space" className="text-primary hover:underline font-bold">privacy@campusloop.space</a>.</li>
-              <li><strong>Right to Grievance Redressal:</strong> You can escalate data protection concerns directly to our Data Protection Officer.</li>
-            </ul>
-          </section>
-
-          {/* Section 4 */}
-          <section className="space-y-3 rounded-2xl border border-border/80 bg-card p-6 shadow-xs">
-            <h2 className="text-base sm:text-lg font-black text-foreground flex items-center gap-2">
-              <Key className="size-5 text-amber-500" /> 4. Data Storage &amp; Encryption Standards
-            </h2>
-            <p>
-              All user data is encrypted in transit using Transport Layer Security (TLS 1.3) and at rest utilizing AES-256 encryption within Neon serverless PostgreSQL and Cloudflare edge networks located in secure data centers.
-            </p>
-          </section>
-
-          {/* Section 5 - DPO & Grievance Contact */}
-          <section className="space-y-4 rounded-3xl border border-primary/40 bg-gradient-to-br from-card via-card to-primary/5 p-6 shadow-sm">
-            <div className="flex items-center gap-2 text-primary font-black uppercase tracking-wider text-xs">
-              <Mail className="size-4" /> Data Protection Officer
+            <div className="rounded-xl border border-border/40 bg-muted/20 p-3.5 space-y-1">
+              <span className="font-extrabold text-foreground text-xs block">👤 Student Profile Data</span>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Display name, username, department, branch, graduating batch, bio, and optional profile picture/banner uploaded by you.
+              </p>
             </div>
-            <h2 className="text-base sm:text-lg font-black text-foreground">
-              5. Contacting the Data Protection Officer (DPO)
-            </h2>
-            <p className="text-xs">
-              If you have any questions, requests for data deletion, or privacy inquiries under the DPDP Act 2023:
-            </p>
-
-            <div className="rounded-2xl border border-border/80 bg-card p-4 space-y-2 text-xs text-foreground">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-muted-foreground">Officer:</span>
-                <span className="font-extrabold">Data Protection &amp; Privacy Officer</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-muted-foreground">Email:</span>
-                <a href="mailto:privacy@campusloop.space" className="font-extrabold text-primary hover:underline">
-                  privacy@campusloop.space
-                </a>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-muted-foreground">Response SLA:</span>
-                <span className="font-extrabold">Within 48 hours for data requests</span>
-              </div>
+            <div className="rounded-xl border border-border/40 bg-muted/20 p-3.5 space-y-1">
+              <span className="font-extrabold text-foreground text-xs block">💬 User Content &amp; Polls</span>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Campus posts, votes, poll responses, comment threads, dating preferences, and community discussions published on the platform.
+              </p>
             </div>
-          </section>
-        </div>
+            <div className="rounded-xl border border-border/40 bg-muted/20 p-3.5 space-y-1">
+              <span className="font-extrabold text-foreground text-xs block">🛡️ Security Telemetry</span>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Hashed session tokens, IP rate-limiting signatures, and DDoS telemetry processed via Cloudflare Workers edge nodes.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 2 */}
+        <section id="anon" className="space-y-3 scroll-mt-28 rounded-2xl border border-border/60 bg-card p-6 shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-purple-500/10 text-purple-500">
+              <EyeOff className="size-4.5" />
+            </span>
+            <h2 className="text-lg font-black text-foreground">
+              2. Cryptographic Anonymity Separation
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            When you publish a post or confession under <strong>Anonymous Mode 🙈</strong>:
+          </p>
+          <ul className="list-disc pl-5 space-y-2 text-xs sm:text-sm text-foreground/80 leading-relaxed">
+            <li>The API and database layers automatically strip relational foreign keys to your real student profile before publishing to the campus feed.</li>
+            <li>Other students, seniors, and campus faculty can never inspect the author&apos;s real name, email, or profile handle.</li>
+            <li>Client-side PII redactor automatically warns you if your post contains phone numbers, roll numbers, or personal email addresses.</li>
+          </ul>
+        </section>
+
+        {/* Section 3 */}
+        <section id="rights" className="space-y-3 scroll-mt-28 rounded-2xl border border-border/60 bg-card p-6 shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
+              <UserCheck className="size-4.5" />
+            </span>
+            <h2 className="text-lg font-black text-foreground">
+              3. Your Rights as a Data Principal (DPDP Act 2023)
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            As a Data Principal under Indian data protection law, you possess full statutory sovereignty over your personal records:
+          </p>
+          <ul className="list-disc pl-5 space-y-2 text-xs sm:text-sm text-foreground/80 leading-relaxed">
+            <li><strong>Right to Access &amp; Summary:</strong> You can review all personal data linked to your account via Profile Settings.</li>
+            <li><strong>Right to Correction &amp; Erasure:</strong> Edit your information anytime or request permanent account erasure by emailing <a href="mailto:privacy@campusloop.space" className="text-primary hover:underline font-bold">privacy@campusloop.space</a>.</li>
+            <li><strong>Right of Grievance Redressal:</strong> Escalate any data governance concern directly to our designated Grievance Officer.</li>
+          </ul>
+        </section>
+
+        {/* Section 4 */}
+        <section id="security" className="space-y-3 scroll-mt-28 rounded-2xl border border-border/60 bg-card p-6 shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+              <Key className="size-4.5" />
+            </span>
+            <h2 className="text-lg font-black text-foreground">
+              4. Storage &amp; Encryption Standards
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            All user data is encrypted in transit via Transport Layer Security (TLS 1.3) and at rest utilizing AES-256 encryption within Neon serverless PostgreSQL and Cloudflare edge networks deployed in compliant data centers.
+          </p>
+        </section>
+
+        {/* Section 5: Grievance Officer */}
+        <section id="dpo" className="space-y-4 scroll-mt-28 rounded-2xl border border-primary/30 bg-card p-6 shadow-xs">
+          <div className="flex items-center gap-2 text-primary font-black uppercase tracking-wider text-xs">
+            <Mail className="size-4" />
+            <span>Designated Data Protection Officer</span>
+          </div>
+          <h2 className="text-lg font-black text-foreground">
+            5. Grievance Officer Contact Details
+          </h2>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            In accordance with the DPDP Act 2023 and Rule 3(2) of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021:
+          </p>
+
+          <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-2 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-muted-foreground">Officer Name:</span>
+              <span className="font-bold text-foreground">Data Protection &amp; Grievance Officer</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-muted-foreground">Email:</span>
+              <a href="mailto:privacy@campusloop.space" className="font-bold text-primary hover:underline">
+                privacy@campusloop.space
+              </a>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-muted-foreground">Response Turnaround:</span>
+              <span className="font-bold text-foreground">Within 24 to 48 working hours</span>
+            </div>
+          </div>
+        </section>
       </main>
 
       <MarketingFooter />

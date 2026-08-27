@@ -14,6 +14,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProfileClientView } from "../app/(main)/profile/profile-client";
+import { PublicFollowButton } from "@/components/profile/public-follow-button";
 
 interface VanityProfileProps {
   params: Promise<{ username: string }>;
@@ -254,12 +255,12 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                 )}
               </div>
 
-              <Link
-                href="/join?mode=signup"
-                className="rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-xs font-bold text-primary shadow-2xs hover:bg-primary/10 transition-all cursor-pointer"
-              >
-                🛡️ Verify to connect
-              </Link>
+              <PublicFollowButton
+                username={profile.username}
+                displayName={profile.displayName}
+                profileId={profile.id}
+                isSignedIn={false}
+              />
             </div>
 
             <div className="space-y-1">

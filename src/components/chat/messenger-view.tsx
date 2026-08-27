@@ -89,9 +89,19 @@ export function MessengerView({
     ) {
       const firstId = conversations[0].id;
       setActiveConversationId(firstId);
-      router.replace(`/app/chat/${firstId}`, { scroll: false });
+      window.history.replaceState(null, "", `/app/chat/${firstId}`);
     }
-  }, [conversations, activeConversationId, initialConversationId, router]);
+  }, [conversations, activeConversationId, initialConversationId]);
+
+  // Sync state when browser back / forward buttons are pressed
+  useEffect(() => {
+    const handlePopState = () => {
+      const match = window.location.pathname.match(/\/app\/chat\/([^/]+)/);
+      setActiveConversationId(match ? match[1] : null);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   // Auto-start or select conversation if targetUserId was provided via URL query
   useEffect(() => {
@@ -108,15 +118,19 @@ export function MessengerView({
   const handleSelectConversation = useCallback(
     (convId: string) => {
       setActiveConversationId(convId);
-      router.push(`/app/chat/${convId}`, { scroll: false });
+      if (typeof window !== "undefined") {
+        window.history.pushState(null, "", `/app/chat/${convId}`);
+      }
     },
-    [router]
+    []
   );
 
   const handleBackToInbox = useCallback(() => {
     setActiveConversationId(null);
-    router.push("/app/chat", { scroll: false });
-  }, [router]);
+    if (typeof window !== "undefined") {
+      window.history.pushState(null, "", "/app/chat");
+    }
+  }, []);
 
   async function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
     const query = e.target.value;

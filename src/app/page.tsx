@@ -17,6 +17,7 @@ import { LeaderboardShowcase } from "@/components/landing/leaderboard-demo";
 import { MatchmakingShowcase } from "@/components/landing/matchmaking-demo";
 import { Reveal } from "@/components/landing/reveal";
 import { TimeCapsuleShowcase } from "@/components/landing/time-capsule-showcase";
+import { InteractiveBentoCard } from "@/components/landing/interactive-bento-card";
 import {
 CTABand,
 GradientText,
@@ -315,8 +316,11 @@ export default async function LandingPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* 1. Dynamic Feed & Repost Chimes */}
             <Reveal className="lg:col-span-2">
-              <Card className="h-full bg-primary/[0.04] border-primary/20">
-                <CardContent className="space-y-4 p-6">
+              <InteractiveBentoCard
+                className="bg-primary/[0.03] border-primary/25 hover:border-primary/60"
+                glowColor="rgba(255, 90, 95, 0.22)"
+              >
+                <div className="space-y-4 p-6">
                   <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider">
                     <Repeat2 className="size-4" />
                     <span>Campus Feed &amp; Audio Celebrations</span>
@@ -328,14 +332,17 @@ export default async function LandingPage() {
                     Spill confessions safely with automatic client-side PII scrubbing. Settle debates with live polls, vote on trending topics, and celebrate quotes with crystalline Web Audio chimes and emerald confetti bursts.
                   </p>
                   <ConfessionDemo />
-                </CardContent>
-              </Card>
+                </div>
+              </InteractiveBentoCard>
             </Reveal>
 
             {/* 2. Campus Match & Secret Crush Vault */}
             <Reveal delay={0.1}>
-              <Card className="h-full bg-card border-border/80">
-                <CardContent className="space-y-4 p-6">
+              <InteractiveBentoCard
+                className="bg-rose-500/[0.03] border-rose-500/25 hover:border-rose-500/60"
+                glowColor="rgba(244, 63, 94, 0.25)"
+              >
+                <div className="space-y-4 p-6">
                   <div className="flex items-center gap-2 text-xs font-bold text-rose-500 uppercase tracking-wider">
                     <Heart className="size-4" />
                     <span>Campus Match &amp; Crush</span>
@@ -347,14 +354,17 @@ export default async function LandingPage() {
                     Swipe on real classmates who cleared the same college domain check. Plus, lock up to 5 campus crushes in our zero-doxxing vault where identity only reveals upon mutual lock!
                   </p>
                   <MatchDemo />
-                </CardContent>
-              </Card>
+                </div>
+              </InteractiveBentoCard>
             </Reveal>
 
             {/* 3. Campus Hubs & Marketplace */}
             <Reveal delay={0.05}>
-              <Card className="h-full bg-card border-border/80">
-                <CardContent className="space-y-3 p-6">
+              <InteractiveBentoCard
+                className="bg-emerald-500/[0.03] border-emerald-500/25 hover:border-emerald-500/60"
+                glowColor="rgba(16, 185, 129, 0.22)"
+              >
+                <div className="space-y-3 p-6">
                   <div className="flex items-center gap-2 text-xs font-bold text-emerald-500 uppercase tracking-wider">
                     <ShoppingBag className="size-4" />
                     <span>Student Services</span>
@@ -367,19 +377,22 @@ export default async function LandingPage() {
                   </p>
                   <div className="flex flex-wrap gap-1.5 pt-2">
                     {["Cycles & Drafters", "Valorant 5v5", "Lost IDs", "Cab Pools"].map((chip) => (
-                      <span key={chip} className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-muted text-foreground/80">
+                      <span key={chip} className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-muted/60 text-foreground/80 border border-border/40 group-hover:border-emerald-500/40 transition-colors">
                         {chip}
                       </span>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </InteractiveBentoCard>
             </Reveal>
 
             {/* 4. Campus Time Capsule (Unique!) */}
             <Reveal delay={0.1}>
-              <Card className="h-full bg-amber-500/[0.04] border-amber-500/20">
-                <CardContent className="space-y-3 p-6">
+              <InteractiveBentoCard
+                className="bg-amber-500/[0.03] border-amber-500/25 hover:border-amber-500/60"
+                glowColor="rgba(245, 158, 11, 0.25)"
+              >
+                <div className="space-y-3 p-6">
                   <div className="flex items-center gap-2 text-xs font-bold text-amber-500 uppercase tracking-wider">
                     <Hourglass className="size-4" />
                     <span>Unique Feature</span>
@@ -390,17 +403,20 @@ export default async function LandingPage() {
                   <p className="text-xs leading-relaxed text-muted-foreground">
                     Bury predictions, letters, and memories for your future batch. Sealed cryptographically until Convocation Day with live countdown tickers.
                   </p>
-                  <div className="rounded-xl bg-background/80 border border-border/40 p-2.5 text-xs text-center font-mono font-bold text-amber-500">
+                  <div className="rounded-xl bg-background/80 border border-border/40 p-2.5 text-xs text-center font-mono font-bold text-amber-500 shadow-inner group-hover:border-amber-500/40 transition-colors">
                     <span>Unlocks in 280d 14h 32m ⏳</span>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </InteractiveBentoCard>
             </Reveal>
 
             {/* 5. Loop Points & Clout */}
             <Reveal delay={0.15}>
-              <Card className="h-full bg-card border-border/80">
-                <CardContent className="space-y-3 p-6">
+              <InteractiveBentoCard
+                className="bg-blue-500/[0.03] border-blue-500/25 hover:border-blue-500/60"
+                glowColor="rgba(59, 130, 246, 0.25)"
+              >
+                <div className="space-y-3 p-6">
                   <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider">
                     <ShieldCheck className="size-4" />
                     <span>Reputation System</span>
@@ -414,8 +430,8 @@ export default async function LandingPage() {
                   <div className="pt-2">
                     <PointsDemo />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </InteractiveBentoCard>
             </Reveal>
           </div>
         </section>

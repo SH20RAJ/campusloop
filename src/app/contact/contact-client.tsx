@@ -1,8 +1,8 @@
 "use client";
 
+import { LegalNav } from "@/components/marketing/legal-nav";
 import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
-import { ArrowLeft,Send } from "lucide-react";
-import Link from "next/link";
+import { Send } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -27,15 +27,13 @@ export function ContactClient() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground bg-grid-pattern relative overflow-x-hidden pb-12">
+    <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden select-none pb-12">
       <MarketingHeader />
+      <LegalNav />
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-md px-6 pt-28 mx-auto space-y-6">
+      <main className="flex-1 w-full max-w-md px-4 sm:px-6 pt-10 pb-16 mx-auto space-y-6">
         <div className="space-y-3">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors">
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Home
-          </Link>
           <h1 className="text-3xl font-black tracking-tight text-foreground">
             Contact <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Support</span>
           </h1>

@@ -2,6 +2,7 @@ import { getDb } from "@/db";
 import { conversations,messages,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
+import { recordHeartbeat } from "@/lib/presence-server";
 import { and,asc,eq,isNull,ne } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -27,6 +28,8 @@ export async function GET(req: Request, { params }: RouteParams) {
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
+
+    recordHeartbeat(profile.id).catch(() => {});
 
     // Auto-mark peer's messages as read (Seen status)
     await db
@@ -72,6 +75,8 @@ export async function POST(req: Request, { params }: RouteParams) {
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 403 });
     }
+
+    recordHeartbeat(profile.id).catch(() => {});
 
     const viewerBlocked = await rejectViewerWrite(profile);
     if (viewerBlocked) return viewerBlocked;

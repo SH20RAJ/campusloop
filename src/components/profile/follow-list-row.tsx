@@ -70,14 +70,23 @@ export function FollowListRow({
         )}
       </div>
 
-      {showFollowButton && !user.isViewer && (
-        <FollowButton
-          username={user.username}
-          displayName={user.displayName}
-          initialIsFollowing={user.isFollowedByViewer}
-          size="sm"
-          className="mt-0.5 shrink-0"
-        />
+      {!user.isViewer && (
+        showFollowButton ? (
+          <FollowButton
+            username={user.username}
+            displayName={user.displayName}
+            initialIsFollowing={user.isFollowedByViewer}
+            size="sm"
+            className="mt-0.5 shrink-0"
+          />
+        ) : (
+          <Link
+            href={`/join?mode=signup&returnUrl=/@${user.username}`}
+            className="mt-0.5 shrink-0 inline-flex items-center justify-center rounded-full bg-primary h-8 px-3.5 text-[11px] font-bold text-primary-foreground shadow-2xs hover:bg-primary/90 transition-all cursor-pointer"
+          >
+            Follow
+          </Link>
+        )
       )}
     </li>
   );

@@ -190,9 +190,10 @@ export default async function PostDetailPage({ params }: PostPageProps) {
         )}
       </header>
 
-      <div className="flex flex-col px-4 pt-3 gap-3">
+      <div className="flex flex-col">
         {/* Main Post Card */}
         <FeedCard post={post as FeedPost} currentUserId={profile?.id} disableNavigation />
+
 
         {/* Comments Section */}
         {profile ? (

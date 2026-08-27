@@ -1,7 +1,14 @@
 "use client";
 
+import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
+import { FeedCardActions } from "@/components/feed/feed-card-actions";
+import { FeedCardHeader } from "@/components/feed/feed-card-header";
+import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { RichText } from "@/components/ui/rich-text";
 import { FeedPost } from "@/hooks/use-feed";
 import { repostPost,voteOnPost } from "@/lib/api";
+import { getAvatarUrl } from "@/lib/utils";
 import { AnimatePresence,motion } from "framer-motion";
 import { Heart,Repeat2 } from "lucide-react";
 import Link from "next/link";
@@ -11,13 +18,6 @@ import { toast } from "sonner";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
 import { ShareStoryModal } from "./share-story-modal";
-
-import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
-import { FeedCardActions } from "@/components/feed/feed-card-actions";
-import { FeedCardHeader } from "@/components/feed/feed-card-header";
-import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
-import { TopCommentCard } from "@/components/feed/top-comment-preview";
-import { RichText } from "@/components/ui/rich-text";
 
 interface FeedCardProps {
   post: FeedPost;
@@ -40,9 +40,10 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const [isReposting, setIsReposting] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
 
-
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
+  const avatarFallback = post.isAnonymous ? "🙈" : (post.author?.displayName?.[0] ?? "S");
+  const avatarUrl = post.isAnonymous ? "" : getAvatarUrl(post.author?.avatarUrl, post.author?.username ?? "student");
 
   async function handleVote() {
     if (isLoading) return;
@@ -98,40 +99,38 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
     if (typeof window !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: "CampusLoop Post",
-          text: `Check out this campus post: "${post.body.slice(0, 100)}${post.body.length > 100 ? "..." : ""}"`,
+          title: `Post by ${authorName} on CampusLoop`,
+          text: post.body.slice(0, 100),
           url: postUrl,
         });
-        return;
-      } catch (err) {
-        if ((err as Error).name !== "AbortError") {
-          setShowShareStoryModal(true);
-        }
-        return;
+      } catch {
+        // Fallback to copy
+        await navigator.clipboard.writeText(postUrl);
+        toast.success("Link copied to clipboard! 📋");
       }
+    } else {
+      await navigator.clipboard.writeText(postUrl);
+      toast.success("Link copied to clipboard! 📋");
     }
-    setShowShareStoryModal(true);
   }
 
-  async function handleExecuteRepost(withCommentary: boolean) {
-    if (isReposting) return;
+  async function handleExecuteRepost(isQuote: boolean) {
     setIsReposting(true);
-
     try {
-      await repostPost(post.id, withCommentary ? quoteThoughts : undefined);
-      toast.success(withCommentary ? "Reshared with your thoughts! 🎉" : "Reposted to campus feed! 🔁");
+      await repostPost(post.id, isQuote ? quoteThoughts : undefined);
+      toast.success(isQuote ? "Quote post published! 🔁" : "Post reposted to feed! 🔁");
       setShowRepostModal(false);
       setQuoteThoughts("");
+      router.refresh();
     } catch (err) {
-      toast.error("Could not repost. Try again.");
-      console.error(err);
+      toast.error(err instanceof Error ? err.message : "Failed to repost");
     } finally {
       setIsReposting(false);
     }
   }
 
   return (
-    <div className="rounded-3xl bg-card text-card-foreground shadow-2xs hover:shadow-xs transition-all relative overflow-hidden border border-border/40">
+    <article className="border-b border-border/30 hover:bg-muted/[0.12] transition-colors relative cursor-pointer select-none px-4 py-3.5">
       {/* Double Tap Heart Pop Overlay */}
       <AnimatePresence>
         {showDoubleTapHeart && (
@@ -151,75 +150,97 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
 
       {/* Repost Banner Header */}
       {post.repostOfId && (
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold px-5 pt-3 -mb-1 select-none">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold pl-12 pb-1.5 select-none">
           <Repeat2 className="size-3.5 text-emerald-500" />
           <span>{authorName} Reposted</span>
         </div>
       )}
 
-      {/* Card Header */}
-      <FeedCardHeader
-        post={post}
-        currentUserId={currentUserId}
-        onOpenRepostModal={() => setShowRepostModal(true)}
-        onOpenReportModal={() => setShowReport(true)}
-        onShare={handleSharePost}
-      />
+      {/* Twitter 2-Column Layout */}
+      <div className="flex gap-3">
+        {/* Left Column: Author Avatar */}
+        <div className="shrink-0 pt-0.5">
+          {!post.isAnonymous ? (
+            <Link
+              href={`/@${authorHandle}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Avatar className="size-10 rounded-full border border-border/40 hover:opacity-90 transition-opacity">
+                <AvatarImage src={avatarUrl || ""} />
+                <AvatarFallback className="font-bold text-xs bg-muted text-foreground">
+                  {avatarFallback}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+          ) : (
+            <Avatar className="size-10 rounded-full border border-border/40 bg-muted">
+              <AvatarFallback className="font-bold text-xs text-muted-foreground">
+                {avatarFallback}
+              </AvatarFallback>
+            </Avatar>
+          )}
+        </div>
 
-      {/* Content Body */}
-      <div
-        className="px-5 py-1 cursor-pointer select-none"
-        onClick={handleCardClick}
-        onDoubleClick={handleDoubleTap}
-      >
-        <RichText content={post.body} className="text-sm md:text-base leading-relaxed text-foreground font-normal" />
+        {/* Right Column: Header, Body, Media, Actions */}
+        <div className="flex-1 min-w-0 space-y-1">
+          <FeedCardHeader
+            post={post}
+            currentUserId={currentUserId}
+            onOpenRepostModal={() => setShowRepostModal(true)}
+            onOpenReportModal={() => setShowReport(true)}
+            onShare={handleSharePost}
+          />
 
-        {/* Embedded Original Quoted Post */}
-        {post.repostOf && (
-          <Link href={`/app/post/${post.repostOf.id}`} onClick={(e) => e.stopPropagation()}>
-            <div className="mt-3 rounded-2xl bg-muted/40 hover:bg-muted/60 transition-colors p-3.5 text-xs space-y-1.5 cursor-pointer">
-              <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
-                <span className="font-bold text-foreground">@{post.repostOf.author?.username || "student"}</span>
-                {post.repostOf.institution?.name && (
-                  <>
-                    <span>•</span>
-                    <span className="truncate text-[11px]">{post.repostOf.institution.name}</span>
-                  </>
-                )}
-              </div>
-              <p className="text-muted-foreground line-clamp-2">{post.repostOf.body}</p>
-            </div>
-          </Link>
-        )}
-
-        {/* Poll Component */}
-        {post.type === "POLL" && post.pollOptions && (
-          <div className="mt-3" onClick={(e) => e.stopPropagation()}>
-            <PollCard post={post} />
+          {/* Content Body */}
+          <div
+            className="text-[15px] leading-normal text-foreground font-normal break-words pt-0.5"
+            onClick={handleCardClick}
+            onDoubleClick={handleDoubleTap}
+          >
+            <RichText content={post.body} />
           </div>
-        )}
+
+          {/* Embedded Original Quoted Post */}
+          {post.repostOf && (
+            <Link
+              href={`/app/post/${post.repostOf.id}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mt-2.5 rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors p-3 text-xs space-y-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
+                  <span className="font-bold text-foreground">@{post.repostOf.author?.username || "student"}</span>
+                  {post.repostOf.institution?.name && (
+                    <>
+                      <span>·</span>
+                      <span className="truncate text-[11px]">{post.repostOf.institution.name.split(",")[0]}</span>
+                    </>
+                  )}
+                </div>
+                <p className="text-foreground/90 line-clamp-3 leading-relaxed">{post.repostOf.body}</p>
+              </div>
+            </Link>
+          )}
+
+          {/* Poll Component */}
+          {post.type === "POLL" && post.pollOptions && (
+            <div className="mt-2.5" onClick={(e) => e.stopPropagation()}>
+              <PollCard post={post} />
+            </div>
+          )}
+
+          {/* Action Bar */}
+          <FeedCardActions
+            post={post}
+            userVote={userVote}
+            votesCount={votesCount}
+            commentsCount={commentsCount}
+            onVote={handleVote}
+            onInstantRepost={() => handleExecuteRepost(false)}
+            onShare={handleSharePost}
+            onOpenComments={() => setShowCommentsModal(true)}
+          />
+        </div>
       </div>
-
-      {/* LinkedIn-Style Top/Trending Comment Preview */}
-      {post.topComment && (
-        <TopCommentCard
-          topComment={post.topComment}
-          commentsCount={commentsCount}
-          onClick={() => setShowCommentsModal(true)}
-        />
-      )}
-
-      {/* Card Actions */}
-      <FeedCardActions
-        post={post}
-        userVote={userVote}
-        votesCount={votesCount}
-        commentsCount={commentsCount}
-        onVote={handleVote}
-        onInstantRepost={() => handleExecuteRepost(false)}
-        onShare={handleSharePost}
-        onOpenComments={() => setShowCommentsModal(true)}
-      />
 
       {/* Fast Instagram-Style Comments Modal */}
       <FastCommentsModal
@@ -251,7 +272,6 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
         isOpen={showShareStoryModal}
         onClose={() => setShowShareStoryModal(false)}
       />
-    </div>
+    </article>
   );
 }
-

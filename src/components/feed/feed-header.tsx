@@ -75,45 +75,49 @@ export function FeedHeader({
         </div>
       </div>
 
-      {/* Underline Category & Sort Tabs (Matching Reference 2 Segmented Tabs) */}
-      <div className="flex items-center justify-between gap-3 pt-2 -mb-1 touch-manipulation">
-        {/* Sort links */}
-        <div className="flex items-center gap-4 text-xs font-semibold text-muted-foreground overflow-x-auto no-scrollbar py-1">
+      {/* Twitter/X Style Segmented Sort Tabs */}
+      <div className="flex items-center justify-between border-t border-border/25 pt-1 -mb-4 -mx-4 px-2">
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 flex-1">
           {SORT_TABS.map((s) => {
             const isCurrent = sort === s.id;
             return (
               <button
                 key={s.id}
+                type="button"
                 onClick={() => onSortChange(s.id)}
                 className={cn(
-                  "relative pb-2 font-bold transition-colors cursor-pointer shrink-0 text-xs",
-                  isCurrent ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  "relative px-4 py-3 font-bold transition-colors cursor-pointer shrink-0 text-[14px]",
+                  isCurrent
+                    ? "text-foreground font-black"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg"
                 )}
               >
                 <span>{s.label}</span>
                 {isCurrent && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-10 rounded-full bg-primary" />
                 )}
               </button>
             );
           })}
         </div>
 
-        {/* Toggle filter drawer button */}
+        {/* Filter button */}
         <button
+          type="button"
           onClick={() => setShowFilters(!showFilters)}
           className={cn(
-            "flex h-7 shrink-0 items-center gap-1.5 rounded-full px-3 text-[10px] font-bold transition-all cursor-pointer active:scale-95 mb-2",
+            "flex size-8 shrink-0 items-center justify-center rounded-full transition-all cursor-pointer mr-2",
             showFilters || activeFiltersCount > 1
               ? "bg-primary/10 text-primary"
-              : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+              : "hover:bg-muted text-muted-foreground hover:text-foreground"
           )}
           aria-label="Filter feed"
+          title="Filter feed"
         >
-          <ListFilter className="h-3 w-3" />
-          <span className="hidden sm:inline">Filter</span>
+          <ListFilter className="size-4" />
         </button>
       </div>
+
 
       {/* Advanced Filters Dropdown */}
       <div

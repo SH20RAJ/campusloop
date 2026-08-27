@@ -14,7 +14,6 @@ import { FeedSkeleton } from "@/components/ui/skeleton-card";
 import { StoryRing } from "@/components/ui/story-ring";
 import { useFeed,useStories } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
-import { Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname,useRouter,useSearchParams } from "next/navigation";
 import { useEffect,useState } from "react";
@@ -149,28 +148,29 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
         )}
       </div>
 
-      {/* ─── Quick Composer Box ─── */}
-      <div className="px-4 pt-4">
-        <Link href="/app/post/new">
-          <div className="flex items-center gap-3 bg-card/45 hover:bg-card/85 border border-border/45 rounded-2xl p-4 transition-all duration-200 cursor-pointer shadow-sm">
-            <Avatar className="h-9 w-9 border border-border/60 shadow-inner shrink-0">
-              <AvatarImage src={profile?.avatarUrl || ""} />
-              <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
-                {profile?.displayName?.[0] || "U"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 text-xs text-muted-foreground font-semibold">
-              Share a confession, drop a poll, or ask your campus...
-            </div>
-            <div className="h-7 w-7 rounded-xl bg-primary text-white flex items-center justify-center shadow-sm">
-              <Plus className="h-4 w-4" />
-            </div>
+      {/* ─── Twitter-Style Top Composer Box ─── */}
+      <div className="border-b border-border/30 px-4 py-3">
+        <Link href="/app/post/new" className="flex gap-3 items-center">
+          <Avatar className="size-10 rounded-full border border-border/40 shrink-0">
+            <AvatarImage src={profile?.avatarUrl || ""} />
+            <AvatarFallback className="bg-muted text-foreground text-xs font-bold">
+              {profile?.displayName?.[0] || "U"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 text-[15px] text-muted-foreground/70 font-normal">
+            What is happening on campus?!
           </div>
+          <button
+            type="button"
+            className="px-4 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-2xs"
+          >
+            Post
+          </button>
         </Link>
       </div>
 
-      {/* ─── Main Feed List ─── */}
-      <div className="flex flex-col px-4 pt-4 gap-4.5">
+      {/* ─── Main Feed Stream (Twitter-Style Flat Timeline) ─── */}
+      <div className="flex flex-col">
         {feedLoading && size === 1 ? (
           <FeedSkeleton />
         ) : isError ? (
@@ -178,14 +178,31 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
         ) : feed && feed.length > 0 ? (
           <>
             {feed.map((post, idx) => (
-              <div key={post.id} className="space-y-4.5">
+              <div key={post.id}>
                 <FeedCard post={post} currentUserId={profile?.id} />
-                {idx === 2 && <InlineCommunitiesWidget />}
-                {idx === 6 && <InlineDatingWidget />}
-                {idx === 10 && <InlineHashtagsWidget />}
-                {idx === 14 && <InlineReferralWidget />}
+                {idx === 2 && (
+                  <div className="p-3 border-b border-border/30 bg-muted/10">
+                    <InlineCommunitiesWidget />
+                  </div>
+                )}
+                {idx === 6 && (
+                  <div className="p-3 border-b border-border/30 bg-muted/10">
+                    <InlineDatingWidget />
+                  </div>
+                )}
+                {idx === 10 && (
+                  <div className="p-3 border-b border-border/30 bg-muted/10">
+                    <InlineHashtagsWidget />
+                  </div>
+                )}
+                {idx === 14 && (
+                  <div className="p-3 border-b border-border/30 bg-muted/10">
+                    <InlineReferralWidget />
+                  </div>
+                )}
               </div>
             ))}
+
 
             {/* Load more trigger anchor */}
             {!isReachingEnd && (

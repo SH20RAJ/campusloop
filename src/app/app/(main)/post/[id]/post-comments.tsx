@@ -203,8 +203,9 @@ export function PostComments({
   }, [comments, postAuthorId, profile?.institutionId, sortMode]);
 
   return (
-    <div className="space-y-4 pt-1 select-none">
+    <div className="px-4 space-y-4 pt-3 select-none">
       {/* Hidden File Input */}
+
       <input
         ref={fileInputRef}
         type="file"

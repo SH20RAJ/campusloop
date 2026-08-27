@@ -1,10 +1,11 @@
 export const FEED_SORT_TABS = [
-  { id: "for_you", label: "🔥 For You" },
+  { id: "for_you", label: "For you" },
   { id: "latest", label: "Latest" },
   { id: "trending", label: "Trending" },
   { id: "top_voted", label: "Top Voted" },
   { id: "most_discussed", label: "Discussed" },
 ] as const;
+
 
 export const FEED_VISIBILITY_OPTIONS = [
   { id: "all", label: "All" },

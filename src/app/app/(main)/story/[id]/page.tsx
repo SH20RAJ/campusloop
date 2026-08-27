@@ -50,7 +50,7 @@ export default async function StoryPage({ params }: PageProps) {
 
   if (!profile) redirect("/app/onboarding");
 
-  // Fetch story details
+  // Fetch story details with user and likes
   const rawStory = await db.query.stories.findFirst({
     where: eq(stories.id, id),
     with: {
@@ -59,6 +59,7 @@ export default async function StoryPage({ params }: PageProps) {
           institution: true,
         },
       },
+      likes: true,
     },
   });
 
@@ -77,6 +78,9 @@ export default async function StoryPage({ params }: PageProps) {
   const currentIndex = storyIds.indexOf(id);
   const prevStoryId = currentIndex > 0 ? storyIds[currentIndex - 1] : null;
   const nextStoryId = currentIndex >= 0 && currentIndex < storyIds.length - 1 ? storyIds[currentIndex + 1] : null;
+
+  const initialLiked = rawStory.likes ? rawStory.likes.some((l) => l.userId === profile.id) : false;
+  const initialLikesCount = rawStory.likes ? rawStory.likes.length : 0;
 
   const formattedStory = {
     id: rawStory.id,
@@ -100,6 +104,8 @@ export default async function StoryPage({ params }: PageProps) {
       currentUserId={profile.id}
       prevStoryId={prevStoryId}
       nextStoryId={nextStoryId}
+      initialLiked={initialLiked}
+      initialLikesCount={initialLikesCount}
     />
   );
 }

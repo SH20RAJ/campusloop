@@ -5,7 +5,7 @@ import { secretCrushes,swipes } from "./dating";
 import { institutionDomains,institutions } from "./institutions";
 import { notifications } from "./notifications";
 import { comments,pollOptions,pollVotes,posts,votes } from "./posts";
-import { stories } from "./stories";
+import { stories,storyHighlights,storyLikes } from "./stories";
 import { userProfiles } from "./users";
 
 
@@ -32,6 +32,7 @@ export const userProfilesRelations = relations(userProfiles, ({ one, many }) => 
   votes: many(votes),
   pollVotes: many(pollVotes),
   stories: many(stories),
+  storyHighlights: many(storyHighlights),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -182,9 +183,28 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   }),
 }));
 
-export const storiesRelations = relations(stories, ({ one }) => ({
+export const storiesRelations = relations(stories, ({ one, many }) => ({
   user: one(userProfiles, {
     fields: [stories.userId],
+    references: [userProfiles.id],
+  }),
+  likes: many(storyLikes),
+}));
+
+export const storyLikesRelations = relations(storyLikes, ({ one }) => ({
+  story: one(stories, {
+    fields: [storyLikes.storyId],
+    references: [stories.id],
+  }),
+  user: one(userProfiles, {
+    fields: [storyLikes.userId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const storyHighlightsRelations = relations(storyHighlights, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [storyHighlights.userId],
     references: [userProfiles.id],
   }),
 }));

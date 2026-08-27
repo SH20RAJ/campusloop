@@ -30,3 +30,21 @@
 
 - [x] **Rightbar on Public & Authenticated Vanity Profile (`/@username`)**:
   - Integrated `RightSidebar` into both the authenticated user profile view and public guest view in `src/app/[username]/page.tsx`.
+
+- [x] **Story & Post Complete Feature Suite (Story Liking, Pause While Typing, Highlights, Story Archive, Post Delete & Archive)**:
+  - **Story Liking**: Added `story_likes` database table, `POST /api/stories/[id]/like` toggle endpoint, optimistic heart animations, and like counter badges.
+  - **Pause Story While Typing**: When replying in the story viewer, the auto-advance timer completely pauses on input focus or text entry (`onFocus`, `onChange`), allowing students to type their reply without the story auto-closing or jumping ahead.
+  - **Story Highlights**: Created `story_highlights` table, `GET/POST/DELETE /api/highlights`, and Instagram-style Highlights circles row on `/app/profile` and `/@username`. Story viewer has a 1-click "Highlight" button for owners.
+  - **Story Archive**: Created `GET /api/stories/archive` endpoint and `StoryArchiveModal` displaying all past expired stories (>24h) with creation dates, like counts, and multi-selection to bundle into highlights.
+  - **Post Delete & Archive**: Added `archivePost` & `deletePost` server actions, `DELETE /api/posts/[id]` & `POST /api/posts/[id]/archive` endpoints, 3-dot dropdown menu actions ("Archive Post", "Delete Post") on `FeedCardHeader`, and a private "Archived" tab on student profiles with 1-click restore or permanent delete.
+
+- [x] **Notification Center Crash Fix & Twitter/Linear Design System Overhaul**:
+  - **Database Fix**: Resolved server 500 error (`column notifications.preview_text does not exist`) by executing `ALTER TABLE notifications ADD COLUMN IF NOT EXISTS preview_text TEXT;` on Neon PostgreSQL.
+  - **Resilient Server Page**: Wrapped queries in `src/app/app/(main)/notifications/page.tsx` with error boundary fallbacks and populated actor institution relation.
+  - **Category Pills**: Added 6 interactive filter tabs ("All", "Mentions", "Replies", "Reactions", "Crushes & Matches", "Verified") powered by `api/notifications?tab=`.
+  - **Visual Design System**:
+    - Dual badge system on student avatars (heart for likes, bubble for replies, lock for crushes, lightning for matches, etc.).
+    - Subtle left-edge brand indicator bar and soft tint for unread items.
+    - Clickable quoted snippet preview box with quotes and clean border.
+    - 1-click "Mark all as read" in sticky glass header.
+    - Polished contextual empty states for every category with direct action buttons.

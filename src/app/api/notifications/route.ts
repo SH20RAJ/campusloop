@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
 import { notifications,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,sql } from "drizzle-orm";
+import { and,desc,eq,inArray,sql } from "drizzle-orm";
 import { NextRequest,NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -23,13 +23,19 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const tab = searchParams.get("tab") || "all"; // all | verified | mentions
+    const tab = searchParams.get("tab") || "all";
 
     // Base query conditions
     const whereConditions = [eq(notifications.userId, profile.id)];
 
     if (tab === "mentions") {
       whereConditions.push(eq(notifications.type, "MENTION"));
+    } else if (tab === "replies") {
+      whereConditions.push(inArray(notifications.type, ["COMMENT", "REPLY", "STORY_REPLY"]));
+    } else if (tab === "reactions") {
+      whereConditions.push(inArray(notifications.type, ["LIKE", "REPOST", "STORY_LIKE"]));
+    } else if (tab === "crushes") {
+      whereConditions.push(inArray(notifications.type, ["CRUSH_ALERT", "MATCH"]));
     }
 
     const rawNotifications = await db.query.notifications.findMany({
@@ -44,6 +50,16 @@ export async function GET(req: NextRequest) {
             avatarUrl: true,
             points: true,
             institutionId: true,
+            role: true,
+          },
+          with: {
+            institution: {
+              columns: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
           },
         },
       },
@@ -62,15 +78,19 @@ export async function GET(req: NextRequest) {
             avatarUrl: null,
             points: 0,
             institutionId: null,
+            role: "STUDENT",
+            institution: null,
           },
         };
       }
       return n;
     });
 
-    // If verified tab is chosen, filter where actor is verified (points >= 150)
+    // If verified tab is chosen, filter where actor is verified (points >= 150 or admin)
     if (tab === "verified") {
-      sanitized = sanitized.filter((n) => (n.actor?.points || 0) >= 150);
+      sanitized = sanitized.filter(
+        (n) => (n.actor?.points || 0) >= 150 || n.actor?.role === "ADMIN"
+      );
     }
 
     // Count total unread notifications for this user
@@ -118,7 +138,7 @@ export async function PATCH(req: NextRequest) {
       await db
         .update(notifications)
         .set({ isRead: true })
-        .where(and(eq(notifications.userId, profile.id), eq(notifications.id, body.id)));
+        .where(and(eq(notifications.id, body.id), eq(notifications.userId, profile.id)));
     }
 
     return NextResponse.json({ success: true });

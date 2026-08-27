@@ -3,10 +3,28 @@
 import { fetcher } from "@/lib/api";
 import useSWR from "swr";
 
+export type NotificationTab =
+  | "all"
+  | "mentions"
+  | "replies"
+  | "reactions"
+  | "crushes"
+  | "verified";
+
 export interface NotificationItem {
   id: string;
   userId: string;
-  type: "LIKE" | "COMMENT" | "REPLY" | "MENTION" | "REPOST" | "MATCH" | "CRUSH_ALERT" | "MILESTONE";
+  type:
+    | "LIKE"
+    | "COMMENT"
+    | "REPLY"
+    | "MENTION"
+    | "REPOST"
+    | "MATCH"
+    | "CRUSH_ALERT"
+    | "MILESTONE"
+    | "STORY_LIKE"
+    | "STORY_REPLY";
   actorId: string;
   referenceId: string | null;
   previewText: string | null;
@@ -19,6 +37,11 @@ export interface NotificationItem {
     avatarUrl?: string | null;
     points?: number | null;
     institutionId?: string | null;
+    role?: string | null;
+    institution?: {
+      name: string;
+      slug?: string | null;
+    } | null;
   } | null;
 }
 
@@ -27,7 +50,7 @@ interface NotificationsResponse {
   unreadCount: number;
 }
 
-export function useNotifications(tab: "all" | "verified" | "mentions" = "all") {
+export function useNotifications(tab: NotificationTab = "all") {
   const { data, error, isLoading, mutate } = useSWR<NotificationsResponse>(
     `/api/notifications?tab=${tab}`,
     fetcher,
@@ -35,10 +58,9 @@ export function useNotifications(tab: "all" | "verified" | "mentions" = "all") {
       revalidateOnFocus: true,
       revalidateIfStale: true,
       keepPreviousData: true,
-      dedupingInterval: 5000,
+      dedupingInterval: 4000,
     }
   );
-
 
   const notifications = data?.notifications || [];
   const unreadCount = data?.unreadCount || 0;

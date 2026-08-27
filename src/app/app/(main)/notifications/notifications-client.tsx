@@ -1,21 +1,28 @@
 "use client";
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { NotificationItem,useNotifications } from "@/hooks/use-notifications";
+import {
+NotificationItem,
+NotificationTab,
+useNotifications,
+} from "@/hooks/use-notifications";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
 AtSign,
 Bell,
 CheckCheck,
+Compass,
 Heart,
 Lock,
 MessageCircle,
 Repeat2,
 ShieldCheck,
 Sparkles,
-Zap,
+Trophy,
+Zap
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface NotificationsClientProps {
@@ -27,7 +34,8 @@ export function NotificationsClient({
   initialNotifications,
   initialUnreadCount,
 }: NotificationsClientProps) {
-  const [activeTab, setActiveTab] = useState<"all" | "verified" | "mentions">("all");
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<NotificationTab>("all");
 
   const {
     notifications,
@@ -37,63 +45,95 @@ export function NotificationsClient({
     markAsRead,
   } = useNotifications(activeTab);
 
-  const displayList = notifications.length > 0 ? notifications : initialNotifications;
+  const displayList =
+    notifications.length > 0
+      ? notifications
+      : activeTab === "all"
+      ? initialNotifications
+      : [];
 
-  // Notification Icon & Accent Helper
+  const effectiveUnread = unreadCount ?? initialUnreadCount;
+
+  // Notification Icon, Action Text & Badges
   function getNotificationMeta(n: NotificationItem) {
     switch (n.type) {
       case "LIKE":
         return {
-          icon: <Heart className="size-4.5 text-rose-500 fill-rose-500" />,
+          icon: <Heart className="size-3.5 text-rose-500 fill-rose-500" />,
+          badgeBg: "bg-rose-500/15 border-rose-500/30 text-rose-500",
           actionText: "liked your post",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
-          actionLabel: "View",
+          actionLabel: "View post",
+        };
+      case "STORY_LIKE":
+        return {
+          icon: <Heart className="size-3.5 text-pink-500 fill-pink-500" />,
+          badgeBg: "bg-pink-500/15 border-pink-500/30 text-pink-500",
+          actionText: "liked your campus story vibe",
+          href: n.referenceId ? `/app/story/${n.referenceId}` : "/app",
+          actionLabel: "View vibe",
         };
       case "COMMENT":
         return {
-          icon: <MessageCircle className="size-4.5 text-[#1d9bf0] fill-[#1d9bf0]" />,
-          actionText: "replied to your post",
+          icon: <MessageCircle className="size-3.5 text-[#1d9bf0] fill-[#1d9bf0]" />,
+          badgeBg: "bg-[#1d9bf0]/15 border-[#1d9bf0]/30 text-[#1d9bf0]",
+          actionText: "replied to your discussion",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
           actionLabel: "Reply",
         };
       case "REPLY":
+      case "STORY_REPLY":
         return {
-          icon: <MessageCircle className="size-4.5 text-[#1d9bf0] fill-[#1d9bf0]" />,
+          icon: <MessageCircle className="size-3.5 text-[#1d9bf0] fill-[#1d9bf0]" />,
+          badgeBg: "bg-[#1d9bf0]/15 border-[#1d9bf0]/30 text-[#1d9bf0]",
           actionText: "replied to your comment",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
           actionLabel: "Reply",
         };
       case "MENTION":
         return {
-          icon: <AtSign className="size-4.5 text-purple-500 stroke-[2.5]" />,
+          icon: <AtSign className="size-3.5 text-violet-500 stroke-[2.5]" />,
+          badgeBg: "bg-violet-500/15 border-violet-500/30 text-violet-500",
           actionText: "mentioned you in a campus post",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
-          actionLabel: "View",
+          actionLabel: "View thread",
         };
       case "REPOST":
         return {
-          icon: <Repeat2 className="size-4.5 text-emerald-500 stroke-[2.5]" />,
-          actionText: "reposted your discussion",
+          icon: <Repeat2 className="size-3.5 text-emerald-500 stroke-[2.5]" />,
+          badgeBg: "bg-emerald-500/15 border-emerald-500/30 text-emerald-500",
+          actionText: "reposted your post to the campus feed",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
           actionLabel: "View",
         };
       case "MATCH":
         return {
-          icon: <Zap className="size-4.5 text-amber-500 fill-amber-500" />,
-          actionText: "matched with you on Campus Match! 🎉",
+          icon: <Zap className="size-3.5 text-amber-500 fill-amber-500" />,
+          badgeBg: "bg-amber-500/15 border-amber-500/30 text-amber-500",
+          actionText: "matched with you on Campus Dating! 💫",
           href: n.referenceId ? `/app/chat/${n.referenceId}` : "/app/chat",
-          actionLabel: "Chat",
+          actionLabel: "Send message",
         };
       case "CRUSH_ALERT":
         return {
-          icon: <Lock className="size-4.5 text-purple-500" />,
-          actionText: "added you to their Secret Crush vault 🔒",
+          icon: <Lock className="size-3.5 text-purple-500" />,
+          badgeBg: "bg-purple-500/15 border-purple-500/30 text-purple-500",
+          actionText: "secretly added you to their Campus Crush vault 🔒",
           href: "/app/crush",
-          actionLabel: "Crush",
+          actionLabel: "View vault",
+        };
+      case "MILESTONE":
+        return {
+          icon: <Trophy className="size-3.5 text-amber-500" />,
+          badgeBg: "bg-amber-500/15 border-amber-500/30 text-amber-500",
+          actionText: "unlocked a new Loop Points Clout Milestone! 🏆",
+          href: "/app/profile",
+          actionLabel: "View clout",
         };
       default:
         return {
-          icon: <Sparkles className="size-4.5 text-primary" />,
+          icon: <Sparkles className="size-3.5 text-primary" />,
+          badgeBg: "bg-primary/15 border-primary/30 text-primary",
           actionText: "interacted with you",
           href: "/app",
           actionLabel: "View",
@@ -101,55 +141,68 @@ export function NotificationsClient({
     }
   }
 
+  function handleItemClick(n: NotificationItem, href: string) {
+    if (!n.isRead) {
+      markAsRead(n.id);
+    }
+    router.push(href);
+  }
+
+  const tabs: { id: NotificationTab; label: string }[] = [
+    { id: "all", label: "All" },
+    { id: "mentions", label: "Mentions" },
+    { id: "replies", label: "Replies" },
+    { id: "reactions", label: "Reactions" },
+    { id: "crushes", label: "Crushes & Matches" },
+    { id: "verified", label: "Verified" },
+  ];
+
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-28 select-none border-x border-border/20">
-      {/* ─── Twitter / X Sticky Top Header ─── */}
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/30">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
+      {/* ─── Sticky Header ─── */}
+      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/30">
+        <div className="flex items-center justify-between px-4 py-3.5">
+          <div className="flex items-center gap-2.5">
             <h1 className="text-lg font-black tracking-tight text-foreground">
               Notifications
             </h1>
-            {unreadCount > 0 && (
-              <span className="size-2 rounded-full bg-[#1d9bf0] inline-block animate-pulse" />
+            {effectiveUnread > 0 && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-black bg-primary text-primary-foreground shadow-xs">
+                {effectiveUnread}
+              </span>
             )}
           </div>
 
-          {unreadCount > 0 && (
+          {effectiveUnread > 0 && (
             <button
               type="button"
               onClick={markAllAsRead}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors cursor-pointer"
-              title="Mark all as read"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer shadow-2xs active:scale-95"
+              title="Mark all notifications as read"
             >
-              <CheckCheck className="size-3.5" />
+              <CheckCheck className="size-3.5 text-primary" />
               <span className="hidden sm:inline">Mark all as read</span>
             </button>
           )}
         </div>
 
-        {/* ─── Twitter 3 Core Tabs (All, Verified, Mentions) ─── */}
-        <div className="grid grid-cols-3 border-t border-border/20 text-center font-bold text-sm">
-          {[
-            { id: "all", label: "All" },
-            { id: "verified", label: "Verified" },
-            { id: "mentions", label: "Mentions" },
-          ].map((tab) => {
+        {/* ─── Filter Pills Bar (Twitter/Linear Style) ─── */}
+        <div className="flex items-center gap-1.5 px-4 pb-2.5 overflow-x-auto scrollbar-none">
+          {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "relative py-3.5 transition-colors hover:bg-muted/30 cursor-pointer flex items-center justify-center",
-                  isActive ? "text-foreground font-black" : "text-muted-foreground"
+                  "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0",
+                  isActive
+                    ? "bg-foreground text-background font-black shadow-xs"
+                    : "bg-muted/40 hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border/40"
                 )}
               >
-                <span>{tab.label}</span>
-                {isActive && (
-                  <span className="absolute bottom-0 h-1 w-12 bg-primary rounded-full" />
-                )}
+                {tab.label}
               </button>
             );
           })}
@@ -157,121 +210,187 @@ export function NotificationsClient({
       </header>
 
       {/* ─── Notification Items Feed ─── */}
-      <div className="divide-y divide-border/25">
+      <div className="divide-y divide-border/20">
         {displayList.map((n) => {
           const meta = getNotificationMeta(n);
-          const isVerified = Boolean((n.actor?.points || 0) >= 150);
-          const actorAvatar = getAvatarUrl(n.actor?.avatarUrl, n.actor?.username || "student");
+          const isVerified = Boolean(
+            (n.actor?.points || 0) >= 150 || n.actor?.role === "ADMIN"
+          );
+          const actorAvatar = getAvatarUrl(
+            n.actor?.avatarUrl,
+            n.actor?.username || "student"
+          );
+          const campusName = n.actor?.institution?.name?.split(",")[0] || null;
 
           return (
             <div
               key={n.id}
-              onClick={() => {
-                if (!n.isRead) markAsRead(n.id);
-              }}
+              onClick={() => handleItemClick(n, meta.href)}
               className={cn(
-                "flex gap-3 px-4 py-3.5 hover:bg-muted/30 transition-colors relative cursor-pointer",
-                !n.isRead && "bg-primary/[0.03]"
+                "group flex items-start gap-3.5 px-4 py-3.5 hover:bg-muted/[0.22] transition-colors relative cursor-pointer",
+                !n.isRead && "bg-primary/[0.035]"
               )}
             >
-              {/* Left: Category Icon */}
-              <div className="shrink-0 pt-1 w-7 flex justify-end">
-                {meta.icon}
+              {/* Unread Indicator Pill on Left Edge */}
+              {!n.isRead && (
+                <span className="absolute left-0 top-3 bottom-3 w-1 bg-primary rounded-r-full" />
+              )}
+
+              {/* Left Column: Avatar with Action Badge */}
+              <div className="relative shrink-0 pt-0.5">
+                <Link
+                  href={`/@${n.actor?.username || "student"}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Avatar className="size-10 rounded-full border border-border/50 hover:opacity-90 transition-opacity">
+                    <AvatarImage src={actorAvatar || ""} />
+                    <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
+                      {n.actor?.displayName?.[0] || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
+
+                {/* Sub-badge over corner */}
+                <div
+                  className={cn(
+                    "absolute -bottom-1 -right-1 size-5 rounded-full border border-card flex items-center justify-center shadow-xs",
+                    meta.badgeBg
+                  )}
+                >
+                  {meta.icon}
+                </div>
               </div>
 
-              {/* Center: Content & Preview */}
-              <div className="flex-1 min-w-0 space-y-1.5">
-                <div className="flex items-center gap-2">
+              {/* Center Column: Text & Content Preview */}
+              <div className="flex-1 min-w-0 space-y-1.5 pt-0.5">
+                <div className="flex items-center gap-1.5 text-xs flex-wrap leading-tight">
                   <Link
                     href={`/@${n.actor?.username || "student"}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="shrink-0"
+                    className="font-bold text-foreground hover:underline truncate"
                   >
-                    <Avatar className="size-8 rounded-full border border-border/40 hover:opacity-90 transition-opacity">
-                      <AvatarImage src={actorAvatar || ""} />
-                      <AvatarFallback className="text-[10px] font-bold bg-muted text-foreground">
-                        {n.actor?.displayName?.[0] || "U"}
-                      </AvatarFallback>
-                    </Avatar>
+                    {n.actor?.displayName || "A Student"}
                   </Link>
 
-                  <div className="min-w-0 flex-1 flex items-center gap-1 text-[13px] flex-wrap leading-tight">
-                    <Link
-                      href={`/@${n.actor?.username || "student"}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="font-bold text-foreground hover:underline truncate"
-                    >
-                      {n.actor?.displayName || "A Student"}
-                    </Link>
+                  {isVerified && (
+                    <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
+                  )}
 
-                    {isVerified && (
-                      <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
-                    )}
+                  <span className="text-muted-foreground font-medium">
+                    @{n.actor?.username || "student"}
+                  </span>
 
-                    <span className="text-muted-foreground font-normal">
-                      {meta.actionText}
-                    </span>
+                  {campusName && (
+                    <>
+                      <span className="text-muted-foreground/40 text-[10px]">·</span>
+                      <span className="text-[10px] font-semibold text-muted-foreground/80 truncate max-w-[120px]">
+                        {campusName}
+                      </span>
+                    </>
+                  )}
 
-                    <span className="text-muted-foreground/50">·</span>
+                  <span className="text-muted-foreground/40 text-[10px]">·</span>
 
-                    <span className="text-[11px] text-muted-foreground/60 shrink-0">
-                      {formatTimeAgo(n.createdAt)}
-                    </span>
-                  </div>
+                  <span className="text-[11px] text-muted-foreground/70 shrink-0 font-medium">
+                    {formatTimeAgo(n.createdAt)}
+                  </span>
                 </div>
+
+                {/* Action Descriptor */}
+                <p className="text-[13px] text-foreground/90 font-medium leading-snug">
+                  {meta.actionText}
+                </p>
 
                 {/* Quoted Snippet Box */}
                 {n.previewText && (
-                  <Link
-                    href={meta.href}
-                    className="block rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/40 p-3 text-xs text-foreground/80 leading-relaxed transition-colors break-words font-normal"
-                  >
+                  <div className="rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/35 p-3 text-xs text-foreground/80 leading-relaxed transition-colors break-words font-normal">
+                    <span className="text-muted-foreground font-semibold">"</span>
                     {n.previewText}
-                  </Link>
+                    <span className="text-muted-foreground font-semibold">"</span>
+                  </div>
                 )}
               </div>
 
-              {/* Right: Unread Indicator Dot & Action Button */}
-              <div className="flex flex-col items-end justify-between shrink-0 pl-1">
+              {/* Right Column: Actions (Mark Read & Navigate) */}
+              <div className="flex flex-col items-end justify-between shrink-0 pl-1 pt-0.5 self-stretch">
                 {!n.isRead ? (
-                  <span className="size-2 rounded-full bg-[#1d9bf0]" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      markAsRead(n.id);
+                    }}
+                    className="size-6 rounded-full hover:bg-muted flex items-center justify-center text-primary hover:text-foreground transition-colors cursor-pointer"
+                    title="Mark as read"
+                  >
+                    <span className="size-2 rounded-full bg-primary inline-block" />
+                  </button>
                 ) : (
-                  <span className="size-2" />
+                  <div className="size-6" />
                 )}
 
-                <Link
-                  href={meta.href}
-                  className="mt-2 px-3 py-1 rounded-full bg-foreground text-background text-[11px] font-black hover:opacity-90 transition-all shadow-2xs active:scale-95"
-                >
-                  {meta.actionLabel}
-                </Link>
+                <span className="text-[11px] font-bold text-muted-foreground group-hover:text-primary transition-colors flex items-center gap-0.5 mt-auto">
+                  {meta.actionLabel} &rarr;
+                </span>
               </div>
             </div>
           );
         })}
 
-        {/* ─── Twitter Empty State ─── */}
+        {/* ─── Empty State ─── */}
         {!isLoading && displayList.length === 0 && (
-          <div className="py-24 px-6 text-center max-w-sm mx-auto space-y-3">
-            <div className="size-14 rounded-full bg-muted/60 flex items-center justify-center mx-auto text-muted-foreground/60">
-              <Bell className="size-7" />
+          <div className="py-24 px-6 text-center max-w-sm mx-auto space-y-4">
+            <div className="size-16 rounded-3xl bg-muted/50 border border-border/40 flex items-center justify-center mx-auto text-muted-foreground">
+              {activeTab === "mentions" ? (
+                <AtSign className="size-8 text-violet-500" />
+              ) : activeTab === "replies" ? (
+                <MessageCircle className="size-8 text-blue-500" />
+              ) : activeTab === "reactions" ? (
+                <Heart className="size-8 text-rose-500" />
+              ) : activeTab === "crushes" ? (
+                <Lock className="size-8 text-purple-500" />
+              ) : (
+                <Bell className="size-8 text-primary" />
+              )}
             </div>
 
-            <div className="space-y-1">
-              <h2 className="text-xl font-black text-foreground">
+            <div className="space-y-1.5">
+              <h2 className="text-base font-black text-foreground">
                 {activeTab === "all"
-                  ? "Nothing to see here — yet"
-                  : activeTab === "verified"
-                  ? "No verified notifications"
-                  : "No mentions yet"}
+                  ? "All caught up!"
+                  : activeTab === "mentions"
+                  ? "No mentions yet"
+                  : activeTab === "replies"
+                  ? "No replies yet"
+                  : activeTab === "reactions"
+                  ? "No reactions yet"
+                  : activeTab === "crushes"
+                  ? "No crushes or matches yet"
+                  : "No verified notifications"}
               </h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {activeTab === "all"
-                  ? "From likes and reposts to replies and mentions, this is where all the campus interactions on your posts and account happen."
-                  : activeTab === "verified"
-                  ? "Interactions from verified students and batchmates with 150+ LP will appear here."
-                  : "When classmates tag you with @username in posts, confessions, or comments, you will find them here."}
+                  ? "When students like your posts, tag you in discussions, or match with you on campus, you will see it here."
+                  : activeTab === "mentions"
+                  ? "When fellow campus classmates tag your @handle in threads or confessions, you will find them here."
+                  : activeTab === "replies"
+                  ? "Replies to your campus questions and discussion threads will show up here."
+                  : activeTab === "reactions"
+                  ? "Upvotes, hearts, reposts, and story reactions will be recorded here."
+                  : activeTab === "crushes"
+                  ? "Crush alerts and match connections from Campus Match will be securely delivered here."
+                  : "Notifications from verified students and college leaders with 150+ LP will appear here."}
               </p>
+            </div>
+
+            <div className="pt-2">
+              <Link
+                href="/app"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                <Compass className="size-3.5" />
+                <span>Explore Campus Feed</span>
+              </Link>
             </div>
           </div>
         )}

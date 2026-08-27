@@ -22,6 +22,7 @@ export const contentStatusEnum = pgEnum("content_status", [
   "HIDDEN",
   "DELETED",
   "PENDING_REVIEW",
+  "ARCHIVED",
 ]);
 export const reportTargetTypeEnum = pgEnum("report_target_type", ["POST", "COMMENT", "USER"]);
 export const reportStatusEnum = pgEnum("report_status", [

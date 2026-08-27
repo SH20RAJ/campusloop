@@ -1,10 +1,11 @@
 "use client";
 
-import { deletePost } from "@/app/app/(main)/post/actions";
+import { archivePost,deletePost } from "@/app/app/(main)/post/actions";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { FeedPost } from "@/hooks/use-feed";
 import { formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
+Archive,
 Flag,
 Link2,
 MoreHorizontal,
@@ -36,6 +37,21 @@ export function FeedCardHeader({
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
+
+  async function handleToggleArchive() {
+    setIsArchiving(true);
+    setShowMenu(false);
+    try {
+      const res = await archivePost(post.id);
+      toast.success(res.isArchived ? "Post moved to your private archive 📦" : "Post restored to public feeds 🚀");
+      router.refresh();
+    } catch {
+      toast.error("Failed to update post archive status");
+    } finally {
+      setIsArchiving(false);
+    }
+  }
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
@@ -169,17 +185,29 @@ export function FeedCardHeader({
                 </button>
 
                 {currentUserId && post.authorId === currentUserId && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowMenu(false);
-                      setShowDeleteConfirm(true);
-                    }}
-                    className="w-full text-left px-3.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer flex items-center gap-2 border-t border-border/30 mt-1"
-                  >
-                    <Trash2 className="size-4" />
-                    <span>Delete Post</span>
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleToggleArchive}
+                      disabled={isArchiving}
+                      className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2 border-t border-border/30 mt-1"
+                    >
+                      <Archive className="size-4 text-amber-500" />
+                      <span>{post.status === "ARCHIVED" ? "Restore to Feed" : "Archive Post"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowMenu(false);
+                        setShowDeleteConfirm(true);
+                      }}
+                      className="w-full text-left px-3.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer flex items-center gap-2"
+                    >
+                      <Trash2 className="size-4" />
+                      <span>Delete Post</span>
+                    </button>
+                  </>
                 )}
               </div>
             </>

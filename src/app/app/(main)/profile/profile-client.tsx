@@ -1,6 +1,8 @@
 "use client";
 
+import { archivePost,deletePost } from "@/app/app/(main)/post/actions";
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
+import { ProfileHighlights } from "@/components/profile/profile-highlights";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
@@ -9,6 +11,7 @@ import type { FeedPost } from "@/hooks/use-feed";
 import { getCloutTier } from "@/lib/gamification";
 import { cn } from "@/lib/utils";
 import {
+Archive,
 ArrowLeft,
 ArrowUpRight,
 Briefcase,
@@ -23,13 +26,13 @@ MessageSquare,
 Move,
 Share2,
 Shield,
+Trash2,
 TrendingUp,
 Trophy,
 Upload,
 VenetianMask,
 X,
 } from "lucide-react";
-
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -82,7 +85,9 @@ export function ProfileClientView({
   currentUserId,
 }: ProfileClientViewProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"posts" | "photos" | "clout">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "photos" | "clout" | "archived">("posts");
+  const [archivedPosts, setArchivedPosts] = useState<FeedPost[]>([]);
+  const [isLoadingArchived, setIsLoadingArchived] = useState(false);
   const [copiedHandle, setCopiedHandle] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showPhotoLightbox, setShowPhotoLightbox] = useState<string | null>(null);
@@ -93,6 +98,50 @@ export function ProfileClientView({
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropImageUrl, setCropImageUrl] = useState("");
   const [cropMode, setCropMode] = useState<"avatar" | "banner">("avatar");
+
+  const loadArchivedPosts = useCallback(async () => {
+    if (!isOwnProfile) return;
+    setIsLoadingArchived(true);
+    try {
+      const res = await fetch("/api/posts/archived");
+      if (res.ok) {
+        const data = (await res.json()) as FeedPost[];
+        setArchivedPosts(data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingArchived(false);
+    }
+  }, [isOwnProfile]);
+
+  useEffect(() => {
+    if (activeTab === "archived") {
+      loadArchivedPosts();
+    }
+  }, [activeTab, loadArchivedPosts]);
+
+  async function handleRestorePost(postId: string) {
+    try {
+      await archivePost(postId);
+      toast.success("Post restored to public feeds! 🚀");
+      setArchivedPosts((prev) => prev.filter((p) => p.id !== postId));
+      router.refresh();
+    } catch {
+      toast.error("Failed to restore post");
+    }
+  }
+
+  async function handleDeleteArchivedPost(postId: string) {
+    try {
+      await deletePost(postId);
+      toast.success("Post deleted permanently");
+      setArchivedPosts((prev) => prev.filter((p) => p.id !== postId));
+      router.refresh();
+    } catch {
+      toast.error("Failed to delete post");
+    }
+  }
 
   // ─── Infinite Scroll for Profile Posts ───
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
@@ -543,6 +592,13 @@ export function ProfileClientView({
           </div>
         </div>
 
+        {/* ─── Instagram-Style Story Highlights & Archive ─── */}
+        <ProfileHighlights
+          userId={profile.id}
+          username={profile.username}
+          isOwnProfile={isOwnProfile}
+        />
+
         {/* ─── LinkedIn-Style Education & Academic Card ─── */}
         <div className="rounded-3xl bg-card p-5 shadow-2xs space-y-3.5">
           <div className="flex items-center justify-between">
@@ -721,6 +777,25 @@ export function ProfileClientView({
               <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
             )}
           </button>
+
+          {isOwnProfile && (
+            <button
+              type="button"
+              onClick={() => setActiveTab("archived")}
+              className={cn(
+                "relative pb-3 transition-colors cursor-pointer text-xs font-bold flex items-center gap-1.5",
+                activeTab === "archived"
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Archive className="size-3.5" />
+              <span>Archived ({archivedPosts.length})</span>
+              {activeTab === "archived" && (
+                <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
+              )}
+            </button>
+          )}
         </div>
 
         {/* ─── Tab Content ─── */}
@@ -825,6 +900,64 @@ export function ProfileClientView({
                 <span className="text-primary font-black">+1 LP</span>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ─── Archived Posts Tab (Private to Student) ─── */}
+        {activeTab === "archived" && (
+          <div className="space-y-3.5">
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="size-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                <Archive className="size-4" />
+              </div>
+              <p>
+                <strong className="text-foreground font-bold">Private Post Archive:</strong> These posts are hidden from public campus feeds and your public profile. Only you can view, restore, or delete them.
+              </p>
+            </div>
+
+            {isLoadingArchived ? (
+              <div className="py-12 flex flex-col items-center justify-center text-xs text-muted-foreground gap-2">
+                <Loader2 className="size-5 animate-spin text-primary" />
+                <span>Loading your archived posts...</span>
+              </div>
+            ) : archivedPosts.length > 0 ? (
+              archivedPosts.map((post) => (
+                <div key={post.id} className="relative group">
+                  <div className="rounded-3xl border border-border/60 bg-card overflow-hidden">
+                    <div className="p-3 bg-muted/30 border-b border-border/40 flex items-center justify-between text-xs">
+                      <span className="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                        <Archive className="size-3.5" /> Archived Post
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleRestorePost(post.id)}
+                          className="px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-colors cursor-pointer"
+                        >
+                          Restore to Public
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteArchivedPost(post.id)}
+                          className="px-3 py-1 rounded-full bg-destructive/10 hover:bg-destructive/20 text-destructive text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                          <Trash2 className="size-3" /> Delete
+                        </button>
+                      </div>
+                    </div>
+                    <FeedCard post={post} currentUserId={currentUserId || profile.id} disableNavigation />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-16 border border-dashed rounded-3xl border-border bg-card text-muted-foreground text-xs font-semibold space-y-2 p-6">
+                <div className="size-12 rounded-2xl bg-muted flex items-center justify-center mx-auto text-muted-foreground">
+                  <Archive className="size-6" />
+                </div>
+                <p className="font-bold text-foreground">No archived posts.</p>
+                <p>You can archive any of your posts anytime using the 3-dot menu on any post.</p>
+              </div>
+            )}
           </div>
         )}
       </main>

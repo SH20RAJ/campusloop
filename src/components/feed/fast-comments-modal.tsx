@@ -1,6 +1,11 @@
 "use client";
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import {
+detectMentionTrigger,
+MentionSuggestions,
+TriggerContext,
+} from "@/components/ui/mention-autocomplete";
 import { RichText } from "@/components/ui/rich-text";
 import { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
@@ -17,8 +22,10 @@ X
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect,useRef,useState } from "react";
+
 import { toast } from "sonner";
 import useSWR from "swr";
+
 
 export interface FastComment {
   id: string;
@@ -66,8 +73,32 @@ export function FastCommentsModal({
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likedComments, setLikedComments] = useState<Record<string, boolean>>({});
+  const [mentionTrigger, setMentionTrigger] = useState<TriggerContext | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    setCommentText(val);
+    const cursor = e.target.selectionStart ?? val.length;
+    setMentionTrigger(detectMentionTrigger(val, cursor));
+  }
+
+  function handleSelectSuggestion(replacement: string, trigger: TriggerContext) {
+    const before = commentText.slice(0, trigger.startIndex);
+    const after = commentText.slice(trigger.endIndex);
+    const newText = `${before}${replacement}${after}`;
+    setCommentText(newText);
+    setMentionTrigger(null);
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        const newPos = before.length + replacement.length;
+        inputRef.current.setSelectionRange(newPos, newPos);
+      }
+    }, 0);
+  }
+
 
   const {
     data: comments,
@@ -386,7 +417,13 @@ export function FastCommentsModal({
                 </Avatar>
 
                 {/* Input with embedded actions */}
-                <div className="flex-1 flex items-center gap-2 rounded-full border border-border/50 bg-background px-3.5 py-1.5 focus-within:border-foreground/40 transition-colors">
+                <div className="relative flex-1 flex items-center gap-2 rounded-full border border-border/50 bg-background px-3.5 py-1.5 focus-within:border-foreground/40 transition-colors">
+                  <MentionSuggestions
+                    trigger={mentionTrigger}
+                    onSelect={handleSelectSuggestion}
+                    onClose={() => setMentionTrigger(null)}
+                    className="bottom-full mb-2 left-0"
+                  />
                   <input
                     ref={inputRef}
                     type="text"
@@ -396,11 +433,12 @@ export function FastCommentsModal({
                         : `Add a comment as @${profile?.username || "you"}...`
                     }
                     value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
+                    onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none"
                     maxLength={500}
                   />
+
 
                   {/* Anonymous Toggle Pill */}
                   <button

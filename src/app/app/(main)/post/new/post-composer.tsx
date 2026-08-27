@@ -4,13 +4,20 @@ import { PollOptionsEditor } from "@/components/post/poll-options-editor";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
+import {
+detectMentionTrigger,
+MentionSuggestions,
+TriggerContext,
+} from "@/components/ui/mention-autocomplete";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { useCommunities } from "@/hooks/use-communities";
 import { useProfile } from "@/hooks/use-profile";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
+
 import { EditorContent,useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+
 import {
 AlertTriangle,
 BarChart3,
@@ -59,6 +66,8 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
 
   const firstName = profile?.displayName?.split(" ")[0];
 
+  const [mentionTrigger, setMentionTrigger] = useState<TriggerContext | null>(null);
+
   const editor = useEditor({
     extensions: [StarterKit],
     content: "",
@@ -68,8 +77,28 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
           "w-full min-h-[140px] sm:min-h-[170px] px-4 py-3 text-base leading-relaxed outline-none prose prose-base dark:prose-invert max-w-none",
       },
     },
-    onUpdate: ({ editor }) => setCharCount(editor.getText().length),
+    onUpdate: ({ editor }) => {
+      setCharCount(editor.getText().length);
+      const { from } = editor.state.selection;
+      const textBefore = editor.state.doc.textBetween(0, from, "\n");
+      setMentionTrigger(detectMentionTrigger(textBefore, textBefore.length));
+    },
   });
+
+  function handleSelectSuggestion(replacement: string, trigger: TriggerContext) {
+    if (!editor) return;
+    const { from } = editor.state.selection;
+    const lengthToReplace = trigger.query.length + 1; // including @ or #
+    const rangeStart = Math.max(0, from - lengthToReplace);
+    editor
+      .chain()
+      .focus()
+      .deleteRange({ from: rangeStart, to: from })
+      .insertContent(replacement)
+      .run();
+    setMentionTrigger(null);
+  }
+
 
   async function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -367,6 +396,12 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
 
         {/* Big borderless editor */}
         <div className="relative">
+          <MentionSuggestions
+            trigger={mentionTrigger}
+            onSelect={handleSelectSuggestion}
+            onClose={() => setMentionTrigger(null)}
+            className="top-12 left-4"
+          />
           {charCount === 0 && (
             <span className="pointer-events-none absolute left-4 top-3 text-base text-muted-foreground/50">
               {isConfession
@@ -380,6 +415,7 @@ export function PostComposer({ communityId: initialCommunityId }: { communityId?
           )}
           <EditorContent editor={editor} />
         </div>
+
 
         {/* Image attachments — FB-style large grid */}
         {uploadedImages.length > 0 && (

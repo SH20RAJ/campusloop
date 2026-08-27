@@ -3,18 +3,31 @@
 import { CommentItem,CommentWithAuthor } from "@/components/post/comment-item";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
+import {
+detectMentionTrigger,
+MentionSuggestions,
+TriggerContext,
+} from "@/components/ui/mention-autocomplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
 import { uploadImageToImgBB } from "@/lib/upload";
 import {
-Image as ImageIcon,Loader2,Lock,MessageSquare,Send,Smile,X,
-Zap
+Image as ImageIcon,
+Loader2,
+Lock,
+MessageSquare,
+Send,
+Smile,
+X,
+Zap,
 } from "lucide-react";
+
 import { useRef,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+
 
 export function PostComments({ postId }: { postId: string }) {
   const { profile } = useProfile();
@@ -30,7 +43,32 @@ export function PostComments({ postId }: { postId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [showStickerPicker, setShowStickerPicker] = useState(false);
+  const [mentionTrigger, setMentionTrigger] = useState<TriggerContext | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  function handleCommentChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    const val = e.target.value;
+    setCommentText(val);
+    const cursor = e.target.selectionStart ?? val.length;
+    setMentionTrigger(detectMentionTrigger(val, cursor));
+  }
+
+  function handleSelectSuggestion(replacement: string, trigger: TriggerContext) {
+    const before = commentText.slice(0, trigger.startIndex);
+    const after = commentText.slice(trigger.endIndex);
+    const newText = `${before}${replacement}${after}`;
+    setCommentText(newText);
+    setMentionTrigger(null);
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        const newPos = before.length + replacement.length;
+        textareaRef.current.setSelectionRange(newPos, newPos);
+      }
+    }, 0);
+  }
+
 
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyBody, setReplyBody] = useState("");
@@ -189,10 +227,17 @@ export function PostComments({ postId }: { postId: string }) {
             </AvatarFallback>
           </Avatar>
 
-          <div className="flex-1 min-w-0 space-y-2">
+          <div className="relative flex-1 min-w-0 space-y-2">
+            <MentionSuggestions
+              trigger={mentionTrigger}
+              onSelect={handleSelectSuggestion}
+              onClose={() => setMentionTrigger(null)}
+              className="bottom-full mb-2 left-0"
+            />
             <textarea
+              ref={textareaRef}
               value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
+              onChange={handleCommentChange}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                   handlePostComment(e);
@@ -206,6 +251,7 @@ export function PostComments({ postId }: { postId: string }) {
               rows={2}
               className="w-full bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none resize-none font-medium leading-relaxed"
             />
+
 
             {/* Comment image preview */}
             {commentImage && (

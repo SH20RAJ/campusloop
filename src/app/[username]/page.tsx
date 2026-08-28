@@ -171,8 +171,8 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
             isAdmin={currentProfile.role === "ADMIN"} 
           />
 
-          <div className="flex md:pl-64 min-h-screen">
-            <main className="flex-1 w-full max-w-2xl px-0 py-0 pb-28 md:pb-0 mx-auto min-h-screen border-r border-border/30">
+          <div className="flex md:pl-64 min-h-screen max-w-full overflow-x-clip">
+            <main className="flex-1 w-full min-w-0 max-w-2xl px-0 py-0 pb-28 md:pb-0 mx-auto min-h-screen border-r border-border/30 overflow-x-clip">
               <ProfileClientView
                 profile={profile}
                 formattedPosts={formattedPosts as FeedPost[]}

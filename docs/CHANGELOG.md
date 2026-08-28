@@ -6,6 +6,12 @@ A log of significant product updates, UI decisions, and architectural commits.
 
 ### Recent Updates
 
+- **Twitter-Style Full-Width UI/UX Overhaul & Mobile Feeds College Hyperlinks**:
+  - Removed `hidden sm:inline` from [`src/components/feed/feed-card-header.tsx`](campusloop/src/components/feed/feed-card-header.tsx) and added `School` icon alongside clickable college name/slug hyperlinks on mobile feeds.
+  - Redesigned Academic Branch Directory ([`src/app/app/(main)/branch/[slug]/branch-client.tsx`](campusloop/src/app/app/(main)/branch/[slug]/branch-client.tsx)) with full-width space utilization, sticky top bar, equal-width Twitter tabs, search bar, and edge-to-edge student directory rows (`divide-y divide-border/30`).
+  - Redesigned Profile View ([`src/app/app/(main)/profile/profile-client.tsx`](campusloop/src/app/app/(main)/profile/profile-client.tsx)) with full-width edge-to-edge banner, responsive overlapping avatar and action buttons, Twitter metadata row (College, Branch, Year, Vanity Link), equal-width tabs, and edge-to-edge post feeds.
+  - Added `min-w-0 max-w-full overflow-x-clip` to [`src/app/app/(main)/layout.tsx`](campusloop/src/app/app/(main)/layout.tsx) and [`src/app/[username]/page.tsx`](campusloop/src/app/[username]/page.tsx) to prevent horizontal flex child overflow on mobile devices.
+
 - **Secret Crush Vault LP Expansion (5 to 50 Slots)**:
   - Linked Secret Crush vault capacity to the student's Loop Points (LP) clout in [`src/constants/gamification.ts`](campusloop/src/constants/gamification.ts).
   - Unlocked expansion from 5 slots to 50 slots automatically at 150 LP (`VERIFIED_LP_THRESHOLD` / Gold Star status).

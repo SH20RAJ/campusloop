@@ -10,6 +10,7 @@ Flag,
 Link2,
 MoreHorizontal,
 Repeat2,
+School,
 ShieldCheck,
 Trash2
 } from "lucide-react";
@@ -88,13 +89,15 @@ export function FeedCardHeader({
 
         {post.institution?.name && (
           <>
-            <span className="text-muted-foreground/40 text-xs hidden sm:inline">·</span>
+            <span className="text-muted-foreground/40 text-xs">·</span>
             <Link
               href={`/app/college/${post.institution?.slug || post.institutionId}`}
               onClick={(e) => e.stopPropagation()}
-              className="text-muted-foreground/70 text-xs hover:underline truncate max-w-[120px] hidden sm:inline"
+              className="text-primary hover:underline truncate max-w-[110px] sm:max-w-[170px] text-xs font-semibold inline-flex items-center gap-1 transition-colors"
+              title={post.institution.name}
             >
-              {post.institution.name.split(",")[0]}
+              <School className="size-3 shrink-0 text-primary/70" />
+              <span className="truncate">{post.institution.name.split(",")[0]}</span>
             </Link>
           </>
         )}

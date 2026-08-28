@@ -21,12 +21,15 @@ Camera,
 Edit3,
 Eye,
 Flame,
+Globe,
 GraduationCap,
 Loader2,
 MessageSquare,
 Move,
+School,
 Share2,
 Shield,
+ShieldCheck,
 Trash2,
 TrendingUp,
 Trophy,
@@ -369,11 +372,11 @@ export function ProfileClientView({
         </div>
       </div>
 
-      <main className="space-y-4 max-w-2xl mx-auto px-3 sm:px-4 pt-3">
-        {/* ─── Profile Hero Card (Exact Pixel-by-Pixel match to Reference 1 & 2) ─── */}
-        <div className="relative overflow-hidden rounded-3xl bg-card shadow-2xs">
-          {/* Cover Banner Photo - Curved Aurora Mesh Gradient */}
-          <div className="relative h-40 sm:h-52 w-full bg-aurora-mesh overflow-hidden">
+      <main className="w-full max-w-2xl mx-auto border-x border-border/30 min-h-screen">
+        {/* ─── Profile Hero (Full-width Twitter Style) ─── */}
+        <div className="relative">
+          {/* Cover Banner Photo - Full-Width Edge-to-Edge */}
+          <div className="relative h-36 sm:h-52 w-full bg-aurora-mesh overflow-hidden">
             {profile.bannerUrl && (
               <img
                 src={profile.bannerUrl}
@@ -412,17 +415,17 @@ export function ProfileClientView({
             )}
           </div>
 
-          {/* Profile Header Main Info (Overlapping Circular Avatar) */}
-          <div className="px-5 pb-5 pt-0 relative space-y-3.5">
-            {/* Avatar & Action Pill Row */}
-            <div className="flex items-end justify-between -mt-12 sm:-mt-14 gap-3">
-              {/* Clickable Circular Profile Picture with Switch/Edit badge */}
-              <div className="relative group">
+          {/* Profile Header Main Info */}
+          <div className="px-4 pb-4 pt-0 relative space-y-3">
+            {/* Avatar & Action Pill Row (Twitter-style responsive) */}
+            <div className="flex items-end justify-between -mt-11 sm:-mt-14 gap-2">
+              {/* Clickable Circular Profile Picture */}
+              <div className="relative group shrink-0">
                 <div
                   onClick={() => {
                     if (isOwnProfile) setShowAvatarMenu(true);
                   }}
-                  className="relative size-24 sm:size-28 rounded-full border-4 border-card shadow-2xl cursor-pointer overflow-hidden bg-background group-hover:opacity-95 transition-opacity"
+                  className="relative size-22 sm:size-28 rounded-full border-4 border-background shadow-xl cursor-pointer overflow-hidden bg-background group-hover:opacity-95 transition-opacity"
                 >
                   <Avatar className="size-full rounded-full">
                     <AvatarImage src={profile.avatarUrl || ""} className="rounded-full object-cover" />
@@ -439,48 +442,51 @@ export function ProfileClientView({
                   )}
                 </div>
 
-                {/* Switch / Edit circular badge (Exact match to Reference 1 & 2) */}
+                {/* Switch / Edit circular badge */}
                 <span
                   onClick={() => {
                     if (isOwnProfile) pfpInputRef.current?.click();
                   }}
-                  className="absolute bottom-0 right-0 size-7 rounded-full bg-black text-white flex items-center justify-center shadow-md border-2 border-card text-[11px] font-black cursor-pointer hover:scale-110 transition-transform"
+                  className="absolute bottom-0 right-0 size-7 rounded-full bg-black text-white flex items-center justify-center shadow-md border-2 border-background text-[11px] font-black cursor-pointer hover:scale-110 transition-transform"
                   title="Switch / Update Photo"
                 >
                   ⇄
                 </span>
               </div>
 
-              {/* Right Side Pill: Verify Account or Verified Check */}
+              {/* Action Buttons: Responsive, Twitter-style */}
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end pb-1">
                 {isOwnProfile ? (
                   <div className="flex items-center gap-2">
                     {points < 150 && (
                       <Link
                         href="/app/settings"
-                        className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
+                        className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-card px-3 py-1.5 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
                       >
                         <span>Get Verified</span>
                       </Link>
                     )}
                     <Link
                       href="/app/profile/edit"
-                      className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-card px-3.5 py-1.5 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
                     >
+                      <Edit3 className="size-3.5" />
                       <span>Edit Profile</span>
                     </Link>
                   </div>
                 ) : (
-
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
                     <SecretCrushButton
                       targetId={profile.id}
                       targetName={profile.displayName}
                     />
                     <Link
                       href={`/app/chat?userId=${profile.id}`}
-                      className="flex items-center justify-center gap-1.5 rounded-full border border-border bg-card h-9 px-4 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
+                      className="h-9 px-3.5 rounded-full border border-border/70 bg-card hover:bg-muted text-xs font-bold text-foreground shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                      title="Message"
                     >
-                      <MessageSquare className="size-3.5" /> Message
+                      <MessageSquare className="size-3.5" />
+                      <span className="hidden xs:inline">Message</span>
                     </Link>
                     <FollowButton
                       username={profile.username}
@@ -495,12 +501,12 @@ export function ProfileClientView({
                   </div>
                 )}
               </div>
+            </div>
 
             {/* Display Name & Role */}
-
             <div className="space-y-1 pt-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-2xl font-black tracking-tight text-foreground">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
                   {profile.displayName}
                 </h2>
                 {profile.role === "ADMIN" && (
@@ -509,14 +515,60 @@ export function ProfileClientView({
                   </span>
                 )}
                 {points >= 150 && (
-                  <span className="text-blue-500 font-bold" title="Verified Campus Star">
-                    ✓
+                  <span title="Verified Campus Star">
+                    <ShieldCheck className="size-5 text-[#1d9bf0] shrink-0" />
                   </span>
                 )}
               </div>
 
-              {/* Stats Row (Exact match to Reference 1 & 2: 213 Following  781 Followers  3 Hubs) */}
-              <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground pt-0.5">
+              <p className="text-xs sm:text-sm text-muted-foreground font-medium">@{profile.username}</p>
+
+              {/* Bio */}
+              <p className="text-xs sm:text-sm font-normal text-foreground leading-relaxed pt-1 whitespace-pre-wrap break-words">
+                {profile.bio || (profile.headline || `Student @ ${campusShort}. Exploring campus vibes and connecting with fellow peers.`)}
+              </p>
+
+              {/* Twitter-Style Metadata Row (College, Branch, Year, Link) */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1.5">
+                {profile.institution && (
+                  <Link
+                    href={`/app/college/${profile.institution.slug || profile.institution.id}`}
+                    className="text-primary font-semibold hover:underline inline-flex items-center gap-1 truncate max-w-full"
+                  >
+                    <School className="size-3.5 shrink-0 text-primary/70" />
+                    <span className="truncate">{institutionName}</span>
+                  </Link>
+                )}
+
+                {profile.branch && branchSlug && (
+                  <Link
+                    href={`/app/branch/${branchSlug}`}
+                    className="hover:underline inline-flex items-center gap-1 text-foreground/80 font-medium truncate max-w-full"
+                  >
+                    <GraduationCap className="size-3.5 shrink-0 text-primary/70" />
+                    <span>{profile.course ? `${profile.course} · ` : ""}{profile.branch}</span>
+                  </Link>
+                )}
+
+                {profile.year && (
+                  <span className="inline-flex items-center gap-1 text-muted-foreground">
+                    <Calendar className="size-3.5 shrink-0" />
+                    Year {profile.year} Student
+                  </span>
+                )}
+
+                {/* Vanity link */}
+                <Link
+                  href={`/@${profile.username}`}
+                  className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
+                >
+                  <Globe className="size-3.5 shrink-0" />
+                  <span>campusloop.space/@{profile.username}</span>
+                </Link>
+              </div>
+
+              {/* Stats Row: Following / Followers / Friends / LP Clout */}
+              <div className="flex items-center gap-4 text-xs font-semibold text-muted-foreground pt-1.5 flex-wrap">
                 <Link href={`/@${profile.username}/following`} className="hover:underline">
                   <strong className="text-foreground font-black">{followingCount}</strong> Following
                 </Link>
@@ -526,25 +578,9 @@ export function ProfileClientView({
                 <Link href={`/@${profile.username}/friends`} className="hover:underline">
                   <strong className="text-foreground font-black">{friendsCount}</strong> Friends
                 </Link>
-                <span>
-                  <strong className="text-foreground font-black">{points}</strong> LP Clout
+                <span className="text-amber-500 font-bold">
+                  🔥 <strong className="text-foreground font-black">{points}</strong> LP Clout
                 </span>
-              </div>
-
-              {/* Bio Description (Exact match to Reference with clean typography) */}
-              <p className="text-xs sm:text-sm font-medium text-muted-foreground leading-relaxed pt-1 whitespace-pre-wrap">
-                {profile.bio || (profile.headline || `Student @ ${campusShort}. Exploring campus vibes and connecting with fellow peers.`)}
-              </p>
-
-              {/* Website / Vanity Link with Globe icon */}
-              <div className="pt-0.5">
-                <Link
-                  href={`/@${profile.username}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                >
-                  <span>🌐</span>
-                  <span>campusloop.space/@{profile.username}</span>
-                </Link>
               </div>
             </div>
 
@@ -609,8 +645,8 @@ export function ProfileClientView({
           isOwnProfile={isOwnProfile}
         />
 
-        {/* ─── LinkedIn-Style Education & Academic Card ─── */}
-        <div className="rounded-3xl bg-card p-5 shadow-2xs space-y-3.5">
+        {/* ─── Campus & Academic Discipline Card (Minimal & Clean) ─── */}
+        <div className="mx-4 my-3 rounded-2xl border border-border/40 bg-card/60 p-4 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <GraduationCap className="size-4 text-primary" /> Campus & Academic Discipline
@@ -622,8 +658,8 @@ export function ProfileClientView({
             )}
           </div>
 
-          <div className="flex items-start gap-3.5 pt-1">
-            <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-xl shrink-0">
+          <div className="flex items-start gap-3.5 pt-0.5">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-lg shrink-0">
               {branchIcon}
             </div>
 
@@ -660,55 +696,8 @@ export function ProfileClientView({
           </div>
         </div>
 
-        {/* ─── LinkedIn-Style About & Bio Card ─── */}
-        {profile.bio && (
-          <div className="rounded-3xl bg-card p-5 shadow-2xs space-y-2.5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                <Briefcase className="size-3.5 text-primary" /> About
-              </h3>
-              {isOwnProfile && (
-                <Link href="/app/profile/edit" className="text-muted-foreground hover:text-primary transition-colors">
-                  <Edit3 className="size-3.5" />
-                </Link>
-              )}
-            </div>
-
-            <p className="text-xs text-foreground/90 leading-relaxed font-medium whitespace-pre-wrap">
-              {profile.bio}
-            </p>
-
-            {/* Interest Tags (Styled as Reference 1 Pastel Badges) */}
-            {profile.interests && profile.interests.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-2">
-                {profile.interests.map((tag, idx) => {
-                  const tagStyles = [
-                    "badge-tag-peach",
-                    "badge-tag-cyan",
-                    "badge-tag-purple",
-                    "badge-tag-rose",
-                    "badge-tag-emerald",
-                  ];
-                  const styleClass = tagStyles[idx % tagStyles.length];
-                  return (
-                    <span
-                      key={tag}
-                      className={cn(
-                        "rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wider",
-                        styleClass
-                      )}
-                    >
-                      {tag}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
         {/* ─── Campus Clout Analytics Card ─── */}
-        <div className="rounded-3xl bg-card p-5 space-y-3 shadow-2xs">
+        <div className="mx-4 my-3 rounded-2xl border border-border/40 bg-card/60 p-4 space-y-2.5">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <TrendingUp className="size-3.5 text-amber-500" /> Campus Clout & Analytics
@@ -737,13 +726,13 @@ export function ProfileClientView({
           </div>
         </div>
 
-        {/* ─── Profile Navigation Underline Tabs (Inspired by Reference 1) ─── */}
-        <div className="flex items-center gap-6 border-b border-border/20 text-xs font-bold pt-2 px-1">
+        {/* ─── Profile Navigation Underline Tabs (Twitter Style) ─── */}
+        <div className="flex border-b border-border/30 bg-background text-xs font-bold mt-2">
           <button
             type="button"
             onClick={() => setActiveTab("posts")}
             className={cn(
-              "relative pb-3 transition-colors cursor-pointer text-xs font-bold",
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold",
               activeTab === "posts"
                 ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground"
@@ -751,7 +740,7 @@ export function ProfileClientView({
           >
             <span>Activity ({posts.length})</span>
             {activeTab === "posts" && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
+              <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
             )}
           </button>
 
@@ -759,7 +748,7 @@ export function ProfileClientView({
             type="button"
             onClick={() => setActiveTab("photos")}
             className={cn(
-              "relative pb-3 transition-colors cursor-pointer text-xs font-bold flex items-center gap-1.5",
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
               activeTab === "photos"
                 ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground"
@@ -768,7 +757,7 @@ export function ProfileClientView({
             <Camera className="size-3.5" />
             <span>Gallery ({candidatePhotos.length})</span>
             {activeTab === "photos" && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
+              <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
             )}
           </button>
 
@@ -776,7 +765,7 @@ export function ProfileClientView({
             type="button"
             onClick={() => setActiveTab("clout")}
             className={cn(
-              "relative pb-3 transition-colors cursor-pointer text-xs font-bold",
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold",
               activeTab === "clout"
                 ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground"
@@ -784,7 +773,7 @@ export function ProfileClientView({
           >
             <span>LP Perks</span>
             {activeTab === "clout" && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
+              <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
             )}
           </button>
 
@@ -793,16 +782,16 @@ export function ProfileClientView({
               type="button"
               onClick={() => setActiveTab("archived")}
               className={cn(
-                "relative pb-3 transition-colors cursor-pointer text-xs font-bold flex items-center gap-1.5",
+                "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
                 activeTab === "archived"
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Archive className="size-3.5" />
-              <span>Archived ({archivedPosts.length})</span>
+              <span>Archive ({archivedPosts.length})</span>
               {activeTab === "archived" && (
-                <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-foreground" />
+                <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
               )}
             </button>
           )}
@@ -810,7 +799,7 @@ export function ProfileClientView({
 
         {/* ─── Tab Content ─── */}
         {activeTab === "posts" && (
-          <div className="space-y-3.5">
+          <div className="divide-y divide-border/30">
             {posts.map((post) => (
               <FeedCard key={post.id} post={post} currentUserId={currentUserId || profile.id} />
             ))}

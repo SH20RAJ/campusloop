@@ -1,5 +1,13 @@
 # CampusLoop Tasks & Fixes
 
+- [x] **Cloudflare Email Sending & Notification Email Engine**:
+  - Configured native `send_email` binding (`EMAIL`) in `wrangler.jsonc` and generated runtime types in `cloudflare-env.d.ts`.
+  - Built universal email utility in `src/lib/email.ts` with Cloudflare Worker `env.EMAIL.send()` and REST API fallback.
+  - Implemented responsive, high-contrast HTML email templates in `src/lib/email-templates.ts`.
+  - Wired `dispatchNotificationEmail` into notification dispatch engine in `src/lib/notifications.ts`.
+  - Added `email` column to `user_profiles` schema and stored verified student emails during onboarding.
+  - Added test API endpoint `/api/admin/test-email` and automated unit test suite `src/lib/email.test.ts` (all 61 tests passing).
+
 - [x] **Dating Swipe Deck Overhaul & High-Resolution Unsplash Seeding**:
   - Eliminated swipe card freezing (fixed double-increment bug in `dating-app-client.tsx` and isolated card keys with `key={top.id}`).
   - Added velocity-based swipe release (`velocity.x > 400 || offset.x > 80`) for effortless mobile flicking.

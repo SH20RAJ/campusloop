@@ -21,6 +21,7 @@ export const userProfiles = pgTable(
     username: text("username").notNull(),
     displayName: text("display_name").notNull(),
     officialName: text("official_name"),
+    email: text("email"),
     avatarUrl: text("avatar_url"),
     bannerUrl: text("banner_url"),
     headline: text("headline"),

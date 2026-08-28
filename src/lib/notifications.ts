@@ -1,5 +1,6 @@
 import { getDb } from "@/db";
 import { notifications,userProfiles } from "@/db/schema";
+import { dispatchNotificationEmail } from "@/lib/notifications-email";
 import { pushToUser } from "@/lib/push-dispatch";
 import { inArray,sql } from "drizzle-orm";
 
@@ -63,6 +64,9 @@ export async function createNotification(params: CreateNotificationParams): Prom
 
     // Wake the recipient's devices; failures here never fail the write above.
     await pushToUser(params.userId, params.type === "MATCH" ? "high" : "normal");
+
+    // Dispatch transactional email via Cloudflare Email Sending
+    dispatchNotificationEmail(params).catch(() => {});
 
     return true;
   } catch (error) {

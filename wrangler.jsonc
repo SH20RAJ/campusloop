@@ -32,6 +32,11 @@
 			"service": "campusloop"
 		}
 	],
+	"send_email": [
+		{
+			"name": "EMAIL"
+		}
+	],
 	"routes": [
 		{
 			"pattern": "campusloop.space",

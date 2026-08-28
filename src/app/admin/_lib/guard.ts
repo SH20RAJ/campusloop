@@ -90,6 +90,7 @@ async function bootstrapFirstAdmin(db: Db, userId: string, email?: string | null
 		userId,
 		username: (email?.split("@")[0] || "admin").toLowerCase(),
 		displayName: "Admin",
+		email: email || null,
 		institutionId: fallbackInst.id,
 		onboardingCompleted: true,
 		role: "ADMIN",

@@ -102,6 +102,7 @@ export async function completeOnboarding(formData: FormData) {
         userId: user.id,
         username: username.trim().toLowerCase(),
         displayName: displayName.trim(),
+        email: email.trim().toLowerCase(),
         officialName,
         avatarUrl: cleanAvatarUrl,
         gender,
@@ -121,6 +122,7 @@ export async function completeOnboarding(formData: FormData) {
       .onConflictDoUpdate({
         target: userProfiles.userId,
         set: {
+          email: email.trim().toLowerCase(),
           username: username.trim().toLowerCase(),
           displayName: displayName.trim(),
           avatarUrl: cleanAvatarUrl,

@@ -1,53 +1,47 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ArrowLeft, FileText, Lock, MessageSquare, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LEGAL_TABS = [
-  { href: "/privacy", label: "Privacy Policy", icon: Lock },
-  { href: "/terms", label: "Terms of Service", icon: FileText },
-  { href: "/safety", label: "Campus Safety", icon: ShieldCheck },
-  { href: "/contact", label: "Contact & Grievance", icon: MessageSquare },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+  { href: "/safety", label: "Safety" },
+  { href: "/contact", label: "Contact" },
 ];
 
+/**
+ * Underlined tab strip across the policy pages.
+ *
+ * Sits below the fixed 4rem MarketingHeader — `top-16` alone would tuck it
+ * underneath, since the header is out of flow.
+ */
 export function LegalNav() {
   const pathname = usePathname();
 
   return (
-    <div className="sticky top-16 z-40 border-b border-border/40 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-4xl items-center justify-between px-4 sm:px-6 h-12 overflow-x-auto scrollbar-none gap-2">
-        <Link
-          href="/"
-          className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors shrink-0 mr-2"
-        >
-          <ArrowLeft className="size-3.5" />
-          <span>Home</span>
-        </Link>
-
-        <div className="flex items-center gap-1">
-          {LEGAL_TABS.map((tab) => {
-            const isActive = pathname === tab.href;
-            const Icon = tab.icon;
-            return (
-              <Link
-                key={tab.href}
-                href={tab.href}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer",
-                  isActive
-                    ? "bg-foreground text-background font-black shadow-xs"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                )}
-              >
-                <Icon className="size-3.5" />
-                <span>{tab.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+    <div className="sticky top-16 z-40 mt-16 border-b border-border/50 bg-background/85 backdrop-blur-xl">
+      <nav className="mx-auto flex max-w-5xl items-center gap-1 overflow-x-auto px-5 sm:px-8 scrollbar-none">
+        {LEGAL_TABS.map((tab) => {
+          const isActive = pathname === tab.href;
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              aria-current={isActive ? "page" : undefined}
+              className={cn(
+                "shrink-0 border-b-2 px-3 py-3.5 text-[13.5px] transition-colors",
+                isActive
+                  ? "border-foreground font-medium text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

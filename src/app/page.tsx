@@ -190,7 +190,7 @@ export default async function LandingPage() {
         }}
       />
 
-      <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <div className="flex min-h-screen flex-col bg-background text-foreground overflow-x-clip">
         <MarketingHeader isAuthenticated={isAuthenticated} />
 
         {/* ─── Hero Section ─── */}

@@ -34,6 +34,8 @@ export async function GET() {
       return NextResponse.json([]);
     }
 
+    const participationMap = new Map(userParticipations.map((p) => [p.conversationId, p]));
+
     // Query conversations with participants and recent messages
     const rawConversations = await db.query.conversations.findMany({
       where: inArray(conversations.id, conversationIds),
@@ -50,15 +52,22 @@ export async function GET() {
       },
     });
 
-    // Format the response payload with WhatsApp style unread counting
+    // Format the response payload with WhatsApp style unread counting and action flags
     const formatted = rawConversations
       .map((conv) => {
         const otherParticipant = conv.participants.find((p) => p.userId !== profile.id)?.user;
-        const lastMessage = conv.messages[0] || null;
+        const participation = participationMap.get(conv.id);
 
         if (!otherParticipant) return null;
 
-        const unreadCount = conv.messages.filter(
+        const lastClearedAt = participation?.lastClearedAt ? new Date(participation.lastClearedAt) : null;
+        const validMessages = lastClearedAt
+          ? conv.messages.filter((m) => new Date(m.createdAt) > lastClearedAt)
+          : conv.messages;
+
+        const lastMessage = validMessages[0] || null;
+
+        const unreadCount = validMessages.filter(
           (m) => m.senderId !== profile.id && !m.readAt
         ).length;
 
@@ -68,6 +77,10 @@ export async function GET() {
           updatedAt: conv.updatedAt,
           otherParticipant,
           unreadCount,
+          isArchived: Boolean(participation?.isArchived),
+          isMuted: Boolean(participation?.isMuted),
+          isPinned: Boolean(participation?.isPinned),
+          lastClearedAt: participation?.lastClearedAt || null,
           lastMessage: lastMessage
             ? {
                 id: lastMessage.id,
@@ -81,9 +94,11 @@ export async function GET() {
       })
       .filter((c): c is NonNullable<typeof c> => c !== null);
 
-
-    // Sort by last message date (or creation date)
+    // Sort by pinned status first, then by last message date (or creation date)
     formatted.sort((a, b) => {
+      if (a.isPinned !== b.isPinned) {
+        return (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0);
+      }
       const dateA = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : new Date(a.createdAt).getTime();
       const dateB = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : new Date(b.createdAt).getTime();
       return dateB - dateA;

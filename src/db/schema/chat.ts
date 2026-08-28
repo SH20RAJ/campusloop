@@ -1,4 +1,4 @@
-import { index,jsonb,pgTable,text,timestamp,uniqueIndex } from "drizzle-orm/pg-core";
+import { boolean,index,jsonb,pgTable,text,timestamp,uniqueIndex } from "drizzle-orm/pg-core";
 import { createdAt,id,updatedAt } from "./common";
 import { userProfiles } from "./users";
 
@@ -24,6 +24,10 @@ export const conversationParticipants = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => userProfiles.id, { onDelete: "cascade" }),
+    isArchived: boolean("is_archived").default(false).notNull(),
+    isMuted: boolean("is_muted").default(false).notNull(),
+    isPinned: boolean("is_pinned").default(false).notNull(),
+    lastClearedAt: timestamp("last_cleared_at", { withTimezone: true }),
     createdAt,
   },
   (table) => [

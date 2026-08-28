@@ -10,18 +10,23 @@ setCachedConversations,
 } from "@/lib/chat-cache";
 import { cn } from "@/lib/utils";
 import {
-CheckCheck,
-Loader2,
-MessageSquare,
-Plus,
-Search,
-ShieldCheck,
-Users2
+  Archive,
+  BellOff,
+  CheckCheck,
+  Loader2,
+  MessageSquare,
+  MoreVertical,
+  Pin,
+  Plus,
+  Search,
+  ShieldCheck,
+  Users2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback,useEffect,useMemo,useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
+import { ConversationActionModal } from "./conversation-action-modal";
 import { MessengerPane } from "./messenger-pane";
 
 const fetcher = async <T,>(url: string): Promise<T> => {
@@ -36,7 +41,7 @@ interface MessengerViewProps {
   initialConversationId?: string;
 }
 
-type InboxFilter = "ALL" | "UNREAD" | "CAMPUS";
+type InboxFilter = "ALL" | "UNREAD" | "CAMPUS" | "ARCHIVED";
 
 export function MessengerView({
   currentUserId,
@@ -52,6 +57,37 @@ export function MessengerView({
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [activeFilter, setActiveFilter] = useState<InboxFilter>("ALL");
+  const [actionConv, setActionConv] = useState<CachedConversation | null>(null);
+  const [showActionModal, setShowActionModal] = useState(false);
+
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isLongPressRef = useRef(false);
+
+  const handleTouchStart = (conv: CachedConversation) => {
+    isLongPressRef.current = false;
+    longPressTimerRef.current = setTimeout(() => {
+      isLongPressRef.current = true;
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        navigator.vibrate(40);
+      }
+      setActionConv(conv);
+      setShowActionModal(true);
+    }, 450);
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const handleTouchMove = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
 
   // Keep state in sync if URL route changes to another /app/chat/[id]
   useEffect(() => {
@@ -202,6 +238,13 @@ export function MessengerView({
     if (!conversations) return [];
     let list = [...conversations];
 
+    if (activeFilter === "ARCHIVED") {
+      return list.filter((c) => Boolean(c.isArchived));
+    }
+
+    // By default, exclude archived conversations from main tabs
+    list = list.filter((c) => !c.isArchived);
+
     if (activeFilter === "UNREAD") {
       list = list.filter((c) => (c.unreadCount || 0) > 0);
     } else if (activeFilter === "CAMPUS") {
@@ -290,7 +333,7 @@ export function MessengerView({
               )}
             >
               <span>Unread</span>
-              {conversations && conversations.filter((c) => (c.unreadCount || 0) > 0).length > 0 && (
+              {conversations && conversations.filter((c) => (c.unreadCount || 0) > 0 && !c.isArchived).length > 0 && (
                 <span className="size-1.5 rounded-full bg-amber-400" />
               )}
             </button>
@@ -305,6 +348,24 @@ export function MessengerView({
               )}
             >
               Campus
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter("ARCHIVED")}
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                activeFilter === "ARCHIVED"
+                  ? "bg-primary text-primary-foreground shadow-2xs"
+                  : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              <Archive className="size-3" />
+              <span>Archived</span>
+              {conversations && conversations.filter((c) => Boolean(c.isArchived)).length > 0 && (
+                <span className="text-[10px] opacity-80">
+                  ({conversations.filter((c) => Boolean(c.isArchived)).length})
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -389,9 +450,23 @@ export function MessengerView({
               return (
                 <div
                   key={conv.id}
-                  onClick={() => handleSelectConversation(conv.id)}
+                  onTouchStart={() => handleTouchStart(conv)}
+                  onTouchEnd={handleTouchEnd}
+                  onTouchMove={handleTouchMove}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setActionConv(conv);
+                    setShowActionModal(true);
+                  }}
+                  onClick={() => {
+                    if (isLongPressRef.current) {
+                      isLongPressRef.current = false;
+                      return;
+                    }
+                    handleSelectConversation(conv.id);
+                  }}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-2xl transition-all cursor-pointer group border-l-3",
+                    "flex items-center gap-3 p-3 rounded-2xl transition-all cursor-pointer group border-l-3 relative",
                     isSelected
                       ? "bg-muted/90 dark:bg-muted/50 border-primary shadow-2xs"
                       : "border-transparent hover:bg-muted/40"
@@ -411,15 +486,27 @@ export function MessengerView({
                   {/* Body & Snippet */}
                   <div className="min-w-0 flex-1 space-y-0.5">
                     <div className="flex items-center justify-between gap-1">
-                      <p
+                      <div
                         className={cn(
-                          "text-xs truncate flex items-center gap-1",
+                          "text-xs truncate flex items-center gap-1 min-w-0",
                           isSelected ? "font-black text-foreground" : "font-bold text-foreground"
                         )}
                       >
-                        <span>{other.displayName}</span>
-                        <ShieldCheck className="size-3 text-blue-500 shrink-0" />
-                      </p>
+                        <span className="truncate">{other.displayName}</span>
+                        {other.points && other.points >= 150 && (
+                          <ShieldCheck className="size-3 text-[#1d9bf0] shrink-0" />
+                        )}
+                        {conv.isPinned && (
+                          <span title="Pinned chat">
+                            <Pin className="size-2.5 text-amber-500 shrink-0 fill-amber-500" />
+                          </span>
+                        )}
+                        {conv.isMuted && (
+                          <span title="Muted chat">
+                            <BellOff className="size-2.5 text-muted-foreground shrink-0" />
+                          </span>
+                        )}
+                      </div>
                       {conv.lastMessage && (
                         <span
                           className={cn(
@@ -433,7 +520,7 @@ export function MessengerView({
                     </div>
 
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1 min-w-0">
+                      <div className="flex items-center gap-1 min-w-0 flex-1">
                         {/* WhatsApp Seen Tick Indicator on last message */}
                         {isLastMe && conv.lastMessage && (
                           conv.lastMessage.readAt ? (
@@ -452,12 +539,28 @@ export function MessengerView({
                         </p>
                       </div>
 
-                      {/* CampusLoop Primary Unread Badge */}
-                      {unread > 0 && (
-                        <span className="size-5 rounded-full bg-primary text-primary-foreground text-[10px] font-black flex items-center justify-center shrink-0 shadow-2xs animate-in zoom-in-75">
-                          {unread}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1 shrink-0">
+                        {/* CampusLoop Primary Unread Badge */}
+                        {unread > 0 && (
+                          <span className="size-5 rounded-full bg-primary text-primary-foreground text-[10px] font-black flex items-center justify-center shrink-0 shadow-2xs animate-in zoom-in-75">
+                            {unread}
+                          </span>
+                        )}
+
+                        {/* 3-Dots Action Button for PC/Desktop */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActionConv(conv);
+                            setShowActionModal(true);
+                          }}
+                          className="size-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 flex items-center justify-center transition-all opacity-80 sm:opacity-0 group-hover:opacity-100 cursor-pointer"
+                          title="Chat options"
+                        >
+                          <MoreVertical className="size-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -495,6 +598,23 @@ export function MessengerView({
           onBack={handleBackToInbox}
         />
       </main>
+
+      {/* Conversation Action Modal (Mobile Long Press & Desktop 3 Dots) */}
+      <ConversationActionModal
+        isOpen={showActionModal}
+        onClose={() => {
+          setShowActionModal(false);
+          setActionConv(null);
+        }}
+        conversation={actionConv}
+        currentUserId={currentUserId}
+        onActionComplete={() => mutateConvs()}
+        onDeleteConversation={(convId) => {
+          if (activeConversationId === convId) {
+            handleBackToInbox();
+          }
+        }}
+      />
     </div>
   );
 }

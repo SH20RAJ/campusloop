@@ -6,6 +6,21 @@ A log of significant product updates, UI decisions, and architectural commits.
 
 ### Recent Updates
 
+- **Chat Overhaul: Call Buttons Removed, Mobile Long-Press / Desktop 3-Dots Actions, and Instagram/WhatsApp User Info & Media Drawer**:
+  - Removed Voice Call and Video Call buttons, state, and modal from the chat header.
+  - Added mobile long-press gesture detection (450ms with optional haptic vibration) and desktop hover 3-dots menu to conversation items on `/chat`.
+  - Built [`src/components/chat/conversation-action-modal.tsx`](campusloop/src/components/chat/conversation-action-modal.tsx) supporting Pin to Top, Mute Notifications, Archive/Unarchive, Mark as Read/Unread, View Profile, and Delete Chat with confirmation dialog.
+  - Added non-breaking columns (`is_archived`, `is_muted`, `is_pinned`, `last_cleared_at`) to `conversation_participants` schema in [`src/db/schema/chat.ts`](campusloop/src/db/schema/chat.ts) and executed migration on Neon DB.
+  - Implemented `PATCH /api/chat/[id]` and `DELETE /api/chat/[id]` endpoints for full conversation lifecycle control.
+  - Added `ARCHIVED` tab to inbox filters on `/chat` (`ALL`, `UNREAD`, `CAMPUS`, `ARCHIVED`) and rendered visual Pin and Mute badges on conversation items.
+  - Built Instagram / WhatsApp-style User Info & Shared Content Drawer ([`src/components/chat/chat-user-info-drawer.tsx`](campusloop/src/components/chat/chat-user-info-drawer.tsx)) opening on clicking the user avatar/name in chat:
+    - Profile header with large avatar, online presence dot, verified shield check, bio, college & branch hyperlinks, and LP clout badge.
+    - Quick actions: Profile, Secret Crush toggle, Mute toggle, and Search in chat.
+    - Shared Media tab with thumbnail grid and full-screen lightbox modal.
+    - Shared Links tab with clickable domain previews and timestamps.
+    - Privacy controls: Mute notifications, Clear message history, Delete chat, and Block/Report student.
+  - Added unit test suite in [`src/lib/chat-actions.test.ts`](campusloop/src/lib/chat-actions.test.ts) (all 67 tests passing).
+
 - **Twitter-Style Full-Width UI/UX Overhaul & Mobile Feeds College Hyperlinks**:
   - Removed `hidden sm:inline` from [`src/components/feed/feed-card-header.tsx`](campusloop/src/components/feed/feed-card-header.tsx) and added `School` icon alongside clickable college name/slug hyperlinks on mobile feeds.
   - Redesigned Academic Branch Directory ([`src/app/app/(main)/branch/[slug]/branch-client.tsx`](campusloop/src/app/app/(main)/branch/[slug]/branch-client.tsx)) with full-width space utilization, sticky top bar, equal-width Twitter tabs, search bar, and edge-to-edge student directory rows (`divide-y divide-border/30`).

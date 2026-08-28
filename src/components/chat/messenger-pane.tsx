@@ -17,24 +17,24 @@ import { PresenceDot } from "@/components/ui/presence-dot";
 import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
 import { cn } from "@/lib/utils";
 import {
-ArrowLeft,
-CheckCheck,
-CornerDownRight,
-Loader2,
-Mic,
-Paperclip,
-Phone,
-Play,
-Search,
-Send,
-ShieldCheck,
-Smile,
-User,
-Video,
-Volume2,
-X
+  ArrowLeft,
+  CheckCheck,
+  CornerDownRight,
+  Info,
+  Loader2,
+  Mic,
+  Paperclip,
+  Play,
+  Search,
+  Send,
+  ShieldCheck,
+  Smile,
+  User,
+  Volume2,
+  X,
 } from "lucide-react";
 import Link from "next/link";
+import { ChatUserInfoDrawer } from "./chat-user-info-drawer";
 import { useEffect,useRef,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -71,7 +71,7 @@ export function MessengerPane({
   const [searchInChat, setSearchInChat] = useState(false);
   const [chatSearchQuery, setChatSearchQuery] = useState("");
   const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
-  const [comingSoonCallType, setComingSoonCallType] = useState<"voice" | "video" | null>(null);
+  const [showInfoDrawer, setShowInfoDrawer] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -306,12 +306,6 @@ export function MessengerPane({
     toast.success("Voice memo sent! 🎙️");
   }
 
-  function handleCallClick(type: "voice" | "video") {
-    sounds.pop();
-    haptics.light();
-    setComingSoonCallType(type);
-  }
-
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -412,10 +406,13 @@ export function MessengerPane({
             </button>
 
             {/* Avatar with active presence dot */}
-            <Link
-              href={`/@${otherParticipant.username || "student"}`}
-              className="relative shrink-0 group"
-            >
+          {/* Avatar & Online status (Clickable to open User Info & Media Drawer) */}
+          <div
+            onClick={() => setShowInfoDrawer(true)}
+            className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer group hover:opacity-90 transition-opacity"
+            title="View student info and shared media"
+          >
+            <div className="relative shrink-0">
               <Avatar className="size-10 border border-border/40 shadow-xs transition-transform group-hover:scale-105">
                 <AvatarImage src={otherParticipant.avatarUrl || ""} />
                 <AvatarFallback className="text-xs font-black bg-primary/10 text-primary">
@@ -423,17 +420,14 @@ export function MessengerPane({
                 </AvatarFallback>
               </Avatar>
               <PresenceDot lastSeenAt={otherParticipant.lastSeenAt} />
-            </Link>
+            </div>
 
             {/* Name & Branch / Presence status */}
             <div className="min-w-0 space-y-0.5">
-              <Link
-                href={`/@${otherParticipant.username || "student"}`}
-                className="text-xs sm:text-sm font-black text-foreground hover:text-primary transition-colors truncate flex items-center gap-1.5 leading-tight"
-              >
+              <div className="text-xs sm:text-sm font-black text-foreground group-hover:text-primary transition-colors truncate flex items-center gap-1.5 leading-tight">
                 <span>{otherParticipant.displayName}</span>
                 <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
-              </Link>
+              </div>
               <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1.5 font-medium">
                 <span
                   className={cn(
@@ -460,27 +454,10 @@ export function MessengerPane({
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Header Action Buttons (Voice Call, Video Call, Search, Profile) */}
+          {/* Header Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-            <button
-              type="button"
-              onClick={() => handleCallClick("voice")}
-              className="size-8 sm:size-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center transition-colors cursor-pointer"
-              title="Voice Call"
-            >
-              <Phone className="size-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleCallClick("video")}
-              className="size-8 sm:size-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center transition-colors cursor-pointer"
-              title="Video Call"
-            >
-              <Video className="size-4.5" />
-            </button>
-
             <button
               type="button"
               onClick={() => setSearchInChat(!searchInChat)}
@@ -493,6 +470,20 @@ export function MessengerPane({
               title="Search in conversation"
             >
               <Search className="size-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowInfoDrawer(true)}
+              className={cn(
+                "size-8 sm:size-9 rounded-full flex items-center justify-center transition-colors cursor-pointer",
+                showInfoDrawer
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+              title="Contact Info & Media"
+            >
+              <Info className="size-4.5" />
             </button>
 
             <Link
@@ -976,46 +967,18 @@ export function MessengerPane({
         onSelectSticker={(sticker) => sendMessage(sticker.url)}
       />
 
-      {/* Voice & Video Call Coming Soon Modal */}
-      {comingSoonCallType && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in-50">
-          <div className="w-full max-w-sm rounded-3xl bg-card border border-border/80 p-6 shadow-2xl space-y-4 text-center">
-            <div className="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner">
-              {comingSoonCallType === "voice" ? <Phone className="size-7" /> : <Video className="size-7" />}
-            </div>
-            <div className="space-y-1.5">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-500 border border-amber-500/30">
-                Coming Soon
-              </span>
-              <h3 className="text-lg font-black text-foreground">
-                {comingSoonCallType === "voice" ? "Campus Voice Call" : "Campus Video Call"}
-              </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                End-to-end encrypted peer-to-peer campus calling with {otherParticipant?.displayName} is currently in testing for verified college networks and will be rolling out in the next update!
-              </p>
-            </div>
-            <div className="flex gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setComingSoonCallType(null)}
-                className="flex-1 py-2.5 rounded-full border border-border/80 text-xs font-bold text-foreground hover:bg-muted transition-colors cursor-pointer"
-              >
-                Got it
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setComingSoonCallType(null);
-                  toast.success("We'll notify you when campus calls go live!");
-                }}
-                className="flex-1 py-2.5 rounded-full bg-primary text-xs font-black text-primary-foreground hover:bg-primary/95 shadow-md transition-all cursor-pointer"
-              >
-                Notify Me
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Instagram / WhatsApp Style User Info & Shared Content Drawer */}
+      <ChatUserInfoDrawer
+        isOpen={showInfoDrawer}
+        onClose={() => setShowInfoDrawer(false)}
+        otherParticipant={otherParticipant}
+        conversationId={conversationId}
+        messages={messages || []}
+        currentUserId={currentUserId}
+        onSearchClick={() => setSearchInChat(true)}
+        onClearChat={() => mutate(undefined, true)}
+        onDeleteChat={onBack}
+      />
     </div>
   );
 }

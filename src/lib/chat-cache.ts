@@ -17,6 +17,10 @@ export type CachedConversation = {
   updatedAt: string;
   otherParticipant: UserProfile;
   unreadCount?: number;
+  isArchived?: boolean;
+  isMuted?: boolean;
+  isPinned?: boolean;
+  lastClearedAt?: string | Date | null;
   lastMessage: {
     id: string;
     body: string;

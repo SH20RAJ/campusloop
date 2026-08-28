@@ -42,8 +42,8 @@ CampusLoop is designed to empower college students with a safe, engaging, and fe
 - Do **NOT** inline API fetchers or re-implement standard hooks. Use centralized helpers in `@/lib/api.ts` and custom hooks in `@/hooks/`.
 
 ### 4. Database & Drizzle ORM Best Practices
-- Schema is centralized in [`src/db/schema.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/db/schema.ts).
-- Database connection uses Neon serverless Postgres driver via [`src/db/index.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/db/index.ts).
+- Schema is centralized in [`src/db/schema.ts`](campusloop/src/db/schema.ts).
+- Database connection uses Neon serverless Postgres driver via [`src/db/index.ts`](campusloop/src/db/index.ts).
 - When querying Drizzle Relational Query Builder (`db.query`), avoid deep self-referential nested relational queries (e.g., `with: { repostOf: { with: { ... } } }`) to prevent worker query cache errors. Batch-fetch relational references when needed.
 
 ### 5. Verification & Deployment Commands

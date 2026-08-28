@@ -8,9 +8,9 @@ A log of significant product updates, UI decisions, and architectural commits.
 
 - **Cloudflare Email Sending & Notification Email Dispatch**:
   - Bound native `send_email` binding (`EMAIL`) in `wrangler.jsonc` and generated runtime types in `cloudflare-env.d.ts`.
-  - Built universal email utility in [`src/lib/email.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/email.ts) supporting native Cloudflare Worker `env.EMAIL.send()`, REST API fallback, and safe simulated dev delivery.
-  - Designed responsive, high-contrast HTML email templates in [`src/lib/email-templates.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/email-templates.ts) for mentions, replies, matches, and student onboarding.
-  - Wired `dispatchNotificationEmail` into notification dispatch engine in [`src/lib/notifications.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/notifications.ts).
+  - Built universal email utility in [`src/lib/email.ts`](campusloop/src/lib/email.ts) supporting native Cloudflare Worker `env.EMAIL.send()`, REST API fallback, and safe simulated dev delivery.
+  - Designed responsive, high-contrast HTML email templates in [`src/lib/email-templates.ts`](campusloop/src/lib/email-templates.ts) for mentions, replies, matches, and student onboarding.
+  - Wired `dispatchNotificationEmail` into notification dispatch engine in [`src/lib/notifications.ts`](campusloop/src/lib/notifications.ts).
   - Added `email` column to `user_profiles` schema and stored verified student emails during onboarding.
   - Created test API endpoint `/api/admin/test-email` and automated unit test suite `src/lib/email.test.ts` (all 61 tests passing).
 

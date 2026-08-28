@@ -116,8 +116,8 @@ src/
 
 ### Rule 3: Centralized API Fetchers & Custom Hooks
 - Do **NOT** write ad-hoc `fetch()` calls or re-implement standard hooks inside components.
-- Use `fetcher` and mutation helpers from [`src/lib/api.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/api.ts).
-- Access shared client state via hooks exported from [`src/hooks/index.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/hooks/index.ts).
+- Use `fetcher` and mutation helpers from [`src/lib/api.ts`](campusloop/src/lib/api.ts).
+- Access shared client state via hooks exported from [`src/hooks/index.ts`](campusloop/src/hooks/index.ts).
 
 ### Rule 4: Drizzle ORM on Cloudflare Workers
 - When using Drizzle's Relational Query Builder (`db.query`), avoid deep self-referential nested relational queries (e.g. `with: { repostOf: { with: { ... } } }`) to prevent worker query cache errors.

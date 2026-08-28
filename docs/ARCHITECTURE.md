@@ -62,9 +62,9 @@ campusloop/
    - Avoid deep self-referential nested relational queries (e.g. `with: { repostOf: { with: { ... } } }`) to prevent worker query cache errors. Batch-fetch relational references when needed.
 
 4. **Zero-Latency Audio & Physical Haptics**:
-   - Utilize synthesized Web Audio API in [`src/lib/sounds.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/sounds.ts) instead of external MP3 assets.
-   - Trigger native vibration feedback via [`src/lib/haptics.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/haptics.ts).
+   - Utilize synthesized Web Audio API in [`src/lib/sounds.ts`](campusloop/src/lib/sounds.ts) instead of external MP3 assets.
+   - Trigger native vibration feedback via [`src/lib/haptics.ts`](campusloop/src/lib/haptics.ts).
 
 5. **Design System & Typography**:
-   - Document and legal pages use clean, minimal monochrome typography in [`src/components/marketing/legal-doc.tsx`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/components/marketing/legal-doc.tsx).
+   - Document and legal pages use clean, minimal monochrome typography in [`src/components/marketing/legal-doc.tsx`](campusloop/src/components/marketing/legal-doc.tsx).
    - Card overlays utilize glassmorphism (`backdrop-blur-xl bg-background/85`) and rounded corners (`rounded-2xl` to `rounded-3xl`).

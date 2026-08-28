@@ -110,15 +110,15 @@ sequenceDiagram
 ```
 
 ### Key Components:
-- **Server Session Verification**: Handled via `hexclaveServerApp.getUser()` in [`src/hexclave/server.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/hexclave/server.ts).
-- **Client Profile Hook**: [`src/hooks/use-profile.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/hooks/use-profile.ts) powers client-side profile caching, verification status, and optimistic updates.
-- **Viewer / Unverified Mode**: Controlled via [`src/lib/viewer.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/viewer.ts), allowing prospective students to explore public campus directory data while preventing writes or private messaging.
+- **Server Session Verification**: Handled via `hexclaveServerApp.getUser()` in [`src/hexclave/server.ts`](campusloop/src/hexclave/server.ts).
+- **Client Profile Hook**: [`src/hooks/use-profile.ts`](campusloop/src/hooks/use-profile.ts) powers client-side profile caching, verification status, and optimistic updates.
+- **Viewer / Unverified Mode**: Controlled via [`src/lib/viewer.ts`](campusloop/src/lib/viewer.ts), allowing prospective students to explore public campus directory data while preventing writes or private messaging.
 
 ---
 
 ## 4. Database Architecture & Schema Topology
 
-The database is built on **Neon Serverless PostgreSQL** and managed through **Drizzle ORM** in [`src/db/schema.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/db/schema.ts).
+The database is built on **Neon Serverless PostgreSQL** and managed through **Drizzle ORM** in [`src/db/schema.ts`](campusloop/src/db/schema.ts).
 
 ```mermaid
 erDiagram
@@ -197,7 +197,7 @@ erDiagram
 ## 5. Core Feature Engines
 
 ### 5.1 Feed & Ranking Engine
-Located in [`src/lib/feed.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/feed.ts) and [`src/app/api/feed/route.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/app/api/feed/route.ts):
+Located in [`src/lib/feed.ts`](campusloop/src/lib/feed.ts) and [`src/app/api/feed/route.ts`](campusloop/src/app/api/feed/route.ts):
 - **Scope Modes**:
   - `CAMPUS`: Filtered strictly by `userProfiles.institutionId = profile.institutionId`.
   - `GLOBAL`: Surfaces posts across all 1,350+ Indian colleges.
@@ -212,22 +212,22 @@ Located in [`src/lib/feed.ts`](file:///Users/shaswatraj/Desktop/startups/campusl
   - Strict isolation prevents moderators or users from linking anonymous confessions to real student profiles.
 
 ### 5.2 Campus Match & Dating Engine
-Located in [`src/components/dating/swipe-deck.tsx`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/components/dating/swipe-deck.tsx) and [`src/app/api/dating/`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/app/api/dating/):
+Located in [`src/components/dating/swipe-deck.tsx`](campusloop/src/components/dating/swipe-deck.tsx) and [`src/app/api/dating/`](campusloop/src/app/api/dating/):
 - **Fluid Gesture Mechanics**: Framer Motion draggable cards with velocity-based release detection (`offset.x > 80 || velocity.x > 400`).
 - **Zero-Lag Image Preloading**: Background image preloader (`new Image().src = ...`) warms up the next 5 candidates in browser memory.
-- **Respectable Unsplash Portrait Engine**: High-res, verified Unsplash college portraits in [`src/constants/dating-photos.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/constants/dating-photos.ts) replacing cartoon/Dicebear avatars.
+- **Respectable Unsplash Portrait Engine**: High-res, verified Unsplash college portraits in [`src/constants/dating-photos.ts`](campusloop/src/constants/dating-photos.ts) replacing cartoon/Dicebear avatars.
 - **Circular PFP Indicator**: Circular avatar rendered directly before the student's name on full-screen cards.
-- **Compatibility Scoring**: Multi-factor algorithm in [`src/lib/dating.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/dating.ts) evaluating shared interests, college proximity, and reciprocal likes.
+- **Compatibility Scoring**: Multi-factor algorithm in [`src/lib/dating.ts`](campusloop/src/lib/dating.ts) evaluating shared interests, college proximity, and reciprocal likes.
 - **Secret Crush Escrow**: Unilateral crushes remain 100% encrypted until a mutual crush occurs.
 
 ### 5.3 Stories & Ephemeral Vibes
-Located in [`src/components/stories/`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/components/stories/) and [`src/app/api/stories/`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/app/api/stories/):
+Located in [`src/components/stories/`](campusloop/src/components/stories/) and [`src/app/api/stories/`](campusloop/src/app/api/stories/):
 - **24-Hour Lifetime**: Ephemeral media content automatically expires after 24 hours.
 - **Interactive Story Viewer**: Fullscreen progressive timer bars, touch tap navigation, story heart likes, and smart pause-on-reply typing.
 - **Story Archive & Highlights**: Permanent storage for expired stories allowing students to curate personal profile highlights.
 
 ### 5.4 Communities & Campus Utility Hubs
-Located in [`src/components/communities/`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/components/communities/):
+Located in [`src/components/communities/`](campusloop/src/components/communities/):
 - **Reddit-Style Sub-Hubs**: Student interest communities (`c/coding`, `c/music-band`, `c/anime`) with full sorting (`Hot`, `New`, `Top`, `Rising`, `Discussed`).
 - **6 Dedicated Template Portals**:
   1. `/app/lost-and-found` — Lost item retrieval & instant claim messaging.
@@ -238,13 +238,13 @@ Located in [`src/components/communities/`](file:///Users/shaswatraj/Desktop/star
   6. `/app/academics` — End-sem handwritten notes, PYQ sheets, and course reviews.
 
 ### 5.5 Chat & Instant Messaging
-Located in [`src/components/chat/`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/components/chat/) and [`src/app/api/chat/`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/app/api/chat/):
+Located in [`src/components/chat/`](campusloop/src/components/chat/) and [`src/app/api/chat/`](campusloop/src/app/api/chat/):
 - **Auto-Resizing Composer**: Multi-line auto-expanding textarea supporting native clipboard & keyboard sticker paste (Gboard & iOS Memojis).
 - **Safe-Area Alignment**: Native touch padding with `pb-[max(0.75rem,env(safe-area-inset-bottom))]`.
 - **Skeleton Loaders**: Dedicated instant loading states preventing blank screens during thread transitions.
 
 ### 5.6 Campus Time Capsule & Batch Legacy Vault
-Located in [`src/components/landing/time-capsule-showcase.tsx`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/components/landing/time-capsule-showcase.tsx) and [`src/app/app/(main)/capsule/`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/app/app/(main)/capsule/):
+Located in [`src/components/landing/time-capsule-showcase.tsx`](campusloop/src/components/landing/time-capsule-showcase.tsx) and [`src/app/app/(main)/capsule/`](campusloop/src/app/app/(main)/capsule/):
 - **Cryptographic Batch Lock**: Sealed letters, predictions, and confessions locked until graduation day.
 - **Live Countdown Timer**: Real-time ticker counting down days, hours, and minutes to convocation.
 - **Unlocked Museum Wall**: Public batch archive rendered after timer expiry.
@@ -253,7 +253,7 @@ Located in [`src/components/landing/time-capsule-showcase.tsx`](file:///Users/sh
 
 ## 6. Gamification & Loop Points (LP) Engine
 
-Engine defined in [`src/lib/feed.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/feed.ts) and [`src/lib/gamification.ts`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/gamification.ts):
+Engine defined in [`src/lib/feed.ts`](campusloop/src/lib/feed.ts) and [`src/lib/gamification.ts`](campusloop/src/lib/gamification.ts):
 
 | Action | Loop Points (LP) Reward |
 | :--- | :--- |
@@ -288,7 +288,7 @@ CampusLoop includes an in-browser sensory feedback engine designed for native ap
 
 ## 8. Trust, Safety, Moderation & Legal Compliance
 
-Located in [`src/lib/moderation/`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/lib/moderation/) and policy routes:
+Located in [`src/lib/moderation/`](campusloop/src/lib/moderation/) and policy routes:
 
 - **Automated Doxxing & Abuse Filter**: Intercepts phone numbers, roll numbers, hostel room numbers, and abuse keywords before database write.
 - **3-Strike Quarantine Escrow**: Any post receiving 3 independent reports is immediately hidden from campus feeds and queued in the `/admin` moderation desk.
@@ -296,7 +296,7 @@ Located in [`src/lib/moderation/`](file:///Users/shaswatraj/Desktop/startups/cam
   - **Information Technology Act, 2000** & **IT Intermediary Rules, 2021**: Dedicated Grievance Redressal Officer with 24hr acknowledgement and 15-day resolution SLA.
   - **UGC Anti-Ragging Regulations, 2009**: Zero-tolerance digital hazing policy with direct escalation pathways.
   - **DPDP Act, 2023 (Digital Personal Data Protection)**: Full user data export and deletion rights.
-- **Document Design System**: Monochrome document layouts in [`src/components/marketing/legal-doc.tsx`](file:///Users/shaswatraj/Desktop/startups/campusloop/src/components/marketing/legal-doc.tsx) powering `/privacy`, `/terms`, `/safety`, and `/contact`.
+- **Document Design System**: Monochrome document layouts in [`src/components/marketing/legal-doc.tsx`](campusloop/src/components/marketing/legal-doc.tsx) powering `/privacy`, `/terms`, `/safety`, and `/contact`.
 
 ---
 

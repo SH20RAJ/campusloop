@@ -5,17 +5,19 @@ import { UserProfile } from "@/db/schema";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import {
-ArrowLeft,
-Flame,
-Heart,
-Loader2,
-Lock,
-MessageSquare,
-Plus,
-Search,
-ShieldCheck,
-Trash2,
-X
+  ArrowLeft,
+  Crown,
+  Flame,
+  Heart,
+  Loader2,
+  Lock,
+  MessageSquare,
+  Plus,
+  Search,
+  ShieldCheck,
+  Trash2,
+  X,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -45,6 +47,14 @@ interface SecretCrushResponse {
   maxSlots: number;
   remainingSlots: number;
   receivedCrushesCount: number;
+  slotProgress?: {
+    isExpanded: boolean;
+    maxSlots: number;
+    points: number;
+    threshold: number;
+    pointsNeeded: number;
+    progressPercent: number;
+  };
 }
 
 const fetcher = <T,>(url: string): Promise<T> =>
@@ -71,9 +81,11 @@ export function CrushClient() {
   const usedSlots = data?.usedSlots || 0;
   const maxSlots = data?.maxSlots || 5;
   const receivedCrushesCount = data?.receivedCrushesCount || 0;
+  const slotProgress = data?.slotProgress;
 
-  // Build fixed 5-slot array
-  const slots = Array.from({ length: 5 }, (_, i) => crushes[i] || null);
+  // Build dynamic slot array (5 default, or up to 50 when expanded with LP clout)
+  const displaySlotCount = maxSlots <= 5 ? maxSlots : Math.min(maxSlots, Math.max(usedSlots + 2, 5));
+  const slots = Array.from({ length: displaySlotCount }, (_, i) => crushes[i] || null);
 
   async function handleSearch(q: string) {
     setSearchQuery(q);
@@ -201,13 +213,64 @@ export function CrushClient() {
                 : `${receivedCrushesCount} students on your campus secretly added you!`}
             </p>
             <p className="text-[11px] text-rose-500/80">
-              Fill your 5 slots below to discover if the feeling is mutual.
+              Fill your slots below to discover if the feeling is mutual.
             </p>
           </div>
         </div>
       )}
 
-      {/* ─── 5 Minimalist Slots ─── */}
+      {/* ─── Loop Points Clout Expansion Banner ─── */}
+      {slotProgress && !slotProgress.isExpanded && (
+        <div className="p-4 rounded-3xl bg-linear-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 text-amber-600 dark:text-amber-400 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center">
+                <Zap className="size-4 fill-amber-500" />
+              </div>
+              <div>
+                <h3 className="text-xs font-black text-foreground">
+                  Expand Vault from 5 to 50 Slots
+                </h3>
+                <p className="text-[11px] text-muted-foreground">
+                  {slotProgress.points} / {slotProgress.threshold} LP earned
+                </p>
+              </div>
+            </div>
+            <span className="text-[11px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-full border border-amber-500/30">
+              {slotProgress.pointsNeeded} LP to 50 slots
+            </span>
+          </div>
+
+          <div className="w-full h-2 bg-amber-500/20 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-linear-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
+              style={{ width: `${slotProgress.progressPercent}%` }}
+            />
+          </div>
+
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Reach <strong>150 Loop Points (LP)</strong> by sharing campus posts, participating in polls, and inviting friends to automatically expand your Secret Crush vault to <strong>50 slots</strong>.
+          </p>
+        </div>
+      )}
+
+      {slotProgress?.isExpanded && (
+        <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-violet-500/10 border border-violet-500/20 text-violet-600 dark:text-violet-400">
+          <div className="size-8 rounded-xl bg-violet-500/20 text-violet-500 flex items-center justify-center shrink-0">
+            <Crown className="size-4" />
+          </div>
+          <div>
+            <p className="text-xs font-black text-foreground">
+              Vault Expanded to 50 Slots
+            </p>
+            <p className="text-[11px] text-violet-600/80 dark:text-violet-400/80">
+              Gold Star verified clout unlocked. You have access to the maximum 50 secret crush slots.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Vault Slots ─── */}
       <div className="space-y-2.5">
         {isLoading ? (
           <div className="py-16 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
@@ -315,6 +378,13 @@ export function CrushClient() {
               </div>
             );
           })
+        )}
+
+        {maxSlots > displaySlotCount && (
+          <div className="p-3.5 text-center rounded-2xl border border-dashed border-border/50 bg-muted/10 text-xs font-bold text-muted-foreground flex items-center justify-center gap-2">
+            <Lock className="size-3.5" />
+            <span>+{maxSlots - usedSlots} more slots unlocked in your expanded vault ({usedSlots}/{maxSlots} used)</span>
+          </div>
         )}
       </div>
 

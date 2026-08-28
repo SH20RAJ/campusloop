@@ -3,16 +3,18 @@
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@/db/schema";
 import {
-Flame,
-Heart,
-Loader2,
-Lock,
-MessageCircle,
-Plus,
-Search,
-ShieldCheck,
-Trash2,
-X
+  Crown,
+  Flame,
+  Heart,
+  Loader2,
+  Lock,
+  MessageCircle,
+  Plus,
+  Search,
+  ShieldCheck,
+  Trash2,
+  X,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -41,6 +43,14 @@ interface SecretCrushResponse {
   maxSlots: number;
   remainingSlots: number;
   receivedCrushesCount: number;
+  slotProgress?: {
+    isExpanded: boolean;
+    maxSlots: number;
+    points: number;
+    threshold: number;
+    pointsNeeded: number;
+    progressPercent: number;
+  };
 }
 
 const fetcher = <T,>(url: string): Promise<T> =>
@@ -70,6 +80,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
   const usedSlots = data?.usedSlots || 0;
   const maxSlots = data?.maxSlots || 5;
   const receivedCrushesCount = data?.receivedCrushesCount || 0;
+  const slotProgress = data?.slotProgress;
 
   async function handleSearch(q: string) {
     setSearchQuery(q);
@@ -192,7 +203,40 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
           </div>
         )}
 
-        {/* 5 Secret Crush Slots */}
+        {/* Loop Points Clout Expansion Banner */}
+        {slotProgress && !slotProgress.isExpanded && (
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="size-4 shrink-0 text-amber-500 fill-amber-500" />
+                <span className="text-xs font-black">
+                  Expand Vault to 50 Slots ({slotProgress.points}/{slotProgress.threshold} LP)
+                </span>
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-full">
+                {slotProgress.pointsNeeded} LP to unlock
+              </span>
+            </div>
+            <div className="w-full h-1.5 bg-amber-500/20 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                style={{ width: `${slotProgress.progressPercent}%` }}
+              />
+            </div>
+            <p className="text-[11px] text-amber-700/90 dark:text-amber-300/90 font-medium leading-relaxed">
+              Earn 150 Loop Points (LP) via posts, polls, and invites to unlock <strong>50 Secret Crush slots</strong>!
+            </p>
+          </div>
+        )}
+
+        {slotProgress?.isExpanded && (
+          <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-violet-500/10 border border-violet-500/20 text-violet-600 dark:text-violet-400 text-xs font-bold">
+            <Crown className="size-4 shrink-0 text-violet-500" />
+            <span>Vault Expanded: 50 Secret Crush Slots Unlocked with Gold Star Clout!</span>
+          </div>
+        )}
+
+        {/* Secret Crush Slots */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
@@ -359,7 +403,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
                 </div>
                 <h3 className="text-xs font-black text-foreground">Your Secret Crush vault is empty</h3>
                 <p className="text-[11px] text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                  Add up to 5 verified students you secretly like. They will NEVER know unless they add you too!
+                  Add up to {maxSlots} verified students you secretly like. They will NEVER know unless they add you too!
                 </p>
                 <button
                   type="button"

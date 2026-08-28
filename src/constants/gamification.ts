@@ -82,3 +82,38 @@ export function getCloutTier(points: number = 0): CloutTier {
 export function isAutoVerified(points: number = 0): boolean {
   return points >= VERIFIED_LP_THRESHOLD;
 }
+
+export const SECRET_CRUSH_BASE_SLOTS = 5;
+export const SECRET_CRUSH_MAX_SLOTS = 50;
+export const SECRET_CRUSH_EXPANSION_LP_THRESHOLD = 150; // Unlocked at Gold Star (150 LP)
+
+export function getSecretCrushSlotLimit(points: number = 0): number {
+  return points >= SECRET_CRUSH_EXPANSION_LP_THRESHOLD
+    ? SECRET_CRUSH_MAX_SLOTS
+    : SECRET_CRUSH_BASE_SLOTS;
+}
+
+export interface SecretCrushSlotProgress {
+  isExpanded: boolean;
+  maxSlots: number;
+  points: number;
+  threshold: number;
+  pointsNeeded: number;
+  progressPercent: number;
+}
+
+export function getSecretCrushSlotProgress(points: number = 0): SecretCrushSlotProgress {
+  const isExpanded = points >= SECRET_CRUSH_EXPANSION_LP_THRESHOLD;
+  const maxSlots = isExpanded ? SECRET_CRUSH_MAX_SLOTS : SECRET_CRUSH_BASE_SLOTS;
+  const pointsNeeded = Math.max(0, SECRET_CRUSH_EXPANSION_LP_THRESHOLD - points);
+  const progressPercent = Math.min(100, Math.round((points / SECRET_CRUSH_EXPANSION_LP_THRESHOLD) * 100));
+
+  return {
+    isExpanded,
+    maxSlots,
+    points,
+    threshold: SECRET_CRUSH_EXPANSION_LP_THRESHOLD,
+    pointsNeeded,
+    progressPercent,
+  };
+}

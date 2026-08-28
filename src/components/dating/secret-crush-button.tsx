@@ -92,7 +92,7 @@ export function SecretCrushButton({
               className="inline-flex items-center justify-center gap-1 rounded-xl bg-muted/50 p-2 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
             >
               <Lock className="size-3 text-rose-500" />
-              <span>Uses 1 of your 5 secret crush slots • Manage Vault</span>
+              <span>Uses 1 secret crush slot • Expand to 50 with LP Clout</span>
             </Link>
 
             <div className="flex gap-2 pt-1">

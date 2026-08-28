@@ -1,5 +1,13 @@
 # CampusLoop Tasks & Fixes
 
+- [x] **Secret Crush Vault LP Expansion (5 to 50 Slots)**:
+  - Linked Secret Crush vault capacity to the student's Loop Points (LP) clout in `src/constants/gamification.ts`.
+  - Unlocked expansion from 5 slots to 50 slots automatically at 150 LP (`VERIFIED_LP_THRESHOLD` / Gold Star status).
+  - Updated `src/app/api/dating/crush/route.ts` with dynamic `maxSlots` and `slotProgress` (calculating points needed and progress percent).
+  - Enforced dynamic slot validation in `POST /api/dating/crush` with helpful motivational error copy when max limit is reached.
+  - Added LP Clout Expansion Card with animated progress bar and remaining LP counter to `src/components/dating/secret-crush-modal.tsx` and `src/app/app/(main)/crush/crush-client.tsx`.
+  - Added unit test suite in `src/lib/dating.test.ts` covering slot limit thresholds and progress calculations (all 64 tests passing).
+
 - [x] **Cloudflare Email Sending & Notification Email Engine**:
   - Configured native `send_email` binding (`EMAIL`) in `wrangler.jsonc` and generated runtime types in `cloudflare-env.d.ts`.
   - Built universal email utility in `src/lib/email.ts` with Cloudflare Worker `env.EMAIL.send()` and REST API fallback.

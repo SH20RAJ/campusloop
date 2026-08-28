@@ -1,17 +1,22 @@
 import { getDb } from "@/db";
 import {
-conversationParticipants,
-conversations,
-messages,
-notifications,
-secretCrushes,
-userProfiles,
+  conversationParticipants,
+  conversations,
+  messages,
+  notifications,
+  secretCrushes,
+  userProfiles,
 } from "@/db/schema";
+import {
+  getSecretCrushSlotLimit,
+  getSecretCrushSlotProgress,
+  SECRET_CRUSH_EXPANSION_LP_THRESHOLD,
+  SECRET_CRUSH_MAX_SLOTS,
+} from "@/constants/gamification";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { and,count,eq } from "drizzle-orm";
 import { NextRequest,NextResponse } from "next/server";
 
-const MAX_SECRET_CRUSHES = 5;
 
 // GET /api/dating/crush — Fetch user's active secret crushes and count of received crushes
 export async function GET() {
@@ -56,6 +61,10 @@ export async function GET() {
 
     const receivedCrushesCount = Number(receivedCountRow?.count || 0);
 
+    const userPoints = profile.points || 0;
+    const maxSlots = getSecretCrushSlotLimit(userPoints);
+    const slotProgress = getSecretCrushSlotProgress(userPoints);
+
     return NextResponse.json({
       crushes: sentCrushes.map((c) => ({
         id: c.id,
@@ -66,9 +75,10 @@ export async function GET() {
         createdAt: c.createdAt,
       })),
       usedSlots: sentCrushes.length,
-      maxSlots: MAX_SECRET_CRUSHES,
-      remainingSlots: Math.max(0, MAX_SECRET_CRUSHES - sentCrushes.length),
+      maxSlots,
+      remainingSlots: Math.max(0, maxSlots - sentCrushes.length),
       receivedCrushesCount,
+      slotProgress,
     });
   } catch (error) {
     console.error("GET /api/dating/crush error:", error);
@@ -136,9 +146,20 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (currentCount >= MAX_SECRET_CRUSHES) {
+    const userPoints = profile.points || 0;
+    const maxSlots = getSecretCrushSlotLimit(userPoints);
+
+    if (currentCount >= maxSlots) {
+      if (maxSlots < SECRET_CRUSH_MAX_SLOTS) {
+        return NextResponse.json(
+          {
+            error: `You have filled all ${maxSlots} secret crush slots. Reach ${SECRET_CRUSH_EXPANSION_LP_THRESHOLD} Loop Points (LP) to unlock 50 slots! You currently have ${userPoints} LP.`,
+          },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: `You have reached the limit of ${MAX_SECRET_CRUSHES} secret crushes. Remove an existing one to add a new crush.` },
+        { error: `You have reached the maximum limit of ${maxSlots} secret crushes. Remove an existing one to add a new crush.` },
         { status: 400 }
       );
     }
@@ -258,7 +279,8 @@ export async function POST(req: NextRequest) {
       matched: false,
       crush: newCrush,
       usedSlots: currentCount + 1,
-      remainingSlots: MAX_SECRET_CRUSHES - currentCount - 1,
+      maxSlots,
+      remainingSlots: Math.max(0, maxSlots - currentCount - 1),
     });
   } catch (error) {
     console.error("POST /api/dating/crush error:", error);

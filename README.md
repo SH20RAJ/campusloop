@@ -11,10 +11,17 @@
 
 <p align="center">
   <a href="https://campusloop.space"><strong>🌐 Live App (campusloop.space)</strong></a> •
+  <a href="ARCHITECTURE.md"><strong>🏛️ System Architecture</strong></a> •
   <a href="https://campusloop.space/overview"><strong>📊 Strategic Overview</strong></a> •
   <a href="https://campusloop.space/pitch"><strong>⚡ Pitch Deck</strong></a> •
-  <a href="https://app.notion.com/p/Campusloop-3c4cd0ed0c2580b88ac4f1c2ae54961b"><strong>📝 Notion Database</strong></a>
+  <a href="https://campusloop.space/safety"><strong>🛡️ Safety & Standards</strong></a>
 </p>
+
+---
+
+## 🏛️ Comprehensive Architecture Documentation
+
+> 📖 **Deep Dive Available**: Read the full system design, Mermaid sequence diagrams, Drizzle ORM schema topology, edge runtime specifications, and recommendation algorithms in [**`ARCHITECTURE.md`**](ARCHITECTURE.md).
 
 ---
 
@@ -29,7 +36,7 @@ Student life is fragmented across loose WhatsApp groups, Instagram pages, Discor
 
 ---
 
-## 🌟 The 5 Core Product Layers
+## 🌟 The Core Product Layers
 
 ```
                                ┌─────────────────────────────────────────┐
@@ -45,33 +52,45 @@ Student life is fragmented across loose WhatsApp groups, Instagram pages, Discor
 ```
 
 ### 1. 🛡️ Identity & Gatekeeping Layer
-- **Institutional OTP Verification**: Access is restricted strictly to verified `.ac.in` and `.edu` college emails.
-- **Campus & Global Scope**: Seamlessly toggle between your local college feed and across all 1,350+ colleges in India.
+- **Institutional OTP Verification**: Access restricted strictly to verified `.ac.in` and `.edu` college emails.
+- **Campus Radius & Global Scope**: Seamlessly toggle between your local college feed and across all 1,350+ colleges in India.
 - **Outsider Isolation**: Corporate recruiters, bots, and non-students are strictly blocked.
 
 ### 2. 💬 Social & Discussion Layer
-- **Multi-Sort Feed Engine**: 5 distinct feed tabs (*🔥 For You, Latest, Trending, Top Voted, Discussed*).
+- **Multi-Sort Feed Engine**: 5 distinct feed algorithms (*🔥 For You, Latest, Trending, Top Voted, Discussed*).
 - **Post Types**: Thoughts, Confessions, Interactive Polls with custom options, and Questions.
-- **1-Tap & Quoted Reposts**: Twitter-style reposts with embedded quote previews.
-- **24-Hour Stories (Vibes)**: Fullscreen visual vibe sharing with custom Gen-Z stickers & color gradients.
+- **1-Tap & Quoted Reposts**: Twitter-style reposts with embedded quote previews and crystalline Web Audio chimes.
+- **24-Hour Stories (Vibes)**: Fullscreen visual vibe sharing with pause-on-reply typing and permanent profile highlights.
 
-### 3. 💖 Connection & Matchmaking Layer
-- **Campus Match Deck**: Swipe card deck for connecting with verified fellow students.
-- **Filtering**: Scope candidates by gender and college radius (Campus vs. Global).
-- **Instant Messaging**: Real-time 1-on-1 DMs with typing indicators and match overlays.
+### 3. 💖 Connection & Matchmaking Layer (`/app/dating`)
+- **Campus Match Swipe Deck**: Draggable Framer Motion cards with velocity-based release detection (`velocity.x > 400 || offset.x > 80`).
+- **Curated Unsplash Student Portraits**: Verified college portrait sets replacing cartoon Dicebear avatars.
+- **Circular PFP Previews**: Sleek circular avatar rendered directly before candidate names.
+- **Zero-Lag Preloader**: Instant image preloading in browser memory for smooth swipe transitions.
+- **Secret Crush & Mutual Match**: Cryptographic crush escrow revealing identity only when feelings are mutual.
 
-### 4. 🏫 Campus Utility & Sub-Hubs
-- **Lost & Found Bulletin**: Post lost keys, IDs, or electronics with instant claim messaging.
-- **Sub-Hub Communities**: Student-created interest groups (Coding Club, Anime Otakus, Music Jams, Hostel Hubs).
-- **Directory**: 1,350+ indexed Indian college hubs with instant search & hub request forms.
+### 4. 🏫 Campus Utility & Dedicated Sub-Hubs (`/app/communities`)
+- **Reddit-Style Sub-Hubs**: Authentic student interest communities (`c/coding`, `c/music-band`, `c/anime`) with custom sorting (*Hot, New, Top, Rising, Discussed*).
+- **6 Dedicated Campus Portals**:
+  - 🔎 [**/app/lost-and-found**](https://campusloop.space/app/lost-and-found) — Lost calculators, ID cards, keys & cycle locks.
+  - 🛒 [**/app/marketplace**](https://campusloop.space/app/marketplace) — Peer-to-peer hostel trading for cycles, coolers, and books.
+  - 🎮 [**/app/gaming**](https://campusloop.space/app/gaming) — Squad recruitment & LAN tournament lobbies.
+  - 🚗 [**/app/rideshare**](https://campusloop.space/app/rideshare) — Weekend cab and auto pooling.
+  - 🏠 [**/app/housing**](https://campusloop.space/app/housing) — Flat hunting and roommate matching.
+  - 📚 [**/app/academics**](https://campusloop.space/app/academics) — Exam-night handwritten notes & solved PYQs.
 
-### 5. ⚡ Clout, Reputation & Virality (Loop Points - LP)
+### 5. ⏳ Campus Time Capsule & Batch Legacy Vault (`/app/capsule`)
+- **Cryptographically Sealed Vaults**: Contribute batch predictions, hostel confessions, and convocation letters.
+- **Graduation Day Countdown**: Real-time ticker counting down days, hours, and minutes until convocation.
+- **Unlocked Museum Wall**: Automatically transforms into a public alumni celebration wall upon timer expiry.
+
+### 6. ⚡ Clout, Reputation & Virality (Loop Points - LP)
 - **Micro-Incentives**: Earn **Loop Points (LP)** for participation:
-  - **+20 LP**: Per successful student referral onboarding.
+  - **+20 LP**: Per successful verified student referral.
   - **+5 LP**: Per post created.
   - **+2 LP**: Per comment / reply.
   - **+1 LP**: Per poll vote / upvote.
-- **Dynamic Vibe Badges**: `🔥 Campus Legend` (≥500 LP), `👑 Campus Talker` (≥200 LP), `⚡ Loop Starter`.
+- **Verified Blue Badge Unlock**: Hitting 150 LP (Gold Star tier) automatically unlocks the verified blue badge on campus.
 
 ---
 
@@ -98,10 +117,11 @@ The value of CampusLoop is **not** in total user headcount across India — it i
 ## 🛠️ Tech Stack & Architecture
 
 - **Framework**: Next.js 16 (App Router + Turbopack)
-- **Runtime & Deployment**: Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`)
+- **Runtime & Edge Deployment**: Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`)
 - **Database**: Neon Serverless Postgres via Drizzle ORM
-- **Auth & User Management**: Hexclave Auth (`hexclaveServerApp.getUser()`)
-- **Rich Text Editor**: Tiptap Editor
+- **Authentication**: Hexclave Auth (`hexclaveServerApp.getUser()`)
+- **Zero-Latency Audio**: Synthesized Web Audio API (`src/lib/sounds.ts`)
+- **Haptics**: Native vibration engine (`src/lib/haptics.ts`)
 - **Styling & UI**: Vanilla CSS + TailwindCSS + Framer Motion + Lucide Icons + Sonner Toasts
 - **Package Manager**: Bun (`bun run dev`, `bun run deploy`)
 
@@ -111,30 +131,35 @@ The value of CampusLoop is **not** in total user headcount across India — it i
 
 ```
 campusloop/
+├── ARCHITECTURE.md            # Comprehensive System Architecture & Engineering Specs
+├── README.md                  # Main project overview & quickstart
+├── AGENTS.md                  # Critical guidelines for AI agents & developers
 ├── docs/                      # Architectural docs & design guidelines
 │   ├── ARCHITECTURE.md
 │   ├── DESIGN_SYSTEM.md
 │   ├── ROADMAP_PHASES.md
 │   └── CHANGELOG.md
-├── OVERVIEW.md                # Strategic Brief & Deep Research document
-├── AGENTS.md                  # Instructions & rules for AI agents
 ├── src/
-│   ├── app/                   # Next.js App Router (Pages & API routes)
-│   │   ├── (main)/            # Main app shell (Feed, Dating, Stories, Chat)
-│   │   ├── overview/          # Strategic overview page (/overview)
-│   │   ├── pitch/             # Pitch deck page (/pitch)
-│   │   ├── api/               # REST API endpoints (/api/feed, /api/posts, etc.)
-│   │   └── admin/             # Admin moderation dashboard
+│   ├── app/                   # Next.js App Router (Pages, Layouts & API routes)
+│   │   ├── (main)/            # Main app shell (Feed, Dating, Stories, Chat, Communities)
+│   │   ├── privacy/           # Legal privacy policy (DPDP Act 2023)
+│   │   ├── terms/             # Terms of service & IT Rules 2021
+│   │   ├── safety/            # Anti-ragging & campus safety guidelines
+│   │   ├── contact/           # Support & statutory grievance redressal
+│   │   ├── api/               # Edge REST API endpoints (/feed, /posts, /chat, etc.)
+│   │   └── admin/             # Admin moderation & audit dashboard
 │   ├── components/            # Feature subcomponents & Shadcn primitives
 │   │   ├── feed/              # Feed cards, sorters, repost modals
-│   │   ├── post/              # Composer toolbar, poll editor, anonymity notice
-│   │   ├── stories/           # Story viewer & creator components
-│   │   ├── dating/            # Match deck & filters modal
+│   │   ├── dating/            # Match deck, circular PFP, Unsplash photo sets
+│   │   ├── communities/       # Sub-hubs & dedicated utility portal clients
+│   │   ├── stories/           # Fullscreen story viewer & creator components
+│   │   ├── chat/              # Responsive messenger pane & sticker paste
+│   │   ├── marketing/         # Minimal document layout & legal navigation
 │   │   └── ui/                # Shared UI primitives
 │   ├── db/                    # Drizzle ORM schema & Neon database client
 │   ├── hexclave/              # Hexclave SDK config
-│   ├── hooks/                 # Custom React hooks (useFeed, useProfile, useStories)
-│   └── lib/                   # API client, feed sorting engine, moderation & LP utilities
+│   ├── hooks/                 # Custom React hooks (useFeed, useProfile, usePostActions)
+│   └── lib/                   # API client, sounds, haptics, moderation & LP utilities
 └── .agents/
     └── skills/
         └── campusloop-guide/  # Comprehensive AI agent handbook
@@ -162,8 +187,11 @@ HEXCLAVE_SECRET_SERVER_KEY="ssk_..."
 
 ### 3. Development & Type Check
 ```bash
-# Type Check (Must pass with 0 errors)
+# Type Check (Must compile cleanly with 0 errors)
 bunx tsc --noEmit
+
+# Run Unit Tests
+bun test
 
 # Development Server
 bun run dev
@@ -176,12 +204,16 @@ bun run deploy
 
 ---
 
-## 🔗 Resources & Links
+## 🔗 Resources & Statutory Links
 
 - 🌐 **Official Website**: [https://campusloop.space](https://campusloop.space)
+- 🏛️ **System Architecture**: [ARCHITECTURE.md](ARCHITECTURE.md)
 - 📊 **Strategic Overview**: [https://campusloop.space/overview](https://campusloop.space/overview)
 - ⚡ **Investor Pitch Deck**: [https://campusloop.space/pitch](https://campusloop.space/pitch)
-- 📝 **Notion Live Database**: [CampusLoop Notion Hub](https://app.notion.com/p/Campusloop-3c4cd0ed0c2580b88ac4f1c2ae54961b)
+- 🛡️ **Safety & Anti-Ragging**: [https://campusloop.space/safety](https://campusloop.space/safety)
+- 🔒 **Privacy Policy (DPDP Act 2023)**: [https://campusloop.space/privacy](https://campusloop.space/privacy)
+- 📜 **Terms of Service (IT Rules 2021)**: [https://campusloop.space/terms](https://campusloop.space/terms)
+- 📬 **Contact & Grievance Officer**: [https://campusloop.space/contact](https://campusloop.space/contact)
 
 ---
 

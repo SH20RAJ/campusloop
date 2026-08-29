@@ -10,8 +10,10 @@ import { cn, formatTimeAgo } from "@/lib/utils";
 import {
   ArrowLeft,
   Check,
+  CheckCircle2,
   ChevronRight,
   Clock,
+  ExternalLink,
   Flame,
   Info,
   Loader2,
@@ -20,13 +22,16 @@ import {
   Percent,
   Phone,
   Plus,
+  QrCode,
   Search,
   Share2,
   ShieldCheck,
   ShoppingBag,
   Star,
   Truck,
+  UtensilsCrossed,
   X,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -41,12 +46,15 @@ interface StoreClientProps {
 
 export function StoreClient({ merchantId, profileId }: StoreClientProps) {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"menu" | "deals" | "reviews" | "about">("menu");
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [selectedAddons, setSelectedAddons] = useState<Array<{ name: string; price: number }>>([]);
+  const [specialInstructions, setSpecialInstructions] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [searchMenuQuery, setSearchMenuQuery] = useState("");
   const [activeCategoryTab, setActiveCategoryTab] = useState("all");
+  const [dietFilter, setDietFilter] = useState<"all" | "veg" | "nonveg">("all");
 
   const { addItem, items, merchantGroups, totalItemsCount } = useMarketplaceCart();
 
@@ -61,7 +69,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
   const offers = store?.offers || [];
   const reviews = store?.reviews || [];
 
-  // Extract unique category names from products
+  // Extract unique categories from products
   const productCategories = useMemo(() => {
     const cats = new Set<string>();
     products.forEach((p: any) => {
@@ -70,12 +78,15 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
     return Array.from(cats);
   }, [products]);
 
-  // Filter products by search and category
+  // Filter products by category, search, and diet
   const filteredProducts = useMemo(() => {
     return products.filter((p: any) => {
       if (activeCategoryTab !== "all" && p.categoryName !== activeCategoryTab) {
         return false;
       }
+      if (dietFilter === "veg" && !p.isVeg) return false;
+      if (dietFilter === "nonveg" && p.isVeg) return false;
+
       if (searchMenuQuery.trim()) {
         const q = searchMenuQuery.toLowerCase();
         const matchesName = p.name?.toLowerCase().includes(q);
@@ -84,7 +95,23 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
       }
       return true;
     });
-  }, [products, activeCategoryTab, searchMenuQuery]);
+  }, [products, activeCategoryTab, dietFilter, searchMenuQuery]);
+
+  // Group products by category when showing all categories
+  const groupedProducts = useMemo(() => {
+    if (activeCategoryTab !== "all" || searchMenuQuery.trim()) {
+      return [{ category: activeCategoryTab === "all" ? "Search Results" : activeCategoryTab, items: filteredProducts }];
+    }
+
+    const groups: Record<string, any[]> = {};
+    filteredProducts.forEach((p: any) => {
+      const cat = p.categoryName || "Specialties";
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(p);
+    });
+
+    return Object.entries(groups).map(([category, items]) => ({ category, items }));
+  }, [filteredProducts, activeCategoryTab, searchMenuQuery]);
 
   // Current store items in cart
   const currentStoreGroup = merchantGroups.find((g) => g.merchantId === merchantId);
@@ -94,12 +121,17 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
       toast.error("This store is currently closed.");
       return;
     }
+    if (!product.isAvailable) {
+      toast.error("This item is currently out of stock.");
+      return;
+    }
+
     sounds.tap();
     haptics.light();
     setSelectedProduct(product);
     setQuantity(1);
+    setSpecialInstructions("");
 
-    // Set default options if any
     const defaults: Record<string, string> = {};
     (product.options || []).forEach((opt: any) => {
       defaults[opt.name] = opt.defaultChoice || opt.choices?.[0] || "";
@@ -139,272 +171,571 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
       selectedAddons,
     });
 
-    toast.success(`Added ${selectedProduct.name} to Cart! 🛒`);
+    toast.success(`Added ${quantity}x "${selectedProduct.name}" to cart! 🛍️`);
     setSelectedProduct(null);
   }
 
   function handleShareStore() {
     sounds.tap();
     haptics.light();
-    const url = window.location.href;
+
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://campusloop.space";
+    const shareUrl = `${baseUrl}/app/marketplace/store/${merchantId}`;
+
     if (navigator.share) {
-      navigator.share({ title: store?.name, url }).catch(() => {});
-      return;
+      navigator
+        .share({
+          title: store?.name || "Campus Store",
+          text: `Check out ${store?.name} menu on CampusLoop Marketplace!`,
+          url: shareUrl,
+        })
+        .catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success("Store link copied to clipboard! 📋");
     }
-    navigator.clipboard.writeText(url);
-    toast.success("Store link copied to clipboard!");
   }
+
+  // Calculate modal total
+  const modalItemTotal = useMemo(() => {
+    if (!selectedProduct) return 0;
+    const base = selectedProduct.price;
+    const addonsTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0);
+    return (base + addonsTotal) * quantity;
+  }, [selectedProduct, selectedAddons, quantity]);
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-2xl p-4 space-y-4">
-        <Skeleton className="h-44 w-full rounded-2xl" />
-        <Skeleton className="h-28 w-full rounded-2xl" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
-      </div>
+      <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen border-x border-border/20 bg-background">
+        <Skeleton className="h-44 w-full" />
+        <div className="p-4 space-y-4">
+          <Skeleton className="h-16 w-16 rounded-full -mt-12" />
+          <Skeleton className="h-6 w-48 rounded-lg" />
+          <Skeleton className="h-4 w-72 rounded-lg" />
+          <Skeleton className="h-28 w-full rounded-2xl" />
+        </div>
+      </main>
     );
   }
 
-  if (!store) {
+  if (error || !store) {
     return (
-      <div className="mx-auto max-w-2xl py-24 text-center px-4 space-y-3">
-        <p className="text-base font-bold text-foreground">Store not found</p>
-        <button
-          type="button"
-          onClick={() => router.push("/app/marketplace")}
+      <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen items-center justify-center p-6 text-center">
+        <UtensilsCrossed className="size-12 text-muted-foreground/50 mb-3" />
+        <h2 className="text-base font-black text-foreground">Store Unavailable</h2>
+        <p className="text-xs text-muted-foreground max-w-xs mt-1 mb-4">
+          This store is currently not listed or temporarily offline.
+        </p>
+        <Link
+          href="/app/marketplace"
           className="px-4 py-2 rounded-full bg-foreground text-background text-xs font-bold"
         >
           Back to Marketplace
-        </button>
-      </div>
+        </Link>
+      </main>
     );
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-28">
-      {/* ─── Top Store Cover & Header ─── */}
-      <div className="relative h-44 sm:h-52 w-full bg-muted overflow-hidden">
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen border-x border-border/20 bg-background text-foreground select-none pb-32">
+      {/* ─── Top Sticky Bar (Twitter/X style) ─── */}
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border/30 bg-background/85 px-4 py-2.5 backdrop-blur-xl">
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="flex size-8 shrink-0 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            aria-label="Back"
+          >
+            <ArrowLeft className="size-4" />
+          </button>
+          <div className="min-w-0">
+            <h1 className="text-sm font-black text-foreground tracking-tight truncate flex items-center gap-1.5">
+              <span>{store.name}</span>
+              <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+            </h1>
+            <p className="text-[11px] text-muted-foreground font-medium">
+              {products.length} menu items · {store.categorySlug}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleShareStore}
+            className="size-8 rounded-full bg-muted/60 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="Share Store"
+          >
+            <Share2 className="size-3.5" />
+          </button>
+
+          <Link
+            href={`/app/marketplace/cart`}
+            className="relative size-8 rounded-full bg-muted/60 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            title="View Cart"
+          >
+            <ShoppingBag className="size-3.5" />
+            {totalItemsCount > 0 && (
+              <span className="absolute -top-1 -right-1 size-4 rounded-full bg-foreground text-background text-[10px] font-black flex items-center justify-center">
+                {totalItemsCount}
+              </span>
+            )}
+          </Link>
+        </div>
+      </header>
+
+      {/* ─── Store Cover Banner ─── */}
+      <div className="relative h-44 sm:h-52 w-full overflow-hidden bg-muted">
         <img
-          src={store.coverUrl || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&h=400&fit=crop"}
+          src={store.coverUrl || "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop"}
           alt={store.name}
           className="size-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
-          <button
-            type="button"
-            onClick={() => {
-              sounds.tap();
-              router.back();
-            }}
-            className="flex size-9 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black backdrop-blur-xs transition-colors cursor-pointer"
+        {/* Operating status badge */}
+        <div className="absolute top-3 right-3">
+          <span
+            className={cn(
+              "px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider backdrop-blur-md border shadow-xs",
+              store.isOpen
+                ? "bg-emerald-500/80 text-white border-emerald-400/40"
+                : "bg-rose-500/80 text-white border-rose-400/40"
+            )}
           >
-            <ArrowLeft className="size-4.5" />
-          </button>
-
-          <button
-            type="button"
-            onClick={handleShareStore}
-            className="flex size-9 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black backdrop-blur-xs transition-colors cursor-pointer"
-          >
-            <Share2 className="size-4" />
-          </button>
+            {store.isOpen ? "🟢 Open Now" : "🔴 Currently Closed"}
+          </span>
         </div>
+      </div>
 
-        {/* Store Logo & Title in Overlay */}
-        <div className="absolute bottom-3 left-4 right-4 flex items-end gap-3 z-10">
-          <div className="size-16 rounded-2xl overflow-hidden border-2 border-background bg-card shrink-0 shadow-lg">
+      {/* ─── Profile Bio & Header Info ─── */}
+      <div className="px-4 pb-3 -mt-10 relative z-10 space-y-3">
+        <div className="flex items-end justify-between">
+          <div className="size-20 rounded-full border-4 border-background overflow-hidden bg-muted shadow-md">
             <img src={store.logoUrl} alt={store.name} className="size-full object-cover" />
           </div>
 
-          <div className="min-w-0 flex-1 text-white">
-            <h1 className="text-lg font-black tracking-tight flex items-center gap-1.5 truncate">
-              <span>{store.name}</span>
-              <ShieldCheck className="size-4 text-blue-400 shrink-0" />
-            </h1>
-            <p className="text-xs text-white/80 line-clamp-1">{store.address}</p>
+          <div className="flex items-center gap-2 pb-1">
+            {store.phone && (
+              <a
+                href={`tel:${store.phone}`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/60 bg-muted/40 hover:bg-muted text-xs font-bold text-foreground transition-all shadow-2xs"
+              >
+                <Phone className="size-3" />
+                <span>Call Store</span>
+              </a>
+            )}
+
+            <Link
+              href="/merchantt-portal/store/qr"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/60 bg-muted/40 hover:bg-muted text-xs font-bold text-foreground transition-all shadow-2xs"
+            >
+              <QrCode className="size-3" />
+              <span>Table QR</span>
+            </Link>
           </div>
         </div>
-      </div>
 
-      {/* ─── Store Quick Info Strip ─── */}
-      <div className="p-4 bg-card border-b border-border/30 space-y-2.5">
-        <div className="flex items-center flex-wrap gap-2 text-xs font-semibold">
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-500 border border-amber-500/30">
-            <Star className="size-3 fill-amber-400 text-amber-400" />
-            <span>{store.rating} ({store.reviewCount} reviews)</span>
-          </span>
-
-          <span
-            className={cn(
-              "px-2 py-0.5 rounded-md text-xs font-bold border",
-              store.isOpen
-                ? "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
-                : "bg-rose-500/15 text-rose-500 border-rose-500/30"
-            )}
-          >
-            {store.isOpen ? "🟢 Open Now" : "🔴 Closed"}
-          </span>
-
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/40">
-            <Clock className="size-3 text-primary" />
-            <span>{store.estimatedPrepTime}</span>
-          </span>
-
-          {store.locationPin && (
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/40">
-              <MapPin className="size-3 text-rose-500" />
-              <span>{store.locationPin}</span>
-            </span>
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-black text-foreground tracking-tight">{store.name}</h2>
+            <ShieldCheck className="size-4 text-blue-500" />
+          </div>
+          {store.description && (
+            <p className="text-xs text-muted-foreground leading-relaxed mt-1">{store.description}</p>
           )}
         </div>
 
-        {/* Active Offers */}
-        {offers.length > 0 && (
-          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-500 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Percent className="size-4 shrink-0" />
-              <span className="font-bold">{offers[0].title}</span>
-            </div>
-            {offers[0].code && (
-              <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 font-black text-[10px] uppercase">
-                {offers[0].code}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Info Strip: Campus, Rating, Delivery */}
+        <div className="flex flex-wrap items-center gap-y-1.5 gap-x-3 text-xs text-muted-foreground pt-1">
+          <span className="flex items-center gap-1">
+            <MapPin className="size-3.5 text-primary shrink-0" />
+            <span>{store.address}</span>
+          </span>
 
-        {/* Menu Search */}
-        <div className="relative pt-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchMenuQuery}
-            onChange={(e) => setSearchMenuQuery(e.target.value)}
-            placeholder={`Search menu inside ${store.name}...`}
-            className="w-full h-9 rounded-full bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background pl-9 pr-8 text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all"
-          />
+          <span className="flex items-center gap-1 font-bold text-amber-500">
+            <Star className="size-3.5 fill-amber-500" />
+            <span>{store.rating || "4.8"}</span>
+            <span className="text-muted-foreground font-normal">({reviews.length} reviews)</span>
+          </span>
+
+          <span className="flex items-center gap-1">
+            <Clock className="size-3.5 text-sky-500 shrink-0" />
+            <span>{store.estimatedPrepTime || "15–20 min"}</span>
+          </span>
+
+          <span className="flex items-center gap-1">
+            <Truck className="size-3.5 text-emerald-500 shrink-0" />
+            <span>₹{store.deliveryFee || 20} Delivery</span>
+          </span>
         </div>
+      </div>
 
-        {/* Category Filter Tabs */}
-        {productCategories.length > 0 && (
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1">
+      {/* ─── Twitter/X Style Tab Bar ─── */}
+      <nav className="flex items-center border-b border-border/30 bg-background/95 sticky top-12 z-30 backdrop-blur-md">
+        {[
+          { id: "menu", label: `Menu (${products.length})` },
+          { id: "deals", label: `Deals & Offers (${offers.length})` },
+          { id: "reviews", label: `Reviews (${reviews.length})` },
+          { id: "about", label: "About & Info" },
+        ].map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
             <button
+              key={tab.id}
               type="button"
               onClick={() => {
                 sounds.tap();
-                setActiveCategoryTab("all");
+                setActiveTab(tab.id as any);
               }}
               className={cn(
-                "px-3 py-1 rounded-full text-xs font-bold shrink-0 transition-colors cursor-pointer",
-                activeCategoryTab === "all"
-                  ? "bg-foreground text-background font-black"
-                  : "bg-muted/60 text-muted-foreground hover:text-foreground"
+                "flex-1 py-3 text-xs font-bold text-center transition-colors relative cursor-pointer",
+                isActive
+                  ? "text-foreground font-black"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
               )}
             >
-              All Items ({products.length})
+              <span>{tab.label}</span>
+              {isActive && (
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full" />
+              )}
             </button>
-            {productCategories.map((cat) => (
+          );
+        })}
+      </nav>
+
+      {/* ─── TAB 1: MENU ─── */}
+      {activeTab === "menu" && (
+        <section className="space-y-4">
+          {/* Menu Search & Diet Filters Bar */}
+          <div className="p-4 border-b border-border/20 bg-muted/10 space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchMenuQuery}
+                onChange={(e) => setSearchMenuQuery(e.target.value)}
+                placeholder="Search menu items (e.g. Steam Momos, Thukpa)..."
+                className="w-full h-9 rounded-xl bg-muted/50 border border-transparent focus:border-border/60 pl-9 pr-8 text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all"
+              />
+              {searchMenuQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchMenuQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 size-4.5 rounded-full bg-muted flex items-center justify-center text-muted-foreground"
+                >
+                  <X className="size-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Category Pills Strip */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
               <button
-                key={cat}
                 type="button"
                 onClick={() => {
                   sounds.tap();
-                  setActiveCategoryTab(cat);
+                  setActiveCategoryTab("all");
                 }}
                 className={cn(
-                  "px-3 py-1 rounded-full text-xs font-bold shrink-0 transition-colors cursor-pointer",
-                  activeCategoryTab === cat
-                    ? "bg-foreground text-background font-black"
-                    : "bg-muted/60 text-muted-foreground hover:text-foreground"
+                  "px-3 py-1 rounded-full text-xs font-bold shrink-0 transition-all cursor-pointer",
+                  activeCategoryTab === "all"
+                    ? "bg-foreground text-background font-black shadow-xs"
+                    : "bg-muted/50 text-muted-foreground hover:text-foreground border border-border/40"
                 )}
               >
-                {cat}
+                All Items
               </button>
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* ─── Menu / Products List ─── */}
-      <div className="p-4 space-y-3">
-        <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-          {activeCategoryTab === "all" ? "Full Menu & Items" : activeCategoryTab}
-        </h2>
+              {productCategories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    sounds.tap();
+                    setActiveCategoryTab(cat);
+                  }}
+                  className={cn(
+                    "px-3 py-1 rounded-full text-xs font-bold shrink-0 transition-all cursor-pointer",
+                    activeCategoryTab === cat
+                      ? "bg-foreground text-background font-black shadow-xs"
+                      : "bg-muted/50 text-muted-foreground hover:text-foreground border border-border/40"
+                  )}
+                >
+                  {cat}
+                </button>
+              ))}
 
-        <div className="grid grid-cols-1 gap-3">
-          {filteredProducts.map((prod: any) => (
-            <div
-              key={prod.id}
-              className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-border/30 bg-card hover:bg-muted/[0.04] transition-colors"
-            >
-              <div className="flex-1 min-w-0 space-y-1">
-                <h3 className="text-sm font-bold text-foreground leading-snug">
-                  {prod.name}
-                </h3>
-                {prod.description && (
-                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                    {prod.description}
-                  </p>
+              {/* Diet filter separator */}
+              <div className="w-px h-4 bg-border/40 shrink-0 mx-1" />
+
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  setDietFilter(dietFilter === "veg" ? "all" : "veg");
+                }}
+                className={cn(
+                  "flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold shrink-0 border transition-all cursor-pointer",
+                  dietFilter === "veg"
+                    ? "bg-emerald-500/20 text-emerald-500 border-emerald-500/40 font-black"
+                    : "bg-muted/30 text-muted-foreground border-border/40"
                 )}
-                <div className="flex items-baseline gap-2 pt-0.5">
-                  <span className="text-sm font-black text-foreground">
-                    ₹{prod.price.toLocaleString("en-IN")}
+              >
+                <div className="size-2 rounded-full bg-emerald-500" />
+                <span>Veg Only</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Grouped Products Listing */}
+          <div className="divide-y divide-border/25">
+            {groupedProducts.map((group) => (
+              <div key={group.category} className="space-y-1">
+                <div className="px-4 pt-3 pb-1 bg-muted/5">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+                    {group.category} ({group.items.length})
+                  </h3>
+                </div>
+
+                <div className="divide-y divide-border/15">
+                  {group.items.map((product: any) => {
+                    const discountPercent =
+                      product.originalPrice && product.originalPrice > product.price
+                        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+                        : null;
+
+                    return (
+                      <div
+                        key={product.id}
+                        className="p-4 hover:bg-muted/[0.04] transition-colors flex items-start justify-between gap-4"
+                      >
+                        {/* Left Details */}
+                        <div className="space-y-1 min-w-0 flex-1">
+                          {/* Veg / NonVeg Tag */}
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={cn(
+                                "size-3.5 rounded-sm border flex items-center justify-center shrink-0",
+                                product.isVeg
+                                  ? "border-emerald-500"
+                                  : "border-rose-500"
+                              )}
+                              title={product.isVeg ? "Pure Veg" : "Non-Veg"}
+                            >
+                              <div
+                                className={cn(
+                                  "size-1.5 rounded-full",
+                                  product.isVeg ? "bg-emerald-500" : "bg-rose-500"
+                                )}
+                              />
+                            </span>
+                            {product.rating && (
+                              <span className="text-[10px] font-bold text-amber-500 flex items-center gap-0.5">
+                                <Star className="size-2.5 fill-amber-500" />
+                                <span>{product.rating}</span>
+                              </span>
+                            )}
+                          </div>
+
+                          <h4 className="text-sm font-bold text-foreground leading-snug">
+                            {product.name}
+                          </h4>
+
+                          {/* Price Row */}
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="font-black text-foreground">₹{product.price}</span>
+                            {product.originalPrice && product.originalPrice > product.price && (
+                              <span className="text-[11px] text-muted-foreground line-through">
+                                ₹{product.originalPrice}
+                              </span>
+                            )}
+                            {discountPercent && (
+                              <span className="px-1.5 py-0.2 rounded-md bg-emerald-500/15 text-emerald-500 text-[10px] font-black">
+                                {discountPercent}% OFF
+                              </span>
+                            )}
+                          </div>
+
+                          {product.description && (
+                            <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed pt-0.5 font-normal">
+                              {product.description}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Right Photo & ADD Button */}
+                        <div className="relative shrink-0 flex flex-col items-center">
+                          <div className="size-24 rounded-2xl overflow-hidden bg-muted border border-border/40">
+                            <img
+                              src={product.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop"}
+                              alt={product.name}
+                              className="size-full object-cover"
+                            />
+                          </div>
+
+                          <button
+                            type="button"
+                            disabled={!store.isOpen || !product.isAvailable}
+                            onClick={() => handleOpenProductModal(product)}
+                            className={cn(
+                              "mt-[-14px] px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm transition-all cursor-pointer active:scale-95",
+                              store.isOpen && product.isAvailable
+                                ? "bg-foreground text-background hover:opacity-90"
+                                : "bg-muted text-muted-foreground border border-border cursor-not-allowed"
+                            )}
+                          >
+                            {!product.isAvailable ? "Sold Out" : "ADD +"}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {groupedProducts.length === 0 && (
+              <div className="py-16 text-center px-4 space-y-2">
+                <UtensilsCrossed className="size-8 text-muted-foreground/40 mx-auto" />
+                <p className="text-xs font-bold text-muted-foreground">No menu items match your search.</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ─── TAB 2: DEALS & OFFERS ─── */}
+      {activeTab === "deals" && (
+        <section className="p-4 space-y-3">
+          {offers.length > 0 ? (
+            offers.map((offer: any) => (
+              <div
+                key={offer.id}
+                className="p-4 rounded-2xl border border-border/40 bg-card space-y-2 shadow-xs"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                    {offer.code}
                   </span>
-                  {prod.originalPrice && prod.originalPrice > prod.price && (
-                    <span className="text-xs text-muted-foreground/60 line-through">
-                      ₹{prod.originalPrice.toLocaleString("en-IN")}
-                    </span>
-                  )}
-                  {prod.preparationTime && (
-                    <span className="text-[10px] text-muted-foreground/80 flex items-center gap-0.5">
-                      <Clock className="size-2.5" />
-                      <span>{prod.preparationTime}</span>
-                    </span>
-                  )}
+                  <span className="text-xs font-bold text-foreground">
+                    {offer.discountType === "PERCENTAGE" ? `${offer.discountValue}% OFF` : `₹${offer.discountValue} FLAT OFF`}
+                  </span>
+                </div>
+                <h4 className="text-sm font-bold text-foreground">{offer.title}</h4>
+                {offer.description && (
+                  <p className="text-xs text-muted-foreground">{offer.description}</p>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="py-16 text-center space-y-2">
+              <Percent className="size-8 text-muted-foreground/40 mx-auto" />
+              <p className="text-xs font-bold text-muted-foreground">No active coupons right now.</p>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ─── TAB 3: REVIEWS ─── */}
+      {activeTab === "reviews" && (
+        <section className="divide-y divide-border/20">
+          {reviews.length > 0 ? (
+            reviews.map((rev: any) => (
+              <div key={rev.id} className="p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-foreground">{rev.studentName || "Verified Student"}</span>
+                    <span className="text-[10px] text-muted-foreground">· {formatTimeAgo(rev.createdAt)}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-amber-500 text-xs font-bold">
+                    <Star className="size-3 fill-amber-500" />
+                    <span>{rev.rating}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-foreground/90 leading-relaxed font-normal">{rev.comment}</p>
+              </div>
+            ))
+          ) : (
+            <div className="py-16 text-center space-y-2">
+              <Star className="size-8 text-muted-foreground/40 mx-auto" />
+              <p className="text-xs font-bold text-muted-foreground">No reviews yet. Be the first to order and review!</p>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ─── TAB 4: ABOUT & QR ─── */}
+      {activeTab === "about" && (
+        <section className="p-4 space-y-4">
+          <div className="p-5 rounded-2xl border border-border/40 bg-card space-y-3 shadow-xs">
+            <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Store Details</h3>
+            <div className="space-y-2 text-xs text-foreground/90">
+              <p><strong>Campus Location:</strong> {store.address}</p>
+              {store.phone && <p><strong>Direct Phone:</strong> {store.phone}</p>}
+              {store.email && <p><strong>Email:</strong> {store.email}</p>}
+              <p><strong>Delivery Fee:</strong> ₹{store.deliveryFee} across campus hostels</p>
+              <p><strong>Min Order:</strong> ₹{store.minOrderValue}</p>
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl border border-border/40 bg-card text-center space-y-3 shadow-xs">
+            <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Table QR Stand</h3>
+            <div className="size-40 mx-auto bg-white p-3 rounded-2xl border border-border">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://campusloop.space/app/marketplace/store/${store.id}`}
+                alt="Store QR"
+                className="size-full object-contain"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Scan at dining table for instant contactless ordering</p>
+          </div>
+        </section>
+      )}
+
+      {/* ─── Sticky Bottom Floating Cart Bar ─── */}
+      {currentStoreGroup && currentStoreGroup.items.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 p-4 pointer-events-none">
+          <div className="mx-auto max-w-2xl pointer-events-auto">
+            <Link
+              href="/app/marketplace/cart"
+              onClick={() => {
+                sounds.tap();
+                haptics.light();
+              }}
+              className="flex items-center justify-between p-3.5 rounded-2xl bg-foreground text-background shadow-2xl hover:opacity-95 transition-all active:scale-[0.99] cursor-pointer"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="size-8 rounded-full bg-background text-foreground flex items-center justify-center font-black text-xs">
+                  {currentStoreGroup.items.reduce((s, i) => s + i.quantity, 0)}
+                </div>
+                <div>
+                  <p className="text-xs font-black">View Cart</p>
+                  <p className="text-[10px] opacity-80">{store.name}</p>
                 </div>
               </div>
 
-              {/* Product Thumbnail & Add Button */}
-              <div className="relative flex flex-col items-center shrink-0">
-                {prod.imageUrl && (
-                  <div className="size-20 rounded-xl overflow-hidden bg-muted border border-border/30 mb-2">
-                    <img src={prod.imageUrl} alt={prod.name} className="size-full object-cover" />
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleOpenProductModal(prod)}
-                  className="px-4 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1"
-                >
-                  <Plus className="size-3.5 stroke-[3]" />
-                  <span>ADD</span>
-                </button>
+              <div className="flex items-center gap-2 font-black text-sm">
+                <span>
+                  ₹{currentStoreGroup.items.reduce((s, i) => s + i.price * i.quantity, 0).toLocaleString("en-IN")}
+                </span>
+                <ChevronRight className="size-4 stroke-[3]" />
               </div>
-            </div>
-          ))}
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* ─── Product Customization Modal ─── */}
+      {/* ─── Item Customization Bottom Drawer / Modal ─── */}
       {selectedProduct && (
-        <div
-          onClick={() => setSelectedProduct(null)}
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md bg-card rounded-t-3xl sm:rounded-3xl border border-border/50 p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto"
-          >
-            <div className="flex items-start justify-between gap-3">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="w-full max-w-lg bg-card border border-border rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-3 border-b border-border/30 pb-3">
               <div>
-                <h3 className="text-base font-black text-foreground">
-                  {selectedProduct.name}
-                </h3>
-                <p className="text-sm font-black text-emerald-500 mt-0.5">
-                  ₹{selectedProduct.price.toLocaleString("en-IN")}
-                </p>
+                <h3 className="text-base font-black text-foreground">{selectedProduct.name}</h3>
+                <p className="text-xs font-black text-foreground mt-0.5">₹{selectedProduct.price}</p>
               </div>
               <button
                 type="button"
@@ -415,160 +746,98 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
               </button>
             </div>
 
-            {selectedProduct.description && (
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {selectedProduct.description}
-              </p>
-            )}
-
-            {/* Options (e.g. Spice level, Size) */}
-            {(selectedProduct.options || []).map((opt: any) => (
-              <div key={opt.name} className="space-y-1.5 pt-2 border-t border-border/30">
-                <label className="text-xs font-bold text-foreground uppercase tracking-wider">
-                  {opt.name}
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {(opt.choices || []).map((choice: string) => {
-                    const isSelected = selectedOptions[opt.name] === choice;
-                    return (
-                      <button
-                        key={choice}
-                        type="button"
-                        onClick={() => {
-                          sounds.tap();
-                          haptics.light();
-                          setSelectedOptions((prev) => ({ ...prev, [opt.name]: choice }));
-                        }}
-                        className={cn(
-                          "px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer",
-                          isSelected
-                            ? "bg-foreground text-background font-black shadow-xs"
-                            : "bg-muted/60 text-muted-foreground hover:text-foreground border border-border/40"
-                        )}
-                      >
-                        {choice}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-
-            {/* Add-ons */}
-            {(selectedProduct.addons || []).length > 0 && (
-              <div className="space-y-2 pt-2 border-t border-border/30">
-                <label className="text-xs font-bold text-foreground uppercase tracking-wider">
-                  Add-ons &amp; Extras
-                </label>
-                <div className="space-y-1.5">
-                  {selectedProduct.addons.map((addon: any) => {
-                    const isChecked = selectedAddons.some((a) => a.name === addon.name);
-                    return (
-                      <button
-                        key={addon.name}
-                        type="button"
-                        onClick={() => handleAddonToggle(addon)}
-                        className={cn(
-                          "flex items-center justify-between w-full p-2.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer",
-                          isChecked
-                            ? "bg-emerald-500/10 border-emerald-500/30 text-foreground font-bold"
-                            : "bg-muted/40 border-border/30 text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={cn(
-                              "size-4 rounded flex items-center justify-center border",
-                              isChecked
-                                ? "bg-emerald-500 border-emerald-500 text-black"
-                                : "border-border/60"
-                            )}
-                          >
-                            {isChecked && <Check className="size-3 stroke-[3]" />}
-                          </div>
-                          <span>{addon.name}</span>
-                        </div>
-                        <span className="text-emerald-500 font-bold">+₹{addon.price}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Quantity Selector & Add Button */}
-            <div className="flex items-center justify-between gap-3 pt-3 border-t border-border/30">
-              <div className="flex items-center gap-3 bg-muted/60 px-3 py-1.5 rounded-full border border-border/40">
+            {/* Quantity Controller */}
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/40 border border-border/40">
+              <span className="text-xs font-bold text-muted-foreground">Quantity</span>
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => {
                     sounds.tap();
-                    haptics.light();
-                    setQuantity((q) => Math.max(1, q - 1));
+                    setQuantity((prev) => Math.max(1, prev - 1));
                   }}
-                  className="size-6 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="size-7 rounded-full bg-card border border-border flex items-center justify-center text-foreground font-black hover:bg-muted"
                 >
-                  <Minus className="size-3.5" />
+                  <Minus className="size-3" />
                 </button>
-                <span className="text-xs font-black text-foreground min-w-4 text-center">
-                  {quantity}
-                </span>
+                <span className="text-xs font-black tabular-nums">{quantity}</span>
                 <button
                   type="button"
                   onClick={() => {
                     sounds.tap();
-                    haptics.light();
-                    setQuantity((q) => q + 1);
+                    setQuantity((prev) => prev + 1);
                   }}
-                  className="size-6 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="size-7 rounded-full bg-card border border-border flex items-center justify-center text-foreground font-black hover:bg-muted"
                 >
-                  <Plus className="size-3.5" />
+                  <Plus className="size-3" />
                 </button>
               </div>
-
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                className="flex-1 h-11 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
-              >
-                <span>Add to Cart</span>
-                <span>·</span>
-                <span>
-                  ₹
-                  {(
-                    (selectedProduct.price +
-                      selectedAddons.reduce((sum, a) => sum + a.price, 0)) *
-                    quantity
-                  ).toLocaleString("en-IN")}
-                </span>
-              </button>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* ─── Sticky Cart Bottom Bar ─── */}
-      {currentStoreGroup && currentStoreGroup.items.length > 0 && (
-        <div className="fixed bottom-16 sm:bottom-6 left-0 right-0 z-40 max-w-lg mx-auto px-4 animate-in slide-in-from-bottom-3 duration-200">
-          <Link
-            href="/app/marketplace/cart"
-            onClick={() => {
-              sounds.tap();
-              haptics.light();
-            }}
-            className="flex items-center justify-between p-3.5 rounded-2xl bg-foreground text-background font-black text-xs shadow-2xl hover:opacity-95 active:scale-98 transition-all cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-md bg-background text-foreground text-[10px] font-black">
-                {currentStoreGroup.items.reduce((sum, i) => sum + i.quantity, 0)} items
+            {/* Add-ons sample (if any) */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Popular Add-ons
               </span>
-              <span>₹{currentStoreGroup.subtotal.toLocaleString("en-IN")} from this store</span>
+              <div className="space-y-1.5">
+                {[
+                  { name: "Extra Schezwan Dip", price: 15 },
+                  { name: "Cheese Burst Topping", price: 30 },
+                  { name: "Spicy Mayo Drizzle", price: 15 },
+                ].map((addon) => {
+                  const isChecked = selectedAddons.some((a) => a.name === addon.name);
+                  return (
+                    <button
+                      key={addon.name}
+                      type="button"
+                      onClick={() => handleAddonToggle(addon)}
+                      className={cn(
+                        "w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-colors cursor-pointer",
+                        isChecked
+                          ? "bg-primary/10 border-primary text-foreground font-black"
+                          : "bg-muted/20 border-border/40 text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={cn(
+                            "size-4 rounded-md border flex items-center justify-center",
+                            isChecked ? "bg-primary border-primary text-primary-foreground" : "border-border"
+                          )}
+                        >
+                          {isChecked && <Check className="size-3 stroke-[3]" />}
+                        </div>
+                        <span>{addon.name}</span>
+                      </div>
+                      <span>+₹{addon.price}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <span>View Cart</span>
-              <ChevronRight className="size-4" />
+
+            {/* Special Instructions */}
+            <div className="space-y-1.5">
+              <span className="text-xs font-bold text-muted-foreground">Cooking Note / Preferences</span>
+              <input
+                type="text"
+                value={specialInstructions}
+                onChange={(e) => setSpecialInstructions(e.target.value)}
+                placeholder="e.g. Less spicy, pack extra tissue..."
+                className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-medium text-foreground outline-none"
+              />
             </div>
-          </Link>
+
+            {/* Add to Cart Submit */}
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="w-full py-3.5 rounded-2xl bg-foreground text-background font-black text-xs hover:opacity-90 transition-all cursor-pointer shadow-lg active:scale-98 flex items-center justify-between px-5"
+            >
+              <span>Add to Cart</span>
+              <span>₹{modalItemTotal.toLocaleString("en-IN")}</span>
+            </button>
+          </div>
         </div>
       )}
     </main>

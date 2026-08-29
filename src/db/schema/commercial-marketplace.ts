@@ -226,6 +226,153 @@ export const savedMarketplaceItems = pgTable("saved_marketplace_items", {
   createdAt,
 });
 
+// ─── 11. Bike Rentals: Fleet Management ───
+export const bikes = pgTable("bikes", {
+  id: id(),
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  name: text("name").notNull(), // e.g. "Honda Activa 6G #01", "Royal Enfield Hunter 350"
+  model: text("model").notNull(), // e.g. "Activa 6G", "Splendor Plus", "Hunter 350"
+  registrationNumber: text("registration_number").notNull(), // e.g. "JH-01-AX-4820"
+  imageUrl: text("image_url"),
+  hourlyPrice: integer("hourly_price").default(50).notNull(), // in Rupees
+  dailyPrice: integer("daily_price").default(350).notNull(), // in Rupees
+  securityDeposit: integer("security_deposit").default(1500).notNull(), // in Rupees
+  pickupLocation: text("pickup_location").default("Campus Main Gate").notNull(),
+  fuelType: text("fuel_type").default("PETROL").notNull(), // "PETROL", "ELECTRIC"
+  specs: jsonb("specs").$type<{
+    engineCapacity?: string;
+    mileage?: string;
+    helmetIncluded?: boolean;
+    fuelLevel?: string;
+    notes?: string;
+  }>().default({ helmetIncluded: true }),
+  
+  // Operational Status: AVAILABLE, BOOKED, RENTED, MAINTENANCE, INACTIVE
+  status: text("status").default("AVAILABLE").notNull(),
+  rating: text("rating").default("4.8").notNull(),
+  reviewCount: integer("review_count").default(12).notNull(),
+  createdAt,
+  updatedAt,
+});
+
+// ─── 12. Bike Bookings & Reservations ───
+export const bikeBookings = pgTable("bike_bookings", {
+  id: id(),
+  bookingNumber: text("booking_number").notNull().unique(), // e.g. "BR1024"
+  bikeId: text("bike_id")
+    .notNull()
+    .references(() => bikes.id, { onDelete: "cascade" }),
+  studentId: text("student_id")
+    .notNull()
+    .references(() => userProfiles.id, { onDelete: "cascade" }),
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  institutionId: text("institution_id")
+    .notNull()
+    .references(() => institutions.id, { onDelete: "cascade" }),
+    
+  startAt: timestamp("start_at", { withTimezone: true, mode: "date" }).notNull(),
+  endAt: timestamp("end_at", { withTimezone: true, mode: "date" }).notNull(),
+  actualPickupAt: timestamp("actual_pickup_at", { withTimezone: true, mode: "date" }),
+  actualReturnAt: timestamp("actual_return_at", { withTimezone: true, mode: "date" }),
+  
+  rentalAmount: integer("rental_amount").notNull(), // in Rupees
+  depositAmount: integer("deposit_amount").notNull(), // in Rupees (refundable)
+  lateFeeAmount: integer("late_fee_amount").default(0).notNull(),
+  damageFeeAmount: integer("damage_fee_amount").default(0).notNull(),
+  totalAmount: integer("total_amount").notNull(), // rentalAmount + depositAmount
+  
+  // Status: REQUESTED -> CONFIRMED -> READY_FOR_PICKUP -> ACTIVE -> RETURNED -> COMPLETED
+  // Terminal / Exception: REJECTED, CANCELLED, DISPUTED
+  status: text("status").default("REQUESTED").notNull(),
+  paymentStatus: text("payment_status").default("PENDING").notNull(), // PENDING, PAID, COD, REFUND_PROCESSING, REFUNDED
+  paymentMethod: text("payment_method").default("COD").notNull(), // COD, UPI
+  depositRefundStatus: text("deposit_refund_status").default("HELD").notNull(), // HELD, INITIATED, REFUNDED, DISPUTED
+  
+  cancellationReason: text("cancellation_reason"),
+  cancelledBy: text("cancelled_by"), // STUDENT, MERCHANT, ADMIN
+  
+  customerPhone: text("customer_phone").notNull(),
+  hostelAddress: text("hostel_address").notNull(),
+  specialNotes: text("special_notes"),
+  
+  createdAt,
+  updatedAt,
+});
+
+// ─── 13. Bike Availability Blocks & Maintenance ───
+export const bikeAvailabilityBlocks = pgTable("bike_availability_blocks", {
+  id: id(),
+  bikeId: text("bike_id")
+    .notNull()
+    .references(() => bikes.id, { onDelete: "cascade" }),
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  startAt: timestamp("start_at", { withTimezone: true, mode: "date" }).notNull(),
+  endAt: timestamp("end_at", { withTimezone: true, mode: "date" }).notNull(),
+  reason: text("reason").default("MAINTENANCE").notNull(), // "MAINTENANCE", "MERCHANT_BLOCKED", "RESERVED"
+  notes: text("notes"),
+  createdAt,
+});
+
+// ─── 14. Bike Inspections (Handover & Return Condition Checklists & Photos) ───
+export const bikeInspections = pgTable("bike_inspections", {
+  id: id(),
+  bookingId: text("booking_id")
+    .notNull()
+    .references(() => bikeBookings.id, { onDelete: "cascade" }),
+  bikeId: text("bike_id")
+    .notNull()
+    .references(() => bikes.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // "PICKUP_HANDOVER" | "RETURN_CHECK"
+  frontOk: boolean("front_ok").default(true).notNull(),
+  rearOk: boolean("rear_ok").default(true).notNull(),
+  tyresOk: boolean("tyres_ok").default(true).notNull(),
+  lightsOk: boolean("lights_ok").default(true).notNull(),
+  odometerKm: integer("odometer_km"),
+  fuelLevel: text("fuel_level").default("FULL"),
+  hasDamage: boolean("has_damage").default(false).notNull(),
+  damageNotes: text("damage_notes"),
+  photos: jsonb("photos").$type<string[]>().default([]),
+  inspectorRole: text("inspector_role").default("MERCHANT").notNull(),
+  createdAt,
+});
+
+// ─── 15. Bike Booking Verification Documents ───
+export const bikeBookingDocuments = pgTable("bike_booking_documents", {
+  id: id(),
+  bookingId: text("booking_id")
+    .notNull()
+    .references(() => bikeBookings.id, { onDelete: "cascade" }),
+  studentId: text("student_id")
+    .notNull()
+    .references(() => userProfiles.id, { onDelete: "cascade" }),
+  drivingLicenseNumber: text("driving_license_number").notNull(),
+  drivingLicenseUrl: text("driving_license_url"),
+  aadhaarLast4: text("aadhaar_last_4"),
+  aadhaarUrl: text("aadhaar_url"),
+  studentIdCardUrl: text("student_id_card_url"),
+  status: text("status").default("VERIFIED").notNull(), // "VERIFIED", "PENDING", "REJECTED"
+  createdAt,
+});
+
+// ─── 16. Bike Booking Status History ───
+export const bikeBookingStatusHistory = pgTable("bike_booking_status_history", {
+  id: id(),
+  bookingId: text("booking_id")
+    .notNull()
+    .references(() => bikeBookings.id, { onDelete: "cascade" }),
+  fromStatus: text("from_status"),
+  toStatus: text("to_status").notNull(),
+  changedBy: text("changed_by").notNull(), // e.g. "STUDENT", "MERCHANT", "ADMIN"
+  reason: text("reason"),
+  createdAt,
+});
+
 export type MarketplaceCategory = typeof marketplaceCategories.$inferSelect;
 export type Merchant = typeof merchants.$inferSelect;
 export type NewMerchant = typeof merchants.$inferInsert;
@@ -237,3 +384,11 @@ export type NewMarketplaceOrder = typeof marketplaceOrders.$inferInsert;
 export type MarketplaceOrderItem = typeof marketplaceOrderItems.$inferSelect;
 export type MarketplaceOffer = typeof marketplaceOffers.$inferSelect;
 export type MarketplaceReview = typeof marketplaceReviews.$inferSelect;
+export type Bike = typeof bikes.$inferSelect;
+export type NewBike = typeof bikes.$inferInsert;
+export type BikeBooking = typeof bikeBookings.$inferSelect;
+export type NewBikeBooking = typeof bikeBookings.$inferInsert;
+export type BikeAvailabilityBlock = typeof bikeAvailabilityBlocks.$inferSelect;
+export type BikeInspection = typeof bikeInspections.$inferSelect;
+export type BikeBookingDocument = typeof bikeBookingDocuments.$inferSelect;
+

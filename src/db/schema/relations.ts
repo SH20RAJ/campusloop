@@ -2,6 +2,12 @@ import { relations } from "drizzle-orm";
 import { academicResources } from "./academic-resources";
 import { conversationParticipants,conversations,messages } from "./chat";
 import {
+  bikeAvailabilityBlocks,
+  bikeBookingDocuments,
+  bikeBookings,
+  bikeBookingStatusHistory,
+  bikeInspections,
+  bikes,
   marketplaceCategories,
   marketplaceOffers,
   marketplaceOrderItems,
@@ -438,6 +444,81 @@ export const savedMarketplaceItemsRelations = relations(savedMarketplaceItems, (
   student: one(userProfiles, {
     fields: [savedMarketplaceItems.studentId],
     references: [userProfiles.id],
+  }),
+}));
+
+export const bikesRelations = relations(bikes, ({ one, many }) => ({
+  merchant: one(merchants, {
+    fields: [bikes.merchantId],
+    references: [merchants.id],
+  }),
+  bookings: many(bikeBookings),
+  availabilityBlocks: many(bikeAvailabilityBlocks),
+  inspections: many(bikeInspections),
+}));
+
+export const bikeBookingsRelations = relations(bikeBookings, ({ one, many }) => ({
+  bike: one(bikes, {
+    fields: [bikeBookings.bikeId],
+    references: [bikes.id],
+  }),
+  student: one(userProfiles, {
+    fields: [bikeBookings.studentId],
+    references: [userProfiles.id],
+  }),
+  merchant: one(merchants, {
+    fields: [bikeBookings.merchantId],
+    references: [merchants.id],
+  }),
+  institution: one(institutions, {
+    fields: [bikeBookings.institutionId],
+    references: [institutions.id],
+  }),
+  inspections: many(bikeInspections),
+  documents: one(bikeBookingDocuments, {
+    fields: [bikeBookings.id],
+    references: [bikeBookingDocuments.bookingId],
+  }),
+  statusHistory: many(bikeBookingStatusHistory),
+}));
+
+export const bikeAvailabilityBlocksRelations = relations(bikeAvailabilityBlocks, ({ one }) => ({
+  bike: one(bikes, {
+    fields: [bikeAvailabilityBlocks.bikeId],
+    references: [bikes.id],
+  }),
+  merchant: one(merchants, {
+    fields: [bikeAvailabilityBlocks.merchantId],
+    references: [merchants.id],
+  }),
+}));
+
+export const bikeInspectionsRelations = relations(bikeInspections, ({ one }) => ({
+  booking: one(bikeBookings, {
+    fields: [bikeInspections.bookingId],
+    references: [bikeBookings.id],
+  }),
+  bike: one(bikes, {
+    fields: [bikeInspections.bikeId],
+    references: [bikes.id],
+  }),
+}));
+
+export const bikeBookingDocumentsRelations = relations(bikeBookingDocuments, ({ one }) => ({
+  booking: one(bikeBookings, {
+    fields: [bikeBookingDocuments.bookingId],
+    references: [bikeBookings.id],
+  }),
+  student: one(userProfiles, {
+    fields: [bikeBookingDocuments.studentId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const bikeBookingStatusHistoryRelations = relations(bikeBookingStatusHistory, ({ one }) => ({
+  booking: one(bikeBookings, {
+    fields: [bikeBookingStatusHistory.bookingId],
+    references: [bikeBookings.id],
   }),
 }));
 

@@ -7,7 +7,11 @@ import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
+  Bike,
+  CalendarCheck2,
+  Clock,
   DollarSign,
+  Gauge,
   Gift,
   LayoutDashboard,
   LogOut,
@@ -15,6 +19,7 @@ import {
   Package,
   QrCode,
   Settings,
+  ShieldCheck,
   ShoppingBag,
   Star,
   Store,
@@ -44,9 +49,18 @@ const MERCHANT_NAV_ITEMS = [
   { href: "/merchantt-portal/store/qr", label: "Printable QR", icon: QrCode },
 ];
 
+const BIKE_RENTAL_NAV_ITEMS = [
+  { href: "/merchantt-portal/bikes", label: "Bike Dashboard", icon: Bike },
+  { href: "/merchantt-portal/bikes/bookings", label: "Bookings", icon: CalendarCheck2 },
+  { href: "/merchantt-portal/bikes/fleet", label: "Fleet Vehicles", icon: Gauge },
+  { href: "/merchantt-portal/bikes/availability", label: "Availability", icon: Clock },
+  { href: "/merchantt-portal/bikes/settings", label: "Rental Rules", icon: Settings },
+];
+
 const MOBILE_MERCHANT_TABS = [
   { href: "/merchantt-portal", label: "Dashboard", icon: LayoutDashboard },
   { href: "/merchantt-portal/orders", label: "Orders", icon: Package },
+  { href: "/merchantt-portal/bikes", label: "Bikes", icon: Bike },
   { href: "/merchantt-portal/products", label: "Menu", icon: UtensilsCrossed },
   { href: "/merchantt-portal/store", label: "Store", icon: Store },
 ];
@@ -103,6 +117,9 @@ export function MerchantLayoutClient({ children, profile }: MerchantLayoutClient
 
           {/* Navigation Links */}
           <nav className="space-y-1">
+            <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+              General Store
+            </p>
             {MERCHANT_NAV_ITEMS.map((item) => {
               const isActive =
                 pathname === item.href ||
@@ -121,6 +138,40 @@ export function MerchantLayoutClient({ children, profile }: MerchantLayoutClient
                     "flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer",
                     isActive
                       ? "bg-foreground text-background font-black shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <Icon className="size-4 shrink-0" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Dedicated Bike Rentals Section */}
+          <nav className="space-y-1 pt-2 border-t border-border/30">
+            <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center gap-1.5">
+              <Bike className="size-3.5" />
+              <span>Bike Fleet Rentals</span>
+            </p>
+            {BIKE_RENTAL_NAV_ITEMS.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/merchantt-portal/bikes" && pathname.startsWith(item.href));
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => {
+                    sounds.tap();
+                    haptics.light();
+                  }}
+                  className={cn(
+                    "flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer",
+                    isActive
+                      ? "bg-emerald-500 text-black font-black shadow-xs"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                 >

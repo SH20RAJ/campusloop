@@ -16,18 +16,19 @@ export const metadata: Metadata = {
 };
 
 import {
-ArrowLeft,
-FileText,
-Ghost,
-LayoutDashboard,
-MessageSquare,
-School,
-ScrollText,
-ShieldAlert,
-ShoppingBag,
-Store,
-Users,
-UtensilsCrossed,
+	ArrowLeft,
+	Bike,
+	FileText,
+	Ghost,
+	LayoutDashboard,
+	MessageSquare,
+	School,
+	ScrollText,
+	ShieldAlert,
+	ShoppingBag,
+	Store,
+	Users,
+	UtensilsCrossed,
 } from "lucide-react";
 
 
@@ -48,6 +49,7 @@ const commercialNav = [
 	{ href: "/admin/marketplace", label: "Marketplace", icon: ShoppingBag },
 	{ href: "/admin/marketplace/merchants", label: "Merchants", icon: Store },
 	{ href: "/admin/marketplace/products", label: "Products", icon: UtensilsCrossed },
+	{ href: "/admin/marketplace/rentals", label: "Bike Rentals", icon: Bike },
 ];
 
 const systemNav = [{ href: "/admin/audit", label: "Audit Log", icon: ScrollText }];

@@ -82,60 +82,54 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
     setSelectedCategory(catId);
   }
 
+  const { data: bikesData } = useSWR<{ bikes: any[] }>(
+    selectedCategory === "rentals" ? "/api/marketplace/rentals/bikes" : null,
+    fetcher,
+    { dedupingInterval: 10000 }
+  );
+
+  const rentalBikes = bikesData?.bikes || [];
+
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-28">
-      {/* ─── Sticky Marketplace Header ─── */}
-      <header className="sticky top-0 z-40 bg-background/85 px-4 pt-3 pb-2.5 backdrop-blur-xl border-b border-border/30 space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-base font-black text-foreground tracking-tight">
-                Campus Marketplace
-              </h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
-                Verified
-              </span>
-            </div>
-            <p className="text-[11px] text-muted-foreground font-medium flex items-center gap-1 mt-0.5">
-              <MapPin className="size-3 text-rose-500 shrink-0" />
-              <span>{collegeName} · Local food, rentals &amp; services</span>
-            </p>
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-24">
+      {/* ─── Top Header & Omnibar Search ─── */}
+      <header className="sticky top-0 z-40 flex flex-col gap-2.5 border-b border-border/30 bg-background/85 px-4 pt-3 pb-2 backdrop-blur-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h1 className="text-base font-black text-foreground tracking-tight">
+              Campus<span className="text-emerald-500">Market</span>
+            </h1>
+            <span className="text-xs text-muted-foreground font-medium">· {collegeName}</span>
           </div>
 
-          {/* Cart Floating Button */}
           <Link
-            href="/app/marketplace/cart"
+            href="/app/marketplace/orders"
             onClick={() => {
               sounds.tap();
               haptics.light();
             }}
-            className="relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs shrink-0 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/60 hover:bg-muted text-foreground text-xs font-bold transition-colors cursor-pointer"
           >
-            <ShoppingBag className="size-4" />
-            <span className="hidden sm:inline">Cart</span>
-            {totalItemsCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-emerald-500 text-black text-[10px] font-black">
-                {totalItemsCount}
-              </span>
-            )}
+            <ShoppingBag className="size-3.5" />
+            <span>My Orders</span>
           </Link>
         </div>
 
-        {/* Large Omnibar Search */}
+        {/* Omnibar Search Input */}
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search Momos, canteens, laundry, Activa rentals, printing..."
+            placeholder={`Search canteens, momos, bike rentals, and services...`}
             className="w-full h-10 rounded-2xl bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background pl-10 pr-9 text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 size-5 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground"
             >
               <X className="size-3.5" />
             </button>
@@ -201,6 +195,83 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
                   <p className="text-[11px] text-muted-foreground truncate">
                     {deal.storeName} · {deal.description}
                   </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── BIKE RENTALS SPECIAL FLEET SECTION (PRD Item 1) ─── */}
+      {selectedCategory === "rentals" && rentalBikes.length > 0 && (
+        <section className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Bike className="size-4 text-emerald-500" />
+              <span>Campus Bike &amp; Scooter Fleet ({rentalBikes.length})</span>
+            </h2>
+            <span className="text-[11px] text-muted-foreground font-bold">
+              Instant Pickup
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3">
+            {rentalBikes.map((b) => (
+              <Link
+                key={b.id}
+                href={`/app/marketplace/rentals/bikes/${b.id}`}
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                }}
+                className="group flex flex-col sm:flex-row gap-3.5 p-3.5 rounded-2xl border border-border/40 hover:border-border bg-card hover:bg-muted/[0.04] transition-all cursor-pointer shadow-xs"
+              >
+                <div className="relative h-36 sm:size-32 rounded-xl overflow-hidden border border-border/30 shrink-0 bg-muted">
+                  <img
+                    src={b.imageUrl}
+                    alt={b.name}
+                    className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/70 text-white text-[10px] font-bold backdrop-blur-xs flex items-center gap-1">
+                    <Star className="size-3 fill-amber-400 text-amber-400" />
+                    <span>{b.rating}</span>
+                  </span>
+                  <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-emerald-500 text-black text-[10px] font-black uppercase tracking-wider">
+                    {b.status}
+                  </span>
+                </div>
+
+                <div className="flex-1 min-w-0 flex flex-col justify-between space-y-2">
+                  <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-sm font-black text-foreground group-hover:underline flex items-center gap-1.5 truncate">
+                        <span>{b.name}</span>
+                        <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+                      </h3>
+                    </div>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                      <MapPin className="size-3 text-rose-500 shrink-0" />
+                      <span>{b.pickupLocation} · {b.merchant?.name}</span>
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1 border-t border-border/30">
+                    <div>
+                      <p className="text-sm font-black text-foreground">
+                        ₹{b.dailyPrice} <span className="text-[10px] font-normal text-muted-foreground">/ day</span>
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        ₹{b.securityDeposit} deposit (refundable)
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="px-4 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black transition-all cursor-pointer shadow-xs active:scale-95"
+                    >
+                      Book Now
+                    </button>
+                  </div>
                 </div>
               </Link>
             ))}

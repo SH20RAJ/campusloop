@@ -1,33 +1,32 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-detectMentionTrigger,
-MentionSuggestions,
-TriggerContext,
+  detectMentionTrigger,
+  MentionSuggestions,
+  TriggerContext,
 } from "@/components/ui/mention-autocomplete";
 import { RichText } from "@/components/ui/rich-text";
 import { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import { AnimatePresence,motion } from "framer-motion";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-ArrowUp,
-Heart,
-Loader2,
-MessageCircle,
-Shield,
-User,
-X
+  ArrowUp,
+  Heart,
+  Loader2,
+  MessageCircle,
+  Reply,
+  Shield,
+  User,
+  X,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect,useRef,useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-
 
 export interface FastComment {
   id: string;
@@ -76,6 +75,12 @@ export function FastCommentsModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likedComments, setLikedComments] = useState<Record<string, boolean>>({});
   const [mentionTrigger, setMentionTrigger] = useState<TriggerContext | null>(null);
+  const [replyingTo, setReplyingTo] = useState<{
+    id: string;
+    handle: string;
+    displayName: string;
+  } | null>(null);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -101,7 +106,6 @@ export function FastCommentsModal({
     }, 0);
   }
 
-
   const {
     data: comments,
     mutate,
@@ -118,6 +122,7 @@ export function FastCommentsModal({
       setTimeout(() => inputRef.current?.focus(), 180);
     } else {
       setCommentText("");
+      setReplyingTo(null);
     }
   }, [isOpen]);
 
@@ -138,14 +143,28 @@ export function FastCommentsModal({
     }));
   };
 
+  function handleStartReply(c: FastComment, handle: string, displayName: string) {
+    sounds.tap();
+    haptics.light();
+    setReplyingTo({ id: c.id, handle, displayName });
+    setCommentText((prev) => {
+      const prefix = `@${handle} `;
+      if (prev.startsWith(prefix)) return prev;
+      return `${prefix}${prev}`;
+    });
+    inputRef.current?.focus();
+  }
+
   const handleSendComment = async () => {
     const text = commentText.trim();
     if (!text || isSubmitting) return;
 
+    const currentReplyingTo = replyingTo;
     const tempId = `temp-${Date.now()}`;
     const optimisticComment: FastComment = {
       id: tempId,
       postId: post.id,
+      parentId: currentReplyingTo?.id || null,
       authorId: isAnonymous ? null : profile?.id || null,
       pseudonym: isAnonymous ? "you_anon" : null,
       body: text,
@@ -171,6 +190,7 @@ export function FastCommentsModal({
     haptics.success();
     mutate(updatedList, false);
     setCommentText("");
+    setReplyingTo(null);
     setIsSubmitting(true);
     onCommentCountChange?.(updatedList.length);
     setTimeout(scrollToBottom, 60);
@@ -182,6 +202,7 @@ export function FastCommentsModal({
         body: JSON.stringify({
           body: text,
           isAnonymous,
+          parentId: currentReplyingTo?.id || undefined,
         }),
       });
 
@@ -303,7 +324,7 @@ export function FastCommentsModal({
                   </div>
                   <p className="text-xs font-bold text-foreground">No comments yet</p>
                   <p className="text-[11px] text-muted-foreground max-w-xs">
-                    Start the conversation! Drop a reaction or share your thoughts with campus.
+                    Start the conversation! Drop a reaction or reply to share your thoughts with campus.
                   </p>
                 </div>
               ) : (
@@ -345,7 +366,7 @@ export function FastCommentsModal({
                           </Link>
                         )}
 
-                        <div className="min-w-0 flex-1 space-y-0.5">
+                        <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="text-xs font-bold text-foreground truncate">
                               {cDisplayName}
@@ -365,6 +386,18 @@ export function FastCommentsModal({
 
                           <div className="text-xs text-foreground/90 leading-relaxed break-words font-normal">
                             <RichText content={c.body} />
+                          </div>
+
+                          {/* Quick Reply Button */}
+                          <div className="flex items-center gap-3 pt-0.5">
+                            <button
+                              type="button"
+                              onClick={() => handleStartReply(c, cHandle, cDisplayName)}
+                              className="flex items-center gap-1 text-[11px] font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer active:scale-95"
+                            >
+                              <Reply className="size-3" />
+                              <span>Reply</span>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -392,7 +425,7 @@ export function FastCommentsModal({
               )}
             </div>
 
-            {/* Quick Emoji Reaction Bar (Instagram Style) */}
+            {/* Quick Emoji Reaction Bar */}
             <div className="px-4 py-1.5 border-t border-border/20 flex items-center justify-between gap-1 overflow-x-auto shrink-0 bg-muted/10">
               {QUICK_REACTIONS.map((emoji) => (
                 <button
@@ -406,8 +439,32 @@ export function FastCommentsModal({
               ))}
             </div>
 
-            {/* Fixed Bottom Input Bar (Instagram Style) */}
+            {/* Fixed Bottom Input Bar */}
             <div className="p-3 sm:p-4 border-t border-border/30 bg-card shrink-0 space-y-2">
+              {/* Replying Context Banner */}
+              {replyingTo && (
+                <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-muted/60 border border-border/40 text-xs">
+                  <span className="text-muted-foreground font-medium flex items-center gap-1.5">
+                    <Reply className="size-3 text-primary shrink-0" />
+                    <span>
+                      Replying to <strong className="text-foreground">@{replyingTo.handle}</strong>
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReplyingTo(null);
+                      if (commentText.startsWith(`@${replyingTo.handle} `)) {
+                        setCommentText(commentText.replace(`@${replyingTo.handle} `, ""));
+                      }
+                    }}
+                    className="size-5 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </div>
+              )}
+
               <div className="flex items-center gap-2.5">
                 {/* Current User Avatar */}
                 <Avatar className="size-8.5 rounded-full border border-border/40 shrink-0">
@@ -429,7 +486,9 @@ export function FastCommentsModal({
                     ref={inputRef}
                     type="text"
                     placeholder={
-                      isAnonymous
+                      replyingTo
+                        ? `Reply to @${replyingTo.handle}...`
+                        : isAnonymous
                         ? "Comment anonymously..."
                         : `Add a comment as @${profile?.username || "you"}...`
                     }
@@ -440,7 +499,6 @@ export function FastCommentsModal({
                     maxLength={500}
                   />
 
-
                   {/* Anonymous Toggle Pill */}
                   <button
                     type="button"
@@ -448,20 +506,20 @@ export function FastCommentsModal({
                     className={cn(
                       "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
                       isAnonymous
-                        ? "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30"
-                        : "text-muted-foreground hover:text-foreground bg-muted/50"
+                        ? "bg-primary/20 text-primary border border-primary/40"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
-                    title={isAnonymous ? "Anonymous mode active" : "Switch to anonymous comment"}
+                    title={isAnonymous ? "Commenting Anonymously" : "Commenting as yourself"}
                   >
                     {isAnonymous ? (
                       <>
-                        <Shield className="size-2.5" />
+                        <Shield className="size-3" />
                         <span>Anon</span>
                       </>
                     ) : (
                       <>
-                        <User className="size-2.5" />
-                        <span>Public</span>
+                        <User className="size-3" />
+                        <span className="hidden sm:inline">Public</span>
                       </>
                     )}
                   </button>
@@ -471,13 +529,13 @@ export function FastCommentsModal({
                     type="button"
                     disabled={!commentText.trim() || isSubmitting}
                     onClick={handleSendComment}
-                    className="size-7 rounded-full bg-foreground text-background flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-95 transition-all cursor-pointer shrink-0"
+                    className="size-7 rounded-full bg-foreground text-background flex items-center justify-center hover:opacity-90 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-xs"
                     aria-label="Send comment"
                   >
                     {isSubmitting ? (
-                      <Loader2 className="size-3.5 animate-spin" />
+                      <Loader2 className="size-3 animate-spin" />
                     ) : (
-                      <ArrowUp className="size-3.5 stroke-[3]" />
+                      <ArrowUp className="size-3.5 stroke-[2.5]" />
                     )}
                   </button>
                 </div>

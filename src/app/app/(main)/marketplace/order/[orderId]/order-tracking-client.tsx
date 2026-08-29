@@ -2,25 +2,13 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo } from "@/lib/utils";
+import { cn,formatTimeAgo } from "@/lib/utils";
 import {
-  AlertTriangle,
-  ArrowLeft,
-  Bike,
-  CheckCircle2,
-  Clock,
-  Home,
-  MapPin,
-  MessageCircle,
-  PackageCheck,
-  Phone,
-  RotateCcw,
-  ShoppingBag,
-  Store,
-  Truck,
-  UtensilsCrossed,
+ArrowLeft,
+CheckCircle2,
+MapPin,
+Phone,
+Store
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

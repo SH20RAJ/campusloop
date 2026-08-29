@@ -1,7 +1,7 @@
 import { SWRProvider } from "@/components/providers/swr-provider";
 import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
-import { RouteProgress } from "@/components/ui/route-progress";
 import { OfflineIndicator } from "@/components/ui/offline-indicator";
+import { RouteProgress } from "@/components/ui/route-progress";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { HexclaveProvider,HexclaveTheme } from "@hexclave/next";
 import type { Metadata,Viewport } from "next";

@@ -6,14 +6,14 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-  Clock,
-  Copy,
-  ExternalLink,
-  Gamepad2,
-  Share2,
-  ShieldCheck,
-  Sword,
-  Users,
+Clock,
+Copy,
+ExternalLink,
+Gamepad2,
+Share2,
+ShieldCheck,
+Sword,
+Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

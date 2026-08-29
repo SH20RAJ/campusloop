@@ -2,9 +2,9 @@
 
 import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions";
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
+import { PostComposer } from "@/app/app/(main)/post/new/post-composer";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
-import { PostComposer } from "@/app/app/(main)/post/new/post-composer";
 import { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
 import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";

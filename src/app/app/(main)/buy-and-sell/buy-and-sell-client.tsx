@@ -7,29 +7,24 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  Bike,
-  BookOpen,
-  CheckCircle2,
-  Compass,
-  Filter,
-  Flame,
-  Home,
-  Laptop,
-  Loader2,
-  PackageSearch,
-  Plus,
-  Search,
-  Shirt,
-  ShoppingBag,
-  SlidersHorizontal,
-  Tag,
-  Wind,
-  X,
+ArrowLeft,
+Bike,
+BookOpen,
+CheckCircle2,
+Compass,
+Home,
+Laptop,
+Loader2,
+Plus,
+Search,
+ShoppingBag,
+Tag,
+Wind,
+X
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect,useMemo,useRef,useState } from "react";
 import useSWRInfinite from "swr/infinite";
 
 interface BuyAndSellClientProps {

@@ -1,41 +1,34 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo } from "@/lib/utils";
+import { cn,formatTimeAgo } from "@/lib/utils";
 import {
-  ArrowLeft,
-  Check,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  ExternalLink,
-  Flame,
-  Info,
-  Loader2,
-  MapPin,
-  Minus,
-  Percent,
-  Phone,
-  Plus,
-  QrCode,
-  Search,
-  Share2,
-  ShieldCheck,
-  ShoppingBag,
-  Star,
-  Truck,
-  UtensilsCrossed,
-  X,
-  Zap,
+ArrowLeft,
+Check,
+ChevronRight,
+Clock,
+MapPin,
+Minus,
+Percent,
+Phone,
+Plus,
+QrCode,
+Search,
+Share2,
+ShieldCheck,
+ShoppingBag,
+Star,
+Truck,
+UtensilsCrossed,
+X
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 

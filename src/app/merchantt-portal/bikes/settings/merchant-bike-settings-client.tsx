@@ -1,13 +1,10 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { Bike, Loader2, Save, Settings, ShieldCheck } from "lucide-react";
+import { Loader2,Save,Settings } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import useSWR from "swr";
 
 export function MerchantBikeSettingsClient() {
   const [rentalMode, setRentalMode] = useState<"BOTH" | "DAILY" | "HOURLY">("BOTH");

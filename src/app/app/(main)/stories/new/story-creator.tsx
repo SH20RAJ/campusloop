@@ -1,29 +1,28 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  ChevronDown,
-  ImagePlus,
-  Loader2,
-  MapPin,
-  Music2,
-  Palette,
-  Send,
-  SlidersHorizontal,
-  Smile,
-  Trash2,
-  Type,
-  X,
+AlignCenter,
+AlignLeft,
+AlignRight,
+ImagePlus,
+Loader2,
+MapPin,
+Music2,
+Palette,
+Send,
+SlidersHorizontal,
+Smile,
+Trash2,
+Type,
+X
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect,useRef,useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 

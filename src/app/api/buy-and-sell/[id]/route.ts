@@ -1,8 +1,8 @@
 import { getDb } from "@/db";
-import { marketplaceItems, userProfiles } from "@/db/schema";
+import { marketplaceItems,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

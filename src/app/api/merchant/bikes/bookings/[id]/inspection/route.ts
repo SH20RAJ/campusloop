@@ -1,5 +1,5 @@
 import { getDb } from "@/db";
-import { bikeBookings, bikeInspections, userProfiles } from "@/db/schema";
+import { bikeBookings,bikeInspections,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
 import { eq } from "drizzle-orm";

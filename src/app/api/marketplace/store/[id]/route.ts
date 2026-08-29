@@ -1,12 +1,12 @@
 import { getDb } from "@/db";
 import {
-  marketplaceOffers,
-  marketplaceReviews,
-  merchantBusinessHours,
-  merchants,
-  products,
+marketplaceOffers,
+marketplaceReviews,
+merchantBusinessHours,
+merchants,
+products,
 } from "@/db/schema";
-import { asc, desc, eq } from "drizzle-orm";
+import { asc,desc,eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

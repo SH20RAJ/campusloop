@@ -3,18 +3,18 @@
 import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
+import { AnimatePresence,motion,useMotionValue,useTransform } from "framer-motion";
 import {
-  GraduationCap,
-  Heart,
-  School,
-  ShieldCheck,
-  UserRound,
-  X,
-  Zap,
+GraduationCap,
+Heart,
+School,
+ShieldCheck,
+UserRound,
+X,
+Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect,useState } from "react";
 
 export type Candidate = {
   id: string;

@@ -2,7 +2,7 @@
 
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback,useEffect,useState } from "react";
 import { toast } from "sonner";
 
 export type PushPermission = "unsupported" | "default" | "granted" | "denied";

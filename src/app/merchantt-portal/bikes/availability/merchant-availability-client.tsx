@@ -4,20 +4,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo } from "@/lib/utils";
 import {
-  AlertCircle,
-  Bike,
-  Calendar,
-  CalendarCheck2,
-  Clock,
-  Loader2,
-  Lock,
-  Plus,
-  Trash2,
-  User,
-  Wrench,
-  X,
+CalendarCheck2,
+Clock,
+Loader2,
+Lock,
+Trash2,
+Wrench,
+X
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";

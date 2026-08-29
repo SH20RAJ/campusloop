@@ -1,32 +1,30 @@
 "use client";
 
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { PresenceDot } from "@/components/ui/presence-dot";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@/db/schema";
 import { CachedMessage } from "@/lib/chat-cache";
-import { isOnline, presenceLabel } from "@/lib/presence";
+import { isOnline,presenceLabel } from "@/lib/presence";
 import { cn } from "@/lib/utils";
 import {
-  Bell,
-  BellOff,
-  Calendar,
-  Eraser,
-  ExternalLink,
-  GraduationCap,
-  Image as ImageIcon,
-  Link2,
-  Lock,
-  School,
-  Search,
-  ShieldAlert,
-  ShieldCheck,
-  Trash2,
-  User,
-  X,
+Bell,
+BellOff,
+Calendar,
+Eraser,
+ExternalLink,
+GraduationCap,
+Image as ImageIcon,
+Link2,
+School,
+Search,
+ShieldAlert,
+ShieldCheck,
+Trash2,
+User,
+X
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo,useState } from "react";
 import { toast } from "sonner";
 
 interface ChatUserInfoDrawerProps {

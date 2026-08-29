@@ -5,34 +5,23 @@ import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { cn, formatTimeAgo } from "@/lib/utils";
+import { cn,formatTimeAgo } from "@/lib/utils";
 import {
-  AlertCircle,
-  AlertTriangle,
-  ArrowLeft,
-  Bike,
-  CalendarCheck2,
-  Camera,
-  Check,
-  CheckCircle2,
-  Clock,
-  HardHat,
-  IdCard,
-  ImagePlus,
-  KeyRound,
-  Loader2,
-  Lock,
-  MapPin,
-  Phone,
-  RotateCcw,
-  ShieldCheck,
-  User,
-  Wrench,
-  X,
+AlertTriangle,
+ArrowLeft,
+Bike,
+Camera,
+Check,
+CheckCircle2,
+KeyRound,
+Loader2,
+Phone,
+RotateCcw,
+User,
+X
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 

@@ -1,8 +1,8 @@
-import { institutions, userProfiles } from "@/db/schema";
-import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
+import { institutions,userProfiles } from "@/db/schema";
+import { and,asc,count,desc,eq,ilike,or,sql,type SQL } from "drizzle-orm";
 import { Metadata } from "next";
-import { UsersTable } from "./users-table";
 import { resolveAdminSession } from "../_lib/guard";
+import { UsersTable } from "./users-table";
 
 export const metadata: Metadata = {
 	title: "Admin Users & Student Analytics | CampusLoop",

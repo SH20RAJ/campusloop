@@ -1,24 +1,23 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { AcademicResource } from "@/db/schema";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
+import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-  ArrowUp,
-  BookOpen,
-  CheckCircle,
-  Copy,
-  Download,
-  Eye,
-  ExternalLink,
-  GraduationCap,
-  Share2,
-  ShieldCheck,
+ArrowUp,
+BookOpen,
+CheckCircle,
+Download,
+ExternalLink,
+Eye,
+GraduationCap,
+Share2,
+ShieldCheck
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface AcademicCardProps {

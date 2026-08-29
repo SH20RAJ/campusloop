@@ -4,25 +4,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo } from "@/lib/utils";
+import { cn,formatTimeAgo } from "@/lib/utils";
 import {
-  AlertCircle,
-  Bell,
-  Check,
-  CheckCircle2,
-  Clock,
-  DollarSign,
-  Flame,
-  Loader2,
-  MapPin,
-  Package,
-  Power,
-  Store,
-  TrendingUp,
-  Truck,
-  Users,
-  UtensilsCrossed,
-  X,
+Bell,
+Check,
+Loader2,
+Power
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

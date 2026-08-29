@@ -6,28 +6,23 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  Check,
-  CheckCircle2,
-  Clock,
-  DollarSign,
-  Edit2,
-  ExternalLink,
-  Loader2,
-  MapPin,
-  Package,
-  Plus,
-  QrCode,
-  Save,
-  Search,
-  ShoppingBag,
-  Store,
-  Trash2,
-  X,
+ArrowLeft,
+Edit2,
+ExternalLink,
+Loader2,
+Package,
+Plus,
+QrCode,
+Save,
+Search,
+ShoppingBag,
+Store,
+Trash2,
+X
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 

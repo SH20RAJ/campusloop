@@ -6,22 +6,16 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  Bike,
-  DollarSign,
-  Edit2,
-  ExternalLink,
-  Package,
-  Plus,
-  QrCode,
-  Search,
-  ShoppingBag,
-  Store,
-  TrendingUp,
-  Users,
-  UtensilsCrossed,
+Bike,
+Edit2,
+ExternalLink,
+Package,
+Plus,
+Search,
+Store
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo,useState } from "react";
 import useSWR from "swr";
 
 export function AdminMarketplaceClient() {

@@ -7,7 +7,7 @@ import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "./avatar";
 
 interface Story {
   id: string;

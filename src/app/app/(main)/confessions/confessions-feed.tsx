@@ -6,9 +6,9 @@ import { useFeed } from "@/hooks/use-feed";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Flame, Globe, Lock, Shield } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { ArrowLeft,Flame,Globe,Lock,Shield } from "lucide-react";
+import { usePathname,useRouter,useSearchParams } from "next/navigation";
+import { useEffect,useRef } from "react";
 
 export function ConfessionsFeed() {
   const router = useRouter();

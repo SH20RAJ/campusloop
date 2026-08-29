@@ -6,11 +6,11 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-  Check,
-  MapPin,
-  MessageCircle,
-  Share2,
-  ShieldCheck,
+Check,
+MapPin,
+MessageCircle,
+Share2,
+ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";

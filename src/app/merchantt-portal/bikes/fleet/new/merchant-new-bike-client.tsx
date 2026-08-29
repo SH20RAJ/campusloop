@@ -3,22 +3,15 @@
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  Bike,
-  Check,
-  Fuel,
-  Gauge,
-  ImagePlus,
-  Loader2,
-  MapPin,
-  Plus,
-  Send,
-  X,
+ArrowLeft,
+Check,
+ImagePlus,
+Loader2,
+X
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef,useState } from "react";
 import { toast } from "sonner";
 
 export function MerchantNewBikeClient() {

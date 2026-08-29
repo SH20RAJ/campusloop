@@ -6,13 +6,10 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  Edit3,
-  Loader2,
-  Plus,
-  Power,
-  Search,
-  Trash2,
-  UtensilsCrossed,
+Plus,
+Search,
+Trash2,
+UtensilsCrossed
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

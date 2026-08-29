@@ -1,7 +1,7 @@
 "use client";
 
 import { FollowButton } from "@/components/profile/follow-button";
-import { MessageSquare, ShieldCheck, UserPlus } from "lucide-react";
+import { MessageSquare,UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

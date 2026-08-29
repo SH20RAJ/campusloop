@@ -6,13 +6,13 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-  ArrowRight,
-  Car,
-  Clock,
-  MessageCircle,
-  Share2,
-  ShieldCheck,
-  Users,
+ArrowRight,
+Car,
+Clock,
+MessageCircle,
+Share2,
+ShieldCheck,
+Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

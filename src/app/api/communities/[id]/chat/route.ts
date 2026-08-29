@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
-import { communities, conversationParticipants, conversations, userProfiles } from "@/db/schema";
+import { communities,conversationParticipants,conversations,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and, eq, or } from "drizzle-orm";
+import { and,eq,or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 interface RouteParams {

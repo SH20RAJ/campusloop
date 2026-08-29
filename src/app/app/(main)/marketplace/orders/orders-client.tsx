@@ -4,14 +4,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo } from "@/lib/utils";
+import { cn,formatTimeAgo } from "@/lib/utils";
 import {
-  ArrowLeft,
-  ChevronRight,
-  Clock,
-  Package,
-  ShoppingBag,
-  Store,
+ArrowLeft,
+ChevronRight,
+Package,
+Store
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

@@ -1,7 +1,7 @@
 "use client";
 
 import { FeaturedCampusCard } from "@/components/discover/featured-campus-card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
@@ -13,18 +13,15 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  Compass,
-  Flame,
-  Globe,
-  MoreHorizontal,
-  Search,
-  ShieldCheck,
-  TrendingUp,
+Globe,
+MoreHorizontal,
+Search,
+ShieldCheck
 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname,useRouter,useSearchParams } from "next/navigation";
+import { useEffect,useMemo,useRef,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 

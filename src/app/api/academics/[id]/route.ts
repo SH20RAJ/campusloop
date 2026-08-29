@@ -1,5 +1,5 @@
 import { getDb } from "@/db";
-import { academicResources, userProfiles } from "@/db/schema";
+import { academicResources,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
 import { eq } from "drizzle-orm";

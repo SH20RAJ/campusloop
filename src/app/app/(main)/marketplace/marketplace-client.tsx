@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { fetcher } from "@/lib/api";
@@ -8,30 +7,28 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  Bike,
-  Car,
-  ChevronRight,
-  Clock,
-  Flame,
-  Loader2,
-  MapPin,
-  Percent,
-  Plus,
-  Search,
-  ShieldCheck,
-  ShoppingBag,
-  Star,
-  Store,
-  Tag,
-  Ticket,
-  Truck,
-  UtensilsCrossed,
-  Wrench,
-  X,
+Bike,
+Car,
+ChevronRight,
+Clock,
+Flame,
+MapPin,
+Percent,
+Search,
+ShieldCheck,
+ShoppingBag,
+Star,
+Store,
+Tag,
+Ticket,
+Truck,
+UtensilsCrossed,
+Wrench,
+X
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo,useState } from "react";
 import useSWR from "swr";
 
 interface MarketplaceClientProps {

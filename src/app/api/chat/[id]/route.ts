@@ -1,8 +1,8 @@
 import { getDb } from "@/db";
-import { conversationParticipants, conversations, messages, userProfiles } from "@/db/schema";
+import { conversationParticipants,conversations,messages,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and, eq } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { and,eq } from "drizzle-orm";
+import { NextRequest,NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

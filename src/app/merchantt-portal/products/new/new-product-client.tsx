@@ -3,18 +3,16 @@
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  ImagePlus,
-  Loader2,
-  Plus,
-  Send,
-  Trash2,
-  X,
+ArrowLeft,
+ImagePlus,
+Loader2,
+Send,
+Trash2,
+X
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef,useState } from "react";
 import { toast } from "sonner";
 
 export function NewProductClient() {

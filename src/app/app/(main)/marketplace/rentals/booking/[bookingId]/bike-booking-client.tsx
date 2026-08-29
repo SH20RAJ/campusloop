@@ -4,25 +4,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo } from "@/lib/utils";
+import { cn,formatTimeAgo } from "@/lib/utils";
 import {
-  AlertCircle,
-  ArrowLeft,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  HardHat,
-  IdCard,
-  KeyRound,
-  MapPin,
-  Phone,
-  RotateCcw,
-  ShieldCheck,
-  Store,
-  UserCheck,
-  X,
+ArrowLeft,
+CheckCircle2,
+MapPin,
+Phone,
+ShieldCheck
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";

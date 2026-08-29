@@ -2,28 +2,27 @@
 
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
 import { CampusHubStrip } from "@/components/communities/campus-hub-strip";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { FeedPost } from "@/hooks/use-feed";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, getAvatarUrl } from "@/lib/utils";
+import { cn,getAvatarUrl } from "@/lib/utils";
 import {
-  CheckCheck,
-  Compass,
-  Globe,
-  Loader2,
-  Lock,
-  MessageSquare,
-  Plus,
-  Search,
-  Sparkles,
-  Users,
-  Users2,
+CheckCheck,
+Compass,
+Globe,
+Loader2,
+Lock,
+MessageSquare,
+Plus,
+Search,
+Users,
+Users2
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect,useMemo,useRef,useState } from "react";
 import useSWRInfinite from "swr/infinite";
 
 export interface CommunityItem {

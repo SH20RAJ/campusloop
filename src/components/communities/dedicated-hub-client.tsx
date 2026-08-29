@@ -7,25 +7,23 @@ import { LostFoundCard } from "@/components/communities/lost-found-card";
 import { MarketplaceCard } from "@/components/communities/marketplace-card";
 import { RideshareCard } from "@/components/communities/rideshare-card";
 import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  BookOpen,
-  Car,
-  CheckCheck,
-  Compass,
-  Gamepad2,
-  Home,
-  Loader2,
-  PackageSearch,
-  Plus,
-  Search,
-  ShoppingBag,
+ArrowLeft,
+BookOpen,
+Car,
+CheckCheck,
+Compass,
+Gamepad2,
+Home,
+Loader2,
+PackageSearch,
+Plus,
+Search,
+ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect,useMemo,useRef,useState } from "react";
 import useSWRInfinite from "swr/infinite";
 
 export type DedicatedHubType =

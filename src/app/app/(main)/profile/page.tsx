@@ -1,8 +1,8 @@
 import { getDb } from "@/db";
 import { posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { getFollowCounts } from "@/lib/follows";
 import { FeedPost } from "@/hooks/use-feed";
+import { getFollowCounts } from "@/lib/follows";
 import { and,desc,eq } from "drizzle-orm";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";

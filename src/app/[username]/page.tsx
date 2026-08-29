@@ -3,6 +3,7 @@ import { Navigation } from "@/components/ui/navigation";
 import { RightSidebar } from "@/components/ui/right-sidebar";
 import { getBranchIcon } from "@/constants";
 
+import { PublicFollowButton } from "@/components/profile/public-follow-button";
 import { getDb } from "@/db";
 import { institutions,posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
@@ -14,7 +15,6 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProfileClientView } from "../app/(main)/profile/profile-client";
-import { PublicFollowButton } from "@/components/profile/public-follow-button";
 
 interface VanityProfileProps {
   params: Promise<{ username: string }>;

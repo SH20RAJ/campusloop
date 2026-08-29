@@ -6,13 +6,13 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-  Calendar,
-  CheckCircle2,
-  Gift,
-  MapPin,
-  MessageCircle,
-  Share2,
-  ShieldCheck,
+Calendar,
+CheckCircle2,
+Gift,
+MapPin,
+MessageCircle,
+Share2,
+ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

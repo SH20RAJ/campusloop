@@ -4,14 +4,14 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  ArrowUpRight,
-  BookOpen,
-  Car,
-  Compass,
-  Gamepad2,
-  Home,
-  PackageSearch,
-  ShoppingBag,
+ArrowUpRight,
+BookOpen,
+Car,
+Compass,
+Gamepad2,
+Home,
+PackageSearch,
+ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
 

@@ -2,42 +2,42 @@
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
+import { PresenceDot } from "@/components/ui/presence-dot";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { UserProfile } from "@/db/schema";
+import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
 import {
 CachedMessage,
 getCachedMessages,
 setCachedMessages,
 } from "@/lib/chat-cache";
 import { haptics } from "@/lib/haptics";
+import { isOnline,presenceLabel } from "@/lib/presence";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { isOnline,presenceLabel } from "@/lib/presence";
-import { PresenceDot } from "@/components/ui/presence-dot";
-import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  CheckCheck,
-  CornerDownRight,
-  Info,
-  Loader2,
-  Mic,
-  Paperclip,
-  Play,
-  Search,
-  Send,
-  ShieldCheck,
-  Smile,
-  User,
-  Volume2,
-  X,
+ArrowLeft,
+CheckCheck,
+CornerDownRight,
+Info,
+Loader2,
+Mic,
+Paperclip,
+Play,
+Search,
+Send,
+ShieldCheck,
+Smile,
+User,
+Volume2,
+X,
 } from "lucide-react";
 import Link from "next/link";
-import { ChatUserInfoDrawer } from "./chat-user-info-drawer";
 import { useEffect,useRef,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { ChatUserInfoDrawer } from "./chat-user-info-drawer";
 
 const fetcher = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url);

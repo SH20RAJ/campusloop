@@ -15,7 +15,6 @@ import {
 Archive,
 ArrowLeft,
 ArrowUpRight,
-Briefcase,
 Calendar,
 Camera,
 Edit3,
@@ -35,7 +34,7 @@ TrendingUp,
 Trophy,
 Upload,
 VenetianMask,
-X,
+X
 } from "lucide-react";
 
 import Link from "next/link";

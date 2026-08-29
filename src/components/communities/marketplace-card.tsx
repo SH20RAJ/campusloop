@@ -1,25 +1,20 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { MarketplaceItem } from "@/db/schema";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
+import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  Flame,
-  Loader2,
-  MapPin,
-  MessageCircle,
-  MoreHorizontal,
-  Share2,
-  ShieldCheck,
-  Tag,
-  Trash2,
-  X,
+CheckCircle2,
+Loader2,
+MapPin,
+MessageCircle,
+Share2,
+ShieldCheck,
+Tag,
+Trash2,
+X
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

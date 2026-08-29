@@ -6,20 +6,14 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  Bike,
-  Edit3,
-  Fuel,
-  Gauge,
-  HardHat,
-  Loader2,
-  MapPin,
-  Plus,
-  Search,
-  ShieldCheck,
-  Star,
-  Trash2,
-  Wrench,
-  X,
+Bike,
+Edit3,
+Gauge,
+Loader2,
+Plus,
+Search,
+Trash2,
+X
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

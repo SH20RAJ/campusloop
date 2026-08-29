@@ -4,21 +4,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
-  Check,
-  CheckCircle2,
-  Edit3,
-  ExternalLink,
-  Loader2,
-  Package,
-  Plus,
-  Search,
-  Store,
-  Tag,
-  UtensilsCrossed,
-  X,
-  XCircle,
+ExternalLink,
+Loader2,
+Package,
+Search,
+UtensilsCrossed
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

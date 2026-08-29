@@ -1,4 +1,4 @@
-import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
+import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { BuyAndSellClient } from "./buy-and-sell-client";

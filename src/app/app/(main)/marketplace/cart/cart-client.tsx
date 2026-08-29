@@ -3,17 +3,15 @@
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import {
-  AlertCircle,
-  ArrowLeft,
-  ChevronRight,
-  Minus,
-  Plus,
-  ShoppingBag,
-  Store,
-  Trash2,
-  Truck,
+AlertCircle,
+ArrowLeft,
+ChevronRight,
+Minus,
+Plus,
+ShoppingBag,
+Store,
+Truck
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

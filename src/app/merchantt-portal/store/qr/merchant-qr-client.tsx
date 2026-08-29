@@ -3,8 +3,7 @@
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
-import { Copy, Download, Printer, QrCode, Share2, Store } from "lucide-react";
+import { Copy,Printer,QrCode } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";

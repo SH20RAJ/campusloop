@@ -2,16 +2,8 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
-import { cn } from "@/lib/utils";
 import {
-  ArrowUpRight,
-  CreditCard,
-  DollarSign,
-  Download,
-  IndianRupee,
-  PackageCheck,
-  TrendingUp,
-  Wallet,
+DollarSign
 } from "lucide-react";
 import useSWR from "swr";
 

@@ -5,28 +5,23 @@ import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  Bike,
-  BookOpen,
-  CheckCircle2,
-  Compass,
-  Home,
-  ImagePlus,
-  Info,
-  Laptop,
-  Loader2,
-  MapPin,
-  Plus,
-  Send,
-  Shirt,
-  ShoppingBag,
-  Tag,
-  Trash2,
-  Wind,
-  X,
+ArrowLeft,
+Bike,
+BookOpen,
+CheckCircle2,
+Compass,
+Home,
+ImagePlus,
+Laptop,
+Loader2,
+MapPin,
+Send,
+Tag,
+Wind,
+X
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef,useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 

@@ -1,6 +1,6 @@
 import {
-  getSecretCrushSlotLimit,
-  getSecretCrushSlotProgress,
+getSecretCrushSlotLimit,
+getSecretCrushSlotProgress,
 } from "@/constants/gamification";
 import { describe,expect,it } from "vitest";
 import {

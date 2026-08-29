@@ -5,20 +5,17 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  BookOpen,
-  Car,
-  CheckCheck,
-  Gamepad2,
-  Home,
-  Loader2,
-  PackageSearch,
-  Plus,
-  Send,
-  ShoppingBag,
+ArrowLeft,
+BookOpen,
+Car,
+Gamepad2,
+Home,
+Loader2,
+PackageSearch,
+Send,
+ShoppingBag
 } from "lucide-react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter,useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 

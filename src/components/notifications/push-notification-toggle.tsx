@@ -2,7 +2,7 @@
 
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { cn } from "@/lib/utils";
-import { Bell, BellOff, BellRing, Check, Loader2, Send } from "lucide-react";
+import { Bell,BellOff,BellRing,Check,Loader2,Send } from "lucide-react";
 import { useState } from "react";
 
 /**

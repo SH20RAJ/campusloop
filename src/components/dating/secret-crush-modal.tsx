@@ -3,18 +3,18 @@
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@/db/schema";
 import {
-  Crown,
-  Flame,
-  Heart,
-  Loader2,
-  Lock,
-  MessageCircle,
-  Plus,
-  Search,
-  ShieldCheck,
-  Trash2,
-  X,
-  Zap,
+Crown,
+Flame,
+Heart,
+Loader2,
+Lock,
+MessageCircle,
+Plus,
+Search,
+ShieldCheck,
+Trash2,
+X,
+Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

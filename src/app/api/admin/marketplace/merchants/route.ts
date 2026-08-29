@@ -1,7 +1,7 @@
-import { getDb } from "@/db";
-import { merchants, userProfiles } from "@/db/schema";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
-import { desc, eq } from "drizzle-orm";
+import { getDb } from "@/db";
+import { merchants } from "@/db/schema";
+import { desc } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

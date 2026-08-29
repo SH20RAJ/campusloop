@@ -13,11 +13,11 @@ SafetySection,
 StatsSection
 } from "@/components/landing/extra-sections";
 import { HeroPreview } from "@/components/landing/hero-preview";
+import { InteractiveBentoCard } from "@/components/landing/interactive-bento-card";
 import { LeaderboardShowcase } from "@/components/landing/leaderboard-demo";
 import { MatchmakingShowcase } from "@/components/landing/matchmaking-demo";
 import { Reveal } from "@/components/landing/reveal";
 import { TimeCapsuleShowcase } from "@/components/landing/time-capsule-showcase";
-import { InteractiveBentoCard } from "@/components/landing/interactive-bento-card";
 import {
 CTABand,
 GradientText,

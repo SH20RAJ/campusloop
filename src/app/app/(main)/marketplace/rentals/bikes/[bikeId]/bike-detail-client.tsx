@@ -7,33 +7,27 @@ import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import {
-  AlertCircle,
-  ArrowLeft,
-  Calendar,
-  Check,
-  CheckCircle2,
-  Clock,
-  CreditCard,
-  FileCheck,
-  Fuel,
-  Gauge,
-  HardHat,
-  IdCard,
-  ImagePlus,
-  Info,
-  Loader2,
-  Lock,
-  MapPin,
-  Phone,
-  ShieldCheck,
-  Star,
-  Wallet,
-  X,
-  Zap,
+AlertCircle,
+ArrowLeft,
+Calendar,
+Check,
+CheckCircle2,
+CreditCard,
+Fuel,
+Gauge,
+HardHat,
+IdCard,
+ImagePlus,
+Loader2,
+Lock,
+MapPin,
+ShieldCheck,
+Star,
+Wallet,
+X
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useRef,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 

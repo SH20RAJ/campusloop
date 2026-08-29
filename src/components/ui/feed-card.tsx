@@ -16,7 +16,7 @@ import { AnimatePresence,motion } from "framer-motion";
 import { Heart,Repeat2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect,useRef,useState } from "react";
 import { toast } from "sonner";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";

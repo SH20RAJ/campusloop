@@ -4,22 +4,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import {
-  ExternalLink,
-  MapPin,
-  Phone,
-  Plus,
-  Search,
-  ShieldCheck,
-  Star,
-  Store,
-  Tag,
-  UtensilsCrossed,
+ExternalLink,
+Plus,
+Search,
+Store
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { toast } from "sonner";
 import useSWR from "swr";
 
 export function AdminMerchantsClient() {

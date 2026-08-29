@@ -1,32 +1,31 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { isOnline, presenceLabel } from "@/lib/presence";
+import { isOnline,presenceLabel } from "@/lib/presence";
 import { formatTimeAgo } from "@/lib/utils";
 import { format } from "date-fns";
 import {
-  Activity,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  Plus,
-  Radio,
-  School,
-  SearchIcon,
-  ShieldCheck,
-  Trash2,
-  TrendingUp,
-  UserPlus,
-  Users,
-  Zap,
+Calendar,
+ChevronLeft,
+ChevronRight,
+ExternalLink,
+Plus,
+Radio,
+School,
+SearchIcon,
+ShieldCheck,
+Trash2,
+TrendingUp,
+UserPlus,
+Users,
+Zap
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter,useSearchParams } from "next/navigation";
+import { useEffect,useState } from "react";
 import { toast } from "sonner";
-import { createUserProfile, deleteUserProfile, updateUserRole, updateUserStatus } from "./actions";
+import { createUserProfile,deleteUserProfile,updateUserRole,updateUserStatus } from "./actions";
 
 export interface UserAnalyticsStats {
   total: number;

@@ -5,16 +5,12 @@ import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import {
-  Clock,
-  Loader2,
-  MapPin,
-  Phone,
-  Power,
-  Save,
-  Store,
-  Truck,
+Loader2,
+Save,
+Store,
+Truck
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect,useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 

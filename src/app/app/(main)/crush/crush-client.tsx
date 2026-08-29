@@ -5,19 +5,19 @@ import { UserProfile } from "@/db/schema";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import {
-  ArrowLeft,
-  Crown,
-  Flame,
-  Heart,
-  Loader2,
-  Lock,
-  MessageSquare,
-  Plus,
-  Search,
-  ShieldCheck,
-  Trash2,
-  X,
-  Zap,
+ArrowLeft,
+Crown,
+Flame,
+Heart,
+Loader2,
+Lock,
+MessageSquare,
+Plus,
+Search,
+ShieldCheck,
+Trash2,
+X,
+Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

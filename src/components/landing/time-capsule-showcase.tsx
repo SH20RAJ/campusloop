@@ -1,16 +1,16 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card,CardContent } from "@/components/ui/card";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  CheckCircle2,
-  Eye,
-  Hourglass,
-  Lock,
-  Unlock,
-  Wand2,
+CheckCircle2,
+Eye,
+Hourglass,
+Lock,
+Unlock,
+Wand2,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";

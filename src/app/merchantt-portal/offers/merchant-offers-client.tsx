@@ -1,12 +1,8 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { Flame, Percent, Plus, Tag, Trash2 } from "lucide-react";
+import { Flame } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import useSWR from "swr";
 
 export function MerchantOffersClient() {

@@ -2,7 +2,7 @@
 
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { ArrowLeft, Loader2, Send, Store } from "lucide-react";
+import { ArrowLeft,Loader2,Send } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

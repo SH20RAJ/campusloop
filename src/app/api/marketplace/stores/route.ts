@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
-import { marketplaceOffers, merchants, userProfiles } from "@/db/schema";
+import { marketplaceOffers,merchants,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and, desc, eq, ilike, or } from "drizzle-orm";
+import { and,desc,eq,ilike,or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

@@ -8,7 +8,7 @@ LegalDocHeader,
 type DocSectionRef,
 } from "@/components/marketing/legal-doc";
 import { LegalNav } from "@/components/marketing/legal-nav";
-import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
+import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

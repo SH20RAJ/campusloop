@@ -1,23 +1,23 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  Bookmark,
-  ChevronLeft,
-  ChevronRight,
-  Heart,
-  Loader2,
-  Plus,
-  Send,
-  Share2,
-  X,
+Bookmark,
+ChevronLeft,
+ChevronRight,
+Heart,
+Loader2,
+Plus,
+Send,
+Share2,
+X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback,useEffect,useRef,useState } from "react";
 import { toast } from "sonner";
 
 interface StoryViewerClientProps {

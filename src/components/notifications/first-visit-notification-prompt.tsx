@@ -3,9 +3,9 @@
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { AnimatePresence, motion } from "framer-motion";
-import { Bell, BellRing, Check, Loader2, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { AnimatePresence,motion } from "framer-motion";
+import { Bell,BellRing,Loader2,X } from "lucide-react";
+import { useEffect,useState } from "react";
 
 const PROMPT_STORAGE_KEY = "campusloop_notif_prompted_v1";
 

@@ -1,19 +1,19 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card,CardContent } from "@/components/ui/card";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  ArrowRight,
-  BookOpen,
-  Car,
-  Copy,
-  Gamepad2,
-  Home,
-  MessageCircle,
-  PackageSearch,
-  ShoppingBag,
+ArrowRight,
+BookOpen,
+Car,
+Copy,
+Gamepad2,
+Home,
+MessageCircle,
+PackageSearch,
+ShoppingBag,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";

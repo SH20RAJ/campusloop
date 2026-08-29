@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe,expect,it } from "vitest";
 import { sendEmail } from "./email";
-import { buildNotificationEmail, buildWelcomeEmail } from "./email-templates";
+import { buildNotificationEmail,buildWelcomeEmail } from "./email-templates";
 
 describe("Cloudflare Email Sending & Templates", () => {
   it("builds notification email with correct subject and snippet", () => {

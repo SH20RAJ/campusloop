@@ -2,22 +2,21 @@ import { relations } from "drizzle-orm";
 import { academicResources } from "./academic-resources";
 import { conversationParticipants,conversations,messages } from "./chat";
 import {
-  bikeAvailabilityBlocks,
-  bikeBookingDocuments,
-  bikeBookings,
-  bikeBookingStatusHistory,
-  bikeInspections,
-  bikes,
-  marketplaceCategories,
-  marketplaceOffers,
-  marketplaceOrderItems,
-  marketplaceOrders,
-  marketplaceReviews,
-  merchantBusinessHours,
-  merchants,
-  merchantUsers,
-  products,
-  savedMarketplaceItems,
+bikeAvailabilityBlocks,
+bikeBookingDocuments,
+bikeBookings,
+bikeBookingStatusHistory,
+bikeInspections,
+bikes,
+marketplaceOffers,
+marketplaceOrderItems,
+marketplaceOrders,
+marketplaceReviews,
+merchantBusinessHours,
+merchants,
+merchantUsers,
+products,
+savedMarketplaceItems
 } from "./commercial-marketplace";
 import { communities,communityMembers } from "./communities";
 import { secretCrushes,swipes } from "./dating";

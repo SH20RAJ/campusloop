@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
-import { bikeBookings, bikes, merchants, userProfiles } from "@/db/schema";
+import { bikeBookings,bikes,merchants,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and, desc, eq, ne, sql } from "drizzle-orm";
+import { and,desc,eq,ne,sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

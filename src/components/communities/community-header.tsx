@@ -2,19 +2,19 @@
 
 import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions";
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  Check,
-  EyeOff,
-  Globe,
-  Lock,
-  MessageSquare,
-  Settings,
-  Share2,
-  ShieldCheck,
-  Users,
+ArrowLeft,
+Check,
+EyeOff,
+Globe,
+Lock,
+MessageSquare,
+Settings,
+Share2,
+ShieldCheck,
+Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

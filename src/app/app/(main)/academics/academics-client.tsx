@@ -7,27 +7,18 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  BookOpen,
-  CheckCircle2,
-  FileCode2,
-  FileSpreadsheet,
-  FileText,
-  Filter,
-  GraduationCap,
-  Layers,
-  Library,
-  Loader2,
-  Plus,
-  Search,
-  Share2,
-  SlidersHorizontal,
-  X,
-  Zap,
+BookOpen,
+FileCode2,
+FileText,
+Library,
+Plus,
+Search,
+X,
+Zap
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter,useSearchParams } from "next/navigation";
+import { useEffect,useMemo,useState } from "react";
 import useSWR from "swr";
 
 interface AcademicsClientProps {

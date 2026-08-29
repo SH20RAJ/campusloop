@@ -1,33 +1,25 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BrandLogo } from "@/components/ui/brand-logo";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  Bike,
-  CalendarCheck2,
-  Clock,
-  DollarSign,
-  Gauge,
-  Gift,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  Package,
-  QrCode,
-  Settings,
-  ShieldCheck,
-  ShoppingBag,
-  Star,
-  Store,
-  Tag,
-  TrendingUp,
-  Users,
-  UtensilsCrossed,
-  X,
+ArrowLeft,
+Bike,
+CalendarCheck2,
+Clock,
+DollarSign,
+Gauge,
+LayoutDashboard,
+Menu,
+Package,
+QrCode,
+Settings,
+Star,
+Store,
+Tag,
+UtensilsCrossed
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

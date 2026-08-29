@@ -1,13 +1,13 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { getBranchIcon } from "@/constants";
-import type { Institution, UserProfile } from "@/db/schema";
+import type { Institution,UserProfile } from "@/db/schema";
 import { fetcher } from "@/lib/api";
 import { getAvatarUrl } from "@/lib/utils";
-import { ArrowLeft, Globe, MessageSquare, School, Search, ShieldCheck } from "lucide-react";
+import { ArrowLeft,Globe,MessageSquare,School,Search,ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams,useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 

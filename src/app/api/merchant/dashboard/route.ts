@@ -1,13 +1,13 @@
 import { getDb } from "@/db";
 import {
-  marketplaceOrders,
-  merchants,
-  merchantUsers,
-  products,
-  userProfiles,
+marketplaceOrders,
+merchants,
+merchantUsers,
+products,
+userProfiles,
 } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { desc, eq, inArray } from "drizzle-orm";
+import { desc,eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

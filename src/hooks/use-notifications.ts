@@ -53,7 +53,7 @@ interface NotificationsResponse {
 }
 
 import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
-import { useEffect, useRef } from "react";
+import { useEffect,useRef } from "react";
 
 export function useNotifications(tab: NotificationTab = "all") {
   const lastTopIdRef = useRef<string | null>(null);

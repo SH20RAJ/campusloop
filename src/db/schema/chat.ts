@@ -1,7 +1,7 @@
 import { boolean,index,jsonb,pgTable,text,timestamp,uniqueIndex } from "drizzle-orm/pg-core";
 import { createdAt,id,updatedAt } from "./common";
-import { userProfiles } from "./users";
 import { communities } from "./communities";
+import { userProfiles } from "./users";
 
 export const conversations = pgTable(
   "conversations",

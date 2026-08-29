@@ -5,22 +5,14 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  Building,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  CreditCard,
-  FileText,
-  Home,
-  IdCard,
-  Loader2,
-  MapPin,
-  Phone,
-  ShieldCheck,
-  Store,
-  Truck,
-  Wallet,
+ArrowLeft,
+CheckCircle2,
+CreditCard,
+Loader2,
+ShieldCheck,
+Store,
+Truck,
+Wallet
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

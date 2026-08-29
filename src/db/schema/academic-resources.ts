@@ -22,6 +22,7 @@ export const academicResources = pgTable("academic_resources", {
   driveUrl: text("drive_url"),
   upvotesCount: integer("upvotes_count").default(0).notNull(),
   downloadsCount: integer("downloads_count").default(0).notNull(),
+  viewsCount: integer("views_count").default(0).notNull(),
   isVerified: boolean("is_verified").default(false).notNull(),
   createdAt,
   updatedAt,

@@ -6,12 +6,13 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-Calendar,
-CheckCircle2,
-Gift,
-MapPin,
-MessageCircle,
-ShieldCheck
+  Calendar,
+  CheckCircle2,
+  Gift,
+  MapPin,
+  MessageCircle,
+  Share2,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -56,6 +57,28 @@ export function LostFoundCard({ item, currentUserId }: LostFoundCardProps) {
     toast.success(resolved ? "Marked as active" : "Marked as resolved & returned! 🎉");
   }
 
+  function handleShare(e: React.MouseEvent) {
+    e.stopPropagation();
+    sounds.tap();
+    haptics.light();
+
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://campusloop.space";
+    const shareUrl = `${baseUrl}/app/lost-and-found?id=${item.id}`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: item.title,
+          text: `[${item.type}] ${item.title} on CampusLoop`,
+          url: shareUrl,
+        })
+        .catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success("Lost & Found link copied to clipboard! 📋");
+    }
+  }
+
   return (
     <div className="p-4 border-b border-border/20 hover:bg-muted/[0.08] transition-colors select-none">
       <div className="flex items-start justify-between gap-3 mb-2.5">
@@ -95,7 +118,7 @@ export function LostFoundCard({ item, currentUserId }: LostFoundCardProps) {
           </div>
         </div>
 
-        {/* Status Pill */}
+        {/* Status Pill & Share Button */}
         <div className="flex items-center gap-1.5 shrink-0">
           <span
             className={cn(
@@ -109,6 +132,15 @@ export function LostFoundCard({ item, currentUserId }: LostFoundCardProps) {
           >
             {resolved ? "Resolved" : isLost ? "Lost Item" : "Found Item"}
           </span>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="size-7 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="Share or Copy Link"
+          >
+            <Share2 className="size-3.5" />
+          </button>
         </div>
       </div>
 

@@ -6,12 +6,13 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-ArrowRight,
-Car,
-Clock,
-MessageCircle,
-ShieldCheck,
-Users
+  ArrowRight,
+  Car,
+  Clock,
+  MessageCircle,
+  Share2,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -69,6 +70,28 @@ export function RideshareCard({ item }: RideshareCardProps) {
     }
   }
 
+  function handleShare(e: React.MouseEvent) {
+    e.stopPropagation();
+    sounds.tap();
+    haptics.light();
+
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://campusloop.space";
+    const shareUrl = `${baseUrl}/app/rideshare?id=${item.id}`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: `Ride Share: ${item.origin} → ${item.destination}`,
+          text: `Split cab fare: ${item.origin} to ${item.destination} (₹${item.pricePerSeat}/seat) on CampusLoop`,
+          url: shareUrl,
+        })
+        .catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success("Rideshare link copied! 🚗");
+    }
+  }
+
   return (
     <div className="p-4 border-b border-border/20 hover:bg-muted/[0.08] transition-colors select-none">
       {/* Header */}
@@ -109,11 +132,20 @@ export function RideshareCard({ item }: RideshareCardProps) {
           </div>
         </div>
 
-        {/* Fare Pill */}
+        {/* Fare Pill & Share Button */}
         <div className="flex items-center gap-1.5 shrink-0">
           <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-sky-500/15 text-sky-500 border border-sky-500/30 shadow-2xs">
             ₹{item.pricePerSeat} / seat
           </span>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="size-7 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="Share or Copy Link"
+          >
+            <Share2 className="size-3.5" />
+          </button>
         </div>
       </div>
 

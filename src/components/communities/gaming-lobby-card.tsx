@@ -6,13 +6,14 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-Clock,
-Copy,
-ExternalLink,
-Gamepad2,
-ShieldCheck,
-Sword,
-Users,
+  Clock,
+  Copy,
+  ExternalLink,
+  Gamepad2,
+  Share2,
+  ShieldCheck,
+  Sword,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -101,6 +102,28 @@ export function GamingLobbyCard({ item }: GamingLobbyCardProps) {
     }
   }
 
+  function handleShare(e: React.MouseEvent) {
+    e.stopPropagation();
+    sounds.tap();
+    haptics.light();
+
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://campusloop.space";
+    const shareUrl = `${baseUrl}/app/gaming?id=${item.id}`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: `Gaming Lobby: ${item.gameName} — ${item.title}`,
+          text: `Join ${item.gameName} squad lobby on CampusLoop!`,
+          url: shareUrl,
+        })
+        .catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success("Gaming lobby link copied! 🎮");
+    }
+  }
+
   return (
     <div className="p-4 border-b border-border/20 hover:bg-muted/[0.08] transition-colors select-none">
       {/* Header */}
@@ -141,7 +164,7 @@ export function GamingLobbyCard({ item }: GamingLobbyCardProps) {
           </div>
         </div>
 
-        {/* Game Title Badge */}
+        {/* Game Title Badge & Share Button */}
         <div className="flex items-center gap-1.5 shrink-0">
           <span
             className={cn(
@@ -152,6 +175,15 @@ export function GamingLobbyCard({ item }: GamingLobbyCardProps) {
             <Gamepad2 className="size-3" />
             <span>{item.gameName}</span>
           </span>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="size-7 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="Share or Copy Link"
+          >
+            <Share2 className="size-3.5" />
+          </button>
         </div>
       </div>
 

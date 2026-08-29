@@ -6,10 +6,11 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-Check,
-MapPin,
-MessageCircle,
-ShieldCheck
+  Check,
+  MapPin,
+  MessageCircle,
+  Share2,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -41,6 +42,28 @@ export function HousingCard({ item }: HousingCardProps) {
       toast.success(`Owner contact copied: ${item.contactInfo} 📋`);
     } else {
       toast.info(`Message @${item.author.username} on CampusLoop`);
+    }
+  }
+
+  function handleShare(e: React.MouseEvent) {
+    e.stopPropagation();
+    sounds.tap();
+    haptics.light();
+
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://campusloop.space";
+    const shareUrl = `${baseUrl}/app/housing?id=${item.id}`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: item.title,
+          text: `Check out this PG / Flat near campus: ${item.title} (₹${item.rentPerMonth}/mo)`,
+          url: shareUrl,
+        })
+        .catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success("Housing listing link copied! 📋");
     }
   }
 
@@ -84,11 +107,20 @@ export function HousingCard({ item }: HousingCardProps) {
           </div>
         </div>
 
-        {/* Rent Pill */}
+        {/* Rent Pill & Share Button */}
         <div className="flex items-center gap-1.5 shrink-0">
           <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-500/15 text-amber-500 border border-amber-500/30 shadow-2xs">
             ₹{item.rentPerMonth.toLocaleString("en-IN")} / mo
           </span>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="size-7 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="Share or Copy Link"
+          >
+            <Share2 className="size-3.5" />
+          </button>
         </div>
       </div>
 

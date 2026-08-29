@@ -130,6 +130,7 @@ export function HubCreateClient({ initialType = "lost_found", profileId }: HubCr
   const [genderPreference, setGenderPreference] = useState("ANY");
 
   // Academics
+  const [resourceType, setResourceType] = useState<"NOTES" | "PYQ" | "CHEAT_SHEET" | "LAB_MANUAL">("NOTES");
   const [subjectCode, setSubjectCode] = useState("CS201");
   const [subjectName, setSubjectName] = useState("Data Structures & Algorithms");
   const [branch, setBranch] = useState("Computer Science");
@@ -186,6 +187,7 @@ export function HubCreateClient({ initialType = "lost_found", profileId }: HubCr
         payload.genderPreference = genderPreference;
         payload.location = location || "Near Campus Gate";
       } else if (hubType === "academics") {
+        payload.resourceType = resourceType;
         payload.subjectCode = subjectCode;
         payload.subjectName = subjectName;
         payload.branch = branch;
@@ -518,25 +520,114 @@ export function HubCreateClient({ initialType = "lost_found", profileId }: HubCr
         )}
 
         {hubType === "academics" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-3.5">
+            {/* Resource Type Pills */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-muted-foreground">Subject Code & Name</label>
-              <input
-                type="text"
-                value={subjectName}
-                onChange={(e) => setSubjectName(e.target.value)}
-                placeholder="e.g. CS201 - Data Structures"
-                className="w-full h-10 px-3.5 rounded-xl border border-border/60 bg-muted/20 text-xs font-semibold text-foreground outline-none focus:border-primary"
-              />
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Resource Type *
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { id: "NOTES", label: "📝 Lecture Notes" },
+                  { id: "PYQ", label: "📑 PYQ Papers" },
+                  { id: "CHEAT_SHEET", label: "⚡ Cheat Sheet" },
+                  { id: "LAB_MANUAL", label: "🧪 Lab Manual" },
+                ].map((type) => (
+                  <button
+                    key={type.id}
+                    type="button"
+                    onClick={() => {
+                      sounds.tap();
+                      haptics.light();
+                      setResourceType(type.id as any);
+                    }}
+                    className={cn(
+                      "p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer",
+                      resourceType === type.id
+                        ? "bg-indigo-600 text-white border-indigo-600 font-black shadow-xs"
+                        : "bg-muted/40 text-muted-foreground border-border/40 hover:text-foreground"
+                    )}
+                  >
+                    {type.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
+            {/* Subject Code & Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground">Subject Code *</label>
+                <input
+                  type="text"
+                  required
+                  value={subjectCode}
+                  onChange={(e) => setSubjectCode(e.target.value)}
+                  placeholder="e.g. CS201 / EC301"
+                  className="w-full h-10 px-3.5 rounded-xl border border-border/60 bg-muted/20 text-xs font-bold text-foreground outline-none focus:border-primary uppercase"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground">Subject Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={subjectName}
+                  onChange={(e) => setSubjectName(e.target.value)}
+                  placeholder="e.g. Data Structures & Algorithms"
+                  className="w-full h-10 px-3.5 rounded-xl border border-border/60 bg-muted/20 text-xs font-semibold text-foreground outline-none focus:border-primary"
+                />
+              </div>
+            </div>
+
+            {/* Branch & Semester */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground">Branch</label>
+                <select
+                  value={branch}
+                  onChange={(e) => setBranch(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl border border-border/60 bg-muted/20 text-xs font-bold text-foreground outline-none focus:border-primary"
+                >
+                  <option value="All">All Branches</option>
+                  <option value="Computer Science">Computer Science (CSE)</option>
+                  <option value="ECE">Electronics &amp; Comm (ECE)</option>
+                  <option value="Information Technology">Information Tech (IT)</option>
+                  <option value="Mechanical">Mechanical (MECH)</option>
+                  <option value="Civil">Civil Engineering</option>
+                  <option value="Electrical">Electrical (EEE/EE)</option>
+                  <option value="Chemical">Chemical</option>
+                  <option value="BioTech">Biotechnology</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground">Semester</label>
+                <select
+                  value={semester}
+                  onChange={(e) => setSemester(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl border border-border/60 bg-muted/20 text-xs font-bold text-foreground outline-none focus:border-primary"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                    <option key={s} value={s}>
+                      Semester {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Drive / Download URL */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-muted-foreground">Google Drive / Resource Link</label>
+              <label className="text-xs font-bold text-muted-foreground">
+                Google Drive / PDF Public Link
+              </label>
               <input
                 type="url"
                 value={driveUrl}
                 onChange={(e) => setDriveUrl(e.target.value)}
-                placeholder="https://drive.google.com/..."
+                placeholder="https://drive.google.com/file/d/..."
                 className="w-full h-10 px-3.5 rounded-xl border border-border/60 bg-muted/20 text-xs font-semibold text-foreground outline-none focus:border-primary"
               />
             </div>

@@ -49,7 +49,7 @@ const HUB_CATEGORIES: Array<{
     icon: ShoppingBag,
     color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/30",
     badge: "Sell Gear",
-    href: "/app/marketplace",
+    href: "/app/buy-and-sell",
   },
   {
     id: "gaming",

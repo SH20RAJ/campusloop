@@ -48,7 +48,7 @@ export const CAMPUS_HUBS = [
     title: "Buy & Sell",
     tagline: "Cycles, coolers, books & dorm gear",
     tag: "Marketplace",
-    href: "/app/marketplace",
+    href: "/app/buy-and-sell",
     icon: ShoppingBag,
     gradient: "from-emerald-500/15 via-emerald-500/5 to-transparent",
     border: "border-emerald-500/25 group-hover:border-emerald-500/50",

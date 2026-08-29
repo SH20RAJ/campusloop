@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    if (tab === "all" || tab === "marketplace") {
+    if (tab === "all" || tab === "marketplace" || tab === "buy-and-sell" || tab === "buy_and_sell") {
       const mpConditions: any[] = [];
       if (cursorDate) mpConditions.push(lt(marketplaceItems.createdAt, cursorDate));
 

@@ -78,7 +78,7 @@ const HUB_META: Record<
       "Buy and sell second-hand bicycles, coolers, mattresses, textbooks, drafters, and calculators with batchmates.",
     icon: ShoppingBag,
     actionLabel: "+ Sell Item",
-    createHref: "/app/marketplace/new",
+    createHref: "/app/buy-and-sell/new",
     badgeColor: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30",
     gradient: "from-emerald-500/15 via-emerald-500/5 to-transparent",
   },

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { DiscoverFeed } from "./discover-feed";
+import DiscoverLoading from "./loading";
 
 export const metadata: Metadata = {
   title: "Discover Campuses Across India | CampusLoop",
@@ -59,7 +61,9 @@ export default function DiscoverPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <DiscoverFeed />
+      <Suspense fallback={<DiscoverLoading />}>
+        <DiscoverFeed />
+      </Suspense>
     </>
   );
 }

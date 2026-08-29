@@ -99,7 +99,7 @@ export async function GET(req: Request) {
       sort,
       limit,
       offset,
-      userInstitutionId: institutionId,
+      userInstitutionId: scope === "GLOBAL" ? null : institutionId,
       seenIds,
       viewerProfileId: profileId,
     });

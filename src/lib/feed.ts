@@ -170,7 +170,7 @@ export type ApiFeedSort = "for_you" | "latest" | "trending" | "top_voted" | "mos
 const recentVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id} and ${votes.createdAt} > now() - interval '7 days'), 0)`;
 const recentCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED' and ${comments.createdAt} > now() - interval '7 days'), 0)`;
 const hoursSinceSql = sql<number>`(extract(epoch from (now() - ${posts.createdAt})) / 3600.0)`;
-const trendingScoreSql = sql<number>`(${recentVoteScoreSql} * 3 + ${recentCommentCountSql} * 2)`;
+const trendingScoreSql = sql<number>`((${recentVoteScoreSql} * 3.5 + ${recentCommentCountSql} * 2.5 + 1.0) / power(${hoursSinceSql} + 2.0, 0.75))`;
 
 function getForYouScoreSql(userInstitutionId?: string | null, seenIds?: string[], viewerProfileId?: string | null) {
 	const ownCollegeBonus = userInstitutionId
@@ -233,7 +233,7 @@ export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | n
 		orderClauses.push(desc(sql<number>`(case when ${posts.id} in (${sql.raw(escaped)}) then 0 else 1 end)`));
 	}
 
-	if (userInstitutionId) {
+	if (userInstitutionId && sort === "for_you") {
 		orderClauses.push(desc(sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 1 else 0 end)`));
 	}
 

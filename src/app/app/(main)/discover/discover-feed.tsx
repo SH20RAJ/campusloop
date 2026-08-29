@@ -1,7 +1,7 @@
 "use client";
 
 import { FeaturedCampusCard } from "@/components/discover/featured-campus-card";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
@@ -9,16 +9,22 @@ import type { UserProfile } from "@/db/schema";
 import { useColleges } from "@/hooks/use-colleges";
 import { useFeed } from "@/hooks/use-feed";
 import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-Globe,
-MoreHorizontal,
-Search,
-ShieldCheck
+  Compass,
+  Flame,
+  Globe,
+  MoreHorizontal,
+  Search,
+  ShieldCheck,
+  TrendingUp,
 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useEffect,useMemo,useRef,useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
@@ -28,6 +34,8 @@ const TABS = [
   { id: "COLLEGES", label: "Colleges" },
   { id: "CONFESSIONS", label: "Confessions" },
 ] as const;
+
+type DiscoverTab = (typeof TABS)[number]["id"];
 
 interface TrendItem {
   category: string;
@@ -56,11 +64,59 @@ interface TrendsResponse {
 }
 
 export function DiscoverFeed() {
-  const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("CAMPUS");
-  const [activeTab, setActiveTab] = useState<"EXPLORE" | "TRENDING" | "COLLEGES" | "CONFESSIONS">("EXPLORE");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  // Read initial state from URL query parameters
+  const rawScope = searchParams.get("scope");
+  const initialScope: "CAMPUS" | "GLOBAL" = rawScope === "GLOBAL" ? "GLOBAL" : "CAMPUS";
+
+  const rawTab = (searchParams.get("tab") || "EXPLORE").toUpperCase();
+  const validTabs: DiscoverTab[] = ["EXPLORE", "TRENDING", "COLLEGES", "CONFESSIONS"];
+  const initialTab: DiscoverTab = validTabs.includes(rawTab as DiscoverTab)
+    ? (rawTab as DiscoverTab)
+    : "EXPLORE";
+
+  const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">(initialScope);
+  const [activeTab, setActiveTab] = useState<DiscoverTab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [collegeSearch, setCollegeSearch] = useState("");
   const [followedIds, setFollowedIds] = useState<Record<string, boolean>>({});
+
+  // Sync state when URL search params change externally
+  useEffect(() => {
+    const currentScope = searchParams.get("scope") === "GLOBAL" ? "GLOBAL" : "CAMPUS";
+    if (currentScope !== scope) {
+      setScope(currentScope);
+    }
+
+    const currentTabRaw = (searchParams.get("tab") || "EXPLORE").toUpperCase();
+    const currentTab = validTabs.includes(currentTabRaw as DiscoverTab)
+      ? (currentTabRaw as DiscoverTab)
+      : "EXPLORE";
+    if (currentTab !== activeTab) {
+      setActiveTab(currentTab);
+    }
+  }, [searchParams]);
+
+  function handleScopeChange(newScope: "CAMPUS" | "GLOBAL") {
+    setScope(newScope);
+    sounds.tap();
+    haptics.light();
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("scope", newScope);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
+  function handleTabChange(newTab: DiscoverTab) {
+    setActiveTab(newTab);
+    sounds.tap();
+    haptics.light();
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", newTab.toLowerCase());
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
 
   // Dynamic trends from API
   const { data: trendsData } = useSWR<TrendsResponse>(
@@ -76,8 +132,20 @@ export function DiscoverFeed() {
     { revalidateOnFocus: false, dedupingInterval: 30000 }
   );
 
+  // Discover Algorithmic Feed Tuning
   const feedType = activeTab === "CONFESSIONS" ? "CONFESSION" : undefined;
-  const { feed, isLoading: feedLoading, isLoadingMore, isReachingEnd, setSize } = useFeed(scope, feedType);
+  const feedSort =
+    activeTab === "TRENDING"
+      ? "trending"
+      : activeTab === "CONFESSIONS"
+      ? "trending"
+      : "for_you";
+
+  const { feed, isLoading: feedLoading, isLoadingMore, isReachingEnd, setSize } = useFeed(
+    scope,
+    feedType,
+    feedSort
+  );
   const { colleges, isLoading: collegesLoading } = useColleges(60);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -131,7 +199,7 @@ export function DiscoverFeed() {
           <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
             <button
               type="button"
-              onClick={() => setScope("CAMPUS")}
+              onClick={() => handleScopeChange("CAMPUS")}
               className={cn(
                 "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
                 scope === "CAMPUS"
@@ -143,7 +211,7 @@ export function DiscoverFeed() {
             </button>
             <button
               type="button"
-              onClick={() => setScope("GLOBAL")}
+              onClick={() => handleScopeChange("GLOBAL")}
               className={cn(
                 "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
                 scope === "GLOBAL"
@@ -176,10 +244,12 @@ export function DiscoverFeed() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={cn(
                   "relative flex-1 pb-3 pt-1 text-center text-xs font-bold transition-colors cursor-pointer",
-                  isActive ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
+                  isActive
+                    ? "text-foreground font-black"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
                 )}
               >
                 <span>{tab.label}</span>
@@ -196,7 +266,7 @@ export function DiscoverFeed() {
         </div>
       </header>
 
-      {/* ─── TAB 1: EXPLORE VIEW (Matching Screenshot 2 & 3) ─── */}
+      {/* ─── TAB 1: EXPLORE VIEW ─── */}
       {activeTab === "EXPLORE" && (
         <div className="space-y-4 pt-3">
           {/* Today's Campus News / Top Discussion Card */}
@@ -237,7 +307,7 @@ export function DiscoverFeed() {
                 </h2>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("TRENDING")}
+                  onClick={() => handleTabChange("TRENDING")}
                   className="text-xs font-bold text-primary hover:underline cursor-pointer"
                 >
                   View all
@@ -257,9 +327,7 @@ export function DiscoverFeed() {
                     <p className="text-sm font-bold text-foreground group-hover:underline truncate">
                       {trend.topic}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {trend.formattedCount}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{trend.formattedCount}</p>
                   </div>
                   <MoreHorizontal className="size-4 text-muted-foreground/50 group-hover:text-foreground shrink-0 mt-1" />
                 </Link>
@@ -267,7 +335,7 @@ export function DiscoverFeed() {
             </div>
           )}
 
-          {/* Inline "Who to follow" Section (Matching Screenshot 3) */}
+          {/* Inline "Who to follow" Section */}
           {suggestedPeers && suggestedPeers.length > 0 && (
             <div className="border-b border-border/30 pb-3 divide-y divide-border/20">
               <div className="px-4 pb-2">
@@ -328,7 +396,7 @@ export function DiscoverFeed() {
           {/* Posts For You Feed */}
           <div className="px-4 space-y-4">
             <h2 className="text-[17px] font-black text-foreground tracking-tight pt-2">
-              Posts For You
+              {scope === "CAMPUS" ? `Posts for You in ${collegeName}` : "Discovery Feed Across India"}
             </h2>
 
             {feedLoading ? (
@@ -337,7 +405,7 @@ export function DiscoverFeed() {
               feed.map((post) => <FeedCard key={post.id} post={post} />)
             ) : (
               <div className="py-16 text-center text-xs text-muted-foreground">
-                No posts found for this campus. Be the first to share a vibe!
+                No posts found for this scope. Be the first to share a vibe!
               </div>
             )}
 
@@ -348,10 +416,10 @@ export function DiscoverFeed() {
         </div>
       )}
 
-      {/* ─── TAB 2: TRENDING VIEW (Matching Screenshot 4) ─── */}
+      {/* ─── TAB 2: TRENDING VIEW ─── */}
       {activeTab === "TRENDING" && (
         <div className="divide-y divide-border/20 pt-2">
-          {/* Hero Banner (Matching Screenshot 4) */}
+          {/* Hero Banner */}
           <div className="p-4">
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-950 to-black p-6 text-white shadow-md">
               <div className="space-y-2 relative z-10 max-w-sm">
@@ -359,11 +427,11 @@ export function DiscoverFeed() {
                   {scope === "CAMPUS" ? `${collegeName} Trending` : "Global Campus Trending"}
                 </h3>
                 <p className="text-xs text-white/80 leading-relaxed">
-                  Real-time hashtags, active discussions, and hot confessions across verified students.
+                  Real-time hashtags, active discussions, and viral posts across verified students.
                 </p>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("EXPLORE")}
+                  onClick={() => handleTabChange("EXPLORE")}
                   className="px-4 py-1.5 rounded-full bg-white text-black text-xs font-black hover:opacity-90 transition-opacity cursor-pointer"
                 >
                   Explore Feed
@@ -372,7 +440,7 @@ export function DiscoverFeed() {
             </div>
           </div>
 
-          {/* Numbered Trends (Matching Screenshot 4: 1 · Trending in India, 2 · etc.) */}
+          {/* Numbered Trends */}
           {trends.length > 0 ? (
             trends.map((trend, index) => (
               <Link
@@ -387,18 +455,37 @@ export function DiscoverFeed() {
                   <p className="text-base font-black text-foreground group-hover:underline truncate">
                     {trend.topic}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {trend.formattedCount}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{trend.formattedCount}</p>
                 </div>
                 <MoreHorizontal className="size-4 text-muted-foreground/50 group-hover:text-foreground shrink-0 mt-1" />
               </Link>
             ))
           ) : (
-            <div className="py-16 text-center text-xs text-muted-foreground">
+            <div className="py-12 text-center text-xs text-muted-foreground">
               No trending topics recorded yet.
             </div>
           )}
+
+          {/* Trending Ranked Posts Feed */}
+          <div className="px-4 pt-4 space-y-4">
+            <h2 className="text-[17px] font-black text-foreground tracking-tight">
+              {scope === "CAMPUS" ? `Top Trending in ${collegeName}` : "Viral Posts Across India"}
+            </h2>
+
+            {feedLoading ? (
+              <FeedSkeleton />
+            ) : feed && feed.length > 0 ? (
+              feed.map((post) => <FeedCard key={post.id} post={post} />)
+            ) : (
+              <div className="py-12 text-center text-xs text-muted-foreground">
+                No trending posts found for this scope yet.
+              </div>
+            )}
+
+            <div ref={loadMoreRef} className="py-6 text-center">
+              {isLoadingMore && <FeedSkeleton />}
+            </div>
+          </div>
         </div>
       )}
 
@@ -423,9 +510,11 @@ export function DiscoverFeed() {
                 <Skeleton className="h-24 w-full rounded-2xl" />
               </div>
             ) : searchedColleges.length > 0 ? (
-              searchedColleges.slice(0, 16).map((college, i) => (
-                <FeaturedCampusCard key={college.id} college={college} index={i} />
-              ))
+              searchedColleges
+                .slice(0, 16)
+                .map((college, i) => (
+                  <FeaturedCampusCard key={college.id} college={college} index={i} />
+                ))
             ) : (
               <div className="col-span-2 py-12 text-center text-xs text-muted-foreground">
                 No college hubs found matching &ldquo;{collegeSearch}&rdquo;.
@@ -438,6 +527,14 @@ export function DiscoverFeed() {
       {/* ─── TAB 4: CONFESSIONS FEED VIEW ─── */}
       {activeTab === "CONFESSIONS" && (
         <div className="px-4 pt-4 space-y-4">
+          <div className="flex items-center justify-between pb-2">
+            <h2 className="text-[17px] font-black text-foreground tracking-tight">
+              {scope === "CAMPUS"
+                ? `Anonymous Confessions in ${collegeName}`
+                : "Confessions Across Indian Campuses"}
+            </h2>
+          </div>
+
           {feedLoading ? (
             <FeedSkeleton />
           ) : feed && feed.length > 0 ? (

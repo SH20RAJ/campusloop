@@ -1,16 +1,22 @@
 import { boolean,index,jsonb,pgTable,text,timestamp,uniqueIndex } from "drizzle-orm/pg-core";
 import { createdAt,id,updatedAt } from "./common";
 import { userProfiles } from "./users";
+import { communities } from "./communities";
 
 export const conversations = pgTable(
   "conversations",
   {
     id: id(),
+    communityId: text("community_id").references(() => communities.id, { onDelete: "cascade" }),
+    type: text("type").default("DIRECT").notNull(),
+    title: text("title"),
+    avatarUrl: text("avatar_url"),
     createdAt,
     updatedAt,
   },
   (table) => [
     index("conversations_updated_idx").on(table.updatedAt),
+    index("conversations_community_idx").on(table.communityId),
   ]
 );
 

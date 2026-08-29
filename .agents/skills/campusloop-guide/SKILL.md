@@ -127,6 +127,10 @@ src/
 - All authenticated API routes must verify session via `await hexclaveServerApp.getUser()`.
 - If no user is logged in, return `NextResponse.json({ error: "Unauthorized" }, { status: 401 })`.
 
+### Rule 6: Full-Page Routes (`page.tsx`) Over Popups for Creation Workflows
+- **ALWAYS** prefer creating dedicated Next.js App Router full-page routes (`page.tsx`) with dynamic SEO metadata, Twitter/X-style full-width minimal UI/UX, and optimal secure backend + frontend, instead of modal popups for creation workflows (e.g. Campus Hub posting, community creation, listing creation).
+- Modals/popups should only be used for fast ephemeral actions (likes modal, fast comment reply, repost quote confirmation). Dedicated pages ensure full mobile screen space, zero modal scrolling bugs, and deep linkability.
+
 ---
 
 ## 🛠️ 5. Standard Verification & Deployment Workflow

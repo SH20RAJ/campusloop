@@ -136,9 +136,13 @@ export const votesRelations = relations(votes, ({ one }) => ({
   }),
 }));
 
-export const conversationsRelations = relations(conversations, ({ many }) => ({
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
   participants: many(conversationParticipants),
   messages: many(messages),
+  community: one(communities, {
+    fields: [conversations.communityId],
+    references: [communities.id],
+  }),
 }));
 
 export const conversationParticipantsRelations = relations(conversationParticipants, ({ one }) => ({

@@ -16,7 +16,7 @@ import { AnimatePresence,motion } from "framer-motion";
 import { Heart,Repeat2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef,useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
@@ -35,6 +35,13 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const [userVote, setUserVote] = useState(post.userVote);
   const [votesCount, setVotesCount] = useState(post.votesCount);
   const [commentsCount, setCommentsCount] = useState(post.commentsCount);
+
+  useEffect(() => {
+    setUserVote(post.userVote);
+    setVotesCount(post.votesCount);
+    setCommentsCount(post.commentsCount);
+  }, [post.userVote, post.votesCount, post.commentsCount]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showRepostModal, setShowRepostModal] = useState(false);

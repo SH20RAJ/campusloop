@@ -3,11 +3,9 @@
 import { AcademicCard } from "@/components/communities/academic-card";
 import { GamingLobbyCard } from "@/components/communities/gaming-lobby-card";
 import { HousingCard } from "@/components/communities/housing-card";
-import { HubCreateModal } from "@/components/communities/hub-create-modal";
 import { LostFoundCard } from "@/components/communities/lost-found-card";
 import { MarketplaceCard } from "@/components/communities/marketplace-card";
 import { RideshareCard } from "@/components/communities/rideshare-card";
-import { HubTabType } from "@/components/communities/campus-hub-strip";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -57,6 +55,7 @@ const HUB_META: Record<
     description: string;
     icon: any;
     actionLabel: string;
+    createHref: string;
     badgeColor: string;
     gradient: string;
   }
@@ -68,6 +67,7 @@ const HUB_META: Record<
       "Report lost student IDs, keys, earphones, lab coats, and reclaim found items safely on campus.",
     icon: PackageSearch,
     actionLabel: "+ Report Item",
+    createHref: "/app/lost-and-found/new",
     badgeColor: "bg-rose-500/15 text-rose-500 border-rose-500/30",
     gradient: "from-rose-500/15 via-rose-500/5 to-transparent",
   },
@@ -78,6 +78,7 @@ const HUB_META: Record<
       "Buy and sell second-hand bicycles, coolers, mattresses, textbooks, drafters, and calculators with batchmates.",
     icon: ShoppingBag,
     actionLabel: "+ Sell Item",
+    createHref: "/app/marketplace/new",
     badgeColor: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30",
     gradient: "from-emerald-500/15 via-emerald-500/5 to-transparent",
   },
@@ -88,6 +89,7 @@ const HUB_META: Record<
       "Find teammates, recruit for college tournaments, and play Valorant, BGMI, Chess, and EA FC scrimmage matches.",
     icon: Gamepad2,
     actionLabel: "+ Create Lobby",
+    createHref: "/app/gaming/new",
     badgeColor: "bg-purple-500/15 text-purple-500 border-purple-500/30",
     gradient: "from-purple-500/15 via-purple-500/5 to-transparent",
   },
@@ -98,6 +100,7 @@ const HUB_META: Record<
       "Split airport, railway station, and weekend city cab fares with verified students to save money.",
     icon: Car,
     actionLabel: "+ Offer / Request Ride",
+    createHref: "/app/rideshare/new",
     badgeColor: "bg-sky-500/15 text-sky-500 border-sky-500/30",
     gradient: "from-sky-500/15 via-sky-500/5 to-transparent",
   },
@@ -108,6 +111,7 @@ const HUB_META: Record<
       "Discover verified PGs, apartments, shared flats, and find student roommates near your college campus.",
     icon: Home,
     actionLabel: "+ List Room / PG",
+    createHref: "/app/housing/new",
     badgeColor: "bg-amber-500/15 text-amber-500 border-amber-500/30",
     gradient: "from-amber-500/15 via-amber-500/5 to-transparent",
   },
@@ -118,6 +122,7 @@ const HUB_META: Record<
       "Previous year exam question papers, verified professor notes, formula cheat sheets, and placement drives.",
     icon: BookOpen,
     actionLabel: "+ Upload Resource",
+    createHref: "/app/hub/new?type=academics",
     badgeColor: "bg-indigo-500/15 text-indigo-500 border-indigo-500/30",
     gradient: "from-indigo-500/15 via-indigo-500/5 to-transparent",
   },
@@ -128,7 +133,6 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
   const Icon = meta.icon;
 
   const [search, setSearch] = useState("");
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const getKey = (pageIndex: number, previousPageData: FeedPageResponse | null) => {
     if (previousPageData && !previousPageData.hasMore) return null;
@@ -189,16 +193,6 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
     };
   }, [isReachingEnd, isValidating, setSize]);
 
-  function handleOpenCreate() {
-    sounds.tap();
-    haptics.light();
-    setShowCreateModal(true);
-  }
-
-  function handleItemCreated() {
-    mutate();
-  }
-
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24 border-x border-border/20 bg-background text-foreground select-none">
       {/* ─── Sticky Header ─── */}
@@ -224,14 +218,13 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleOpenCreate}
+        <Link
+          href={meta.createHref}
           className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/95 transition-all shadow-xs cursor-pointer active:scale-95 shrink-0"
         >
           <Plus className="size-3.5" />
           <span>{meta.actionLabel}</span>
-        </button>
+        </Link>
       </header>
 
       {/* ─── Hero Banner Card ─── */}
@@ -304,24 +297,15 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
                 ? `No items match "${search}". Try searching with different keywords.`
                 : "Be the first verified student to post or share in this campus hub!"}
             </p>
-            <button
-              type="button"
-              onClick={handleOpenCreate}
-              className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/95 transition-all shadow-xs cursor-pointer active:scale-95"
+            <Link
+              href={meta.createHref}
+              className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/95 transition-all shadow-xs cursor-pointer active:scale-95"
             >
               {meta.actionLabel}
-            </button>
+            </Link>
           </div>
         )}
       </div>
-
-      {/* ─── Hub Create Modal ─── */}
-      <HubCreateModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        defaultHub={hubType as HubTabType}
-        onItemCreated={handleItemCreated}
-      />
     </div>
   );
 }

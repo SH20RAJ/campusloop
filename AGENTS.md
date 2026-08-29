@@ -51,6 +51,10 @@ CampusLoop is designed to empower college students with a safe, engaging, and fe
 - **Development**: `bun run dev`
 - **Cloudflare Build & Deploy**: `bun run deploy`
 
+### 6. Full-Page Routes (`page.tsx`) Over Popups for Creation Workflows
+- **ALWAYS** prefer creating dedicated Next.js App Router full-page routes (`page.tsx`) with rich SEO metadata, Twitter/X-style full-width minimal UI/UX, and optimal secure backend + frontend, instead of modal popups for creation flows (e.g. Campus Hub posting, community creation, listing creation).
+- Popups/modals should only be reserved for micro-interactions (fast comment reply, repost quote, quick reaction). Dedicated pages ensure 100% mobile space utilization, avoid cramped modal scrolling, and enable deep linkability.
+
 ---
 
 ## 📁 Workspace Directory Sitemap

@@ -46,14 +46,17 @@ export async function POST(req: Request, { params }: RouteParams) {
     });
 
     if (existingVote) {
-      if (value === 0 || existingVote.value === value) {
-        // Delete vote if same value or 0
+      if (value === 0) {
+        // Explicitly remove vote
         await db.delete(votes).where(eq(votes.id, existingVote.id));
         return NextResponse.json({ message: "Vote removed", userVote: 0 });
-      } else {
+      } else if (existingVote.value !== value) {
         // Update vote value
         await db.update(votes).set({ value }).where(eq(votes.id, existingVote.id));
         return NextResponse.json({ message: "Vote updated", userVote: value });
+      } else {
+        // Vote already set to desired value
+        return NextResponse.json({ message: "Vote confirmed", userVote: value });
       }
     } else {
       if (value !== 0) {
@@ -82,7 +85,6 @@ export async function POST(req: Request, { params }: RouteParams) {
           }
         }
         return NextResponse.json({ message: "Vote cast", userVote: value });
-
       }
     }
 

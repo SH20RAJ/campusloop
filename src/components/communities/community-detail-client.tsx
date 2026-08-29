@@ -8,6 +8,8 @@ import { PostComposer } from "@/app/app/(main)/post/new/post-composer";
 import { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
 import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
 ArrowLeft,
@@ -18,6 +20,7 @@ Compass,
 Flame,
 Globe,
 Image as ImageIcon,
+Loader2,
 Lock,
 MessageSquare,
 Settings,
@@ -104,6 +107,7 @@ export function CommunityDetailClient({
   const [membersCount, setMembersCount] = useState(initialMembersCount);
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
   const [copied, setCopied] = useState(false);
+  const [isOpeningChat, setIsOpeningChat] = useState(false);
 
   // Quick Composer State
   const [quickText, setQuickText] = useState("");
@@ -112,6 +116,28 @@ export function CommunityDetailClient({
   const [showFullComposer, setShowFullComposer] = useState(false);
 
   const identifier = community.slug || community.id;
+
+  async function handleOpenCommunityChat() {
+    if (isOpeningChat) return;
+    setIsOpeningChat(true);
+    sounds.tap();
+    haptics.light();
+
+    try {
+      const res = await fetch(`/api/communities/${community.id}/chat`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to open community chat room");
+      }
+      const data = (await res.json()) as { conversationId: string };
+      router.push(`/app/chat/${data.conversationId}`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to open chat room");
+    } finally {
+      setIsOpeningChat(false);
+    }
+  }
 
   const parsedRules = useMemo(() => {
     if (!community.rules) return [];
@@ -346,6 +372,20 @@ export function CommunityDetailClient({
           </Avatar>
 
           <div className="flex items-center gap-2 pb-1">
+            <button
+              type="button"
+              onClick={handleOpenCommunityChat}
+              disabled={isOpeningChat}
+              className="h-9 px-4 text-xs font-black rounded-full border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5 shrink-0"
+              title={`Join c/${community.name} Discord-style group chat`}
+            >
+              {isOpeningChat ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <MessageSquare className="size-3.5" />
+              )}
+              <span>Chat Room</span>
+            </button>
             <JoinCommunityButton
               communityId={community.id}
               initialIsMember={isMember}

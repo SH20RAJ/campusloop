@@ -56,13 +56,13 @@ export function SecretCrushButton({
         type="button"
         onClick={() => setShowConfirm(true)}
         className={cn(
-          "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-black transition-all active:scale-95 cursor-pointer shadow-2xs",
+          "inline-flex items-center justify-center gap-1.5 h-9 px-2.5 sm:px-3.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-black transition-all active:scale-95 cursor-pointer shadow-2xs shrink-0",
           className
         )}
-        title="Add to your Secret Crush vault"
+        title={`Secret Crush on ${targetName}`}
       >
-        <Heart className="size-3.5 fill-rose-500/20" />
-        <span>Secret Crush</span>
+        <Heart className="size-4 sm:size-3.5 fill-rose-500/20 shrink-0" />
+        <span className="hidden sm:inline">Secret Crush</span>
       </button>
 
       {/* Confirmation Modal */}

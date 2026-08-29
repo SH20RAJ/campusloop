@@ -40,6 +40,7 @@ export async function GET() {
     const rawConversations = await db.query.conversations.findMany({
       where: inArray(conversations.id, conversationIds),
       with: {
+        community: true,
         participants: {
           with: {
             user: true,
@@ -55,7 +56,24 @@ export async function GET() {
     // Format the response payload with WhatsApp style unread counting and action flags
     const formatted = rawConversations
       .map((conv) => {
-        const otherParticipant = conv.participants.find((p) => p.userId !== profile.id)?.user;
+        const isCommunity = conv.type === "COMMUNITY";
+        const otherUser = conv.participants.find((p) => p.userId !== profile.id)?.user;
+        const comm = conv.community;
+
+        const otherParticipant = isCommunity
+          ? ({
+              id: conv.communityId || conv.id,
+              userId: conv.communityId || conv.id,
+              displayName: conv.title || (comm ? `c/${comm.name}` : "Community Group"),
+              username: comm?.slug || comm?.id || "community",
+              avatarUrl: conv.avatarUrl || comm?.avatarUrl || null,
+              bio: comm?.description || "Official Community Group Chat",
+              points: comm?.points || 0,
+              isCommunity: true,
+              membersCount: conv.participants.length,
+            } as unknown as typeof otherUser)
+          : otherUser;
+
         const participation = participationMap.get(conv.id);
 
         if (!otherParticipant) return null;
@@ -73,6 +91,9 @@ export async function GET() {
 
         return {
           id: conv.id,
+          type: conv.type,
+          isCommunity,
+          title: conv.title,
           createdAt: conv.createdAt,
           updatedAt: conv.updatedAt,
           otherParticipant,

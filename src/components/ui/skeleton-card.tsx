@@ -336,7 +336,7 @@ export function DatingSkeleton() {
           <Skeleton className="h-6 w-24 rounded-full" />
           <Skeleton className="size-8 rounded-full" />
         </div>
-        <div className="relative z-10 space-y-2 bg-gradient-to-t from-black/85 via-black/40 to-transparent -mx-5 -mb-5 p-5">
+        <div className="relative z-10 space-y-2 bg-linear-to-t from-black/85 via-black/40 to-transparent -mx-5 -mb-5 p-5">
           <Skeleton className="h-6 w-44 rounded-full bg-white/40" />
           <Skeleton className="h-3.5 w-56 rounded-full bg-white/30" />
           <div className="flex gap-2 pt-2">

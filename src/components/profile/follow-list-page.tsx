@@ -90,7 +90,7 @@ export async function FollowListPageView({
       <div className="flex min-h-screen flex-col bg-background text-foreground">
         <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b border-border/80 bg-background/80 px-4 backdrop-blur-xl">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-black tracking-tight text-transparent">
+            <span className="bg-linear-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-black tracking-tight text-transparent">
               CampusLoop
             </span>
           </Link>

@@ -37,18 +37,18 @@ interface StoryCreatorProps {
 }
 
 const GRADIENTS = [
-  { id: "purple-indigo", class: "bg-gradient-to-tr from-violet-600 to-indigo-600", label: "Classic Indigo" },
-  { id: "orange-rose", class: "bg-gradient-to-tr from-orange-500 to-rose-500", label: "Sunset Glow" },
-  { id: "emerald-teal", class: "bg-gradient-to-tr from-emerald-500 to-teal-700", label: "Neon Emerald" },
-  { id: "pink-purple", class: "bg-gradient-to-tr from-pink-500 to-purple-600", label: "Barbie Magic" },
-  { id: "midnight", class: "bg-gradient-to-tr from-neutral-950 to-neutral-900", label: "Midnight Onyx" },
-  { id: "neon-cyan", class: "bg-gradient-to-tr from-cyan-500 to-blue-600", label: "Electric Ocean" },
-  { id: "golden-hour", class: "bg-gradient-to-tr from-amber-300 via-orange-400 to-rose-500", label: "Golden Hour" },
-  { id: "cyberpunk", class: "bg-gradient-to-tr from-fuchsia-600 via-purple-600 to-cyan-500", label: "Cyberpunk Neon" },
-  { id: "synthwave", class: "bg-gradient-to-tr from-rose-500 via-purple-700 to-indigo-900", label: "Retro Synthwave" },
-  { id: "aurora", class: "bg-gradient-to-tr from-teal-400 via-emerald-600 to-indigo-950", label: "Northern Lights" },
-  { id: "cherry-velvet", class: "bg-gradient-to-tr from-red-600 to-rose-950", label: "Cherry Velvet" },
-  { id: "dark-carbon", class: "bg-gradient-to-tr from-zinc-900 via-black to-zinc-950", label: "Dark Carbon" },
+  { id: "purple-indigo", class: "bg-linear-to-tr from-violet-600 to-indigo-600", label: "Classic Indigo" },
+  { id: "orange-rose", class: "bg-linear-to-tr from-orange-500 to-rose-500", label: "Sunset Glow" },
+  { id: "emerald-teal", class: "bg-linear-to-tr from-emerald-500 to-teal-700", label: "Neon Emerald" },
+  { id: "pink-purple", class: "bg-linear-to-tr from-pink-500 to-purple-600", label: "Barbie Magic" },
+  { id: "midnight", class: "bg-linear-to-tr from-neutral-950 to-neutral-900", label: "Midnight Onyx" },
+  { id: "neon-cyan", class: "bg-linear-to-tr from-cyan-500 to-blue-600", label: "Electric Ocean" },
+  { id: "golden-hour", class: "bg-linear-to-tr from-amber-300 via-orange-400 to-rose-500", label: "Golden Hour" },
+  { id: "cyberpunk", class: "bg-linear-to-tr from-fuchsia-600 via-purple-600 to-cyan-500", label: "Cyberpunk Neon" },
+  { id: "synthwave", class: "bg-linear-to-tr from-rose-500 via-purple-700 to-indigo-900", label: "Retro Synthwave" },
+  { id: "aurora", class: "bg-linear-to-tr from-teal-400 via-emerald-600 to-indigo-950", label: "Northern Lights" },
+  { id: "cherry-velvet", class: "bg-linear-to-tr from-red-600 to-rose-950", label: "Cherry Velvet" },
+  { id: "dark-carbon", class: "bg-linear-to-tr from-zinc-900 via-black to-zinc-950", label: "Dark Carbon" },
 ];
 
 const FONTS = [
@@ -280,7 +280,7 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
               alt="Story Background"
               className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 z-0 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/80 z-0 pointer-events-none" />
           </>
         )}
 
@@ -743,7 +743,7 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
         )}
 
         {/* ─── Bottom Share Bar ─── */}
-        <div className="relative z-20 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex items-center justify-between bg-gradient-to-t from-black/80 to-transparent">
+        <div className="relative z-20 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex items-center justify-between bg-linear-to-t from-black/80 to-transparent">
           {/* User Preview */}
           <div className="flex items-center gap-2">
             <Avatar className="size-8 border border-white/30">

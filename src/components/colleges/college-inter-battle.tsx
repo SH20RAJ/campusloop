@@ -72,7 +72,7 @@ export function CollegeInterBattle({
   return (
     <div className="space-y-6 select-none animate-in fade-in">
       {/* ─── Grand Battle Banner ─── */}
-      <div className="rounded-3xl border border-rose-500/20 bg-gradient-to-br from-rose-500/10 via-card to-amber-500/10 p-6 shadow-sm space-y-4">
+      <div className="rounded-3xl border border-rose-500/20 bg-linear-to-br from-rose-500/10 via-card to-amber-500/10 p-6 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <span className="text-[10px] font-black uppercase tracking-wider text-rose-500 px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center gap-1.5 w-fit">

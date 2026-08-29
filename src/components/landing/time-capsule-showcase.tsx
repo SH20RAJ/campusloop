@@ -40,7 +40,7 @@ export function TimeCapsuleShowcase() {
   }
 
   return (
-    <section className="relative w-full overflow-hidden border-t border-border/60 bg-gradient-to-b from-amber-500/[0.04] to-transparent py-20 sm:py-24">
+    <section className="relative w-full overflow-hidden border-t border-border/60 bg-linear-to-b from-amber-500/[0.04] to-transparent py-20 sm:py-24">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <Reveal className="max-w-2xl space-y-3 pb-10">
           <div className="flex items-center gap-2">
@@ -129,7 +129,7 @@ export function TimeCapsuleShowcase() {
                     "url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop&q=80')",
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-card via-card/70 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-card via-card/70 to-transparent" />
 
                 <div className="absolute top-3.5 right-3.5 z-10">
                   <span

@@ -125,7 +125,7 @@ export function GamingLobbyCard({ item }: GamingLobbyCardProps) {
   }
 
   return (
-    <div className="p-4 border-b border-border/20 hover:bg-muted/[0.08] transition-colors select-none">
+    <div className="p-4 border-b border-border/20 hover:bg-muted/8 transition-colors select-none">
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-2.5">
         <div className="flex items-center gap-2.5 min-w-0">

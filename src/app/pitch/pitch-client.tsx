@@ -273,7 +273,7 @@ export function PitchClient() {
         </div>
 
         {/* ── Feature Highlight: Secret Crush (Match Mode 18+) ── */}
-        <div className="mt-10 overflow-hidden rounded-3xl border border-rose-500/30 bg-gradient-to-br from-rose-500/10 via-pink-500/5 to-card p-6 sm:p-8 shadow-sm">
+        <div className="mt-10 overflow-hidden rounded-3xl border border-rose-500/30 bg-linear-to-br from-rose-500/10 via-pink-500/5 to-card p-6 sm:p-8 shadow-sm">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-3 max-w-xl">
               <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-rose-500 bg-rose-500/15 px-3 py-1 rounded-full">
@@ -430,7 +430,7 @@ export function PitchClient() {
         </ol>
 
         {/* Notion resource card */}
-        <div className="mt-12 flex flex-col justify-between gap-4 rounded-3xl border border-primary/30 bg-gradient-to-r from-primary/10 via-orange-500/10 to-amber-500/10 p-6 sm:flex-row sm:items-center sm:p-8">
+        <div className="mt-12 flex flex-col justify-between gap-4 rounded-3xl border border-primary/30 bg-linear-to-r from-primary/10 via-orange-500/10 to-amber-500/10 p-6 sm:flex-row sm:items-center sm:p-8">
           <div className="space-y-1">
             <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
               <BookOpen className="size-4" /> Live resource database

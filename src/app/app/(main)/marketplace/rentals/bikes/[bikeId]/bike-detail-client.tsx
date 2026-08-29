@@ -196,7 +196,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
       {/* ─── Top Bike Image Hero ─── */}
       <div className="relative h-60 sm:h-72 w-full bg-muted overflow-hidden">
         <img src={bike.imageUrl} alt={bike.name} className="size-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
 
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
           <button
@@ -583,7 +583,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
                     </>
                   ) : (
                     <>
-                      <Check className="size-4 stroke-[3]" />
+                      <Check className="size-4 stroke-3" />
                       <span>
                         Request Booking · ₹{(availability?.totalPayable || 0).toLocaleString("en-IN")}
                       </span>

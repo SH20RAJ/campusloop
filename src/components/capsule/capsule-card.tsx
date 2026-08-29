@@ -51,7 +51,7 @@ export function CapsuleCard({
             className="w-full h-full object-cover"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
 
         {/* Status Badge */}
         <div className="absolute top-3.5 right-3.5 z-10 flex items-center gap-1.5">

@@ -285,7 +285,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
           alt={store.name}
           className="size-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
 
         {/* Operating status badge */}
         <div className="absolute top-3 right-3">
@@ -321,7 +321,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
             )}
 
             <Link
-              href="/merchantt-portal/store/qr"
+              href="/merchant-portal/store/qr"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/60 bg-muted/40 hover:bg-muted text-xs font-bold text-foreground transition-all shadow-2xs"
             >
               <QrCode className="size-3" />
@@ -502,7 +502,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                     return (
                       <div
                         key={product.id}
-                        className="p-4 hover:bg-muted/[0.04] transition-colors flex items-start justify-between gap-4"
+                        className="p-4 hover:bg-muted/4 transition-colors flex items-start justify-between gap-4"
                       >
                         {/* Left Details */}
                         <div className="space-y-1 min-w-0 flex-1">
@@ -713,7 +713,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                 <span>
                   ₹{currentStoreGroup.items.reduce((s, i) => s + i.price * i.quantity, 0).toLocaleString("en-IN")}
                 </span>
-                <ChevronRight className="size-4 stroke-[3]" />
+                <ChevronRight className="size-4 stroke-3" />
               </div>
             </Link>
           </div>
@@ -798,7 +798,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                             isChecked ? "bg-primary border-primary text-primary-foreground" : "border-border"
                           )}
                         >
-                          {isChecked && <Check className="size-3 stroke-[3]" />}
+                          {isChecked && <Check className="size-3 stroke-3" />}
                         </div>
                         <span>{addon.name}</span>
                       </div>

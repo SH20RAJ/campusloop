@@ -385,7 +385,7 @@ function MemeDemo() {
 
       {/* Meme Body */}
       <div className="overflow-hidden rounded-lg border border-border bg-muted/20">
-        <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-pink-500/10 via-rose-500/5 to-purple-500/10">
+        <div className="flex aspect-[16/9] items-center justify-center bg-linear-to-br from-pink-500/10 via-rose-500/5 to-purple-500/10">
           <div className="flex flex-col items-center gap-2 text-center">
             <Zap className="size-8 text-pink-400/60" />
             <div className="space-y-1">
@@ -620,7 +620,7 @@ function ConfessionDemo() {
       <div className="overflow-hidden rounded-lg border border-border bg-card">
         <div className="flex items-center justify-between border-b border-border/40 px-3 py-2">
           <div className="flex items-center gap-1.5">
-            <div className="flex size-5 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-orange-500 text-[7px] font-bold text-white">
+            <div className="flex size-5 items-center justify-center rounded-full bg-linear-to-br from-red-500 to-orange-500 text-[7px] font-bold text-white">
               {text ? anonKey(text).slice(5, 7).toUpperCase() : "??"}
             </div>
             <span className="text-[10px] font-mono font-bold">
@@ -699,7 +699,7 @@ function StoryDemo() {
             className="flex cursor-pointer flex-col items-center gap-1 transition-transform active:scale-90"
           >
             <div className={cn(
-              "rounded-full p-[2px] bg-gradient-to-br transition-all duration-300",
+              "rounded-full p-[2px] bg-linear-to-br transition-all duration-300",
               story.viewed ? "from-gray-400 to-gray-300" : story.color,
               viewing === story.id && "scale-110"
             )}>
@@ -744,7 +744,7 @@ function StoryDemo() {
             </div>
 
             {/* Content */}
-            <div className="flex aspect-[3/1] items-center justify-center bg-gradient-to-br from-gray-900 via-primary/20 to-gray-900 px-4">
+            <div className="flex aspect-[3/1] items-center justify-center bg-linear-to-br from-gray-900 via-primary/20 to-gray-900 px-4">
               <div className="text-center">
                 <p className="text-sm font-semibold text-white/90">
                   Morning library grind 🫠
@@ -779,7 +779,7 @@ function CommunityDemo() {
   return (
     <div className="space-y-4">
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-indigo-500/20 via-blue-500/10 to-indigo-500/20 p-4">
+      <div className="relative overflow-hidden rounded-lg bg-linear-to-br from-indigo-500/20 via-blue-500/10 to-indigo-500/20 p-4">
         <div className="pointer-events-none absolute -right-4 -top-4 size-20 rounded-full bg-indigo-500/10 blur-2xl" />
         <div className="relative flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-indigo-500/20">
@@ -912,7 +912,7 @@ function ArtifactCard({
         {/* Ambient gradient wash */}
         <div
           className={cn(
-            "pointer-events-none absolute -right-8 -top-8 size-36 rounded-full bg-gradient-to-br blur-3xl transition-opacity duration-500",
+            "pointer-events-none absolute -right-8 -top-8 size-36 rounded-full bg-linear-to-br blur-3xl transition-opacity duration-500",
             artifact.color,
             isHovered ? "opacity-90" : "opacity-25"
           )}

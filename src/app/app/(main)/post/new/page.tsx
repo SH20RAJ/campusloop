@@ -44,7 +44,7 @@ export default async function NewPostPage() {
         </Link>
         <h1 className="text-sm font-black tracking-tight text-foreground flex items-center gap-1.5">
           <span>Create a</span>
-          <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Post</span>
+          <span className="bg-linear-to-r from-primary to-orange-500 bg-clip-text text-transparent">Post</span>
         </h1>
         <span className="flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-extrabold text-primary shadow-xs">
           <Zap className="size-3" /> +5 LP

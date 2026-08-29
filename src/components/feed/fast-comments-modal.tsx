@@ -320,7 +320,7 @@ export function FastCommentsModal({
               ) : commentsList.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center py-16 px-4 space-y-2">
                   <div className="size-12 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground">
-                    <MessageCircle className="size-6 stroke-[1.5]" />
+                    <MessageCircle className="size-6 stroke-1" />
                   </div>
                   <p className="text-xs font-bold text-foreground">No comments yet</p>
                   <p className="text-[11px] text-muted-foreground max-w-xs">
@@ -535,7 +535,7 @@ export function FastCommentsModal({
                     {isSubmitting ? (
                       <Loader2 className="size-3 animate-spin" />
                     ) : (
-                      <ArrowUp className="size-3.5 stroke-[2.5]" />
+                      <ArrowUp className="size-3.5 stroke-2" />
                     )}
                   </button>
                 </div>

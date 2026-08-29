@@ -31,30 +31,30 @@ interface MerchantLayoutClientProps {
 }
 
 const MERCHANT_NAV_ITEMS = [
-  { href: "/merchantt-portal", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/merchantt-portal/orders", label: "Orders", icon: Package },
-  { href: "/merchantt-portal/products", label: "Products / Menu", icon: UtensilsCrossed },
-  { href: "/merchantt-portal/store", label: "Store Profile", icon: Store },
-  { href: "/merchantt-portal/offers", label: "Offers & Deals", icon: Tag },
-  { href: "/merchantt-portal/earnings", label: "Earnings", icon: DollarSign },
-  { href: "/merchantt-portal/reviews", label: "Reviews", icon: Star },
-  { href: "/merchantt-portal/store/qr", label: "Printable QR", icon: QrCode },
+  { href: "/merchant-portal", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/merchant-portal/orders", label: "Orders", icon: Package },
+  { href: "/merchant-portal/products", label: "Products / Menu", icon: UtensilsCrossed },
+  { href: "/merchant-portal/store", label: "Store Profile", icon: Store },
+  { href: "/merchant-portal/offers", label: "Offers & Deals", icon: Tag },
+  { href: "/merchant-portal/earnings", label: "Earnings", icon: DollarSign },
+  { href: "/merchant-portal/reviews", label: "Reviews", icon: Star },
+  { href: "/merchant-portal/store/qr", label: "Printable QR", icon: QrCode },
 ];
 
 const BIKE_RENTAL_NAV_ITEMS = [
-  { href: "/merchantt-portal/bikes", label: "Bike Dashboard", icon: Bike },
-  { href: "/merchantt-portal/bikes/bookings", label: "Bookings", icon: CalendarCheck2 },
-  { href: "/merchantt-portal/bikes/fleet", label: "Fleet Vehicles", icon: Gauge },
-  { href: "/merchantt-portal/bikes/availability", label: "Availability", icon: Clock },
-  { href: "/merchantt-portal/bikes/settings", label: "Rental Rules", icon: Settings },
+  { href: "/merchant-portal/bikes", label: "Bike Dashboard", icon: Bike },
+  { href: "/merchant-portal/bikes/bookings", label: "Bookings", icon: CalendarCheck2 },
+  { href: "/merchant-portal/bikes/fleet", label: "Fleet Vehicles", icon: Gauge },
+  { href: "/merchant-portal/bikes/availability", label: "Availability", icon: Clock },
+  { href: "/merchant-portal/bikes/settings", label: "Rental Rules", icon: Settings },
 ];
 
 const MOBILE_MERCHANT_TABS = [
-  { href: "/merchantt-portal", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/merchantt-portal/orders", label: "Orders", icon: Package },
-  { href: "/merchantt-portal/bikes", label: "Bikes", icon: Bike },
-  { href: "/merchantt-portal/products", label: "Menu", icon: UtensilsCrossed },
-  { href: "/merchantt-portal/store", label: "Store", icon: Store },
+  { href: "/merchant-portal", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/merchant-portal/orders", label: "Orders", icon: Package },
+  { href: "/merchant-portal/bikes", label: "Bikes", icon: Bike },
+  { href: "/merchant-portal/products", label: "Menu", icon: UtensilsCrossed },
+  { href: "/merchant-portal/store", label: "Store", icon: Store },
 ];
 
 export function MerchantLayoutClient({ children, profile }: MerchantLayoutClientProps) {
@@ -92,7 +92,7 @@ export function MerchantLayoutClient({ children, profile }: MerchantLayoutClient
         <div className="space-y-5">
           {/* Merchant Brand */}
           <div className="px-3">
-            <Link href="/merchantt-portal" className="flex items-center gap-2">
+            <Link href="/merchant-portal" className="flex items-center gap-2">
               <div className="size-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500">
                 <Store className="size-4.5" />
               </div>
@@ -115,7 +115,7 @@ export function MerchantLayoutClient({ children, profile }: MerchantLayoutClient
             {MERCHANT_NAV_ITEMS.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.href !== "/merchantt-portal" && pathname.startsWith(item.href));
+                (item.href !== "/merchant-portal" && pathname.startsWith(item.href));
               const Icon = item.icon;
 
               return (
@@ -149,7 +149,7 @@ export function MerchantLayoutClient({ children, profile }: MerchantLayoutClient
             {BIKE_RENTAL_NAV_ITEMS.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.href !== "/merchantt-portal/bikes" && pathname.startsWith(item.href));
+                (item.href !== "/merchant-portal/bikes" && pathname.startsWith(item.href));
               const Icon = item.icon;
 
               return (
@@ -212,7 +212,7 @@ export function MerchantLayoutClient({ children, profile }: MerchantLayoutClient
         {MOBILE_MERCHANT_TABS.map((item) => {
           const isActive =
             pathname === item.href ||
-            (item.href !== "/merchantt-portal" && pathname.startsWith(item.href));
+            (item.href !== "/merchant-portal" && pathname.startsWith(item.href));
           const Icon = item.icon;
 
           return (

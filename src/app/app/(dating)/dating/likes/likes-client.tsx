@@ -92,7 +92,7 @@ export function LikesClient() {
                   alt={admirer.displayName}
                   className="aspect-[3/4] w-full object-cover"
                 />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/95 via-black/20 to-transparent" />
 
                 <div className="absolute inset-x-0 bottom-0 space-y-1.5 p-3">
                   <div>
@@ -119,7 +119,7 @@ export function LikesClient() {
                       type="button"
                       onClick={() => swipe(admirer, "LIKE")}
                       aria-label={`Like ${admirer.displayName} back`}
-                      className="flex h-8 flex-1 items-center justify-center rounded-xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white transition-all hover:opacity-90 active:scale-95 cursor-pointer"
+                      className="flex h-8 flex-1 items-center justify-center rounded-xl bg-linear-to-tr from-rose-500 to-pink-500 text-white transition-all hover:opacity-90 active:scale-95 cursor-pointer"
                     >
                       <Heart className="size-4 fill-white" />
                     </button>

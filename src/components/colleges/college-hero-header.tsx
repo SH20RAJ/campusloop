@@ -101,7 +101,7 @@ export function CollegeHeroHeader({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-r from-primary/15 via-violet-500/10 to-indigo-500/15" />
+            <div className="w-full h-full bg-linear-to-r from-primary/15 via-violet-500/10 to-indigo-500/15" />
           )}
 
           {/* Top-Right Badges */}

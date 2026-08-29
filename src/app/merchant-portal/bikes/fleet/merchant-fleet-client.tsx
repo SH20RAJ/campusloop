@@ -125,14 +125,14 @@ export function MerchantFleetClient() {
         </div>
 
         <Link
-          href="/merchantt-portal/bikes/fleet/new"
+          href="/merchant-portal/bikes/fleet/new"
           onClick={() => {
             sounds.tap();
             haptics.light();
           }}
           className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-opacity shadow-xs cursor-pointer w-fit"
         >
-          <Plus className="size-3.5 stroke-[3]" />
+          <Plus className="size-3.5 stroke-3" />
           <span>Add New Bike</span>
         </Link>
       </div>

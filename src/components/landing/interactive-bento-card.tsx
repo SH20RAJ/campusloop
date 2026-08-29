@@ -49,7 +49,7 @@ export function InteractiveBentoCard({
       />
 
       {/* Shimmer light sweep */}
-      <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent transition-transform duration-1000 ease-in-out z-0" />
+      <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full bg-linear-to-r from-transparent via-white/[0.04] to-transparent transition-transform duration-1000 ease-in-out z-0" />
 
       {/* Content */}
       <div className="relative z-10 h-full flex flex-col justify-between">

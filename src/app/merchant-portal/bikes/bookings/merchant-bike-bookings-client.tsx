@@ -188,7 +188,7 @@ export function MerchantBikeBookingsClient() {
                 {/* ONE OBVIOUS NEXT ACTION (PRD Item 26) */}
                 <div className="flex items-center justify-between pt-3 border-t border-border/30">
                   <Link
-                    href={`/merchantt-portal/bikes/bookings/${booking.id}`}
+                    href={`/merchant-portal/bikes/bookings/${booking.id}`}
                     className="text-xs font-bold text-primary hover:underline"
                   >
                     View Details &amp; Checklist →
@@ -235,7 +235,7 @@ export function MerchantBikeBookingsClient() {
                     {/* READY_FOR_PICKUP -> Direct to Handover Inspection on Detail Page */}
                     {booking.status === "READY_FOR_PICKUP" && (
                       <Link
-                        href={`/merchantt-portal/bikes/bookings/${booking.id}`}
+                        href={`/merchant-portal/bikes/bookings/${booking.id}`}
                         className="px-5 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all cursor-pointer shadow-xs"
                       >
                         Start Rental &amp; Handover 🛵
@@ -245,7 +245,7 @@ export function MerchantBikeBookingsClient() {
                     {/* ACTIVE -> Direct to Return Inspection on Detail Page */}
                     {booking.status === "ACTIVE" && (
                       <Link
-                        href={`/merchantt-portal/bikes/bookings/${booking.id}`}
+                        href={`/merchant-portal/bikes/bookings/${booking.id}`}
                         className="px-5 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-black text-xs transition-all cursor-pointer shadow-xs"
                       >
                         Mark Returned &amp; Inspect 🔍

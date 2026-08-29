@@ -115,7 +115,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
             }}
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer"
           >
-            <Plus className="size-3.5 stroke-[3]" />
+            <Plus className="size-3.5 stroke-3" />
             <span>Upload Notes</span>
           </Link>
         </div>

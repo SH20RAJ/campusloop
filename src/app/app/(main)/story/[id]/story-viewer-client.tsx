@@ -345,7 +345,7 @@ export function StoryViewerClient({
     }
   }
 
-  const bgClass = story.backgroundColor || "bg-gradient-to-tr from-violet-600 to-indigo-600";
+  const bgClass = story.backgroundColor || "bg-linear-to-tr from-violet-600 to-indigo-600";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-95 md:bg-opacity-85 backdrop-blur-md select-none p-0 md:p-4 touch-manipulation">
@@ -381,7 +381,7 @@ export function StoryViewerClient({
         )}
 
         {/* Dark Vignette Overlay for Crisp Readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-transparent to-black/85 z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/65 via-transparent to-black/85 z-10 pointer-events-none" />
 
         {/* Double-Click Animated Floating Heart Burst */}
         {showHeartBurst && (
@@ -473,7 +473,7 @@ export function StoryViewerClient({
         </div>
 
         {/* ─── Bottom Actions Bar (Reply / Like / Share / Highlight) ─── */}
-        <div className="relative z-20 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex items-center gap-2 w-full bg-gradient-to-t from-black/80 to-transparent pointer-events-auto">
+        <div className="relative z-20 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex items-center gap-2 w-full bg-linear-to-t from-black/80 to-transparent pointer-events-auto">
           {!isOwner ? (
             <form onSubmit={handleSendReply} className="flex-1 relative flex items-center">
               <input

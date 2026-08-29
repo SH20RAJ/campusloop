@@ -209,7 +209,7 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
             }}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs shrink-0 cursor-pointer"
           >
-            <Plus className="size-3.5 stroke-[3]" />
+            <Plus className="size-3.5 stroke-3" />
             <span>Sell Item</span>
           </Link>
         </div>
@@ -337,7 +337,7 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
               }}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
             >
-              <Plus className="size-3.5 stroke-[3]" />
+              <Plus className="size-3.5 stroke-3" />
               <span>List First Item</span>
             </Link>
           </div>

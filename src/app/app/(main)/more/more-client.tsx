@@ -59,7 +59,7 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <div className="flex size-10 items-center justify-center rounded-2xl bg-muted/60 text-foreground group-hover:scale-105 transition-transform shrink-0">
-                        <Icon className="size-5 text-foreground stroke-[1.8]" />
+                        <Icon className="size-5 text-foreground stroke-2" />
                       </div>
 
                       <div className="min-w-0">

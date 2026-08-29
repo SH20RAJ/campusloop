@@ -190,7 +190,7 @@ export function MerchantBikeBookingDetailClient({
         <p className="text-base font-bold text-foreground">Booking not found</p>
         <button
           type="button"
-          onClick={() => router.push("/merchantt-portal/bikes/bookings")}
+          onClick={() => router.push("/merchant-portal/bikes/bookings")}
           className="px-4 py-2 rounded-full bg-foreground text-background text-xs font-bold"
         >
           View Bookings
@@ -212,7 +212,7 @@ export function MerchantBikeBookingDetailClient({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => router.push("/merchantt-portal/bikes/bookings")}
+            onClick={() => router.push("/merchant-portal/bikes/bookings")}
             className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             <ArrowLeft className="size-4.5" />

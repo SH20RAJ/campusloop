@@ -27,7 +27,7 @@ export function StoryAvatarItem({
         className={cn(
           "p-0.5 rounded-full transition-all duration-300 group-hover:scale-105",
           hasUnseen
-            ? "bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2px]"
+            ? "bg-linear-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2px]"
             : "bg-muted"
         )}
       >

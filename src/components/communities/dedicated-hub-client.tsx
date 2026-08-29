@@ -227,7 +227,7 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
 
       {/* ─── Hero Banner Card ─── */}
       <div className="px-4 py-4 border-b border-border/20 bg-muted/10 relative overflow-hidden">
-        <div className={cn("absolute inset-0 bg-gradient-to-r pointer-events-none", meta.gradient)} />
+        <div className={cn("absolute inset-0 bg-linear-to-r pointer-events-none", meta.gradient)} />
         <div className="relative z-10 space-y-2">
           <p className="text-xs text-foreground/90 leading-relaxed font-medium">
             {meta.description}

@@ -122,7 +122,7 @@ function TopCard({
           loading="eager"
         />
       </AnimatePresence>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-black/50" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/95 via-black/20 to-black/50" />
 
       {/* Photo tap zones */}
       {photos.length > 1 && (
@@ -352,7 +352,7 @@ export function SwipeActions({
         type="button"
         onClick={handleLike}
         aria-label="Like"
-        className="flex size-16 items-center justify-center rounded-full bg-gradient-to-tr from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/40 transition-all hover:scale-110 active:scale-90 cursor-pointer"
+        className="flex size-16 items-center justify-center rounded-full bg-linear-to-tr from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/40 transition-all hover:scale-110 active:scale-90 cursor-pointer"
       >
         <Heart className="size-8 fill-white" />
       </button>

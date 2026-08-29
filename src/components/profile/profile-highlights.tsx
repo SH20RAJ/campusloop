@@ -71,7 +71,7 @@ export function ProfileHighlights({ userId, isOwnProfile }: ProfileHighlightsPro
             <button
               type="button"
               onClick={() => handleOpenHighlight(h)}
-              className="size-16 sm:size-18 rounded-full p-0.5 bg-gradient-to-tr from-amber-500 via-primary to-rose-500 transition-transform group-hover:scale-105 cursor-pointer shadow-xs"
+              className="size-16 sm:size-18 rounded-full p-0.5 bg-linear-to-tr from-amber-500 via-primary to-rose-500 transition-transform group-hover:scale-105 cursor-pointer shadow-xs"
             >
               <div className="size-full rounded-full bg-card border-2 border-card overflow-hidden flex items-center justify-center">
                 {h.coverUrl ? (
@@ -81,7 +81,7 @@ export function ProfileHighlights({ userId, isOwnProfile }: ProfileHighlightsPro
                     className="size-full object-cover"
                   />
                 ) : (
-                  <div className="size-full bg-gradient-to-tr from-primary/20 to-violet-500/20 flex items-center justify-center text-primary">
+                  <div className="size-full bg-linear-to-tr from-primary/20 to-violet-500/20 flex items-center justify-center text-primary">
                     <Bookmark className="size-6" />
                   </div>
                 )}

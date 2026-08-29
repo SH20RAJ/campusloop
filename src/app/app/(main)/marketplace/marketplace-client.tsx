@@ -221,7 +221,7 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
                   sounds.tap();
                   haptics.light();
                 }}
-                className="group flex flex-col sm:flex-row gap-3.5 p-3.5 rounded-2xl border border-border/40 hover:border-border bg-card hover:bg-muted/[0.04] transition-all cursor-pointer shadow-xs"
+                className="group flex flex-col sm:flex-row gap-3.5 p-3.5 rounded-2xl border border-border/40 hover:border-border bg-card hover:bg-muted/4 transition-all cursor-pointer shadow-xs"
               >
                 <div className="relative h-36 sm:size-32 rounded-xl overflow-hidden border border-border/30 shrink-0 bg-muted">
                   <img
@@ -303,7 +303,7 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
                   sounds.tap();
                   haptics.light();
                 }}
-                className="group flex flex-col sm:flex-row gap-3.5 p-3.5 rounded-2xl border border-border/40 hover:border-border bg-card hover:bg-muted/[0.04] transition-all cursor-pointer shadow-xs"
+                className="group flex flex-col sm:flex-row gap-3.5 p-3.5 rounded-2xl border border-border/40 hover:border-border bg-card hover:bg-muted/4 transition-all cursor-pointer shadow-xs"
               >
                 {/* Store Cover / Logo */}
                 <div className="relative h-32 sm:size-28 rounded-xl overflow-hidden border border-border/30 shrink-0 bg-muted">

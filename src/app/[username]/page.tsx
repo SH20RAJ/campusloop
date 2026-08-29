@@ -209,7 +209,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
           <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
             <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
           </div>
-          <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-black tracking-tight text-transparent">
+          <span className="bg-linear-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-black tracking-tight text-transparent">
             CampusLoop
           </span>
         </Link>

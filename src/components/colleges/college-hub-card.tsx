@@ -36,11 +36,11 @@ export function CollegeHubCard({ college }: { college: CollegeItem }) {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-r from-violet-600/20 via-indigo-600/20 to-purple-600/20" />
+          <div className="w-full h-full bg-linear-to-r from-violet-600/20 via-indigo-600/20 to-purple-600/20" />
         )}
 
         {/* Ambient Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-card via-black/20 to-transparent" />
 
         {/* Badges on Top-Right of Card Banner */}
         <div className="absolute top-2.5 right-2.5 flex items-center gap-1">

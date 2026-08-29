@@ -215,7 +215,7 @@ export function StoryArchiveModal({
                       <div
                         className={cn(
                           "size-full p-2 flex items-center justify-center text-center text-[11px] font-bold text-white leading-tight",
-                          story.backgroundColor || "bg-gradient-to-tr from-violet-600 to-indigo-600"
+                          story.backgroundColor || "bg-linear-to-tr from-violet-600 to-indigo-600"
                         )}
                       >
                         <p className="line-clamp-4">{story.text || "Campus Vibe"}</p>
@@ -223,7 +223,7 @@ export function StoryArchiveModal({
                     )}
 
                     {/* Dark gradient for date readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
 
                     {/* Top Right: Selection Checkbox (Highlight Mode) or Like Count */}
                     <div className="absolute top-2 right-2 z-10">

@@ -309,7 +309,7 @@ export function ProfileClientView({
   }
 
   return (
-    <div className="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom,0px))] text-foreground select-none touch-manipulation">
+    <div className="min-h-screen pb-28 text-foreground select-none touch-manipulation">
       {/* Image Crop & Resize Modal */}
       {cropModalOpen && (
         <ImageCropModal
@@ -713,7 +713,7 @@ export function ProfileClientView({
             </div>
             <div className="h-2 w-full rounded-full bg-muted/60 overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-primary via-orange-500 to-amber-500 transition-all duration-500"
+                className="h-full rounded-full bg-linear-to-r from-primary via-orange-500 to-amber-500 transition-all duration-500"
                 style={{ width: `${Math.min(100, Math.round((points / (tier.maxPoints + 1)) * 100))}%` }}
               />
             </div>

@@ -170,8 +170,8 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                         className={cn(
                           "size-5.5 shrink-0 transition-transform duration-200 group-hover:scale-110",
                           isActive
-                            ? "text-foreground stroke-[2.5]"
-                            : "text-muted-foreground group-hover:text-foreground stroke-[1.8]"
+                            ? "text-foreground stroke-2"
+                            : "text-muted-foreground group-hover:text-foreground stroke-2"
                         )}
                       />
                     </AnimateIcon>
@@ -199,7 +199,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
             <div className="pt-2 px-1">
               <Link href="/app/post/new" className="block">
                 <Button className="w-full h-11 bg-foreground text-background hover:opacity-90 font-black rounded-full text-sm cursor-pointer border-none shadow-sm transition-all flex items-center justify-center gap-2">
-                  <Plus className="size-4.5 stroke-[3]" />
+                  <Plus className="size-4.5 stroke-3" />
                   <span>Post</span>
                 </Button>
               </Link>
@@ -307,7 +307,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     className="flex size-10 items-center justify-center rounded-full bg-foreground text-background shadow-xs active:scale-95 transition-transform cursor-pointer"
                     aria-label="Create post"
                   >
-                    <Plus className="size-5 stroke-[2.5]" />
+                    <Plus className="size-5 stroke-2" />
                   </Link>
                 );
               }
@@ -324,7 +324,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   <Icon
                     className={cn(
                       "size-5.5 transition-colors",
-                      isActive ? "stroke-[2.5]" : "stroke-[1.8]"
+                      isActive ? "stroke-2" : "stroke-2"
                     )}
                   />
                   <span className="mt-0.5 text-[9px] font-semibold">{item.label}</span>
@@ -427,7 +427,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                         <Icon
                           className={cn(
                             "size-5 shrink-0",
-                            isActive ? "text-foreground stroke-[2.5]" : "text-muted-foreground"
+                            isActive ? "text-foreground stroke-2" : "text-muted-foreground"
                           )}
                         />
                         <span>{item.label}</span>

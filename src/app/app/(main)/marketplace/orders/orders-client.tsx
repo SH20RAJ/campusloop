@@ -98,7 +98,7 @@ export function OrdersClient() {
                 sounds.tap();
                 haptics.light();
               }}
-              className="flex items-center justify-between gap-3 p-4 rounded-2xl border border-border/40 bg-card hover:bg-muted/[0.04] transition-all cursor-pointer group shadow-xs"
+              className="flex items-center justify-between gap-3 p-4 rounded-2xl border border-border/40 bg-card hover:bg-muted/4 transition-all cursor-pointer group shadow-xs"
             >
               <div className="flex items-start gap-3 min-w-0 flex-1">
                 <div className="size-12 rounded-xl bg-muted border border-border/40 overflow-hidden shrink-0">

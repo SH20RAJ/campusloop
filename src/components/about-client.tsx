@@ -239,7 +239,7 @@ export function AboutClient() {
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-none text-foreground">
             A Safe Digital Space For <br />
-            <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">
               Your College Campus
             </span>
           </h1>
@@ -459,7 +459,7 @@ export function AboutClient() {
                   </div>
                   <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-primary to-orange-500 transition-all duration-500" 
+                      className="h-full bg-linear-to-r from-primary to-orange-500 transition-all duration-500" 
                       style={{ width: `${Math.min((loopPoints / 80) * 100, 100)}%` }}
                     />
                   </div>
@@ -581,7 +581,7 @@ export function AboutClient() {
               {verificationStep === "verified" && (
                 <div className="text-center py-4 space-y-4 animate-fade-in">
                   <div className="h-10 w-10 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20">
-                    <Check className="h-6 w-6 stroke-[3]" />
+                    <Check className="h-6 w-6 stroke-3" />
                   </div>
                   <div className="space-y-1">
                     <h4 className="text-sm font-black text-foreground">Campus Whitelist Verified!</h4>
@@ -818,7 +818,7 @@ export function AboutClient() {
         <section className="space-y-6">
           <div className="text-center space-y-1.5">
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
-              Frequently Asked <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Questions</span>
+              Frequently Asked <span className="bg-linear-to-r from-primary to-orange-500 bg-clip-text text-transparent">Questions</span>
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground font-medium">
               Everything you need to know about privacy, security, and moderation on CampusLoop.

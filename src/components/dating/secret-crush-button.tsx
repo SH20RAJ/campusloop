@@ -74,7 +74,7 @@ export function SecretCrushButton({
           />
 
           <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border/40 bg-card p-6 shadow-2xl space-y-4 text-center animate-in zoom-in-95">
-            <div className="size-12 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white mx-auto shadow-md">
+            <div className="size-12 rounded-2xl bg-linear-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white mx-auto shadow-md">
               <Heart className="size-6 fill-white" />
             </div>
 

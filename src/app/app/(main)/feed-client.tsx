@@ -230,7 +230,7 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
 
   return (
     <PullToRefresh onRefresh={refresh}>
-      <main className="mx-auto flex w-full flex-col min-h-screen max-w-2xl bg-background text-foreground pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]">
+      <main className="mx-auto flex w-full flex-col min-h-screen max-w-2xl bg-background text-foreground pb-24">
         <FeedHeader
           scope={scope}
           onScopeChange={handleScopeChange}

@@ -276,7 +276,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                       <Globe className="size-3.5 text-primary" /> 1. All Types of Posts
                     </span>
                     {feedVisibility === "ALL" && (
-                      <Check className="size-3.5 text-primary stroke-[3]" />
+                      <Check className="size-3.5 text-primary stroke-3" />
                     )}
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
@@ -300,7 +300,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                       <ShieldCheck className="size-3.5 text-emerald-500" /> 2. Only Non-Anonymous
                     </span>
                     {feedVisibility === "NON_ANONYMOUS" && (
-                      <Check className="size-3.5 text-primary stroke-[3]" />
+                      <Check className="size-3.5 text-primary stroke-3" />
                     )}
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
@@ -372,7 +372,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
         </section>
 
         {/* Verification & Rewards Status */}
-        <section className="rounded-3xl border border-primary/20 bg-gradient-to-r from-primary/10 via-card to-card p-6 shadow-sm space-y-3">
+        <section className="rounded-3xl border border-primary/20 bg-linear-to-r from-primary/10 via-card to-card p-6 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
               <Zap className="h-4 w-4 text-primary" /> Loop Points & Star Badge

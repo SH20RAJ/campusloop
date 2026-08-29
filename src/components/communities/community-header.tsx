@@ -164,9 +164,9 @@ export function CommunityHeader({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-r from-neutral-900 via-neutral-950 to-neutral-900 relative">
+          <div className="w-full h-full bg-linear-to-r from-neutral-900 via-neutral-950 to-neutral-900 relative">
             <div
-              className={`w-full h-full bg-gradient-to-r ${getInitialsGradient(
+              className={`w-full h-full bg-linear-to-r ${getInitialsGradient(
                 community.name
               )} opacity-25`}
             />
@@ -203,7 +203,7 @@ export function CommunityHeader({
             </Avatar>
           ) : (
             <div
-              className={`size-22 sm:size-26 rounded-2xl sm:rounded-3xl border-4 border-background bg-gradient-to-br ${getInitialsGradient(
+              className={`size-22 sm:size-26 rounded-2xl sm:rounded-3xl border-4 border-background bg-linear-to-br ${getInitialsGradient(
                 community.name
               )} shadow-xl flex items-center justify-center text-white text-2xl font-black shrink-0 overflow-hidden ring-1 ring-border/20`}
             >

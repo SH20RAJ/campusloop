@@ -97,7 +97,7 @@ export function MerchantNewBikeClient() {
       if (!res.ok) throw new Error("Failed to add vehicle");
 
       toast.success("Bike added to fleet! 🛵");
-      router.push("/merchantt-portal/bikes/fleet");
+      router.push("/merchant-portal/bikes/fleet");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to add bike");
       setIsSubmitting(false);
@@ -325,7 +325,7 @@ export function MerchantNewBikeClient() {
               </>
             ) : (
               <>
-                <Check className="size-4 stroke-[3]" />
+                <Check className="size-4 stroke-3" />
                 <span>Add Bike to Fleet</span>
               </>
             )}

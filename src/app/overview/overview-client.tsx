@@ -56,7 +56,7 @@ export function OverviewClient() {
         }}
       />
       {/* Background glow accents */}
-      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-[500px] w-full max-w-4xl rounded-full bg-gradient-to-b from-primary/10 via-orange-500/5 to-transparent blur-3xl" />
+      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-[500px] w-full max-w-4xl rounded-full bg-linear-to-b from-primary/10 via-orange-500/5 to-transparent blur-3xl" />
 
       <MarketingHeader />
 
@@ -80,7 +80,7 @@ export function OverviewClient() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-foreground leading-tight">
-            Platform Overview &amp; <span className="bg-gradient-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">Strategic Brief</span>
+            Platform Overview &amp; <span className="bg-linear-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">Strategic Brief</span>
           </h1>
 
           <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl font-medium leading-relaxed">
@@ -417,7 +417,7 @@ export function OverviewClient() {
         </AnimatePresence>
 
         {/* ─── Notion Structured Data Footer Card ─── */}
-        <section className="rounded-3xl border border-primary/30 bg-gradient-to-r from-primary/10 via-orange-500/10 to-amber-500/10 p-6 sm:p-8 space-y-4 shadow-xl">
+        <section className="rounded-3xl border border-primary/30 bg-linear-to-r from-primary/10 via-orange-500/10 to-amber-500/10 p-6 sm:p-8 space-y-4 shadow-xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1.5">
               <span className="flex items-center gap-1.5 text-xs font-bold text-primary">

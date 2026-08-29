@@ -68,7 +68,7 @@ export function StoryRing({ users }: StoryRingProps) {
             className={cn(
               "flex items-center justify-center p-0.5 rounded-full transition-transform active:scale-95 cursor-pointer",
               myStoryGroup && myStoryGroup.stories.length > 0
-                ? "bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 shadow-sm"
+                ? "bg-linear-to-tr from-amber-500 via-rose-500 to-purple-600 shadow-sm"
                 : "bg-muted hover:scale-105"
             )}
             aria-label={myStoryGroup?.stories?.length ? "View your story" : "Add new vibe"}
@@ -91,7 +91,7 @@ export function StoryRing({ users }: StoryRingProps) {
             className="absolute bottom-0 right-0 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center border-2 border-background shadow-xs hover:scale-110 active:scale-90 transition-transform cursor-pointer"
             aria-label="Add new story"
           >
-            <Plus className="h-3 w-3 stroke-[3]" />
+            <Plus className="h-3 w-3 stroke-3" />
           </button>
         </div>
 

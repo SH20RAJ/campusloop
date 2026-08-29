@@ -33,7 +33,7 @@ export function FeaturedCampusCard({ college, index }: FeaturedCampusCardProps) 
     <Link
       href={`/app/college/${college.slug || college.id}`}
       className={cn(
-        "group relative overflow-hidden rounded-2xl bg-gradient-to-br p-4 transition-all duration-300 shadow-2xs",
+        "group relative overflow-hidden rounded-2xl bg-linear-to-br p-4 transition-all duration-300 shadow-2xs",
         "hover:-translate-y-0.5 hover:shadow-md",
         CAMPUS_COLORS[index % CAMPUS_COLORS.length],
         CAMPUS_GLOWS[index % CAMPUS_GLOWS.length]

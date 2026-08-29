@@ -61,7 +61,7 @@ export function FirstVisitNotificationPrompt() {
       >
         <div className="relative overflow-hidden rounded-3xl border border-primary/35 bg-card/95 backdrop-blur-2xl p-4 sm:p-5 shadow-2xl text-foreground select-none">
           {/* Subtle Ambient Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-tr from-primary/10 via-transparent to-transparent pointer-events-none" />
 
           {/* Close button */}
           <button
@@ -74,7 +74,7 @@ export function FirstVisitNotificationPrompt() {
           </button>
 
           <div className="flex items-start gap-3.5">
-            <div className="size-11 rounded-2xl bg-gradient-to-tr from-primary to-primary/80 text-primary-foreground flex items-center justify-center shadow-md shrink-0">
+            <div className="size-11 rounded-2xl bg-linear-to-tr from-primary to-primary/80 text-primary-foreground flex items-center justify-center shadow-md shrink-0">
               <BellRing className="size-5.5 animate-bounce" />
             </div>
 

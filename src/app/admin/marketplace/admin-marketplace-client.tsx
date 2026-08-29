@@ -86,7 +86,7 @@ export function AdminMarketplaceClient() {
             }}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background font-black text-xs hover:opacity-90 transition-opacity shadow-xs"
           >
-            <Plus className="size-3.5 stroke-[3]" />
+            <Plus className="size-3.5 stroke-3" />
             <span>Onboard Merchant</span>
           </Link>
         </div>

@@ -107,7 +107,7 @@ export function ConfessionDemo() {
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-border/40">
             <div className="flex items-center gap-2">
-              <div className="size-7 rounded-full bg-gradient-to-br from-primary via-accent to-secondary flex items-center justify-center text-[10px] font-mono font-bold text-white shadow-sm">
+              <div className="size-7 rounded-full bg-linear-to-br from-primary via-accent to-secondary flex items-center justify-center text-[10px] font-mono font-bold text-white shadow-sm">
                 {text ? anonKey(text).slice(5, 7).toUpperCase() : "??"}
               </div>
               <div>

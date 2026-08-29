@@ -141,7 +141,7 @@ export function MatchmakingShowcase() {
                         className="object-cover"
                         priority
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/40" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/40" />
 
                       <div className="flex items-center justify-between z-10">
                         <Badge variant="outline" className="bg-black/60 text-white border-white/20 backdrop-blur-md text-[10px] gap-1 px-2 py-0.5 font-semibold">

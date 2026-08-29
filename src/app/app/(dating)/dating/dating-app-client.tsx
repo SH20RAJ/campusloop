@@ -188,7 +188,7 @@ export function DatingAppClient() {
         </Link>
 
         <div className="flex items-center gap-1.5">
-          <h1 className="bg-gradient-to-r from-rose-400 to-pink-500 bg-clip-text text-lg font-black tracking-tight text-transparent">
+          <h1 className="bg-linear-to-r from-rose-400 to-pink-500 bg-clip-text text-lg font-black tracking-tight text-transparent">
             Campus Match
           </h1>
           <span className="text-[9px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded-full">
@@ -264,7 +264,7 @@ export function DatingAppClient() {
               <button
                 type="submit"
                 disabled={isSavingGender}
-                className="w-full cursor-pointer rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 py-3 text-xs font-bold text-white shadow-lg shadow-rose-500/25 transition-all hover:opacity-95 disabled:opacity-50"
+                className="w-full cursor-pointer rounded-2xl bg-linear-to-r from-rose-500 to-pink-500 py-3 text-xs font-bold text-white shadow-lg shadow-rose-500/25 transition-all hover:opacity-95 disabled:opacity-50"
               >
                 {isSavingGender ? "Saving..." : "Start swiping"}
               </button>
@@ -298,7 +298,7 @@ export function DatingAppClient() {
               <button
                 type="button"
                 onClick={() => widenSearch({ scope: "GLOBAL", gender: "ALL" })}
-                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:opacity-95"
+                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl bg-linear-to-r from-rose-500 to-pink-500 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:opacity-95"
               >
                 <Globe className="size-3.5" /> Widen my search
               </button>

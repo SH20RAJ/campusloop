@@ -71,12 +71,12 @@ export function StoryViewerModal({
               alt="Story Background"
               className="absolute inset-0 w-full h-full object-cover z-0"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/10 to-black/85 z-0 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/10 to-black/85 z-0 pointer-events-none" />
           </>
         ) : (
           <div
             className={cn(
-              "absolute inset-0 z-0 bg-gradient-to-tr from-violet-600 to-indigo-600",
+              "absolute inset-0 z-0 bg-linear-to-tr from-violet-600 to-indigo-600",
               currentStory.backgroundColor?.split(" ")[0]
             )}
           />

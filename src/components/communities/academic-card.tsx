@@ -112,7 +112,7 @@ export function AcademicCard({ item, isHighlighted }: AcademicCardProps) {
     <article
       id={`academic-${item.id}`}
       className={cn(
-        "p-4 border-b border-border/25 hover:bg-muted/[0.04] transition-all select-none",
+        "p-4 border-b border-border/25 hover:bg-muted/4 transition-all select-none",
         isHighlighted && "bg-indigo-500/5 ring-2 ring-indigo-500/30 rounded-2xl"
       )}
     >
@@ -224,7 +224,7 @@ export function AcademicCard({ item, isHighlighted }: AcademicCardProps) {
                 : "hover:text-foreground hover:bg-muted"
             )}
           >
-            <ArrowUp className={cn("size-3.5", hasUpvoted && "stroke-[3]")} />
+            <ArrowUp className={cn("size-3.5", hasUpvoted && "stroke-3")} />
             <span className="tabular-nums">{upvotes}</span>
           </button>
 

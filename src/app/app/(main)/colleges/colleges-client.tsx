@@ -438,7 +438,7 @@ export default function CollegesClient() {
                     href={`/app/college/${col.slug}`}
                     className={`relative overflow-hidden rounded-2xl border p-5 flex flex-col justify-between space-y-4 transition-all duration-300 hover:scale-[1.02] cursor-pointer ${
                       isFirst
-                        ? "bg-gradient-to-b from-amber-500/15 via-card to-card border-amber-500/40 shadow-lg md:order-2 md:-mt-2"
+                        ? "bg-linear-to-b from-amber-500/15 via-card to-card border-amber-500/40 shadow-lg md:order-2 md:-mt-2"
                         : isSecond
                         ? "bg-card border-border/80 shadow-xs md:order-1"
                         : "bg-card border-border/80 shadow-xs md:order-3"
@@ -571,7 +571,7 @@ export default function CollegesClient() {
       )}
 
       {/* ─── Aspirants Reality Guide Footer CTA ─── */}
-      <div className="rounded-3xl border border-primary/20 bg-gradient-to-r from-violet-600/10 via-indigo-600/10 to-purple-600/10 p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+      <div className="rounded-3xl border border-primary/20 bg-linear-to-r from-violet-600/10 via-indigo-600/10 to-purple-600/10 p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div className="space-y-1 text-center sm:text-left">
           <span className="text-[10px] font-black uppercase tracking-wider text-primary flex items-center justify-center sm:justify-start gap-1">
             <Zap className="size-3" /> JEE &amp; NEET Aspirants Reality Desk

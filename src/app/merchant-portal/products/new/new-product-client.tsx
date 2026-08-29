@@ -110,7 +110,7 @@ export function NewProductClient() {
       if (!res.ok) throw new Error("Failed to add product");
 
       toast.success("Product added to menu! 🎉");
-      router.push("/merchantt-portal/products");
+      router.push("/merchant-portal/products");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create product");
       setIsSubmitting(false);

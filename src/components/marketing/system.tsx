@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-export const BRAND_GRADIENT = "bg-gradient-to-r from-indigo-500 via-violet-600 to-purple-600";
+export const BRAND_GRADIENT = "bg-linear-to-r from-indigo-500 via-violet-600 to-purple-600";
 
 export function GradientText({ children, className }: { children: React.ReactNode; className?: string }) {
   return <span className={cn(BRAND_GRADIENT, "bg-clip-text text-transparent", className)}>{children}</span>;

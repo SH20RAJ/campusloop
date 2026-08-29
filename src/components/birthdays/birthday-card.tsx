@@ -63,7 +63,7 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
     <div
       className={`group relative flex items-center justify-between p-3.5 rounded-3xl transition-all duration-300 ${
         isToday
-          ? "bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-amber-500/5 border border-pink-500/30 shadow-xs hover:border-pink-500/50"
+          ? "bg-linear-to-r from-pink-500/10 via-purple-500/10 to-amber-500/5 border border-pink-500/30 shadow-xs hover:border-pink-500/50"
           : "bg-card hover:bg-muted/40 shadow-2xs"
       }`}
     >

@@ -93,7 +93,7 @@ function RouteProgressInner() {
       aria-hidden={progress >= 100}
     >
       <div
-        className="h-full bg-gradient-to-r from-primary via-orange-500 to-amber-500 shadow-[0_0_10px_var(--color-primary)] transition-[width,opacity] duration-200 ease-out"
+        className="h-full bg-linear-to-r from-primary via-orange-500 to-amber-500 shadow-[0_0_10px_var(--color-primary)] transition-[width,opacity] duration-200 ease-out"
         style={{ width: `${progress}%`, opacity: progress >= 100 ? 0 : 1 }}
       />
     </div>

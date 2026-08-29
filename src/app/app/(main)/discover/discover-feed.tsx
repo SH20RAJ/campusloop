@@ -418,7 +418,7 @@ export function DiscoverFeed() {
         <div className="divide-y divide-border/20 pt-2">
           {/* Hero Banner */}
           <div className="p-4">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-950 to-black p-6 text-white shadow-md">
+            <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-blue-900 via-indigo-950 to-black p-6 text-white shadow-md">
               <div className="space-y-2 relative z-10 max-w-sm">
                 <h3 className="text-lg font-black tracking-tight text-white">
                   {scope === "CAMPUS" ? `${collegeName} Trending` : "Global Campus Trending"}

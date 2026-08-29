@@ -101,7 +101,7 @@ export function CapsuleClient({
 
       {/* Intro Feature Banner */}
       <div className="p-4">
-        <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent p-5 space-y-2.5">
+        <div className="rounded-3xl border border-amber-500/30 bg-linear-to-br from-amber-500/10 via-amber-500/5 to-transparent p-5 space-y-2.5">
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-500">
             <Archive className="size-4" />
             <span>Unique Institutional Vault</span>

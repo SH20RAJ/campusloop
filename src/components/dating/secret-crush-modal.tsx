@@ -163,7 +163,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/30 pb-4">
           <div className="flex items-center gap-3">
-            <div className="size-11 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
+            <div className="size-11 rounded-2xl bg-linear-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
               <Heart className="size-6 fill-white" />
             </div>
             <div>

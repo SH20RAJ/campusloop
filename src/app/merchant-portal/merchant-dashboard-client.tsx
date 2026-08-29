@@ -243,7 +243,7 @@ export function MerchantDashboardClient() {
                       <Loader2 className="size-4 animate-spin" />
                     ) : (
                       <>
-                        <Check className="size-4 stroke-[3]" />
+                        <Check className="size-4 stroke-3" />
                         <span>ACCEPT ORDER</span>
                       </>
                     )}
@@ -281,7 +281,7 @@ export function MerchantDashboardClient() {
             Recent Orders ({recentOrders.length})
           </h2>
           <Link
-            href="/merchantt-portal/orders"
+            href="/merchant-portal/orders"
             className="text-xs font-bold text-primary hover:underline"
           >
             Manage Order Pipeline →

@@ -67,14 +67,14 @@ export function MerchantBikeDashboardClient() {
         </div>
 
         <Link
-          href="/merchantt-portal/bikes/fleet/new"
+          href="/merchant-portal/bikes/fleet/new"
           onClick={() => {
             sounds.tap();
             haptics.light();
           }}
           className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-opacity shadow-xs cursor-pointer w-fit"
         >
-          <Plus className="size-3.5 stroke-[3]" />
+          <Plus className="size-3.5 stroke-3" />
           <span>Add New Bike</span>
         </Link>
       </div>
@@ -115,7 +115,7 @@ export function MerchantBikeDashboardClient() {
           </h2>
 
           <Link
-            href="/merchantt-portal/bikes/bookings"
+            href="/merchant-portal/bikes/bookings"
             className="text-xs font-bold text-primary hover:underline"
           >
             All Bookings →
@@ -155,7 +155,7 @@ export function MerchantBikeDashboardClient() {
                   </span>
 
                   <Link
-                    href={`/merchantt-portal/bikes/bookings/${b.id}`}
+                    href={`/merchant-portal/bikes/bookings/${b.id}`}
                     className="px-3 py-1.5 rounded-xl bg-foreground text-background font-bold text-xs hover:opacity-90"
                   >
                     View
@@ -182,7 +182,7 @@ export function MerchantBikeDashboardClient() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Link
-            href="/merchantt-portal/bikes/fleet"
+            href="/merchant-portal/bikes/fleet"
             onClick={() => {
               sounds.tap();
               haptics.light();
@@ -197,7 +197,7 @@ export function MerchantBikeDashboardClient() {
           </Link>
 
           <Link
-            href="/merchantt-portal/bikes/bookings"
+            href="/merchant-portal/bikes/bookings"
             onClick={() => {
               sounds.tap();
               haptics.light();
@@ -212,7 +212,7 @@ export function MerchantBikeDashboardClient() {
           </Link>
 
           <Link
-            href="/merchantt-portal/bikes/availability"
+            href="/merchant-portal/bikes/availability"
             onClick={() => {
               sounds.tap();
               haptics.light();

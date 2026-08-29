@@ -331,7 +331,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
           </Link>
 
           <Link
-            href={`/merchantt-portal/store/qr`}
+            href={`/merchant-portal/store/qr`}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
           >
             <QrCode className="size-3.5" />
@@ -601,7 +601,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
               onClick={handleOpenAddProduct}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-xs"
             >
-              <Plus className="size-3.5 stroke-[3]" />
+              <Plus className="size-3.5 stroke-3" />
               <span>Add Menu Item</span>
             </button>
           </div>
@@ -763,7 +763,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
             <p className="text-xs text-muted-foreground">Table Ordering QR Code</p>
           </div>
           <Link
-            href="/merchantt-portal/store/qr"
+            href="/merchant-portal/store/qr"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90"
           >
             <span>Print Official A4 Table Stand</span>

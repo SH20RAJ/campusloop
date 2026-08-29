@@ -151,7 +151,7 @@ export function CampusHubStrip({ activeTab }: CampusHubStripProps) {
               {/* Card Ambient Gradient */}
               <div
                 className={cn(
-                  "absolute inset-0 bg-gradient-to-br transition-opacity duration-300 pointer-events-none",
+                  "absolute inset-0 bg-linear-to-br transition-opacity duration-300 pointer-events-none",
                   hub.gradient,
                   isActive ? "opacity-100" : "opacity-40 group-hover:opacity-100"
                 )}

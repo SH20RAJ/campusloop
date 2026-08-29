@@ -91,10 +91,10 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
 
   useEffect(() => {
     const savedMode = typeof window !== "undefined" ? localStorage.getItem("campusloop_feed_visibility") : null;
-    const mode = profile?.feedVisibility || savedMode;
+    const mode = profile?.feedVisibility ?? savedMode ?? "ALL";
     if (mode === "NON_ANONYMOUS") {
       setVisibility("public");
-    } else if (mode === "ALL") {
+    } else {
       setVisibility("all");
     }
   }, [profile?.feedVisibility]);

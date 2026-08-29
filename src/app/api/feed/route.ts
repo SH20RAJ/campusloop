@@ -55,19 +55,20 @@ export async function GET(req: Request) {
       conditions.push(eq(posts.type, type as (typeof posts.type.enumValues)[number]));
     }
 
-    const filterVisibility = visibility && visibility !== "all" 
-      ? visibility 
-      : (userFeedVisibility === "NON_ANONYMOUS" ? "non_anonymous" : "all");
+    // Confessions are by definition anonymous; never block them due to visibility filter
+    if (type !== "CONFESSION") {
+      const explicitVisibility = visibility && visibility !== "all" ? visibility : null;
+      const effectiveVisibility = explicitVisibility || (userFeedVisibility === "NON_ANONYMOUS" ? "non_anonymous" : "all");
 
-
-    if (filterVisibility === "anonymous") {
-      conditions.push(eq(posts.isAnonymous, true));
-    } else if (
-      filterVisibility === "public" ||
-      filterVisibility === "non_anonymous" ||
-      filterVisibility === "NON_ANONYMOUS"
-    ) {
-      conditions.push(eq(posts.isAnonymous, false));
+      if (effectiveVisibility === "anonymous") {
+        conditions.push(eq(posts.isAnonymous, true));
+      } else if (
+        effectiveVisibility === "public" ||
+        effectiveVisibility === "non_anonymous" ||
+        effectiveVisibility === "NON_ANONYMOUS"
+      ) {
+        conditions.push(eq(posts.isAnonymous, false));
+      }
     }
 
 

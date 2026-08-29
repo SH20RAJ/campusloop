@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ConfessionsFeed } from "./confessions-feed";
 
 export const metadata: Metadata = {
@@ -60,7 +61,9 @@ export default function ConfessionsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ConfessionsFeed />
+      <Suspense fallback={<div className="p-4 text-center text-xs text-muted-foreground">Loading confessions...</div>}>
+        <ConfessionsFeed />
+      </Suspense>
     </>
   );
 }

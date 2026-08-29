@@ -87,13 +87,13 @@ export function useFeed(
     {
       initialSize,
       fallbackData,
-      revalidateFirstPage: false,
+      revalidateFirstPage: true,
       revalidateAll: false,
-      revalidateIfStale: false,
+      revalidateIfStale: true,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      dedupingInterval: 30000,
-      keepPreviousData: true,
+      dedupingInterval: 5000,
+      keepPreviousData: false,
     }
   );
 

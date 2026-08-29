@@ -1,3 +1,4 @@
+import { FirstVisitNotificationPrompt } from "@/components/notifications/first-visit-notification-prompt";
 import { Navigation } from "@/components/ui/navigation";
 import { RightSidebar } from "@/components/ui/right-sidebar";
 import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
@@ -68,6 +69,7 @@ export default async function MainLayout({
             </div>
           )}
           {children}
+          <FirstVisitNotificationPrompt />
         </main>
         <aside className="hidden lg:block w-80 xl:w-[350px] shrink-0 border-l border-border/30 px-4 py-3">
           <RightSidebar />

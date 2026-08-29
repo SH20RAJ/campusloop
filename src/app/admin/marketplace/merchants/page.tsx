@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { AdminMarketplaceClient } from "../admin-marketplace-client";
+import { AdminMerchantsClient } from "./admin-merchants-client";
 
 export const metadata: Metadata = {
   title: "Merchants Directory | CampusLoop Admin",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminMerchantsPage() {
-  return <AdminMarketplaceClient />;
+  return <AdminMerchantsClient />;
 }

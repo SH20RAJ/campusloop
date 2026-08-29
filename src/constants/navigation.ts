@@ -1,22 +1,23 @@
 import type { LucideIcon } from "lucide-react";
 import {
-Bell,
-Cake,
-Compass,
-Flame,
-Heart,
-HelpCircle,
-Home,
-Hourglass,
-Lock,
-MessageSquare,
-MoreHorizontal,
-Plus,
-School,
-ShieldCheck,
-Sliders,
-UserCircle,
-Users
+  Bell,
+  Cake,
+  Compass,
+  Flame,
+  Heart,
+  HelpCircle,
+  Home,
+  Hourglass,
+  Lock,
+  MessageSquare,
+  MoreHorizontal,
+  Plus,
+  School,
+  ShieldCheck,
+  ShoppingBag,
+  Sliders,
+  UserCircle,
+  Users,
 } from "lucide-react";
 
 export interface NavItem {
@@ -34,11 +35,18 @@ export interface NavGroup {
 }
 
 /**
- * Clean, minimal primary navigation items (Twitter / X style: 5-6 core items + More)
+ * Clean, minimal primary navigation items (Twitter / X style: core items + More)
  */
 export const DESKTOP_NAV_ITEMS: NavItem[] = [
   { icon: Home, href: "/app", label: "Home" },
   { icon: Compass, href: "/app/discover", label: "Explore" },
+  {
+    icon: ShoppingBag,
+    href: "/app/marketplace",
+    label: "Marketplace",
+    badge: "NEW",
+    badgeColor: "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30",
+  },
   { icon: Heart, href: "/app/dating", label: "Dating" },
   { icon: Bell, href: "/app/notifications", label: "Notifications" },
   { icon: MessageSquare, href: "/app/chat", label: "Messages" },

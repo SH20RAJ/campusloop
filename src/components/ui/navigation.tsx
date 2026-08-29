@@ -25,7 +25,7 @@ X
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 interface NavigationProps {
@@ -39,8 +39,24 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [marketplaceSeen, setMarketplaceSeen] = useState(true);
   const unreadNotificationsCount = useUnreadNotificationsCount();
 
+  useEffect(() => {
+    try {
+      const seen = localStorage.getItem("marketplace_seen");
+      if (!seen) setMarketplaceSeen(false);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (pathname.startsWith("/app/marketplace")) {
+      try {
+        localStorage.setItem("marketplace_seen", "true");
+        setMarketplaceSeen(true);
+      } catch {}
+    }
+  }, [pathname]);
 
   const desktopNavItems = [
     ...DESKTOP_NAV_ITEMS.filter((item) => {
@@ -167,6 +183,11 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   </div>
 
                   <span className="truncate">{item.label}</span>
+                  {item.badge === "NEW" && !marketplaceSeen && (
+                    <span className="ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 uppercase tracking-wider">
+                      NEW
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -410,6 +431,11 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                           )}
                         />
                         <span>{item.label}</span>
+                        {item.badge === "NEW" && !marketplaceSeen && (
+                          <span className="ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 uppercase tracking-wider">
+                            NEW
+                          </span>
+                        )}
                       </Link>
                     );
                   })}

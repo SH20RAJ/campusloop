@@ -1,6 +1,7 @@
 export * from "./academic-resources";
 export * from "./chat";
 export * from "./common";
+export * from "./commercial-marketplace";
 export * from "./communities";
 export * from "./dating";
 export * from "./gaming";

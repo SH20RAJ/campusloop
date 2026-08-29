@@ -1,6 +1,18 @@
 import { relations } from "drizzle-orm";
 import { academicResources } from "./academic-resources";
 import { conversationParticipants,conversations,messages } from "./chat";
+import {
+  marketplaceCategories,
+  marketplaceOffers,
+  marketplaceOrderItems,
+  marketplaceOrders,
+  marketplaceReviews,
+  merchantBusinessHours,
+  merchants,
+  merchantUsers,
+  products,
+  savedMarketplaceItems,
+} from "./commercial-marketplace";
 import { communities,communityMembers } from "./communities";
 import { secretCrushes,swipes } from "./dating";
 import { gamingLobbies } from "./gaming";
@@ -336,6 +348,99 @@ export const capsuleEntriesRelations = relations(capsuleEntries, ({ one }) => ({
     references: [userProfiles.id],
   }),
 }));
+
+// ─── Commercial Marketplace Relations ───
+
+export const merchantsRelations = relations(merchants, ({ one, many }) => ({
+  institution: one(institutions, {
+    fields: [merchants.institutionId],
+    references: [institutions.id],
+  }),
+  products: many(products),
+  orders: many(marketplaceOrders),
+  users: many(merchantUsers),
+  businessHours: many(merchantBusinessHours),
+  offers: many(marketplaceOffers),
+  reviews: many(marketplaceReviews),
+}));
+
+export const merchantUsersRelations = relations(merchantUsers, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [merchantUsers.merchantId],
+    references: [merchants.id],
+  }),
+  user: one(userProfiles, {
+    fields: [merchantUsers.userId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const merchantBusinessHoursRelations = relations(merchantBusinessHours, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [merchantBusinessHours.merchantId],
+    references: [merchants.id],
+  }),
+}));
+
+export const productsRelations = relations(products, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [products.merchantId],
+    references: [merchants.id],
+  }),
+}));
+
+export const marketplaceOrdersRelations = relations(marketplaceOrders, ({ one, many }) => ({
+  student: one(userProfiles, {
+    fields: [marketplaceOrders.studentId],
+    references: [userProfiles.id],
+  }),
+  merchant: one(merchants, {
+    fields: [marketplaceOrders.merchantId],
+    references: [merchants.id],
+  }),
+  institution: one(institutions, {
+    fields: [marketplaceOrders.institutionId],
+    references: [institutions.id],
+  }),
+  items: many(marketplaceOrderItems),
+}));
+
+export const marketplaceOrderItemsRelations = relations(marketplaceOrderItems, ({ one }) => ({
+  order: one(marketplaceOrders, {
+    fields: [marketplaceOrderItems.orderId],
+    references: [marketplaceOrders.id],
+  }),
+  product: one(products, {
+    fields: [marketplaceOrderItems.productId],
+    references: [products.id],
+  }),
+}));
+
+export const marketplaceOffersRelations = relations(marketplaceOffers, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [marketplaceOffers.merchantId],
+    references: [merchants.id],
+  }),
+}));
+
+export const marketplaceReviewsRelations = relations(marketplaceReviews, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [marketplaceReviews.merchantId],
+    references: [merchants.id],
+  }),
+  student: one(userProfiles, {
+    fields: [marketplaceReviews.studentId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const savedMarketplaceItemsRelations = relations(savedMarketplaceItems, ({ one }) => ({
+  student: one(userProfiles, {
+    fields: [savedMarketplaceItems.studentId],
+    references: [userProfiles.id],
+  }),
+}));
+
 
 
 

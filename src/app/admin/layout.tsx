@@ -24,7 +24,10 @@ MessageSquare,
 School,
 ScrollText,
 ShieldAlert,
+ShoppingBag,
+Store,
 Users,
+UtensilsCrossed,
 } from "lucide-react";
 
 
@@ -41,9 +44,15 @@ const contentNav = [
 	{ href: "/admin/colleges", label: "Colleges", icon: School },
 ];
 
+const commercialNav = [
+	{ href: "/admin/marketplace", label: "Marketplace", icon: ShoppingBag },
+	{ href: "/admin/marketplace/merchants", label: "Merchants", icon: Store },
+	{ href: "/admin/marketplace/products", label: "Products", icon: UtensilsCrossed },
+];
+
 const systemNav = [{ href: "/admin/audit", label: "Audit Log", icon: ScrollText }];
 
-function NavLink({ href, label, icon: Icon }: { href: string; label: string; icon: typeof FileText }) {
+function NavLink({ href, label, icon: Icon }: { href: string; label: string; icon: any }) {
 	return (
 		<Link
 			href={href}
@@ -78,6 +87,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 					<nav className="space-y-1" aria-label="Content">
 						<p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Content</p>
 						{contentNav.map((item) => (
+							<NavLink key={item.href} {...item} />
+						))}
+					</nav>
+
+					<nav className="space-y-1" aria-label="Commerce">
+						<p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Marketplace</p>
+						{commercialNav.map((item) => (
 							<NavLink key={item.href} {...item} />
 						))}
 					</nav>

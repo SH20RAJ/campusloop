@@ -59,7 +59,7 @@ export function ConfessionsFeed() {
           setSize((s) => s + 1);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.01, rootMargin: "600px 0px" }
     );
 
     observer.observe(node);
@@ -202,15 +202,26 @@ export function ConfessionsFeed() {
             {/* Infinite Scroll Trigger */}
             <div
               ref={loadMoreRef}
-              className="flex justify-center items-center py-8 text-xs text-muted-foreground"
+              className="flex flex-col justify-center items-center py-8 text-xs text-muted-foreground gap-2"
             >
               {isLoadingMore ? (
-                <div className="size-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              ) : isReachingEnd ? (
-                <span className="text-[11px] text-muted-foreground/60">
-                  You've caught up with all campus secrets ✨
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="size-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs font-medium">Loading more confessions...</span>
+                </div>
+              ) : !isReachingEnd ? (
+                <button
+                  type="button"
+                  onClick={() => setSize((s) => s + 1)}
+                  className="px-4 py-2 rounded-full border border-border/60 bg-muted/40 hover:bg-muted text-xs font-bold text-foreground transition-colors cursor-pointer"
+                >
+                  Load more
+                </button>
+              ) : (
+                <span className="text-[11px] text-muted-foreground/60 font-medium">
+                  You&apos;ve caught up with all campus secrets ✨
                 </span>
-              ) : null}
+              )}
             </div>
           </>
         ) : (

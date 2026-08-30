@@ -26,7 +26,6 @@ export async function GET(req: Request, { params }: RouteParams) {
             username: true,
             displayName: true,
             avatarUrl: true,
-            campusRole: true,
             email: true,
           },
         },

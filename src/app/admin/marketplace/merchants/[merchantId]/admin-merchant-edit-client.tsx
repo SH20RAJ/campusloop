@@ -329,7 +329,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
   async function handleDeleteProduct(p: any) {
     if (!confirm(`Delete "${p.name}" from menu?`)) return;
     sounds.pop();
-    haptics.warning();
+    haptics.heavy();
     try {
       await fetch(`/api/merchant/products?id=${p.id}`, { method: "DELETE" });
       toast.success("Product removed from menu");

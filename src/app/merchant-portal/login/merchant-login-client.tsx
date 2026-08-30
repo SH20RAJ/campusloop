@@ -53,8 +53,8 @@ export function MerchantLoginClient() {
         throw new Error(data.error || "Login failed");
       }
 
-      sounds.success();
-      haptics.success();
+      sounds.ting();
+      haptics.medium();
       toast.success(`Welcome back, ${data.merchant?.name || "Merchant"}!`);
 
       // If rental merchant, redirect to /merchant-portal/bikes, else /merchant-portal
@@ -66,7 +66,7 @@ export function MerchantLoginClient() {
       router.refresh();
     } catch (err: any) {
       sounds.pop();
-      haptics.error();
+      haptics.heavy();
       toast.error(err.message || "Failed to log in");
     } finally {
       setIsLoading(false);

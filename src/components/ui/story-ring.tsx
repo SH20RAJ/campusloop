@@ -24,6 +24,7 @@ interface UserWithStories {
   username: string;
   avatarUrl: string | null;
   stories: Story[];
+  isFriend?: boolean;
 }
 
 interface StoryRingProps {
@@ -110,6 +111,7 @@ export function StoryRing({ users }: StoryRingProps) {
             key={userGroup.id}
             displayName={userGroup.displayName}
             avatarUrl={userGroup.avatarUrl}
+            isFriend={userGroup.isFriend}
             onClick={() => handleOpenStory(firstStory.id)}
           />
         );

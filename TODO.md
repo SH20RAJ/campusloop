@@ -112,3 +112,235 @@
     - Synthesized sounds: `ting()` (repost & publish), `pop()` (heart like & double tap), `send()` (message & comment whoosh), `tap()` (tabs & filter pills), `match()` (secret crush & dating chord arpeggio), and `archive()` (metallic latch).
   - **Physical Haptic Feedback Engine (`src/lib/haptics.ts`)**:
     - Native vibration patterns for light taps, impact upvotes, repost celebrations, and error alerts.
+
+
+keep the righbar updated in who to follow I had followed all but it still showing me to follow btn , also I can send Secret Crush to a maximum of 5 people during a rolling 7-day period. 
+
+ Story sharing / visibility
+Stories should support Friends-first + Following visibility.
+Clarify exact priority/order if needed.
+ GIF & sticker sending
+Add GIF/sticker support directly from the chat keyboard/composer.
+Mobile keyboard experience should be considered.
+ Swipe-to-reply
+Swipe a message → reply/quote that message.
+ Delete message
+Add message deletion functionality.
+Ideally support the appropriate distinction between deleting for self vs everyone if your backend permits it.
+ Chat performance
+“Load chats optimally.”
+This is consistent with the separate chat bug report: conversation previews currently take ~5 seconds to reflect a newly sent message.
+ Delete chats
+Allow users to delete/remove conversations from their chat list.
+ Chat notifications
+Fix chat notification system.
+Sidebar Messages indicator should only appear when there is actually an unread/pending message.
+ @Mention profiles in chats
+Support mentioning another CampusLoop user in a message.
+Ideally autocomplete after typing @.
+Mention should link/open that user's profile.
+ YouTube / external embeds
+Support sharing YouTube and other supported embeds inside chats.
+Render rich previews/player cards rather than only raw URLs. you dont have to add the reel feature then fix = Yes. I extracted the messages you sent in the CampusLoop chat from all 3 screenshots. I’ve separated actual feature requests/bugs from the accidental/unclear text so you can turn this directly into a development checklist.
+1. Exact messages you sent
+Screenshot 1
+“Story only of friends (priority) and following...”
+“GIF and sticker sending from keyboard....”
+“d”
+“slide to reply and delete message feature....”
+“story likes feg... not working” (the screenshot appears to say “story likes fegative not working”; likely a typo while typing)
+“list likes”
+“load chats optimally....”
+“push users to delete chats...”
+Screenshot 2
+“💕 It's a Secret Crush Match! We both secretly liked each other.”
+“It must appear in middle of the chat the secret crut message with a diff ui and better ui ux....”
+“[https://campusloop.space/app/discover](https://campusloop.space/app/discover) make the search work”
+“add pagination in [https://campusloop.space/app/discover?tab=colleges&scope=GLOBAL”](https://campusloop.space/app/discover?tab=colleges&scope=GLOBAL%E2%80%9D)
+“Chat notification not working....”
+“[https://campusloop.space/app/colleges”](https://campusloop.space/app/colleges%E2%80%9D)
+“links not working....”
+“Add secret crush time limit...”
+Screenshot 3
+“dont show already swiped people in feed on /dating until unless there are very less options , or the things are resolved like swiped then accepted or rejected....”
+“mention profile on chats....”
+“Reels in future....”
+“Youtube/other embeds sharing....”
+2. Clean CampusLoop development checklist
+I've converted those messages into proper requirements.
+💬 Messaging
+Story sharing / visibility
+Stories should support Friends-first + Following visibility.
+Clarify exact priority/order if needed.
+GIF & sticker sending
+Add GIF/sticker support directly from the chat keyboard/composer.
+Mobile keyboard experience should be considered.
+Swipe-to-reply
+Swipe a message → reply/quote that message.
+Delete message
+Add message deletion functionality.
+Ideally support the appropriate distinction between deleting for self vs everyone if your backend permits it.
+Chat performance
+“Load chats optimally.”
+This is consistent with the separate chat bug report: conversation previews currently take ~5 seconds to reflect a newly sent message.
+Delete chats
+Allow users to delete/remove conversations from their chat list.
+Chat notifications
+Fix chat notification system.
+Sidebar Messages indicator should only appear when there is actually an unread/pending message.
+@Mention profiles in chats
+Support mentioning another CampusLoop user in a message.
+Ideally autocomplete after typing @.
+Mention should link/open that user's profile.
+YouTube / external embeds
+Support sharing YouTube and other supported embeds inside chats.
+Render rich previews/player cards rather than only raw URLs.
+Reels
+Future feature: support sharing/embedding reels in chat.
+3. ❤️ Secret Crush / Match
+Secret Crush Match message
+You specifically want:
+“💕 It's a Secret Crush Match! We both secretly liked each other.”
+And:
+Display the Secret Crush Match notification/message inside the conversation
+Put it in the middle of the chat, rather than making it look like an ordinary outgoing message.
+Give it a distinct UI/UX so users immediately understand that something special happened.
+Make it visually different from normal chat bubbles.
+Include both people / mutual-crush context appropriately.
+Secret Crush expiration
+Add Secret Crush time limit
+Secret Crush should have an expiration window.
+Need backend enforcement + UI countdown/status.
+Define what happens after expiration.
+Previously swiped users
+Your requirement was:
+“dont show already swiped people in feed on /dating until unless there are very less options, or the things are resolved like swiped then accepted or rejected....”
+So the Match algorithm should:
+Don't normally show users already swiped.
+Persist swipe state: LIKE, PASS, etc.
+Don't repeatedly surface passed/liked users.
+If the available candidate pool becomes extremely small, optionally allow previously seen candidates to re-enter.
+If a previous interaction becomes resolved (accepted/rejected/mutual outcome), handle that state explicitly rather than treating the person as a fresh candidate.
+This is especially important because Match Mode is intended to be intent-hidden in CampusLoop's product model.
+4. 🔎 Discover
+Search
+You sent:
+“[https://campusloop.space/app/discover](https://campusloop.space/app/discover) make the search work”
+Fix Discover search.
+Search should actually filter/search the intended entities.
+Search state should persist correctly while navigating/filtering.
+Handle no-results state.
+Pagination
+You specifically mentioned:
+/app/discover?tab=colleges&scope=GLOBAL
+Add pagination to Discover → Colleges.
+Make sure pagination works with:
+tab=colleges
+scope=GLOBAL
+Search
+Filters
+Avoid loading the entire college dataset at once.
+This also connects to the existing Colleges/Discover data problems: the current Colleges page has a mismatch between the advertised “1,350+” figure and the actual directory showing 60 campus hubs.
+5. 🏫 Colleges
+You sent:
+https://campusloop.space/app/colleges
+and then:
+“links not working....”
+So the implied task is:
+Audit the /app/colleges page.
+Fix broken links.
+Verify every college/campus card opens the correct destination.
+Verify browser back/forward navigation.
+Verify direct URLs.
+Verify links from Discover → Colleges.
+Check pagination + query parameters.
+There's also a serious existing deep-link/router bug: directly loading /app/notifications has previously rendered the Birthdays page instead.
+6. 📖 Stories
+You sent:
+“Story only of friends (priority) and following...”
+and:
+“story likes fegative not working”
+and:
+“list likes”
+So Stories needs:
+Story audience/visibility:
+Friends
+Following
+potentially priority ordering
+Fix Story Likes.
+Story like/unlike should update immediately.
+Persist likes correctly.
+Add List Likes / View Likes.
+Show who liked a story.
+Make like count update without refreshing.
+7. ⚡ Performance
+You wrote:
+“load chats optimally....”
+This should probably become a broader performance task rather than only a chat task.
+The existing audit found that many CampusLoop pages show skeletons for 2–5 seconds on navigation, even for pages already visited, instead of using cached data.
+So:
+Optimize chat initial loading.
+Optimistic message sending.
+Immediately update conversation preview after sending.
+Cache conversation list.
+Avoid unnecessary refetching.
+Prefetch likely next conversations/pages.
+Reduce skeleton duration.
+Preserve already-loaded content while fetching updates.
+8. 🚨 Important bugs from your separate bug reports that overlap these requests
+There are several things in your uploaded bug reports that aren't visible in the screenshots but should absolutely be added to the same development backlog:
+Critical
+Uncaught ReferenceError: __name is not defined occurs across essentially every tested route.
+Direct URL/deep-link routing can render the wrong page.
+Dating/Match can initially show a blank black screen with an infinite spinner.
+Posts
+Comment counter doesn't synchronize between post card and discussion thread.
+Comment/Post button can remain stuck in loading state after success.
+Create Post doesn't clear/reset after successful publishing.
+Composer temporarily displays fake "Student" / "U" identity instead of the actual user.
+Birthdays
+Month filter doesn't actually filter results.
+Birthday page can render in a mobile layout on desktop.
+Data quality
+"Aspirant Viewer Hub" appears to be leaked test/system data.
+Duplicate templated comments exist.
+#CampusLife contains obvious generated filler posts.
+Hub label inconsistently displays "bitmesra Hub" vs "Campus".
+9. Recommended priority
+If you're going to give this to Antigravity as one implementation task, don't implement everything in screenshot order.
+🔴 P0 — Fix first
+Global __name is not defined
+Deep-link/router issues
+Chat notification bug
+Chat loading/performance
+Chat selected-user/name disappearing
+Discover search
+Colleges broken links
+Dating infinite/blank loading
+Already-swiped Match logic
+🟠 P1 — Core UX
+Message preview instant update
+Delete chat
+Delete message
+Swipe-to-reply
+GIF/stickers
+@mentions
+Secret Crush Match special message UI
+Secret Crush expiry
+Story likes
+Story likes list
+Create-post reset/loading bugs
+🟡 P2 — Growth/features
+Discover pagination
+YouTube/external embeds
+Reels sharing
+Friends/following Story visibility
+Better chat caching/prefetching
+Match candidate-pool fallback logic
+🟢 P3 — Cleanup
+Remove leaked/test campus data
+Remove duplicate seed comments
+Remove templated #CampusLife filler
+Fix inconsistent hub naming
+Fix LP calculation/display mismatch
+This gives you a much cleaner CampusLoop engineering backlog than treating every chat message as an isolated task. The feature structure also confirms that Messaging is intended to connect conversations originating from posts, Communities, and Match Mode, so these messaging features should be implemented as a shared system rather than separate one-off flows.and always git commit , also in story if viewed dim the ring....

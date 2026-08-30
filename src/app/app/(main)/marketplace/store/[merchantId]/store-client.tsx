@@ -5,7 +5,7 @@ import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo } from "@/lib/utils";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 import {
 ArrowLeft,
 Check,
@@ -220,7 +220,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
         }),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as { error?: string };
       if (!res.ok) {
         throw new Error(data.error || "Failed to submit review");
       }

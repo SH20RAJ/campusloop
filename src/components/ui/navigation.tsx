@@ -13,11 +13,13 @@ import {
   ShieldCheck,
   Sliders,
   UserCircle,
+  VenetianMask,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
 import { DreamCampusesModal } from "@/components/preview/dream-campuses-modal";
@@ -34,6 +36,101 @@ import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
+
+function FeedAnonymityQuickToggle({ initialMode }: { initialMode?: string }) {
+  const [feedMode, setFeedMode] = useState<"ALL" | "NON_ANONYMOUS">("ALL");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("campusloop_feed_visibility") as "ALL" | "NON_ANONYMOUS" | null;
+      if (saved) {
+        setFeedMode(saved);
+      } else if (initialMode === "NON_ANONYMOUS") {
+        setFeedMode("NON_ANONYMOUS");
+      }
+    } catch {}
+
+    function handleSync(e: CustomEvent<string>) {
+      if (e.detail === "ALL" || e.detail === "NON_ANONYMOUS") {
+        setFeedMode(e.detail);
+      }
+    }
+
+    window.addEventListener("campusloop_feed_visibility_change" as any, handleSync as any);
+    return () => window.removeEventListener("campusloop_feed_visibility_change" as any, handleSync as any);
+  }, [initialMode]);
+
+  function handleToggle() {
+    sounds.tap();
+    haptics.light();
+    const nextMode = feedMode === "ALL" ? "NON_ANONYMOUS" : "ALL";
+    setFeedMode(nextMode);
+
+    try {
+      localStorage.setItem("campusloop_feed_visibility", nextMode);
+      window.dispatchEvent(new CustomEvent("campusloop_feed_visibility_change", { detail: nextMode }));
+      fetch("/api/profile/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feedVisibility: nextMode }),
+      }).catch(() => {});
+    } catch {}
+
+    if (nextMode === "ALL") {
+      toast.success("Feed: Showing all posts & confessions 🎭");
+    } else {
+      toast.success("Feed: Hiding confessions & anon posts (Public only) 🛡️");
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleToggle}
+      className={cn(
+        "w-full flex items-center justify-between p-2.5 rounded-2xl border transition-all cursor-pointer select-none shadow-2xs group",
+        feedMode === "ALL"
+          ? "border-purple-500/30 bg-purple-500/10 text-foreground hover:bg-purple-500/15"
+          : "border-emerald-500/30 bg-emerald-500/10 text-foreground hover:bg-emerald-500/15"
+      )}
+      title={
+        feedMode === "ALL"
+          ? "Currently showing confessions & anon posts. Click to hide."
+          : "Currently hiding anon posts. Click to show all."
+      }
+    >
+      <div className="flex items-center gap-2.5 min-w-0">
+        <div
+          className={cn(
+            "flex size-7 items-center justify-center rounded-xl transition-colors shrink-0",
+            feedMode === "ALL"
+              ? "bg-purple-500/20 text-purple-600 dark:text-purple-400"
+              : "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+          )}
+        >
+          {feedMode === "ALL" ? <VenetianMask className="size-4" /> : <ShieldCheck className="size-4" />}
+        </div>
+        <div className="text-left min-w-0">
+          <p className="text-[11px] font-black truncate leading-tight">
+            {feedMode === "ALL" ? "All Posts & Anon" : "Public Only (No Anon)"}
+          </p>
+          <p className="text-[9px] text-muted-foreground truncate leading-tight mt-0.5">
+            {feedMode === "ALL" ? "Confessions visible" : "Confessions hidden"}
+          </p>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "w-7 h-4 rounded-full transition-colors flex items-center p-0.5 shrink-0",
+          feedMode === "ALL" ? "bg-purple-500 justify-end" : "bg-emerald-500 justify-start"
+        )}
+      >
+        <div className="size-3 rounded-full bg-white shadow-xs" />
+      </div>
+    </button>
+  );
+}
 
 interface NavigationProps {
   profile?: UserProfile;
@@ -244,13 +341,14 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
               </div>
             </div>
           ) : (
-            <div className="pt-2 px-1">
+            <div className="pt-2 px-1 space-y-2">
               <Link href="/app/post/new" className="block">
                 <Button className="w-full h-11 bg-foreground text-background hover:opacity-90 font-black rounded-full text-sm cursor-pointer border-none shadow-sm transition-all flex items-center justify-center gap-2">
                   <Plus className="size-4.5 stroke-3" />
                   <span>Post</span>
                 </Button>
               </Link>
+              <FeedAnonymityQuickToggle initialMode={profile?.feedVisibility} />
             </div>
           )}
         </div>
@@ -498,6 +596,11 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     );
                   })}
                 </nav>
+
+                {/* Anonymity Quick Switcher in Mobile Drawer */}
+                <div className="pt-2">
+                  <FeedAnonymityQuickToggle initialMode={profile?.feedVisibility} />
+                </div>
 
                 {/* Secondary Quick Links */}
                 <div className="pt-4 border-t border-border/30 space-y-1">

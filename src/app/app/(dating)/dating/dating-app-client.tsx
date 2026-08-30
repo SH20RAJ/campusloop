@@ -169,22 +169,22 @@ export function DatingAppClient() {
   }
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-lg flex-col px-4 select-none">
+    <div className="mx-auto flex h-dvh w-full max-w-lg flex-col px-4 bg-background text-foreground select-none">
       {/* ─── Top Bar ─── */}
-      <header className="flex items-center justify-between py-3">
+      <header className="flex items-center justify-between py-3 border-b border-border/30">
         <Link
           href="/app"
           aria-label="Back to feed"
-          className="flex size-10 items-center justify-center rounded-full bg-white/5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex size-9 items-center justify-center rounded-full bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border border-border/40 cursor-pointer"
         >
-          <ArrowLeft className="size-5" />
+          <ArrowLeft className="size-4.5" />
         </Link>
 
         <div className="flex items-center gap-1.5">
-          <h1 className="bg-linear-to-r from-rose-400 to-pink-500 bg-clip-text text-lg font-black tracking-tight text-transparent">
+          <h1 className="bg-linear-to-r from-rose-500 via-pink-500 to-rose-600 bg-clip-text text-base font-black tracking-tight text-transparent">
             Campus Match
           </h1>
-          <span className="text-[9px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded-full">
+          <span className="text-[9px] font-black uppercase tracking-wider bg-rose-500/15 text-rose-500 border border-rose-500/30 px-1.5 py-0.5 rounded-full">
             18+
           </span>
         </div>
@@ -193,21 +193,21 @@ export function DatingAppClient() {
           {/* Secret Crush Vault Link */}
           <Link
             href="/app/crush"
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-xs border border-white/10"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs border border-rose-500/25"
             title="Manage Secret Crush Vault"
           >
-            <Lock className="size-3.5 text-rose-400" />
+            <Lock className="size-3 text-rose-500" />
             <span className="hidden sm:inline">Crush Vault</span>
           </Link>
 
           <Link
             href="/app/dating/likes"
             aria-label="Likes you"
-            className="relative flex size-10 items-center justify-center rounded-full bg-white/5 text-rose-400 transition-colors hover:bg-white/10"
+            className="relative flex size-9 items-center justify-center rounded-full bg-muted/60 text-rose-500 hover:bg-muted transition-colors border border-border/40 cursor-pointer"
           >
-            <Heart className="size-5 fill-rose-500/30" />
+            <Heart className="size-4.5 fill-rose-500/30" />
             {likesYouCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-black text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-black text-white shadow-xs">
                 {likesYouCount > 9 ? "9+" : likesYouCount}
               </span>
             )}
@@ -215,9 +215,9 @@ export function DatingAppClient() {
           <Link
             href="/app/dating/filters"
             aria-label="Preferences"
-            className="flex size-10 items-center justify-center rounded-full bg-white/5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+            className="flex size-9 items-center justify-center rounded-full bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border border-border/40 cursor-pointer"
           >
-            <SlidersHorizontal className="size-4.5" />
+            <SlidersHorizontal className="size-4" />
           </Link>
         </div>
       </header>
@@ -226,13 +226,18 @@ export function DatingAppClient() {
       <SecretCrushModal isOpen={showSecretCrushModal} onClose={() => setShowSecretCrushModal(false)} />
 
       {/* ─── Deck ─── */}
-      <main className="flex min-h-0 flex-1 flex-col pb-[max(env(safe-area-inset-bottom),1rem)]">
+      <main className="flex min-h-0 flex-1 flex-col py-3 pb-[max(env(safe-area-inset-bottom),1rem)]">
         {genderGateRequired ? (
-          <div className="m-auto w-full max-w-sm space-y-5 rounded-3xl border border-white/10 bg-white/5 p-6 text-center">
-            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-400">
+          <div className="m-auto w-full max-w-sm space-y-5 rounded-3xl border border-border/70 bg-card p-6 text-center shadow-lg">
+            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-500 border border-rose-500/30">
               <Heart className="size-7 fill-rose-500/25" />
             </div>
-            <h2 className="text-lg font-black text-white">Select your gender</h2>
+            <div>
+              <h2 className="text-lg font-black text-foreground">Select your gender</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Campus Dating connects you with verified students based on your preferences.
+              </p>
+            </div>
             <form onSubmit={handleSaveGenderGate} className="space-y-4">
               <div className="grid grid-cols-3 gap-2">
                 {(["MALE", "FEMALE", "OTHER"] as const).map((g) => (
@@ -242,8 +247,8 @@ export function DatingAppClient() {
                     onClick={() => setSelectedGenderGate(g)}
                     className={`cursor-pointer rounded-2xl border py-2.5 text-xs font-bold transition-all ${
                       selectedGenderGate === g
-                        ? "border-rose-500/60 bg-rose-500/15 text-rose-400"
-                        : "border-white/10 bg-white/5 text-white/50 hover:text-white"
+                        ? "border-rose-500 bg-rose-500/15 text-rose-500 font-black shadow-xs ring-1 ring-rose-500"
+                        : "border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {g === "MALE" ? "👨 Male" : g === "FEMALE" ? "👩 Female" : "🌈 Other"}
@@ -253,22 +258,23 @@ export function DatingAppClient() {
               <button
                 type="submit"
                 disabled={isSavingGender}
-                className="w-full cursor-pointer rounded-2xl bg-linear-to-r from-rose-500 to-pink-500 py-3 text-xs font-bold text-white shadow-lg shadow-rose-500/25 transition-all hover:opacity-95 disabled:opacity-50"
+                className="w-full cursor-pointer rounded-2xl bg-linear-to-r from-rose-500 to-pink-500 py-3 text-xs font-black text-white shadow-md shadow-rose-500/25 transition-all hover:opacity-95 disabled:opacity-50"
               >
-                {isSavingGender ? "Saving..." : "Start swiping"}
+                {isSavingGender ? "Saving..." : "Start Swiping"}
               </button>
             </form>
           </div>
         ) : isLoading && candidates.length === 0 ? (
-          <div className="m-auto">
+          <div className="m-auto flex flex-col items-center gap-3">
             <Loader2 className="size-8 animate-spin text-rose-500" />
+            <p className="text-xs font-bold text-muted-foreground">Finding campus matches...</p>
           </div>
         ) : remaining.length > 0 ? (
           <>
             <div className="relative min-h-0 flex-1 py-1">
               <SwipeDeck candidates={remaining} onSwipe={handleSwipe} />
             </div>
-            <div className="pt-4">
+            <div className="pt-3">
               <SwipeActions
                 onPass={() => handleSwipe("pass")}
                 onLike={() => handleSwipe("like")}
@@ -278,31 +284,36 @@ export function DatingAppClient() {
             </div>
           </>
         ) : (
-          <div className="m-auto w-full max-w-sm space-y-4 rounded-3xl border border-dashed border-white/15 bg-white/5 p-8 text-center">
-            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-400">
+          <div className="m-auto w-full max-w-sm space-y-4 rounded-3xl border border-dashed border-border/80 bg-card/60 p-8 text-center shadow-xs">
+            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-500 border border-rose-500/30">
               <Heart className="size-7" />
             </div>
-            <h3 className="text-base font-bold text-white">That&apos;s everyone for now</h3>
-            <div className="flex flex-col gap-2 pt-1">
+            <div>
+              <h3 className="text-base font-black text-foreground">That&apos;s everyone for now</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                You&apos;ve viewed all available profiles matching your filters.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => widenSearch({ scope: "GLOBAL", gender: "ALL" })}
-                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl bg-linear-to-r from-rose-500 to-pink-500 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:opacity-95"
+                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl bg-linear-to-r from-rose-500 to-pink-500 py-2.5 text-xs font-black text-white shadow-md shadow-rose-500/25 transition-all hover:opacity-95"
               >
-                <Globe className="size-3.5" /> Widen my search
+                <Globe className="size-3.5" /> Widen my search (All Campuses)
               </button>
               <button
                 type="button"
                 onClick={handleResetSwipes}
-                className="flex w-full cursor-pointer items-center justify-center gap-1.5 py-2 text-xs font-semibold text-white/40 transition-colors hover:text-white"
+                className="flex w-full cursor-pointer items-center justify-center gap-1.5 py-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors rounded-xl hover:bg-muted/50"
               >
-                <RotateCcw className="size-3.5" /> Reset swipes
+                <RotateCcw className="size-3.5" /> Reset swipes &amp; review again
               </button>
               <Link
                 href="/app/profile/edit"
-                className="flex w-full items-center justify-center gap-1.5 py-1 text-xs font-semibold text-white/40 transition-colors hover:text-white"
+                className="flex w-full items-center justify-center gap-1.5 py-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors rounded-xl hover:bg-muted/50"
               >
-                <Camera className="size-3.5" /> Improve my profile
+                <Camera className="size-3.5" /> Upload more photos to get 3x matches
               </Link>
             </div>
           </div>

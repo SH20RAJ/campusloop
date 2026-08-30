@@ -325,18 +325,18 @@ export function SwipeActions({
   }
 
   return (
-    <div className="flex items-center justify-center gap-5">
+    <div className="flex items-center justify-center gap-4 py-1">
       <button
         type="button"
         onClick={handleUndo}
         disabled={!canUndo}
         aria-label="Undo last swipe"
-        className="flex size-12 items-center justify-center rounded-full border border-white/15 bg-white/5 text-amber-400 backdrop-blur-md transition-all hover:scale-110 hover:bg-white/10 active:scale-95 cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
+        className="flex size-11 items-center justify-center rounded-full border border-amber-500/40 bg-card text-amber-500 shadow-xs transition-all hover:scale-105 hover:bg-amber-500/15 active:scale-90 cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
       >
         <svg
           viewBox="0 0 24 24"
           fill="none"
-          className="size-5"
+          className="size-4.5"
           stroke="currentColor"
           strokeWidth={2.5}
           strokeLinecap="round"
@@ -351,18 +351,18 @@ export function SwipeActions({
         type="button"
         onClick={handlePass}
         aria-label="Pass"
-        className="flex size-16 items-center justify-center rounded-full border-2 border-rose-500/50 bg-white/5 text-rose-500 backdrop-blur-md transition-all hover:scale-110 hover:bg-rose-500/15 active:scale-90 cursor-pointer"
+        className="flex size-14 items-center justify-center rounded-full border-2 border-rose-500/40 bg-card text-rose-500 shadow-md transition-all hover:scale-105 hover:bg-rose-500/15 hover:border-rose-500 active:scale-90 cursor-pointer"
       >
-        <X className="size-8" strokeWidth={3} />
+        <X className="size-7" strokeWidth={2.5} />
       </button>
 
       <button
         type="button"
         onClick={handleLike}
         aria-label="Like"
-        className="flex size-16 items-center justify-center rounded-full bg-linear-to-tr from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/40 transition-all hover:scale-110 active:scale-90 cursor-pointer"
+        className="flex size-14 items-center justify-center rounded-full bg-linear-to-tr from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/35 transition-all hover:scale-105 hover:opacity-95 active:scale-90 cursor-pointer"
       >
-        <Heart className="size-8 fill-white" />
+        <Heart className="size-7 fill-white" />
       </button>
     </div>
   );

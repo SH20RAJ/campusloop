@@ -73,7 +73,7 @@ export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
   { icon: Compass, href: "/app/discover", label: "Explore" },
   { icon: Plus, href: "/app/post/new", label: "Post" },
   { icon: ShoppingBag, href: "/app/marketplace", label: "Market" },
-  { icon: MoreHorizontal, href: "/app/more", label: "More" },
+  { icon: Heart, href: "/app/dating", label: "Dating" },
 ];
 
 /**

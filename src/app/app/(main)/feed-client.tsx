@@ -3,7 +3,7 @@
 import { Flame } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { FeedHeader } from "@/components/feed/feed-header";
@@ -90,17 +90,31 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     const savedMode =
       typeof window !== "undefined" ? localStorage.getItem("campusloop_feed_visibility") : null;
     const mode = profile?.feedVisibility ?? savedMode ?? "ALL";
-    if (mode === "NON_ANONYMOUS") {
-      setVisibility("public");
-    } else {
-      setVisibility("all");
+    setVisibility(mode === "NON_ANONYMOUS" ? "public" : "all");
+
+    function handleSync(e: CustomEvent<string>) {
+      const activeMode =
+        e.detail ||
+        (typeof window !== "undefined" ? localStorage.getItem("campusloop_feed_visibility") : "ALL");
+      setVisibility(activeMode === "NON_ANONYMOUS" ? "public" : "all");
     }
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("campusloop_feed_visibility_change" as any, handleSync as any);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("campusloop_feed_visibility_change" as any, handleSync as any);
+      }
+    };
   }, [profile?.feedVisibility]);
 
   function handleVisibilityChange(newVis: string) {
     setVisibility(newVis);
+    const newMode = newVis === "public" ? "NON_ANONYMOUS" : "ALL";
     if (typeof window !== "undefined") {
-      localStorage.setItem("campusloop_feed_visibility", newVis === "public" ? "NON_ANONYMOUS" : "ALL");
+      localStorage.setItem("campusloop_feed_visibility", newMode);
+      window.dispatchEvent(new CustomEvent("campusloop_feed_visibility_change", { detail: newMode }));
     }
   }
 
@@ -114,6 +128,14 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     setSize,
     refresh,
   } = useFeed(scope, type, sort, visibility);
+
+  const displayedPosts: FeedPost[] = useMemo(() => {
+    if (!feed) return [];
+    if (visibility === "public") {
+      return feed.filter((post) => !post.isAnonymous && post.type !== "CONFESSION");
+    }
+    return feed;
+  }, [feed, visibility]);
 
   const { stories, mutate: mutateStories, isLoading: storiesLoading } = useStories();
 
@@ -347,9 +369,9 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
             <FeedSkeleton />
           ) : isError && (!feed || feed.length === 0) ? (
             <FeedErrorState onRetry={() => refresh()} />
-          ) : feed && feed.length > 0 ? (
+          ) : displayedPosts && displayedPosts.length > 0 ? (
             <>
-              {feed.map((post, idx) => (
+              {displayedPosts.map((post, idx) => (
                 <div key={post.id}>
                   <FeedCard post={post} currentUserId={profile?.id} />
                   {idx === 2 && (

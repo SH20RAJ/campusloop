@@ -66,6 +66,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
     setFeedVisibility(mode);
     if (typeof window !== "undefined") {
       localStorage.setItem("campusloop_feed_visibility", mode);
+      window.dispatchEvent(new CustomEvent("campusloop_feed_visibility_change", { detail: mode }));
     }
 
     try {

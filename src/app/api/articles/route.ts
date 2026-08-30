@@ -89,11 +89,14 @@ export async function GET(req: NextRequest) {
       orderByClause = [desc(articles.viewsCount), desc(articles.createdAt)];
     }
 
+    // The hub, feed widget and search all render cards from `excerpt`, so the
+    // full markdown body is never needed here and would dominate the response.
     const articleList = await db.query.articles.findMany({
       where: and(...conditions),
       orderBy: orderByClause,
       limit,
       offset,
+      columns: { content: false },
       with: {
         author: {
           with: { institution: true },

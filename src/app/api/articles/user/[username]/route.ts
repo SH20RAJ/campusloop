@@ -25,12 +25,13 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // This powers a card list, which never renders the body — omitting `content`
+    // keeps a prolific author's profile from shipping a megabyte of markdown.
     const userArticles = await db.query.articles.findMany({
-      where: and(
-        eq(articles.authorId, targetUser.id),
-        eq(articles.status, status)
-      ),
+      where: and(eq(articles.authorId, targetUser.id), eq(articles.status, status)),
       orderBy: [desc(articles.createdAt)],
+      limit: 60,
+      columns: { content: false },
       with: {
         author: {
           with: { institution: true },

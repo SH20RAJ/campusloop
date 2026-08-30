@@ -111,10 +111,12 @@ export function ProfileClientView({
   const [showPhotoLightbox, setShowPhotoLightbox] = useState<string | null>(null);
   const [showQrModal, setShowQrModal] = useState(false);
 
-  // Fetch articles for this user
+  // Fetched unconditionally so the Articles tab shows a real count instead of
+  // "(0)" until someone opens it. The payload excludes article bodies.
   const { data: userArticlesData, isLoading: isLoadingArticles } = useSWR<{ articles: any[] }>(
-    activeTab === "articles" ? `/api/articles/user/${profile.username}` : null,
-    fetcher
+    `/api/articles/user/${profile.username}`,
+    fetcher,
+    { dedupingInterval: 60000 }
   );
   const userArticles = userArticlesData?.articles || [];
   const bannerInputRef = useRef<HTMLInputElement | null>(null);

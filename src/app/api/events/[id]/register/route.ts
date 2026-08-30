@@ -14,14 +14,14 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const auth = await hexclaveServerApp.getUser();
-    if (!auth?.user?.id) {
+    const user = await hexclaveServerApp.getUser();
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const db = getDb();
     const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, auth.user.id),
+      where: eq(userProfiles.userId, user.id),
       with: {
         institution: true,
       },
@@ -78,7 +78,7 @@ export async function POST(
       });
     }
 
-    const body = await req.json().catch(() => ({}));
+    const body = ((await req.json().catch(() => ({}))) || {}) as Record<string, any>;
     const {
       registrationType = "SOLO",
       teamName,
@@ -118,13 +118,11 @@ export async function POST(
     // Create confirmation notification
     try {
       await db.insert(notifications).values({
-        id: `notif_${nanoid(12)}`,
         userId: profile.id,
         actorId: event.organizerProfileId,
-        type: "SYSTEM",
-        title: "Event Registration Confirmed 🎟️",
-        content: `You are officially registered for ${event.title} organized by ${event.clubName}!`,
-        data: { eventId: event.id, slug: event.slug },
+        type: "EVENT_REGISTRATION",
+        referenceId: event.id,
+        previewText: `You are officially registered for ${event.title} organized by ${event.clubName}!`,
       });
     } catch {
       // Non-blocking
@@ -148,14 +146,14 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const auth = await hexclaveServerApp.getUser();
-    if (!auth?.user?.id) {
+    const user = await hexclaveServerApp.getUser();
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const db = getDb();
     const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, auth.user.id),
+      where: eq(userProfiles.userId, user.id),
     });
 
     if (!profile) {

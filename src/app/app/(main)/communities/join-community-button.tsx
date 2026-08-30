@@ -10,7 +10,7 @@ import { joinCommunity } from "./actions";
 
 interface JoinButtonProps {
   communityId: string;
-  initialIsMember: boolean;
+  initialIsMember?: boolean;
   className?: string;
   /** Notified immediately on the optimistic flip, and again if it is rolled back. */
   onMembershipChange?: (isMember: boolean) => void;
@@ -18,7 +18,7 @@ interface JoinButtonProps {
 
 export function JoinCommunityButton({
   communityId,
-  initialIsMember,
+  initialIsMember = false,
   className,
   onMembershipChange,
 }: JoinButtonProps) {

@@ -64,7 +64,7 @@ export function EventEmbed({ eventId }: EventEmbedProps) {
   async function handleQuickRegister(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (isRegistering || userRegistered) return;
+    if (!event || isRegistering || userRegistered) return;
 
     setIsRegistering(true);
     try {
@@ -74,7 +74,7 @@ export function EventEmbed({ eventId }: EventEmbedProps) {
         body: JSON.stringify({ registrationType: "SOLO" }),
       });
 
-      const resData = await res.json();
+      const resData = (await res.json()) as { error?: string };
       if (!res.ok) {
         throw new Error(resData.error || "Failed to register");
       }

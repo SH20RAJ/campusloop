@@ -17,11 +17,11 @@ export async function GET(req: Request) {
     const query = searchParams.get("q") || "";
 
     // Authenticated user session
-    const auth = await hexclaveServerApp.getUser();
+    const user = await hexclaveServerApp.getUser();
     let currentProfile = null;
-    if (auth?.user?.id) {
+    if (user?.id) {
       currentProfile = await db.query.userProfiles.findFirst({
-        where: eq(userProfiles.userId, auth.user.id),
+        where: eq(userProfiles.userId, user.id),
       });
     }
 
@@ -143,14 +143,14 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const auth = await hexclaveServerApp.getUser();
-    if (!auth?.user?.id) {
+    const user = await hexclaveServerApp.getUser();
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const db = getDb();
     const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, auth.user.id),
+      where: eq(userProfiles.userId, user.id),
     });
 
     if (!profile) {
@@ -161,7 +161,7 @@ export async function POST(req: Request) {
     const guardResponse = await rejectIfLacksCapability(profile, "CREATE_POST");
     if (guardResponse) return guardResponse;
 
-    const body = await req.json();
+    const body = (await req.json()) as Record<string, any>;
     const {
       title,
       tagline,

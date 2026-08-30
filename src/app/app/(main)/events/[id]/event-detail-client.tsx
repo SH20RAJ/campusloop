@@ -38,7 +38,7 @@ interface EventDetailClientProps {
 
 export function EventDetailClient({ eventId }: EventDetailClientProps) {
   const router = useRouter();
-  const { data, isLoading } = useSWR(
+  const { data, isLoading } = useSWR<{ event: any }>(
     `/api/events/${eventId}`,
     fetcher,
     { revalidateOnFocus: false }
@@ -146,7 +146,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
       const res = await fetch(`/api/events/${event.id}/reminder`, {
         method: "POST",
       });
-      const resData = await res.json();
+      const resData = (await res.json()) as Record<string, any>;
       if (!res.ok) throw new Error(resData.error);
 
       if (resData.reminderSet) {
@@ -183,7 +183,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
         }),
       });
 
-      const resData = await res.json();
+      const resData = (await res.json()) as Record<string, any>;
       if (!res.ok) {
         throw new Error(resData.error || "Failed to register");
       }

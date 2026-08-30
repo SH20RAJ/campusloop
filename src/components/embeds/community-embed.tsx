@@ -57,6 +57,7 @@ export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
   function handleShare(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
+    if (!community) return;
     haptics.light();
     const url = `${window.location.origin}/c/${community.id}`;
     if (navigator.share) {

@@ -13,14 +13,14 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const auth = await hexclaveServerApp.getUser();
-    if (!auth?.user?.id) {
+    const user = await hexclaveServerApp.getUser();
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const db = getDb();
     const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, auth.user.id),
+      where: eq(userProfiles.userId, user.id),
     });
 
     if (!profile) {

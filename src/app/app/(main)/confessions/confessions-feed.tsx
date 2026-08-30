@@ -8,7 +8,6 @@ import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
-  Clock,
   Dices,
   Flame,
   Globe,
@@ -17,9 +16,7 @@ import {
   School,
   Shield,
   Sparkles,
-  Trophy,
   VenetianMask,
-  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -43,7 +40,7 @@ export function ConfessionsFeed() {
 
   const rawSort = searchParams.get("sort") || "spicy";
   const [currentSort, setCurrentSort] = useState<string>(rawSort);
-  const [randomSeed, setRandomSeed] = useState<number>(() => Date.now());
+  const [randomSeed, setRandomSeed] = useState<number>(0);
   const [isRotating, setIsRotating] = useState(false);
 
   const {
@@ -87,7 +84,7 @@ export function ConfessionsFeed() {
     haptics.light();
     setCurrentSort(sortId);
     if (sortId === "random") {
-      setRandomSeed(Date.now());
+      setRandomSeed((prev) => prev + 1);
     }
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", sortId);
@@ -98,7 +95,7 @@ export function ConfessionsFeed() {
     sounds.pop();
     haptics.medium();
     setIsRotating(true);
-    setRandomSeed(Date.now());
+    setRandomSeed((prev) => prev + 1);
     mutate();
     setTimeout(() => setIsRotating(false), 700);
   }

@@ -901,12 +901,12 @@ export function MessengerPane({
                   >
                     <div
                       className={cn(
-                        "relative text-xs leading-relaxed transition-all shadow-xs",
+                        "relative text-[14px] leading-relaxed transition-all shadow-xs",
                         isDirectMedia
                           ? "p-0 bg-transparent border-0"
                           : isMe
-                          ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-xs px-3.5 py-2"
-                          : "bg-card dark:bg-[#1e293b] text-foreground rounded-2xl rounded-tl-xs px-3.5 py-2 border border-border/40"
+                          ? "bg-[#1d9bf0] text-white rounded-2xl rounded-br-xs px-4 py-2.5"
+                          : "bg-[#202327] dark:bg-[#202327] bg-neutral-100 text-foreground rounded-2xl rounded-bl-xs px-4 py-2.5 border border-border/20"
                       )}
                     >
                       {/* Quoted Message Preview Bar */}
@@ -1135,23 +1135,28 @@ export function MessengerPane({
         )}
         <form
           onSubmit={handleSendSubmit}
-          className="max-w-4xl mx-auto w-full flex items-end gap-1.5 sm:gap-2"
+          className="max-w-3xl mx-auto w-full flex items-center gap-1.5 bg-muted/50 dark:bg-[#202327] rounded-3xl p-1.5 pl-2.5 border border-border/40 focus-within:border-[#1d9bf0]/60 transition-all shadow-xs"
         >
           {/* Action Attachments */}
-          <div className="flex items-center gap-0.5 shrink-0 mb-0.5">
+          <div className="flex items-center gap-1 shrink-0 text-[#1d9bf0]">
             <button
               type="button"
-              onClick={() => setShowStickerPicker(true)}
-              className="flex size-9 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-              title="Send Sticker"
+              disabled={isUploadingImage}
+              onClick={() => fileInputRef.current?.click()}
+              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-[#1d9bf0] transition-colors cursor-pointer"
+              title="Attach Photo"
             >
-              <Smile className="size-4.5" />
+              {isUploadingImage ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Paperclip className="size-4" />
+              )}
             </button>
 
             <button
               type="button"
               onClick={() => setShowGifPicker(true)}
-              className="flex h-9 px-2 items-center justify-center rounded-xl text-xs font-black text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              className="flex h-5 px-1.5 items-center justify-center rounded border border-[#1d9bf0]/50 text-[10px] font-black text-[#1d9bf0] hover:bg-[#1d9bf0]/10 transition-colors cursor-pointer leading-none"
               title="Send GIF"
             >
               GIF
@@ -1159,16 +1164,11 @@ export function MessengerPane({
 
             <button
               type="button"
-              disabled={isUploadingImage}
-              onClick={() => fileInputRef.current?.click()}
-              className="flex size-9 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-              title="Attach Photo"
+              onClick={() => setShowStickerPicker(true)}
+              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-[#1d9bf0] transition-colors cursor-pointer"
+              title="Send Sticker / Emoji"
             >
-              {isUploadingImage ? (
-                <Loader2 className="size-4.5 animate-spin text-primary" />
-              ) : (
-                <Paperclip className="size-4.5" />
-              )}
+              <Smile className="size-4" />
             </button>
           </div>
 
@@ -1176,12 +1176,12 @@ export function MessengerPane({
           <textarea
             ref={textareaRef}
             rows={1}
-            placeholder="Type a message... (@ to mention)"
+            placeholder="Start a new message..."
             value={msgText}
             onChange={(e) => setMsgText(e.target.value)}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
-            className="flex min-h-[40px] max-h-36 flex-1 resize-none rounded-2xl bg-muted/40 dark:bg-[#1e293b] px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-medium placeholder:text-muted-foreground/60 focus:bg-background border border-border/40 outline-none focus:border-primary transition-all leading-relaxed scrollbar-none"
+            className="flex min-h-[36px] max-h-32 flex-1 resize-none bg-transparent px-2 py-2 text-[14px] font-normal text-foreground placeholder:text-muted-foreground/60 outline-none leading-snug scrollbar-none"
           />
 
           {/* Voice Memo Button or Send Button */}
@@ -1190,7 +1190,7 @@ export function MessengerPane({
               type="submit"
               disabled={isSending}
               aria-label="Send message"
-              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs transition-transform active:scale-90 cursor-pointer mb-0.5"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#1d9bf0] text-white hover:opacity-90 shadow-xs transition-transform active:scale-90 cursor-pointer mr-1"
             >
               <Send className="size-4" />
             </button>
@@ -1199,10 +1199,10 @@ export function MessengerPane({
               type="button"
               onClick={handleSendVoiceMemo}
               aria-label="Record voice memo"
-              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted/60 hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-all cursor-pointer shadow-xs active:scale-90 mb-0.5"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full hover:bg-muted/70 text-muted-foreground hover:text-[#1d9bf0] transition-all cursor-pointer mr-1 active:scale-90"
               title="Click to send voice note"
             >
-              <Mic className="size-4.5" />
+              <Mic className="size-4" />
             </button>
           )}
         </form>

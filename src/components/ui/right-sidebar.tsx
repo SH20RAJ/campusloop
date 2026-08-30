@@ -103,7 +103,7 @@ export function RightSidebar() {
 
       {/* ─── COMPONENT 1: What's happening (Trending on Campus) ─── */}
       {trends.length > 0 && (
-        <section className="space-y-1">
+        <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-1">
           <div className="px-1 pb-1">
             <h3 className="text-[17px] font-black tracking-tight text-foreground">
               What&apos;s happening
@@ -115,7 +115,7 @@ export function RightSidebar() {
               <Link
                 key={trend.topic}
                 href={trend.href}
-                className="flex items-start justify-between px-2 py-2.5 hover:bg-muted/25 rounded-xl transition-colors group cursor-pointer"
+                className="flex items-start justify-between px-2 py-2.5 hover:bg-muted/30 rounded-xl transition-colors group cursor-pointer"
               >
                 <div className="space-y-0.5 min-w-0 flex-1">
                   <p className="text-[11px] text-muted-foreground font-medium truncate">
@@ -135,20 +135,16 @@ export function RightSidebar() {
 
           <Link
             href="/app/discover"
-            className="block px-2 pt-1 text-xs font-bold text-primary hover:underline transition-colors cursor-pointer"
+            className="block px-2 pt-2 text-xs font-bold text-primary hover:underline transition-colors cursor-pointer"
           >
             Show more
           </Link>
         </section>
       )}
 
-      {trends.length > 0 && peers.length > 0 && (
-        <hr className="border-border/30 my-3" />
-      )}
-
       {/* ─── COMPONENT 2: Who to follow (Classmates & Peers) ─── */}
       {peers.length > 0 && (
-        <section className="space-y-1">
+        <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-1">
           <div className="px-1 pb-1 flex items-center justify-between">
             <h3 className="text-[17px] font-black tracking-tight text-foreground">
               Who to follow
@@ -170,7 +166,7 @@ export function RightSidebar() {
               return (
                 <div
                   key={peer.id}
-                  className="flex items-center justify-between gap-3 px-2 py-2.5 hover:bg-muted/25 rounded-xl transition-colors"
+                  className="flex items-center justify-between gap-3 px-2 py-2.5 hover:bg-muted/30 rounded-xl transition-colors"
                 >
                   <Link
                     href={`/@${peer.username}`}
@@ -215,7 +211,7 @@ export function RightSidebar() {
 
           <Link
             href="/app/discover"
-            className="block px-2 pt-1 text-xs font-bold text-primary hover:underline transition-colors cursor-pointer"
+            className="block px-2 pt-2 text-xs font-bold text-primary hover:underline transition-colors cursor-pointer"
           >
             Show more
           </Link>

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import { extractEmbedsFromText, extractSpotifyEmbedUrl, extractYouTubeId } from "./embeds";
 
 describe("Link and Embed Parsing Engine", () => {
@@ -10,6 +10,27 @@ describe("Link and Embed Parsing Engine", () => {
   it("extracts short youtu.be URLs and shorts", () => {
     expect(extractYouTubeId("https://youtu.be/dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ");
     expect(extractYouTubeId("https://youtube.com/shorts/abc12345678")).toBe("abc12345678");
+  });
+
+  it("extracts live, mobile, music and query-shuffled YouTube URLs", () => {
+    expect(extractYouTubeId("https://www.youtube.com/live/dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ");
+    expect(extractYouTubeId("https://m.youtube.com/watch?v=dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ");
+    expect(extractYouTubeId("https://music.youtube.com/watch?v=dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ");
+    // The `v` param is not always first — YouTube's own share links reorder it.
+    expect(extractYouTubeId("https://www.youtube.com/watch?feature=shared&v=dQw4w9WgXcQ")).toBe(
+      "dQw4w9WgXcQ"
+    );
+    expect(extractYouTubeId("https://youtu.be/dQw4w9WgXcQ?si=AbCdEfGhIjKl")).toBe("dQw4w9WgXcQ");
+  });
+
+  it("renders a live stream link as a YouTube embed rather than a bare link preview", () => {
+    const embeds = extractEmbedsFromText("Tune in https://www.youtube.com/live/dQw4w9WgXcQ");
+    expect(embeds[0]?.type).toBe("youtube");
+    expect(embeds[0]?.embedUrl).toBe("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ");
+  });
+
+  it("ignores lookalike hosts that are not YouTube", () => {
+    expect(extractYouTubeId("https://notyoutube.com/watch?v=dQw4w9WgXcQ")).toBeNull();
   });
 
   it("extracts Spotify embed URLs", () => {

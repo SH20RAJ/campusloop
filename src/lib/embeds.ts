@@ -38,13 +38,26 @@ export interface ParsedEmbed {
 }
 
 /**
- * Extract YouTube video ID from various YouTube URL formats
+ * Extract YouTube video ID from every YouTube URL shape students actually paste:
+ * `watch?v=`, `watch?feature=x&v=`, `shorts/`, `live/`, `embed/`, `v/`, `youtu.be/`,
+ * across the `www`, `m` and `music` subdomains.
  */
 export function extractYouTubeId(url: string): string | null {
-  const match = url.match(
-    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i
-  );
-  return match ? match[1] : null;
+  // The leading lookbehind keeps lookalike hosts such as `notyoutube.com` from
+  // matching the bare `youtube.com` tail of the pattern.
+  const patterns = [
+    // youtu.be/ID and youtube.com/{shorts,live,embed,v}/ID
+    /(?<![\w.-])(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com\/(?:shorts|live|embed|v)\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/i,
+    // youtube.com/watch?...v=ID (the v param may sit anywhere in the query string)
+    /(?<![\w.-])(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtube\.com\/watch\?(?:[^#]*&)?v=([a-zA-Z0-9_-]{11})/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+
+  return null;
 }
 
 /**

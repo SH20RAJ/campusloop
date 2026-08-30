@@ -12,6 +12,7 @@ import {
   setCachedMessages,
   updateCachedConversationLastMessage,
 } from "@/lib/chat-cache";
+import { extractYouTubeId } from "@/lib/embeds";
 import { haptics } from "@/lib/haptics";
 import { isOnline,presenceLabel } from "@/lib/presence";
 import { sounds } from "@/lib/sounds";
@@ -58,9 +59,12 @@ interface MessengerPaneProps {
 
 const QUICK_REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥"];
 
+/**
+ * Chat reuses the shared feed parser so a link that embeds in a post embeds in
+ * a DM too (Shorts, live streams and `m.`/`music.` links included).
+ */
 function getYouTubeVideoId(text: string) {
-  const match = text.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i);
-  return match ? match[1] : null;
+  return extractYouTubeId(text);
 }
 
 function renderMessageWithMentions(text: string) {

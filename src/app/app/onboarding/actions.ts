@@ -83,10 +83,17 @@ export async function completeOnboarding(formData: FormData) {
     where: eq(institutionDomains.domain, domain),
   });
 
-  // Non-college emails join in Viewer-Only Mode: they get a profile in the
-  // reserved Viewer Hub and can browse everything, but write APIs refuse them.
-  const institutionId = whitelistedDomain
-    ? whitelistedDomain.institutionId
+  // A college domain only grants campus access once the provider confirms the
+  // student can actually read that inbox. Signing up with someone else's
+  // college address and never verifying it must not hand over their campus.
+  const isVerifiedCollegeEmail = Boolean(whitelistedDomain) && user.primaryEmailVerified;
+
+  // Everyone else joins in Campus Preview: a profile in the reserved Viewer Hub
+  // that can browse everything, while write APIs refuse them. An unverified
+  // college address lands here too, and can unlock later through the verified
+  // upgrade flow without losing anything.
+  const institutionId = isVerifiedCollegeEmail
+    ? whitelistedDomain!.institutionId
     : await getViewerInstitutionId();
 
   // Handle referral tracking
@@ -113,7 +120,7 @@ export async function completeOnboarding(formData: FormData) {
   const cleanAvatarUrl = avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
 
   // Only aspirants carry a stage; for students the branch and year say it.
-  const headline = aspirantStage && !whitelistedDomain ? `${aspirantStage} · ${branch ?? "Aspirant"}` : null;
+  const headline = aspirantStage && !isVerifiedCollegeEmail ? `${aspirantStage} · ${branch ?? "Aspirant"}` : null;
 
   try {
     await db

@@ -39,7 +39,10 @@ export default async function OnboardingPage() {
         where: eq(institutionDomains.domain, emailDomain),
       })
     : null;
-  const viewerMode = !whitelistedDomain;
+  // Mirrors the server action: an unverified college address is treated as
+  // Campus Preview, so the form asks aspirant questions rather than pretending
+  // the student is already verified.
+  const viewerMode = !whitelistedDomain || !user.primaryEmailVerified;
 
   // Smart Name Parser: e.g. "shaswat.raj" -> "Shaswat Raj", "aarav_sharma" -> "Aarav Sharma"
   function parseNameFromEmail(raw: string): string {

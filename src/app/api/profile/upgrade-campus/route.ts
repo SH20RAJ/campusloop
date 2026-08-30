@@ -1,11 +1,20 @@
-import { getDb } from "@/db";
-import { institutionDomains, institutions, savedPosts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { count, eq, ilike, or } from "drizzle-orm";
+import { checkCampusUpgradeEligibility } from "@/lib/campus-upgrade";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Step 1 of the campus upgrade: prove the student can read the college inbox.
+ *
+ * This endpoint grants nothing. It attaches the address to the signed-in auth
+ * account as an unverified, non-primary contact channel and emails a
+ * verification link. `/api/profile/upgrade-campus/confirm` applies the upgrade
+ * once the provider reports the channel verified.
+ *
+ * It previously flipped the account to STUDENT on the strength of a typed
+ * string, with no ownership check and no deduplication.
+ */
 export async function POST(req: Request) {
   try {
     const user = await hexclaveServerApp.getUser();
@@ -13,111 +22,58 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = (await req.json().catch(() => ({}))) as {
-      collegeEmail?: string;
-      institutionId?: string;
-    };
+    const body = (await req.json().catch(() => ({}))) as { collegeEmail?: string };
 
-    const { collegeEmail, institutionId } = body;
-
-    if (!collegeEmail || !collegeEmail.includes("@")) {
+    // `institutionId` is deliberately not read from the body: the campus is
+    // derived from the verified domain, never chosen by the caller.
+    const check = await checkCampusUpgradeEligibility(body.collegeEmail || "");
+    if (!check.ok) {
       return NextResponse.json(
-        { error: "Please enter a valid official college email" },
-        { status: 400 }
+        { error: check.error, unrecognizedDomain: check.unrecognizedDomain },
+        { status: check.status }
       );
     }
 
-    const cleanEmail = collegeEmail.trim().toLowerCase();
-    const domain = cleanEmail.split("@")[1];
+    const { email, institution } = check;
 
-    const db = getDb();
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
+    const channels = await user.listContactChannels();
+    let channel = channels.find((c) => c.value.toLowerCase() === email);
+
+    if (channel?.isVerified) {
+      // Already proven on a previous attempt — let the confirm step finish it.
+      return NextResponse.json({
+        pending: false,
+        alreadyVerified: true,
+        email,
+        college: { id: institution.id, name: institution.name, slug: institution.slug },
+      });
+    }
+
+    if (!channel) {
+      // Not primary and not usable for sign-in until it is verified and the
+      // upgrade is confirmed, so an unverified address can never be a way in.
+      channel = await user.createContactChannel({
+        value: email,
+        type: "email",
+        usedForAuth: false,
+        isPrimary: false,
+      });
+    }
+
+    await channel.sendVerificationEmail({
+      callbackUrl: "https://campusloop.space/app/profile?campus_verified=1",
     });
 
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-    }
-
-    // Resolve target institution by explicit ID or domain match
-    let targetInstitution = null;
-
-    if (institutionId) {
-      targetInstitution = await db.query.institutions.findFirst({
-        where: eq(institutions.id, institutionId),
-      });
-    }
-
-    if (!targetInstitution && domain) {
-      // Look up institutionDomains table
-      const domainMatch = await db.query.institutionDomains.findFirst({
-        where: eq(institutionDomains.domain, domain),
-        with: { institution: true },
-      });
-
-      if (domainMatch?.institution) {
-        targetInstitution = domainMatch.institution;
-      }
-    }
-
-    if (!targetInstitution && domain) {
-      // Fuzzy match by website or slug
-      targetInstitution = await db.query.institutions.findFirst({
-        where: or(
-          ilike(institutions.website, `%${domain}%`),
-          ilike(institutions.slug, `%${domain.split(".")[0]}%`)
-        ),
-      });
-    }
-
-    if (!targetInstitution) {
-      return NextResponse.json(
-        {
-          error:
-            "Could not automatically detect your campus from this domain. Please select your college from the directory or request an index.",
-          unrecognizedDomain: domain,
-        },
-        { status: 404 }
-      );
-    }
-
-    // Atomic in-place upgrade from VIEWER to STUDENT
-    await db
-      .update(userProfiles)
-      .set({
-        institutionId: targetInstitution.id,
-        role: "STUDENT",
-        email: cleanEmail,
-        status: "ACTIVE",
-      })
-      .where(eq(userProfiles.id, profile.id));
-
-    // Calculate journey recap stats
-    const [savedCountResult] = await db
-      .select({ val: count() })
-      .from(savedPosts)
-      .where(eq(savedPosts.profileId, profile.id));
-
-    const savedPostsCount = savedCountResult?.val ?? 0;
-
     return NextResponse.json({
-      success: true,
-      college: {
-        id: targetInstitution.id,
-        name: targetInstitution.name,
-        slug: targetInstitution.slug,
-        logoUrl: targetInstitution.logoUrl,
-        state: targetInstitution.state,
-      },
-      journeyStats: {
-        savedPostsCount,
-        collegeName: targetInstitution.name,
-      },
+      pending: true,
+      email,
+      college: { id: institution.id, name: institution.name, slug: institution.slug },
+      message: `We've sent a verification link to ${email}. Open it, then come back to finish unlocking your campus.`,
     });
   } catch (error) {
     console.error("POST /api/profile/upgrade-campus error:", error);
     return NextResponse.json(
-      { error: "Failed to upgrade campus mode" },
+      { error: error instanceof Error ? error.message : "Failed to start campus verification" },
       { status: 500 }
     );
   }

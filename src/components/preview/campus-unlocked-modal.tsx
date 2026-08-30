@@ -2,14 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import {
   ArrowRight,
   CheckCircle2,
   GraduationCap,
   Mail,
   School,
-  ShieldCheck,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -36,12 +34,17 @@ export function CampusUnlockedModal({
   const [collegeEmail, setCollegeEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [journeyStats, setJourneyStats] = useState<JourneyStats | null>(null);
+  const [stage, setStage] = useState<"email" | "verify">("email");
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  async function handleUpgrade(e: React.FormEvent) {
+  /** Step 1: ask the provider to email a verification link. Grants nothing. */
+  async function handleRequestVerification(e: React.FormEvent) {
     e.preventDefault();
     if (!collegeEmail.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
+    setError(null);
     try {
       const res = await fetch("/api/profile/upgrade-campus", {
         method: "POST",
@@ -49,18 +52,67 @@ export function CampusUnlockedModal({
         body: JSON.stringify({ collegeEmail }),
       });
 
-      const data = (await res.json()) as { error?: string; journeyStats?: JourneyStats };
+      const data = (await res.json()) as {
+        error?: string;
+        pending?: boolean;
+        alreadyVerified?: boolean;
+        email?: string;
+      };
+      if (!res.ok) throw new Error(data.error || "Could not start verification");
+
+      setPendingEmail(data.email || collegeEmail.trim().toLowerCase());
+
+      // A previous attempt may already be verified; finish immediately.
+      if (data.alreadyVerified) {
+        await handleConfirm(data.email || collegeEmail);
+        return;
+      }
+
+      setStage("verify");
+      toast.success("Verification link sent");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Verification failed";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  /** Step 2: apply the upgrade, but only once the provider says it is verified. */
+  async function handleConfirm(emailOverride?: string) {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/profile/upgrade-campus/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ collegeEmail: emailOverride || pendingEmail || collegeEmail }),
+      });
+
+      const data = (await res.json()) as {
+        error?: string;
+        pendingVerification?: boolean;
+        journeyStats?: JourneyStats;
+      };
+
       if (!res.ok) {
-        throw new Error(data.error || "Failed to verify college email");
+        if (data.pendingVerification) {
+          setError("Not verified yet — open the link in your inbox, then try again.");
+          return;
+        }
+        throw new Error(data.error || "Could not unlock your campus");
       }
 
       sounds.pop();
-      if (data.journeyStats) {
-        setJourneyStats(data.journeyStats);
-      }
+      if (data.journeyStats) setJourneyStats(data.journeyStats);
       onSuccess?.();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Verification failed");
+      const message = err instanceof Error ? err.message : "Verification failed";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -144,8 +196,59 @@ export function CampusUnlockedModal({
               <ArrowRight className="size-4" />
             </Button>
           </div>
+        ) : stage === "verify" ? (
+          /* ─── STAGE 2: WAITING ON THE VERIFICATION LINK ─── */
+          <div className="space-y-5 relative z-10">
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute -top-2 -right-2 size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <X className="size-4" />
+            </button>
+
+            <div className="mx-auto size-14 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+              <Mail className="size-7" />
+            </div>
+
+            <div className="space-y-1.5">
+              <h2 className="text-xl font-black tracking-tight text-foreground">Check your inbox</h2>
+              <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
+                We sent a verification link to{" "}
+                <strong className="text-foreground">{pendingEmail}</strong>. Open it, then come back
+                here to finish unlocking your campus.
+              </p>
+            </div>
+
+            {error && <p className="text-[11px] font-semibold text-destructive">{error}</p>}
+
+            <div className="space-y-2">
+              <Button
+                type="button"
+                onClick={() => handleConfirm()}
+                disabled={isSubmitting}
+                className="w-full h-11 text-xs font-black rounded-2xl bg-foreground text-background hover:opacity-90 transition-opacity gap-2 cursor-pointer shadow-md"
+              >
+                {isSubmitting ? "Checking..." : "I've verified — unlock my campus"}
+                <ArrowRight className="size-3.5" />
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={isSubmitting}
+                onClick={() => {
+                  setStage("email");
+                  setError(null);
+                }}
+                className="w-full h-9 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                Use a different email
+              </Button>
+            </div>
+          </div>
         ) : (
-          /* ─── STAGE 1: EMAIL VERIFICATION INPUT ─── */
+          /* ─── STAGE 1: EMAIL ENTRY ─── */
           <div className="space-y-5 relative z-10">
             <button
               type="button"
@@ -171,7 +274,7 @@ export function CampusUnlockedModal({
               </p>
             </div>
 
-            <form onSubmit={handleUpgrade} className="space-y-4 text-left">
+            <form onSubmit={handleRequestVerification} className="space-y-4 text-left">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-foreground">
                   Official College Email
@@ -188,8 +291,12 @@ export function CampusUnlockedModal({
                   />
                 </div>
                 <p className="text-[10px] text-muted-foreground">
-                  All your past saved posts and profile preferences will be 100% preserved.
+                  We&apos;ll email a link to confirm you can read this inbox. Your saved posts,
+                  profile and points stay on this same account.
                 </p>
+                {error && (
+                  <p className="text-[11px] font-semibold text-destructive">{error}</p>
+                )}
               </div>
 
               <div className="space-y-2 pt-2">
@@ -198,7 +305,7 @@ export function CampusUnlockedModal({
                   disabled={isSubmitting || !collegeEmail.trim()}
                   className="w-full h-11 text-xs font-black rounded-2xl bg-foreground text-background hover:opacity-90 transition-opacity gap-2 cursor-pointer shadow-md"
                 >
-                  {isSubmitting ? "Verifying Campus..." : "Verify & Unlock Campus"}
+                  {isSubmitting ? "Sending link..." : "Send verification link"}
                   <ArrowRight className="size-3.5" />
                 </Button>
 

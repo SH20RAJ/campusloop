@@ -1,3 +1,12 @@
+ also like https://campusloop.space/app/college/bitmesra isnt working on incognito without login fix that I have to rank certain pages that can be ranked on google and users have to see those pages show that also add proper seo just hide feeds and interations , '/Users/shaswatraj/Desktop/startups/campusloop/docs/CAMPUS_PREVIEW_FEATURE.md' also see if this feature is working just give them access to see things around
+
+❯ https://campusloop.space/app/onboarding make ui ux of this page and every other page twitter like clean and minimal dry
+
+❯ also fix https://campusloop.space/merchant-portal/login this page is continueouly redirecting me fix all and dont run build commands everytime it do time waste just check ts erres and commit
+
+ keep separate onboading and schema for viewer mode users and say you need a college email id access to start interating with community
+ 
+
 # CampusLoop Tasks & Fixes
 
 Working notes for CampusLoop. **Open work is at the top**; everything below

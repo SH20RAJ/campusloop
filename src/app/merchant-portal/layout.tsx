@@ -1,8 +1,4 @@
-import { getAuthenticatedMerchant } from "@/lib/merchant-auth";
-import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { MerchantLayoutClient } from "./merchant-layout-client";
 
 export const metadata: Metadata = {
   title: "Merchant Portal | CampusLoop",
@@ -10,37 +6,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function MerchantPortalLayout({
+/**
+ * Metadata-only shell. The session gate lives in the `(portal)` route group so
+ * that `/merchant-portal/login` — which sits outside it — is reachable while
+ * signed out. Gating here redirected the login page to itself forever.
+ */
+export default function MerchantPortalRootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // 1. Try direct merchant session cookie
-  const directMerchant = await getAuthenticatedMerchant();
-  if (directMerchant) {
-    return (
-      <MerchantLayoutClient
-        merchant={directMerchant}
-        profile={{
-          displayName: directMerchant.name,
-          username: directMerchant.loginUsername || directMerchant.slug,
-          avatarUrl: directMerchant.logoUrl,
-        }}
-      >
-        {children}
-      </MerchantLayoutClient>
-    );
-  }
-
-  // 2. Fallback to Hexclave user session
-  const user = await getCachedAuthUser();
-  if (user) {
-    const profile = await getCachedUserProfile(user.id);
-    if (profile) {
-      return <MerchantLayoutClient profile={profile}>{children}</MerchantLayoutClient>;
-    }
-  }
-
-  // 3. Not logged in -> Redirect to dedicated merchant login page
-  redirect("/merchant-portal/login");
+  return <>{children}</>;
 }

@@ -11,4 +11,5 @@ export * from "./gamification";
 export * from "./gifs";
 export * from "./navigation";
 export * from "./seo";
+export * from "./socials";
 export * from "./stickers";

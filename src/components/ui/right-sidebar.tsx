@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SOCIAL_LINKS } from "@/constants/socials";
 import type { Institution, UserProfile } from "@/db/schema";
 import { fetcher } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -213,24 +214,58 @@ export function RightSidebar() {
       <hr className="border-border/30 my-3" />
 
       {/* ─── Twitter Minimal Footer ─── */}
-      <footer className="px-3 pt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground/60 leading-relaxed">
-        <Link href="/terms" className="hover:underline">
-          Terms of Service
-        </Link>
-        <span>·</span>
-        <Link href="/privacy" className="hover:underline">
-          Privacy Policy
-        </Link>
-        <span>·</span>
-        <Link href="/safety" className="hover:underline">
-          Safety
-        </Link>
-        <span>·</span>
-        <Link href="/about" className="hover:underline">
-          About
-        </Link>
-        <span>·</span>
-        <span>© {new Date().getFullYear()} CampusLoop</span>
+      <footer className="px-3 pt-1 space-y-1.5 text-[11px] text-muted-foreground/60 leading-relaxed">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <Link href="/terms" className="hover:underline">
+            Terms
+          </Link>
+          <span>·</span>
+          <Link href="/privacy" className="hover:underline">
+            Privacy
+          </Link>
+          <span>·</span>
+          <Link href="/safety" className="hover:underline">
+            Safety
+          </Link>
+          <span>·</span>
+          <Link href="/about" className="hover:underline">
+            About
+          </Link>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 pt-0.5">
+          <a
+            href={SOCIAL_LINKS.instagram.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-pink-500 transition-colors"
+            title="Instagram @campusloop.space"
+          >
+            Instagram
+          </a>
+          <span>·</span>
+          <a
+            href={SOCIAL_LINKS.linkedin.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-blue-500 transition-colors"
+            title="LinkedIn @mycampusloop"
+          >
+            LinkedIn
+          </a>
+          <span>·</span>
+          <a
+            href={SOCIAL_LINKS.x.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground transition-colors"
+            title="X @mycampusloop"
+          >
+            X
+          </a>
+          <span>·</span>
+          <span>© {new Date().getFullYear()} CampusLoop</span>
+        </div>
       </footer>
     </aside>
   );

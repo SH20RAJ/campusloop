@@ -4,21 +4,20 @@ import {
   BarChart3,
   ChevronDown,
   Clock,
+  Compass,
   FileText,
-  Heart,
   Lock,
   MessageCircle,
-  MessageSquare,
   School,
   ShieldAlert,
   ShieldCheck,
   Users,
+  Zap,
 } from "lucide-react";
 import { Reveal } from "@/components/landing/reveal";
-import { NumberTicker } from "@/components/ui/number-ticker";
 
-// ──────── Section 1: Stats & Numbers ────────
-
+// ──────── Section 1: Stats & Numbers (Preserved in code for reference) ────────
+/*
 const STATS = [
   {
     icon: School,
@@ -70,6 +69,84 @@ export function StatsSection() {
                   <span className="text-primary">{stat.suffix}</span>
                 </p>
                 <p className="mt-1 text-xs font-medium text-muted-foreground">{stat.label}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+*/
+
+// ──────── Section 1 (Replaced): Authentic Campus Pillars & Real Value ────────
+
+const PILLARS = [
+  {
+    icon: School,
+    badge: "1,350+ Hubs",
+    title: "Verified Student Network",
+    desc: "Gated strictly by university email domains. Zero recruiters, zero faculty, zero fake accounts.",
+    accent: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+  },
+  {
+    icon: Lock,
+    badge: "Zero-Knowledge",
+    title: "Cryptographic Anonymity",
+    desc: "Share unfiltered confessions and thoughts behind one-way salted hashes. Zero PII stored or tracked.",
+    accent: "text-purple-500 bg-purple-500/10 border-purple-500/20",
+  },
+  {
+    icon: Compass,
+    badge: "Dual Radius",
+    title: "Local & All-India Pulse",
+    desc: "Switch seamlessly between your hostel/canteen feed and trending student discussions across India.",
+    accent: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+  },
+  {
+    icon: Zap,
+    badge: "Gamified Clout",
+    title: "Loop Points (LP) System",
+    desc: "Earn recognition for helpful answers, unlocking Gold Star verification and exclusive campus perks.",
+    accent: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+  },
+];
+
+export function StatsSection() {
+  return (
+    <section className="border-t border-border/60 bg-muted/10">
+      <div className="mx-auto w-full max-w-6xl px-6 py-20">
+        <Reveal className="mx-auto mb-12 max-w-xl text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Core Pillars</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+            Built purely for genuine campus life.
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            No corporate spam or algorithm traps. Just you, your friends, and your university loop.
+          </p>
+        </Reveal>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {PILLARS.map((pillar, i) => (
+            <Reveal key={pillar.title} delay={i * 0.06}>
+              <div className="relative flex flex-col justify-between h-full overflow-hidden rounded-2xl border border-border/60 bg-card p-5 transition-all hover:border-border hover:shadow-md">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div
+                      className={`flex size-10 items-center justify-center rounded-xl border ${pillar.accent}`}
+                    >
+                      <pillar.icon className="size-5" />
+                    </div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border/40">
+                      {pillar.badge}
+                    </span>
+                  </div>
+
+                  <h3 className="font-heading text-base font-bold text-foreground tracking-tight pt-1">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-xs leading-relaxed text-muted-foreground">{pillar.desc}</p>
+                </div>
               </div>
             </Reveal>
           ))}

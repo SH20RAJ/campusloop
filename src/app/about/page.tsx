@@ -51,7 +51,11 @@ export default function AboutPage() {
       name: "CampusLoop Inc.",
       url: "https://campusloop.space",
       logo: "https://campusloop.space/logo.png",
-      sameAs: ["https://x.com/campusloop", "https://instagram.com/campusloop"],
+      sameAs: [
+        "https://www.instagram.com/campusloop.space/",
+        "https://www.linkedin.com/company/mycampusloop/?viewAsMember=true",
+        "https://x.com/company/mycampusloop/",
+      ],
     },
   };
 

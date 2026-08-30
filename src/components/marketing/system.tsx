@@ -1,8 +1,9 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Instagram, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { SOCIAL_LINKS } from "@/constants/socials";
 import { cn } from "@/lib/utils";
 
 export const BRAND_GRADIENT = "bg-linear-to-r from-indigo-500 via-violet-600 to-purple-600";
@@ -100,6 +101,45 @@ export function MarketingFooter() {
             The verified student-only social network for Indian colleges. Built for students, gated by a
             college email.
           </p>
+
+          {/* ─── Prioritized Social Links (Instagram -> LinkedIn -> X) ─── */}
+          <div className="flex items-center gap-2 pt-2">
+            <a
+              href={SOCIAL_LINKS.instagram.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground transition-colors hover:border-pink-500/50 hover:bg-pink-500/10 hover:text-pink-500 shadow-2xs"
+              aria-label="CampusLoop on Instagram"
+              title="Instagram @campusloop.space"
+            >
+              <Instagram className="size-4" />
+            </a>
+
+            <a
+              href={SOCIAL_LINKS.linkedin.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground transition-colors hover:border-blue-500/50 hover:bg-blue-500/10 hover:text-blue-500 shadow-2xs"
+              aria-label="CampusLoop on LinkedIn"
+              title="LinkedIn @mycampusloop"
+            >
+              <Linkedin className="size-4" />
+            </a>
+
+            <a
+              href={SOCIAL_LINKS.x.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground transition-colors hover:border-foreground/40 hover:bg-foreground/10 hover:text-foreground shadow-2xs"
+              aria-label="CampusLoop on X"
+              title="X (Twitter) @mycampusloop"
+            >
+              <svg className="size-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              <span className="sr-only">X (Twitter)</span>
+            </a>
+          </div>
         </div>
 
         {FOOTER_COLUMNS.map((col) => (
@@ -122,9 +162,37 @@ export function MarketingFooter() {
       </div>
 
       <div className="border-t border-border/60">
-        <p className="mx-auto w-full max-w-6xl px-6 py-5 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} CampusLoop. Your campus, unfiltered.
-        </p>
+        <div className="mx-auto flex w-full max-w-6xl flex-col sm:flex-row items-center justify-between gap-3 px-6 py-5 text-xs text-muted-foreground">
+          <p>© {new Date().getFullYear()} CampusLoop. Your campus, unfiltered.</p>
+          <div className="flex items-center gap-4 text-xs">
+            <a
+              href={SOCIAL_LINKS.instagram.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              Instagram
+            </a>
+            <span>·</span>
+            <a
+              href={SOCIAL_LINKS.linkedin.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              LinkedIn
+            </a>
+            <span>·</span>
+            <a
+              href={SOCIAL_LINKS.x.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              X
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   );

@@ -158,7 +158,11 @@ export default function RootLayout({
               name: "CampusLoop",
               url: "https://campusloop.space",
               logo: "https://campusloop.space/logo.png",
-              sameAs: ["https://twitter.com/campusloop", "https://instagram.com/campusloop"],
+              sameAs: [
+                "https://www.instagram.com/campusloop.space/",
+                "https://www.linkedin.com/company/mycampusloop/?viewAsMember=true",
+                "https://x.com/company/mycampusloop/",
+              ],
               description:
                 "CampusLoop connects students across 1,350+ Indian colleges with verified campus feeds, confessions, dating matches, and sub-hubs.",
             }),

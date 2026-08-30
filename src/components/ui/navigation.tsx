@@ -5,6 +5,8 @@ import {
   Bell,
   GraduationCap,
   HelpCircle,
+  Instagram,
+  Linkedin,
   Menu,
   MessageSquare,
   MoreHorizontal,
@@ -27,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { DESKTOP_NAV_ITEMS, MOBILE_BOTTOM_ITEMS } from "@/constants/navigation";
+import { SOCIAL_LINKS } from "@/constants/socials";
 import type { UserProfile } from "@/db/schema";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { haptics } from "@/lib/haptics";
@@ -522,8 +525,50 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 </div>
               </div>
 
+              {/* Social Channels (Instagram -> LinkedIn -> X) */}
+              <div className="pt-3 pb-2 flex items-center justify-between border-t border-border/30">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Follow Us
+                </span>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={SOCIAL_LINKS.instagram.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex size-7 items-center justify-center rounded-lg border border-border/50 bg-muted/40 text-muted-foreground hover:text-pink-500 transition-colors shadow-2xs"
+                    aria-label="Instagram"
+                    title="Instagram @campusloop.space"
+                  >
+                    <Instagram className="size-3.5" />
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.linkedin.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex size-7 items-center justify-center rounded-lg border border-border/50 bg-muted/40 text-muted-foreground hover:text-blue-500 transition-colors shadow-2xs"
+                    aria-label="LinkedIn"
+                    title="LinkedIn @mycampusloop"
+                  >
+                    <Linkedin className="size-3.5" />
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.x.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex size-7 items-center justify-center rounded-lg border border-border/50 bg-muted/40 text-muted-foreground hover:text-foreground transition-colors shadow-2xs"
+                    aria-label="X (Twitter)"
+                    title="X @mycampusloop"
+                  >
+                    <svg className="size-3 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                    <span className="sr-only">X (Twitter)</span>
+                  </a>
+                </div>
+              </div>
+
               {/* Bottom Drawer Footer */}
-              <div className="pt-4 border-t border-border/30 flex items-center justify-between">
+              <div className="pt-3 border-t border-border/30 flex items-center justify-between">
                 <ThemeToggle className="size-8 rounded-xl border-none bg-muted/50 hover:bg-muted" />
                 {profile ? (
                   <SignOutButton />

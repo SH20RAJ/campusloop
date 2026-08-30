@@ -1,13 +1,15 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-detectMentionTrigger,
-MentionSuggestions,
-TriggerContext,
+  detectMentionTrigger,
+  MentionSuggestions,
+  TriggerContext,
 } from "@/components/ui/mention-autocomplete";
 import { RichText } from "@/components/ui/rich-text";
 import { Comment } from "@/db/schema";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import { Heart,MessageCircle,MoreHorizontal,ShieldCheck } from "lucide-react";
 import Link from "next/link";
@@ -73,9 +75,13 @@ export function CommentItem({
 
   function handleToggleLike() {
     if (liked) {
+      sounds.tap();
+      haptics.light();
       setLiked(false);
       setLikesCount((c) => Math.max(0, c - 1));
     } else {
+      sounds.pop();
+      haptics.medium();
       setLiked(true);
       setLikesCount((c) => c + 1);
     }
@@ -195,6 +201,8 @@ export function CommentItem({
             <button
               type="button"
               onClick={() => {
+                sounds.tap();
+                haptics.light();
                 if (isReplying) {
                   setReplyingToId(null);
                 } else {
@@ -278,7 +286,11 @@ export function CommentItem({
                     <button
                       type="button"
                       disabled={isSubmitting || !replyBody.trim()}
-                      onClick={() => submitReply(comment.id)}
+                      onClick={() => {
+                        sounds.send();
+                        haptics.medium();
+                        submitReply(comment.id);
+                      }}
                       className="px-3.5 py-1 rounded-full bg-foreground text-background text-xs font-black disabled:opacity-40 hover:opacity-90 transition-all cursor-pointer shadow-2xs active:scale-95"
                     >
                       Reply

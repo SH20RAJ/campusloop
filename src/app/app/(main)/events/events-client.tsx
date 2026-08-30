@@ -1,6 +1,7 @@
 "use client";
 
 import { EventCard, EventItem } from "@/components/events/event-card";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -46,7 +47,7 @@ export function EventsClient() {
   const endpoint = `/api/events?category=${activeCategory}&scope=${scope}&sort=${activeTab}&q=${encodeURIComponent(
     searchQuery
   )}`;
-  const { data, isLoading } = useSWR<{ events: EventItem[] }>(
+  const { data, isLoading, mutate } = useSWR<{ events: EventItem[] }>(
     endpoint,
     fetcher,
     { dedupingInterval: 15000, revalidateOnFocus: true }
@@ -55,15 +56,16 @@ export function EventsClient() {
   const events = data?.events || [];
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl select-none flex-col border-x border-border/30 bg-background pb-28">
-      {/* ─── Sticky Header (Twitter / X Minimal) ─── */}
-      <header className="sticky top-0 z-40 border-b border-border/30 bg-background/85 backdrop-blur-xl">
-        <div className="flex h-13 items-center justify-between gap-2 px-4">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <h1 className="text-base font-black tracking-tight text-foreground flex items-center gap-1.5">
-              <span>Campus Events</span>
-              <Calendar className="size-4 text-primary shrink-0" />
-            </h1>
+    <PullToRefresh onRefresh={() => mutate()}>
+      <main className="mx-auto flex min-h-screen w-full max-w-2xl select-none flex-col border-x border-border/30 bg-background pb-28">
+        {/* ─── Sticky Header (Twitter / X Minimal) ─── */}
+        <header className="sticky top-0 z-40 border-b border-border/30 bg-background/85 backdrop-blur-xl">
+          <div className="flex h-13 items-center justify-between gap-2 px-4">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <h1 className="text-base font-black tracking-tight text-foreground flex items-center gap-1.5">
+                <span>Campus Events</span>
+                <Calendar className="size-4 text-primary shrink-0" />
+              </h1>
 
             {/* Scope Pill Toggle */}
             <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
@@ -228,5 +230,6 @@ export function EventsClient() {
         )}
       </div>
     </main>
+    </PullToRefresh>
   );
 }

@@ -1,8 +1,10 @@
 "use client";
 
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { ArrowDown,Loader2 } from "lucide-react";
-import React,{ useCallback,useEffect,useRef,useState } from "react";
+import { ArrowDown, Loader2 } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<unknown> | void;
@@ -10,7 +12,7 @@ interface PullToRefreshProps {
   disabled?: boolean;
 }
 
-const PULL_THRESHOLD = 60;
+const PULL_THRESHOLD = 55;
 const MAX_PULL_DISTANCE = 85;
 
 export function PullToRefresh({ onRefresh, children, disabled = false }: PullToRefreshProps) {
@@ -20,18 +22,27 @@ export function PullToRefresh({ onRefresh, children, disabled = false }: PullToR
   const isPullingRef = useRef(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const getScrollTop = useCallback(() => {
+    return (
+      window.scrollY ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      window.pageYOffset ||
+      0
+    );
+  }, []);
+
   const handleTouchStart = useCallback(
     (e: TouchEvent) => {
       if (disabled || isRefreshing) return;
-      // Only initiate pull when at the very top of the window
-      if (window.scrollY <= 2) {
+      if (getScrollTop() <= 5) {
         startYRef.current = e.touches[0].clientY;
         isPullingRef.current = false;
       } else {
         startYRef.current = null;
       }
     },
-    [disabled, isRefreshing]
+    [disabled, isRefreshing, getScrollTop]
   );
 
   const handleTouchMove = useCallback(
@@ -40,15 +51,14 @@ export function PullToRefresh({ onRefresh, children, disabled = false }: PullToR
 
       const currentY = e.touches[0].clientY;
       const diffY = currentY - startYRef.current;
+      const scrollTop = getScrollTop();
 
-      if (diffY > 0 && window.scrollY <= 2) {
+      if (diffY > 0 && scrollTop <= 5) {
         isPullingRef.current = true;
-        // Non-linear dampening formula for rubber band feel
-        const dampened = Math.min(Math.pow(diffY, 0.82) * 1.6, MAX_PULL_DISTANCE);
+        const dampened = Math.min(Math.pow(diffY, 0.8) * 1.5, MAX_PULL_DISTANCE);
         setPullDistance(dampened);
 
-        // Prevent default native rubber-banding if we are pulling down
-        if (e.cancelable && diffY > 10) {
+        if (e.cancelable && diffY > 15) {
           e.preventDefault();
         }
       } else {
@@ -56,7 +66,7 @@ export function PullToRefresh({ onRefresh, children, disabled = false }: PullToR
         setPullDistance(0);
       }
     },
-    [disabled, isRefreshing]
+    [disabled, isRefreshing, getScrollTop]
   );
 
   const handleTouchEnd = useCallback(async () => {
@@ -66,14 +76,9 @@ export function PullToRefresh({ onRefresh, children, disabled = false }: PullToR
 
     if (pullDistance >= PULL_THRESHOLD) {
       setIsRefreshing(true);
-      setPullDistance(52); // Lock at loading badge height
-      try {
-        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-          navigator.vibrate(12);
-        }
-      } catch {
-        // Ignore vibration errors
-      }
+      setPullDistance(48);
+      sounds.pop();
+      haptics.medium();
 
       const minDuration = new Promise((resolve) => setTimeout(resolve, 600));
       try {
@@ -113,7 +118,7 @@ export function PullToRefresh({ onRefresh, children, disabled = false }: PullToR
       {/* ─── Floating Pull Indicator Badge (Twitter / Instagram style) ─── */}
       <div
         className={cn(
-          "pointer-events-none fixed left-1/2 -translate-x-1/2 z-50 transition-transform duration-200 ease-out",
+          "pointer-events-none fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-200 ease-out",
           pullDistance > 0 || isRefreshing ? "opacity-100 scale-100" : "opacity-0 scale-75"
         )}
         style={{

@@ -13,6 +13,8 @@ import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
 import { rankAndThreadComments } from "@/lib/comments-algorithm";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import {
@@ -111,6 +113,9 @@ export function PostComments({
 
     if (!body || isSubmitting) return;
 
+    sounds.send();
+    haptics.medium();
+
     const optimisticComment: CommentWithAuthor = {
       id: `temp_${Date.now()}`,
       postId,
@@ -151,6 +156,9 @@ export function PostComments({
 
   async function handlePostReply(parentId: string) {
     if (!replyBody.trim() || isSubmitting) return;
+
+    sounds.send();
+    haptics.medium();
 
     const optimisticReply: CommentWithAuthor = {
       id: `temp_reply_${Date.now()}`,

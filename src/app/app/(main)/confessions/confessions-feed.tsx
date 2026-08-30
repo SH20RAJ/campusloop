@@ -1,5 +1,6 @@
 "use client";
 
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { FeedCard } from "@/components/ui/feed-card";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
 import { useFeed } from "@/hooks/use-feed";
@@ -45,6 +46,7 @@ export function ConfessionsFeed() {
     isReachingEnd,
     setSize,
     mutate,
+    refresh,
   } = useFeed(scope, "CONFESSION", currentSort, "all", undefined, randomSeed);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -101,7 +103,8 @@ export function ConfessionsFeed() {
     "Campus";
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-28 border-x border-border/30 bg-background">
+    <PullToRefresh onRefresh={refresh}>
+      <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-28 border-x border-border/30 bg-background">
       {/* ─── Top Sticky Bar (Twitter / X Minimalist) ─── */}
       <header className="sticky top-0 z-40 border-b border-border/30 bg-background/85 backdrop-blur-xl">
         <div className="flex h-13 items-center justify-between px-4 gap-2">
@@ -239,5 +242,6 @@ export function ConfessionsFeed() {
         )}
       </div>
     </main>
+    </PullToRefresh>
   );
 }

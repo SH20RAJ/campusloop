@@ -66,14 +66,14 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * Mobile Bottom Floating Navigation
+ * Mobile Bottom Floating Navigation (Home, Explore, +, Marketplace, More)
  */
 export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
   { icon: Home, href: "/app", label: "Home" },
   { icon: Compass, href: "/app/discover", label: "Explore" },
   { icon: Plus, href: "/app/post/new", label: "Post" },
-  { icon: Bell, href: "/app/notifications", label: "Notifications" },
-  { icon: UserCircle, href: "/app/profile", label: "Profile" },
+  { icon: ShoppingBag, href: "/app/marketplace", label: "Market" },
+  { icon: MoreHorizontal, href: "/app/more", label: "More" },
 ];
 
 /**

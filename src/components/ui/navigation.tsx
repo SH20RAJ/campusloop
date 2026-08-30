@@ -9,6 +9,8 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { DESKTOP_NAV_ITEMS,MOBILE_BOTTOM_ITEMS } from "@/constants/navigation";
 import type { UserProfile } from "@/db/schema";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import { AnimatePresence,motion } from "framer-motion";
 import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
@@ -84,20 +86,28 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
-                onClick={() => setShowMobileMenu(true)}
-                className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-foreground transition-colors cursor-pointer"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setShowMobileMenu(true);
+                }}
+                className="relative flex items-center justify-center p-0.5 rounded-full hover:bg-muted/60 active:scale-95 transition-all cursor-pointer group shrink-0"
                 aria-label="Open menu"
+                title="Open menu"
               >
-                {profile?.avatarUrl ? (
-                  <Avatar className="size-7.5 border border-border/40">
-                    <AvatarImage src={profile.avatarUrl} />
-                    <AvatarFallback className="text-[10px] font-bold">
-                      {profile.displayName[0]}
+                <div className="relative">
+                  <Avatar className="size-8 border border-border/50 shadow-2xs">
+                    <AvatarImage src={profile?.avatarUrl || ""} />
+                    <AvatarFallback className="text-[11px] font-black bg-muted text-foreground">
+                      {profile?.displayName?.[0] || "U"}
                     </AvatarFallback>
                   </Avatar>
-                ) : (
-                  <Menu className="size-5 text-foreground" />
-                )}
+
+                  {/* Clean, minimal menu indicator badge on avatar corner */}
+                  <span className="absolute -bottom-0.5 -right-0.5 flex size-3.5 items-center justify-center rounded-full bg-card border border-border/80 shadow-xs text-muted-foreground group-hover:text-foreground">
+                    <Menu className="size-2 stroke-[2.5]" />
+                  </span>
+                </div>
               </button>
 
               <Link href="/app" className="flex items-center gap-2">
@@ -357,6 +367,10 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => {
+                    sounds.tap();
+                    haptics.light();
+                  }}
                   className={cn(
                     "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
                     isActive ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground"
@@ -369,6 +383,9 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                         isActive ? "stroke-[2.2] text-foreground" : "stroke-2"
                       )}
                     />
+                    {item.href === "/app/marketplace" && !marketplaceSeen && (
+                      <span className="absolute -top-1 -right-1 size-2 rounded-full bg-emerald-500" />
+                    )}
                     {item.href === "/app/notifications" && unreadNotificationsCount > 0 && (
                       <span className="absolute -top-1 -right-1 size-2 rounded-full bg-primary" />
                     )}

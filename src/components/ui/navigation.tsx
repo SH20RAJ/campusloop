@@ -244,51 +244,58 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
         {/* Bottom User Capsule */}
         {profile ? (
           <div className="relative pt-2">
-            {showProfileMenu && (
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowProfileMenu(false)}
-              />
-            )}
-
             <AnimatePresence>
               {showProfileMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                  transition={{ duration: 0.15, ease: "easeOut" }}
-                  className="absolute bottom-16 left-0 right-0 z-50 rounded-2xl bg-card border border-border/50 p-1.5 shadow-xl space-y-1"
-                >
-                  <Link
-                    href="/app/profile"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+                <>
+                  <div
+                    className="fixed inset-0 z-40 bg-transparent"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowProfileMenu(false);
+                    }}
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                    transition={{ duration: 0.12, ease: "easeOut" }}
+                    className="absolute bottom-16 left-0 right-0 z-50 rounded-2xl bg-card border border-border/50 p-1.5 shadow-xl space-y-1"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <UserCircle className="size-4 text-muted-foreground" />
-                    <span>View Profile</span>
-                  </Link>
+                    <Link
+                      href="/app/profile"
+                      onClick={() => setShowProfileMenu(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+                    >
+                      <UserCircle className="size-4 text-muted-foreground" />
+                      <span>View Profile</span>
+                    </Link>
 
-                  <Link
-                    href="/app/settings"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors"
-                  >
-                    <Sliders className="size-4 text-muted-foreground" />
-                    <span>Settings</span>
-                  </Link>
+                    <Link
+                      href="/app/settings"
+                      onClick={() => setShowProfileMenu(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+                    >
+                      <Sliders className="size-4 text-muted-foreground" />
+                      <span>Settings</span>
+                    </Link>
 
-                  <div className="pt-1 border-t border-border/30 px-2 py-1 flex items-center justify-between">
-                    <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted" />
-                    <SignOutButton />
-                  </div>
-                </motion.div>
+                    <div className="pt-1 border-t border-border/30 px-2 py-1 flex items-center justify-between">
+                      <ThemeToggle className="size-7 rounded-lg border-none bg-transparent hover:bg-muted" />
+                      <SignOutButton />
+                    </div>
+                  </motion.div>
+                </>
               )}
             </AnimatePresence>
 
             <button
               type="button"
-              onClick={() => setShowProfileMenu((prev) => !prev)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowProfileMenu((prev) => !prev);
+              }}
               className="w-full flex items-center justify-between p-2.5 rounded-full hover:bg-muted/50 transition-colors cursor-pointer text-left group"
             >
               <div className="flex items-center gap-2.5 min-w-0">

@@ -179,7 +179,7 @@ async function seedTrendingEvents() {
             profileId: attendee.id,
             status: "CONFIRMED",
             reminderSet: Math.random() > 0.4,
-            registeredAt: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000),
+            createdAt: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000),
           })
           .onConflictDoNothing();
 

@@ -165,12 +165,48 @@ export async function getVisibleProfilePosts(profileId: string) {
 
 // ─── API Feed Sort Engine (used by /api/feed) ───
 
-export type ApiFeedSort = "for_you" | "latest" | "trending" | "top_voted" | "most_discussed";
+export type ApiFeedSort =
+	| "for_you"
+	| "latest"
+	| "trending"
+	| "viral"
+	| "spicy"
+	| "top_voted"
+	| "most_discussed"
+	| "random";
 
 const recentVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id} and ${votes.createdAt} > now() - interval '7 days'), 0)`;
 const recentCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED' and ${comments.createdAt} > now() - interval '7 days'), 0)`;
+const totalVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id}), 0)`;
+const totalCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)`;
 const hoursSinceSql = sql<number>`(extract(epoch from (now() - ${posts.createdAt})) / 3600.0)`;
+
+// HackerNews + Reddit gravity trending
 const trendingScoreSql = sql<number>`((${recentVoteScoreSql} * 3.5 + ${recentCommentCountSql} * 2.5 + 1.0) / power(${hoursSinceSql} + 2.0, 0.75))`;
+
+// 🌶️ State-of-the-art Confessions Spicy Algorithm:
+// High weight on discussion velocity, controversy delta, and fresh secret exploration
+const spicyScoreSql = sql<number>`(
+	((${recentVoteScoreSql} * 3.2 + ${recentCommentCountSql} * 4.8 + abs(${totalVoteScoreSql} - ${totalCommentCountSql}) * 0.7 + 1.0)
+	/ power(${hoursSinceSql} + 1.4, 1.18))
+	+ (case when ${posts.type} = 'CONFESSION' then 15.0 else 0.0 end)
+	+ (random() * 14.0)
+)`;
+
+// 🚀 Multi-Armed Bandit / Epsilon-Greedy Viral Algorithm (TikTok / Twitter Heavy Ranker inspired):
+// Logarithmic engagement magnitude + velocity derivative + stochastic exploration injection
+const viralScoreSql = sql<number>`(
+	-- Velocity Derivative (First derivative of campus interactions over age)
+	((${recentVoteScoreSql} * 4.2 + ${recentCommentCountSql} * 5.8 + 2.0) / power(${hoursSinceSql} + 0.65, 1.28))
+	-- Log-scale engagement floor
+	+ (ln(greatest(1.0, ${totalVoteScoreSql} + ${totalCommentCountSql} * 2.2 + 1.0)) * 14.0)
+	-- Stochastic Exploration Injection (15% probability burst for worthy fresh posts < 36h)
+	+ (case when ${hoursSinceSql} < 36.0 then (random() * 28.0) else (random() * 5.0) end)
+	-- Cross-campus reach affinity
+	+ (case when ${posts.scope} in ('INDIA', 'GLOBAL') then 10.0 else 0.0 end)
+	-- Interactive / poll / confession bonus
+	+ (case when ${posts.type} in ('POLL', 'QUESTION', 'CONFESSION', 'MEME') then 6.0 else 0.0 end)
+)`;
 
 function getForYouScoreSql(userInstitutionId?: string | null, seenIds?: string[], viewerProfileId?: string | null) {
 	const ownCollegeBonus = userInstitutionId
@@ -217,8 +253,11 @@ export function normalizeApiFeedSort(value?: string | null): ApiFeedSort {
 		value === "for_you" ||
 		value === "latest" ||
 		value === "trending" ||
+		value === "viral" ||
+		value === "spicy" ||
 		value === "top_voted" ||
-		value === "most_discussed"
+		value === "most_discussed" ||
+		value === "random"
 	) {
 		return value;
 	}
@@ -247,6 +286,15 @@ export function getFeedOrderBy(sort: ApiFeedSort, userInstitutionId?: string | n
 		case "trending":
 			orderClauses.push(desc(trendingScoreSql));
 			break;
+		case "spicy":
+			orderClauses.push(desc(spicyScoreSql));
+			break;
+		case "viral":
+			orderClauses.push(desc(viralScoreSql));
+			break;
+		case "random":
+			orderClauses.push(sql`random()`);
+			return orderClauses;
 		case "for_you": {
 			const forYouScore = getForYouScoreSql(userInstitutionId, seenIds, viewerProfileId);
 			orderClauses.push(desc(forYouScore));

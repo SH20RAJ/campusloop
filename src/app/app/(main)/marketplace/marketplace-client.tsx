@@ -1,30 +1,31 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  EmptyState,
+  FilterPills,
+  ListRow,
+  PageHeader,
+  PageList,
+  PageShell,
+  RowSkeleton,
+  SearchField,
+} from "@/components/ui/app-shell";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-Bike,
-Car,
-ChevronRight,
-Clock,
-Flame,
-MapPin,
-Percent,
-Search,
-ShieldCheck,
-ShoppingBag,
-Star,
-Store,
-Tag,
-Ticket,
-Truck,
-UtensilsCrossed,
-Wrench,
-X
+  Car,
+  ChevronRight,
+  ShieldCheck,
+  ShoppingBag,
+  Star,
+  Store,
+  Tag,
+  Ticket,
+  UtensilsCrossed,
+  Wrench,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -37,14 +38,16 @@ interface MarketplaceClientProps {
 }
 
 const CATEGORIES = [
-  { id: "all", label: "All Stores", icon: Store, color: "bg-foreground text-background" },
-  { id: "food", label: "Food & Canteens", icon: UtensilsCrossed, color: "bg-orange-500/10 text-orange-500 border-orange-500/30" },
-  { id: "essentials", label: "Essentials & Grocery", icon: ShoppingBag, color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30" },
-  { id: "services", label: "Laundry & Services", icon: Wrench, color: "bg-blue-500/10 text-blue-500 border-blue-500/30" },
-  { id: "rentals", label: "Vehicle Rentals", icon: Car, color: "bg-purple-500/10 text-purple-500 border-purple-500/30" },
-  { id: "activities", label: "Activities & Outings", icon: Ticket, color: "bg-pink-500/10 text-pink-500 border-pink-500/30" },
-  { id: "deals", label: "Student Deals", icon: Tag, color: "bg-amber-500/10 text-amber-500 border-amber-500/30" },
+  { id: "all", label: "All", icon: Store },
+  { id: "food", label: "Food", icon: UtensilsCrossed },
+  { id: "essentials", label: "Essentials", icon: ShoppingBag },
+  { id: "services", label: "Services", icon: Wrench },
+  { id: "rentals", label: "Rentals", icon: Car },
+  { id: "activities", label: "Activities", icon: Ticket },
+  { id: "deals", label: "Deals", icon: Tag },
 ] as const;
+
+const CATEGORY_PILLS = CATEGORIES.map((c) => ({ id: c.id, label: c.label, icon: c.icon }));
 
 export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: MarketplaceClientProps) {
   const router = useRouter();
@@ -87,88 +90,46 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
 
   const rentalBikes = bikesData?.bikes || [];
 
-  return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-24">
-      {/* ─── Top Header & Omnibar Search ─── */}
-      <header className="sticky top-0 z-40 flex flex-col gap-2.5 border-b border-border/30 bg-background/85 px-4 pt-3 pb-2 backdrop-blur-xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-base font-black text-foreground tracking-tight">
-              Campus<span className="text-emerald-500">Market</span>
-            </h1>
-            <span className="text-xs text-muted-foreground font-medium">· {collegeName}</span>
-          </div>
+  const categoryLabel =
+    CATEGORIES.find((c) => c.id === selectedCategory)?.label ?? "Stores";
 
+  return (
+    <PageShell>
+      <PageHeader
+        title="Marketplace"
+        subtitle={collegeName}
+        action={
           <Link
             href="/app/marketplace/orders"
             onClick={() => {
               sounds.tap();
               haptics.light();
             }}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/60 hover:bg-muted text-foreground text-xs font-bold transition-colors cursor-pointer"
+            className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-border/60 px-4 text-xs font-bold text-foreground transition-colors hover:bg-muted/50 active:scale-95"
           >
             <ShoppingBag className="size-3.5" />
-            <span>My Orders</span>
+            <span>Orders</span>
           </Link>
-        </div>
+        }
+      />
 
-        {/* Omnibar Search Input */}
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={`Search canteens, momos, bike rentals, and services...`}
-            className="w-full h-10 rounded-2xl bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background pl-10 pr-9 text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 size-5 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground"
-            >
-              <X className="size-3.5" />
-            </button>
-          )}
-        </div>
+      <SearchField
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search canteens, rentals or services"
+      />
 
-        {/* Horizontal Category Scroller */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
-          {CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => handleCategorySelect(cat.id)}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all cursor-pointer shadow-2xs active:scale-95",
-                  isSelected
-                    ? "bg-foreground text-background font-black shadow-xs"
-                    : "bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted border border-border/40"
-                )}
-              >
-                <Icon className="size-3.5" />
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </header>
+      <FilterPills
+        pills={CATEGORY_PILLS}
+        value={selectedCategory}
+        onChange={handleCategorySelect}
+      />
 
-      {/* ─── Featured Student Deals Banner Strip ─── */}
+      {/* ─── Student deals ─── */}
       {deals.length > 0 && selectedCategory === "all" && !searchQuery && (
-        <section className="px-4 pt-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Percent className="size-3.5 text-emerald-500" />
-              <span>Exclusive Student Deals</span>
-            </h2>
-          </div>
-
-          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
+        <section className="border-b border-border/30 px-4 py-3">
+          <h2 className="mb-2 text-[13px] font-bold text-foreground">Student deals</h2>
+          <div className="no-scrollbar flex items-center gap-2 overflow-x-auto">
             {deals.map((deal: any) => (
               <Link
                 key={deal.id}
@@ -177,20 +138,16 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
                   sounds.tap();
                   haptics.light();
                 }}
-                className="flex items-center gap-3 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 hover:border-emerald-500/40 shrink-0 w-72 transition-all cursor-pointer group shadow-2xs"
+                className="flex w-64 shrink-0 items-center gap-2.5 rounded-xl border border-border/40 p-2.5 transition-colors hover:bg-muted/25"
               >
-                <div className="size-11 rounded-xl overflow-hidden bg-muted shrink-0 border border-border/40">
-                  <img src={deal.storeLogo} alt={deal.storeName} className="size-full object-cover" />
+                <div className="size-10 shrink-0 overflow-hidden rounded-lg bg-muted">
+                  <img src={deal.storeLogo} alt="" className="size-full object-cover" />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-black uppercase text-emerald-500 tracking-wider">
-                    {deal.code ? `CODE: ${deal.code}` : "Special Offer"}
-                  </span>
-                  <h3 className="text-xs font-bold text-foreground truncate group-hover:underline">
-                    {deal.title}
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground truncate">
-                    {deal.storeName} · {deal.description}
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-bold text-foreground">{deal.title}</p>
+                  <p className="truncate text-[11px] text-muted-foreground">
+                    {deal.storeName}
+                    {deal.code ? ` · ${deal.code}` : ""}
                   </p>
                 </div>
               </Link>
@@ -199,226 +156,154 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
         </section>
       )}
 
-      {/* ─── BIKE RENTALS SPECIAL FLEET SECTION (PRD Item 1) ─── */}
+      {/* ─── Bike fleet ─── */}
       {selectedCategory === "rentals" && rentalBikes.length > 0 && (
-        <section className="p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Bike className="size-4 text-emerald-500" />
-              <span>Campus Bike &amp; Scooter Fleet ({rentalBikes.length})</span>
-            </h2>
-            <span className="text-[11px] text-muted-foreground font-bold">
-              Instant Pickup
-            </span>
-          </div>
+        <PageList>
+          {rentalBikes.map((b) => (
+            <ListRow key={b.id} href={`/app/marketplace/rentals/bikes/${b.id}`}>
+              <div className="size-20 shrink-0 overflow-hidden rounded-xl bg-muted">
+                <img src={b.imageUrl} alt="" className="size-full object-cover" />
+              </div>
 
-          <div className="grid grid-cols-1 gap-3">
-            {rentalBikes.map((b) => (
-              <Link
-                key={b.id}
-                href={`/app/marketplace/rentals/bikes/${b.id}`}
-                onClick={() => {
-                  sounds.tap();
-                  haptics.light();
-                }}
-                className="group flex flex-col sm:flex-row gap-3.5 p-3.5 rounded-2xl border border-border/40 hover:border-border bg-card hover:bg-muted/4 transition-all cursor-pointer shadow-xs"
-              >
-                <div className="relative h-36 sm:size-32 rounded-xl overflow-hidden border border-border/30 shrink-0 bg-muted">
-                  <img
-                    src={b.imageUrl}
-                    alt={b.name}
-                    className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/70 text-white text-[10px] font-bold backdrop-blur-xs flex items-center gap-1">
-                    <Star className="size-3 fill-amber-400 text-amber-400" />
-                    <span>{b.rating}</span>
-                  </span>
-                  <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-emerald-500 text-black text-[10px] font-black uppercase tracking-wider">
-                    {b.status}
-                  </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="truncate text-[15px] font-bold text-foreground group-hover:text-primary">
+                    {b.name}
+                  </h3>
+                  <ShieldCheck className="size-3.5 shrink-0 text-primary" />
                 </div>
-
-                <div className="flex-1 min-w-0 flex flex-col justify-between space-y-2">
-                  <div>
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="text-sm font-black text-foreground group-hover:underline flex items-center gap-1.5 truncate">
-                        <span>{b.name}</span>
-                        <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
-                      </h3>
-                    </div>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                      <MapPin className="size-3 text-rose-500 shrink-0" />
-                      <span>{b.pickupLocation} · {b.merchant?.name}</span>
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1 border-t border-border/30">
-                    <div>
-                      <p className="text-sm font-black text-foreground">
-                        ₹{b.dailyPrice} <span className="text-[10px] font-normal text-muted-foreground">/ day</span>
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">
-                        ₹{b.securityDeposit} deposit (refundable)
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="px-4 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black transition-all cursor-pointer shadow-xs active:scale-95"
-                    >
-                      Book Now
-                    </button>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+                <p className="truncate text-[13px] text-muted-foreground">
+                  {b.pickupLocation}
+                  {b.merchant?.name ? ` · ${b.merchant.name}` : ""}
+                </p>
+                <p className="mt-0.5 text-[13px] text-muted-foreground">
+                  <span className="font-black text-foreground">₹{b.dailyPrice}</span> / day ·{" "}
+                  <span className="inline-flex items-center gap-1">
+                    <Star className="size-3 fill-amber-500 text-amber-500" />
+                    {b.rating}
+                  </span>
+                  {b.securityDeposit ? ` · ₹${b.securityDeposit} deposit` : ""}
+                </p>
+              </div>
+            </ListRow>
+          ))}
+        </PageList>
       )}
 
-      {/* ─── Nearby Campus Businesses ─── */}
-      <section className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-            {selectedCategory === "all" ? "Nearby Campus Businesses" : `${selectedCategory.toUpperCase()} STORES`}
-          </h2>
-          <span className="text-[11px] text-muted-foreground">
-            {stores.length} verified {stores.length === 1 ? "store" : "stores"}
-          </span>
-        </div>
-
+      {/* ─── Stores ─── */}
+      <PageList>
         {isLoading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-32 w-full rounded-2xl" />
-            <Skeleton className="h-32 w-full rounded-2xl" />
-            <Skeleton className="h-32 w-full rounded-2xl" />
-          </div>
+          <RowSkeleton count={5} media="thumb" />
         ) : stores.length > 0 ? (
-          <div className="grid grid-cols-1 gap-3.5">
+          <>
+            <p className="px-4 py-2.5 text-[13px] text-muted-foreground">
+              <strong className="font-black text-foreground">{stores.length}</strong>{" "}
+              {stores.length === 1 ? "store" : "stores"}
+              {selectedCategory !== "all" ? ` in ${categoryLabel}` : " near you"}
+            </p>
+
             {stores.map((store) => (
-              <Link
-                key={store.id}
-                href={`/app/marketplace/store/${store.id}`}
-                onClick={() => {
-                  sounds.tap();
-                  haptics.light();
-                }}
-                className="group flex flex-col sm:flex-row gap-3.5 p-3.5 rounded-2xl border border-border/40 hover:border-border bg-card hover:bg-muted/4 transition-all cursor-pointer shadow-xs"
-              >
-                {/* Store Cover / Logo */}
-                <div className="relative h-32 sm:size-28 rounded-xl overflow-hidden border border-border/30 shrink-0 bg-muted">
+              <ListRow key={store.id} href={`/app/marketplace/store/${store.id}`}>
+                <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-muted">
                   <img
                     src={store.coverUrl || store.logoUrl}
-                    alt={store.name}
-                    className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    alt=""
+                    className="size-full object-cover"
                   />
                   {!store.isOpen && (
-                    <div className="absolute inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center text-white text-xs font-bold">
-                      Currently Closed
-                    </div>
-                  )}
-                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/70 text-white text-[10px] font-bold backdrop-blur-xs flex items-center gap-1">
-                    <Star className="size-3 fill-amber-400 text-amber-400" />
-                    <span>{store.rating}</span>
-                  </span>
-                </div>
-
-                {/* Store Details */}
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h3 className="text-sm font-black text-foreground group-hover:underline flex items-center gap-1.5">
-                        <span>{store.name}</span>
-                        <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
-                      </h3>
-                      <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
-                        {store.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Badges & Meta Info */}
-                  <div className="flex items-center flex-wrap gap-2 text-[11px] text-muted-foreground pt-1">
-                    {store.locationPin && (
-                      <span className="inline-flex items-center gap-1 bg-muted/50 px-2 py-0.5 rounded-md">
-                        <MapPin className="size-3 text-rose-500" />
-                        <span>{store.locationPin}</span>
-                      </span>
-                    )}
-
-                    <span className="inline-flex items-center gap-1 bg-muted/50 px-2 py-0.5 rounded-md">
-                      <Clock className="size-3 text-primary" />
-                      <span>{store.estimatedPrepTime}</span>
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/65 text-[11px] font-bold text-white">
+                      Closed
                     </span>
-
-                    {store.isDeliveryEnabled && (
-                      <span className="inline-flex items-center gap-1 text-emerald-500 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                        <Truck className="size-3" />
-                        <span>Delivery (₹{store.deliveryFee})</span>
-                      </span>
-                    )}
-
-                    {store.isPickupEnabled && (
-                      <span className="inline-flex items-center gap-1 bg-muted/50 px-2 py-0.5 rounded-md">
-                        Pickup Available
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Active Offer Tag if any */}
-                  {store.offers && store.offers.length > 0 && (
-                    <div className="pt-1">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                        <Flame className="size-3" />
-                        <span>{store.offers[0].title}</span>
-                      </span>
-                    </div>
                   )}
                 </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center px-4 space-y-3">
-            <div className="size-12 rounded-2xl bg-muted/60 flex items-center justify-center border border-border/40 text-muted-foreground">
-              <Store className="size-6 text-muted-foreground/60" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-bold text-foreground">No stores found</p>
-              <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
-                {searchQuery
-                  ? `No stores matching "${searchQuery}". Try different keywords.`
-                  : "No businesses listed under this category yet."}
-              </p>
-            </div>
-          </div>
-        )}
-      </section>
 
-      {/* ─── Sticky Cart Bottom Bar (if items in cart) ─── */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="truncate text-[15px] font-bold text-foreground group-hover:text-primary">
+                      {store.name}
+                    </h3>
+                    <ShieldCheck className="size-3.5 shrink-0 text-primary" />
+                  </div>
+
+                  <p className="truncate text-[13px] text-muted-foreground">{store.description}</p>
+
+                  {/* One plain meta line, rather than five coloured pills. */}
+                  <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-[13px] text-muted-foreground">
+                    <span className="inline-flex items-center gap-1">
+                      <Star className="size-3 fill-amber-500 text-amber-500" />
+                      {store.rating}
+                    </span>
+                    {store.estimatedPrepTime && (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span>{store.estimatedPrepTime}</span>
+                      </>
+                    )}
+                    {store.locationPin && (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span className="truncate">{store.locationPin}</span>
+                      </>
+                    )}
+                    {store.isDeliveryEnabled && (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span>Delivery ₹{store.deliveryFee}</span>
+                      </>
+                    )}
+                    {store.isPickupEnabled && (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span>Pickup</span>
+                      </>
+                    )}
+                  </p>
+
+                  {store.offers?.length > 0 && (
+                    <p className="mt-1 inline-flex items-center gap-1 text-[13px] font-bold text-emerald-600 dark:text-emerald-400">
+                      <Tag className="size-3 shrink-0" />
+                      <span className="truncate">{store.offers[0].title}</span>
+                    </p>
+                  )}
+                </div>
+              </ListRow>
+            ))}
+          </>
+        ) : (
+          <EmptyState
+            icon={Store}
+            title="No stores found"
+            description={
+              searchQuery
+                ? `Nothing matches "${searchQuery}".`
+                : "No businesses listed in this category yet."
+            }
+          />
+        )}
+      </PageList>
+
+      {/* ─── Cart bar ─── */}
       {totalItemsCount > 0 && (
-        <div className="fixed bottom-16 sm:bottom-6 left-0 right-0 z-40 max-w-lg mx-auto px-4 animate-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed bottom-16 left-0 right-0 z-40 mx-auto max-w-lg px-4 duration-200 animate-in slide-in-from-bottom-3 sm:bottom-6">
           <Link
             href="/app/marketplace/cart"
             onClick={() => {
               sounds.tap();
               haptics.light();
             }}
-            className="flex items-center justify-between p-3.5 rounded-2xl bg-foreground text-background font-black text-xs shadow-2xl hover:opacity-95 active:scale-98 transition-all cursor-pointer"
+            className="flex cursor-pointer items-center justify-between rounded-full bg-foreground px-5 py-3.5 text-[13px] font-black text-background shadow-xl transition-opacity hover:opacity-95 active:scale-[0.99]"
           >
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-md bg-background text-foreground text-[10px] font-black">
-                {totalItemsCount} {totalItemsCount === 1 ? "item" : "items"}
-              </span>
-              <span>₹{overallSubtotal.toLocaleString("en-IN")} Subtotal</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span>View Cart</span>
+            <span>
+              {totalItemsCount} {totalItemsCount === 1 ? "item" : "items"} · ₹
+              {overallSubtotal.toLocaleString("en-IN")}
+            </span>
+            <span className="flex items-center gap-1">
+              View cart
               <ChevronRight className="size-4" />
-            </div>
+            </span>
           </Link>
         </div>
       )}
-    </main>
+    </PageShell>
   );
 }

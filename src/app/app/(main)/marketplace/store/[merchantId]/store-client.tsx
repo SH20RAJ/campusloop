@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { fetcher } from "@/lib/api";
@@ -70,6 +71,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
 
   const store = data?.store;
   const products = store?.products || [];
@@ -300,7 +302,16 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setShowQrModal(true)}
+            className="size-8 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors cursor-pointer active:scale-95"
+            title="Store QR Card"
+          >
+            <QrCode className="size-3.5" />
+          </button>
+
           <button
             type="button"
             onClick={handleShareStore}
@@ -1042,6 +1053,18 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
           </div>
         </div>
       )}
+
+      {/* ─── Cute Branded QR Modal ─── */}
+      <BrandedQrModal
+        isOpen={showQrModal}
+        onClose={() => setShowQrModal(false)}
+        title={store.name}
+        subtitle={`${store.categorySlug || "Campus Canteen"} • ${store.locationPin || "Campus Hub"}`}
+        badgeText="Campus Store"
+        shortUrl={`https://campusloop.space/app/marketplace/store/${store.id}`}
+        avatarUrl={store.logoUrl}
+        category="store"
+      />
     </main>
   );
 }

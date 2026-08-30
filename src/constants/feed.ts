@@ -1,9 +1,9 @@
 export const FEED_SORT_TABS = [
   { id: "for_you", label: "For you" },
-  { id: "latest", label: "Latest" },
+  { id: "viral", label: "Viral ⚡" },
   { id: "trending", label: "Trending" },
+  { id: "latest", label: "Latest" },
   { id: "top_voted", label: "Top Voted" },
-  { id: "most_discussed", label: "Discussed" },
 ] as const;
 
 

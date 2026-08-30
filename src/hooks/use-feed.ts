@@ -56,14 +56,14 @@ const feedFetcher = async <T,>(url: string): Promise<T> => {
 const PAGE_LIMIT = 20;
 
 export function useFeed(
-
   scope: "CAMPUS" | "GLOBAL" = "CAMPUS",
   type?: string,
   sort?: string,
   visibility?: string,
   hashtag?: string,
+  seed?: string | number,
 ) {
-  const cacheKey = `${scope}_${type || "ALL"}_${sort || "latest"}_${visibility || "all"}_${hashtag || ""}`;
+  const cacheKey = `${scope}_${type || "ALL"}_${sort || "latest"}_${visibility || "all"}_${hashtag || ""}_${seed || ""}`;
   const initialSize = feedSizeCache.get(cacheKey) || 1;
   const fallbackData = feedPagesCache.get(cacheKey);
 
@@ -76,6 +76,7 @@ export function useFeed(
     if (sort) url.searchParams.set("sort", sort);
     if (visibility && visibility !== "all") url.searchParams.set("visibility", visibility);
     if (hashtag) url.searchParams.set("hashtag", hashtag);
+    if (seed) url.searchParams.set("seed", String(seed));
     url.searchParams.set("page", String(pageIndex + 1));
     url.searchParams.set("limit", String(PAGE_LIMIT));
 

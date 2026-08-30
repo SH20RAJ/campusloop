@@ -135,9 +135,9 @@ export function DiscoverFeed() {
   const feedType = activeTab === "CONFESSIONS" ? "CONFESSION" : undefined;
   const feedSort =
     activeTab === "TRENDING"
-      ? "trending"
+      ? "viral"
       : activeTab === "CONFESSIONS"
-      ? "trending"
+      ? "spicy"
       : "for_you";
 
   const { feed, isLoading: feedLoading, isLoadingMore, isReachingEnd, setSize } = useFeed(

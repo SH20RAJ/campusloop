@@ -6,6 +6,17 @@
 
  keep separate onboading and schema for viewer mode users and say you need a college email id access to start interating with community
  
+ ---
+
+ ❯ can you add better algorithms sortings and all here https://campusloop.space/app/confessions also a reload svg to refresh random feeds create best algo for https://campusloop.space/app/confessions , also you have to create the best viral algorithm for normal feeds also with proper maths copy from top companies so that any post can go viral suddenly with some probability in campus or all over india that deservs to be viral and it will also go to trending chars in explore pagee...........
+
+
+❯ https://campusloop.space/app/marketplace this and its subpages looks cluttry give then a
+  twitter like ui ux and push also do this with other pages like
+  https://campusloop.space/app/events and https://campusloop.space/app/events/new seach
+  for twitter design system fonts spacing size colors and everything create a full design
+  system like sidebar has, like profile has....
+ 
 
 # CampusLoop Tasks & Fixes
 

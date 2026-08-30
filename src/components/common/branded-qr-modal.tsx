@@ -24,6 +24,7 @@ const CATEGORY_THEMES = {
   profile: { qrDark: "#172554", accent: "#2563eb", tint: "#eff6ff", border: "#bfdbfe" },
   article: { qrDark: "#3b0764", accent: "#9333ea", tint: "#faf5ff", border: "#e9d5ff" },
   community: { qrDark: "#042f2e", accent: "#0d9488", tint: "#f0fdfa", border: "#99f6e4" },
+  store: { qrDark: "#451a03", accent: "#d97706", tint: "#fffbeb", border: "#fde68a" },
   general: { qrDark: "#1e1b4b", accent: "#6366f1", tint: "#eef2ff", border: "#c7d2fe" },
 } as const;
 
@@ -34,7 +35,7 @@ export interface BrandedQrModalProps {
   subtitle?: string;
   badgeText?: string;
   shortUrl: string;
-  category?: "event" | "profile" | "article" | "community" | "general";
+  category?: "event" | "profile" | "article" | "community" | "store" | "general";
   avatarUrl?: string | null;
 }
 

@@ -104,15 +104,50 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
   }
 
   function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
-    const items = Array.from(e.clipboardData?.items || []);
-    const imageFiles = items
+    const clipboardData = e.clipboardData;
+    if (!clipboardData) return;
+
+    // 1. Direct Files
+    const files = Array.from(clipboardData.files || []);
+    const directImageFiles = files.filter((f) => f.type.startsWith("image/"));
+    if (directImageFiles.length > 0) {
+      e.preventDefault();
+      handleUploadCommentFiles(directImageFiles);
+      return;
+    }
+
+    // 2. Clipboard Items
+    const items = Array.from(clipboardData.items || []);
+    const itemImageFiles = items
       .filter((item) => item.type.startsWith("image/"))
       .map((item) => item.getAsFile())
       .filter((f): f is File => f !== null);
 
-    if (imageFiles.length > 0) {
+    if (itemImageFiles.length > 0) {
       e.preventDefault();
-      handleUploadCommentFiles(imageFiles);
+      handleUploadCommentFiles(itemImageFiles);
+      return;
+    }
+
+    // 3. HTML / Web Sticker / GIF
+    const html = clipboardData.getData("text/html");
+    if (html) {
+      const match = html.match(/<img[^>]+src="([^">]+)"/i);
+      if (match && match[1] && /^https?:\/\//i.test(match[1])) {
+        const imgSrc = match[1];
+        if (
+          /\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(imgSrc) ||
+          imgSrc.includes("giphy.com") ||
+          imgSrc.includes("tenor.com")
+        ) {
+          e.preventDefault();
+          const imgMarkdown = `\n![Image](${imgSrc})`;
+          setCommentText((prev) => `${prev.trim()}${imgMarkdown}`);
+          toast.success("Sticker / GIF attached! 📸");
+          setTimeout(() => inputRef.current?.focus(), 50);
+          return;
+        }
+      }
     }
   }
 

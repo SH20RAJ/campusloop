@@ -93,6 +93,72 @@ export function PostComments({ postId, postAuthorId, postAuthorHandle }: PostCom
     }
   }
 
+  async function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const clipboardData = e.clipboardData;
+    if (!clipboardData) return;
+
+    // 1. Direct Files (e.g. Gboard sticker / pasted image)
+    const files = Array.from(clipboardData.files || []);
+    const directImageFile = files.find((f) => f.type.startsWith("image/"));
+    if (directImageFile) {
+      e.preventDefault();
+      setIsUploadingImage(true);
+      try {
+        toast.loading("Uploading pasted image...", { id: "cmt-upload" });
+        const res = await uploadImageToImgBB(directImageFile);
+        setCommentImage(res.displayUrl || res.url);
+        toast.success("Photo attached! 📸", { id: "cmt-upload" });
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Image upload failed", { id: "cmt-upload" });
+      } finally {
+        setIsUploadingImage(false);
+      }
+      return;
+    }
+
+    // 2. Clipboard Items
+    const items = Array.from(clipboardData.items || []);
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          setIsUploadingImage(true);
+          try {
+            toast.loading("Uploading pasted image...", { id: "cmt-upload" });
+            const res = await uploadImageToImgBB(file);
+            setCommentImage(res.displayUrl || res.url);
+            toast.success("Photo attached! 📸", { id: "cmt-upload" });
+          } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Image upload failed", { id: "cmt-upload" });
+          } finally {
+            setIsUploadingImage(false);
+          }
+          return;
+        }
+      }
+    }
+
+    // 3. HTML / Web Sticker / GIF
+    const html = clipboardData.getData("text/html");
+    if (html) {
+      const match = html.match(/<img[^>]+src="([^">]+)"/i);
+      if (match && match[1] && /^https?:\/\//i.test(match[1])) {
+        const imgSrc = match[1];
+        if (
+          /\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(imgSrc) ||
+          imgSrc.includes("giphy.com") ||
+          imgSrc.includes("tenor.com")
+        ) {
+          e.preventDefault();
+          setCommentImage(imgSrc);
+          toast.success("Sticker / GIF attached! 📸");
+          return;
+        }
+      }
+    }
+  }
+
   async function handlePostComment(e: React.FormEvent) {
     e.preventDefault();
     let body = commentText.trim();
@@ -240,6 +306,7 @@ export function PostComments({ postId, postAuthorId, postAuthorHandle }: PostCom
               ref={textareaRef}
               value={commentText}
               onChange={handleCommentChange}
+              onPaste={handlePaste}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                   handlePostComment(e);

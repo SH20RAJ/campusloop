@@ -1,6 +1,16 @@
 "use client";
 
-import { Archive, Flag, Link2, MoreHorizontal, Repeat2, School, ShieldCheck, Trash2 } from "lucide-react";
+import {
+  Archive,
+  Copy,
+  Flag,
+  Link2,
+  MoreHorizontal,
+  Repeat2,
+  School,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -151,6 +161,25 @@ export function FeedCardHeader({
                   >
                     <Link2 className="size-4 text-blue-500" />
                     <span>Copy Link</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setShowMenu(false);
+                      if (typeof navigator !== "undefined" && navigator.clipboard) {
+                        try {
+                          await navigator.clipboard.writeText(post.body || "");
+                          toast.success("Post text copied to clipboard! 📋");
+                        } catch {
+                          toast.error("Failed to copy text");
+                        }
+                      }
+                    }}
+                    className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2"
+                  >
+                    <Copy className="size-4 text-purple-500" />
+                    <span>Copy Text</span>
                   </button>
 
                   <button

@@ -400,21 +400,63 @@ export function MessengerPane({
     }
   }
 
-  function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
-    const items = e.clipboardData?.items;
-    if (!items) return;
+  async function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const clipboardData = e.clipboardData;
+    if (!clipboardData) return;
 
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
+    // 1. Check direct file attachments (Files array, e.g. Gboard / iOS keyboard sticker / copied photo)
+    const files = Array.from(clipboardData.files || []);
+    const imageFile = files.find((f) => f.type.startsWith("image/"));
+    if (imageFile) {
+      e.preventDefault();
+      toast.info("Sending pasted sticker / image... 🎨");
+      sendImageFile(imageFile);
+      return;
+    }
+
+    // 2. Check clipboard items (e.g. data transfer items)
+    const items = Array.from(clipboardData.items || []);
+    for (const item of items) {
       if (item.type.startsWith("image/")) {
         e.preventDefault();
         const file = item.getAsFile();
         if (file) {
-          toast.info("Sending sticker / image...");
+          toast.info("Sending pasted sticker / image... 🎨");
           sendImageFile(file);
           return;
         }
       }
+    }
+
+    // 3. Check HTML content for embedded <img> (e.g. copied web sticker / emoji GIF)
+    const html = clipboardData.getData("text/html");
+    if (html) {
+      const match = html.match(/<img[^>]+src="([^">]+)"/i);
+      if (match && match[1] && /^https?:\/\//i.test(match[1])) {
+        const imgSrc = match[1];
+        if (
+          /\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(imgSrc) ||
+          imgSrc.includes("giphy.com") ||
+          imgSrc.includes("tenor.com")
+        ) {
+          e.preventDefault();
+          toast.info("Sending sticker / GIF... 🎨");
+          sendMessage(imgSrc);
+          return;
+        }
+      }
+    }
+
+    // 4. Check plain text if it's a standalone image / gif URL
+    const text = clipboardData.getData("text/plain").trim();
+    if (
+      /^https?:\/\/[^\s]+?\.(png|jpe?g|gif|webp)(\?[^\s]*)?$/i.test(text) ||
+      /^https?:\/\/(?:media|i)\.giphy\.com\/[^\s]+/i.test(text) ||
+      /^https?:\/\/media\.tenor\.com\/[^\s]+/i.test(text)
+    ) {
+      e.preventDefault();
+      sendMessage(text);
+      return;
     }
   }
 

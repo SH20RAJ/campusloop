@@ -163,16 +163,48 @@ export function PostComposer({
         ),
       },
       handlePaste: (_view, event) => {
-        const items = Array.from(event.clipboardData?.items || []);
-        const imageFiles = items
+        const clipboardData = event.clipboardData;
+        if (!clipboardData) return false;
+
+        // 1. Direct Files (e.g. Gboard sticker / mobile keyboard pasted photo)
+        const files = Array.from(clipboardData.files || []);
+        const directImageFiles = files.filter((f) => f.type.startsWith("image/"));
+        if (directImageFiles.length > 0) {
+          event.preventDefault();
+          handleUploadFiles(directImageFiles);
+          return true;
+        }
+
+        // 2. Clipboard Items
+        const items = Array.from(clipboardData.items || []);
+        const itemImageFiles = items
           .filter((item) => item.type.startsWith("image/"))
           .map((item) => item.getAsFile())
           .filter((f): f is File => f !== null);
 
-        if (imageFiles.length > 0) {
+        if (itemImageFiles.length > 0) {
           event.preventDefault();
-          handleUploadFiles(imageFiles);
+          handleUploadFiles(itemImageFiles);
           return true;
+        }
+
+        // 3. HTML Content / Web Sticker / GIF
+        const html = clipboardData.getData("text/html");
+        if (html) {
+          const match = html.match(/<img[^>]+src="([^">]+)"/i);
+          if (match && match[1] && /^https?:\/\//i.test(match[1])) {
+            const imgSrc = match[1];
+            if (
+              /\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(imgSrc) ||
+              imgSrc.includes("giphy.com") ||
+              imgSrc.includes("tenor.com")
+            ) {
+              event.preventDefault();
+              setUploadedImages((prev) => [...prev, imgSrc]);
+              toast.success("Sticker / GIF attached! 📸");
+              return true;
+            }
+          }
         }
         return false;
       },

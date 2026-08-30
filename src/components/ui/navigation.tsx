@@ -84,7 +84,14 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
         !pathname.startsWith("/app/chats") &&
         !pathname.startsWith("/app/stories/new") &&
         !pathname.startsWith("/app/story/") &&
-        !pathname.startsWith("/app/post/new") && (
+        !pathname.startsWith("/app/post/") &&
+        !pathname.startsWith("/app/college/") &&
+        !(pathname.startsWith("/app/communities/") && pathname !== "/app/communities") &&
+        !pathname.startsWith("/app/community/") &&
+        !pathname.startsWith("/app/search") &&
+        !pathname.startsWith("/app/dating") &&
+        !pathname.startsWith("/app/settings") &&
+        !pathname.startsWith("/@") && (
           <header className="sticky top-0 z-40 flex h-13 w-full items-center justify-between border-b border-border/30 bg-background/85 px-4 backdrop-blur-xl md:hidden select-none">
             <div className="flex items-center gap-2.5">
               <button

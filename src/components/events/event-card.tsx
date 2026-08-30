@@ -1,8 +1,7 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { haptics } from "@/lib/haptics";
+import { cn } from "@/lib/utils";
 import { sounds } from "@/lib/sounds";
 import { Calendar, Check, Clock, Globe, MapPin, School, Trophy, Users } from "lucide-react";
 import Link from "next/link";
@@ -104,123 +103,104 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <Link
       href={`/app/events/${event.slug || event.id}`}
-      className="group block overflow-hidden rounded-3xl border border-border/50 bg-card hover:border-border transition-all duration-200 hover:shadow-lg shadow-xs"
+      className="group flex gap-3.5 px-4 py-4 transition-colors hover:bg-muted/25"
     >
-      {/* Banner */}
-      <div className="relative aspect-[21/9] w-full overflow-hidden bg-muted/40">
+      {/* Thumbnail */}
+      <div className="relative size-24 shrink-0 overflow-hidden rounded-xl bg-muted/40 sm:size-28">
         {event.bannerUrl ? (
           <img
             src={event.bannerUrl}
-            alt={event.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            alt=""
             loading="lazy"
+            className="h-full w-full object-cover"
           />
         ) : (
-          <div className="h-full w-full bg-linear-to-tr from-primary/20 via-primary/5 to-muted flex items-center justify-center">
-            <Calendar className="size-12 text-primary/40" />
+          <div className="flex h-full w-full items-center justify-center bg-muted/60">
+            <Calendar className="size-7 text-muted-foreground" />
           </div>
         )}
+      </div>
 
-        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
-
-        {/* Top Badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="rounded-lg bg-black/75 px-2.5 py-1 text-[11px] font-black uppercase text-white backdrop-blur-md">
-              {event.eventType}
-            </span>
-            <span className="rounded-lg bg-primary/90 px-2.5 py-1 text-[11px] font-black text-primary-foreground backdrop-blur-md">
-              {event.mode}
-            </span>
-          </div>
-
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        {/* Club, type and audience */}
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-muted-foreground">
+          <span className="truncate font-bold text-foreground">{event.clubName}</span>
+          <span aria-hidden>·</span>
+          <span className="capitalize">{event.eventType.toLowerCase()}</span>
           {isRestricted ? (
-            <span className="rounded-lg bg-amber-500/90 text-black px-2 py-1 text-[10px] font-black backdrop-blur-md flex items-center gap-1">
+            <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400">
               <School className="size-3" />
-              Restricted
+              Campus only
             </span>
           ) : (
-            <span className="rounded-lg bg-black/60 text-white/90 px-2 py-1 text-[10px] font-bold backdrop-blur-md flex items-center gap-1">
+            <span className="inline-flex items-center gap-1">
               <Globe className="size-3" />
-              All Campuses
+              All campuses
             </span>
           )}
         </div>
 
-        {/* Bottom Banner Content: Club & Date */}
-        <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2 text-white">
-          <div className="min-w-0">
-            <p className="text-xs font-black uppercase tracking-wider text-primary-foreground/90 drop-shadow-xs">
-              {event.clubName}
-            </p>
-          </div>
-          <div className="text-right shrink-0">
-            <span className="rounded-lg bg-black/60 px-2.5 py-1 text-xs font-bold backdrop-blur-md">
-              {dateStr}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-4 space-y-3">
         <div>
-          <h3 className="font-black text-base text-foreground group-hover:text-primary transition-colors line-clamp-1">
+          <h3 className="text-[15px] font-black leading-tight text-foreground transition-colors group-hover:text-primary">
             {event.title}
           </h3>
           {event.tagline && (
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-1 leading-relaxed">
+            <p className="mt-0.5 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
               {event.tagline}
             </p>
           )}
         </div>
 
-        {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground font-medium pt-1 border-t border-border/30">
-          <div className="flex items-center gap-1.5 truncate">
-            <Clock className="size-3.5 shrink-0 text-primary" />
-            <span className="truncate">{timeStr}</span>
-          </div>
-          <div className="flex items-center gap-1.5 truncate">
-            <MapPin className="size-3.5 shrink-0 text-primary" />
+        {/* Meta */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <Calendar className="size-3.5" />
+            {dateStr}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Clock className="size-3.5" />
+            {timeStr}
+          </span>
+          <span className="inline-flex min-w-0 items-center gap-1.5">
+            <MapPin className="size-3.5 shrink-0" />
             <span className="truncate">{event.venue?.split(",")[0] || event.mode}</span>
-          </div>
+          </span>
         </div>
 
-        {/* Prizes / Perks badge */}
         {event.prizesDescription && (
-          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1.5 rounded-xl">
+          <p className="inline-flex items-center gap-1.5 text-[13px] font-bold text-amber-600 dark:text-amber-400">
             <Trophy className="size-3.5 shrink-0" />
             <span className="truncate">{event.prizesDescription}</span>
-          </div>
+          </p>
         )}
 
-        {/* Actions Bar */}
-        <div className="flex items-center justify-between gap-3 pt-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-bold">
+        {/* Actions */}
+        <div className="mt-0.5 flex items-center justify-between gap-3">
+          <span className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground">
             <Users className="size-3.5" />
-            <span>{attendeeCount} attending</span>
-          </div>
+            {attendeeCount} going
+          </span>
 
-          <Button
-            size="sm"
+          <button
+            type="button"
             onClick={handleQuickRegister}
             disabled={isMutating || isRegistered}
-            className={`h-8 px-4 text-xs font-black rounded-full transition-all cursor-pointer ${
+            className={cn(
+              "flex h-8 cursor-pointer items-center gap-1 rounded-full px-4 text-xs font-black transition-all active:scale-95 disabled:cursor-default",
               isRegistered
-                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
-                : "bg-primary text-primary-foreground hover:opacity-90 shadow-2xs"
-            }`}
+                ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                : "bg-foreground text-background hover:opacity-90"
+            )}
           >
             {isRegistered ? (
               <>
-                <Check className="size-3.5 mr-1" />
-                <span>Registered</span>
+                <Check className="size-3.5" />
+                Going
               </>
             ) : (
-              <span>Register Free</span>
+              "Register"
             )}
-          </Button>
+          </button>
         </div>
       </div>
     </Link>

@@ -39,11 +39,7 @@ interface EventDetailClientProps {
 
 export function EventDetailClient({ eventId }: EventDetailClientProps) {
   const router = useRouter();
-  const { data, isLoading } = useSWR<{ event: any }>(
-    `/api/events/${eventId}`,
-    fetcher,
-    { revalidateOnFocus: false }
-  );
+  const { data, isLoading } = useSWR<{ event: any }>(`/api/events/${eventId}`, fetcher);
 
   const event = data?.event;
 

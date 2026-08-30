@@ -143,7 +143,6 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
     fetcher,
     {
       revalidateFirstPage: false,
-      revalidateOnFocus: false,
       dedupingInterval: 6000,
     }
   );

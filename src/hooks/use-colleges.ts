@@ -26,7 +26,6 @@ export function useColleges(limit = 100, page = 1) {
     `/api/colleges?limit=${limit}&page=${page}`,
     fetcher,
     {
-      revalidateOnFocus: false,
       revalidateIfStale: true,
       keepPreviousData: true,
       dedupingInterval: 30000,

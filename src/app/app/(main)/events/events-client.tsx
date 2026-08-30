@@ -38,7 +38,7 @@ export function EventsClient() {
   const { data, isLoading, mutate } = useSWR<{ events: EventItem[] }>(
     endpoint,
     fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 15000 }
+    { dedupingInterval: 15000 }
   );
 
   const events = data?.events || [];

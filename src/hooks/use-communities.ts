@@ -21,7 +21,6 @@ export function useCommunities() {
     "/api/communities",
     fetcher,
     {
-      revalidateOnFocus: false,
       revalidateIfStale: true,
       keepPreviousData: true,
       dedupingInterval: 20000,

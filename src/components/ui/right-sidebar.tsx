@@ -36,14 +36,14 @@ export function RightSidebar() {
   const { data: trendsData } = useSWR<TrendsResponse>(
     "/api/trends?scope=CAMPUS",
     fetcher,
-    { revalidateIfStale: true, revalidateOnFocus: false, dedupingInterval: 15000 }
+    { revalidateIfStale: true, dedupingInterval: 15000 }
   );
 
   // Suggested peers from real database (excludes already followed users)
   const { data: suggestedPeers, mutate: mutateSuggested } = useSWR<SuggestedPeer[]>(
     "/api/profile/suggested",
     fetcher,
-    { revalidateIfStale: true, revalidateOnFocus: false, dedupingInterval: 10000 }
+    { revalidateIfStale: true, dedupingInterval: 10000 }
   );
 
   function handleSearch(e: React.FormEvent) {

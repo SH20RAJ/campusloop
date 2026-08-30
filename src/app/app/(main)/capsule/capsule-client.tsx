@@ -26,7 +26,6 @@ export function CapsuleClient({
 }: CapsuleClientProps) {
   const { data, mutate } = useSWR<{ capsules: any[] }>("/api/capsules", fetcher, {
     fallbackData: { capsules: initialCapsules },
-    revalidateOnFocus: false,
   });
 
   const [activeFilter, setActiveFilter] = useState<string>("ALL");

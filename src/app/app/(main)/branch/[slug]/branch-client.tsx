@@ -33,7 +33,7 @@ export function BranchDirectoryClient() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const url = `/api/academics/branch/${encodeURIComponent(slug)}?scope=${scope}&sort=${sort}&q=${encodeURIComponent(searchQuery)}`;
-  const { data, isLoading } = useSWR<BranchApiResponse>(url, fetcher, { revalidateOnFocus: false });
+  const { data, isLoading } = useSWR<BranchApiResponse>(url, fetcher);
 
   const branchTitle = data?.branch || slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   const branchIcon = data?.icon || getBranchIcon(branchTitle);

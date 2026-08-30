@@ -82,7 +82,6 @@ export function CommunitiesIndexClient({
 
   const { data, size, setSize, isValidating } = useSWRInfinite<FeedPageResponse>(getKey, fetcher, {
     revalidateFirstPage: false,
-    revalidateOnFocus: false,
     dedupingInterval: 6000,
   });
 

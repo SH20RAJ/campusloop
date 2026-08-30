@@ -56,12 +56,19 @@ export function SWRProvider({ children }: { children: React.ReactNode }) {
     <SWRConfig
       value={{
         provider: getLocalStorageProvider,
-        revalidateOnFocus: false,
-        revalidateOnReconnect: true,
+        // Cache-first for instant paint, then refresh in the background:
+        // `keepPreviousData` + `revalidateIfStale` render the persisted cache
+        // immediately while a fresh request is already in flight, so students
+        // never sit on a skeleton *or* on stale data.
         revalidateIfStale: true,
-        dedupingInterval: 10000,
         keepPreviousData: true,
-
+        // Coming back to the tab refetches, throttled so tab-flicking does not
+        // turn into a request storm.
+        revalidateOnFocus: true,
+        focusThrottleInterval: 30000,
+        revalidateOnReconnect: true,
+        dedupingInterval: 10000,
+        errorRetryCount: 2,
       }}
     >
       {children}

@@ -30,7 +30,6 @@ export function useStories() {
     "/api/stories",
     fetcher,
     {
-      revalidateOnFocus: false,
       revalidateIfStale: true,
       keepPreviousData: true,
       dedupingInterval: 15000,

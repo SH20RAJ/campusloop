@@ -121,14 +121,14 @@ export function DiscoverFeed() {
   const { data: trendsData } = useSWR<TrendsResponse>(
     `/api/trends?scope=${scope}`,
     fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 20000 }
+    { dedupingInterval: 20000 }
   );
 
   // Suggested peers for inline "Who to follow"
   const { data: suggestedPeers } = useSWR<UserProfile[]>(
     "/api/profile/suggested",
     fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 30000 }
+    { dedupingInterval: 30000 }
   );
 
   // Discover Algorithmic Feed Tuning

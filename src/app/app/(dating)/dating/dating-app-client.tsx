@@ -39,7 +39,6 @@ export function DatingAppClient() {
     "/api/dating/profiles",
     fetcher,
     {
-      revalidateOnFocus: false,
       revalidateIfStale: true,
       keepPreviousData: true,
       dedupingInterval: 15000,

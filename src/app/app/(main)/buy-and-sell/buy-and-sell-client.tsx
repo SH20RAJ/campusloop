@@ -71,7 +71,6 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
 
   const { data, size, setSize, isLoading, isValidating, mutate } =
     useSWRInfinite<FeedPageResponse>(getKey, fetcher, {
-      revalidateOnFocus: false,
       dedupingInterval: 15000,
     });
 

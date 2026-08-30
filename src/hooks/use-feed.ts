@@ -88,13 +88,17 @@ export function useFeed(
     {
       initialSize,
       fallbackData,
+      // Only the first page is refetched: later pages are append-only history,
+      // so revalidating all of them on every focus would be wasteful.
       revalidateFirstPage: true,
       revalidateAll: false,
       revalidateIfStale: true,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
       dedupingInterval: 5000,
-      keepPreviousData: false,
+      // The cached pages stay on screen while the refresh runs, so returning to
+      // the feed never flashes a skeleton over content we already have.
+      keepPreviousData: true,
     }
   );
 

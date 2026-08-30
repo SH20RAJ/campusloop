@@ -40,7 +40,6 @@ export function useProfile() {
     "/api/profile/me",
     fetcher,
     {
-      revalidateOnFocus: false,
       revalidateIfStale: true,
       keepPreviousData: true,
       dedupingInterval: 15000,

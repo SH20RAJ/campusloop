@@ -1,9 +1,10 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DEGREE_CATEGORIES, getBranchesForDegree } from "@/constants";
+import { DEGREE_CATEGORIES, getBranchOptionsForDegree } from "@/constants";
 import { useColleges } from "@/hooks/use-colleges";
 import { useUsernameAvailability } from "@/hooks/use-username-availability";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { isUsernameBlocking, UsernameStatusHint } from "@/components/ui/username-status";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
@@ -160,7 +161,12 @@ export function OnboardingForm({
   const nameVal = displayName ? validateDisplayName(displayName) : null;
   const userVal = username ? validateUsername(username) : null;
   const usernameStatus = useUsernameAvailability(username);
-  const currentDegreeBranches = getBranchesForDegree(course);
+  const currentDegreeBranches = getBranchOptionsForDegree(course);
+  const branchOptions = currentDegreeBranches.map((b) => ({
+    value: b.name,
+    label: b.name,
+    icon: b.icon,
+  }));
 
   const { colleges } = useColleges(120);
 
@@ -526,8 +532,11 @@ export function OnboardingForm({
                 onChange={(e) => {
                   const next = e.target.value;
                   setCourse(next);
-                  const branches = getBranchesForDegree(next);
-                  if (branches.length > 0) setBranch(branches[0]);
+                  // Keep the current branch when the new degree still offers it.
+                  const branches = getBranchOptionsForDegree(next);
+                  if (!branches.some((b) => b.name === branch) && branches.length > 0) {
+                    setBranch(branches[0].name);
+                  }
                 }}
                 className={selectClass}
               >
@@ -560,21 +569,18 @@ export function OnboardingForm({
             </div>
           </div>
 
-          {currentDegreeBranches.length > 0 && (
+          {branchOptions.length > 0 && (
             <div className="space-y-1.5">
               <FieldLabel htmlFor="branch">Branch</FieldLabel>
-              <select
+              <SearchableSelect
                 id="branch"
+                options={branchOptions}
                 value={branch}
-                onChange={(e) => setBranch(e.target.value)}
-                className={selectClass}
-              >
-                {currentDegreeBranches.map((b) => (
-                  <option key={b} value={b}>
-                    {b}
-                  </option>
-                ))}
-              </select>
+                onChange={setBranch}
+                placeholder="Select your branch"
+                searchPlaceholder="Search branches..."
+                emptyText="No branch matches. Pick 'Other / Not listed'."
+              />
             </div>
           )}
         </section>

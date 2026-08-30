@@ -2,6 +2,8 @@
 
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { getBranchOptionsForDegree } from "@/constants";
 import { useProfile } from "@/hooks/use-profile";
 import { useUsernameAvailability } from "@/hooks/use-username-availability";
 import { isUsernameBlocking, UsernameStatusHint } from "@/components/ui/username-status";
@@ -82,6 +84,11 @@ export function EditProfileClient() {
   const nameVal = displayName ? validateDisplayName(displayName) : null;
   const userVal = username ? validateUsername(username) : null;
   const usernameStatus = useUsernameAvailability(username);
+  const branchOptions = getBranchOptionsForDegree(course).map((b) => ({
+    value: b.name,
+    label: b.name,
+    icon: b.icon,
+  }));
 
   useEffect(() => {
     if (profile) {
@@ -665,38 +672,25 @@ export function EditProfileClient() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-muted-foreground">Department / Branch</label>
-              <div className="flex flex-wrap gap-1.5 pb-1">
-                {[
-                  "Computer Science & Engineering",
-                  "Architecture & Urban Planning",
-                  "AI & Data Science",
-                  "Electronics & Communication (ECE)",
-                  "Mechanical Engineering",
-                  "Civil Engineering",
-                  "Business Administration (MBA)",
-                  "Computer Applications (MCA)",
-                  "Medicine & Surgery (MBBS)",
-                  "Design & UI/UX",
-                ].map((b) => (
-                  <button
-                    key={b}
-                    type="button"
-                    onClick={() => setBranch(b)}
-                    className={`py-1 px-2.5 rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
-                      branch === b
-                        ? "border-primary bg-primary/10 text-primary shadow-xs"
-                        : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {b}
-                  </button>
-                ))}
-              </div>
+              {/*
+                Was a hardcoded 10-chip list whose labels did not match the
+                catalog ("Civil Engineering" vs "Civil & Structural
+                Engineering"), so a chip stored a branch that never resolved to
+                a directory slug. Now driven by the catalog itself.
+              */}
+              <SearchableSelect
+                options={branchOptions}
+                value={branch}
+                onChange={setBranch}
+                placeholder="Select your branch"
+                searchPlaceholder="Search branches..."
+                emptyText="No branch matches. Pick 'Other / Not listed'."
+              />
               <input
                 type="text"
                 value={branch}
                 onChange={(e) => setBranch(e.target.value)}
-                placeholder="Or type custom branch/major..."
+                placeholder="Or type a custom branch/major..."
                 className="w-full rounded-xl border border-border/60 bg-muted/20 px-3.5 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary focus:bg-background transition-all"
               />
             </div>

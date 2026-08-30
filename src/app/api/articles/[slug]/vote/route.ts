@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
 import { articles, articleVotes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { awardPoints } from "@/lib/gamification";
+import { awardPoints } from "@/lib/gamification-server";
 import { and, eq, or, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 

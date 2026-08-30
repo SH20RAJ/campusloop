@@ -1,3 +1,5 @@
+"use client";
+
 import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
 import { ExternalLink, X, ZoomIn } from "lucide-react";
 import Link from "next/link";

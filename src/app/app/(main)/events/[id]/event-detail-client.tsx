@@ -1,3 +1,5 @@
+"use client";
+
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { MarkdownContent } from "@/components/common/markdown-content";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

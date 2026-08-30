@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Trash2,
   User,
+  Users2,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -30,7 +31,15 @@ import { cn } from "@/lib/utils";
 interface ChatUserInfoDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  otherParticipant: UserProfile | null;
+  otherParticipant:
+    | (UserProfile & {
+        isGroup?: boolean;
+        isCommunity?: boolean;
+        membersCount?: number;
+        category?: string;
+        participants?: UserProfile[];
+      })
+    | null;
   conversationId: string | null;
   messages: CachedMessage[];
   currentUserId: string;
@@ -246,59 +255,109 @@ export function ChatUserInfoDrawer({
             </p>
           )}
 
-          {/* Academic Meta */}
-          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground pt-1">
-            {otherParticipant.institutionId && (
-              <Link
-                href={`/app/college/${otherParticipant.institutionId}`}
-                className="text-primary hover:underline font-semibold inline-flex items-center gap-1"
-              >
-                <School className="size-3.5" />
-                <span>Campus Hub</span>
-              </Link>
-            )}
-            {otherParticipant.branch && (
-              <span className="inline-flex items-center gap-1 text-foreground/80 font-medium">
-                <GraduationCap className="size-3.5 text-primary/70" />
+          {/* Academic Meta or Group Category */}
+          {otherParticipant.isGroup ? (
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground pt-1">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-bold text-primary">
+                <Users2 className="size-3.5" />
                 <span>
-                  {otherParticipant.course ? `${otherParticipant.course} · ` : ""}
-                  {otherParticipant.branch}
+                  {otherParticipant.membersCount || otherParticipant.participants?.length || 2} Campus Members
                 </span>
               </span>
-            )}
-            {otherParticipant.year && (
-              <span className="inline-flex items-center gap-1">
-                <Calendar className="size-3" /> Year {otherParticipant.year}
-              </span>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground pt-1">
+              {otherParticipant.institutionId && (
+                <Link
+                  href={`/app/college/${otherParticipant.institutionId}`}
+                  className="text-primary hover:underline font-semibold inline-flex items-center gap-1"
+                >
+                  <School className="size-3.5" />
+                  <span>Campus Hub</span>
+                </Link>
+              )}
+              {otherParticipant.branch && (
+                <span className="inline-flex items-center gap-1 text-foreground/80 font-medium">
+                  <GraduationCap className="size-3.5 text-primary/70" />
+                  <span>
+                    {otherParticipant.course ? `${otherParticipant.course} · ` : ""}
+                    {otherParticipant.branch}
+                  </span>
+                </span>
+              )}
+              {otherParticipant.year && (
+                <span className="inline-flex items-center gap-1">
+                  <Calendar className="size-3.5" /> Year {otherParticipant.year}
+                </span>
+              )}
+            </div>
+          )}
 
-          {/* LP Clout Badge */}
-          <div className="pt-1">
-            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-bold text-amber-500">
-              🔥 {otherParticipant.points || 0} LP Clout
-            </span>
-          </div>
+          {/* LP Clout Badge (Only for individual students) */}
+          {!otherParticipant.isGroup && (
+            <div className="pt-1">
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-bold text-amber-500">
+                🔥 {otherParticipant.points || 0} LP Clout
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Quick Action Grid (WhatsApp Style) */}
+        {/* Quick Action Grid */}
         <div className="grid grid-cols-4 gap-2 p-4 border-b border-border/30 text-center bg-card">
-          <Link
-            href={`/@${otherParticipant.username}`}
-            className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-muted/60 transition-colors group cursor-pointer"
-          >
-            <div className="size-10 rounded-full bg-muted flex items-center justify-center text-foreground group-hover:text-primary transition-colors">
-              <User className="size-4.5" />
-            </div>
-            <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground">
-              Profile
-            </span>
-          </Link>
+          {!otherParticipant.isGroup ? (
+            <>
+              <Link
+                href={`/@${otherParticipant.username}`}
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-muted/60 transition-colors group cursor-pointer"
+              >
+                <div className="size-10 rounded-full bg-muted flex items-center justify-center text-foreground group-hover:text-primary transition-colors">
+                  <User className="size-4.5" />
+                </div>
+                <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground">
+                  Profile
+                </span>
+              </Link>
 
-          <div className="flex flex-col items-center gap-1.5 p-2">
-            <SecretCrushButton targetId={otherParticipant.id} targetName={otherParticipant.displayName} />
-            <span className="text-[10px] font-bold text-muted-foreground">Crush</span>
-          </div>
+              <div className="flex flex-col items-center gap-1.5 p-2">
+                <SecretCrushButton targetId={otherParticipant.id} targetName={otherParticipant.displayName} />
+                <span className="text-[10px] font-bold text-muted-foreground">Crush</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof navigator !== "undefined" && navigator.clipboard) {
+                    navigator.clipboard.writeText(`https://campusloop.space/app/chat/${conversationId}`);
+                    toast.success("Group link copied to clipboard! 📋");
+                  }
+                }}
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-muted/60 transition-colors group cursor-pointer"
+              >
+                <div className="size-10 rounded-full bg-muted flex items-center justify-center text-foreground group-hover:text-primary transition-colors">
+                  <Link2 className="size-4.5" />
+                </div>
+                <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground">
+                  Invite Link
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toast.info("To add members, share the group link or tap + Group")}
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-muted/60 transition-colors group cursor-pointer"
+              >
+                <div className="size-10 rounded-full bg-muted flex items-center justify-center text-foreground group-hover:text-primary transition-colors">
+                  <Users2 className="size-4.5" />
+                </div>
+                <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground">
+                  Members
+                </span>
+              </button>
+            </>
+          )}
 
           <button
             type="button"
@@ -329,6 +388,44 @@ export function ChatUserInfoDrawer({
             </span>
           </button>
         </div>
+
+        {/* Group Participants List (If Group Chat) */}
+        {otherParticipant.isGroup &&
+          otherParticipant.participants &&
+          otherParticipant.participants.length > 0 && (
+            <div className="p-4 border-b border-border/30 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-foreground">
+                  Group Members ({otherParticipant.participants.length})
+                </span>
+              </div>
+              <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                {otherParticipant.participants.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/@${p.username}`}
+                    onClick={onClose}
+                    className="flex items-center justify-between p-2 rounded-xl hover:bg-muted/40 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Avatar className="size-8 border border-border/40 shrink-0">
+                        <AvatarImage src={p.avatarUrl || ""} />
+                        <AvatarFallback className="text-[10px] font-black bg-primary/10 text-primary">
+                          {p.displayName?.[0] || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-foreground truncate hover:underline">
+                          {p.displayName} {p.id === currentUserId ? "(You)" : ""}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground truncate">@{p.username}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
         {/* Media, Links Tabs (Instagram / WhatsApp Style) */}
         <div className="border-b border-border/30">

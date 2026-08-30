@@ -80,6 +80,8 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
     <>
       {/* ─── Minimal Top Mobile Header ─── */}
       {!pathname.startsWith("/app/chat") &&
+        !pathname.startsWith("/chats") &&
+        !pathname.startsWith("/app/chats") &&
         !pathname.startsWith("/app/stories/new") &&
         !pathname.startsWith("/app/story/") &&
         !pathname.startsWith("/app/post/new") && (

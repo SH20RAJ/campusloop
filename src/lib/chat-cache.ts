@@ -13,9 +13,19 @@ export type CachedMessage = Message & {
 
 export type CachedConversation = {
   id: string;
+  type?: string;
+  title?: string | null;
+  isCommunity?: boolean;
+  isGroup?: boolean;
   createdAt: string;
   updatedAt: string;
-  otherParticipant: UserProfile;
+  otherParticipant: UserProfile & {
+    isCommunity?: boolean;
+    isGroup?: boolean;
+    membersCount?: number;
+    category?: string;
+    participants?: UserProfile[];
+  };
   unreadCount?: number;
   isArchived?: boolean;
   isMuted?: boolean;

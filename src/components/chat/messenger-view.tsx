@@ -21,8 +21,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PresenceDot } from "@/components/ui/presence-dot";
 import type { UserProfile } from "@/db/schema";
 import { type CachedConversation, getCachedConversations, setCachedConversations } from "@/lib/chat-cache";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import { ConversationActionModal } from "./conversation-action-modal";
+import { CreateGroupModal } from "./create-group-modal";
 import { MessengerPane } from "./messenger-pane";
 
 const fetcher = async <T,>(url: string): Promise<T> => {
@@ -37,7 +40,7 @@ interface MessengerViewProps {
   initialConversationId?: string;
 }
 
-type InboxFilter = "ALL" | "UNREAD" | "CAMPUS" | "ARCHIVED";
+type InboxFilter = "ALL" | "UNREAD" | "GROUPS" | "CAMPUS" | "ARCHIVED";
 
 export function MessengerView({
   currentUserId,
@@ -55,6 +58,7 @@ export function MessengerView({
   const [activeFilter, setActiveFilter] = useState<InboxFilter>("ALL");
   const [actionConv, setActionConv] = useState<CachedConversation | null>(null);
   const [showActionModal, setShowActionModal] = useState(false);
+  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
 
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isLongPressRef = useRef(false);
@@ -240,8 +244,10 @@ export function MessengerView({
 
     if (activeFilter === "UNREAD") {
       list = list.filter((c) => (c.unreadCount || 0) > 0);
+    } else if (activeFilter === "GROUPS") {
+      list = list.filter((c) => Boolean(c.isGroup || c.type === "GROUP" || c.isCommunity));
     } else if (activeFilter === "CAMPUS") {
-      list = list.filter((c) => Boolean(c.otherParticipant?.institutionId));
+      list = list.filter((c) => Boolean(c.otherParticipant?.institutionId && !c.isGroup));
     }
 
     return list;
@@ -277,12 +283,20 @@ export function MessengerView({
             </div>
 
             <div className="flex items-center gap-2">
-              <Link
-                href="/app"
-                className="text-[11px] font-bold text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-full bg-muted/50 hover:bg-muted transition-all"
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setShowCreateGroupModal(true);
+                }}
+                className="flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-95"
+                title="Create campus group or study pod"
               >
-                Feed
-              </Link>
+                <Users2 className="size-3.5" />
+                <span>+ Group</span>
+              </button>
+
               <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                 {conversations?.length || 0}
               </span>
@@ -330,6 +344,19 @@ export function MessengerView({
                 conversations.filter((c) => (c.unreadCount || 0) > 0 && !c.isArchived).length > 0 && (
                   <span className="size-1.5 rounded-full bg-amber-400" />
                 )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter("GROUPS")}
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                activeFilter === "GROUPS"
+                  ? "bg-primary text-primary-foreground shadow-2xs"
+                  : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              <Users2 className="size-3" />
+              <span>Groups</span>
             </button>
             <button
               type="button"
@@ -608,6 +635,17 @@ export function MessengerView({
           if (activeConversationId === convId) {
             handleBackToInbox();
           }
+        }}
+      />
+
+      {/* Create Campus Group / Study Pod Modal */}
+      <CreateGroupModal
+        isOpen={showCreateGroupModal}
+        onClose={() => setShowCreateGroupModal(false)}
+        currentUserId={currentUserId}
+        onGroupCreated={(newConvId) => {
+          mutateConvs();
+          handleSelectConversation(newConvId);
         }}
       />
     </div>

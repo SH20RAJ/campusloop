@@ -16,6 +16,7 @@ import {
   Smile,
   Trash2,
   User,
+  Users2,
   Volume2,
   X,
 } from "lucide-react";
@@ -51,7 +52,15 @@ const fetcher = async <T,>(url: string): Promise<T> => {
 
 interface MessengerPaneProps {
   conversationId: string | null;
-  otherParticipant: UserProfile | null;
+  otherParticipant:
+    | (UserProfile & {
+        isGroup?: boolean;
+        isCommunity?: boolean;
+        membersCount?: number;
+        category?: string;
+        participants?: UserProfile[];
+      })
+    | null;
   currentUserId: string;
   onBack?: () => void;
 }
@@ -557,12 +566,11 @@ export function MessengerPane({
               <ArrowLeft className="size-4" />
             </button>
 
-            {/* Avatar with active presence dot */}
-            {/* Avatar & Online status (Clickable to open User Info & Media Drawer) */}
+            {/* Avatar & Online status / Group Info (Clickable to open User/Group Info Drawer) */}
             <div
               onClick={() => setShowInfoDrawer(true)}
               className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer group hover:opacity-90 transition-opacity"
-              title="View student info and shared media"
+              title="View student or group info and shared media"
             >
               <div className="relative shrink-0">
                 <Avatar className="size-10 border border-border/40 shadow-xs transition-transform group-hover:scale-105">
@@ -571,36 +579,64 @@ export function MessengerPane({
                     {(otherParticipant.displayName?.[0] || "S").toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <PresenceDot lastSeenAt={otherParticipant.lastSeenAt} />
+                {!otherParticipant.isGroup && <PresenceDot lastSeenAt={otherParticipant.lastSeenAt} />}
               </div>
 
-              {/* Name & Branch / Presence status */}
+              {/* Name & Branch / Presence status / Group Member Count */}
               <div className="min-w-0 space-y-0.5">
                 <div className="text-xs sm:text-sm font-black text-foreground group-hover:text-primary transition-colors truncate flex items-center gap-1.5 leading-tight">
                   <span>{otherParticipant.displayName}</span>
-                  <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+                  {otherParticipant.isGroup ? (
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-md bg-primary/15 text-primary border border-primary/20 shrink-0">
+                      GROUP
+                    </span>
+                  ) : (
+                    <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+                  )}
                 </div>
                 <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1.5 font-medium">
-                  <span
-                    className={cn(
-                      "font-bold flex items-center gap-1 shrink-0",
-                      viewerIsOnline ? "text-emerald-500" : "text-muted-foreground"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "size-1.5 rounded-full",
-                        viewerIsOnline ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/40"
-                      )}
-                    />
-                    {viewerIsOnline ? "Online" : presenceText || "Offline"}
-                  </span>
-                  <span>•</span>
-                  <span>@{otherParticipant.username}</span>
-                  {otherParticipant.branch && (
+                  {otherParticipant.isGroup ? (
                     <>
-                      <span className="hidden sm:inline">•</span>
-                      <span className="hidden sm:inline">{otherParticipant.branch}</span>
+                      <span className="font-bold text-primary flex items-center gap-1 shrink-0">
+                        <Users2 className="size-3" />
+                        <span>
+                          {otherParticipant.membersCount || otherParticipant.participants?.length || 2}{" "}
+                          members
+                        </span>
+                      </span>
+                      {otherParticipant.category && (
+                        <>
+                          <span>•</span>
+                          <span className="capitalize">
+                            {otherParticipant.category.toLowerCase().replace(/_/g, " ")}
+                          </span>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <span
+                        className={cn(
+                          "font-bold flex items-center gap-1 shrink-0",
+                          viewerIsOnline ? "text-emerald-500" : "text-muted-foreground"
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "size-1.5 rounded-full",
+                            viewerIsOnline ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/40"
+                          )}
+                        />
+                        {viewerIsOnline ? "Online" : presenceText || "Offline"}
+                      </span>
+                      <span>•</span>
+                      <span>@{otherParticipant.username}</span>
+                      {otherParticipant.branch && (
+                        <>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="hidden sm:inline">{otherParticipant.branch}</span>
+                        </>
+                      )}
                     </>
                   )}
                 </p>
@@ -911,6 +947,20 @@ export function MessengerPane({
                               : "bg-[#202327] dark:bg-[#202327] bg-neutral-100 text-foreground rounded-2xl rounded-bl-xs px-4 py-2.5 border border-border/20"
                         )}
                       >
+                        {/* Group Sender Name */}
+                        {!isMe && (otherParticipant.isGroup || otherParticipant.isCommunity) && (
+                          <div className="flex items-center gap-1 mb-1 leading-none">
+                            <span className="text-[11px] font-black text-primary">
+                              {msg.sender?.displayName || "Member"}
+                            </span>
+                            {msg.sender?.username && (
+                              <span className="text-[10px] text-muted-foreground/70 font-normal">
+                                @{msg.sender.username}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
                         {/* Quoted Message Preview Bar */}
                         {isQuoted && (
                           <div

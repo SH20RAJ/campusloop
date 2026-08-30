@@ -38,6 +38,7 @@ export type FeedPost = Post & {
   }[];
   hasVotedPoll?: boolean;
   totalPollVotes?: number;
+  isSaved?: boolean;
 };
 
 

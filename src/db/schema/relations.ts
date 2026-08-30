@@ -28,6 +28,7 @@ import { marketplaceItems } from "./marketplace";
 import { notifications } from "./notifications";
 import { comments,pollOptions,pollVotes,posts,votes } from "./posts";
 import { ridesharePools } from "./rideshare";
+import { savedPosts } from "./saved-posts";
 import { stories,storyHighlights,storyLikes } from "./stories";
 import { capsuleEntries,timeCapsules } from "./time-capsule";
 import { follows,userProfiles } from "./users";
@@ -57,8 +58,20 @@ export const userProfilesRelations = relations(userProfiles, ({ one, many }) => 
   pollVotes: many(pollVotes),
   stories: many(stories),
   storyHighlights: many(storyHighlights),
+  savedPosts: many(savedPosts),
   followers: many(follows, { relationName: "profile_followers" }),
   following: many(follows, { relationName: "profile_following" }),
+}));
+
+export const savedPostsRelations = relations(savedPosts, ({ one }) => ({
+  profile: one(userProfiles, {
+    fields: [savedPosts.profileId],
+    references: [userProfiles.id],
+  }),
+  post: one(posts, {
+    fields: [savedPosts.postId],
+    references: [posts.id],
+  }),
 }));
 
 export const followsRelations = relations(follows, ({ one }) => ({
@@ -98,6 +111,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   reposts: many(posts, {
     relationName: "post_reposts",
   }),
+  savedBy: many(savedPosts),
 }));
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({

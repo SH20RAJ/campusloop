@@ -37,6 +37,7 @@ export const userProfiles = pgTable(
     isDobPrivate: boolean("is_dob_private").default(false).notNull(),
     interests: jsonb("interests").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
     photos: jsonb("photos").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
+    targetInstitutionIds: jsonb("target_institution_ids").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
     datingPreferences: jsonb("dating_preferences").$type<{
       gender?: "DEFAULT" | "MALE" | "FEMALE" | "ALL";
       scope?: "GLOBAL" | "CAMPUS";

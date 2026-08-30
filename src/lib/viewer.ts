@@ -62,10 +62,20 @@ export async function getViewerInstitutionId(): Promise<string> {
 }
 
 /** True when the given profile is a read-only viewer account. */
-export async function isViewerProfile(profile: { institutionId: string | null }): Promise<boolean> {
+export async function isViewerProfile(profile: {
+  institutionId: string | null;
+  role?: string | null;
+}): Promise<boolean> {
+  if (profile.role === "VIEWER") return true;
   if (!profile.institutionId) return false;
-  const viewerId = await getViewerInstitutionId();
-  return profile.institutionId === viewerId;
+  if (profile.institutionId === VIEWER_INSTITUTION_SLUG) return true;
+
+  try {
+    const viewerId = await getViewerInstitutionId();
+    return profile.institutionId === viewerId;
+  } catch {
+    return profile.institutionId === VIEWER_INSTITUTION_SLUG || profile.role === "VIEWER";
+  }
 }
 
 /**

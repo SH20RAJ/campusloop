@@ -4,8 +4,9 @@ import { FeedPost } from "@/hooks/use-feed";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { Heart,MessageCircle,Repeat2,Share } from "lucide-react";
+import { Bookmark,Heart,MessageCircle,Repeat2,Share } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface FeedCardActionsProps {
   post: FeedPost;
@@ -30,23 +31,44 @@ export function FeedCardActions({
   onOpenComments,
   onOpenLikes,
 }: FeedCardActionsProps) {
-
   const [repostSpin, setRepostSpin] = useState(false);
   const [hasReposted, setHasReposted] = useState(false);
+  const [isSaved, setIsSaved] = useState(Boolean(post.isSaved));
   const displayCommentsCount = commentsCount ?? post.commentsCount;
 
   function triggerRepostAnimation(e: React.MouseEvent) {
     e.stopPropagation();
     if (hasReposted) return;
 
-    // One quick 180° turn that settles into a persistent reposted state —
-    // the snap plus haptic is the reward, no overlay or confetti needed.
     setRepostSpin(true);
     setHasReposted(true);
     sounds.tap();
     haptics.light();
     setTimeout(() => setRepostSpin(false), 320);
     onInstantRepost();
+  }
+
+  async function handleToggleSave(e: React.MouseEvent) {
+    e.stopPropagation();
+    const nextState = !isSaved;
+    setIsSaved(nextState);
+    sounds.pop();
+    haptics.light();
+
+    try {
+      const res = await fetch(`/api/posts/${post.id}/save`, {
+        method: nextState ? "POST" : "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to update save status");
+      if (nextState) {
+        toast.success("Saved to campus vault 🔖");
+      } else {
+        toast.info("Removed from saved posts");
+      }
+    } catch {
+      setIsSaved(!nextState);
+      toast.error("Could not update bookmark");
+    }
   }
 
   return (
@@ -127,6 +149,25 @@ export function FeedCardActions({
         )}
       </div>
 
+      {/* Save / Bookmark Action */}
+      <button
+        type="button"
+        onClick={handleToggleSave}
+        className={cn(
+          "flex items-center gap-1.5 text-xs transition-colors group cursor-pointer",
+          isSaved ? "text-amber-500" : "hover:text-amber-500"
+        )}
+        aria-label={isSaved ? "Saved" : "Save post"}
+      >
+        <div className="size-8 rounded-full group-hover:bg-amber-500/10 flex items-center justify-center transition-colors">
+          <Bookmark
+            className={cn(
+              "size-4.5 transition-transform group-hover:scale-110",
+              isSaved && "fill-amber-500 text-amber-500"
+            )}
+          />
+        </div>
+      </button>
 
       {/* Share Action */}
       <button

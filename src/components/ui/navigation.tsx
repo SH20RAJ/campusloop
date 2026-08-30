@@ -11,22 +11,27 @@ import type { UserProfile } from "@/db/schema";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { cn } from "@/lib/utils";
 import { AnimatePresence,motion } from "framer-motion";
+import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
+import { DreamCampusesModal } from "@/components/preview/dream-campuses-modal";
 import {
-Bell,
-HelpCircle,
-Menu,
-MessageSquare,
-MoreHorizontal,
-Plus,
-ShieldCheck,
-Sliders,
-UserCircle,
-X
+  Bell,
+  Compass,
+  GraduationCap,
+  HelpCircle,
+  Lock,
+  Menu,
+  MessageSquare,
+  MoreHorizontal,
+  Plus,
+  School,
+  ShieldCheck,
+  Sliders,
+  UserCircle,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect,useState } from "react";
-
+import { useEffect, useState } from "react";
 
 interface NavigationProps {
   profile?: UserProfile;
@@ -39,6 +44,8 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [showDreamModal, setShowDreamModal] = useState(false);
   const [marketplaceSeen, setMarketplaceSeen] = useState(true);
   const unreadNotificationsCount = useUnreadNotificationsCount();
 
@@ -194,8 +201,35 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
           </nav>
 
 
-          {/* Post Action Button */}
-          {!isViewer && (
+          {/* Post Action Button or Campus Preview Unlock */}
+          {isViewer ? (
+            <div className="pt-2 px-1 space-y-2">
+              <div className="p-3 rounded-2xl bg-linear-to-b from-amber-500/10 to-transparent border border-amber-500/20 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-500">
+                    <School className="size-3" /> Campus Preview
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowDreamModal(true)}
+                    className="text-[10px] font-bold text-muted-foreground hover:text-foreground underline cursor-pointer"
+                  >
+                    Dream Hubs
+                  </button>
+                </div>
+                <p className="text-[10px] text-muted-foreground leading-tight">
+                  Exploring from outside. Saved posts persist permanently.
+                </p>
+                <Button
+                  onClick={() => setShowUnlockModal(true)}
+                  className="w-full h-8 text-xs font-black rounded-xl bg-foreground text-background hover:opacity-90 transition-opacity gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <GraduationCap className="size-3.5" />
+                  <span>Unlock Campus</span>
+                </Button>
+              </div>
+            </div>
+          ) : (
             <div className="pt-2 px-1">
               <Link href="/app/post/new" className="block">
                 <Button className="w-full h-11 bg-foreground text-background hover:opacity-90 font-black rounded-full text-sm cursor-pointer border-none shadow-sm transition-all flex items-center justify-center gap-2">
@@ -495,6 +529,16 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
           </div>
         )}
       </AnimatePresence>
+
+      {/* Campus Preview Modals */}
+      <CampusUnlockedModal
+        isOpen={showUnlockModal}
+        onClose={() => setShowUnlockModal(false)}
+      />
+      <DreamCampusesModal
+        isOpen={showDreamModal}
+        onClose={() => setShowDreamModal(false)}
+      />
     </>
   );
 }

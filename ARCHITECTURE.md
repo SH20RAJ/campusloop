@@ -112,7 +112,8 @@ sequenceDiagram
 ### Key Components:
 - **Server Session Verification**: Handled via `hexclaveServerApp.getUser()` in [`src/hexclave/server.ts`](campusloop/src/hexclave/server.ts).
 - **Client Profile Hook**: [`src/hooks/use-profile.ts`](campusloop/src/hooks/use-profile.ts) powers client-side profile caching, verification status, and optimistic updates.
-- **Viewer / Unverified Mode**: Controlled via [`src/lib/viewer.ts`](campusloop/src/lib/viewer.ts), allowing prospective students to explore public campus directory data while preventing writes or private messaging.
+- **Campus Preview (Viewer Mode)**: Controlled via [`src/lib/viewer.ts`](campusloop/src/lib/viewer.ts) and gated through [`src/lib/capabilities.ts`](campusloop/src/lib/capabilities.ts), so every write API refuses a viewer through a single capability check rather than scattered role comparisons. A preview profile is an ordinary `user_profiles` row parked in a reserved "Viewer Hub" institution — no separate account type and no schema fork.
+- **Campus upgrade path**: [`src/lib/campus-upgrade.ts`](campusloop/src/lib/campus-upgrade.ts) plus the two-step `POST /api/profile/upgrade-campus` and `.../confirm` endpoints. Step one attaches the college address to the auth account as an unverified, non-primary contact channel and emails a verification link; step two applies the upgrade only once the provider reports the channel verified. Eligibility is re-checked at both steps. The institution is derived from a whitelisted domain in `institution_domains` — never from a client-supplied id — and addresses already bound to another profile or auth account are refused. The upgrade happens **in place**: the college channel is promoted to primary and sign-in-capable while the personal address is retained as a secondary recovery channel, so the same profile row keeps every dependent record (posts, saved posts, follows, points).
 
 ---
 

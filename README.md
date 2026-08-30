@@ -52,9 +52,34 @@ Student life is fragmented across loose WhatsApp groups, Instagram pages, Discor
 ```
 
 ### 1. 🛡️ Identity & Gatekeeping Layer
-- **Institutional OTP Verification**: Access restricted strictly to verified `.ac.in` and `.edu` college emails.
+- **Institutional Email Verification**: Posting access is restricted to verified `.ac.in` / `.edu` college emails. A domain counts only if it is explicitly whitelisted in `institution_domains`; the account is upgraded only after the mail provider confirms the address, never on a typed string.
 - **Campus Radius & Global Scope**: Seamlessly toggle between your local college feed and across all 1,350+ colleges in India.
-- **Outsider Isolation**: Corporate recruiters, bots, and non-students are strictly blocked.
+- **Outsider Isolation**: Corporate recruiters, bots, and non-students are strictly blocked from participating.
+
+#### 👀 Campus Preview (Viewer Mode)
+
+A JEE/NEET/CUET aspirant has no college email yet, but is exactly the person who
+most wants to read a campus. **Viewer is an account state, not a separate account
+type** — which is what makes the upgrade painless years later.
+
+| | Campus Preview | Campus Unlocked 🎓 |
+|---|---|---|
+| Sign-up | Any personal email | Verified college email |
+| Read feeds, confessions, polls, campus hubs | ✅ | ✅ |
+| Save posts to a private vault | ✅ | ✅ |
+| Pick up to 5 dream campuses that feed your timeline | ✅ | — |
+| Post, comment, vote | ❌ | ✅ |
+| Chat, Campus Match, Secret Crush | ❌ | ✅ |
+
+- **Implementation**: A preview profile is a normal `user_profiles` row parked in
+  a reserved "Viewer Hub" institution. Permissions are decided by
+  `src/lib/capabilities.ts` rather than scattered role checks, so every write API
+  refuses a viewer through one gate.
+- **Upgrade is in place, not a migration**: verifying a college email promotes it
+  to the primary sign-in channel and demotes the personal address to a secondary
+  recovery channel. The same profile row survives, so saved posts, follows, points
+  and history stay attached — nothing is copied and nothing is deleted.
+- Full design rationale: [`docs/CAMPUS_PREVIEW_FEATURE.md`](docs/CAMPUS_PREVIEW_FEATURE.md).
 
 ### 2. 💬 Social & Discussion Layer
 - **Multi-Sort Feed Engine**: 5 distinct feed algorithms (*🔥 For You, Latest, Trending, Top Voted, Discussed*).

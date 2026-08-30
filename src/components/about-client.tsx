@@ -152,6 +152,14 @@ export function AboutClient() {
       a: "CampusLoop strictly enforces data minimization and purpose limitation under the Digital Personal Data Protection Act (DPDP), 2023. Student profile verification is used strictly for authentication. Furthermore, match discovery mode is strictly restricted to users aged 18+ to safeguard minors."
     },
     {
+      q: "I'm a JEE/NEET aspirant without a college email. Can I still join?",
+      a: "Yes — through Campus Preview. Sign up with a personal email and you can read across 1,350+ campuses: confessions, placement threads, fest chatter and hostel life. Pick up to five dream campuses and their discussions come into your feed. What stays locked is posting, voting, chat and matching, because those are what a verified college inbox pays for. When you get admitted, verifying your college email upgrades the same account in place — your saved posts, profile and points carry over, and your personal address is kept as a recovery email."
+    },
+    {
+      q: "Can someone unlock a campus by just typing a college email?",
+      a: "No. Entering the address only sends a verification link to that inbox; nothing changes until you open it. The campus is derived from the verified domain rather than anything the client asks for, an address already linked to another account is refused, and a college domain counts only if it is explicitly whitelisted. Reading is open, but posting is earned."
+    },
+    {
       q: "My college is not listed. How can I request access?",
       a: "If your college domain is not yet whitelisted, you can submit a Request Domain Whitelist form on the About page or email support. Our campus ambassador team will verify the institution's credentials and add it to our whitelist within 24 hours."
     }

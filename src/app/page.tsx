@@ -31,6 +31,8 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { cn } from "@/lib/utils";
 import {
 ArrowRight,
+Bookmark,
+Eye,
 Heart,
 HeartHandshake,
 Hourglass,
@@ -165,6 +167,24 @@ const STEPS = [
     icon: HeartHandshake,
     title: "Post, poll, trade & match",
     body: "Confess without a name, trade cycles, form gaming lobbies, match with peers, and bury memories.",
+  },
+];
+
+const PREVIEW_POINTS = [
+  {
+    icon: Eye,
+    title: "Read before you apply",
+    body: "Pick up to five dream campuses and their real student chatter lands in your feed — not a brochure, not a coaching ad.",
+  },
+  {
+    icon: Bookmark,
+    title: "Everything you save is kept",
+    body: "Saved threads, your profile and your points live on the same account. Verifying later unlocks the rest; nothing is migrated or lost.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Reading is open, posting is earned",
+    body: "Only a verified college inbox can post, vote, chat or match. That boundary is why what you are reading is real.",
   },
 ];
 
@@ -500,6 +520,40 @@ export default async function LandingPage() {
                 </CardContent>
               </Card>
             </Reveal>
+          </div>
+        </section>
+
+        {/* ─── Campus Preview (aspirants) ─── */}
+        <section className="border-t border-border/60">
+          <div className="mx-auto w-full max-w-6xl px-6 py-24">
+            <Reveal className="max-w-2xl space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                No college email yet?
+              </p>
+              <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+                Campus Preview, for everyone still deciding.
+              </h2>
+              <p className="text-base leading-relaxed text-muted-foreground">
+                JEE, NEET and CUET aspirants can sign up with a personal email and read the
+                campuses they are aiming for — the confessions, the placement threads, the hostel
+                tea and the fest chaos. What you cannot do is post, vote, chat or match. Those stay
+                with verified students, which is what keeps the content worth reading.
+              </p>
+            </Reveal>
+
+            <div className="grid gap-10 pt-14 md:grid-cols-3 md:gap-8">
+              {PREVIEW_POINTS.map((point, i) => (
+                <Reveal key={point.title} delay={i * 0.08}>
+                  <div className="space-y-3">
+                    <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <point.icon className="size-5" />
+                    </span>
+                    <h3 className="font-heading text-lg font-semibold">{point.title}</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{point.body}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </section>
 

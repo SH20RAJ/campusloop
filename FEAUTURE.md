@@ -9,7 +9,7 @@ A comprehensive breakdown of all implemented and supported features across Campu
 - **Campus Radius & Global Scope**: Instant toggle between your local college feed and all 1,350+ indexed Indian colleges.
 - **Verified Student Profiles**: Major, branch, graduation year, social handles, and clout badges.
 - **Vanity URL Routing**: Public and authenticated access via `/@username`.
-- **Viewer / Unverified Preview**: Guest preview allowing domain exploration with write gates.
+- **Campus Preview (Viewer Mode)**: Aspirants sign up with a personal email and get full read access — feeds, confessions, polls, campus hubs — plus a saved-posts vault and up to 5 dream campuses feeding their timeline. Posting, voting, chat and matching stay locked behind a verified college email. Viewer is an account *state*, not a separate account type, so verifying later upgrades the same profile in place: the college address becomes the primary sign-in channel, the personal one is kept for recovery, and saved posts, follows and points carry over untouched. See `docs/CAMPUS_PREVIEW_FEATURE.md`.
 
 ---
 

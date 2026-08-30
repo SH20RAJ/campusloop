@@ -20,11 +20,8 @@ export async function GET() {
     const urls = list
       .map((item) => {
         const slugOrId = item.slug || item.id;
+        // The public `/college/` mirror, not `/app/college/`, which is gated.
         return `
-  <url>
-    <loc>https://campusloop.space/app/college/${slugOrId}</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
   <url>
     <loc>https://campusloop.space/college/${slugOrId}</loc>
     <changefreq>daily</changefreq>

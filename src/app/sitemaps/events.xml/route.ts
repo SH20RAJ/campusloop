@@ -19,18 +19,13 @@ export async function GET() {
       .map((item) => {
         const key = item.slug || item.id;
         const lastmod = (item.updatedAt ?? new Date()).toISOString();
+        // Public `/e/` form only — `/app/events/...` is behind the auth gate.
         return `
-  <url>
-    <loc>https://campusloop.space/app/events/${key}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
   <url>
     <loc>https://campusloop.space/e/${key}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>`;
       })
       .join("");

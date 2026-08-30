@@ -1,8 +1,8 @@
 import { getDb } from "@/db";
-import { events, institutions } from "@/db/schema";
+import { events } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import EventDetailPage from "@/app/app/(main)/events/[id]/page";
 
 interface EventShortLinkProps {
   params: Promise<{ id: string }>;
@@ -42,16 +42,8 @@ export async function generateMetadata({ params }: EventShortLinkProps): Promise
   };
 }
 
-export default async function EventShortLinkPage({ params }: EventShortLinkProps) {
-  const { id } = await params;
-  const db = getDb();
-  const event = await db.query.events.findFirst({
-    where: or(eq(events.id, id), eq(events.slug, id)),
-  });
-
-  if (!event) {
-    notFound();
-  }
-
-  redirect(`/app/events/${event.slug || event.id}`);
-}
+/**
+ * Public event page. Outside the auth-gated `(main)` layout so a QR scan or a
+ * shared link opens the event itself; registering still requires an account.
+ */
+export default EventDetailPage;

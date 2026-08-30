@@ -2,7 +2,7 @@ import { getDb } from "@/db";
 import { articles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import ArticleReaderPage from "@/app/app/(main)/articles/[slug]/page";
 
 interface ArticleShortLinkProps {
   params: Promise<{ slug: string }>;
@@ -41,7 +41,9 @@ export async function generateMetadata({ params }: ArticleShortLinkProps): Promi
   };
 }
 
-export default async function ArticleShortLinkPage({ params }: ArticleShortLinkProps) {
-  const { slug } = await params;
-  redirect(`/app/articles/${slug}`);
-}
+/**
+ * Public reader. This route lives outside the auth-gated `(main)` layout so a
+ * shared link, a QR scan or Googlebot reaches the article itself rather than the
+ * sign-in wall. Interactions on the page still require an account.
+ */
+export default ArticleReaderPage;

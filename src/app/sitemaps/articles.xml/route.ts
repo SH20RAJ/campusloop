@@ -38,18 +38,14 @@ export async function GET() {
     </image:image>`
           : "";
 
+        // Only the public `/a/` form is listed: `/app/articles/...` sits behind
+        // the auth gate and would serve Googlebot a sign-in redirect.
         return `
-  <url>
-    <loc>https://campusloop.space/app/articles/${item.slug}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>${image}
-  </url>
   <url>
     <loc>https://campusloop.space/a/${item.slug}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>${image}
   </url>`;
       })
       .join("");

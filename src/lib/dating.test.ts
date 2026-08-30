@@ -3,6 +3,7 @@ import { getSecretCrushSlotLimit, getSecretCrushSlotProgress } from "@/constants
 import {
   type CompatibilityProfile,
   computeCompatibility,
+  rankDatingCandidates,
   resolveGenderPreference,
   sharedInterestsBetween,
 } from "./dating";
@@ -89,7 +90,7 @@ describe("computeCompatibility", () => {
     const cand = profile({ id: "cand-a" });
     const plain = computeCompatibility(me, cand).score;
     const boosted = computeCompatibility(me, cand, { likedMe: true }).score;
-    expect(boosted).toBe(plain + 8);
+    expect(boosted).toBe(plain + 18);
   });
 
   it("is deterministic for the same pair and clamps to 35..99", () => {
@@ -112,6 +113,37 @@ describe("computeCompatibility", () => {
     expect(
       computeCompatibility(me, profile({ id: "cand-min", institutionId: "z", institution: {} })).score
     ).toBeGreaterThanOrEqual(35);
+  });
+});
+
+describe("rankDatingCandidates", () => {
+  it("prioritizes reciprocal likes at the top of the deck", () => {
+    const me = profile({ id: "me", interests: ["coding", "gaming"] });
+    const c1 = profile({ id: "c1", interests: ["coding", "gaming"] });
+    const c2 = profile({ id: "c2", interests: [] }); // Low score but liked me
+
+    const ranked = rankDatingCandidates(me, [c1, c2], {
+      likedMeIds: new Set(["c2"]),
+      sessionSeed: 1,
+    });
+
+    expect(ranked[0].candidate.id).toBe("c2");
+    expect(ranked[0].likedYou).toBe(true);
+  });
+
+  it("interleaves high affinity matches and exploratory candidates", () => {
+    const me = profile({ id: "me", interests: ["coding"] });
+    const candidates = Array.from({ length: 10 }, (_, i) =>
+      profile({ id: `cand-${i}`, interests: i < 5 ? ["coding"] : [] })
+    );
+
+    const ranked = rankDatingCandidates(me, candidates, {
+      likedMeIds: new Set(),
+      sessionSeed: 42,
+    });
+
+    expect(ranked.length).toBeLessThanOrEqual(10);
+    expect(ranked.some((r) => r.candidate.id.startsWith("cand-"))).toBe(true);
   });
 });
 

@@ -4,7 +4,7 @@ import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
 import { getDb } from "@/db";
 import { swipes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { computeCompatibility, resolveGenderPreference } from "@/lib/dating";
+import { rankDatingCandidates, resolveGenderPreference } from "@/lib/dating";
 import { getViewerInstitutionId, rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
@@ -88,7 +88,8 @@ export async function GET(req: Request) {
 
     const rawCandidates = await db.query.userProfiles.findMany({
       where: and(...conditions.filter((c): c is SQL => c !== undefined)),
-      limit: 60,
+      orderBy: (table, { desc }) => [desc(table.updatedAt), desc(table.points)],
+      limit: 150,
       with: {
         institution: true,
       },
@@ -96,20 +97,15 @@ export async function GET(req: Request) {
 
     const isDicebear = (url?: string | null) => !url || url.includes("dicebear.com");
 
-    const scoredCandidates = rawCandidates.map((cand) => {
+    const processedCandidates = rawCandidates.map((cand) => {
       const fallbackSet = getDatingCandidatePhotoSet(cand.gender, cand.id || cand.username);
       const validPhotos = (cand.photos || []).filter((p) => !isDicebear(p));
       const candPhotos = validPhotos.length > 0 ? validPhotos : fallbackSet.photos;
       const candAvatar = !isDicebear(cand.avatarUrl) ? cand.avatarUrl : fallbackSet.avatar;
 
-      const { score, sharedInterests } = computeCompatibility(
-        profile,
-        { ...cand, photos: candPhotos },
-        { likedMe: likedMeIds.has(cand.id) }
-      );
-
       return {
         id: cand.id,
+        institutionId: cand.institutionId,
         displayName: cand.displayName,
         username: cand.username,
         avatarUrl: candAvatar,
@@ -125,26 +121,45 @@ export async function GET(req: Request) {
           ? { name: cand.institution.name, slug: cand.institution.slug, state: cand.institution.state }
           : null,
         createdAt: cand.createdAt,
-        compatibilityScore: score,
-        sharedInterests,
-        likedYou: likedMeIds.has(cand.id),
       };
     });
 
-    if (sort === "RECENT") {
-      scoredCandidates.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    } else if (sort === "POPULAR") {
-      scoredCandidates.sort((a, b) => (b.points || 0) - (a.points || 0));
-    } else {
-      scoredCandidates.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
-    }
+    // Dynamic session seed rotates exploration every 20 minutes so repeat visits explore new students
+    const sessionSeed = Math.floor(Date.now() / (1000 * 60 * 20));
+
+    const ranked = rankDatingCandidates(profile, processedCandidates, {
+      likedMeIds,
+      sessionSeed,
+      sort,
+      limit: 25,
+    });
+
+    const formattedCandidates = ranked.map(({ candidate, score, sharedInterests, likedYou }) => ({
+      id: candidate.id,
+      displayName: candidate.displayName,
+      username: candidate.username,
+      avatarUrl: candidate.avatarUrl,
+      photos: candidate.photos,
+      bio: candidate.bio,
+      gender: candidate.gender,
+      course: candidate.course,
+      branch: candidate.branch,
+      year: candidate.year,
+      points: candidate.points,
+      interests: candidate.interests,
+      institution: candidate.institution,
+      createdAt: candidate.createdAt,
+      compatibilityScore: score,
+      sharedInterests,
+      likedYou,
+    }));
 
     // Likes still waiting for an answer (they liked me, I haven't swiped back)
     const swipedSet = new Set(swipedIds);
     const pendingLikes = [...likedMeIds].filter((id) => !swipedSet.has(id)).length;
 
     return NextResponse.json({
-      candidates: scoredCandidates.slice(0, 25),
+      candidates: formattedCandidates,
       meta: {
         showingGender: genderFilter,
         likesYouCount: pendingLikes,

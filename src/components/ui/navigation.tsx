@@ -77,56 +77,54 @@ function FeedAnonymityQuickToggle({ initialMode }: { initialMode?: string }) {
     } catch {}
 
     if (nextMode === "ALL") {
-      toast.success("Feed: Showing all posts & confessions 🎭");
+      toast.success("Anon Mode: Enabled (Showing all posts & confessions)");
     } else {
-      toast.success("Feed: Hiding confessions & anon posts (Public only) 🛡️");
+      toast.success("Anon Mode: Disabled (Public only, hiding confessions)");
     }
   }
+
+  const isAnonEnabled = feedMode === "ALL";
 
   return (
     <button
       type="button"
       onClick={handleToggle}
-      className={cn(
-        "w-full flex items-center justify-between p-2.5 rounded-2xl border transition-all cursor-pointer select-none shadow-2xs group",
-        feedMode === "ALL"
-          ? "border-purple-500/30 bg-purple-500/10 text-foreground hover:bg-purple-500/15"
-          : "border-emerald-500/30 bg-emerald-500/10 text-foreground hover:bg-emerald-500/15"
-      )}
+      className="w-full flex items-center justify-between p-2.5 rounded-2xl border border-border/50 bg-card hover:bg-muted/40 transition-colors cursor-pointer select-none shadow-2xs group"
       title={
-        feedMode === "ALL"
-          ? "Currently showing confessions & anon posts. Click to hide."
-          : "Currently hiding anon posts. Click to show all."
+        isAnonEnabled
+          ? "Anon Mode is ON. Showing confessions & anonymous posts. Click to turn off."
+          : "Anon Mode is OFF. Only public posts visible. Click to turn on."
       }
     >
       <div className="flex items-center gap-2.5 min-w-0">
         <div
           className={cn(
             "flex size-7 items-center justify-center rounded-xl transition-colors shrink-0",
-            feedMode === "ALL"
-              ? "bg-purple-500/20 text-purple-600 dark:text-purple-400"
-              : "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+            isAnonEnabled ? "bg-foreground/10 text-foreground" : "bg-muted text-muted-foreground"
           )}
         >
-          {feedMode === "ALL" ? <VenetianMask className="size-4" /> : <ShieldCheck className="size-4" />}
+          {isAnonEnabled ? <VenetianMask className="size-4" /> : <ShieldCheck className="size-4" />}
         </div>
         <div className="text-left min-w-0">
-          <p className="text-[11px] font-black truncate leading-tight">
-            {feedMode === "ALL" ? "All Posts & Anon" : "Public Only (No Anon)"}
-          </p>
-          <p className="text-[9px] text-muted-foreground truncate leading-tight mt-0.5">
-            {feedMode === "ALL" ? "Confessions visible" : "Confessions hidden"}
+          <p className="text-xs font-bold text-foreground truncate leading-tight">Anon Mode</p>
+          <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
+            {isAnonEnabled ? "On · Includes confessions" : "Off · Public only"}
           </p>
         </div>
       </div>
 
       <div
         className={cn(
-          "w-7 h-4 rounded-full transition-colors flex items-center p-0.5 shrink-0",
-          feedMode === "ALL" ? "bg-purple-500 justify-end" : "bg-emerald-500 justify-start"
+          "w-8 h-4.5 rounded-full transition-colors flex items-center p-0.5 shrink-0 border border-border/30",
+          isAnonEnabled ? "bg-foreground justify-end" : "bg-muted justify-start"
         )}
       >
-        <div className="size-3 rounded-full bg-white shadow-xs" />
+        <div
+          className={cn(
+            "size-3.5 rounded-full transition-transform shadow-xs",
+            isAnonEnabled ? "bg-background" : "bg-muted-foreground/60"
+          )}
+        />
       </div>
     </button>
   );

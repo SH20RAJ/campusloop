@@ -6,6 +6,16 @@ A log of significant product updates, UI decisions, and architectural commits.
 
 ### Recent Updates
 
+- **Two-Sided Multi-Armed Bandit Matching Engine & Dating Mobile Skeleton Overhaul**:
+  - Implemented state-of-the-art **Two-Sided Matching & Discovery Engine** (`rankDatingCandidates` in [`src/lib/dating.ts`](campusloop/src/lib/dating.ts)) based on Reciprocal Recommender Systems and Thompson Sampling:
+    - **Reciprocal Matching Priority**: Automatically elevates candidates who liked the user to the front of the deck for instant mutual match celebrations (+18 score boost).
+    - **Interleaved Exploration vs Exploitation**: Partitions candidates into Top Affinity (65%) and Fresh Exploratory Discovery (35%) tiers to completely eradicate the "same people repeatedly" problem.
+    - **Temporal Session Hash Rotation**: Dynamic seed rotating every 20 minutes ensures refreshing the deck surfaces fresh campus faces rather than a static Postgres disk-order slice.
+    - **Candidate Pool Expansion**: Enlarged database candidate fetch from 60 to 150 rows with activity ordering (`desc(userProfiles.updatedAt)`, `desc(userProfiles.points)`).
+  - Built high-fidelity full-screen mobile card skeleton ([`src/components/dating/dating-card-skeleton.tsx`](campusloop/src/components/dating/dating-card-skeleton.tsx)) eliminating layout shift on `/app/dating`.
+  - Refactored sidebar anonymity switcher to clean Twitter/X-style monochrome **"Anon Mode"** toggle in [`src/components/ui/navigation.tsx`](campusloop/src/components/ui/navigation.tsx).
+  - Added unit test suite in [`src/lib/dating.test.ts`](campusloop/src/lib/dating.test.ts) (all 100 tests passing).
+
 - **Qdrant Vector Database Integration & Zero-Downtime Semantic Recommendations**:
   - Built resilient Qdrant REST client wrapper ([`src/lib/qdrant/client.ts`](campusloop/src/lib/qdrant/client.ts)) with strict 600ms timeout and circuit breaker protection.
   - Built zero-dependency serverless 384-dimensional dense vector generator ([`src/lib/qdrant/embeddings.ts`](campusloop/src/lib/qdrant/embeddings.ts)) with L2 normalization.

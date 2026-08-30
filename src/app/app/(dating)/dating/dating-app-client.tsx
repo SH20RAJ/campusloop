@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowLeft, Camera, Globe, Heart, Loader2, Lock, RotateCcw, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, Camera, Globe, Heart, Lock, RotateCcw, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { DatingCardSkeleton } from "@/components/dating/dating-card-skeleton";
 import { DatingMatchModal } from "@/components/dating/dating-match-modal";
 import { SecretCrushModal } from "@/components/dating/secret-crush-modal";
 import { type Candidate, SwipeActions, SwipeDeck } from "@/components/dating/swipe-deck";
@@ -265,10 +266,7 @@ export function DatingAppClient() {
             </form>
           </div>
         ) : isLoading && candidates.length === 0 ? (
-          <div className="m-auto flex flex-col items-center gap-3">
-            <Loader2 className="size-8 animate-spin text-rose-500" />
-            <p className="text-xs font-bold text-muted-foreground">Finding campus matches...</p>
-          </div>
+          <DatingCardSkeleton />
         ) : remaining.length > 0 ? (
           <>
             <div className="relative min-h-0 flex-1 py-1">

@@ -3,7 +3,8 @@
 import { ExternalLink, X, ZoomIn } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
 
 interface RichTextProps {
@@ -13,8 +14,26 @@ interface RichTextProps {
   onImageClick?: (url: string) => void;
 }
 
-export function RichText({ content, className = "", disableEmbeds = false }: RichTextProps) {
+export function RichText({ content, className = "", disableEmbeds = false, onImageClick }: RichTextProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedImage) return;
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setSelectedImage(null);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedImage]);
 
   if (!content) return null;
 
@@ -31,6 +50,19 @@ export function RichText({ content, className = "", disableEmbeds = false }: Ric
 
   // Text with markdown images removed
   const textWithoutMdImages = content.replace(imageRegex, "").trim();
+
+  function handleOpenImage(e: React.MouseEvent, url: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.nativeEvent && (e.nativeEvent as MouseEvent).stopImmediatePropagation) {
+      (e.nativeEvent as MouseEvent).stopImmediatePropagation();
+    }
+    if (onImageClick) {
+      onImageClick(url);
+    } else {
+      setSelectedImage(url);
+    }
+  }
 
   // Helper to parse links, hashtags, and mentions in remaining text
   function parseText(text: string) {
@@ -74,14 +106,17 @@ export function RichText({ content, className = "", disableEmbeds = false }: Ric
         const isImageUrl = /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(raw);
         if (isImageUrl) {
           parts.push(
-            <div key={`img-bare-${tokenMatch.index}`} className="my-2 block">
+            <div
+              key={`img-bare-${tokenMatch.index}`}
+              className="my-2 block no-card-nav"
+              data-no-nav="true"
+              onClick={(e) => handleOpenImage(e, raw)}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
               <img
                 src={raw}
                 alt="Shared media"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage(raw);
-                }}
+                data-no-nav="true"
                 className="max-h-72 max-w-full rounded-2xl object-cover border border-border shadow-xs hover:opacity-95 transition-opacity cursor-pointer"
                 loading="lazy"
               />
@@ -149,26 +184,29 @@ export function RichText({ content, className = "", disableEmbeds = false }: Ric
 
       {/* Render Markdown Images */}
       {images.length > 0 && (
-        <div className={`grid gap-2 pt-1 ${images.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
+        <div
+          className={`grid gap-2 pt-1 no-card-nav ${images.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}
+          data-no-nav="true"
+        >
           {images.map((img, i) => (
             <div
               key={i}
-              className="relative group rounded-2xl overflow-hidden border border-border/80 bg-muted/20 shadow-xs max-w-lg cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedImage(img.url);
-              }}
+              className="relative group rounded-2xl overflow-hidden border border-border/80 bg-muted/20 shadow-xs max-w-lg cursor-pointer no-card-nav"
+              data-no-nav="true"
+              onClick={(e) => handleOpenImage(e, img.url)}
+              onPointerDown={(e) => e.stopPropagation()}
             >
               <img
                 src={img.url}
                 alt={img.alt}
+                data-no-nav="true"
                 className="w-full max-h-80 object-cover group-hover:scale-[1.01] transition-transform duration-300"
                 loading="lazy"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = "none";
                 }}
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
                 <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-md">
                   <ZoomIn className="size-4" />
                 </span>
@@ -181,27 +219,77 @@ export function RichText({ content, className = "", disableEmbeds = false }: Ric
       {/* Rich Embeds (YouTube, Spotify, User Profiles, Communities, Events, Web Previews) */}
       {!disableEmbeds && <PostEmbedRenderer content={content} />}
 
-      {/* Fullscreen Lightbox Modal */}
-      {selectedImage && (
-        <div
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
-        >
-          <button
-            type="button"
-            onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 size-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors"
+      {/* Portal-Mounted Fullscreen Lightbox Modal */}
+      {mounted &&
+        selectedImage &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-100 bg-black/95 backdrop-blur-md flex flex-col items-center justify-between p-4 select-none animate-in fade-in duration-200"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setSelectedImage(null);
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
           >
-            <X className="size-5" />
-          </button>
-          <img
-            src={selectedImage}
-            alt="Expanded view"
-            className="max-h-[90vh] max-w-[90vw] object-contain rounded-2xl shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
+            {/* Top Toolbar */}
+            <div
+              className="w-full max-w-4xl flex items-center justify-between px-2 pt-2 z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-xs font-semibold text-white/60">Image Preview</span>
+              <div className="flex items-center gap-2">
+                <a
+                  href={selectedImage}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer"
+                  title="Open full resolution"
+                  aria-label="Open in new tab"
+                >
+                  <ExternalLink className="size-4" />
+                </a>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSelectedImage(null);
+                  }}
+                  className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer"
+                  aria-label="Close image preview"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Centered Image */}
+            <div
+              className="flex-1 flex items-center justify-center w-full max-w-5xl overflow-hidden py-4"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setSelectedImage(null);
+              }}
+            >
+              <img
+                src={selectedImage}
+                alt="Expanded view"
+                className="max-h-[85vh] max-w-[95vw] object-contain rounded-2xl shadow-2xl transition-transform"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+
+            {/* Bottom Dismiss Hint */}
+            <div className="pb-2 text-center text-xs text-white/50" onClick={(e) => e.stopPropagation()}>
+              Tap anywhere outside image to close · Press Esc
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

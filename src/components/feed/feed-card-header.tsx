@@ -61,153 +61,173 @@ export function FeedCardHeader({
     post.institution?.name?.split(",")?.[0]?.replace(/^(Birla Institute of Technology)/i, "BIT") || null;
 
   return (
-    <div className="flex items-center justify-between gap-2 min-w-0 select-none">
-      <div className="flex items-center gap-1.5 flex-wrap text-[15px] leading-tight min-w-0">
-        {!post.isAnonymous ? (
-          <Link
-            href={`/@${post.author?.username || "student"}`}
-            onClick={(e) => e.stopPropagation()}
-            className="font-bold text-foreground hover:underline truncate"
-          >
-            {authorName}
-          </Link>
-        ) : (
-          <span className="font-bold text-foreground truncate">{authorName}</span>
-        )}
+    <div className="space-y-0.5 min-w-0 select-none">
+      {/* Primary Author & Time Row */}
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
+          {!post.isAnonymous ? (
+            <Link
+              href={`/@${post.author?.username || "student"}`}
+              onClick={(e) => e.stopPropagation()}
+              className="font-bold text-[14px] sm:text-[15px] text-foreground hover:underline truncate max-w-[130px] sm:max-w-[200px] shrink-0 sm:shrink"
+            >
+              {authorName}
+            </Link>
+          ) : (
+            <span className="font-bold text-[14px] sm:text-[15px] text-foreground truncate max-w-[130px] sm:max-w-[200px] shrink-0 sm:shrink">
+              {authorName}
+            </span>
+          )}
 
-        {isVerified && <ShieldCheck className="size-4 text-[#1d9bf0] shrink-0" />}
+          {isVerified && <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />}
 
-        {authorHandle && <span className="text-muted-foreground text-[14px] truncate">{authorHandle}</span>}
+          {authorHandle && (
+            <span className="text-muted-foreground text-xs sm:text-[13px] truncate max-w-[90px] sm:max-w-[130px] shrink-0 sm:shrink">
+              {authorHandle}
+            </span>
+          )}
 
-        <span className="text-muted-foreground/60 text-xs">·</span>
+          <span className="text-muted-foreground/40 text-xs shrink-0">·</span>
 
-        <span className="text-muted-foreground/70 text-xs shrink-0">{formatTimeAgo(post.createdAt)}</span>
+          <span className="text-muted-foreground text-xs shrink-0 whitespace-nowrap">
+            {formatTimeAgo(post.createdAt)}
+          </span>
+        </div>
 
-        {institutionDisplayName && (
-          <>
-            <span className="text-muted-foreground/40 text-xs">·</span>
+        {/* Right Actions: Confession Pill & More Menu */}
+        <div className="flex items-center gap-1 shrink-0">
+          {post.type === "CONFESSION" && (
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+              Confession
+            </span>
+          )}
+
+          {/* More Options Button */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
+              className="size-7 rounded-full flex items-center justify-center text-muted-foreground/60 hover:text-[#1d9bf0] hover:bg-[#1d9bf0]/10 transition-colors cursor-pointer"
+              aria-label="More options"
+            >
+              <MoreHorizontal className="size-4" />
+            </button>
+
+            {showMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-20"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                  }}
+                />
+                <div
+                  className="absolute right-0 mt-1.5 w-48 rounded-2xl border border-border/50 bg-popover text-popover-foreground shadow-2xl z-30 py-1.5 animate-in fade-in zoom-in-95"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      onOpenRepostModal();
+                    }}
+                    className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2"
+                  >
+                    <Repeat2 className="size-4 text-emerald-500" />
+                    <span>Repost or Quote</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      onShare();
+                    }}
+                    className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2"
+                  >
+                    <Link2 className="size-4 text-blue-500" />
+                    <span>Copy Link</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      onOpenReportModal();
+                    }}
+                    className="w-full text-left px-3.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer flex items-center gap-2"
+                  >
+                    <Flag className="size-4" />
+                    <span>Report Post</span>
+                  </button>
+
+                  {currentUserId && post.authorId === currentUserId && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleToggleArchive}
+                        disabled={isArchiving}
+                        className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2 border-t border-border/30 mt-1"
+                      >
+                        <Archive className="size-4 text-amber-500" />
+                        <span>{post.status === "ARCHIVED" ? "Restore to Feed" : "Archive Post"}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowMenu(false);
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="w-full text-left px-3.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer flex items-center gap-2"
+                      >
+                        <Trash2 className="size-4" />
+                        <span>Delete Post</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Optional Context Sub-Row: Community & College */}
+      {(post.community || (!post.isAnonymous && institutionDisplayName)) && (
+        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/80 font-medium truncate pt-0.5">
+          {post.community && (
+            <Link
+              href={`/app/communities/${post.community.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-primary font-bold hover:underline truncate max-w-[180px] sm:max-w-[260px] inline-flex items-center gap-1"
+              title={`c/${post.community.name}`}
+            >
+              <span>c/{post.community.name}</span>
+            </Link>
+          )}
+
+          {post.community && !post.isAnonymous && institutionDisplayName && (
+            <span className="text-muted-foreground/40">·</span>
+          )}
+
+          {!post.isAnonymous && institutionDisplayName && (
             <Link
               href={`/app/college/${post.institution?.slug || post.institutionId}`}
               onClick={(e) => e.stopPropagation()}
-              className="text-muted-foreground hover:text-foreground truncate max-w-[120px] sm:max-w-[180px] text-xs font-semibold inline-flex items-center gap-1 transition-colors"
+              className="hover:text-foreground truncate max-w-[140px] sm:max-w-[200px] inline-flex items-center gap-1 transition-colors"
               title={post.institution?.name || ""}
             >
-              <School className="size-3 shrink-0 text-muted-foreground/70" />
+              <School className="size-3 shrink-0 text-muted-foreground/60" />
               <span className="truncate">{institutionDisplayName}</span>
             </Link>
-          </>
-        )}
-      </div>
-
-      {/* Right Side: Category Pill & Twitter 3 Dots */}
-      <div className="flex items-center gap-1.5 shrink-0">
-        {post.community && (
-          <Link href={`/app/communities/${post.community.id}`} onClick={(e) => e.stopPropagation()}>
-            <span className="text-[11px] font-bold text-muted-foreground hover:text-foreground transition-colors">
-              c/{post.community.name}
-            </span>
-          </Link>
-        )}
-
-        {post.type === "CONFESSION" && (
-          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
-            Confession
-          </span>
-        )}
-
-        {/* More Options Button */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowMenu(!showMenu);
-            }}
-            className="size-7 rounded-full flex items-center justify-center text-muted-foreground/60 hover:text-[#1d9bf0] hover:bg-[#1d9bf0]/10 transition-colors cursor-pointer"
-            aria-label="More options"
-          >
-            <MoreHorizontal className="size-4" />
-          </button>
-
-          {showMenu && (
-            <>
-              <div
-                className="fixed inset-0 z-20"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowMenu(false);
-                }}
-              />
-              <div
-                className="absolute right-0 mt-1.5 w-48 rounded-2xl border border-border/50 bg-popover text-popover-foreground shadow-2xl z-30 py-1.5 animate-in fade-in zoom-in-95"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onOpenRepostModal();
-                  }}
-                  className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2"
-                >
-                  <Repeat2 className="size-4 text-emerald-500" />
-                  <span>Repost or Quote</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onShare();
-                  }}
-                  className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2"
-                >
-                  <Link2 className="size-4 text-blue-500" />
-                  <span>Copy Link</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onOpenReportModal();
-                  }}
-                  className="w-full text-left px-3.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer flex items-center gap-2"
-                >
-                  <Flag className="size-4" />
-                  <span>Report Post</span>
-                </button>
-
-                {currentUserId && post.authorId === currentUserId && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleToggleArchive}
-                      disabled={isArchiving}
-                      className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2 border-t border-border/30 mt-1"
-                    >
-                      <Archive className="size-4 text-amber-500" />
-                      <span>{post.status === "ARCHIVED" ? "Restore to Feed" : "Archive Post"}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowMenu(false);
-                        setShowDeleteConfirm(true);
-                      }}
-                      className="w-full text-left px-3.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer flex items-center gap-2"
-                    >
-                      <Trash2 className="size-4" />
-                      <span>Delete Post</span>
-                    </button>
-                  </>
-                )}
-              </div>
-            </>
           )}
         </div>
-      </div>
+      )}
 
       <ConfirmDialog
         isOpen={showDeleteConfirm}

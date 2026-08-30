@@ -87,8 +87,22 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
     }
   }
 
-  function handleCardClick() {
+  function handleCardClick(e?: React.MouseEvent) {
     if (disableNavigation) return;
+
+    if (e) {
+      const target = e.target as HTMLElement;
+      if (
+        target.closest("img") ||
+        target.closest("button") ||
+        target.closest("a") ||
+        target.closest("[data-no-nav]") ||
+        target.closest(".no-card-nav")
+      ) {
+        return;
+      }
+    }
+
     if (clickTimeoutRef.current) {
       clearTimeout(clickTimeoutRef.current);
       clickTimeoutRef.current = null;
@@ -222,7 +236,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
           {/* Content Body */}
           <div
             className="text-[15px] leading-relaxed text-foreground font-normal break-words pt-1"
-            onClick={handleCardClick}
+            onClick={(e) => handleCardClick(e)}
             onDoubleClick={handleDoubleTap}
           >
             <RichText content={post.body} />

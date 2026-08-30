@@ -1,7 +1,17 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUp, Heart, Loader2, MessageCircle, Reply, Shield, User, X } from "lucide-react";
+import {
+  ArrowUp,
+  Heart,
+  Image as ImageIcon,
+  Loader2,
+  MessageCircle,
+  Reply,
+  Shield,
+  User,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -17,6 +27,7 @@ import type { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
+import { uploadImageToImgBB } from "@/lib/upload";
 import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 export interface FastComment {
@@ -67,8 +78,43 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
     displayName: string;
   } | null>(null);
 
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  async function handleUploadCommentFiles(files: File[]) {
+    const validImageFiles = files.filter((f) => f.type.startsWith("image/"));
+    if (validImageFiles.length === 0) return;
+
+    setIsUploadingImage(true);
+    try {
+      toast.loading("Uploading attached image...", { id: "comment-img" });
+      const uploaded = await uploadImageToImgBB(validImageFiles[0]);
+      const imgMarkdown = `\n![Image](${uploaded.displayUrl || uploaded.url})`;
+      setCommentText((prev) => `${prev.trim()}${imgMarkdown}`);
+      toast.success("Image attached 📸", { id: "comment-img" });
+      setTimeout(() => inputRef.current?.focus(), 50);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload image", { id: "comment-img" });
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
+    const items = Array.from(e.clipboardData?.items || []);
+    const imageFiles = items
+      .filter((item) => item.type.startsWith("image/"))
+      .map((item) => item.getAsFile())
+      .filter((f): f is File => f !== null);
+
+    if (imageFiles.length > 0) {
+      e.preventDefault();
+      handleUploadCommentFiles(imageFiles);
+    }
+  }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value;
@@ -447,6 +493,16 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                     className="bottom-full mb-2 left-0"
                   />
                   <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      if (files.length > 0) handleUploadCommentFiles(files);
+                    }}
+                  />
+                  <input
                     ref={inputRef}
                     type="text"
                     placeholder={
@@ -459,9 +515,26 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                     value={commentText}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
+                    onPaste={handlePaste}
                     className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none"
                     maxLength={500}
                   />
+
+                  {/* Photo Attachment Button */}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingImage}
+                    className="text-muted-foreground hover:text-foreground transition-colors p-1 cursor-pointer disabled:opacity-40"
+                    title="Attach photo (or paste from clipboard)"
+                    aria-label="Attach photo"
+                  >
+                    {isUploadingImage ? (
+                      <Loader2 className="size-3.5 animate-spin text-primary" />
+                    ) : (
+                      <ImageIcon className="size-3.5" />
+                    )}
+                  </button>
 
                   {/* Anonymous Toggle Pill */}
                   <button

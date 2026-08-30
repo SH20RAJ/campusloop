@@ -462,7 +462,7 @@ export function CommunityDetailClient({
       </div>
 
       {/* ─── Twitter/X Sticky Segmented Tabs ─── */}
-      <div className="border-b border-border/30 bg-background/80 backdrop-blur-xl sticky top-[53px] z-30 flex items-center justify-around mt-4">
+      <div className="border-b border-border/30 bg-background/95 backdrop-blur-md sticky top-[53px] z-20 flex items-center overflow-x-auto scrollbar-none no-scrollbar px-2 gap-1 mt-3">
         {[
           { key: "trending", label: "Trending" },
           { key: "latest", label: "Latest" },
@@ -472,16 +472,19 @@ export function CommunityDetailClient({
         ].map((tab) => (
           <button
             key={tab.key}
+            type="button"
             onClick={() => setActiveTab(tab.key as typeof activeTab)}
             className={cn(
-              "relative flex-1 py-3 text-center text-sm transition-colors cursor-pointer flex flex-col items-center justify-center font-bold",
+              "relative px-4 py-3 text-center text-xs sm:text-sm transition-colors cursor-pointer flex flex-col items-center justify-center font-bold whitespace-nowrap shrink-0",
               activeTab === tab.key
                 ? "text-foreground font-black"
                 : "text-muted-foreground hover:text-foreground font-medium"
             )}
           >
             <span>{tab.label}</span>
-            {activeTab === tab.key && <div className="absolute bottom-0 h-1 w-12 bg-primary rounded-full" />}
+            {activeTab === tab.key && (
+              <div className="absolute bottom-0 h-0.5 inset-x-2 bg-primary rounded-full" />
+            )}
           </button>
         ))}
       </div>

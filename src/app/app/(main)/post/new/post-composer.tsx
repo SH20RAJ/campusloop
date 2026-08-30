@@ -122,6 +122,35 @@ export function PostComposer({
   const firstName = profile?.displayName?.split(" ")[0];
   const [mentionTrigger, setMentionTrigger] = useState<TriggerContext | null>(null);
 
+  async function handleUploadFiles(files: File[]) {
+    const validImageFiles = files.filter((f) => f.type.startsWith("image/"));
+    if (validImageFiles.length === 0) return;
+
+    setIsUploadingImage(true);
+    try {
+      toast.loading(
+        validImageFiles.length > 1 ? `Uploading ${validImageFiles.length} photos...` : "Uploading photo...",
+        { id: "img-upload" }
+      );
+      for (const file of validImageFiles) {
+        const uploaded = await uploadImageToImgBB(file);
+        setUploadedImages((prev) => [...prev, uploaded.displayUrl || uploaded.url]);
+      }
+      sounds.pop();
+      haptics.success();
+      toast.success(validImageFiles.length > 1 ? "Photos attached 📸" : "Photo attached 📸", {
+        id: "img-upload",
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload image", {
+        id: "img-upload",
+      });
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   const editor = useEditor({
     extensions: [StarterKit],
     content: "",
@@ -132,6 +161,30 @@ export function PostComposer({
           "px-5 py-4 text-[17px] leading-relaxed",
           isModal ? "min-h-[120px]" : "min-h-[180px] sm:min-h-[220px]"
         ),
+      },
+      handlePaste: (_view, event) => {
+        const items = Array.from(event.clipboardData?.items || []);
+        const imageFiles = items
+          .filter((item) => item.type.startsWith("image/"))
+          .map((item) => item.getAsFile())
+          .filter((f): f is File => f !== null);
+
+        if (imageFiles.length > 0) {
+          event.preventDefault();
+          handleUploadFiles(imageFiles);
+          return true;
+        }
+        return false;
+      },
+      handleDrop: (_view, event) => {
+        const files = Array.from(event.dataTransfer?.files || []);
+        const imageFiles = files.filter((f) => f.type.startsWith("image/"));
+        if (imageFiles.length > 0) {
+          event.preventDefault();
+          handleUploadFiles(imageFiles);
+          return true;
+        }
+        return false;
       },
     },
     onUpdate: ({ editor }) => {
@@ -151,26 +204,10 @@ export function PostComposer({
     setMentionTrigger(null);
   }
 
-  async function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-
-    setIsUploadingImage(true);
-    try {
-      toast.loading(files.length > 1 ? `Uploading ${files.length} photos...` : "Uploading photo...", {
-        id: "img-upload",
-      });
-      for (const file of files) {
-        const uploaded = await uploadImageToImgBB(file);
-        setUploadedImages((prev) => [...prev, uploaded.displayUrl || uploaded.url]);
-      }
-      toast.success(files.length > 1 ? "Photos attached 📸" : "Photo attached 📸", { id: "img-upload" });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to upload image", { id: "img-upload" });
-    } finally {
-      setIsUploadingImage(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+    handleUploadFiles(files);
   }
 
   function handleRemoveImage(index: number) {
@@ -400,8 +437,21 @@ export function PostComposer({
     },
   ];
 
+  function handleContainerPaste(e: React.ClipboardEvent) {
+    const items = Array.from(e.clipboardData?.items || []);
+    const imageFiles = items
+      .filter((item) => item.type.startsWith("image/"))
+      .map((item) => item.getAsFile())
+      .filter((f): f is File => f !== null);
+
+    if (imageFiles.length > 0) {
+      e.preventDefault();
+      handleUploadFiles(imageFiles);
+    }
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="select-none">
+    <form onSubmit={handleSubmit} onPaste={handleContainerPaste} className="select-none">
       <input
         ref={fileInputRef}
         type="file"

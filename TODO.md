@@ -336,3 +336,14 @@ Hub label inconsistently displays "bitmesra Hub" vs "Campus".
   - [x] Exclude system viewer-hub from public college directory listings
   - [x] Fix LP calculation and display mismatch
   - [x] Documented in `docs/CAMPUS_PREVIEW_FEATURE.md`
+
+
+
+  https://campusloop.space/@btech10223_25 dont show any anonumous post of the user on there public profile....
+
+  [og-image.png](file;file:///Users/shaswatraj/Desktop/startups/campusloop/public/og-image.png) when any user will create event they will get a cute QR code genarated to share with campusloop watermart get the design system from the attached image also create a short link easy to remember and share , also add the qr code sharing feature to all cute possible plases like profie  sharing .... and all possible places 
+
+  seach for nextjs optimisation techniques and make the website faster git push and deploy every possible way every possible page with greate fast ui ux SEO and speed backend optimised and structured....\ who to follow in rightbar always showing same people and catched follow btn also add confession btn here https://campusloop.space/app/confessions to add new one also on the main feeds page add link for https://campusloop.space/app/confessions after For You on top also dont always show catched data its for fast load  you always have to update it in background....
+
+  also plan a blog feature in more page add this also add the blog link to user profile where user can write articles long articles not posts and it will be shown in explore, feeds in bw posts to the users on click show more full article will open with the best seo and best article editor all upvote downvote share, og image , good dashboard with paginations and a featured packed optiised backend and frontend with all possible seo plan and execute it....
+  

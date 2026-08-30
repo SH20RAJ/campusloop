@@ -1,5 +1,4 @@
-"use client";
-
+import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,7 @@ import {
   Gift,
   Globe,
   MapPin,
+  QrCode,
   School,
   Share2,
   Trophy,
@@ -47,6 +47,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
   const event = data?.event;
 
   const [showRegModal, setShowRegModal] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
   const [regType, setRegType] = useState<"SOLO" | "TEAM">("SOLO");
   const [teamName, setTeamName] = useState("");
   const [teamMember1, setTeamMember1] = useState("");
@@ -202,17 +203,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
 
   function handleShare() {
     haptics.light();
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({
-        title: event.title,
-        text: `Check out ${event.title} organized by ${event.clubName} on CampusLoop!`,
-        url,
-      });
-    } else {
-      navigator.clipboard.writeText(url);
-      toast.success("Event link copied to clipboard 📋");
-    }
+    setShowQrModal(true);
   }
 
   return (
@@ -228,6 +219,17 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
         </button>
 
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowQrModal(true)}
+            className="h-8 px-3 rounded-full text-xs font-bold gap-1.5 cursor-pointer bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
+            title="Cute QR Code Share Card"
+          >
+            <QrCode className="size-3.5" />
+            <span>QR Code</span>
+          </Button>
+
           <Button
             size="sm"
             variant="outline"
@@ -639,6 +641,17 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Cute Branded QR Code Modal */}
+      <BrandedQrModal
+        isOpen={showQrModal}
+        onClose={() => setShowQrModal(false)}
+        title={event.title}
+        subtitle={`${event.clubName} • ${event.venue || event.mode}`}
+        badgeText="Campus Event"
+        shortUrl={`https://campusloop.space/e/${event.slug || event.id}`}
+        category="event"
+      />
     </div>
   );
 }

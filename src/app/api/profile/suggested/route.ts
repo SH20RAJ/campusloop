@@ -1,23 +1,33 @@
 import { getDb } from "@/db";
-import { userProfiles } from "@/db/schema";
+import { follows, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getViewerInstitutionId } from "@/lib/viewer";
-import { and,desc,eq,ne,sql } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { and, desc, eq, ne, notInArray, sql } from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const user = await hexclaveServerApp.getUser();
     const db = getDb();
 
     let currentProfile = null;
+    let followingIds: string[] = [];
+
     if (user) {
       currentProfile = await db.query.userProfiles.findFirst({
         where: eq(userProfiles.userId, user.id),
         with: { institution: true },
       });
+
+      if (currentProfile) {
+        const userFollows = await db.query.follows.findMany({
+          where: eq(follows.followerId, currentProfile.id),
+          columns: { followingId: true },
+        });
+        followingIds = userFollows.map((f) => f.followingId);
+      }
     }
 
     const viewerInstitutionId = await getViewerInstitutionId();
@@ -31,11 +41,15 @@ export async function GET() {
       conditions.push(ne(userProfiles.id, currentProfile.id));
     }
 
+    if (followingIds.length > 0) {
+      conditions.push(notInArray(userProfiles.id, followingIds));
+    }
+
     // Fetch candidate pool from home campus and India
     const candidatePool = await db.query.userProfiles.findMany({
       where: and(...conditions),
-      orderBy: [desc(userProfiles.points), sql`random()`],
-      limit: 35,
+      orderBy: [sql`random()`, desc(userProfiles.points)],
+      limit: 40,
       with: {
         institution: true,
       },

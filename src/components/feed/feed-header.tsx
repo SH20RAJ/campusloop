@@ -6,7 +6,8 @@ FEED_SORT_TABS as SORT_TABS,
 FEED_VISIBILITY_OPTIONS as VISIBILITY_OPTIONS,
 } from "@/constants";
 import { cn } from "@/lib/utils";
-import { Globe,ListFilter,RotateCw,School } from "lucide-react";
+import { Flame, Globe, ListFilter, RotateCw, School } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 
@@ -103,22 +104,34 @@ export function FeedHeader({
           {SORT_TABS.map((s) => {
             const isCurrent = sort === s.id;
             return (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => onSortChange(s.id)}
-                className={cn(
-                  "relative px-4 py-3 font-bold transition-colors cursor-pointer shrink-0 text-[14px]",
-                  isCurrent
-                    ? "text-foreground font-black"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg"
+              <div key={s.id} className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => onSortChange(s.id)}
+                  className={cn(
+                    "relative px-4 py-3 font-bold transition-colors cursor-pointer shrink-0 text-[14px]",
+                    isCurrent
+                      ? "text-foreground font-black"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg"
+                  )}
+                >
+                  <span>{s.label}</span>
+                  {isCurrent && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-10 rounded-full bg-primary" />
+                  )}
+                </button>
+
+                {/* Confessions Quick Tab Link immediately after For You */}
+                {s.id === "for_you" && (
+                  <Link
+                    href="/app/confessions"
+                    className="relative px-3.5 py-3 font-bold transition-colors cursor-pointer shrink-0 text-[14px] text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg flex items-center gap-1.5 group"
+                  >
+                    <span className="group-hover:text-foreground">Confessions</span>
+                    <Flame className="size-3.5 text-amber-500 fill-amber-500 shrink-0" />
+                  </Link>
                 )}
-              >
-                <span>{s.label}</span>
-                {isCurrent && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-10 rounded-full bg-primary" />
-                )}
-              </button>
+              </div>
             );
           })}
         </div>

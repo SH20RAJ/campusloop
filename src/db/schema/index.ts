@@ -1,4 +1,5 @@
 export * from "./academic-resources";
+export * from "./articles";
 export * from "./chat";
 export * from "./commercial-marketplace";
 export * from "./common";

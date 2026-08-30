@@ -4,7 +4,7 @@ import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import type { Institution,UserProfile } from "@/db/schema";
 import { fetcher } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { MoreHorizontal,Search,ShieldCheck } from "lucide-react";
+import { MoreHorizontal, RotateCw, Search, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -30,24 +30,35 @@ export function RightSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [followedIds, setFollowedIds] = useState<Record<string, boolean>>({});
 
+  const [isRefreshingPeers, setIsRefreshingPeers] = useState(false);
+
   // Dynamic live trends from real database
   const { data: trendsData } = useSWR<TrendsResponse>(
     "/api/trends?scope=CAMPUS",
     fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 30000 }
+    { revalidateIfStale: true, revalidateOnFocus: false, dedupingInterval: 15000 }
   );
 
-  // Suggested peers from real database
+  // Suggested peers from real database (excludes already followed users)
   const { data: suggestedPeers, mutate: mutateSuggested } = useSWR<SuggestedPeer[]>(
     "/api/profile/suggested",
     fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 30000 }
+    { revalidateIfStale: true, revalidateOnFocus: false, dedupingInterval: 10000 }
   );
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     router.push(`/app/search?q=${encodeURIComponent(searchQuery.trim())}`);
+  }
+
+  async function handleRefreshPeers() {
+    setIsRefreshingPeers(true);
+    try {
+      await mutateSuggested();
+    } finally {
+      setIsRefreshingPeers(false);
+    }
   }
 
   async function handleFollowToggle(peer: SuggestedPeer) {
@@ -60,11 +71,13 @@ export function RightSidebar() {
       if (nextState) {
         toast.success(`Following @${peer.username}`);
         await fetch(`/api/profile/${peer.username}/follow`, { method: "POST" });
+        // Optimistically remove followed peer from suggested list and refresh in background
+        mutateSuggested((current) => current?.filter((p) => p.id !== peer.id), false);
       } else {
         toast.info(`Unfollowed @${peer.username}`);
         await fetch(`/api/profile/${peer.username}/follow`, { method: "DELETE" });
       }
-      mutateSuggested();
+      setTimeout(() => mutateSuggested(), 500);
     } catch {
       setFollowedIds((prev) => ({ ...prev, [peer.id]: isCurrentlyFollowed }));
       toast.error("Failed to update follow status");
@@ -72,7 +85,7 @@ export function RightSidebar() {
   }
 
   const trends = (trendsData?.trends || []).slice(0, 4);
-  const peers = (suggestedPeers || []).slice(0, 3);
+  const peers = (suggestedPeers || []).slice(0, 4);
 
   return (
     <aside className="sticky top-3 space-y-4 text-foreground w-full select-none">
@@ -136,10 +149,19 @@ export function RightSidebar() {
       {/* ─── COMPONENT 2: Who to follow (Classmates & Peers) ─── */}
       {peers.length > 0 && (
         <section className="space-y-1">
-          <div className="px-1 pb-1">
+          <div className="px-1 pb-1 flex items-center justify-between">
             <h3 className="text-[17px] font-black tracking-tight text-foreground">
               Who to follow
             </h3>
+            <button
+              type="button"
+              onClick={handleRefreshPeers}
+              disabled={isRefreshingPeers}
+              title="Shuffle suggestions"
+              className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer active:scale-95"
+            >
+              <RotateCw className={cn("size-3.5 transition-transform", isRefreshingPeers && "animate-spin text-primary")} />
+            </button>
           </div>
 
           <div className="divide-y divide-border/20">

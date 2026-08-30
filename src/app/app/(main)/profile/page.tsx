@@ -51,9 +51,13 @@ export default async function ProfilePage({
   const profile = currentProfile;
   const isOwnProfile = true;
 
-  // Fetch posts written by this user
+  // Fetch posts written by this user (exclude anonymous confessions/posts)
   const userPosts = await db.query.posts.findMany({
-    where: and(eq(posts.authorId, profile.id), eq(posts.status, "PUBLISHED")),
+    where: and(
+      eq(posts.authorId, profile.id),
+      eq(posts.status, "PUBLISHED"),
+      eq(posts.isAnonymous, false)
+    ),
     orderBy: [desc(posts.createdAt)],
     limit: 20,
     with: {

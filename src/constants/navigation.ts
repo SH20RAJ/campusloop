@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
+  BookOpen,
   Bookmark,
   Cake,
   Calendar,
@@ -104,6 +105,14 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
   {
     group: "Campus Directories & Life",
     items: [
+      {
+        icon: BookOpen,
+        href: "/app/articles",
+        label: "Campus Articles & Blogs",
+        desc: "Placement roadmaps, tech tutorials & campus long reads",
+        badge: "NEW",
+        badgeColor: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+      },
       {
         icon: Calendar,
         href: "/app/events",

@@ -103,9 +103,13 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
     notFound();
   }
 
-  // Fetch posts written by this user
+  // Fetch posts written by this user (never expose anonymous posts on public profile)
   const userPosts = await db.query.posts.findMany({
-    where: and(eq(posts.authorId, profile.id), eq(posts.status, "PUBLISHED")),
+    where: and(
+      eq(posts.authorId, profile.id),
+      eq(posts.status, "PUBLISHED"),
+      eq(posts.isAnonymous, false)
+    ),
     orderBy: [desc(posts.createdAt)],
     limit: 20,
     with: {

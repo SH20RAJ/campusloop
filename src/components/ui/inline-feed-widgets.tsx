@@ -4,12 +4,15 @@ import { fetcher } from "@/lib/api";
 import type { TrendingHashtag } from "@/lib/trending-hashtags";
 import { cn } from "@/lib/utils";
 import {
-ArrowRight,
-Flame,
-Gift,
-Hash,
-Heart,
-Users,
+  ArrowRight,
+  BookOpen,
+  Clock,
+  Flame,
+  Gift,
+  Hash,
+  Heart,
+  ThumbsUp,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -234,3 +237,71 @@ export function InlineReferralWidget() {
     </div>
   );
 }
+
+// ──────── 5. Campus Articles Spotlight Widget ────────
+
+export function InlineArticlesWidget() {
+  const { data } = useSWR<{ articles: any[] }>("/api/articles?limit=2&sort=popular", fetcher, {
+    revalidateIfStale: true,
+    dedupingInterval: 30000,
+  });
+
+  const articles = data?.articles || [];
+  if (articles.length === 0) return null;
+
+  return (
+    <div className="py-3 px-4 space-y-3 select-none rounded-2xl border border-border/30 bg-gradient-to-br from-primary/5 via-card to-card">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <BookOpen className="size-4 text-primary" />
+          <h3 className="text-[15px] font-black text-foreground tracking-tight">
+            Articles & Long Reads
+          </h3>
+        </div>
+        <Link
+          href="/app/articles"
+          className="text-xs font-bold text-primary hover:underline flex items-center gap-0.5"
+        >
+          Explore all
+          <ArrowRight className="size-3" />
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {articles.map((art) => (
+          <Link
+            key={art.id}
+            href={`/app/articles/${art.slug}`}
+            className="group flex flex-col justify-between rounded-xl border border-border/40 bg-card p-3.5 hover:border-primary/40 hover:shadow-md transition-all cursor-pointer"
+          >
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-1 text-[10px]">
+                <span className="font-black text-primary uppercase">
+                  {art.category || "General"}
+                </span>
+                <span className="text-muted-foreground flex items-center gap-1 font-medium">
+                  <Clock className="size-2.5" />
+                  {art.readingTimeMinutes || 3} min
+                </span>
+              </div>
+              <h4 className="font-bold text-xs text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                {art.title}
+              </h4>
+              {art.excerpt && (
+                <p className="text-[11px] text-muted-foreground line-clamp-2">
+                  {art.excerpt}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-2.5 flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/20 pt-2 font-medium">
+              <span>@{art.author?.username || "student"}</span>
+              <span className="text-primary font-bold group-hover:underline">Read →</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+

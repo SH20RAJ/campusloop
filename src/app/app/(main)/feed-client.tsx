@@ -5,6 +5,7 @@ import { FeedCaughtUpCard,FeedEmptyState,FeedErrorState } from "@/components/fee
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import {
+InlineArticlesWidget,
 InlineCommunitiesWidget,
 InlineDatingWidget,
 InlineHashtagsWidget,
@@ -361,6 +362,11 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
                   {idx === 2 && (
                     <div className="p-3 border-b border-border/30 bg-muted/10">
                       <InlineCommunitiesWidget />
+                    </div>
+                  )}
+                  {idx === 4 && (
+                    <div className="p-3 border-b border-border/30 bg-muted/10">
+                      <InlineArticlesWidget />
                     </div>
                   )}
                   {idx === 6 && (

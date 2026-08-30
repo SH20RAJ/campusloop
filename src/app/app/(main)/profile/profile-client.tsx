@@ -11,10 +11,15 @@ import { getBranchIcon,slugifyBranch } from "@/constants";
 import type { FeedPost } from "@/hooks/use-feed";
 import { getCloutTier } from "@/lib/gamification";
 import { cn } from "@/lib/utils";
+import { ArticleCard } from "@/components/articles/article-card";
+import { BrandedQrModal } from "@/components/common/branded-qr-modal";
+import { fetcher } from "@/lib/api";
+import useSWR from "swr";
 import {
 Archive,
 ArrowLeft,
 ArrowUpRight,
+BookOpen,
 Calendar,
 Camera,
 Edit3,
@@ -25,6 +30,8 @@ GraduationCap,
 Loader2,
 MessageSquare,
 Move,
+PenTool,
+QrCode,
 School,
 Share2,
 Shield,
@@ -97,11 +104,19 @@ export function ProfileClientView({
 }: ProfileClientViewProps) {
   const router = useRouter();
   const [followers, setFollowers] = useState(followersCount);
-  const [activeTab, setActiveTab] = useState<"posts" | "photos" | "clout" | "archived">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "articles" | "photos" | "clout" | "archived">("posts");
   const [archivedPosts, setArchivedPosts] = useState<FeedPost[]>([]);
   const [isLoadingArchived, setIsLoadingArchived] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showPhotoLightbox, setShowPhotoLightbox] = useState<string | null>(null);
+  const [showQrModal, setShowQrModal] = useState(false);
+
+  // Fetch articles for this user
+  const { data: userArticlesData, isLoading: isLoadingArticles } = useSWR<{ articles: any[] }>(
+    activeTab === "articles" ? `/api/articles/user/${profile.username}` : null,
+    fetcher
+  );
+  const userArticles = userArticlesData?.articles || [];
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
   const pfpInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -360,6 +375,15 @@ export function ProfileClientView({
           </h1>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowQrModal(true)}
+              className="flex items-center gap-1.5 text-[11px] font-bold text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1 rounded-xl transition-all cursor-pointer shadow-2xs active:scale-95"
+              title="Share Cute QR Code"
+            >
+              <QrCode className="size-3.5" /> <span>QR Card</span>
+            </button>
+
             <button
               type="button"
               onClick={handleShareVibe}
@@ -745,6 +769,23 @@ export function ProfileClientView({
 
           <button
             type="button"
+            onClick={() => setActiveTab("articles")}
+            className={cn(
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
+              activeTab === "articles"
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <BookOpen className="size-3.5" />
+            <span>Articles ({userArticles.length})</span>
+            {activeTab === "articles" && (
+              <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
+            )}
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab("photos")}
             className={cn(
               "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
@@ -829,6 +870,59 @@ export function ProfileClientView({
                     <Loader2 className="size-4 animate-spin text-primary" />
                     <span>Loading more campus posts...</span>
                   </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ─── Articles Tab Content ─── */}
+        {activeTab === "articles" && (
+          <div className="p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <BookOpen className="size-4 text-primary" /> Published Long Reads
+              </h3>
+              {isOwnProfile && (
+                <Link
+                  href="/app/articles/new"
+                  className="flex items-center gap-1 text-xs font-black text-primary hover:underline bg-primary/10 px-3 py-1 rounded-full border border-primary/20"
+                >
+                  <PenTool className="size-3" />
+                  <span>Write Article (+15 LP)</span>
+                </Link>
+              )}
+            </div>
+
+            {isLoadingArticles ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-pulse">
+                <div className="h-56 bg-muted/30 rounded-3xl" />
+                <div className="h-56 bg-muted/30 rounded-3xl" />
+              </div>
+            ) : userArticles.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {userArticles.map((art) => (
+                  <ArticleCard key={art.id} article={art} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 border border-dashed rounded-3xl border-border bg-card text-muted-foreground text-xs font-semibold space-y-2 p-6">
+                <div className="size-12 rounded-2xl bg-muted flex items-center justify-center mx-auto text-primary">
+                  <BookOpen className="size-6" />
+                </div>
+                <p className="font-bold text-foreground">No articles published yet.</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {isOwnProfile
+                    ? "Share placement tips, tech roadmaps, and campus journalism with your batch."
+                    : `@${profile.username} hasn't published any articles yet.`}
+                </p>
+                {isOwnProfile && (
+                  <Link
+                    href="/app/articles/new"
+                    className="inline-block py-2 px-4 rounded-xl bg-primary text-primary-foreground font-bold shadow-xs hover:bg-primary/90 transition-all cursor-pointer mt-2"
+                  >
+                    Write your first article
+                  </Link>
                 )}
               </div>
             )}
@@ -1076,6 +1170,18 @@ export function ProfileClientView({
           />
         </div>
       )}
+
+      {/* ─── Branded Cute QR Code Modal ─── */}
+      <BrandedQrModal
+        isOpen={showQrModal}
+        onClose={() => setShowQrModal(false)}
+        title={profile.displayName}
+        subtitle={`@${profile.username} • ${profile.institution?.name || "Verified Student"}`}
+        badgeText="Verified Student Network"
+        shortUrl={`https://campusloop.space/@${profile.username}`}
+        avatarUrl={profile.avatarUrl}
+        category="profile"
+      />
     </div>
   );
 }

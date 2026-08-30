@@ -92,12 +92,14 @@ export async function GET(req: Request) {
 
     if (authorId) {
       conditions.push(eq(posts.authorId, authorId));
+      conditions.push(eq(posts.isAnonymous, false));
     } else if (authorUsername) {
       const targetUser = await db.query.userProfiles.findFirst({
         where: eq(userProfiles.username, authorUsername.toLowerCase().trim()),
       });
       if (targetUser) {
         conditions.push(eq(posts.authorId, targetUser.id));
+        conditions.push(eq(posts.isAnonymous, false));
       }
     }
 

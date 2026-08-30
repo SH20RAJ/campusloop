@@ -6,9 +6,10 @@ import { useFeed } from "@/hooks/use-feed";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { ArrowLeft,Flame,Globe,Lock,Shield } from "lucide-react";
-import { usePathname,useRouter,useSearchParams } from "next/navigation";
-import { useEffect,useRef } from "react";
+import { ArrowLeft, Flame, Globe, Lock, Plus, Shield, Sparkles, VenetianMask } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 export function ConfessionsFeed() {
   const router = useRouter();
@@ -56,28 +57,28 @@ export function ConfessionsFeed() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-24">
       {/* ─── Sticky Minimal Top Header ─── */}
-      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border/30 bg-background/85 px-4 backdrop-blur-xl">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border/30 bg-background/85 px-4 backdrop-blur-xl gap-2">
+        <div className="flex items-center gap-3 min-w-0">
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer shrink-0"
             title="Go back"
           >
             <ArrowLeft className="size-4.5" />
           </button>
-          <div>
-            <h1 className="text-base font-black text-foreground tracking-tight flex items-center gap-1.5">
+          <div className="min-w-0">
+            <h1 className="text-base font-black text-foreground tracking-tight flex items-center gap-1.5 truncate">
               <span>Campus Confessions</span>
-              <Flame className="size-4 text-amber-500 fill-amber-500" />
+              <Flame className="size-4 text-amber-500 fill-amber-500 shrink-0" />
             </h1>
-            <p className="text-[11px] text-muted-foreground font-medium">
-              Anonymous, sealed thoughts from {scope === "CAMPUS" ? "your college" : "all of India"}
+            <p className="text-[11px] text-muted-foreground font-medium truncate">
+              Anonymous thoughts from {scope === "CAMPUS" ? "your college" : "all of India"}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Scope Pill */}
           <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
             <button
@@ -107,14 +108,44 @@ export function ConfessionsFeed() {
             </button>
           </div>
 
-          <span className="hidden sm:flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-muted/60 text-muted-foreground border border-border/40">
-            <Lock className="size-2.5" />
-            <span>Sealed</span>
-          </span>
+          {/* New Confession Button */}
+          <Link
+            href="/app/post/new?type=CONFESSION"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500 text-black text-xs font-black hover:bg-amber-400 transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
+          >
+            <Plus className="size-3.5 stroke-[3]" />
+            <span>Confess</span>
+          </Link>
         </div>
       </header>
 
       <div className="flex flex-col px-4 pt-4 gap-4">
+        {/* ─── Fast Confession Composer Box ─── */}
+        <Link
+          href="/app/post/new?type=CONFESSION"
+          className="group relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent p-4 transition-all hover:border-amber-500/60 hover:shadow-md cursor-pointer"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-amber-500/20 text-amber-500 shadow-inner group-hover:scale-105 transition-transform">
+                <VenetianMask className="size-5" />
+              </div>
+              <div>
+                <p className="text-xs font-black text-foreground group-hover:text-amber-500 transition-colors">
+                  Got a campus secret or late-night thought?
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  100% anonymous & cryptographic pseudonym protection.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-xs font-black text-amber-500 bg-amber-500/15 px-3 py-1.5 rounded-full shrink-0 group-hover:bg-amber-500 group-hover:text-black transition-all">
+              <span>Write Secret</span>
+              <Sparkles className="size-3.5" />
+            </div>
+          </div>
+        </Link>
+
         {isLoading ? (
           <FeedSkeleton />
         ) : feed && feed.length > 0 ? (

@@ -61,9 +61,7 @@ export function FeedCardHeader({
   const isVerified = Boolean(!post.isAnonymous && ((post.author?.points || 0) >= 150 || post.author?.role === "ADMIN"));
 
   const institutionDisplayName =
-    post.institution?.shortName ||
     post.institution?.name?.split(",")?.[0]?.replace(/^(Birla Institute of Technology)/i, "BIT") ||
-    post.institution?.name?.slice(0, 20) ||
     null;
 
   return (

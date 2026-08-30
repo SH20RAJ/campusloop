@@ -110,9 +110,9 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
 
-    const body = await req.json();
-    const commentBody = String(body.body || "").trim();
-    const parentId = body.parentId ? String(body.parentId) : null;
+    const body = (await req.json()) as { body?: string; parentId?: string };
+    const commentBody = String(body?.body || "").trim();
+    const parentId = body?.parentId ? String(body.parentId) : null;
 
     if (!commentBody || commentBody.length < 2) {
       return NextResponse.json({ error: "Comment text is too short." }, { status: 400 });

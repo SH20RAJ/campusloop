@@ -30,7 +30,7 @@ export function ConfessionsFeed() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { data: profile } = useProfile();
+  const { profile } = useProfile();
 
   const rawScope = searchParams.get("scope");
   const scope: "CAMPUS" | "GLOBAL" = rawScope === "GLOBAL" ? "GLOBAL" : "CAMPUS";

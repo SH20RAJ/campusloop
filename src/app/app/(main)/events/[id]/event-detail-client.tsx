@@ -1,4 +1,5 @@
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
+import { MarkdownContent } from "@/components/common/markdown-content";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -500,8 +501,8 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
           <h3 className="text-sm font-black text-foreground uppercase tracking-wider">
             About the Event
           </h3>
-          <div className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap rounded-2xl border border-border/40 p-4 bg-card">
-            {event.description}
+          <div className="rounded-2xl border border-border/40 bg-card p-4 text-sm leading-relaxed text-foreground/90">
+            <MarkdownContent content={event.description} />
           </div>
         </div>
 

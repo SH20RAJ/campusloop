@@ -70,6 +70,16 @@ class HapticsEngine {
       navigator.vibrate(55);
     }
   }
+
+  /**
+   * Double buzz for rejected actions (validation failures, failed submits).
+   * Distinct from `heavy()` so a refusal never feels like a confirmation.
+   */
+  public error() {
+    if (this.canVibrate()) {
+      navigator.vibrate([60, 50, 60]);
+    }
+  }
 }
 
 export const haptics = new HapticsEngine();

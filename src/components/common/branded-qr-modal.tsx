@@ -1,7 +1,6 @@
 "use client";
 
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
 import {
   Check,
   Copy,
@@ -9,12 +8,24 @@ import {
   QrCode,
   Share2,
   ShieldCheck,
-  Sparkles,
   X,
 } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
+
+/**
+ * Per-surface accent, so an event card, a profile card and an article card are
+ * recognisably different at a glance while staying on the CampusLoop palette.
+ */
+const CATEGORY_THEMES = {
+  event: { qrDark: "#1e1b4b", accent: "#7c3aed", tint: "#f5f3ff", border: "#ddd6fe" },
+  profile: { qrDark: "#172554", accent: "#2563eb", tint: "#eff6ff", border: "#bfdbfe" },
+  article: { qrDark: "#3b0764", accent: "#9333ea", tint: "#faf5ff", border: "#e9d5ff" },
+  community: { qrDark: "#042f2e", accent: "#0d9488", tint: "#f0fdfa", border: "#99f6e4" },
+  general: { qrDark: "#1e1b4b", accent: "#6366f1", tint: "#eef2ff", border: "#c7d2fe" },
+} as const;
 
 export interface BrandedQrModalProps {
   isOpen: boolean;
@@ -37,6 +48,8 @@ export function BrandedQrModal({
   category = "general",
   avatarUrl,
 }: BrandedQrModalProps) {
+  const theme = CATEGORY_THEMES[category] ?? CATEGORY_THEMES.general;
+
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -50,9 +63,10 @@ export function BrandedQrModal({
       width: 480,
       margin: 1.5,
       color: {
-        dark: "#1e1b4b", // Deep indigo / purple
+        dark: theme.qrDark,
         light: "#ffffff",
       },
+      // "H" keeps the code scannable despite the logo badge covering the centre.
       errorCorrectionLevel: "H",
     })
       .then((url) => {
@@ -61,7 +75,7 @@ export function BrandedQrModal({
       .catch((err) => {
         console.error("QR Code Generation Error:", err);
       });
-  }, [shortUrl]);
+  }, [shortUrl, theme.qrDark]);
 
   async function handleCopyLink() {
     try {
@@ -82,8 +96,9 @@ export function BrandedQrModal({
           text: `${title} — Check it out on CampusLoop!`,
           url: shortUrl,
         });
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
+      } catch (err) {
+        // A user dismissing the share sheet is not a failure worth reporting.
+        if ((err as Error)?.name !== "AbortError") {
           handleCopyLink();
         }
       }
@@ -182,6 +197,9 @@ export function BrandedQrModal({
       ctx.fillText("CampusLoop", logoX + 52, logoY + 18);
       ctx.restore();
 
+      // Vertical baseline for the title; an avatar pushes everything below it down.
+      let titleY = 310;
+
       // 5. Verified Pill Badge
       ctx.save();
       const badgeY = cardY + 200;
@@ -191,18 +209,62 @@ export function BrandedQrModal({
       const badgeW = textWidth + 48;
       const badgeX = cardX + (cardW - badgeW) / 2;
 
-      ctx.fillStyle = "#f5f3ff";
+      ctx.fillStyle = theme.tint;
       ctx.beginPath();
       ctx.roundRect(badgeX, badgeY, badgeW, 42, 21);
       ctx.fill();
-      ctx.strokeStyle = "#ddd6fe";
+      ctx.strokeStyle = theme.border;
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      ctx.fillStyle = "#7c3aed";
+      ctx.fillStyle = theme.accent;
       ctx.textAlign = "center";
       ctx.fillText(badgeTextFull, cardX + cardW / 2, badgeY + 28);
       ctx.restore();
+
+      // 5b. Optional circular avatar (profile shares)
+      if (avatarUrl) {
+        try {
+          const avatarImg = new Image();
+          avatarImg.crossOrigin = "anonymous";
+          avatarImg.src = avatarUrl;
+          await new Promise((resolve, reject) => {
+            avatarImg.onload = resolve;
+            avatarImg.onerror = reject;
+          });
+
+          const avatarSize = 132;
+          const avatarCx = cardX + cardW / 2;
+          const avatarCy = cardY + 300;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(avatarCx, avatarCy, avatarSize / 2, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(
+            avatarImg,
+            avatarCx - avatarSize / 2,
+            avatarCy - avatarSize / 2,
+            avatarSize,
+            avatarSize
+          );
+          ctx.restore();
+
+          // Accent ring around the avatar
+          ctx.save();
+          ctx.strokeStyle = theme.accent;
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.arc(avatarCx, avatarCy, avatarSize / 2 + 3, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+
+          titleY += 110;
+        } catch {
+          // A blocked or CORS-restricted avatar must not sink the whole card.
+        }
+      }
 
       // 6. Title
       ctx.save();
@@ -210,14 +272,14 @@ export function BrandedQrModal({
       ctx.font = "bold 44px Inter, sans-serif";
       ctx.textAlign = "center";
       const truncatedTitle = title.length > 34 ? `${title.slice(0, 32)}...` : title;
-      ctx.fillText(truncatedTitle, cardX + cardW / 2, cardY + 310);
+      ctx.fillText(truncatedTitle, cardX + cardW / 2, cardY + titleY);
 
       // Subtitle
       if (subtitle) {
         ctx.fillStyle = "#64748b";
         ctx.font = "500 26px Inter, sans-serif";
         const truncatedSub = subtitle.length > 50 ? `${subtitle.slice(0, 48)}...` : subtitle;
-        ctx.fillText(truncatedSub, cardX + cardW / 2, cardY + 360);
+        ctx.fillText(truncatedSub, cardX + cardW / 2, cardY + titleY + 50);
       }
       ctx.restore();
 
@@ -231,7 +293,7 @@ export function BrandedQrModal({
 
       const qrSize = 460;
       const qrX = cardX + (cardW - qrSize) / 2;
-      const qrY = cardY + 420;
+      const qrY = cardY + titleY + 110;
 
       // QR Code Container Box with Soft Glow
       ctx.save();
@@ -262,7 +324,7 @@ export function BrandedQrModal({
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      ctx.fillStyle = "#4f46e5";
+      ctx.fillStyle = theme.accent;
       ctx.font = "bold 28px Inter, monospace";
       ctx.textAlign = "center";
       ctx.fillText(displayUrl, cardX + cardW / 2, linkY + 42);
@@ -339,6 +401,17 @@ export function BrandedQrModal({
                 <span>{badgeText}</span>
               </div>
             </div>
+
+            {/* Optional avatar for profile shares */}
+            {avatarUrl && (
+              <div className="flex justify-center pt-4">
+                <img
+                  src={avatarUrl}
+                  alt={title}
+                  className="size-16 rounded-full border-2 border-primary object-cover shadow-md"
+                />
+              </div>
+            )}
 
             {/* Title & Subtitle */}
             <div className="pt-4 pb-3">

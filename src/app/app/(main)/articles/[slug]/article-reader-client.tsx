@@ -2,6 +2,7 @@
 
 import { ArticleCard } from "@/components/articles/article-card";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
+import { MarkdownContent } from "@/components/common/markdown-content";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { haptics } from "@/lib/haptics";
@@ -317,65 +318,8 @@ export function ArticleReaderClient({
         )}
 
         {/* ─── Article Body (Rich Typography) ─── */}
-        <article className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed space-y-5 select-text">
-          {article.content.split("\n\n").map((para, idx) => {
-            if (para.startsWith("# ")) {
-              return (
-                <h1 key={idx} className="text-2xl md:text-3xl font-black text-foreground pt-5 border-b border-border/30 pb-2.5">
-                  {para.replace("# ", "")}
-                </h1>
-              );
-            }
-            if (para.startsWith("## ")) {
-              return (
-                <h2 key={idx} className="text-xl md:text-2xl font-black text-foreground pt-4">
-                  {para.replace("## ", "")}
-                </h2>
-              );
-            }
-            if (para.startsWith("### ")) {
-              return (
-                <h3 key={idx} className="text-lg md:text-xl font-bold text-foreground pt-3">
-                  {para.replace("### ", "")}
-                </h3>
-              );
-            }
-            if (para.startsWith("> ")) {
-              return (
-                <blockquote
-                  key={idx}
-                  className="border-l-4 border-primary pl-4 italic text-foreground/80 my-4 bg-muted/20 py-2 rounded-r-xl"
-                >
-                  {para.replace("> ", "")}
-                </blockquote>
-              );
-            }
-            if (para.startsWith("```")) {
-              return (
-                <pre
-                  key={idx}
-                  className="bg-muted/70 p-4 rounded-2xl text-xs md:text-sm font-mono overflow-x-auto border border-border/40 text-foreground"
-                >
-                  <code>{para.replace(/```/g, "").trim()}</code>
-                </pre>
-              );
-            }
-            if (para.startsWith("- ")) {
-              const items = para.split("\n").map((l) => l.replace(/^- /, ""));
-              return (
-                <ul key={idx} className="list-disc pl-5 space-y-1.5">
-                  {items.map((item, itemIdx) => (
-                    <li key={itemIdx}>{item}</li>
-                  ))}
-                </ul>
-              );
-            }
-            return (
-              <p key={idx} className="text-foreground/90 leading-relaxed">
-                {para}
-              </p>
-            );
-          })}
+        <article className="select-text text-base leading-relaxed">
+          <MarkdownContent content={article.content} />
         </article>
 
         {/* ─── Tags List ─── */}

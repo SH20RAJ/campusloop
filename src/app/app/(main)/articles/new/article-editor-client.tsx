@@ -1,9 +1,11 @@
 "use client";
 
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
+import { MarkdownContent } from "@/components/common/markdown-content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { haptics } from "@/lib/haptics";
+import { uploadImageToImgBB } from "@/lib/upload";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import confetti from "canvas-confetti";
@@ -22,6 +24,7 @@ import {
   Link as LinkIcon,
   List,
   ListOrdered,
+  Loader2,
   Minus,
   PenTool,
   Quote,
@@ -29,6 +32,7 @@ import {
   Send,
   Sparkles,
   Strikethrough,
+  Upload,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -95,6 +99,10 @@ export function ArticleEditorClient({
   const [showQrModal, setShowQrModal] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const inlineImageInputRef = useRef<HTMLInputElement | null>(null);
+  const coverImageInputRef = useRef<HTMLInputElement | null>(null);
+  const [isUploadingInline, setIsUploadingInline] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
 
   // Restore draft from localStorage if creating new
   useEffect(() => {
@@ -147,6 +155,48 @@ export function ArticleEditorClient({
         start + prefix.length + (selected.length || 4)
       );
     }, 0);
+  }
+
+  /** Uploads a file and drops a markdown image tag at the caret. */
+  async function handleInlineImageUpload(file: File) {
+    if (!file) return;
+    setIsUploadingInline(true);
+    haptics.light();
+    const toastId = toast.loading("Uploading image...");
+    try {
+      const { displayUrl } = await uploadImageToImgBB(file);
+      const textarea = textareaRef.current;
+      const snippet = `\n\n![${file.name.replace(/\.[^.]+$/, "")}](${displayUrl})\n\n`;
+      if (textarea) {
+        const start = textarea.selectionStart;
+        setContent(content.substring(0, start) + snippet + content.substring(textarea.selectionEnd));
+      } else {
+        setContent(`${content}${snippet}`);
+      }
+      toast.success("Image added to your article", { id: toastId });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Image upload failed", { id: toastId });
+    } finally {
+      setIsUploadingInline(false);
+      if (inlineImageInputRef.current) inlineImageInputRef.current.value = "";
+    }
+  }
+
+  async function handleCoverUpload(file: File) {
+    if (!file) return;
+    setIsUploadingCover(true);
+    haptics.light();
+    const toastId = toast.loading("Uploading cover...");
+    try {
+      const { displayUrl } = await uploadImageToImgBB(file);
+      setCoverImageUrl(displayUrl);
+      toast.success("Cover image set", { id: toastId });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cover upload failed", { id: toastId });
+    } finally {
+      setIsUploadingCover(false);
+      if (coverImageInputRef.current) coverImageInputRef.current.value = "";
+    }
   }
 
   function handleAddTag(e?: React.FormEvent) {
@@ -352,12 +402,37 @@ export function ArticleEditorClient({
                   </button>
                 )}
               </div>
-              <Input
-                placeholder="Paste image link (e.g. https://images.unsplash.com/...)"
-                value={coverImageUrl}
-                onChange={(e) => setCoverImageUrl(e.target.value)}
-                className="rounded-xl text-xs h-9 bg-background"
-              />
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Paste image link, or upload →"
+                  value={coverImageUrl}
+                  onChange={(e) => setCoverImageUrl(e.target.value)}
+                  className="rounded-xl text-xs h-9 bg-background"
+                />
+                <button
+                  type="button"
+                  disabled={isUploadingCover}
+                  onClick={() => coverImageInputRef.current?.click()}
+                  className="shrink-0 flex items-center gap-1.5 px-3 rounded-xl bg-primary text-primary-foreground text-xs font-black cursor-pointer hover:opacity-90 active:scale-95 transition-opacity disabled:opacity-60"
+                >
+                  {isUploadingCover ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Upload className="size-3.5" />
+                  )}
+                  <span className="hidden sm:inline">Upload</span>
+                </button>
+                <input
+                  ref={coverImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void handleCoverUpload(file);
+                  }}
+                />
+              </div>
               {coverImageUrl && (
                 <div className="aspect-[21/9] w-full overflow-hidden rounded-xl bg-muted/40 border border-border/40 mt-2">
                   <img
@@ -558,11 +633,35 @@ export function ArticleEditorClient({
               <button
                 type="button"
                 onClick={() => insertFormatting("![Image Alt](", ")")}
-                title="Insert Image"
+                title="Insert image by URL"
                 className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
                 <ImageIcon className="size-4" />
               </button>
+              <button
+                type="button"
+                disabled={isUploadingInline}
+                onClick={() => inlineImageInputRef.current?.click()}
+                title="Upload an image"
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg hover:bg-primary/10 text-primary font-black text-xs transition-colors cursor-pointer active:scale-95 disabled:opacity-60"
+              >
+                {isUploadingInline ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Upload className="size-4" />
+                )}
+                <span className="hidden sm:inline">Upload</span>
+              </button>
+              <input
+                ref={inlineImageInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void handleInlineImageUpload(file);
+                }}
+              />
               <button
                 type="button"
                 onClick={() => insertFormatting("\n---\n")}
@@ -611,57 +710,8 @@ export function ArticleEditorClient({
               )}
             </div>
 
-            {/* Article Content Rendered */}
-            <div className="prose prose-neutral dark:prose-invert max-w-none space-y-4 text-sm leading-relaxed">
-              {content.split("\n\n").map((para, idx) => {
-                if (para.startsWith("# ")) {
-                  return (
-                    <h1 key={idx} className="text-2xl font-black text-foreground pt-4 border-b border-border/30 pb-2">
-                      {para.replace("# ", "")}
-                    </h1>
-                  );
-                }
-                if (para.startsWith("## ")) {
-                  return (
-                    <h2 key={idx} className="text-xl font-black text-foreground pt-3">
-                      {para.replace("## ", "")}
-                    </h2>
-                  );
-                }
-                if (para.startsWith("### ")) {
-                  return (
-                    <h3 key={idx} className="text-lg font-bold text-foreground pt-2">
-                      {para.replace("### ", "")}
-                    </h3>
-                  );
-                }
-                if (para.startsWith("> ")) {
-                  return (
-                    <blockquote
-                      key={idx}
-                      className="border-l-4 border-primary pl-4 italic text-muted-foreground my-3"
-                    >
-                      {para.replace("> ", "")}
-                    </blockquote>
-                  );
-                }
-                if (para.startsWith("```")) {
-                  return (
-                    <pre
-                      key={idx}
-                      className="bg-muted/60 p-4 rounded-xl text-xs font-mono overflow-x-auto border border-border/40"
-                    >
-                      <code>{para.replace(/```/g, "").trim()}</code>
-                    </pre>
-                  );
-                }
-                return (
-                  <p key={idx} className="text-foreground/90 whitespace-pre-wrap">
-                    {para}
-                  </p>
-                );
-              })}
-            </div>
+            {/* Article Content Rendered — same renderer the published page uses */}
+            <MarkdownContent content={content} />
           </div>
         )}
       </div>

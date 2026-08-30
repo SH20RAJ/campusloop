@@ -185,6 +185,7 @@ export async function POST(req: Request) {
       prizesDescription,
       perks = ["Certificates", "Prizes", "Loop Points"],
       loopPointsReward = 30,
+      status = "PUBLISHED",
     } = body;
 
     if (!title || !description || !clubName || !startDate || !endDate) {
@@ -193,6 +194,31 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      return NextResponse.json({ error: "Start and end dates must be valid" }, { status: 400 });
+    }
+
+    if (end <= start) {
+      return NextResponse.json(
+        { error: "The event end time must be after its start time" },
+        { status: 400 }
+      );
+    }
+
+    const deadline = registrationDeadline ? new Date(registrationDeadline) : null;
+    if (deadline && !Number.isNaN(deadline.getTime()) && deadline > start) {
+      return NextResponse.json(
+        { error: "Registrations must close on or before the event starts" },
+        { status: 400 }
+      );
+    }
+
+    // Only organiser-selectable states; COMPLETED/CANCELLED are lifecycle-driven.
+    const safeStatus = status === "DRAFT" ? "DRAFT" : "PUBLISHED";
 
     const eventId = `event_${nanoid(12)}`;
     const baseSlug = title
@@ -216,9 +242,9 @@ export async function POST(req: Request) {
       mode,
       venue: venue?.trim() || null,
       meetingUrl: meetingUrl?.trim() || null,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
-      registrationDeadline: registrationDeadline ? new Date(registrationDeadline) : null,
+      startDate: start,
+      endDate: end,
+      registrationDeadline: deadline && !Number.isNaN(deadline.getTime()) ? deadline : null,
       participationType,
       minTeamSize: Number(minTeamSize) || 1,
       maxTeamSize: Number(maxTeamSize) || 4,
@@ -228,7 +254,7 @@ export async function POST(req: Request) {
       prizesDescription: prizesDescription?.trim() || null,
       perks: Array.isArray(perks) ? perks : ["Certificates", "Prizes", "Loop Points"],
       loopPointsReward: Number(loopPointsReward) || 30,
-      status: "PUBLISHED",
+      status: safeStatus,
     };
 
     await db.insert(events).values(newEvent);

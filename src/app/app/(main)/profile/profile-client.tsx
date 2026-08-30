@@ -24,7 +24,6 @@ import {
   Trash2,
   TrendingUp,
   Trophy,
-  Upload,
   VenetianMask,
   X,
 } from "lucide-react";
@@ -1106,10 +1105,10 @@ export function ProfileClientView({
                       setShowAvatarMenu(false);
                       pfpInputRef.current?.click();
                     }}
-                    className="w-full py-2.5 px-3.5 rounded-2xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-2.5 cursor-pointer transition-colors shadow-xs"
+                    className="w-full py-2.5 px-3.5 rounded-2xl bg-primary text-primary-foreground text-xs font-black flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs hover:opacity-90 active:scale-95"
                   >
-                    <Upload className="size-4" />
-                    <span>Upload &amp; Crop New Photo</span>
+                    <Camera className="size-4" />
+                    <span>Upload Real Photo (+50 LP)</span>
                   </button>
 
                   <button
@@ -1122,14 +1121,13 @@ export function ProfileClientView({
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ avatarUrl: newAvatar }),
                       });
-                      toast.success("Generated new avatar!");
+                      toast.info("Illustration set. Profiles with real photos get 3x more campus matches!");
                       setShowAvatarMenu(false);
                       router.refresh();
                     }}
-                    className="w-full py-2.5 px-3.5 rounded-2xl border border-border/80 bg-muted/20 hover:bg-muted/50 text-xs font-bold text-foreground flex items-center gap-2.5 cursor-pointer transition-colors"
+                    className="w-full py-2 px-3.5 rounded-2xl border border-border/60 text-muted-foreground hover:text-foreground text-[11px] font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors opacity-70 hover:opacity-100"
                   >
-                    <Flame className="size-4 text-amber-500" />
-                    <span>Generate Random Avatar</span>
+                    <span>Use Cartoon Illustration (Lower Reach)</span>
                   </button>
                 </>
               )}

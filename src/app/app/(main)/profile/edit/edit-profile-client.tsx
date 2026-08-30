@@ -13,7 +13,7 @@ import {
   Plus,
   Save,
   ShieldCheck,
-  Upload,
+  Sparkles,
   User,
   VenetianMask,
   X,
@@ -372,34 +372,61 @@ export function EditProfileClient() {
               )}
             </div>
 
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2 sm:pt-8">
-              <button
-                type="button"
-                onClick={() => pfpInputRef.current?.click()}
-                className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
-              >
-                <Upload className="size-3.5 text-primary" />
-                <span>Upload Avatar</span>
-              </button>
+            <div className="space-y-2 pt-2 sm:pt-4 flex-1">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xs font-bold text-foreground">Profile Avatar</h3>
+                  {avatarUrl && !avatarUrl.includes("dicebear.com") ? (
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                      📸 Real Photo Verified (+50 LP)
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                      🎁 Upload real photo for 3x boost
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  {avatarUrl && !avatarUrl.includes("dicebear.com")
+                    ? "Your verified photo is active on Campus Match, Study Pods & feeds."
+                    : "Profiles with authentic campus photos receive 3x more friend connections & dating matches."}
+                </p>
+              </div>
 
-              {avatarUrl && (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={() => handleOpenCropForCurrent("avatar")}
-                  className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                  onClick={() => pfpInputRef.current?.click()}
+                  className="py-1.5 px-3.5 rounded-xl bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
                 >
-                  <Move className="size-3.5 text-primary" />
-                  <span>Resize & Crop</span>
+                  <Camera className="size-3.5 stroke-[2.5]" />
+                  <span>
+                    {avatarUrl && !avatarUrl.includes("dicebear.com")
+                      ? "Change Real Photo"
+                      : "Upload Real Photo (+50 LP)"}
+                  </span>
                 </button>
-              )}
 
-              <button
-                type="button"
-                onClick={handleGenerateDiceBearAvatar}
-                className="py-1.5 px-3 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <Zap className="size-3.5" /> Randomize
-              </button>
+                {avatarUrl && (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenCropForCurrent("avatar")}
+                    className="py-1.5 px-3 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-muted transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                  >
+                    <Move className="size-3.5 text-primary" />
+                    <span>Resize & Crop</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleGenerateDiceBearAvatar}
+                  className="py-1.5 px-2.5 rounded-xl border border-border/50 text-muted-foreground hover:text-foreground text-[11px] font-semibold hover:bg-muted/40 transition-all cursor-pointer flex items-center gap-1 opacity-70 hover:opacity-100"
+                  title="Use cartoon illustration (reduces match reach)"
+                >
+                  <Sparkles className="size-3" /> Cartoon Illustration
+                </button>
+              </div>
             </div>
           </div>
         </div>

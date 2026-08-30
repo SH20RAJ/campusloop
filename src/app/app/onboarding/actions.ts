@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { institutionDomains, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { getAvatarUrl } from "@/lib/utils";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
 import { getViewerInstitutionId } from "@/lib/viewer";
 
@@ -117,8 +118,7 @@ export async function completeOnboarding(formData: FormData) {
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 
-  const cleanAvatarUrl =
-    avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
+  const cleanAvatarUrl = avatarUrl || getAvatarUrl(null, username, displayName);
 
   // Only aspirants carry a stage; for students the branch and year say it.
   const headline =

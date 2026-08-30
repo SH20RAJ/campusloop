@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Check, Loader2, Lock, School, Search, Sparkles, Upload } from "lucide-react";
+import { AlertCircle, Camera, Check, Loader2, Lock, School, Search, Sparkles } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,7 +10,7 @@ import { DEGREE_CATEGORIES, getBranchOptionsForDegree } from "@/constants";
 import { useColleges } from "@/hooks/use-colleges";
 import { useUsernameAvailability } from "@/hooks/use-username-availability";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { cn } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
 import { completeOnboarding } from "./actions";
 
@@ -198,9 +198,12 @@ export function OnboardingForm({
     }
   }
 
+  const [showIllustrationOption, setShowIllustrationOption] = useState(false);
+
   function handleGenerateAvatar() {
     const seed = username.trim() || displayName.trim() || String(Date.now());
     setAvatarUrl(`https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`);
+    toast.info("Illustration set. Real student photos get 3x higher campus visibility!");
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -239,9 +242,8 @@ export function OnboardingForm({
     }
   }
 
-  const currentAvatar =
-    avatarUrl ||
-    (username ? `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}` : "");
+  const isRealPhoto = Boolean(avatarUrl && !avatarUrl.includes("dicebear.com"));
+  const currentAvatar = avatarUrl || getAvatarUrl(null, username, displayName);
 
   const submitDisabled =
     isLoading ||
@@ -260,41 +262,106 @@ export function OnboardingForm({
         onChange={handlePfpUpload}
       />
 
-      {/* ─── Photo ─── */}
-      <section className="flex items-center gap-4 py-6">
-        <Avatar className="size-20 border border-border/60">
-          <AvatarImage src={currentAvatar} />
-          <AvatarFallback className="bg-muted text-xl font-black text-muted-foreground">
-            {displayName ? displayName[0].toUpperCase() : "U"}
-          </AvatarFallback>
-        </Avatar>
+      {/* ─── Photo Section with Psychology Incentive ─── */}
+      <section className="space-y-3 py-6 border-b border-border/40">
+        <div className="flex items-start gap-4">
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="relative group cursor-pointer shrink-0"
+          >
+            <Avatar className="size-20 border-2 border-primary/30 shadow-md group-hover:border-primary transition-all">
+              <AvatarImage src={currentAvatar} className="object-cover" />
+              <AvatarFallback className="bg-primary/10 text-xl font-black text-primary">
+                {displayName ? displayName[0].toUpperCase() : "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+              <Camera className="size-5" />
+            </div>
+          </div>
 
-        <div className="min-w-0 space-y-2">
-          <p className="text-[13px] font-bold text-foreground">Profile photo</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              disabled={isUploadingPfp}
-              onClick={() => fileInputRef.current?.click()}
-              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border/60 px-3.5 py-1.5 text-xs font-bold text-foreground transition-colors hover:bg-muted/50 disabled:opacity-60"
-            >
-              {isUploadingPfp ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <Upload className="size-3.5" />
-              )}
-              Upload
-            </button>
-            <button
-              type="button"
-              onClick={handleGenerateAvatar}
-              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border/60 px-3.5 py-1.5 text-xs font-bold text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Sparkles className="size-3.5" />
-              Generate
-            </button>
+          <div className="min-w-0 space-y-2 flex-1">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[13px] font-bold text-foreground flex items-center gap-1.5">
+                <span>Profile Photo</span>
+                {isRealPhoto ? (
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                    <Check className="size-2.5" /> Real Photo Verified (+50 LP)
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                    🎁 +50 LP Clout Reward
+                  </span>
+                )}
+              </p>
+            </div>
+
+            {/* Primary Action Button */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                disabled={isUploadingPfp}
+                onClick={() => fileInputRef.current?.click()}
+                className="flex cursor-pointer items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-black text-primary-foreground shadow-xs hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
+              >
+                {isUploadingPfp ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <Camera className="size-3.5 stroke-[2.5]" />
+                )}
+                <span>{isRealPhoto ? "Change Real Photo" : "Upload Real Photo (+50 LP)"}</span>
+              </button>
+            </div>
+
+            {/* Social Proof & Psychology Text */}
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              {isRealPhoto
+                ? "✨ Great photo! Your profile will be boosted across campus dating, study pods & college feeds."
+                : "💡 Verified profiles with real photos get 3x more friend connections, dating matches, and instant trust on campus."}
+            </p>
           </div>
         </div>
+
+        {/* Discreet / Harder to choose illustration option */}
+        {!isRealPhoto && (
+          <div className="pt-1">
+            {!showIllustrationOption ? (
+              <button
+                type="button"
+                onClick={() => setShowIllustrationOption(true)}
+                className="text-[11px] font-semibold text-muted-foreground/60 hover:text-muted-foreground transition-colors cursor-pointer"
+              >
+                Need a temporary illustration instead? ▾
+              </button>
+            ) : (
+              <div className="p-3 rounded-2xl bg-muted/20 border border-border/50 space-y-2 animate-in fade-in duration-150">
+                <div className="flex items-start gap-2 text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+                  <AlertCircle className="size-3.5 shrink-0 mt-0.5" />
+                  <span>
+                    Note: Illustrated avatars receive 60% fewer matches and do not unlock the 50 LP verified
+                    clout reward.
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleGenerateAvatar}
+                    className="px-3 py-1 rounded-full border border-border/70 bg-card text-[11px] font-bold text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <Sparkles className="size-3 inline mr-1" /> Use Cartoon Avatar Anyway
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowIllustrationOption(false)}
+                    className="text-[11px] text-muted-foreground hover:underline cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ─── Identity ─── */}

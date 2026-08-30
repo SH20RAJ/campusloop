@@ -57,9 +57,9 @@ export function SettingsClient({ profile }: SettingsClientProps) {
   const currentAvatar = getAvatarUrl(avatarUrl, profile.username);
 
   function handleResetToDefaultAvatar() {
-    const defaultSvg = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(profile.username)}`;
+    const defaultSvg = getAvatarUrl(null, profile.username, profile.displayName);
     setAvatarUrl(defaultSvg);
-    toast.success("Avatar reset to personalized DiceBear SVG!");
+    toast.success("Avatar reset to clean monogram initial DP!");
   }
 
   async function handleFeedVisibilityChange(mode: "ALL" | "NON_ANONYMOUS") {
@@ -168,7 +168,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                 onClick={handleResetToDefaultAvatar}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/80 bg-muted/50 hover:bg-muted text-xs font-semibold text-foreground transition-all cursor-pointer shadow-xs active:scale-95"
               >
-                <RotateCcw className="h-3.5 w-3.5 text-primary" /> Reset to DiceBear SVG DP
+                <RotateCcw className="h-3.5 w-3.5 text-primary" /> Reset to Monogram Initial DP
               </button>
             </div>
           </div>

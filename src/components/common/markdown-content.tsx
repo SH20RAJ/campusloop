@@ -1,5 +1,6 @@
 "use client";
 
+import { CodeBlock } from "./code-block";
 import { cn } from "@/lib/utils";
 import React from "react";
 
@@ -164,17 +165,12 @@ export function MarkdownContent({ content, className, compact = false }: Markdow
       }
       index++; // consume the closing fence
       blocks.push(
-        <pre
+        <CodeBlock
           key={key++}
-          className="overflow-x-auto rounded-2xl border border-border/40 bg-muted/60 p-4 text-xs md:text-sm"
-        >
-          {language && (
-            <span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-              {language}
-            </span>
-          )}
-          <code className="font-mono text-foreground">{body.join("\n")}</code>
-        </pre>
+          code={body.join("\n")}
+          language={language || "typescript"}
+          showLineNumbers={!compact}
+        />
       );
       continue;
     }

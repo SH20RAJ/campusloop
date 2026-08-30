@@ -1,6 +1,7 @@
 "use client";
 
 import { ArticleCard } from "@/components/articles/article-card";
+import { ArticleCommentsSection } from "@/components/articles/article-comments-section";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { MarkdownContent } from "@/components/common/markdown-content";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -372,6 +373,12 @@ export function ArticleReaderClient({
             </p>
           )}
         </div>
+
+        {/* ─── Threaded Article Comments Section ─── */}
+        <ArticleCommentsSection
+          articleSlug={article.slug}
+          currentProfile={currentProfile}
+        />
 
         {/* ─── Related Articles ─── */}
         {relatedArticles.length > 0 && (

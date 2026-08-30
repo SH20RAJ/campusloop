@@ -53,7 +53,38 @@ export const articleVotes = pgTable("article_votes", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const articleComments = pgTable("article_comments", {
+  id: text("id").primaryKey(),
+  articleId: text("article_id")
+    .notNull()
+    .references(() => articles.id, { onDelete: "cascade" }),
+  authorId: text("author_id")
+    .notNull()
+    .references(() => userProfiles.id, { onDelete: "cascade" }),
+  parentId: text("parent_id"), // For threaded nested replies
+  body: text("body").notNull(),
+  upvotesCount: integer("upvotes_count").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const articleCommentVotes = pgTable("article_comment_votes", {
+  id: text("id").primaryKey(),
+  commentId: text("comment_id")
+    .notNull()
+    .references(() => articleComments.id, { onDelete: "cascade" }),
+  profileId: text("profile_id")
+    .notNull()
+    .references(() => userProfiles.id, { onDelete: "cascade" }),
+  value: integer("value").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export type Article = typeof articles.$inferSelect;
 export type NewArticle = typeof articles.$inferInsert;
 export type ArticleVote = typeof articleVotes.$inferSelect;
 export type NewArticleVote = typeof articleVotes.$inferInsert;
+export type ArticleComment = typeof articleComments.$inferSelect;
+export type NewArticleComment = typeof articleComments.$inferInsert;
+export type ArticleCommentVote = typeof articleCommentVotes.$inferSelect;
+export type NewArticleCommentVote = typeof articleCommentVotes.$inferInsert;

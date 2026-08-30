@@ -14,18 +14,16 @@ import QRCode from "qrcode";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-
 /**
- * Per-surface accent, so an event card, a profile card and an article card are
- * recognisably different at a glance while staying on the CampusLoop palette.
+ * Per-surface accent themes
  */
 const CATEGORY_THEMES = {
-  event: { qrDark: "#1e1b4b", accent: "#7c3aed", tint: "#f5f3ff", border: "#ddd6fe" },
+  event: { qrDark: "#1e1b4b", accent: "#2563eb", tint: "#eff6ff", border: "#bfdbfe" },
   profile: { qrDark: "#172554", accent: "#2563eb", tint: "#eff6ff", border: "#bfdbfe" },
-  article: { qrDark: "#3b0764", accent: "#9333ea", tint: "#faf5ff", border: "#e9d5ff" },
+  article: { qrDark: "#1e1b4b", accent: "#2563eb", tint: "#eff6ff", border: "#bfdbfe" },
   community: { qrDark: "#042f2e", accent: "#0d9488", tint: "#f0fdfa", border: "#99f6e4" },
   store: { qrDark: "#451a03", accent: "#d97706", tint: "#fffbeb", border: "#fde68a" },
-  general: { qrDark: "#1e1b4b", accent: "#6366f1", tint: "#eef2ff", border: "#c7d2fe" },
+  general: { qrDark: "#1e1b4b", accent: "#2563eb", tint: "#eff6ff", border: "#bfdbfe" },
 } as const;
 
 export interface BrandedQrModalProps {
@@ -49,40 +47,34 @@ export function BrandedQrModal({
   category = "general",
   avatarUrl,
 }: BrandedQrModalProps) {
-  const theme = CATEGORY_THEMES[category] ?? CATEGORY_THEMES.general;
-
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const cardRef = useRef<HTMLDivElement | null>(null);
 
-  // Generate QR code whenever shortUrl changes
+  const theme = CATEGORY_THEMES[category] || CATEGORY_THEMES.general;
+
+  // Generate crisp QR code data URL
   useEffect(() => {
-    if (!shortUrl) return;
+    if (!isOpen || !shortUrl) return;
 
     QRCode.toDataURL(shortUrl, {
-      width: 480,
-      margin: 1.5,
+      width: 600,
+      margin: 2,
       color: {
         dark: theme.qrDark,
-        light: "#ffffff",
+        light: "#FFFFFF",
       },
-      // "H" keeps the code scannable despite the logo badge covering the centre.
       errorCorrectionLevel: "H",
     })
-      .then((url) => {
-        setQrDataUrl(url);
-      })
-      .catch((err) => {
-        console.error("QR Code Generation Error:", err);
-      });
-  }, [shortUrl, theme.qrDark]);
+      .then((url) => setQrDataUrl(url))
+      .catch((err) => console.error("QR Code Error:", err));
+  }, [isOpen, shortUrl, theme.qrDark]);
 
   async function handleCopyLink() {
     try {
       await navigator.clipboard.writeText(shortUrl);
       setCopied(true);
-      toast.success("Short link copied to clipboard! 📋");
+      toast.success("Short link copied! 📋");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error("Failed to copy link");
@@ -94,22 +86,19 @@ export function BrandedQrModal({
       try {
         await navigator.share({
           title,
-          text: `${title} — Check it out on CampusLoop!`,
+          text: subtitle || `Check out ${title} on CampusLoop!`,
           url: shortUrl,
         });
-      } catch (err) {
-        // A user dismissing the share sheet is not a failure worth reporting.
-        if ((err as Error)?.name !== "AbortError") {
-          handleCopyLink();
-        }
+      } catch {
+        // User cancelled share
       }
     } else {
-      handleCopyLink();
+      void handleCopyLink();
     }
   }
 
   /**
-   * Generates a high-res, styled PNG card matching og-image.png design system
+   * Generates a pixel-perfect 1200 x 1440 image matching the template
    */
   async function handleDownloadCard() {
     if (!qrDataUrl) return;
@@ -120,34 +109,34 @@ export function BrandedQrModal({
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas context unavailable");
 
-      // High-res canvas dimensions (1200 x 1400)
+      // High-res canvas dimensions (1200 x 1440)
       const width = 1200;
-      const height = 1400;
+      const height = 1440;
       canvas.width = width;
       canvas.height = height;
 
-      // 1. Background Gradient (Soft modern violet / indigo gradient)
+      // 1. Outer Soft Gradient Background
       const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-      bgGrad.addColorStop(0, "#f8fafc");
-      bgGrad.addColorStop(0.5, "#f1f5f9");
-      bgGrad.addColorStop(1, "#ede9fe");
+      bgGrad.addColorStop(0, "#ece5ff");
+      bgGrad.addColorStop(0.5, "#e9e3fe");
+      bgGrad.addColorStop(1, "#ddf1ff");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Corner Ambient Aura Blobs
-      const radGrad1 = ctx.createRadialGradient(100, 100, 10, 100, 100, 450);
-      radGrad1.addColorStop(0, "rgba(168, 85, 247, 0.25)");
-      radGrad1.addColorStop(1, "rgba(168, 85, 247, 0)");
+      // Subtle ambient corner glow blobs
+      const radGrad1 = ctx.createRadialGradient(150, 150, 20, 150, 150, 500);
+      radGrad1.addColorStop(0, "rgba(192, 132, 252, 0.35)");
+      radGrad1.addColorStop(1, "rgba(192, 132, 252, 0)");
       ctx.fillStyle = radGrad1;
       ctx.fillRect(0, 0, width, height);
 
-      const radGrad2 = ctx.createRadialGradient(width - 100, height - 100, 10, width - 100, height - 100, 500);
-      radGrad2.addColorStop(0, "rgba(99, 102, 241, 0.22)");
-      radGrad2.addColorStop(1, "rgba(99, 102, 241, 0)");
+      const radGrad2 = ctx.createRadialGradient(width - 150, height - 150, 20, width - 150, height - 150, 550);
+      radGrad2.addColorStop(0, "rgba(125, 211, 252, 0.35)");
+      radGrad2.addColorStop(1, "rgba(125, 211, 252, 0)");
       ctx.fillStyle = radGrad2;
       ctx.fillRect(0, 0, width, height);
 
-      // 3. Central Card Container (Glassmorphic white card)
+      // 2. Central Floating White Card
       const cardX = 90;
       const cardY = 80;
       const cardW = width - 180;
@@ -155,9 +144,9 @@ export function BrandedQrModal({
       const radius = 48;
 
       ctx.save();
-      ctx.shadowColor = "rgba(79, 70, 229, 0.15)";
-      ctx.shadowBlur = 40;
-      ctx.shadowOffsetY = 20;
+      ctx.shadowColor = "rgba(99, 102, 241, 0.14)";
+      ctx.shadowBlur = 48;
+      ctx.shadowOffsetY = 24;
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
       ctx.roundRect(cardX, cardY, cardW, cardH, radius);
@@ -165,65 +154,67 @@ export function BrandedQrModal({
       ctx.restore();
 
       // Card Border
-      ctx.strokeStyle = "rgba(226, 232, 240, 0.8)";
+      ctx.strokeStyle = "rgba(226, 232, 240, 0.9)";
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // 4. Header: CampusLoop Violet Logo + Brand Name
+      // 3. Header: CampusLoop Violet Logo + Brand Name
       ctx.save();
-      // Draw gradient 'C' logo circle
-      const logoX = cardX + cardW / 2 - 130;
-      const logoY = cardY + 110;
-      const logoGrad = ctx.createLinearGradient(logoX - 35, logoY - 35, logoX + 35, logoY + 35);
-      logoGrad.addColorStop(0, "#8b5cf6");
-      logoGrad.addColorStop(1, "#6366f1");
+      const brandY = cardY + 115;
+      const brandLogoX = cardX + cardW / 2 - 170;
+
+      // Draw Gradient Crescent Moon Logo Circle
+      const logoGrad = ctx.createLinearGradient(brandLogoX - 32, brandY - 32, brandLogoX + 32, brandY + 32);
+      logoGrad.addColorStop(0, "#7c3aed");
+      logoGrad.addColorStop(1, "#3b82f6");
 
       ctx.fillStyle = logoGrad;
       ctx.beginPath();
-      ctx.arc(logoX, logoY, 36, 0, Math.PI * 2);
+      ctx.arc(brandLogoX, brandY, 36, 0, Math.PI * 2);
       ctx.fill();
 
-      // Inner C cutout
+      // Inner white cutout crescent
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
-      ctx.arc(logoX, logoY, 20, 0, Math.PI * 2);
+      ctx.arc(brandLogoX + 10, brandY, 22, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = logoGrad;
-      ctx.fillRect(logoX + 4, logoY - 14, 28, 28);
+      ctx.beginPath();
+      ctx.arc(brandLogoX + 16, brandY, 20, 0, Math.PI * 2);
+      ctx.fill();
 
       // Brand Text
-      ctx.fillStyle = "#09090b";
-      ctx.font = "bold 56px Inter, sans-serif";
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "900 62px Inter, sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText("CampusLoop", logoX + 52, logoY + 18);
+      ctx.fillText("CampusLoop", brandLogoX + 54, brandY + 20);
       ctx.restore();
 
-      // Vertical baseline for the title; an avatar pushes everything below it down.
-      let titleY = 310;
-
-      // 5. Verified Pill Badge
+      // 4. Pill Badge: "✓ VERIFIED STUDENT NETWORK"
       ctx.save();
-      const badgeY = cardY + 200;
+      const badgeY = cardY + 205;
       const badgeTextFull = `✓  ${badgeText.toUpperCase()}`;
-      ctx.font = "bold 20px Inter, sans-serif";
+      ctx.font = "bold 22px Inter, sans-serif";
       const textWidth = ctx.measureText(badgeTextFull).width;
-      const badgeW = textWidth + 48;
+      const badgeW = textWidth + 56;
       const badgeX = cardX + (cardW - badgeW) / 2;
 
-      ctx.fillStyle = theme.tint;
+      ctx.fillStyle = "#eff6ff";
       ctx.beginPath();
-      ctx.roundRect(badgeX, badgeY, badgeW, 42, 21);
+      ctx.roundRect(badgeX, badgeY, badgeW, 46, 23);
       ctx.fill();
-      ctx.strokeStyle = theme.border;
+      ctx.strokeStyle = "#bfdbfe";
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      ctx.fillStyle = theme.accent;
+      ctx.fillStyle = "#2563eb";
       ctx.textAlign = "center";
-      ctx.fillText(badgeTextFull, cardX + cardW / 2, badgeY + 28);
+      ctx.fillText(badgeTextFull, cardX + cardW / 2, badgeY + 31);
       ctx.restore();
 
-      // 5b. Optional circular avatar (profile shares)
+      let dynamicY = badgeY + 80;
+
+      // 5. Optional Circular Avatar
       if (avatarUrl) {
         try {
           const avatarImg = new Image();
@@ -234,10 +225,22 @@ export function BrandedQrModal({
             avatarImg.onerror = reject;
           });
 
-          const avatarSize = 132;
+          const avatarSize = 136;
           const avatarCx = cardX + cardW / 2;
-          const avatarCy = cardY + 300;
+          const avatarCy = dynamicY + avatarSize / 2 + 10;
 
+          // Shadow under avatar
+          ctx.save();
+          ctx.shadowColor = "rgba(37, 99, 235, 0.2)";
+          ctx.shadowBlur = 20;
+          ctx.shadowOffsetY = 8;
+          ctx.beginPath();
+          ctx.arc(avatarCx, avatarCy, avatarSize / 2, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+          ctx.restore();
+
+          // Clip avatar image
           ctx.save();
           ctx.beginPath();
           ctx.arc(avatarCx, avatarCy, avatarSize / 2, 0, Math.PI * 2);
@@ -252,39 +255,44 @@ export function BrandedQrModal({
           );
           ctx.restore();
 
-          // Accent ring around the avatar
+          // Border ring around avatar
           ctx.save();
-          ctx.strokeStyle = theme.accent;
-          ctx.lineWidth = 6;
+          ctx.strokeStyle = "#3b82f6";
+          ctx.lineWidth = 4;
           ctx.beginPath();
-          ctx.arc(avatarCx, avatarCy, avatarSize / 2 + 3, 0, Math.PI * 2);
+          ctx.arc(avatarCx, avatarCy, avatarSize / 2 + 2, 0, Math.PI * 2);
           ctx.stroke();
           ctx.restore();
 
-          titleY += 110;
+          dynamicY += avatarSize + 30;
         } catch {
-          // A blocked or CORS-restricted avatar must not sink the whole card.
+          dynamicY += 20;
         }
+      } else {
+        dynamicY += 30;
       }
 
       // 6. Title
       ctx.save();
-      ctx.fillStyle = "#09090b";
-      ctx.font = "bold 44px Inter, sans-serif";
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "900 48px Inter, sans-serif";
       ctx.textAlign = "center";
-      const truncatedTitle = title.length > 34 ? `${title.slice(0, 32)}...` : title;
-      ctx.fillText(truncatedTitle, cardX + cardW / 2, cardY + titleY);
+      const truncatedTitle = title.length > 32 ? `${title.slice(0, 30)}...` : title;
+      ctx.fillText(truncatedTitle, cardX + cardW / 2, dynamicY);
 
       // Subtitle
       if (subtitle) {
         ctx.fillStyle = "#64748b";
-        ctx.font = "500 26px Inter, sans-serif";
-        const truncatedSub = subtitle.length > 50 ? `${subtitle.slice(0, 48)}...` : subtitle;
-        ctx.fillText(truncatedSub, cardX + cardW / 2, cardY + titleY + 50);
+        ctx.font = "600 25px Inter, sans-serif";
+        const truncatedSub = subtitle.length > 46 ? `${subtitle.slice(0, 44)}...` : subtitle;
+        ctx.fillText(truncatedSub, cardX + cardW / 2, dynamicY + 44);
+        dynamicY += 44;
       }
       ctx.restore();
 
-      // 7. QR Code Image in Center
+      dynamicY += 30;
+
+      // 7. QR Code Container Card in Center
       const qrImg = new Image();
       qrImg.src = qrDataUrl;
       await new Promise((resolve, reject) => {
@@ -292,17 +300,16 @@ export function BrandedQrModal({
         qrImg.onerror = reject;
       });
 
-      const qrSize = 460;
+      const qrSize = 440;
       const qrX = cardX + (cardW - qrSize) / 2;
-      const qrY = cardY + titleY + 110;
+      const qrY = dynamicY + 20;
 
-      // QR Code Container Box with Soft Glow
       ctx.save();
       ctx.fillStyle = "#ffffff";
-      ctx.shadowColor = "rgba(124, 58, 237, 0.12)";
-      ctx.shadowBlur = 30;
+      ctx.shadowColor = "rgba(0, 0, 0, 0.06)";
+      ctx.shadowBlur = 24;
       ctx.beginPath();
-      ctx.roundRect(qrX - 16, qrY - 16, qrSize + 32, qrSize + 32, 28);
+      ctx.roundRect(qrX - 18, qrY - 18, qrSize + 36, qrSize + 36, 32);
       ctx.fill();
       ctx.strokeStyle = "#e2e8f0";
       ctx.lineWidth = 2;
@@ -311,35 +318,36 @@ export function BrandedQrModal({
 
       ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-      // 8. Short Link Display Banner
+      // 8. Short Link Banner Pill
       ctx.save();
-      const linkY = qrY + qrSize + 60;
+      const linkY = qrY + qrSize + 54;
       const displayUrl = shortUrl.replace(/^https?:\/\//, "");
-      ctx.fillStyle = "#f8fafc";
       const linkBoxW = cardW - 120;
       const linkBoxX = cardX + 60;
+
+      ctx.fillStyle = "#eff6ff";
       ctx.beginPath();
-      ctx.roundRect(linkBoxX, linkY, linkBoxW, 64, 16);
+      ctx.roundRect(linkBoxX, linkY, linkBoxW, 64, 20);
       ctx.fill();
-      ctx.strokeStyle = "#e2e8f0";
+      ctx.strokeStyle = "#dbeafe";
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      ctx.fillStyle = theme.accent;
+      ctx.fillStyle = "#2563eb";
       ctx.font = "bold 28px Inter, monospace";
       ctx.textAlign = "center";
       ctx.fillText(displayUrl, cardX + cardW / 2, linkY + 42);
       ctx.restore();
 
-      // 9. Footer Watermark: "Scan with any Camera app • campusloop.space"
+      // 9. Footer Watermark: "📷 Scan with any camera app • campusloop.space"
       ctx.save();
       ctx.fillStyle = "#94a3b8";
-      ctx.font = "bold 20px Inter, sans-serif";
+      ctx.font = "bold 21px Inter, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("📷 Scan with any camera app  •  campusloop.space", cardX + cardW / 2, cardY + cardH - 60);
+      ctx.fillText("📷 Scan with any camera app  •  campusloop.space", cardX + cardW / 2, cardY + cardH - 50);
       ctx.restore();
 
-      // 10. Trigger Download
+      // 10. Export Download File
       const dataUrl = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       const safeSlug = title.toLowerCase().replace(/[^a-z0-9]/g, "-").slice(0, 24);
@@ -362,7 +370,7 @@ export function BrandedQrModal({
         <DialogTitle className="sr-only">{title} QR Code</DialogTitle>
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 pt-4 pb-2">
+        <div className="flex items-center justify-between px-5 pt-4 pb-2 border-b border-border/30">
           <div className="flex items-center gap-2">
             <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <QrCode className="size-4" />
@@ -380,42 +388,41 @@ export function BrandedQrModal({
           </button>
         </div>
 
-        {/* Branded Visual Card Preview (Og-image design system) */}
-        <div className="p-5 pt-1">
+        {/* Branded Visual Card Preview */}
+        <div className="p-5 pt-3">
           <div
-            ref={cardRef}
-            className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-b from-card via-card/90 to-primary/5 p-5 text-center shadow-lg transition-all"
+            className="relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-purple-500/10 via-background to-blue-500/10 p-5 text-center shadow-lg"
           >
             {/* Top Branding Banner */}
-            <div className="flex items-center justify-between pb-3 border-b border-border/30">
+            <div className="flex items-center justify-between pb-3">
               <div className="flex items-center gap-2">
-                <div className="flex size-6 items-center justify-center rounded-md bg-linear-to-br from-primary via-purple-600 to-indigo-600 text-white font-black text-xs shadow-sm">
+                <div className="flex size-7 items-center justify-center rounded-full bg-linear-to-br from-violet-600 to-blue-600 text-white font-black text-xs shadow-sm">
                   C
                 </div>
-                <span className="text-xs font-black tracking-tight text-foreground">
+                <span className="text-sm font-black tracking-tight text-foreground">
                   Campus<span className="text-primary">Loop</span>
                 </span>
               </div>
 
-              <div className="flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
+              <div className="flex items-center gap-1 text-[10px] font-black text-blue-600 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
                 <ShieldCheck className="size-3" />
                 <span>{badgeText}</span>
               </div>
             </div>
 
-            {/* Optional avatar for profile shares */}
+            {/* Optional Avatar */}
             {avatarUrl && (
-              <div className="flex justify-center pt-4">
+              <div className="flex justify-center pt-2">
                 <img
                   src={avatarUrl}
                   alt={title}
-                  className="size-16 rounded-full border-2 border-primary object-cover shadow-md"
+                  className="size-16 rounded-full border-2 border-blue-500 object-cover shadow-md"
                 />
               </div>
             )}
 
             {/* Title & Subtitle */}
-            <div className="pt-4 pb-3">
+            <div className="pt-3 pb-2">
               <h3 className="text-base font-black text-foreground tracking-tight line-clamp-1">
                 {title}
               </h3>
@@ -428,34 +435,33 @@ export function BrandedQrModal({
 
             {/* QR Code Graphic Frame */}
             <div className="my-2 flex justify-center">
-              <div className="relative rounded-2xl bg-white p-3 shadow-inner border border-slate-200">
+              <div className="relative rounded-2xl bg-white p-3 shadow-sm border border-slate-200">
                 {qrDataUrl ? (
                   <img
                     src={qrDataUrl}
                     alt={`${title} QR Code`}
-                    className="size-48 rounded-lg object-contain"
+                    className="size-44 rounded-lg object-contain"
                   />
                 ) : (
-                  <div className="size-48 animate-pulse rounded-lg bg-slate-100 flex items-center justify-center text-xs text-muted-foreground font-bold">
+                  <div className="size-44 animate-pulse rounded-lg bg-slate-100 flex items-center justify-center text-xs text-muted-foreground font-bold">
                     Generating QR...
                   </div>
                 )}
-                {/* Center Badge Watermark */}
-                <div className="absolute inset-0 m-auto flex size-9 items-center justify-center rounded-full bg-linear-to-br from-primary to-indigo-600 shadow-md border-2 border-white pointer-events-none">
-                  <span className="text-white font-black text-xs">C</span>
+                <div className="absolute inset-0 m-auto flex size-8 items-center justify-center rounded-full bg-linear-to-br from-violet-600 to-blue-600 shadow-md border-2 border-white pointer-events-none">
+                  <span className="text-white font-black text-[10px]">C</span>
                 </div>
               </div>
             </div>
 
             {/* Short Link Display Pill */}
-            <div className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-muted/60 px-3 py-2 border border-border/40">
-              <span className="text-xs font-bold text-foreground font-mono truncate max-w-[240px]">
+            <div className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-blue-50/90 dark:bg-blue-950/40 px-3 py-2 border border-blue-200 dark:border-blue-800">
+              <span className="text-xs font-black text-blue-600 dark:text-blue-400 font-mono truncate max-w-[240px]">
                 {shortUrl.replace(/^https?:\/\//, "")}
               </span>
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                className="text-blue-600 dark:text-blue-400 hover:opacity-80 transition-opacity cursor-pointer"
                 title="Copy short link"
               >
                 {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
@@ -463,8 +469,8 @@ export function BrandedQrModal({
             </div>
 
             {/* Card Footer Microcopy */}
-            <p className="mt-2 text-[10px] text-muted-foreground/70 font-medium">
-              Scan with any phone camera • Verified on CampusLoop
+            <p className="mt-2 text-[10px] text-muted-foreground/80 font-medium">
+              📷 Scan with any camera app • campusloop.space
             </p>
           </div>
 
@@ -495,7 +501,7 @@ export function BrandedQrModal({
               className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-xs font-bold text-foreground transition-all cursor-pointer active:scale-95 shadow-xs"
             >
               <Share2 className="size-3.5" />
-              <span>Share App</span>
+              <span>Share</span>
             </button>
           </div>
         </div>

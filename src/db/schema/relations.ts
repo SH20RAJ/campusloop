@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import { academicResources } from "./academic-resources";
-import { articles, articleVotes } from "./articles";
+import { articleComments, articleCommentVotes, articles, articleVotes } from "./articles";
 import { conversationParticipants,conversations,messages } from "./chat";
 import {
 bikeAvailabilityBlocks,
@@ -572,6 +572,7 @@ export const articlesRelations = relations(articles, ({ one, many }) => ({
     references: [institutions.id],
   }),
   votes: many(articleVotes),
+  comments: many(articleComments),
 }));
 
 export const articleVotesRelations = relations(articleVotes, ({ one }) => ({
@@ -581,6 +582,37 @@ export const articleVotesRelations = relations(articleVotes, ({ one }) => ({
   }),
   profile: one(userProfiles, {
     fields: [articleVotes.profileId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const articleCommentsRelations = relations(articleComments, ({ one, many }) => ({
+  article: one(articles, {
+    fields: [articleComments.articleId],
+    references: [articles.id],
+  }),
+  author: one(userProfiles, {
+    fields: [articleComments.authorId],
+    references: [userProfiles.id],
+  }),
+  parent: one(articleComments, {
+    fields: [articleComments.parentId],
+    references: [articleComments.id],
+    relationName: "parent_reply",
+  }),
+  replies: many(articleComments, {
+    relationName: "parent_reply",
+  }),
+  votes: many(articleCommentVotes),
+}));
+
+export const articleCommentVotesRelations = relations(articleCommentVotes, ({ one }) => ({
+  comment: one(articleComments, {
+    fields: [articleCommentVotes.commentId],
+    references: [articleComments.id],
+  }),
+  profile: one(userProfiles, {
+    fields: [articleCommentVotes.profileId],
     references: [userProfiles.id],
   }),
 }));

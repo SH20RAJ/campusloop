@@ -1,6 +1,7 @@
 "use client";
 
 import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import {
 NotificationItem,
@@ -15,11 +16,14 @@ AtSign,
 Bell,
 CheckCheck,
 Compass,
+Eraser,
 Heart,
 Lock,
 MessageCircle,
 Repeat2,
 ShieldCheck,
+MoreHorizontal,
+Trash2,
 Trophy,
 UserPlus,
 Users,
@@ -27,7 +31,8 @@ Zap
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface NotificationsClientProps {
   initialNotifications: NotificationItem[];
@@ -40,6 +45,22 @@ export function NotificationsClient({
 }: NotificationsClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<NotificationTab>("all");
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
+  const [pendingClear, setPendingClear] = useState<"all" | "read" | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  // Dismiss the overflow menu on any outside click.
+  useEffect(() => {
+    if (!showActionsMenu) return;
+    function onPointerDown(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowActionsMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [showActionsMenu]);
 
   const {
     notifications,
@@ -47,6 +68,7 @@ export function NotificationsClient({
     isLoading,
     markAllAsRead,
     markAsRead,
+    clearAll,
   } = useNotifications(activeTab);
 
   const displayList =
@@ -176,6 +198,25 @@ export function NotificationsClient({
     markAllAsRead();
   }
 
+  async function handleClear(scope: "all" | "read") {
+    setIsClearing(true);
+    haptics.heavy();
+
+    const ok = await clearAll(scope);
+
+    setIsClearing(false);
+    setPendingClear(null);
+    setShowActionsMenu(false);
+
+    if (ok) {
+      sounds.archive();
+      toast.success(scope === "all" ? "Notifications cleared" : "Read notifications cleared");
+    } else {
+      haptics.error();
+      toast.error("Could not clear notifications. Please try again.");
+    }
+  }
+
   const tabs: { id: NotificationTab; label: string }[] = [
     { id: "all", label: "All" },
     { id: "mentions", label: "Mentions" },
@@ -201,17 +242,68 @@ export function NotificationsClient({
             )}
           </div>
 
-          {effectiveUnread > 0 && (
-            <button
-              type="button"
-              onClick={handleMarkAllAsRead}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer shadow-2xs active:scale-95"
-              title="Mark all notifications as read"
-            >
-              <CheckCheck className="size-3.5 text-primary" />
-              <span className="hidden sm:inline">Mark all as read</span>
-            </button>
-          )}
+          <div className="flex items-center gap-1">
+            {effectiveUnread > 0 && (
+              <button
+                type="button"
+                onClick={handleMarkAllAsRead}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer shadow-2xs active:scale-95"
+                title="Mark all notifications as read"
+              >
+                <CheckCheck className="size-3.5 text-primary" />
+                <span className="hidden sm:inline">Mark all as read</span>
+              </button>
+            )}
+
+            {displayList.length > 0 && (
+              <div className="relative" ref={menuRef}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    haptics.light();
+                    setShowActionsMenu((v) => !v);
+                  }}
+                  aria-haspopup="menu"
+                  aria-expanded={showActionsMenu}
+                  aria-label="More notification actions"
+                  className="flex size-9 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer active:scale-95"
+                >
+                  <MoreHorizontal className="size-4" />
+                </button>
+
+                {showActionsMenu && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-11 z-50 w-56 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-xl animate-in fade-in slide-in-from-top-1"
+                  >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => setPendingClear("read")}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-3 text-left text-xs font-bold text-foreground transition-colors hover:bg-muted/60 cursor-pointer"
+                    >
+                      <Eraser className="size-4 text-muted-foreground" />
+                      <span>Clear read notifications</span>
+                    </button>
+
+                    <div className="h-px bg-border/50" />
+
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => setPendingClear("all")}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-3 text-left text-xs font-bold text-destructive transition-colors hover:bg-destructive/10 cursor-pointer"
+                    >
+                      <Trash2 className="size-4" />
+                      <span>
+                        {activeTab === "all" ? "Delete all notifications" : "Delete all in this tab"}
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ─── Filter Pills Bar (Twitter/Linear Style) ─── */}
@@ -431,6 +523,32 @@ export function NotificationsClient({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={pendingClear !== null}
+        variant="danger"
+        isLoading={isClearing}
+        title={
+          pendingClear === "read"
+            ? "Clear read notifications?"
+            : activeTab === "all"
+            ? "Delete all notifications?"
+            : "Delete all in this tab?"
+        }
+        description={
+          pendingClear === "read"
+            ? "Notifications you have already read will be permanently removed. Unread ones stay put."
+            : activeTab === "all"
+            ? "This permanently removes every notification in your inbox. This cannot be undone."
+            : "This permanently removes every notification in the current filter. This cannot be undone."
+        }
+        confirmText={pendingClear === "read" ? "Clear read" : "Delete all"}
+        onConfirm={() => handleClear(pendingClear ?? "all")}
+        onClose={() => {
+          if (!isClearing) setPendingClear(null);
+        }}
+      />
+
     </main>
   );
 }

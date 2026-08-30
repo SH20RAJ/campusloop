@@ -147,3 +147,68 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const user = await hexclaveServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const db = getDb();
+    const profile = await db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, user.id),
+    });
+
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    const scope = searchParams.get("scope"); // "all" | "read"
+    const tab = searchParams.get("tab");
+
+    // Every branch is scoped to the caller's own rows, so one student can never
+    // clear another's notifications.
+    const ownedByCaller = eq(notifications.userId, profile.id);
+
+    if (id) {
+      await db.delete(notifications).where(and(eq(notifications.id, id), ownedByCaller));
+      return NextResponse.json({ success: true, deleted: "one" });
+    }
+
+    if (scope === "read") {
+      await db.delete(notifications).where(and(ownedByCaller, eq(notifications.isRead, true)));
+      return NextResponse.json({ success: true, deleted: "read" });
+    }
+
+    if (scope === "all") {
+      const conditions = [ownedByCaller];
+
+      // Clearing from a filtered tab only clears that tab, which is what the
+      // visible list implies.
+      if (tab === "mentions") {
+        conditions.push(eq(notifications.type, "MENTION"));
+      } else if (tab === "replies") {
+        conditions.push(inArray(notifications.type, ["COMMENT", "REPLY", "STORY_REPLY"]));
+      } else if (tab === "reactions") {
+        conditions.push(inArray(notifications.type, ["LIKE", "REPOST", "STORY_LIKE"]));
+      } else if (tab === "crushes") {
+        conditions.push(inArray(notifications.type, ["CRUSH_ALERT", "MATCH"]));
+      }
+
+      await db.delete(notifications).where(and(...conditions));
+      return NextResponse.json({ success: true, deleted: "all" });
+    }
+
+    return NextResponse.json(
+      { error: "Provide an `id`, or `scope=all` / `scope=read`" },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error("DELETE /api/notifications error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}

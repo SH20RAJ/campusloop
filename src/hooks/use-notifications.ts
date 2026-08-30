@@ -147,6 +147,70 @@ export function useNotifications(tab: NotificationTab = "all") {
     }
   }
 
+  /**
+   * Permanently removes notifications. `scope: "all"` clears the current tab
+   * (matching what the student can see); `scope: "read"` keeps unread ones.
+   */
+  async function clearAll(scope: "all" | "read" = "all") {
+    const previous = data;
+
+    mutate(
+      (prev) => {
+        if (!prev) return prev;
+        if (scope === "read") {
+          const remaining = prev.notifications.filter((n) => !n.isRead);
+          return { notifications: remaining, unreadCount: remaining.length };
+        }
+        return { notifications: [], unreadCount: 0 };
+      },
+      false
+    );
+
+    try {
+      const res = await fetch(
+        `/api/notifications?scope=${scope}&tab=${encodeURIComponent(tab)}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error("Request failed");
+      await mutate();
+      return true;
+    } catch (err) {
+      console.warn("Failed to clear notifications:", err);
+      // Put the list back rather than leaving the student staring at a false empty state.
+      mutate(previous, false);
+      return false;
+    }
+  }
+
+  async function deleteOne(id: string) {
+    const previous = data;
+
+    mutate(
+      (prev) => {
+        if (!prev) return prev;
+        const target = prev.notifications.find((n) => n.id === id);
+        return {
+          notifications: prev.notifications.filter((n) => n.id !== id),
+          unreadCount:
+            target && !target.isRead ? Math.max(0, prev.unreadCount - 1) : prev.unreadCount,
+        };
+      },
+      false
+    );
+
+    try {
+      const res = await fetch(`/api/notifications?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Request failed");
+      return true;
+    } catch (err) {
+      console.warn("Failed to delete notification:", err);
+      mutate(previous, false);
+      return false;
+    }
+  }
+
   return {
     notifications,
     unreadCount,
@@ -155,6 +219,8 @@ export function useNotifications(tab: NotificationTab = "all") {
     mutate,
     markAllAsRead,
     markAsRead,
+    clearAll,
+    deleteOne,
   };
 }
 

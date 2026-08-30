@@ -250,6 +250,14 @@ Located in [`src/components/landing/time-capsule-showcase.tsx`](campusloop/src/c
 - **Live Countdown Timer**: Real-time ticker counting down days, hours, and minutes to convocation.
 - **Unlocked Museum Wall**: Public batch archive rendered after timer expiry.
 
+### 5.7 Semantic Vector Search & Qdrant Cloud Engine
+Located in [`src/lib/qdrant/`](campusloop/src/lib/qdrant/) and [`src/lib/recommendations/`](campusloop/src/lib/recommendations/):
+- **Zero-Downtime Dual Layer**: Qdrant Cloud Vector Database acts strictly as an asynchronous enhancement layer.
+- **Circuit Breaker & Strict Timeout**: Every Qdrant call is wrapped in a 600ms strict timeout and failure circuit breaker. If Qdrant is unavailable, the application automatically falls back 100% to PostgreSQL relational queries with zero latency penalty or downtime for users.
+- **384-Dim Dense Embeddings**: Zero-dependency serverless vector generator ([`src/lib/qdrant/embeddings.ts`](campusloop/src/lib/qdrant/embeddings.ts)) producing L2-normalized vectors for Cosine similarity.
+- **Related Campus Threads**: Related discussions widget on `/app/post/[id]` rendering semantic thread recommendations with similarity vibe score badges.
+- **Non-Blocking Background Indexing**: Asynchronously indexes newly created posts and student profiles without delaying API responses.
+
 ---
 
 ## 6. Gamification & Loop Points (LP) Engine

@@ -112,14 +112,21 @@ Where:
 - $L_{\text{clout\_tier}} = 1.0 + \frac{\text{Author LP}}{1000}$ (Rewards high-reputation contributors).
 - $(T_{\text{hours}} + 2)^{1.4}$ provides smooth exponential time decay (Hacker News gravity style).
 
+### C. Semantic Vector Search & Dense Embeddings (Qdrant Cloud)
+
+In addition to relational gravity formulas, CampusLoop executes dense semantic vector similarity matching via **Qdrant Vector DB** (`src/lib/qdrant/`):
+- **Embedding Space**: 384-dimensional dense vectors generated via normalized sub-word and n-gram hash projection (`src/lib/qdrant/embeddings.ts`).
+- **Cosine Similarity Threshold**: Top nearest neighbor candidates evaluated with score threshold $\ge 0.10$.
+- **Zero-Downtime Fallback Layer**: If vector cloud experiences latency exceeding 600ms or network failure, queries seamlessly revert 100% to PostgreSQL relational indices with zero downtime.
+
 ---
 
 ## 🚀 6. Summary Comparison Table
 
 | Architecture Dimension | Twitter / X (`the-algorithm`) | Bluesky (ATProto) | CampusLoop Architecture |
 | :--- | :--- | :--- | :--- |
-| **Candidate Retrieval** | GraphJet + SimClusters (145k clusters) | Custom Federated Feed Generators | Drizzle ORM + Indexed Scope / Branch / Tags |
-| **Scoring Engine** | Multi-Task Neural Ranker (10+ predictions) | Custom Serverless Queries | Time-Decayed Engagement Weighting |
+| **Candidate Retrieval** | GraphJet + SimClusters (145k clusters) | Custom Federated Feed Generators | **Qdrant Dense Vectors (384-dim)** + Drizzle ORM Scope/Branch Indices |
+| **Scoring Engine** | Multi-Task Neural Ranker (10+ predictions) | Custom Serverless Queries | Time-Decayed Engagement Weighting + Cosine Vector Similarity |
 | **Identity Verification** | Paid Blue Check ($8/mo) | Domain Verification (DNS/TXT) | **Strict Verified College Email Whitelist** |
 | **Privacy & Safety** | Shadowbanning / Visibility Filters | Blocklists & Moderation Labelers | **AES-Sealed Cryptographic Anon Identity Vault** |
 | **Feed Orchestration** | Java/Scala Home Mixer & Rust rewrites | AppView Skeletons | Next.js 16 App Router on Cloudflare Workers |

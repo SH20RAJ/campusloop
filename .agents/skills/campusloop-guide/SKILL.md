@@ -131,6 +131,21 @@ src/
 - **ALWAYS** prefer creating dedicated Next.js App Router full-page routes (`page.tsx`) with dynamic SEO metadata, Twitter/X-style full-width minimal UI/UX, and optimal secure backend + frontend, instead of modal popups for creation workflows (e.g. Campus Hub posting, community creation, listing creation).
 - Modals/popups should only be used for fast ephemeral actions (likes modal, fast comment reply, repost quote confirmation). Dedicated pages ensure full mobile screen space, zero modal scrolling bugs, and deep linkability.
 
+### Rule 7: Qdrant Cloud Vector Search & Zero-Downtime Fallback Rule
+- **Qdrant Vector Database** is integrated for semantic search, related post recommendations, and dating compatibility (`src/lib/qdrant/`).
+- **CRITICAL INVARIANT**: Vector DB is strictly an asynchronous enhancement layer. Any query to Qdrant is protected by a strict 600ms timeout and circuit breaker.
+- If Qdrant is unavailable, times out, or encounters network errors, the application **MUST gracefully fallback 100% to PostgreSQL relational queries** with zero interruption to users.
+
+### Rule 8: Mobile Bottom Navigation & Anonymity Mode Switcher
+- **Mobile Bottom Navigation**: The mobile bottom bar has 5 core tabs: **Home (`/app`)**, **Colleges (`/app/colleges`)**, **Post (`/app/post/new`)**, **Chat (`/chat`)**, and **Dating (`/app/dating`)**.
+- **Anonymity Mode Switcher**: Desktop sidebar and mobile drawer feature a quick switcher between **All Posts & Anon 🎭** and **Public Only (No Anon) 🛡️**. Switching dispatches `campusloop_feed_visibility_change` on the window and saves to `localStorage` + `/api/profile/me` for instant zero-reload timeline filtering.
+
+### Rule 9: Official Social Media Channels Priority
+- Always prioritize official social media links in the order:
+  1. **Instagram (🔥 Highlighted)**: `https://www.instagram.com/campusloop.space/` (`@campusloop.space`)
+  2. **LinkedIn**: `https://www.linkedin.com/company/mycampusloop/?viewAsMember=true` (`CampusLoop`)
+  3. **X (Twitter)**: `https://x.com/company/mycampusloop/` (`@mycampusloop`)
+
 ---
 
 ## 🛠️ 5. Standard Verification & Deployment Workflow
@@ -141,12 +156,17 @@ src/
    ```
    *Must pass with 0 errors before committing or completing work.*
 
-2. **Run Local Dev Server**:
+2. **Lint and Format**:
    ```bash
-   bun run dev
+   bunx biome check ./src && bunx biome check biome.json
    ```
 
-3. **Deploy to Cloudflare Workers**:
+3. **Run Unit Tests**:
+   ```bash
+   bun test
+   ```
+
+4. **Deploy to Cloudflare Workers**:
    ```bash
    bun run deploy
    ```

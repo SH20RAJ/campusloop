@@ -36,10 +36,13 @@ campusloop/
 │   │   └── ui/                # Atomic UI components, avatars, badges
 │   ├── db/                    # Drizzle ORM client & Neon PostgreSQL schema
 │   │   ├── index.ts           # Neon serverless database client
-│   │   └── schema.ts          # Relational tables, enums & relations
+│   │   ├── schema/            # Sub-schemas (users, posts, institutions, chat, dating, etc.)
+│   │   └── schema.ts          # Centralized export barrel
 │   ├── hexclave/              # Hexclave authentication configuration
 │   ├── hooks/                 # Custom React hooks (useProfile, useFeed, usePostActions)
 │   └── lib/                   # API client, sounds, haptics, moderation, algorithms
+│       ├── qdrant/            # Qdrant client, embeddings, collections, async indexer
+│       └── recommendations/   # Semantic related posts & deep compatibility matching
 └── .agents/
     └── skills/
         └── campusloop-guide/  # AI Agent handbook & domain rules
@@ -53,18 +56,26 @@ campusloop/
    - Never add `"use client"` to `page.tsx` or `layout.tsx` when exporting Next.js `Metadata` or `generateMetadata`.
    - Keep page entry points server components and delegate interactive UI to client components (e.g. `feed-client.tsx`, `dating-app-client.tsx`).
 
-2. **Centralized API Helper & Hooks Pattern**:
+2. **Qdrant Vector Database & Resilient Postgres Fallback**:
+   - Qdrant Cloud Vector DB powers semantic related posts, natural language discovery, and AI dating vibes.
+   - Guarded with a strict 600ms timeout and circuit breaker.
+   - Any vector failure automatically falls back 100% to Neon PostgreSQL queries without throwing errors or breaking UI.
+
+3. **Centralized API Helper & Hooks Pattern**:
    - Do NOT redefine `const fetcher = ...` inline in components.
    - Use centralized hooks from `@/hooks/` (`useProfile`, `useFeed`, `usePostActions`, `useColleges`, `useCommunities`, `useStories`).
 
-3. **Database & Drizzle ORM Guidelines**:
+4. **Database & Drizzle ORM Guidelines**:
    - Always query Drizzle ORM via `getDb()` from `@/db`.
    - Avoid deep self-referential nested relational queries (e.g. `with: { repostOf: { with: { ... } } }`) to prevent worker query cache errors. Batch-fetch relational references when needed.
 
-4. **Zero-Latency Audio & Physical Haptics**:
+5. **Zero-Latency Audio & Physical Haptics**:
    - Utilize synthesized Web Audio API in [`src/lib/sounds.ts`](campusloop/src/lib/sounds.ts) instead of external MP3 assets.
    - Trigger native vibration feedback via [`src/lib/haptics.ts`](campusloop/src/lib/haptics.ts).
 
-5. **Design System & Typography**:
+6. **Design System & Typography**:
    - Document and legal pages use clean, minimal monochrome typography in [`src/components/marketing/legal-doc.tsx`](campusloop/src/components/marketing/legal-doc.tsx).
    - Card overlays utilize glassmorphism (`backdrop-blur-xl bg-background/85`) and rounded corners (`rounded-2xl` to `rounded-3xl`).
+
+7. **Social Media Links Priority**:
+   - Prioritize official social media links in the order: **Instagram (`@campusloop.space`)** > **LinkedIn (`CampusLoop`)** > **X (`@mycampusloop`)**.

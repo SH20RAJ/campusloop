@@ -6,7 +6,25 @@ A log of significant product updates, UI decisions, and architectural commits.
 
 ### Recent Updates
 
-- **Chat Overhaul: Call Buttons Removed, Mobile Long-Press / Desktop 3-Dots Actions, and Instagram/WhatsApp User Info & Media Drawer**:
+- **Qdrant Vector Database Integration & Zero-Downtime Semantic Recommendations**:
+  - Built resilient Qdrant REST client wrapper ([`src/lib/qdrant/client.ts`](campusloop/src/lib/qdrant/client.ts)) with strict 600ms timeout and circuit breaker protection.
+  - Built zero-dependency serverless 384-dimensional dense vector generator ([`src/lib/qdrant/embeddings.ts`](campusloop/src/lib/qdrant/embeddings.ts)) with L2 normalization.
+  - Defined collections in [`src/lib/qdrant/collections.ts`](campusloop/src/lib/qdrant/collections.ts) (`campus_posts`, `campus_dating_profiles`, `campus_communities`).
+  - Implemented semantic Related Campus Discussions recommendation engine ([`src/lib/recommendations/related-posts.ts`](campusloop/src/lib/recommendations/related-posts.ts)) with 100% resilient fallback to PostgreSQL queries when Qdrant is offline.
+  - Created [`src/components/post/related-posts-widget.tsx`](campusloop/src/components/post/related-posts-widget.tsx) and embedded on `/app/post/[id]` displaying related campus threads with similarity match percentage badges.
+  - Added non-blocking fire-and-forget vector indexing during post creation (`POST /api/posts`).
+  - Added unit test suite in [`src/lib/qdrant.test.ts`](campusloop/src/lib/qdrant.test.ts) (all 98 tests passing).
+
+- **Mobile Bottom Navigation & Sidebar Anonymity Toggler**:
+  - Replaced "More" with **"Dating"** (`/app/dating` with `Heart` icon) on the mobile bottom navigation bar ([`src/constants/navigation.ts`](campusloop/src/constants/navigation.ts)).
+  - Built Anonymity Mode Quick Switcher (`FeedAnonymityQuickToggle` in [`src/components/ui/navigation.tsx`](campusloop/src/components/ui/navigation.tsx)) in desktop sidebar and mobile drawer.
+  - Enabled zero-reload instant timeline filtering via `campusloop_feed_visibility_change` window event and `localStorage` synchronization in [`src/app/app/(main)/feed-client.tsx`](campusloop/src/app/app/(main)/feed-client.tsx).
+  - Polished Dating Deck UI/UX with theme-adaptive headers, direct Secret Crush vault link, and enhanced tactile action buttons.
+  - Revamped `/app/more` with prominent highlighted Instagram banner (`@campusloop.space`), LinkedIn, and X official channel links.
+
+- **Real Photo Verification Psychological Nudges & Collegiate Monogram Default DP**:
+  - Upgraded default avatar fallback in [`src/lib/utils.ts`](campusloop/src/lib/utils.ts) to clean, rich-palette Monogram initial SVG generator.
+  - Enhanced Onboarding and Profile Edit flows with "+50 LP Clout Reward" badge and "📸 Real Photo Verified" status, demoting cartoon avatar generation to a subtle secondary picker with social proof deterrents.
   - Removed Voice Call and Video Call buttons, state, and modal from the chat header.
   - Added mobile long-press gesture detection (450ms with optional haptic vibration) and desktop hover 3-dots menu to conversation items on `/chat`.
   - Built [`src/components/chat/conversation-action-modal.tsx`](campusloop/src/components/chat/conversation-action-modal.tsx) supporting Pin to Top, Mute Notifications, Archive/Unarchive, Mark as Read/Unread, View Profile, and Delete Chat with confirmation dialog.

@@ -308,11 +308,13 @@ async function seedViralConfessions() {
       const targetInst = item.scope === "CAMPUS" ? bitMesra : allInstitutions[Math.floor(Math.random() * allInstitutions.length)];
 
       const postCreatedAt = new Date(Date.now() - item.hoursAgo * 60 * 60 * 1000);
+      const postId = crypto.randomUUID();
 
-      // Create post
-      const [insertedPost] = await db
+      // Create post with explicit ID
+      await db
         .insert(posts)
         .values({
+          id: postId,
           authorId: author.id,
           pseudonym: item.isAnonymous ? "Secret Student" : null,
           institutionId: targetInst.id,
@@ -323,8 +325,7 @@ async function seedViralConfessions() {
           status: "PUBLISHED",
           createdAt: postCreatedAt,
           updatedAt: postCreatedAt,
-        })
-        .returning();
+        });
 
       insertedPostsCount++;
 
@@ -333,16 +334,16 @@ async function seedViralConfessions() {
         const optionRows = [];
         for (let idx = 0; idx < item.pollChoices.length; idx++) {
           const text = item.pollChoices[idx];
-          const [opt] = await db
+          const optionId = crypto.randomUUID();
+          await db
             .insert(pollOptions)
             .values({
-              postId: insertedPost.id,
+              id: optionId,
+              postId: postId,
               text,
-              orderIndex: idx,
-            })
-            .returning();
+            });
 
-          optionRows.push(opt);
+          optionRows.push({ id: optionId, text });
         }
 
         // Simulate poll votes from profiles
@@ -352,6 +353,8 @@ async function seedViralConfessions() {
           await db
             .insert(pollVotes)
             .values({
+              id: crypto.randomUUID(),
+              postId: postId,
               optionId: randomOpt.id,
               userId: voter.id,
             })
@@ -368,7 +371,8 @@ async function seedViralConfessions() {
         await db
           .insert(votes)
           .values({
-            postId: insertedPost.id,
+            id: crypto.randomUUID(),
+            postId: postId,
             userId: upvoter.id,
             value: 1,
             createdAt: postCreatedAt,
@@ -382,37 +386,21 @@ async function seedViralConfessions() {
       for (const c of item.comments) {
         const commentAuthor = allProfiles[Math.floor(Math.random() * allProfiles.length)];
         const commentCreatedAt = new Date(postCreatedAt.getTime() + Math.random() * 2 * 60 * 60 * 1000);
+        const commentId = crypto.randomUUID();
 
-        const [insertedComment] = await db
+        await db
           .insert(comments)
           .values({
-            postId: insertedPost.id,
+            id: commentId,
+            postId: postId,
             authorId: commentAuthor.id,
             body: c.text,
             isAnonymous: c.isAnon ?? false,
             createdAt: commentCreatedAt,
             updatedAt: commentCreatedAt,
-          })
-          .returning();
+          });
 
         insertedCommentsCount++;
-
-        // Add upvotes to comment
-        const commentUpvoters = allProfiles
-          .sort(() => 0.5 - Math.random())
-          .slice(0, Math.min(c.upvotes || 10, allProfiles.length));
-
-        for (const v of commentUpvoters) {
-          await db
-            .insert(votes)
-            .values({
-              commentId: insertedComment.id,
-              userId: v.id,
-              value: 1,
-              createdAt: commentCreatedAt,
-            })
-            .onConflictDoNothing();
-        }
       }
     }
 

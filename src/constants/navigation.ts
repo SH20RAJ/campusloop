@@ -50,7 +50,6 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
     badge: "NEW",
     badgeColor: "bg-primary/15 text-primary border border-primary/30",
   },
-  { icon: Bookmark, href: "/app/saved", label: "Saved" },
   {
     icon: ShoppingBag,
     href: "/app/marketplace",
@@ -152,6 +151,12 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
   {
     group: "Account & Platform",
     items: [
+      {
+        icon: Bookmark,
+        href: "/app/saved",
+        label: "Saved Posts",
+        desc: "Your private vault of bookmarked posts & threads",
+      },
       {
         icon: Sliders,
         href: "/app/settings",

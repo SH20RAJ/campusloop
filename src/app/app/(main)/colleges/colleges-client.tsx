@@ -1,33 +1,19 @@
 "use client";
 
 import { AddCollegeModal } from "@/components/colleges/add-college-modal";
-import { CollegeHubCard,CollegeItem } from "@/components/colleges/college-hub-card";
-import { Button } from "@/components/ui/button";
+import { CollegeHubRow, type CollegeItem } from "@/components/colleges/college-hub-row";
 import { fetcher } from "@/lib/api";
-import {
-ArrowRight,
-Award,
-Building2,
-ChevronRight,
-Crown,
-Flame,
-Plus,
-School,
-Search,
-Trophy,
-X,
-Zap,
-} from "lucide-react";
-import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Building2, Flame, Plus, School, Search, Trophy, X, Zap } from "lucide-react";
 import { useEffect,useMemo,useState } from "react";
 import { toast } from "sonner";
 
 const CATEGORY_FILTERS = [
-  { id: "ALL", label: "All 1,350+ Hubs", icon: School },
-  { id: "TRENDING", label: "🔥 Trending", icon: Flame },
-  { id: "IIT_NIT", label: "🏛️ IITs & NITs", icon: Trophy },
-  { id: "NIRF", label: "⚡ NIRF Top 100", icon: Zap },
-  { id: "CENTRAL", label: "🎓 Central & Deemed", icon: Building2 },
+  { id: "ALL", label: "All", icon: School },
+  { id: "TRENDING", label: "Trending", icon: Flame },
+  { id: "IIT_NIT", label: "IITs & NITs", icon: Trophy },
+  { id: "NIRF", label: "NIRF Top 100", icon: Zap },
+  { id: "CENTRAL", label: "Central & Deemed", icon: Building2 },
 ];
 
 const POPULAR_STATES = [
@@ -224,109 +210,108 @@ export default function CollegesClient() {
     }
   }
 
-  return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col min-h-screen px-3 sm:px-6 pt-4 pb-28 space-y-6 select-none">
-      {/* ─── Hero Spotlight Header (College Vibes Aesthetic) ─── */}
-      <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-xs space-y-4">
-        {/* Subtle Ambient Glow */}
-        <div className="absolute -top-12 -right-12 size-64 rounded-full bg-primary/15 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-8 -left-8 size-64 rounded-full bg-indigo-500/15 blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1.5 max-w-xl">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-primary/10 text-primary border border-primary/20">
-              <Zap className="size-3" /> 1,350+ Accredited Indian Campuses
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground leading-tight">
-              Never miss what matters across Indian colleges.
-            </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Explore student confessions, canteen debates, placement realities, and inter-college rankings.
+  const tabs = [
+    { id: "directory" as const, label: "Directory" },
+    { id: "leaderboard" as const, label: "Leaderboard" },
+  ];
+
+  return (
+    <main className="mx-auto flex min-h-screen w-full max-w-2xl select-none flex-col border-x border-border/20 pb-28">
+      {/* ─── Sticky Header ─── */}
+      <header className="sticky top-0 z-40 border-b border-border/30 bg-background/90 backdrop-blur-xl">
+        <div className="flex items-center justify-between gap-2 px-4 py-3.5">
+          <div className="min-w-0">
+            <h1 className="text-lg font-black tracking-tight text-foreground">Colleges</h1>
+            <p className="truncate text-[13px] text-muted-foreground">
+              Campus hubs across India
             </p>
           </div>
 
-          <Button
+          <button
+            type="button"
             onClick={() => setShowAddModal(true)}
-            className="h-10 px-4 text-xs font-bold rounded-2xl bg-primary text-primary-foreground gap-2 cursor-pointer shadow-md hover:bg-primary/90 transition-all shrink-0 self-start sm:self-center"
+            className="flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-black text-primary-foreground transition-opacity hover:opacity-90 active:scale-95"
           >
-            <Plus className="size-4" /> Request Campus (+50 LP)
-          </Button>
-        </div>
-
-        {/* View Switcher: Directory vs National Leaderboard */}
-        <div className="relative z-10 flex items-center gap-2 pt-2 border-t border-border/50">
-          <button
-            type="button"
-            onClick={() => setActiveTab("directory")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeTab === "directory"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/50 text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <School className="size-3.5" />
-            <span>Campus Directory (1,350+)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("leaderboard")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeTab === "leaderboard"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/50 text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Trophy className="size-3.5 text-amber-400" />
-            <span>🏆 National Campus Leaderboard</span>
+            <Plus className="size-3.5" />
+            <span className="hidden sm:inline">Request campus</span>
+            <span className="sm:hidden">Add</span>
           </button>
         </div>
 
-        {/* Hero Search Bar with Instant Debounce */}
-        {activeTab === "directory" && (
-          <div className="relative pt-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search 1,350+ colleges by name, acronym (BIT, IIT, NIT), city, or NIRF rank..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              className="w-full h-12 pl-11 pr-10 rounded-2xl border border-border/80 bg-background/80 backdrop-blur-md text-xs sm:text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-inner"
-            />
-            {search && (
+        {/* Equal-width underline tabs, matching the feed */}
+        <div className="flex items-center">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
               <button
-                onClick={() => setSearch("")}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer p-1"
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "relative flex-1 cursor-pointer py-3 text-[14px] font-bold transition-colors",
+                  isActive
+                    ? "font-black text-foreground"
+                    : "text-muted-foreground hover:bg-muted/30 hover:text-foreground"
+                )}
               >
-                <X className="size-4" />
+                <span>{tab.label}</span>
+                {isActive && (
+                  <span className="absolute bottom-0 left-1/2 h-1 w-10 -translate-x-1/2 rounded-full bg-primary" />
+                )}
               </button>
-            )}
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </div>
+      </header>
 
-      {/* ─── TAB 1: CAMPUS DIRECTORY ─── */}
+      {/* ─── Directory ─── */}
       {activeTab === "directory" && (
         <>
-          {/* Category Pills & State Selectors */}
-          <div className="space-y-3">
-            {/* Category Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+          {/* Search */}
+          <div className="border-b border-border/30 px-4 py-3">
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search by name, city or NIRF rank"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                className="h-10 w-full rounded-full border border-border/60 bg-muted/30 pl-10 pr-9 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
+                >
+                  <X className="size-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="space-y-2 border-b border-border/30 px-4 py-3">
+            <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto">
               {CATEGORY_FILTERS.map((cat) => {
                 const Icon = cat.icon;
                 const isSelected = selectedCategory === cat.id;
                 return (
                   <button
                     key={cat.id}
+                    type="button"
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
+                    className={cn(
+                      "flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold transition-all",
                       isSelected
-                        ? "bg-primary text-primary-foreground border-primary shadow-xs"
-                        : "bg-card text-muted-foreground border-border/70 hover:text-foreground hover:bg-muted/40"
-                    }`}
+                        ? "bg-foreground font-black text-background"
+                        : "border border-border/40 bg-muted/40 text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                    )}
                   >
                     <Icon className="size-3.5" />
                     <span>{cat.label}</span>
@@ -335,23 +320,21 @@ export default function CollegesClient() {
               })}
             </div>
 
-            {/* State Filter Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              <span className="text-[10px] font-black uppercase text-muted-foreground/80 pl-1 shrink-0">
-                State:
-              </span>
+            <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto">
               {POPULAR_STATES.map((st) => (
                 <button
                   key={st}
+                  type="button"
                   onClick={() => {
                     setSelectedState(st);
                     setPage(1);
                   }}
-                  className={`px-3 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all border cursor-pointer ${
+                  className={cn(
+                    "shrink-0 cursor-pointer whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-bold transition-all",
                     selectedState === st
-                      ? "bg-foreground text-background border-foreground font-bold"
-                      : "bg-card text-muted-foreground border-border/60 hover:text-foreground"
-                  }`}
+                      ? "bg-foreground font-black text-background"
+                      : "border border-border/40 bg-muted/30 text-muted-foreground hover:text-foreground"
+                  )}
                 >
                   {st === "ALL" ? "All India" : st}
                 </button>
@@ -359,241 +342,91 @@ export default function CollegesClient() {
             </div>
           </div>
 
-          {/* Campus Hubs Grid */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>
-                Showing <strong className="text-foreground">{filteredColleges.length}</strong> campus hubs
-                {selectedState !== "ALL" ? ` in ${selectedState}` : ""}
-              </span>
-            </div>
-
+          {/* Results */}
+          <div className="divide-y divide-border/30">
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Array.from({ length: 9 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-44 rounded-2xl border border-border/60 bg-card p-4 animate-pulse space-y-3"
-                  >
-                    <div className="h-20 bg-muted/60 rounded-xl" />
-                    <div className="h-4 w-3/4 bg-muted/60 rounded" />
-                    <div className="h-3 w-1/2 bg-muted/40 rounded" />
+              Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="flex animate-pulse items-center gap-3.5 px-4 py-3.5">
+                  <div className="size-11 shrink-0 rounded-full bg-muted/60" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3.5 w-2/3 rounded bg-muted/60" />
+                    <div className="h-2.5 w-1/3 rounded bg-muted/40" />
                   </div>
-                ))}
-              </div>
-            ) : filteredColleges.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredColleges.map((college) => (
-                  <CollegeHubCard key={college.id} college={college} />
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-3xl border border-dashed border-border/80 bg-card p-12 text-center space-y-4">
-                <div className="size-14 mx-auto rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                  <School className="size-7" />
                 </div>
+              ))
+            ) : filteredColleges.length > 0 ? (
+              <>
+                <p className="px-4 py-2.5 text-[13px] text-muted-foreground">
+                  <strong className="font-black text-foreground">
+                    {filteredColleges.length}
+                  </strong>{" "}
+                  {filteredColleges.length === 1 ? "campus" : "campuses"}
+                  {selectedState !== "ALL" ? ` in ${selectedState}` : ""}
+                </p>
+                {filteredColleges.map((college) => (
+                  <CollegeHubRow key={college.id} college={college} />
+                ))}
+              </>
+            ) : (
+              <div className="flex flex-col items-center gap-3 px-8 py-16 text-center">
+                <School className="size-8 text-muted-foreground" />
                 <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-foreground">No campus hubs found</h3>
-                  <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-                    Can&apos;t find your college? Submit a quick request and we will index it within 24 hours.
+                  <h3 className="text-[15px] font-bold text-foreground">No campuses found</h3>
+                  <p className="text-[13px] text-muted-foreground">
+                    Can&apos;t find your college? Request it and we&apos;ll index it.
                   </p>
                 </div>
-                <Button
+                <button
+                  type="button"
                   onClick={() => setShowAddModal(true)}
-                  className="h-9 px-4 text-xs font-bold rounded-xl bg-primary text-primary-foreground gap-1.5 cursor-pointer"
+                  className="mt-1 cursor-pointer rounded-full bg-primary px-4 py-2 text-xs font-black text-primary-foreground transition-opacity hover:opacity-90"
                 >
-                  <Plus className="size-3.5" /> Request &amp; Index College (+50 LP)
-                </Button>
+                  Request campus
+                </button>
               </div>
             )}
           </div>
         </>
       )}
 
-      {/* ─── TAB 2: NATIONAL CAMPUS LEADERBOARD & PODIUM ─── */}
+      {/* ─── Leaderboard ─── */}
       {activeTab === "leaderboard" && (
-        <div className="space-y-6 animate-in fade-in duration-300">
-          {/* Top 3 National Podium */}
-          <div className="rounded-3xl border border-border/80 bg-card p-6 space-y-5 shadow-sm">
-            <div className="text-center space-y-1">
-              <span className="text-[11px] font-black uppercase tracking-wider text-amber-500 flex items-center justify-center gap-1.5">
-                <Crown className="size-4" /> All-India Campus Clout Standings
-              </span>
-              <h2 className="text-xl font-black text-foreground">
-                India&apos;s Most Active Student Networks
-              </h2>
-              <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                Ranked live by student engagement, verified batchmate enrollments, and active campus threads.
-              </p>
-            </div>
+        <div className="divide-y divide-border/30">
+          <p className="px-4 py-3 text-[13px] text-muted-foreground">
+            Ranked by student engagement, verified enrolments and active threads.
+          </p>
 
-            {/* Podium Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              {TOP_LEADERBOARD_COLLEGES.slice(0, 3).map((col, idx) => {
-                const isFirst = idx === 0;
-                const isSecond = idx === 1;
-                return (
-                  <Link
-                    key={col.id}
-                    href={`/app/college/${col.slug}`}
-                    className={`relative overflow-hidden rounded-2xl border p-5 flex flex-col justify-between space-y-4 transition-all duration-300 hover:scale-[1.02] cursor-pointer ${
-                      isFirst
-                        ? "bg-linear-to-b from-amber-500/15 via-card to-card border-amber-500/40 shadow-lg md:order-2 md:-mt-2"
-                        : isSecond
-                        ? "bg-card border-border/80 shadow-xs md:order-1"
-                        : "bg-card border-border/80 shadow-xs md:order-3"
-                    }`}
-                  >
-                    {/* Rank Badge */}
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`size-8 rounded-full flex items-center justify-center font-black text-xs shadow-xs ${
-                          isFirst
-                            ? "bg-amber-500 text-white"
-                            : isSecond
-                            ? "bg-slate-300 text-slate-900"
-                            : "bg-amber-700 text-white"
-                        }`}
-                      >
-                        #{col.rank}
-                      </span>
-                      {col.nirf && (
-                        <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                          NIRF #{col.nirf}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* College Emblem & Name */}
-                    <div className="flex items-center gap-3">
-                      <div className="size-12 rounded-xl bg-card border border-border shadow-xs p-1 shrink-0 flex items-center justify-center overflow-hidden">
-                        {col.logoUrl ? (
-                          <img
-                            src={col.logoUrl}
-                            alt={col.name}
-                            referrerPolicy="no-referrer"
-                            crossOrigin="anonymous"
-                            className="w-full h-full object-contain"
-                          />
-                        ) : (
-                          <School className="size-6 text-primary" />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="text-xs font-black text-foreground line-clamp-2 leading-tight">
-                          {col.name}
-                        </h3>
-                        <p className="text-[10px] text-muted-foreground">{col.location}</p>
-                      </div>
-                    </div>
-
-                    {/* Stats Metric */}
-                    <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border/50 text-center">
-                      <div>
-                        <span className="text-[9px] font-bold uppercase text-muted-foreground block">LP Score</span>
-                        <span className="text-xs font-black text-primary">{col.points.toLocaleString()}</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] font-bold uppercase text-muted-foreground block">Students</span>
-                        <span className="text-xs font-black text-foreground">{col.students}</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] font-bold uppercase text-muted-foreground block">Threads</span>
-                        <span className="text-xs font-black text-foreground">{col.discussions}</span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Full Standings List */}
-          <div className="rounded-3xl border border-border/80 bg-card overflow-hidden shadow-xs">
-            <div className="p-4 border-b border-border/60 flex items-center justify-between">
-              <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
-                <Award className="size-4 text-primary" /> Top Campus Clout Leaderboard
-              </h3>
-              <span className="text-[11px] text-muted-foreground">Updated Live</span>
-            </div>
-
-            <div className="divide-y divide-border">
-              {TOP_LEADERBOARD_COLLEGES.map((col) => (
-                <Link
-                  key={col.id}
-                  href={`/app/college/${col.slug}`}
-                  className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group cursor-pointer"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <span className="text-sm font-black text-muted-foreground w-6 text-center group-hover:text-primary transition-colors">
-                      #{col.rank}
-                    </span>
-
-                    <div className="size-10 rounded-xl bg-card border border-border shadow-xs p-1 shrink-0 flex items-center justify-center overflow-hidden">
-                      {col.logoUrl ? (
-                        <img
-                          src={col.logoUrl}
-                          alt={col.name}
-                          referrerPolicy="no-referrer"
-                          crossOrigin="anonymous"
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <School className="size-5 text-primary" />
-                      )}
-                    </div>
-
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">
-                        {col.name}
-                      </h4>
-                      <p className="text-[10px] text-muted-foreground truncate">{col.location}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 shrink-0 pl-3">
-                    <div className="text-right hidden sm:block">
-                      <span className="text-xs font-black text-primary block">
-                        {col.points.toLocaleString()} LP
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {col.students} enrolled • {col.discussions} threads
-                      </span>
-                    </div>
-
-                    <ChevronRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+          {TOP_LEADERBOARD_COLLEGES.map((col) => (
+            <CollegeHubRow
+              key={col.id}
+              rank={col.rank}
+              college={{
+                id: col.id,
+                slug: col.slug,
+                name: col.name,
+                state: col.location,
+                district: null,
+                website: null,
+                yearOfEstablishment: null,
+                aisheCode: "",
+                logoUrl: col.logoUrl,
+                nirfRank: col.nirf,
+              }}
+              trailing={
+                <>
+                  <span className="block text-[13px] font-black text-primary tabular-nums">
+                    {col.points.toLocaleString("en-IN")} LP
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">
+                    {col.students} enrolled
+                  </span>
+                </>
+              }
+            />
+          ))}
         </div>
       )}
 
-      {/* ─── Aspirants Reality Guide Footer CTA ─── */}
-      <div className="rounded-3xl border border-primary/20 bg-linear-to-r from-violet-600/10 via-indigo-600/10 to-purple-600/10 p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-        <div className="space-y-1 text-center sm:text-left">
-          <span className="text-[10px] font-black uppercase tracking-wider text-primary flex items-center justify-center sm:justify-start gap-1">
-            <Zap className="size-3" /> JEE &amp; NEET Aspirants Reality Desk
-          </span>
-          <h4 className="text-sm font-black text-foreground">
-            Looking for genuine hostel tea, placement truth, and fest vibes?
-          </h4>
-          <p className="text-xs text-muted-foreground">
-            Explore verified senior answer scorecards without promotional marketing bias.
-          </p>
-        </div>
-
-        <Link
-          href="/app/college/bitmesra"
-          className="px-5 py-2.5 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer shadow-md shrink-0 flex items-center gap-1.5"
-        >
-          <span>Explore BIT Mesra Hub</span>
-          <ArrowRight className="size-3.5" />
-        </Link>
-      </div>
-
-      {/* Add College Modal */}
       {showAddModal && (
         <AddCollegeModal
           isOpen={showAddModal}

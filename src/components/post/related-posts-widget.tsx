@@ -4,6 +4,7 @@ import { MessageSquare, Sparkles, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { fetcher } from "@/lib/api";
 import type { RelatedPostItem } from "@/lib/recommendations/related-posts";
 import { cn } from "@/lib/utils";
 
@@ -14,11 +15,15 @@ interface RelatedPostsWidgetProps {
 }
 
 export function RelatedPostsWidget({ postId, currentUserId, initialItems }: RelatedPostsWidgetProps) {
-  const { data, isLoading } = useSWR<{ related: RelatedPostItem[] }>(`/api/posts/${postId}/related`, {
-    fallbackData: initialItems ? { related: initialItems } : undefined,
-    revalidateOnFocus: false,
-    dedupingInterval: 30000,
-  });
+  const { data, isLoading } = useSWR<{ related: RelatedPostItem[] }>(
+    `/api/posts/${postId}/related`,
+    fetcher,
+    {
+      fallbackData: initialItems ? { related: initialItems } : undefined,
+      revalidateOnFocus: false,
+      dedupingInterval: 30000,
+    }
+  );
 
   const items = data?.related || initialItems || [];
 

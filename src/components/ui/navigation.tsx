@@ -81,7 +81,8 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
       {/* ─── Minimal Top Mobile Header ─── */}
       {!pathname.startsWith("/app/chat") &&
         !pathname.startsWith("/app/stories/new") &&
-        !pathname.startsWith("/app/story/") && (
+        !pathname.startsWith("/app/story/") &&
+        !pathname.startsWith("/app/post/new") && (
           <header className="sticky top-0 z-40 flex h-13 w-full items-center justify-between border-b border-border/30 bg-background/85 px-4 backdrop-blur-xl md:hidden select-none">
             <div className="flex items-center gap-2.5">
               <button
@@ -341,7 +342,8 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
       {/* ─── Mobile Bottom Floating Navigation ─── */}
       {!pathname.startsWith("/app/chat") &&
         !pathname.startsWith("/app/stories/new") &&
-        !pathname.startsWith("/app/story/") && (
+        !pathname.startsWith("/app/story/") &&
+        !pathname.startsWith("/app/post/new") && (
           <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/30 bg-background/90 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
             {MOBILE_BOTTOM_ITEMS.map((item) => {
               const isActive =

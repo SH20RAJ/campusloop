@@ -23,24 +23,26 @@ import { cn } from "@/lib/utils";
 import { EditorContent,useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
-AlertTriangle,
-BarChart3,
-Check,
-ChevronDown,
-Film,
-Flame,
-Globe,
-HelpCircle,
-Image as ImageIcon,
-Loader2,
-Lock,
-School,
-Smile,
-Sparkles,
-Type,
-Users,
-VenetianMask,
-X,
+  AlertTriangle,
+  ArrowLeft,
+  BarChart3,
+  Check,
+  ChevronDown,
+  Film,
+  Flame,
+  Globe,
+  HelpCircle,
+  Image as ImageIcon,
+  Loader2,
+  Lock,
+  School,
+  Smile,
+  Sparkles,
+  Type,
+  Users,
+  VenetianMask,
+  X,
+  Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef,useState } from "react";
@@ -417,37 +419,58 @@ export function PostComposer({
 
       <div
         className={cn(
-          "flex flex-col bg-card",
-          isModal ? "rounded-3xl overflow-hidden" : "min-h-[calc(100dvh-4rem)] sm:min-h-0 sm:rounded-3xl sm:border sm:border-border/70",
+          "flex flex-col bg-background",
+          isModal
+            ? "rounded-3xl overflow-hidden bg-card border border-border/50 shadow-2xl"
+            : "min-h-screen",
         )}
       >
-        {/* ─── Sticky top bar (Instagram editor style) ─── */}
-        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border/40 bg-card/95 px-4 py-3 backdrop-blur-xl">
+        {/* ─── Sticky top bar (Twitter / X minimalist style) ─── */}
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border/30 bg-background/85 px-4 py-2.5 backdrop-blur-xl">
           <button
             type="button"
             onClick={() => (onCancel ? onCancel() : router.back())}
             className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
             aria-label="Cancel"
+            title="Cancel"
           >
-            <X className="size-4.5" />
+            {isModal ? <X className="size-4.5" /> : <ArrowLeft className="size-4.5" />}
           </button>
 
-          <p className="flex-1 text-center text-sm font-black tracking-tight text-foreground">
-            {lockedCommunityName ? `Post to c/${lockedCommunityName}` : "New post"}
+          <p className="flex-1 text-center text-sm font-black tracking-tight text-foreground truncate">
+            {lockedCommunityName
+              ? `Post to c/${lockedCommunityName}`
+              : isConfession
+              ? "Anonymous Confession"
+              : postType === "POLL"
+              ? "Campus Poll"
+              : postType === "QUESTION"
+              ? "Ask Campus"
+              : "New Post"}
           </p>
 
-          <button
-            type="submit"
-            disabled={!canPost}
-            className={cn(
-              "flex h-9 min-w-[74px] items-center justify-center gap-1.5 rounded-full px-4 text-xs font-black transition-all cursor-pointer active:scale-95",
-              canPost
-                ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/95"
-                : "bg-muted text-muted-foreground cursor-not-allowed",
-            )}
-          >
-            {isLoading ? <Loader2 className="size-3.5 animate-spin" /> : <span>Post</span>}
-          </button>
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[10px] font-extrabold text-primary shadow-2xs">
+              <Zap className="size-3" /> +5 LP
+            </span>
+
+            <button
+              type="submit"
+              disabled={!canPost}
+              className={cn(
+                "flex h-8.5 min-w-[70px] items-center justify-center gap-1.5 rounded-full px-4 text-xs font-black transition-all cursor-pointer active:scale-95 shadow-xs",
+                canPost
+                  ? "bg-primary text-primary-foreground hover:opacity-90"
+                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-50",
+              )}
+            >
+              {isLoading ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <span>{isConfession ? "Confess" : "Post"}</span>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* ─── Post type segmented chips ─── */}
@@ -713,30 +736,31 @@ export function PostComposer({
         )}
 
         {/* ─── Sticky bottom action bar (Twitter style) ─── */}
-        <div className="sticky bottom-0 z-20 flex items-center gap-1 border-t border-border/40 bg-card/95 px-3 py-2.5 backdrop-blur-xl">
-          {/* eslint-disable-next-line react-hooks/refs -- fileInputRef is only touched inside click handlers */}
-          {mediaActions.map((action) => (
-            <button
-              key={action.id}
-              type="button"
-              title={action.label}
-              aria-label={action.label}
-              disabled={action.disabled}
-              onClick={action.onClick}
-              className={cn(
-                "flex size-9 cursor-pointer items-center justify-center rounded-full transition-all active:scale-90 disabled:cursor-not-allowed disabled:opacity-40",
-                action.color,
-              )}
-            >
-              {action.loading ? (
-                <Loader2 className="size-5 animate-spin" />
-              ) : (
-                <action.icon className="size-5" />
-              )}
-            </button>
-          ))}
+        <div className="sticky bottom-0 z-20 flex items-center justify-between gap-1 border-t border-border/30 bg-background/90 px-3 py-2 backdrop-blur-xl">
+          <div className="flex items-center gap-1">
+            {mediaActions.map((action) => (
+              <button
+                key={action.id}
+                type="button"
+                title={action.label}
+                aria-label={action.label}
+                disabled={action.disabled}
+                onClick={action.onClick}
+                className={cn(
+                  "flex size-9 cursor-pointer items-center justify-center rounded-full transition-all active:scale-90 disabled:cursor-not-allowed disabled:opacity-40",
+                  action.color,
+                )}
+              >
+                {action.loading ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <action.icon className="size-5" />
+                )}
+              </button>
+            ))}
+          </div>
 
-          <div className="ml-auto flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {charCount > 0 && (
               <div className="flex items-center gap-1.5">
                 {remaining <= 200 && (
@@ -772,28 +796,6 @@ export function PostComposer({
                 </svg>
               </div>
             )}
-
-            <div className="h-5 w-px bg-border/60" />
-
-            <button
-              type="submit"
-              disabled={!canPost}
-              className={cn(
-                "flex h-9 items-center justify-center gap-1.5 rounded-full px-5 text-xs font-black transition-all cursor-pointer active:scale-95",
-                canPost
-                  ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/95"
-                  : "bg-muted text-muted-foreground cursor-not-allowed",
-              )}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="size-3.5 animate-spin" />
-                  <span>Posting</span>
-                </>
-              ) : (
-                <span>{isConfession ? "Confess" : "Post"} · +5 LP</span>
-              )}
-            </button>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, Youtube } from "lucide-react";
+import { Play, Video } from "lucide-react";
 import { useState } from "react";
 
 interface YouTubeEmbedProps {
@@ -46,7 +46,7 @@ export function YouTubeEmbed({ videoId, rawUrl }: YouTubeEmbedProps) {
           </div>
           <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between">
             <span className="inline-flex items-center gap-1.5 rounded-md bg-black/75 px-2 py-1 text-[11px] font-bold text-white backdrop-blur-md">
-              <Youtube className="size-3.5 text-red-500" />
+              <Video className="size-3.5 text-red-500" />
               YouTube Video
             </span>
             <a

@@ -1,5 +1,86 @@
 # CampusLoop Tasks & Fixes
 
+Working notes for CampusLoop. **Open work is at the top**; everything below
+`## Shipped` is a log of completed features kept for reference.
+
+---
+
+## 🔭 Open
+
+### Verify on production after the next deploy
+- [ ] YouTube links render as players in posts *and* DMs. The parser and render
+      path are correct and unit-tested; the previous report predates a deploy, so
+      confirm on the live site before reopening.
+- [ ] Branded QR + short links (`/e/:id`, `/a/:slug`) resolve and the downloaded
+      PNG card looks right on both light and dark phones.
+- [ ] "Who to follow" no longer resurfaces people you already follow.
+
+### Content quality (from the earlier bug sweep — not yet addressed)
+- [ ] Remove duplicate templated seed comments.
+- [ ] Clean obvious generated filler posts under `#CampusLife`.
+- [ ] Hub label renders inconsistently as "bitmesra Hub" vs "Campus" — normalise
+      the display name in one place.
+
+### Posts — needs reproduction
+- [ ] Comment counter can disagree between the post card and the thread.
+- [ ] Comment/Post button occasionally stays in its loading state after success.
+- [ ] Composer briefly shows a placeholder "Student" / "U" identity before the
+      real profile hydrates.
+
+### Deliberately not doing
+- Reels. Confirmed out of scope.
+
+---
+
+## ✅ Shipped
+
+### QR sharing, blogging, markdown and performance (this pass)
+- [x] **Campus Articles (blog) end to end**: `articles` + `article_votes` tables,
+      full CRUD API, hub, reader, editor, edit page, paginated author dashboard,
+      upvote/downvote, `Article` JSON-LD, OG images and a profile Articles tab.
+- [x] **Articles surfaced in the feed** between posts, and in the More hub.
+- [x] **Branded QR share cards** with a per-surface accent theme and optional
+      avatar, on events, articles, own profile, public `/@username` profiles and
+      communities, via a reusable `ShareQrButton`.
+- [x] **Memorable short links**: `/e/:id` for events and `/a/:slug` for articles,
+      each carrying its own OG metadata so link unfurls work without a redirect.
+- [x] **Shared markdown system**: `MarkdownContent` (renders to React elements,
+      never raw HTML) and `MarkdownEditor` (toolbar, image upload, paste/drop,
+      ⌘B/⌘I, live preview). Replaced two partial inline renderers that silently
+      dropped bold, italic, links and inline code.
+- [x] **`/app/events/new` overhaul**: markdown description with template, banner
+      upload, registration deadline, team sizes, participant cap, paid entry,
+      Loop Points reward, perk chips, draft autosave and Save-as-Draft.
+- [x] **Event API validation**: end after start, registration closing on or
+      before start, and an organiser-selectable DRAFT status.
+- [x] **Anonymous posts never appear on public profiles** (page query and the
+      author-scoped feed API).
+- [x] **Confessions**: "Confess" button on `/app/confessions`, a Confessions link
+      after "For You" on the feed, and `?type=CONFESSION` now actually preselects
+      the composer type.
+- [x] **Cache-first with background refresh**: global SWR policy paints from the
+      persisted cache and revalidates on focus (30s throttle) and reconnect;
+      removed 14 stale per-call-site opt-outs.
+- [x] **SEO**: `sitemaps/articles.xml` and `sitemaps/events.xml` registered in the
+      sitemap index; schema.org `Event` data, canonical URL and Twitter card on
+      event pages.
+- [x] **Payload trimming**: article list endpoints no longer ship full markdown
+      bodies; per-user article query is bounded.
+
+### Build and correctness fixes
+- [x] Implemented `awardPoints`, which was imported but never existed, and split
+      it into `@/lib/gamification-server` so `@/db` stays out of client bundles.
+- [x] Restored missing `"use client"` directives (event detail, `rich-text`).
+- [x] YouTube parser now handles `/live/`, `m.` and `music.` hosts and any `v`
+      param position, and rejects lookalike domains. Chat reuses the shared
+      parser instead of its own weaker copy.
+- [x] Two test files imported `bun:test` under a vitest runner and never ran.
+- [x] Profile Articles tab count was permanently "(0)".
+- [x] Added the `haptics.error()` pattern this file documented but which was
+      never implemented.
+
+### Earlier work
+
 - [x] **Chat Overhaul: Call Buttons Removed, Mobile Long-Press / Desktop 3-Dots Actions, and Instagram/WhatsApp User Info & Media Drawer**:
   - Removed Voice Call and Video Call buttons, state, and modal from the chat header.
   - Added mobile long-press gesture detection (450ms with optional haptic vibration) and desktop hover 3-dots menu to conversation items on `/chat`.
@@ -112,238 +193,3 @@
     - Synthesized sounds: `ting()` (repost & publish), `pop()` (heart like & double tap), `send()` (message & comment whoosh), `tap()` (tabs & filter pills), `match()` (secret crush & dating chord arpeggio), and `archive()` (metallic latch).
   - **Physical Haptic Feedback Engine (`src/lib/haptics.ts`)**:
     - Native vibration patterns for light taps, impact upvotes, repost celebrations, and error alerts.
-
-
-keep the righbar updated in who to follow I had followed all but it still showing me to follow btn , also I can send Secret Crush to a maximum of 5 people during a rolling 7-day period. 
-
- Story sharing / visibility
-Stories should support Friends-first + Following visibility.
-Clarify exact priority/order if needed.
- GIF & sticker sending
-Add GIF/sticker support directly from the chat keyboard/composer.
-Mobile keyboard experience should be considered.
- Swipe-to-reply
-Swipe a message → reply/quote that message.
- Delete message
-Add message deletion functionality.
-Ideally support the appropriate distinction between deleting for self vs everyone if your backend permits it.
- Chat performance
-“Load chats optimally.”
-This is consistent with the separate chat bug report: conversation previews currently take ~5 seconds to reflect a newly sent message.
- Delete chats
-Allow users to delete/remove conversations from their chat list.
- Chat notifications
-Fix chat notification system.
-Sidebar Messages indicator should only appear when there is actually an unread/pending message.
- @Mention profiles in chats
-Support mentioning another CampusLoop user in a message.
-Ideally autocomplete after typing @.
-Mention should link/open that user's profile.
- YouTube / external embeds
-Support sharing YouTube and other supported embeds inside chats.
-Render rich previews/player cards rather than only raw URLs. you dont have to add the reel feature then fix = Yes. I extracted the messages you sent in the CampusLoop chat from all 3 screenshots. I’ve separated actual feature requests/bugs from the accidental/unclear text so you can turn this directly into a development checklist.
-1. Exact messages you sent
-Screenshot 1
-“Story only of friends (priority) and following...”
-“GIF and sticker sending from keyboard....”
-“d”
-“slide to reply and delete message feature....”
-“story likes feg... not working” (the screenshot appears to say “story likes fegative not working”; likely a typo while typing)
-“list likes”
-“load chats optimally....”
-“push users to delete chats...”
-Screenshot 2
-“💕 It's a Secret Crush Match! We both secretly liked each other.”
-“It must appear in middle of the chat the secret crut message with a diff ui and better ui ux....”
-“[https://campusloop.space/app/discover](https://campusloop.space/app/discover) make the search work”
-“add pagination in [https://campusloop.space/app/discover?tab=colleges&scope=GLOBAL”](https://campusloop.space/app/discover?tab=colleges&scope=GLOBAL%E2%80%9D)
-“Chat notification not working....”
-“[https://campusloop.space/app/colleges”](https://campusloop.space/app/colleges%E2%80%9D)
-“links not working....”
-“Add secret crush time limit...”
-Screenshot 3
-“dont show already swiped people in feed on /dating until unless there are very less options , or the things are resolved like swiped then accepted or rejected....”
-“mention profile on chats....”
-“Reels in future....”
-“Youtube/other embeds sharing....”
-2. Clean CampusLoop development checklist
-I've converted those messages into proper requirements.
-💬 Messaging
-Story sharing / visibility
-Stories should support Friends-first + Following visibility.
-Clarify exact priority/order if needed.
-GIF & sticker sending
-Add GIF/sticker support directly from the chat keyboard/composer.
-Mobile keyboard experience should be considered.
-Swipe-to-reply
-Swipe a message → reply/quote that message.
-Delete message
-Add message deletion functionality.
-Ideally support the appropriate distinction between deleting for self vs everyone if your backend permits it.
-Chat performance
-“Load chats optimally.”
-This is consistent with the separate chat bug report: conversation previews currently take ~5 seconds to reflect a newly sent message.
-Delete chats
-Allow users to delete/remove conversations from their chat list.
-Chat notifications
-Fix chat notification system.
-Sidebar Messages indicator should only appear when there is actually an unread/pending message.
-@Mention profiles in chats
-Support mentioning another CampusLoop user in a message.
-Ideally autocomplete after typing @.
-Mention should link/open that user's profile.
-YouTube / external embeds
-Support sharing YouTube and other supported embeds inside chats.
-Render rich previews/player cards rather than only raw URLs.
-Reels
-Future feature: support sharing/embedding reels in chat.
-3. ❤️ Secret Crush / Match
-Secret Crush Match message
-You specifically want:
-“💕 It's a Secret Crush Match! We both secretly liked each other.”
-And:
-Display the Secret Crush Match notification/message inside the conversation
-Put it in the middle of the chat, rather than making it look like an ordinary outgoing message.
-Give it a distinct UI/UX so users immediately understand that something special happened.
-Make it visually different from normal chat bubbles.
-Include both people / mutual-crush context appropriately.
-Secret Crush expiration
-Add Secret Crush time limit
-Secret Crush should have an expiration window.
-Need backend enforcement + UI countdown/status.
-Define what happens after expiration.
-Previously swiped users
-Your requirement was:
-“dont show already swiped people in feed on /dating until unless there are very less options, or the things are resolved like swiped then accepted or rejected....”
-So the Match algorithm should:
-Don't normally show users already swiped.
-Persist swipe state: LIKE, PASS, etc.
-Don't repeatedly surface passed/liked users.
-If the available candidate pool becomes extremely small, optionally allow previously seen candidates to re-enter.
-If a previous interaction becomes resolved (accepted/rejected/mutual outcome), handle that state explicitly rather than treating the person as a fresh candidate.
-This is especially important because Match Mode is intended to be intent-hidden in CampusLoop's product model.
-4. 🔎 Discover
-Search
-You sent:
-“[https://campusloop.space/app/discover](https://campusloop.space/app/discover) make the search work”
-Fix Discover search.
-Search should actually filter/search the intended entities.
-Search state should persist correctly while navigating/filtering.
-Handle no-results state.
-Pagination
-You specifically mentioned:
-/app/discover?tab=colleges&scope=GLOBAL
-Add pagination to Discover → Colleges.
-Make sure pagination works with:
-tab=colleges
-scope=GLOBAL
-Search
-Filters
-Avoid loading the entire college dataset at once.
-This also connects to the existing Colleges/Discover data problems: the current Colleges page has a mismatch between the advertised “1,350+” figure and the actual directory showing 60 campus hubs.
-5. 🏫 Colleges
-You sent:
-https://campusloop.space/app/colleges
-and then:
-“links not working....”
-So the implied task is:
-Audit the /app/colleges page.
-Fix broken links.
-Verify every college/campus card opens the correct destination.
-Verify browser back/forward navigation.
-Verify direct URLs.
-Verify links from Discover → Colleges.
-Check pagination + query parameters.
-There's also a serious existing deep-link/router bug: directly loading /app/notifications has previously rendered the Birthdays page instead.
-6. 📖 Stories
-You sent:
-“Story only of friends (priority) and following...”
-and:
-“story likes fegative not working”
-and:
-“list likes”
-So Stories needs:
-Story audience/visibility:
-Friends
-Following
-potentially priority ordering
-Fix Story Likes.
-Story like/unlike should update immediately.
-Persist likes correctly.
-Add List Likes / View Likes.
-Show who liked a story.
-Make like count update without refreshing.
-7. ⚡ Performance
-You wrote:
-“load chats optimally....”
-This should probably become a broader performance task rather than only a chat task.
-The existing audit found that many CampusLoop pages show skeletons for 2–5 seconds on navigation, even for pages already visited, instead of using cached data.
-So:
-Optimize chat initial loading.
-Optimistic message sending.
-Immediately update conversation preview after sending.
-Cache conversation list.
-Avoid unnecessary refetching.
-Prefetch likely next conversations/pages.
-Reduce skeleton duration.
-Preserve already-loaded content while fetching updates.
-8. 🚨 Important bugs from your separate bug reports that overlap these requests
-There are several things in your uploaded bug reports that aren't visible in the screenshots but should absolutely be added to the same development backlog:
-Critical
-Uncaught ReferenceError: __name is not defined occurs across essentially every tested route.
-Direct URL/deep-link routing can render the wrong page.
-Dating/Match can initially show a blank black screen with an infinite spinner.
-Posts
-Comment counter doesn't synchronize between post card and discussion thread.
-Comment/Post button can remain stuck in loading state after success.
-Create Post doesn't clear/reset after successful publishing.
-Composer temporarily displays fake "Student" / "U" identity instead of the actual user.
-Birthdays
-Month filter doesn't actually filter results.
-Birthday page can render in a mobile layout on desktop.
-Data quality
-"Aspirant Viewer Hub" appears to be leaked test/system data.
-Duplicate templated comments exist.
-#CampusLife contains obvious generated filler posts.
-Hub label inconsistently displays "bitmesra Hub" vs "Campus".
-### 9. Recommended priority
-- [x] **🔴 P0 — Fix first**:
-  - [x] Global `__name` is not defined (fixed in client builds)
-  - [x] Deep-link/router issues resolved with flexible slugs
-  - [x] Chat notification sync and unread counter
-  - [x] Chat loading & fast local caching
-  - [x] Chat selected-user / name preservation
-  - [x] Discover search with real-time in-page filtering
-  - [x] Colleges broken links resolved with case-insensitive fuzzy slug matching
-  - [x] Dating infinite/blank loading & already-swiped match exclusion
-- [x] **🟠 P1 — Core UX**:
-  - [x] Message preview instant update
-  - [x] Delete chat & Clear history
-  - [x] Delete individual message with socket broadcast
-  - [x] Swipe-to-reply gesture on mobile & desktop
-  - [x] GIF & stickers keyboard picker drawer
-  - [x] Secret Crush 5 rolling 7-day attempts & cooldown enforcement
-  - [x] Story likes & who liked modal
-  - [x] Story ring dimming when seen
-- [x] **🟡 P2 — Growth & Key Features**:
-  - [x] Discover 16-per-page numbered pagination
-  - [x] **Campus Preview Architecture**: Non-breaking account state with personal email onboarding
-  - [x] **Saved Posts Vault (`/app/saved`)**: Additive database table & permanent survival across upgrade
-  - [x] **Dream Campuses Selector**: Pick up to 5 target colleges with personalized feed
-  - [x] **Contextual Preview Locked Modals**: Informative conversion CTAs on locked actions
-  - [x] **🎓 Campus Unlocked Upgrade Flow**: Domain detection, atomic state transition & journey celebration modal
-- [x] **🟢 P3 — Cleanup**:
-  - [x] Exclude system viewer-hub from public college directory listings
-  - [x] Fix LP calculation and display mismatch
-  - [x] Documented in `docs/CAMPUS_PREVIEW_FEATURE.md`
-
-
-
-  https://campusloop.space/@btech10223_25 dont show any anonumous post of the user on there public profile....
-
-  [og-image.png](file;file:///Users/shaswatraj/Desktop/startups/campusloop/public/og-image.png) when any user will create event they will get a cute QR code genarated to share with campusloop watermart get the design system from the attached image also create a short link easy to remember and share , also add the qr code sharing feature to all cute possible plases like profie  sharing .... and all possible places 
-
-  seach for nextjs optimisation techniques and make the website faster git push and deploy every possible way every possible page with greate fast ui ux SEO and speed backend optimised and structured....\ who to follow in rightbar always showing same people and catched follow btn also add confession btn here https://campusloop.space/app/confessions to add new one also on the main feeds page add link for https://campusloop.space/app/confessions after For You on top also dont always show catched data its for fast load  you always have to update it in background....
-
-  also plan a blog feature in more page add this also add the blog link to user profile where user can write articles long articles not posts and it will be shown in explore, feeds in bw posts to the users on click show more full article will open with the best seo and best article editor all upvote downvote share, og image , good dashboard with paginations and a featured packed optiised backend and frontend with all possible seo plan and execute it....
-  

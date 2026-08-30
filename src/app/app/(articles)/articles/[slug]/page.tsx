@@ -1,10 +1,10 @@
+import { and, eq, or } from "drizzle-orm";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getDb } from "@/db";
 import { articles, articleVotes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getFollowState } from "@/lib/follows";
-import { and, eq, or } from "drizzle-orm";
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { ArticleReaderClient } from "./article-reader-client";
 
 interface ArticlePageProps {
@@ -29,8 +29,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   }
 
   const title = `${article.title} — By @${article.author?.username || "student"} | CampusLoop`;
-  const description =
-    article.excerpt || article.subtitle || `Read ${article.title} on CampusLoop.`;
+  const description = article.excerpt || article.subtitle || `Read ${article.title} on CampusLoop.`;
   const url = `https://campusloop.space/app/articles/${article.slug}`;
   const ogImage = article.coverImageUrl || "https://campusloop.space/og-image.png";
 
@@ -104,10 +103,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   let userVote = 0;
   if (currentProfile) {
     const vote = await db.query.articleVotes.findFirst({
-      where: and(
-        eq(articleVotes.articleId, article.id),
-        eq(articleVotes.profileId, currentProfile.id)
-      ),
+      where: and(eq(articleVotes.articleId, article.id), eq(articleVotes.profileId, currentProfile.id)),
     });
     if (vote) {
       userVote = vote.value;
@@ -166,10 +162,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <ArticleReaderClient
         article={article as any}
         currentProfile={currentProfile as any}

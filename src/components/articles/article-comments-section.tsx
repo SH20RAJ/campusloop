@@ -1,24 +1,15 @@
 "use client";
 
+import { CornerDownRight, Loader2, MessageSquare, Send, ShieldCheck, ThumbsUp, X } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-  CornerDownRight,
-  Heart,
-  Loader2,
-  MessageSquare,
-  Send,
-  ShieldCheck,
-  ThumbsUp,
-  X,
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
 
 interface ArticleCommentsSectionProps {
   articleSlug: string;
@@ -30,10 +21,7 @@ interface ArticleCommentsSectionProps {
   } | null;
 }
 
-export function ArticleCommentsSection({
-  articleSlug,
-  currentProfile,
-}: ArticleCommentsSectionProps) {
+export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleCommentsSectionProps) {
   const [commentText, setCommentText] = useState("");
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -105,10 +93,7 @@ export function ArticleCommentsSection({
     haptics.light();
 
     try {
-      const res = await fetch(
-        `/api/articles/${articleSlug}/comments/${commentId}/vote`,
-        { method: "POST" }
-      );
+      const res = await fetch(`/api/articles/${articleSlug}/comments/${commentId}/vote`, { method: "POST" });
       if (!res.ok) throw new Error("Vote failed");
       mutate();
     } catch {
@@ -153,20 +138,14 @@ export function ArticleCommentsSection({
         </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-border/20">
-          <span className="text-[11px] text-muted-foreground">
-            Be respectful &amp; insightful.
-          </span>
+          <span className="text-[11px] text-muted-foreground">Be respectful &amp; insightful.</span>
           <button
             type="button"
             disabled={!commentText.trim() || isSubmitting}
             onClick={() => handleAddComment(null)}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 cursor-pointer shadow-xs"
           >
-            {isSubmitting ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Send className="size-3.5" />
-            )}
+            {isSubmitting ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
             <span>Comment</span>
           </button>
         </div>
@@ -211,15 +190,11 @@ export function ArticleCommentsSection({
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-foreground group-hover:underline flex items-center gap-1">
                         <span>{author?.displayName || `@${author?.username}`}</span>
-                        {isVerified && (
-                          <ShieldCheck className="size-3 text-blue-500 shrink-0" />
-                        )}
+                        {isVerified && <ShieldCheck className="size-3 text-blue-500 shrink-0" />}
                       </p>
                       <p className="text-[10px] text-muted-foreground truncate">
                         @{author?.username}
-                        {author?.institution?.name
-                          ? ` · ${author.institution.name.split(",")[0]}`
-                          : ""}
+                        {author?.institution?.name ? ` · ${author.institution.name.split(",")[0]}` : ""}
                       </p>
                     </div>
                   </Link>
@@ -324,15 +299,11 @@ export function ArticleCommentsSection({
                               </Avatar>
                               <p className="text-[11px] font-bold text-foreground group-hover:underline flex items-center gap-1">
                                 <span>{replyAuthor?.displayName || `@${replyAuthor?.username}`}</span>
-                                {replyVerified && (
-                                  <ShieldCheck className="size-2.5 text-blue-500 shrink-0" />
-                                )}
+                                {replyVerified && <ShieldCheck className="size-2.5 text-blue-500 shrink-0" />}
                               </p>
                             </Link>
 
-                            <span className="text-[9px] text-muted-foreground">
-                              {replyDate}
-                            </span>
+                            <span className="text-[9px] text-muted-foreground">{replyDate}</span>
                           </div>
 
                           <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-wrap pl-6">
@@ -345,7 +316,9 @@ export function ArticleCommentsSection({
                               onClick={() => handleVoteComment(reply.id)}
                               className={cn(
                                 "flex items-center gap-1 text-[10px] font-bold transition-colors cursor-pointer",
-                                reply.userVote > 0 ? "text-primary font-black" : "text-muted-foreground hover:text-foreground"
+                                reply.userVote > 0
+                                  ? "text-primary font-black"
+                                  : "text-muted-foreground hover:text-foreground"
                               )}
                             >
                               <ThumbsUp className="size-3" />

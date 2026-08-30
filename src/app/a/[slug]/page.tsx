@@ -2,7 +2,7 @@ import { getDb } from "@/db";
 import { articles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import ArticleReaderPage from "@/app/app/(main)/articles/[slug]/page";
+import ArticleReaderPage from "@/app/app/(articles)/articles/[slug]/page";
 
 interface ArticleShortLinkProps {
   params: Promise<{ slug: string }>;

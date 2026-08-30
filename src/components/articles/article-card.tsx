@@ -1,22 +1,11 @@
 "use client";
 
+import { ArrowUpRight, BookOpen, Clock, Eye, QrCode, ShieldCheck, ThumbsUp } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import {
-  ArrowUpRight,
-  BookOpen,
-  Calendar,
-  Clock,
-  Eye,
-  Flame,
-  QrCode,
-  Share2,
-  ShieldCheck,
-  ThumbsUp,
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
 
 export interface ArticleCardProps {
   article: {
@@ -70,7 +59,8 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
   const authorName = article.author?.displayName || "Campus Writer";
   const authorUsername = article.author?.username || "student";
   const isVerified = (article.author?.points || 0) >= 150;
-  const collegeShort = article.institution?.name?.split(",")[0] || article.author?.institution?.name?.split(",")[0] || "Campus";
+  const collegeShort =
+    article.institution?.name?.split(",")[0] || article.author?.institution?.name?.split(",")[0] || "Campus";
 
   const formattedDate = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString("en-IN", {
@@ -92,9 +82,7 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
           href={`/app/articles/${article.slug}`}
           className={cn(
             "relative block overflow-hidden bg-muted/40",
-            featured
-              ? "md:col-span-6 aspect-[16/10] md:aspect-auto md:h-full"
-              : "aspect-[16/9] w-full"
+            featured ? "md:col-span-6 aspect-[16/10] md:aspect-auto md:h-full" : "aspect-[16/9] w-full"
           )}
         >
           {article.coverImageUrl ? (
@@ -130,10 +118,7 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
 
         {/* Content Details */}
         <div
-          className={cn(
-            "flex flex-1 flex-col justify-between p-5",
-            featured ? "md:col-span-6 md:p-6" : ""
-          )}
+          className={cn("flex flex-1 flex-col justify-between p-5", featured ? "md:col-span-6 md:p-6" : "")}
         >
           <div className="space-y-2.5">
             {/* Author Header */}
@@ -166,7 +151,10 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
             </div>
 
             {/* Title & Excerpt */}
-            <Link href={`/app/articles/${article.slug}`} className="block group-hover:text-primary transition-colors">
+            <Link
+              href={`/app/articles/${article.slug}`}
+              className="block group-hover:text-primary transition-colors"
+            >
               <h3
                 className={cn(
                   "font-black text-foreground tracking-tight line-clamp-2 leading-snug",

@@ -1,26 +1,16 @@
 "use client";
 
-import { BrandedQrModal } from "@/components/common/branded-qr-modal";
-import { Button } from "@/components/ui/button";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   ArrowUpRight,
   BookOpen,
-  Calendar,
-  Clock,
   Edit3,
   Eye,
   FileEdit,
   FileText,
-  Flame,
   LayoutDashboard,
-  PenTool,
   Plus,
   QrCode,
-  Share2,
   ThumbsUp,
   Trash2,
 } from "lucide-react";
@@ -28,6 +18,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { BrandedQrModal } from "@/components/common/branded-qr-modal";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 
 interface ArticleDashboardClientProps {
   publishedArticles: any[];
@@ -88,9 +82,7 @@ export function ArticleDashboardClient({
           </button>
           <div className="flex items-center gap-2">
             <LayoutDashboard className="size-4 text-primary" />
-            <h1 className="text-base font-black text-foreground tracking-tight">
-              Articles Dashboard
-            </h1>
+            <h1 className="text-base font-black text-foreground tracking-tight">Articles Dashboard</h1>
           </div>
         </div>
 
@@ -211,9 +203,7 @@ export function ArticleDashboardClient({
                   </Link>
 
                   {item.excerpt && (
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {item.excerpt}
-                    </p>
+                    <p className="text-xs text-muted-foreground line-clamp-1">{item.excerpt}</p>
                   )}
 
                   {item.status === "PUBLISHED" && (

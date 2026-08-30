@@ -57,18 +57,17 @@ export default function ArticlesPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Suspense
         fallback={
-          <div className="min-h-screen p-6 max-w-5xl mx-auto space-y-6 animate-pulse">
-            <div className="h-10 w-48 bg-muted/40 rounded-full" />
-            <div className="h-44 bg-muted/25 rounded-3xl" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="h-64 bg-muted/20 rounded-3xl" />
-              <div className="h-64 bg-muted/20 rounded-3xl" />
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
+            <div className="h-10 max-w-md bg-muted/40 rounded-2xl animate-pulse mb-6" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-4">
+                <div className="h-48 rounded-3xl bg-muted/40 animate-pulse" />
+                <div className="h-48 rounded-3xl bg-muted/40 animate-pulse" />
+              </div>
+              <div className="h-96 rounded-3xl bg-muted/40 animate-pulse" />
             </div>
           </div>
         }

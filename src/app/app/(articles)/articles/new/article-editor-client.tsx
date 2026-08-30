@@ -1,19 +1,9 @@
 "use client";
 
-import { BrandedQrModal } from "@/components/common/branded-qr-modal";
-import { MarkdownContent } from "@/components/common/markdown-content";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { haptics } from "@/lib/haptics";
-import { uploadImageToImgBB } from "@/lib/upload";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import confetti from "canvas-confetti";
 import {
   ArrowLeft,
   Bold,
-  BookOpen,
-  Check,
   Code,
   Eye,
   Heading1,
@@ -26,19 +16,24 @@ import {
   ListOrdered,
   Loader2,
   Minus,
-  PenTool,
   Quote,
   Save,
   Send,
-  Sparkles,
   Strikethrough,
   Upload,
   X,
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { BrandedQrModal } from "@/components/common/branded-qr-modal";
+import { MarkdownContent } from "@/components/common/markdown-content";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { cn } from "@/lib/utils";
 
 interface ArticleEditorClientProps {
   initialArticle?: {
@@ -79,10 +74,7 @@ const SUGGESTED_TAGS = [
   "InterviewPrep",
 ];
 
-export function ArticleEditorClient({
-  initialArticle,
-  isEditing = false,
-}: ArticleEditorClientProps) {
+export function ArticleEditorClient({ initialArticle, isEditing = false }: ArticleEditorClientProps) {
   const router = useRouter();
 
   const [title, setTitle] = useState(initialArticle?.title || "");
@@ -144,16 +136,12 @@ export function ArticleEditorClient({
     const selected = content.substring(start, end);
     const replacement = `${prefix}${selected || "text"}${suffix}`;
 
-    const newContent =
-      content.substring(0, start) + replacement + content.substring(end);
+    const newContent = content.substring(0, start) + replacement + content.substring(end);
     setContent(newContent);
 
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(
-        start + prefix.length,
-        start + prefix.length + (selected.length || 4)
-      );
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length + (selected.length || 4));
     }, 0);
   }
 
@@ -231,9 +219,7 @@ export function ArticleEditorClient({
     haptics.medium();
 
     try {
-      const endpoint = isEditing && initialArticle
-        ? `/api/articles/${initialArticle.slug}`
-        : "/api/articles";
+      const endpoint = isEditing && initialArticle ? `/api/articles/${initialArticle.slug}` : "/api/articles";
       const method = isEditing && initialArticle ? "PUT" : "POST";
 
       const res = await fetch(endpoint, {
@@ -688,26 +674,16 @@ export function ArticleEditorClient({
           <div className="space-y-6">
             {coverImageUrl && (
               <div className="aspect-[21/9] w-full overflow-hidden rounded-3xl bg-muted/40 border border-border/40 shadow-sm">
-                <img
-                  src={coverImageUrl}
-                  alt={title}
-                  className="h-full w-full object-cover"
-                />
+                <img src={coverImageUrl} alt={title} className="h-full w-full object-cover" />
               </div>
             )}
 
             <div className="space-y-2">
-              <span className="text-xs font-black uppercase text-primary tracking-wider">
-                {category}
-              </span>
+              <span className="text-xs font-black uppercase text-primary tracking-wider">{category}</span>
               <h1 className="text-3xl font-black text-foreground tracking-tight">
                 {title || "Untitled Article"}
               </h1>
-              {subtitle && (
-                <p className="text-base text-muted-foreground leading-relaxed">
-                  {subtitle}
-                </p>
-              )}
+              {subtitle && <p className="text-base text-muted-foreground leading-relaxed">{subtitle}</p>}
             </div>
 
             {/* Article Content Rendered — same renderer the published page uses */}

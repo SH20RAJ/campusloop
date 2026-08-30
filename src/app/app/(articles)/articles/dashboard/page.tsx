@@ -1,9 +1,9 @@
+import { desc, eq } from "drizzle-orm";
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { articles, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and, desc, eq } from "drizzle-orm";
-import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { ArticleDashboardClient } from "./article-dashboard-client";
 
 export const metadata: Metadata = {

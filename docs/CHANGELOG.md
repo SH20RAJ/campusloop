@@ -6,6 +6,14 @@ A log of significant product updates, UI decisions, and architectural commits.
 
 ### Recent Updates
 
+- **In-Feed Vibe-Matching Student Profile Recommendations**:
+  - Implemented semantic user recommendation engine ([`src/lib/recommendations/recommended-users.ts`](campusloop/src/lib/recommendations/recommended-users.ts)) combining Qdrant Cloud vector embeddings, mutual interests, shared college hubs, and academic branch matching.
+  - Multi-tier fallback pipeline: 1st Qdrant Vector Semantic Vibe match -> 2nd Shared Interests/Department -> 3rd Same Campus -> 4th Active Verified Loopers.
+  - Created `/api/profile/recommended` endpoint with strict user authentication and un-followed candidate filtering.
+  - Built sleek in-feed carousel widget ([`src/components/feed/feed-recommended-users.tsx`](campusloop/src/components/feed/feed-recommended-users.tsx)) with vibe match badges (`✨ 94% Vibe Match`, `🏛️ Same Campus`, `⚡ Coding`), monogram fallback DP, and 1-tap tactile follow actions.
+  - Embedded seamlessly into `/app` feed timeline at `idx === 3`.
+  - Added unit test suite in [`src/lib/recommendations/recommended-users.test.ts`](campusloop/src/lib/recommendations/recommended-users.test.ts) (all 102 tests passing).
+
 - **Two-Sided Multi-Armed Bandit Matching Engine & Dating Mobile Skeleton Overhaul**:
   - Implemented state-of-the-art **Two-Sided Matching & Discovery Engine** (`rankDatingCandidates` in [`src/lib/dating.ts`](campusloop/src/lib/dating.ts)) based on Reciprocal Recommender Systems and Thompson Sampling:
     - **Reciprocal Matching Priority**: Automatically elevates candidates who liked the user to the front of the deck for instant mutual match celebrations (+18 score boost).

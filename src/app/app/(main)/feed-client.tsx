@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { FeedHeader } from "@/components/feed/feed-header";
+import { FeedRecommendedUsers } from "@/components/feed/feed-recommended-users";
 import { FeedCaughtUpCard, FeedEmptyState, FeedErrorState } from "@/components/feed/feed-state-cards";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
@@ -377,6 +378,11 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
                   {idx === 2 && (
                     <div className="p-3 border-b border-border/30 bg-muted/10">
                       <InlineCommunitiesWidget />
+                    </div>
+                  )}
+                  {idx === 3 && (
+                    <div className="border-b border-border/30 bg-muted/10">
+                      <FeedRecommendedUsers />
                     </div>
                   )}
                   {idx === 4 && (

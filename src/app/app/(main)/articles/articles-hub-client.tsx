@@ -19,6 +19,8 @@ import {
   School,
   Search,
   Sparkles,
+  TrendingUp,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -27,14 +29,14 @@ import useSWR from "swr";
 
 const CATEGORIES = [
   { id: "ALL", label: "All Topics" },
-  { id: "TECH_AND_CODE", label: "Tech & Code" },
-  { id: "PLACEMENTS", label: "Placements" },
-  { id: "CAMPUS_LIFE", label: "Campus Life" },
-  { id: "RESEARCH", label: "Research" },
-  { id: "INTERNSHIPS", label: "Internships" },
-  { id: "PROJECTS", label: "Projects" },
-  { id: "GUIDES", label: "Guides" },
-  { id: "OPINION", label: "Opinion" },
+  { id: "TECH_AND_CODE", label: "Tech & Code 💻" },
+  { id: "PLACEMENTS", label: "Placements 💼" },
+  { id: "CAMPUS_LIFE", label: "Campus Life 🎓" },
+  { id: "RESEARCH", label: "Research 🔬" },
+  { id: "INTERNSHIPS", label: "Internships 🚀" },
+  { id: "PROJECTS", label: "Projects 🛠️" },
+  { id: "GUIDES", label: "Guides 📖" },
+  { id: "OPINION", label: "Opinion 💭" },
 ];
 
 export function ArticlesHubClient() {
@@ -79,8 +81,8 @@ export function ArticlesHubClient() {
   const restArticles = articlesList.slice(1);
 
   return (
-    <div className="min-h-screen pb-28 border-x border-border/30 bg-background max-w-4xl mx-auto select-none">
-      {/* ─── Top Sticky Bar ─── */}
+    <main className="min-h-screen pb-28 border-x border-border/20 bg-background max-w-4xl mx-auto select-none">
+      {/* ─── Top Sticky Header (Twitter/X Minimal) ─── */}
       <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border/30 bg-background/85 px-4 backdrop-blur-xl gap-2">
         <div className="flex items-center gap-3 min-w-0">
           <button
@@ -93,9 +95,12 @@ export function ArticlesHubClient() {
           </button>
           <div className="min-w-0">
             <h1 className="text-base font-black text-foreground tracking-tight flex items-center gap-1.5 truncate">
-              <span>Articles & Long Reads</span>
+              <span>Campus Articles</span>
               <BookOpen className="size-4 text-primary shrink-0" />
             </h1>
+            <p className="text-[11px] text-muted-foreground font-medium truncate">
+              Roadmaps, placement experiences &amp; student publications
+            </p>
           </div>
         </div>
 
@@ -143,10 +148,14 @@ export function ArticlesHubClient() {
           {/* Write Article CTA */}
           <Link
             href="/app/articles/new"
+            onClick={() => {
+              sounds.tap();
+              haptics.light();
+            }}
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 shadow-md shadow-primary/20 transition-all cursor-pointer active:scale-95 shrink-0"
           >
             <PenTool className="size-3.5" />
-            <span>Write</span>
+            <span>Write (+15 LP)</span>
           </Link>
         </div>
       </header>
@@ -157,19 +166,19 @@ export function ArticlesHubClient() {
           <div className="relative z-10 max-w-xl space-y-3">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/20 text-primary text-[11px] font-black border border-primary/30">
               <Sparkles className="size-3.5" />
-              <span>Campus Publication & Editorial</span>
+              <span>Verified Student Editorial Hub</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight">
-              Share knowledge, placement roadmaps, and campus journalism.
+              Placement secrets, tech deep dives &amp; campus journalism.
             </h2>
             <p className="text-xs md:text-sm text-muted-foreground leading-relaxed font-medium">
-              Write long-form articles that reach your batchmates and 1,350+ engineering & management campuses across India.
+              Read long-form insights written by verified seniors and batchmates across 1,350+ campuses in India.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <Link
                 href="/app/articles/new"
-                className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-foreground text-background text-xs font-black hover:opacity-90 transition-all shadow-md active:scale-95"
+                className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-foreground text-background text-xs font-black hover:opacity-90 transition-all shadow-md active:scale-95 cursor-pointer"
               >
                 <PenTool className="size-4" />
                 <span>Write an Article (+15 LP)</span>
@@ -177,10 +186,10 @@ export function ArticlesHubClient() {
 
               <Link
                 href="/app/articles/dashboard"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-2xl border border-border/80 bg-background/80 hover:bg-muted text-xs font-bold text-foreground transition-all"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-2xl border border-border/80 bg-background/80 hover:bg-muted text-xs font-bold text-foreground transition-all cursor-pointer"
               >
                 <FileText className="size-4" />
-                <span>Drafts & Analytics</span>
+                <span>Drafts &amp; Stats</span>
               </Link>
             </div>
           </div>
@@ -199,8 +208,20 @@ export function ArticlesHubClient() {
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            className="w-full h-11 pl-11 pr-4 rounded-2xl bg-muted/40 border border-border/40 focus:border-primary focus:bg-background text-xs font-medium placeholder:text-muted-foreground outline-none transition-all"
+            className="w-full h-11 pl-11 pr-10 rounded-2xl bg-muted/40 border border-border/40 focus:border-primary focus:bg-background text-xs font-medium placeholder:text-muted-foreground outline-none transition-all"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setPage(1);
+              }}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+            >
+              <X className="size-4" />
+            </button>
+          )}
         </div>
 
         {/* ─── Category Filter Chips ─── */}
@@ -214,7 +235,7 @@ export function ArticlesHubClient() {
                 "px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0",
                 selectedCategory === cat.id
                   ? "bg-foreground text-background shadow-xs font-black"
-                  : "bg-muted/40 text-muted-foreground hover:text-foreground border border-border/40"
+                  : "bg-muted/40 text-muted-foreground hover:text-foreground border border-border/40 hover:bg-muted"
               )}
             >
               {cat.label}
@@ -259,7 +280,7 @@ export function ArticlesHubClient() {
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   className="px-4 py-2 rounded-full border border-border/60 bg-card hover:bg-muted text-xs font-bold text-foreground transition-all cursor-pointer"
                 >
-                  Previous Page
+                  ← Previous Page
                 </button>
               )}
 
@@ -271,7 +292,7 @@ export function ArticlesHubClient() {
                 <button
                   type="button"
                   onClick={() => setPage((p) => p + 1)}
-                  className="px-4 py-2 rounded-full bg-primary text-primary-foreground hover:opacity-90 text-xs font-black transition-all cursor-pointer shadow-sm"
+                  className="px-4 py-2 rounded-full bg-primary text-primary-foreground hover:opacity-90 text-xs font-black transition-all cursor-pointer shadow-sm active:scale-95"
                 >
                   Next Page →
                 </button>
@@ -284,7 +305,7 @@ export function ArticlesHubClient() {
               <PenTool className="size-7" />
             </div>
             <div className="space-y-1 max-w-sm">
-              <h3 className="text-base font-black text-foreground">No articles published yet</h3>
+              <h3 className="text-base font-black text-foreground">No articles found in this category</h3>
               <p className="text-xs text-muted-foreground">
                 Be the pioneer writer from your campus to drop placement experiences, tutorials, or student opinions.
               </p>
@@ -299,6 +320,6 @@ export function ArticlesHubClient() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

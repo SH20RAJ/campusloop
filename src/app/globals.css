@@ -328,6 +328,23 @@
 }
 
 @layer utilities {
+  /*
+   * Horizontal filter strips (feed tabs, category pills, story rails) scroll
+   * without showing a bar. Both names are in use across the app; neither was
+   * ever defined, so ~49 call sites were silently rendering a scrollbar.
+   */
+  .no-scrollbar,
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar,
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
   .animate-marquee {
     animation: marquee var(--duration, 30s) linear infinite;
   }

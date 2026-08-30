@@ -26,7 +26,8 @@ export async function completeOnboarding(formData: FormData) {
   const avatarUrl = (formData.get("avatarUrl") as string) || null;
   const course = (formData.get("course") as string)?.trim() || null;
   const branch = (formData.get("branch") as string)?.trim() || null;
-  const year = Number(formData.get("year")) || 1;
+  const rawYear = formData.get("year");
+  const year = rawYear ? Number(rawYear) || 1 : null;
   const bio = (formData.get("bio") as string)?.trim() || null;
   const dob = (formData.get("dob") as string)?.trim() || null;
   const isDobPrivate = formData.get("isDobPrivate") === "true" || formData.get("isDobPrivate") === "on";
@@ -36,6 +37,22 @@ export async function completeOnboarding(formData: FormData) {
     interests = JSON.parse(interestsRaw);
   } catch {
     interests = [];
+  }
+
+  // Campus Preview (aspirant) fields. An aspirant has no year of study, and
+  // picks the campuses they are aiming for instead of a branch.
+  const aspirantStage = (formData.get("aspirantStage") as string)?.trim() || null;
+  const targetIdsRaw = (formData.get("targetInstitutionIds") as string) || "[]";
+  let targetInstitutionIds: string[] = [];
+  try {
+    const parsed = JSON.parse(targetIdsRaw);
+    if (Array.isArray(parsed)) {
+      targetInstitutionIds = parsed
+        .filter((id): id is string => typeof id === "string" && id.trim().length > 0)
+        .slice(0, 5);
+    }
+  } catch {
+    targetInstitutionIds = [];
   }
 
   // Strict Gender Validation
@@ -95,6 +112,9 @@ export async function completeOnboarding(formData: FormData) {
 
   const cleanAvatarUrl = avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
 
+  // Only aspirants carry a stage; for students the branch and year say it.
+  const headline = aspirantStage && !whitelistedDomain ? `${aspirantStage} · ${branch ?? "Aspirant"}` : null;
+
   try {
     await db
       .insert(userProfiles)
@@ -112,7 +132,9 @@ export async function completeOnboarding(formData: FormData) {
         branch,
         year,
         bio,
+        headline,
         interests,
+        targetInstitutionIds,
         institutionId,
         referredById: referrerId,
         onboardingCompleted: true,
@@ -133,7 +155,9 @@ export async function completeOnboarding(formData: FormData) {
           branch,
           year,
           bio,
+          headline,
           interests,
+          targetInstitutionIds,
           institutionId,
           onboardingCompleted: true,
         },

@@ -30,9 +30,9 @@ export function StoryAvatarItem({
           "p-0.5 rounded-full transition-all duration-300 group-hover:scale-105",
           hasUnseen
             ? isFriend
-              ? "bg-linear-to-tr from-emerald-500 via-teal-500 to-green-400 p-[2px]"
-              : "bg-linear-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2px]"
-            : "bg-muted"
+              ? "bg-linear-to-tr from-emerald-500 via-teal-500 to-green-400 p-[2.5px] shadow-xs shadow-emerald-500/20"
+              : "bg-linear-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2.5px] shadow-xs"
+            : "p-[1.5px] border-2 border-muted-foreground/30 opacity-60 group-hover:opacity-100"
         )}
       >
         <Avatar className="h-14 w-14 border-2 border-background shadow-xs">

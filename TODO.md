@@ -344,3 +344,5 @@ Remove templated #CampusLife filler
 Fix inconsistent hub naming
 Fix LP calculation/display mismatch
 This gives you a much cleaner CampusLoop engineering backlog than treating every chat message as an isolated task. The feature structure also confirms that Messaging is intended to connect conversations originating from posts, Communities, and Match Mode, so these messaging features should be implemented as a shared system rather than separate one-off flows.and always git commit , also in story if viewed dim the ring....
+
+Add - docs/CAMPUS_PREVIEW_FEATURE.md

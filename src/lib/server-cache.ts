@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
 import { communities,institutions,posts,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq,or } from "drizzle-orm";
+import { eq, ilike, or } from "drizzle-orm";
 import { cache } from "react";
 
 /**
@@ -70,8 +70,21 @@ export const getCachedCommunity = cache(async (idOrSlug: string) => {
 export const getCachedInstitution = cache(async (idOrSlug: string) => {
   if (!idOrSlug) return null;
   const db = getDb();
-  return await db.query.institutions.findFirst({
+  const exact = await db.query.institutions.findFirst({
     where: or(eq(institutions.slug, idOrSlug), eq(institutions.id, idOrSlug)),
+    with: {
+      profiles: true,
+    },
+  });
+  if (exact) return exact;
+
+  const cleanSlug = idOrSlug.toLowerCase().trim();
+  return await db.query.institutions.findFirst({
+    where: or(
+      ilike(institutions.slug, cleanSlug),
+      ilike(institutions.slug, `%${cleanSlug}%`),
+      ilike(institutions.name, `%${cleanSlug}%`)
+    ),
     with: {
       profiles: true,
     },

@@ -39,9 +39,25 @@ export function StoryRing({ users }: StoryRingProps) {
   const myStoryGroup = users.find((u) => u.id === profile?.id);
   const otherUsers = users.filter((u) => u.id !== profile?.id);
 
+  function isStorySeen(storyId: string) {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem(`cl_seen_story_${storyId}`) === "1";
+    } catch {
+      return false;
+    }
+  }
+
   function handleOpenStory(storyId: string) {
     sounds.pop();
     haptics.light();
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(`cl_seen_story_${storyId}`, "1");
+      } catch {
+        // ignore
+      }
+    }
     router.push(`/app/story/${storyId}`);
   }
 
@@ -106,12 +122,15 @@ export function StoryRing({ users }: StoryRingProps) {
         const firstStory = userGroup.stories[0];
         if (!firstStory) return null;
 
+        const allSeen = userGroup.stories.every((s) => isStorySeen(s.id));
+
         return (
           <StoryAvatarItem
             key={userGroup.id}
             displayName={userGroup.displayName}
             avatarUrl={userGroup.avatarUrl}
             isFriend={userGroup.isFriend}
+            hasUnseen={!allSeen}
             onClick={() => handleOpenStory(firstStory.id)}
           />
         );

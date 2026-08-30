@@ -93,3 +93,31 @@ export function setCachedConversations(convs: CachedConversation[]): void {
     }
   }
 }
+
+export function updateCachedConversationLastMessage(
+  conversationId: string,
+  lastMessage: {
+    id: string;
+    body: string;
+    senderId?: string;
+    createdAt: string;
+  }
+): void {
+  const convs = getCachedConversations() || [];
+  const updated = convs.map((c) => {
+    if (c.id !== conversationId) return c;
+    return {
+      ...c,
+      updatedAt: lastMessage.createdAt,
+      lastMessage: {
+        id: lastMessage.id,
+        body: lastMessage.body,
+        senderId: lastMessage.senderId,
+        readAt: null,
+        createdAt: lastMessage.createdAt,
+      },
+    };
+  });
+  setCachedConversations(updated);
+}
+

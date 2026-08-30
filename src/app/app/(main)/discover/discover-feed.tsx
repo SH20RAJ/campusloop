@@ -79,6 +79,7 @@ export function DiscoverFeed() {
   const [activeTab, setActiveTab] = useState<DiscoverTab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [collegeSearch, setCollegeSearch] = useState("");
+  const [collegesPage, setCollegesPage] = useState(1);
   const [followedIds, setFollowedIds] = useState<Record<string, boolean>>({});
 
   // Sync state when URL search params change externally
@@ -98,24 +99,25 @@ export function DiscoverFeed() {
   }, [searchParams]);
 
   function handleScopeChange(newScope: "CAMPUS" | "GLOBAL") {
-    setScope(newScope);
     sounds.tap();
     haptics.light();
+    setScope(newScope);
     const params = new URLSearchParams(searchParams.toString());
     params.set("scope", newScope);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
   function handleTabChange(newTab: DiscoverTab) {
-    setActiveTab(newTab);
-    sounds.tap();
+    sounds.pop();
     haptics.light();
+    setActiveTab(newTab);
+    setCollegesPage(1);
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", newTab.toLowerCase());
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
-  // Dynamic trends from API
+  // Dynamic live trends from real database
   const { data: trendsData } = useSWR<TrendsResponse>(
     `/api/trends?scope=${scope}`,
     fetcher,
@@ -143,7 +145,7 @@ export function DiscoverFeed() {
     feedType,
     feedSort
   );
-  const { colleges, isLoading: collegesLoading } = useColleges(60);
+  const { colleges, isLoading: collegesLoading } = useColleges(120);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -170,21 +172,55 @@ export function DiscoverFeed() {
     });
   }
 
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    if (activeTab === "COLLEGES") {
+      setCollegeSearch(searchQuery);
+      setCollegesPage(1);
+    } else {
+      router.push(`/app/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  }
+
   const trends = trendsData?.trends || [];
   const news = trendsData?.news || [];
   const collegeName = trendsData?.collegeName || "Your Campus";
 
+  // Filter feed by in-page search query
+  const filteredFeed = useMemo(() => {
+    if (!feed) return [];
+    if (!searchQuery.trim()) return feed;
+    const q = searchQuery.toLowerCase();
+    return feed.filter(
+      (p) =>
+        p.body.toLowerCase().includes(q) ||
+        p.author?.displayName?.toLowerCase().includes(q) ||
+        p.author?.username?.toLowerCase().includes(q) ||
+        p.institution?.name?.toLowerCase().includes(q)
+    );
+  }, [feed, searchQuery]);
+
+  const effectiveCollegeQuery = collegeSearch || searchQuery;
+
   const searchedColleges = useMemo(() => {
     if (!colleges) return [];
-    if (!collegeSearch.trim()) return colleges;
-    const q = collegeSearch.toLowerCase();
+    if (!effectiveCollegeQuery.trim()) return colleges;
+    const q = effectiveCollegeQuery.toLowerCase();
     return colleges.filter(
       (c) =>
         c.name.toLowerCase().includes(q) ||
         c.state?.toLowerCase().includes(q) ||
         c.district?.toLowerCase().includes(q)
     );
-  }, [colleges, collegeSearch]);
+  }, [colleges, effectiveCollegeQuery]);
+
+  const COLLEGES_PER_PAGE = 16;
+  const totalCollegePages = Math.max(1, Math.ceil(searchedColleges.length / COLLEGES_PER_PAGE));
+  const paginatedColleges = useMemo(() => {
+    const start = (collegesPage - 1) * COLLEGES_PER_PAGE;
+    return searchedColleges.slice(start, start + COLLEGES_PER_PAGE);
+  }, [searchedColleges, collegesPage]);
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-24">
@@ -267,7 +303,7 @@ export function DiscoverFeed() {
       {activeTab === "EXPLORE" && (
         <div className="space-y-4 pt-3">
           {/* Today's Campus News / Top Discussion Card */}
-          {news.length > 0 && (
+          {news.length > 0 && !searchQuery.trim() && (
             <div className="border-b border-border/30 pb-3 divide-y divide-border/20">
               <div className="px-4 pb-2">
                 <h2 className="text-[17px] font-black text-foreground tracking-tight">
@@ -296,7 +332,7 @@ export function DiscoverFeed() {
           )}
 
           {/* Trending Hashtags Section */}
-          {trends.length > 0 && (
+          {trends.length > 0 && !searchQuery.trim() && (
             <div className="border-b border-border/30 pb-3 divide-y divide-border/20">
               <div className="px-4 pb-2 flex items-center justify-between">
                 <h2 className="text-[17px] font-black text-foreground tracking-tight">
@@ -333,7 +369,7 @@ export function DiscoverFeed() {
           )}
 
           {/* Inline "Who to follow" Section */}
-          {suggestedPeers && suggestedPeers.length > 0 && (
+          {suggestedPeers && suggestedPeers.length > 0 && !searchQuery.trim() && (
             <div className="border-b border-border/30 pb-3 divide-y divide-border/20">
               <div className="px-4 pb-2">
                 <h2 className="text-[17px] font-black text-foreground tracking-tight">
@@ -393,22 +429,28 @@ export function DiscoverFeed() {
           {/* Posts For You Feed */}
           <div className="px-4 space-y-4">
             <h2 className="text-[17px] font-black text-foreground tracking-tight pt-2">
-              {scope === "CAMPUS" ? `Posts for You in ${collegeName}` : "Discovery Feed Across India"}
+              {searchQuery.trim()
+                ? `Results for "${searchQuery}"`
+                : scope === "CAMPUS"
+                ? `Posts for You in ${collegeName}`
+                : "Discovery Feed Across India"}
             </h2>
 
             {feedLoading ? (
               <FeedSkeleton />
-            ) : feed && feed.length > 0 ? (
-              feed.map((post) => <FeedCard key={post.id} post={post} />)
+            ) : filteredFeed && filteredFeed.length > 0 ? (
+              filteredFeed.map((post) => <FeedCard key={post.id} post={post} />)
             ) : (
               <div className="py-16 text-center text-xs text-muted-foreground">
-                No posts found for this scope. Be the first to share a vibe!
+                No posts found {searchQuery.trim() ? `matching "${searchQuery}"` : "for this scope"}.
               </div>
             )}
 
-            <div ref={loadMoreRef} className="py-6 text-center">
-              {isLoadingMore && <FeedSkeleton />}
-            </div>
+            {!searchQuery.trim() && (
+              <div ref={loadMoreRef} className="py-6 text-center">
+                {isLoadingMore && <FeedSkeleton />}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -417,87 +459,125 @@ export function DiscoverFeed() {
       {activeTab === "TRENDING" && (
         <div className="divide-y divide-border/20 pt-2">
           {/* Hero Banner */}
-          <div className="p-4">
-            <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-blue-900 via-indigo-950 to-black p-6 text-white shadow-md">
-              <div className="space-y-2 relative z-10 max-w-sm">
-                <h3 className="text-lg font-black tracking-tight text-white">
-                  {scope === "CAMPUS" ? `${collegeName} Trending` : "Global Campus Trending"}
-                </h3>
-                <p className="text-xs text-white/80 leading-relaxed">
-                  Real-time hashtags, active discussions, and viral posts across verified students.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => handleTabChange("EXPLORE")}
-                  className="px-4 py-1.5 rounded-full bg-white text-black text-xs font-black hover:opacity-90 transition-opacity cursor-pointer"
-                >
-                  Explore Feed
-                </button>
+          {!searchQuery.trim() && (
+            <div className="p-4">
+              <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-blue-900 via-indigo-950 to-black p-6 text-white shadow-md">
+                <div className="space-y-2 relative z-10 max-w-sm">
+                  <h3 className="text-lg font-black tracking-tight text-white">
+                    {scope === "CAMPUS" ? `${collegeName} Trending` : "Global Campus Trending"}
+                  </h3>
+                  <p className="text-xs text-white/80 leading-relaxed">
+                    Real-time hashtags, active discussions, and viral posts across verified students.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange("EXPLORE")}
+                    className="px-4 py-1.5 rounded-full bg-white text-black text-xs font-black hover:opacity-90 transition-opacity cursor-pointer"
+                  >
+                    Explore Feed
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Numbered Trends */}
-          {trends.length > 0 ? (
-            trends.map((trend, index) => (
-              <Link
-                key={trend.topic}
-                href={trend.href}
-                className="flex items-start justify-between px-4 py-3.5 hover:bg-muted/30 transition-colors group cursor-pointer"
-              >
-                <div className="space-y-0.5 min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground font-medium truncate">
-                    {index + 1} · {trend.category}
-                  </p>
-                  <p className="text-base font-black text-foreground group-hover:underline truncate">
-                    {trend.topic}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{trend.formattedCount}</p>
-                </div>
-                <MoreHorizontal className="size-4 text-muted-foreground/50 group-hover:text-foreground shrink-0 mt-1" />
-              </Link>
-            ))
-          ) : (
-            <div className="py-12 text-center text-xs text-muted-foreground">
-              No trending topics recorded yet.
-            </div>
+          {!searchQuery.trim() && (
+            trends.length > 0 ? (
+              trends.map((trend, index) => (
+                <Link
+                  key={trend.topic}
+                  href={trend.href}
+                  className="flex items-start justify-between px-4 py-3.5 hover:bg-muted/30 transition-colors group cursor-pointer"
+                >
+                  <div className="space-y-0.5 min-w-0 flex-1">
+                    <p className="text-xs text-muted-foreground font-medium truncate">
+                      {index + 1} · {trend.category}
+                    </p>
+                    <p className="text-base font-black text-foreground group-hover:underline truncate">
+                      {trend.topic}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{trend.formattedCount}</p>
+                  </div>
+                  <MoreHorizontal className="size-4 text-muted-foreground/50 group-hover:text-foreground shrink-0 mt-1" />
+                </Link>
+              ))
+            ) : (
+              <div className="py-12 text-center text-xs text-muted-foreground">
+                No trending topics recorded yet.
+              </div>
+            )
           )}
 
           {/* Trending Ranked Posts Feed */}
           <div className="px-4 pt-4 space-y-4">
             <h2 className="text-[17px] font-black text-foreground tracking-tight">
-              {scope === "CAMPUS" ? `Top Trending in ${collegeName}` : "Viral Posts Across India"}
+              {searchQuery.trim()
+                ? `Trending Results for "${searchQuery}"`
+                : scope === "CAMPUS"
+                ? `Top Trending in ${collegeName}`
+                : "Viral Posts Across India"}
             </h2>
 
             {feedLoading ? (
               <FeedSkeleton />
-            ) : feed && feed.length > 0 ? (
-              feed.map((post) => <FeedCard key={post.id} post={post} />)
+            ) : filteredFeed && filteredFeed.length > 0 ? (
+              filteredFeed.map((post) => <FeedCard key={post.id} post={post} />)
             ) : (
               <div className="py-12 text-center text-xs text-muted-foreground">
-                No trending posts found for this scope yet.
+                No trending posts found {searchQuery.trim() ? `matching "${searchQuery}"` : "yet"}.
               </div>
             )}
 
-            <div ref={loadMoreRef} className="py-6 text-center">
-              {isLoadingMore && <FeedSkeleton />}
-            </div>
+            {!searchQuery.trim() && (
+              <div ref={loadMoreRef} className="py-6 text-center">
+                {isLoadingMore && <FeedSkeleton />}
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* ─── TAB 3: COLLEGES DIRECTORY VIEW ─── */}
+      {/* ─── TAB 3: COLLEGES DIRECTORY VIEW WITH PAGINATION ─── */}
       {activeTab === "COLLEGES" && (
         <div className="px-4 py-4 space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-            <input
-              type="text"
-              value={collegeSearch}
-              onChange={(e) => setCollegeSearch(e.target.value)}
-              placeholder="Search 1,350+ Indian colleges..."
-              className="w-full h-10 rounded-full border border-border/50 bg-muted/40 pl-9 pr-4 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-foreground transition-all"
-            />
+          <div className="flex items-center justify-between gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+              <input
+                type="text"
+                value={collegeSearch}
+                onChange={(e) => {
+                  setCollegeSearch(e.target.value);
+                  setCollegesPage(1);
+                }}
+                placeholder="Search 1,350+ Indian colleges..."
+                className="w-full h-10 rounded-full border border-border/50 bg-muted/40 pl-9 pr-4 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-foreground transition-all"
+              />
+            </div>
+            {collegeSearch && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCollegeSearch("");
+                  setCollegesPage(1);
+                }}
+                className="text-xs font-bold text-muted-foreground hover:text-foreground px-2 py-1"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between text-xs text-muted-foreground font-medium px-1">
+            <span>
+              Showing {searchedColleges.length > 0 ? (collegesPage - 1) * COLLEGES_PER_PAGE + 1 : 0} -{" "}
+              {Math.min(collegesPage * COLLEGES_PER_PAGE, searchedColleges.length)} of{" "}
+              {searchedColleges.length} Indian college hubs
+            </span>
+            <span>
+              Page {collegesPage} of {totalCollegePages}
+            </span>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -506,18 +586,76 @@ export function DiscoverFeed() {
                 <Skeleton className="h-24 w-full rounded-2xl" />
                 <Skeleton className="h-24 w-full rounded-2xl" />
               </div>
-            ) : searchedColleges.length > 0 ? (
-              searchedColleges
-                .slice(0, 16)
-                .map((college, i) => (
-                  <FeaturedCampusCard key={college.id} college={college} index={i} />
-                ))
+            ) : paginatedColleges.length > 0 ? (
+              paginatedColleges.map((college, i) => (
+                <FeaturedCampusCard key={college.id} college={college} index={i} />
+              ))
             ) : (
               <div className="col-span-2 py-12 text-center text-xs text-muted-foreground">
-                No college hubs found matching &ldquo;{collegeSearch}&rdquo;.
+                No college hubs found matching &ldquo;{effectiveCollegeQuery}&rdquo;.
               </div>
             )}
           </div>
+
+          {/* Colleges Pagination Controls */}
+          {totalCollegePages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-6 pb-4">
+              <button
+                type="button"
+                disabled={collegesPage <= 1}
+                onClick={() => {
+                  setCollegesPage((p) => Math.max(1, p - 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-muted hover:bg-muted/80 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              >
+                Previous
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalCollegePages) }, (_, i) => {
+                  let pageNum = i + 1;
+                  if (totalCollegePages > 5) {
+                    if (collegesPage > 3) {
+                      pageNum = collegesPage - 2 + i;
+                      if (pageNum > totalCollegePages) pageNum = totalCollegePages - 4 + i;
+                    }
+                  }
+                  const isCurrent = pageNum === collegesPage;
+                  return (
+                    <button
+                      key={pageNum}
+                      type="button"
+                      onClick={() => {
+                        setCollegesPage(pageNum);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className={cn(
+                        "size-8 rounded-xl text-xs font-bold transition-all cursor-pointer",
+                        isCurrent
+                          ? "bg-foreground text-background font-black shadow-xs"
+                          : "bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted"
+                      )}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                type="button"
+                disabled={collegesPage >= totalCollegePages}
+                onClick={() => {
+                  setCollegesPage((p) => Math.min(totalCollegePages, p + 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-muted hover:bg-muted/80 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -526,7 +664,9 @@ export function DiscoverFeed() {
         <div className="px-4 pt-4 space-y-4">
           <div className="flex items-center justify-between pb-2">
             <h2 className="text-[17px] font-black text-foreground tracking-tight">
-              {scope === "CAMPUS"
+              {searchQuery.trim()
+                ? `Confession Results for "${searchQuery}"`
+                : scope === "CAMPUS"
                 ? `Anonymous Confessions in ${collegeName}`
                 : "Confessions Across Indian Campuses"}
             </h2>
@@ -534,17 +674,19 @@ export function DiscoverFeed() {
 
           {feedLoading ? (
             <FeedSkeleton />
-          ) : feed && feed.length > 0 ? (
-            feed.map((post) => <FeedCard key={post.id} post={post} />)
+          ) : filteredFeed && filteredFeed.length > 0 ? (
+            filteredFeed.map((post) => <FeedCard key={post.id} post={post} />)
           ) : (
             <div className="py-16 text-center text-xs text-muted-foreground">
-              No confessions found for this scope.
+              No confessions found {searchQuery.trim() ? `matching "${searchQuery}"` : "for this scope"}.
             </div>
           )}
 
-          <div ref={loadMoreRef} className="py-6 text-center">
-            {isLoadingMore && <FeedSkeleton />}
-          </div>
+          {!searchQuery.trim() && (
+            <div ref={loadMoreRef} className="py-6 text-center">
+              {isLoadingMore && <FeedSkeleton />}
+            </div>
+          )}
         </div>
       )}
     </main>

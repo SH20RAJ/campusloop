@@ -38,7 +38,7 @@ export function RightSidebar() {
   );
 
   // Suggested peers from real database
-  const { data: suggestedPeers } = useSWR<SuggestedPeer[]>(
+  const { data: suggestedPeers, mutate: mutateSuggested } = useSWR<SuggestedPeer[]>(
     "/api/profile/suggested",
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 30000 }
@@ -50,14 +50,25 @@ export function RightSidebar() {
     router.push(`/app/search?q=${encodeURIComponent(searchQuery.trim())}`);
   }
 
-  function handleFollowToggle(peerId: string, peerName: string) {
-    setFollowedIds((prev) => {
-      const nextState = !prev[peerId];
+  async function handleFollowToggle(peer: SuggestedPeer) {
+    const isCurrentlyFollowed = Boolean(followedIds[peer.id]);
+    const nextState = !isCurrentlyFollowed;
+
+    setFollowedIds((prev) => ({ ...prev, [peer.id]: nextState }));
+
+    try {
       if (nextState) {
-        toast.success(`Connected with ${peerName}!`);
+        toast.success(`Following @${peer.username}`);
+        await fetch(`/api/profile/${peer.username}/follow`, { method: "POST" });
+      } else {
+        toast.info(`Unfollowed @${peer.username}`);
+        await fetch(`/api/profile/${peer.username}/follow`, { method: "DELETE" });
       }
-      return { ...prev, [peerId]: nextState };
-    });
+      mutateSuggested();
+    } catch {
+      setFollowedIds((prev) => ({ ...prev, [peer.id]: isCurrentlyFollowed }));
+      toast.error("Failed to update follow status");
+    }
   }
 
   const trends = (trendsData?.trends || []).slice(0, 4);
@@ -165,7 +176,7 @@ export function RightSidebar() {
 
                   <button
                     type="button"
-                    onClick={() => handleFollowToggle(peer.id, peer.displayName)}
+                    onClick={() => handleFollowToggle(peer)}
                     className={cn(
                       "rounded-full px-4 py-1.5 text-xs font-black transition-all cursor-pointer shrink-0 active:scale-95",
                       isFollowed

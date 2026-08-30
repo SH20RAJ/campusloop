@@ -7,9 +7,10 @@ import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { UserProfile } from "@/db/schema";
 import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
 import {
-CachedMessage,
-getCachedMessages,
-setCachedMessages,
+  CachedMessage,
+  getCachedMessages,
+  setCachedMessages,
+  updateCachedConversationLastMessage,
 } from "@/lib/chat-cache";
 import { haptics } from "@/lib/haptics";
 import { isOnline,presenceLabel } from "@/lib/presence";
@@ -17,21 +18,24 @@ import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import {
-ArrowLeft,
-CheckCheck,
-CornerDownRight,
-Info,
-Loader2,
-Mic,
-Paperclip,
-Play,
-Search,
-Send,
-ShieldCheck,
-Smile,
-User,
-Volume2,
-X,
+  ArrowLeft,
+  CheckCheck,
+  CornerDownRight,
+  ExternalLink,
+  Heart,
+  Info,
+  Loader2,
+  Mic,
+  Paperclip,
+  Play,
+  Search,
+  Send,
+  ShieldCheck,
+  Smile,
+  Trash2,
+  User,
+  Volume2,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect,useRef,useState } from "react";
@@ -54,6 +58,31 @@ interface MessengerPaneProps {
 
 const QUICK_REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥"];
 
+function getYouTubeVideoId(text: string) {
+  const match = text.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i);
+  return match ? match[1] : null;
+}
+
+function renderMessageWithMentions(text: string) {
+  const parts = text.split(/(@[a-zA-Z0-9_]+)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("@") && part.length > 1) {
+      const username = part.slice(1);
+      return (
+        <Link
+          key={i}
+          href={`/@${username}`}
+          className="font-bold text-primary hover:underline inline-block px-1 py-0.5 rounded-md bg-primary/10 transition-colors"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </Link>
+      );
+    }
+    return part;
+  });
+}
+
 export function MessengerPane({
   conversationId,
   otherParticipant,
@@ -72,11 +101,123 @@ export function MessengerPane({
   const [chatSearchQuery, setChatSearchQuery] = useState("");
   const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
   const [showInfoDrawer, setShowInfoDrawer] = useState(false);
+  const [deleteModalMsg, setDeleteModalMsg] = useState<CachedMessage | null>(null);
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionSuggestions, setMentionSuggestions] = useState<UserProfile[]>([]);
+  const [isSearchingMentions, setIsSearchingMentions] = useState(false);
+
+  // Swipe gesture tracking
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const activeSwipingMsgIdRef = useRef<string | null>(null);
+  const [swipedOffset, setSwipedOffset] = useState<Record<string, number>>({});
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Detect @mention trigger in textarea
+  useEffect(() => {
+    const cursor = textareaRef.current?.selectionStart || msgText.length;
+    const textBeforeCursor = msgText.slice(0, cursor);
+    const match = textBeforeCursor.match(/@([a-zA-Z0-9_]*)$/);
+    if (match) {
+      const q = match[1];
+      setMentionQuery(q);
+      fetch(`/api/chat/search?q=${encodeURIComponent(q)}`)
+        .then(async (res) => {
+          if (res.ok) {
+            const users = (await res.json()) as UserProfile[];
+            setMentionSuggestions(users.slice(0, 5));
+          } else {
+            setMentionSuggestions([]);
+          }
+        })
+        .catch(() => setMentionSuggestions([]))
+        .finally(() => setIsSearchingMentions(false));
+    } else {
+      setMentionQuery(null);
+      setMentionSuggestions([]);
+    }
+  }, [msgText]);
+
+  function handleSelectMention(username: string) {
+    if (!textareaRef.current) return;
+    const cursor = textareaRef.current.selectionStart || msgText.length;
+    const textBeforeCursor = msgText.slice(0, cursor);
+    const textAfterCursor = msgText.slice(cursor);
+    const replacedBefore = textBeforeCursor.replace(/@([a-zA-Z0-9_]*)$/, `@${username} `);
+    setMsgText(replacedBefore + textAfterCursor);
+    setMentionQuery(null);
+    setMentionSuggestions([]);
+    textareaRef.current.focus();
+  }
+
+  function handleTouchStart(e: React.TouchEvent, msgId: string) {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+    activeSwipingMsgIdRef.current = msgId;
+  }
+
+  function handleTouchMove(e: React.TouchEvent, msg: CachedMessage) {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const diffX = e.touches[0].clientX - touchStartXRef.current;
+    const diffY = e.touches[0].clientY - touchStartYRef.current;
+
+    // Only swipe horizontally if dominant
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+      const clamped = Math.min(Math.max(diffX, -80), 80);
+      setSwipedOffset({ [msg.id]: clamped });
+    }
+  }
+
+  function handleTouchEnd(msg: CachedMessage) {
+    const currentOffset = swipedOffset[msg.id] || 0;
+    if (Math.abs(currentOffset) >= 45) {
+      sounds.tap();
+      haptics.light();
+      setReplyingTo(msg);
+      toast.info(`Replying to ${msg.senderId === currentUserId ? "yourself" : otherParticipant?.displayName || "message"}`);
+    }
+    setSwipedOffset({});
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+    activeSwipingMsgIdRef.current = null;
+  }
+
+  async function handleDeleteMessage(msgId: string, deleteFor: "everyone" | "me") {
+    if (!conversationId) return;
+    sounds.pop();
+    haptics.heavy();
+    setDeleteModalMsg(null);
+
+    // Optimistic update
+    mutate((prev) => {
+      if (!prev) return prev;
+      return prev.map((m) => {
+        if (m.id !== msgId) return m;
+        return {
+          ...m,
+          body: deleteFor === "everyone" ? "🚫 This message was deleted" : "🚫 You deleted this message",
+          reactions: [],
+        };
+      });
+    }, false);
+
+    try {
+      const res = await fetch(
+        `/api/chat/${conversationId}/messages/${msgId}?deleteFor=${deleteFor}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error("Failed to delete message");
+      toast.success(deleteFor === "everyone" ? "Message deleted for everyone" : "Message deleted for you");
+      mutate();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete message");
+      mutate();
+    }
+  }
 
   // Auto-resize textarea to fit content (from 1 line up to 5 lines)
   useEffect(() => {
@@ -189,6 +330,13 @@ export function MessengerPane({
       setCachedMessages(conversationId, updated);
       return updated;
     }, false);
+
+    updateCachedConversationLastMessage(conversationId, {
+      id: optimisticMessage.id,
+      body: fullBody,
+      senderId: currentUserId,
+      createdAt: new Date().toISOString(),
+    });
 
     try {
       const res = await fetch(`/api/chat/${conversationId}/messages`, {
@@ -593,6 +741,11 @@ export function MessengerPane({
             const isReactionMenuOpen = isHovered || activeReactionMsgId === msg.id;
             const reactions = msg.reactions || [];
 
+            // Check if Secret Crush Match greeting
+            const isSecretCrushMatch =
+              msg.body.includes("Secret Crush Match") ||
+              msg.body.includes("We both secretly liked each other");
+
             // Check if message is a quoted reply
             const isQuoted = msg.body.startsWith("> ");
             let quotedText = "";
@@ -602,6 +755,46 @@ export function MessengerPane({
               quotedText = lines[0].replace(/^> /, "");
               messageBody = lines.slice(1).join("\n\n") || lines[0];
             }
+
+            // Detect YouTube Video URL
+            const ytVideoId = getYouTubeVideoId(messageBody);
+
+            // If Secret Crush Match System card: render centered in chat
+            if (isSecretCrushMatch) {
+              return (
+                <div key={msg.id} className="space-y-1 my-4">
+                  {showDateSeparator && (
+                    <div className="flex items-center justify-center my-3">
+                      <span className="text-[10px] font-bold px-3 py-0.5 rounded-full bg-card/90 text-muted-foreground border border-border/40 shadow-2xs tracking-wider">
+                        {formatDateSeparator(msg.createdAt)}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="w-full max-w-md mx-auto p-4 sm:p-5 rounded-3xl bg-linear-to-tr from-rose-500/15 via-pink-500/10 to-purple-500/15 border border-rose-500/30 text-center space-y-3 shadow-lg backdrop-blur-md animate-in zoom-in-95">
+                    <div className="size-12 rounded-2xl bg-rose-500 text-white flex items-center justify-center mx-auto shadow-md shadow-rose-500/30 animate-pulse">
+                      <Heart className="size-6 fill-white stroke-white" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-sm sm:text-base font-black text-rose-500 tracking-tight">
+                        💕 It&apos;s a Secret Crush Match!
+                      </h4>
+                      <p className="text-xs font-bold text-foreground">
+                        We both secretly liked each other.
+                      </p>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        Your identities have been revealed to each other. Break the ice and say hello!
+                      </p>
+                    </div>
+                    <div className="text-[10px] font-bold text-rose-500/70 pt-1">
+                      {formatTime(msg.createdAt)}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            const currentSwipe = swipedOffset[msg.id] || 0;
 
             return (
               <div key={msg.id} className="space-y-1 relative">
@@ -614,17 +807,23 @@ export function MessengerPane({
                   </div>
                 )}
 
-                {/* Message Row Wrapper with Hover & Safe Bridge */}
+                {/* Message Row Wrapper with Hover, Swipe, & Safe Bridge */}
                 <div
                   className={cn(
-                    "flex items-end gap-1.5 relative group/row",
+                    "flex items-end gap-1.5 relative group/row transition-transform duration-75",
                     isMe ? "justify-end flex-row" : "justify-start flex-row"
                   )}
+                  style={{
+                    transform: currentSwipe ? `translateX(${currentSwipe}px)` : undefined,
+                  }}
+                  onTouchStart={(e) => handleTouchStart(e, msg.id)}
+                  onTouchMove={(e) => handleTouchMove(e, msg)}
+                  onTouchEnd={() => handleTouchEnd(msg)}
                   onMouseEnter={() => handleMsgMouseEnter(msg.id)}
                   onMouseLeave={handleMsgMouseLeave}
                   onDoubleClick={() => toggleReaction(msg.id, "❤️")}
                 >
-                  {/* Action trigger button (visible on hover or tap) */}
+                  {/* Action trigger buttons (visible on hover or tap) */}
                   <div
                     className={cn(
                       "flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100 transition-opacity shrink-0 mb-1 z-10",
@@ -651,6 +850,15 @@ export function MessengerPane({
                       title="Reply"
                     >
                       <CornerDownRight className="size-3" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setDeleteModalMsg(msg)}
+                      className="size-6 rounded-full bg-card border border-border/50 hover:bg-rose-500/10 hover:text-rose-500 flex items-center justify-center text-muted-foreground transition-all cursor-pointer shadow-2xs"
+                      title="Delete message"
+                    >
+                      <Trash2 className="size-3" />
                     </button>
                   </div>
 
@@ -683,7 +891,7 @@ export function MessengerPane({
                   {/* ─── Message Bubble ─── */}
                   <div
                     className={cn(
-                      "max-w-[85%] sm:max-w-[70%] space-y-0.5 relative",
+                      "max-w-[85%] sm:max-w-[70%] space-y-1 relative",
                       isMe ? "items-end text-right" : "items-start text-left"
                     )}
                   >
@@ -784,10 +992,23 @@ export function MessengerPane({
                           </div>
                         </div>
                       ) : (
-                        <div className="space-y-0.5">
+                        <div className="space-y-1">
                           <p className="whitespace-pre-wrap break-words pr-12 text-[13px]">
-                            {messageBody}
+                            {renderMessageWithMentions(messageBody)}
                           </p>
+
+                          {/* YouTube Video Embed Player */}
+                          {ytVideoId && (
+                            <div className="mt-2 overflow-hidden rounded-xl aspect-video w-full max-w-sm border border-border/40 shadow-sm">
+                              <iframe
+                                src={`https://www.youtube-nocookie.com/embed/${ytVideoId}`}
+                                title="YouTube video player"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="w-full h-full border-0"
+                              />
+                            </div>
+                          )}
 
                           {/* WhatsApp-Style Bottom Right Timestamp & Seen Double Ticks */}
                           <div
@@ -870,6 +1091,36 @@ export function MessengerPane({
         </div>
       )}
 
+      {/* Mention Autocomplete Popover */}
+      {mentionSuggestions.length > 0 && (
+        <div className="border-t border-border/40 bg-card/95 backdrop-blur-md px-3 py-2 shrink-0 z-30 animate-in slide-in-from-bottom-2">
+          <div className="max-w-4xl mx-auto space-y-1">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+              Mention Student
+            </p>
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+              {mentionSuggestions.map((u) => (
+                <button
+                  key={u.id}
+                  type="button"
+                  onClick={() => handleSelectMention(u.username)}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground text-xs font-bold transition-colors cursor-pointer shrink-0"
+                >
+                  <Avatar className="size-5">
+                    <AvatarImage src={u.avatarUrl || ""} />
+                    <AvatarFallback className="text-[9px]">
+                      {u.displayName?.[0] || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>@{u.username}</span>
+                  <span className="text-[10px] opacity-75 font-normal">({u.displayName})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── Messenger Bottom Input Bar (WhatsApp Layout) ─── */}
       <footer className="border-t border-border/40 bg-card/95 backdrop-blur-md px-2.5 sm:px-4 py-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shrink-0 z-20">
         {isUploadingImage && (
@@ -921,7 +1172,7 @@ export function MessengerPane({
           <textarea
             ref={textareaRef}
             rows={1}
-            placeholder="Type a message..."
+            placeholder="Type a message... (@ to mention)"
             value={msgText}
             onChange={(e) => setMsgText(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -952,6 +1203,48 @@ export function MessengerPane({
           )}
         </form>
       </footer>
+
+      {/* Delete Message Confirmation Modal */}
+      {deleteModalMsg && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-5 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <Trash2 className="size-4 text-rose-500" />
+                Delete Message?
+              </h3>
+              <button
+                type="button"
+                onClick={() => setDeleteModalMsg(null)}
+                className="size-7 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Are you sure you want to delete this message?
+            </p>
+            <div className="space-y-2 pt-2">
+              {deleteModalMsg.senderId === currentUserId && (
+                <button
+                  type="button"
+                  onClick={() => handleDeleteMessage(deleteModalMsg.id, "everyone")}
+                  className="w-full py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs transition-colors cursor-pointer"
+                >
+                  Delete for Everyone
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => handleDeleteMessage(deleteModalMsg.id, "me")}
+                className="w-full py-2.5 rounded-xl bg-muted hover:bg-muted/80 text-foreground font-bold text-xs transition-colors cursor-pointer"
+              >
+                Delete for Me
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* GIF Picker Modal */}
       <GifPickerModal

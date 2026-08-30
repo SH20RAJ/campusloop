@@ -1,22 +1,20 @@
-import {
-getSecretCrushSlotLimit,
-getSecretCrushSlotProgress,
-SECRET_CRUSH_EXPANSION_LP_THRESHOLD,
-SECRET_CRUSH_MAX_SLOTS,
-} from "@/constants/gamification";
 import { getDb } from "@/db";
 import {
-conversationParticipants,
-conversations,
-messages,
-notifications,
-secretCrushes,
-userProfiles,
+  conversationParticipants,
+  conversations,
+  messages,
+  notifications,
+  secretCrushAttempts,
+  secretCrushes,
+  userProfiles,
 } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,count,eq } from "drizzle-orm";
-import { NextRequest,NextResponse } from "next/server";
+import { and, count, eq, gte } from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
 
+const MAX_ACTIVE_SLOTS = 5;
+const MAX_ATTEMPTS_7_DAYS = 5;
+const COOLDOWN_DAYS = 7;
 
 // GET /api/dating/crush — Fetch user's active secret crushes and count of received crushes
 export async function GET() {
@@ -35,7 +33,7 @@ export async function GET() {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    // 1. Get sent secret crushes with target profile
+    // 1. Get sent active secret crushes with target profile
     const sentCrushes = await db.query.secretCrushes.findMany({
       where: eq(secretCrushes.senderId, profile.id),
       with: {
@@ -53,17 +51,27 @@ export async function GET() {
       orderBy: (sc, { desc }) => [desc(sc.createdAt)],
     });
 
-    // 2. Get count of anonymous incoming secret crushes (Intent hidden!)
+    // 2. Count attempts in rolling 7 days
+    const sevenDaysAgo = new Date(Date.now() - COOLDOWN_DAYS * 24 * 60 * 60 * 1000);
+    const [attemptsCountRow] = await db
+      .select({ count: count() })
+      .from(secretCrushAttempts)
+      .where(
+        and(
+          eq(secretCrushAttempts.senderId, profile.id),
+          gte(secretCrushAttempts.createdAt, sevenDaysAgo)
+        )
+      );
+
+    const attemptsUsed = Number(attemptsCountRow?.count || 0);
+
+    // 3. Get count of anonymous incoming secret crushes (Intent hidden!)
     const [receivedCountRow] = await db
       .select({ count: count() })
       .from(secretCrushes)
       .where(and(eq(secretCrushes.targetId, profile.id), eq(secretCrushes.isMutual, false)));
 
     const receivedCrushesCount = Number(receivedCountRow?.count || 0);
-
-    const userPoints = profile.points || 0;
-    const maxSlots = getSecretCrushSlotLimit(userPoints);
-    const slotProgress = getSecretCrushSlotProgress(userPoints);
 
     return NextResponse.json({
       crushes: sentCrushes.map((c) => ({
@@ -75,10 +83,12 @@ export async function GET() {
         createdAt: c.createdAt,
       })),
       usedSlots: sentCrushes.length,
-      maxSlots,
-      remainingSlots: Math.max(0, maxSlots - sentCrushes.length),
+      maxSlots: MAX_ACTIVE_SLOTS,
+      remainingSlots: Math.max(0, MAX_ACTIVE_SLOTS - sentCrushes.length),
+      attemptsUsedIn7Days: attemptsUsed,
+      maxAttemptsIn7Days: MAX_ATTEMPTS_7_DAYS,
+      remainingAttemptsIn7Days: Math.max(0, MAX_ATTEMPTS_7_DAYS - attemptsUsed),
       receivedCrushesCount,
-      slotProgress,
     });
   } catch (error) {
     console.error("GET /api/dating/crush error:", error);
@@ -106,7 +116,6 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as { targetId?: string };
     const { targetId } = body;
 
-
     if (!targetId || typeof targetId !== "string") {
       return NextResponse.json({ error: "targetId is required" }, { status: 400 });
     }
@@ -123,48 +132,77 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Target student not found" }, { status: 404 });
     }
 
-    // Check active crush count
-    const [sentCountRow] = await db
+    // 1. Check active slots limit (max 5)
+    const [activeCountRow] = await db
       .select({ count: count() })
       .from(secretCrushes)
       .where(eq(secretCrushes.senderId, profile.id));
 
-    const currentCount = Number(sentCountRow?.count || 0);
+    const activeCount = Number(activeCountRow?.count || 0);
+    if (activeCount >= MAX_ACTIVE_SLOTS) {
+      return NextResponse.json(
+        { error: `You have filled all ${MAX_ACTIVE_SLOTS} active Secret Crush slots. Remove one to free up an active slot.` },
+        { status: 400 }
+      );
+    }
 
-    // Check if already crushed on this target
-    const existing = await db.query.secretCrushes.findFirst({
+    // 2. Check rolling 7-day attempts limit (max 5 new attempts)
+    const sevenDaysAgo = new Date(Date.now() - COOLDOWN_DAYS * 24 * 60 * 60 * 1000);
+    const [attemptsCountRow] = await db
+      .select({ count: count() })
+      .from(secretCrushAttempts)
+      .where(
+        and(
+          eq(secretCrushAttempts.senderId, profile.id),
+          gte(secretCrushAttempts.createdAt, sevenDaysAgo)
+        )
+      );
+
+    const attemptsInLast7Days = Number(attemptsCountRow?.count || 0);
+    if (attemptsInLast7Days >= MAX_ATTEMPTS_7_DAYS) {
+      return NextResponse.json(
+        {
+          error: `You have used all ${MAX_ATTEMPTS_7_DAYS} Secret Crush attempts for this rolling 7-day period. Removing a crush does not restore attempts.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // 3. Check if currently active crush on this person
+    const existingActive = await db.query.secretCrushes.findFirst({
       where: and(
         eq(secretCrushes.senderId, profile.id),
         eq(secretCrushes.targetId, targetId)
       ),
     });
 
-    if (existing) {
+    if (existingActive) {
       return NextResponse.json({
         message: "You already have this student in your Secret Crush vault",
-        isMutual: existing.isMutual,
+        isMutual: existingActive.isMutual,
       });
     }
 
-    const userPoints = profile.points || 0;
-    const maxSlots = getSecretCrushSlotLimit(userPoints);
+    // 4. Check 7-day cooldown on this specific person
+    const recentAttempt = await db.query.secretCrushAttempts.findFirst({
+      where: and(
+        eq(secretCrushAttempts.senderId, profile.id),
+        eq(secretCrushAttempts.targetId, targetId),
+        gte(secretCrushAttempts.createdAt, sevenDaysAgo)
+      ),
+      orderBy: (sca, { desc }) => [desc(sca.createdAt)],
+    });
 
-    if (currentCount >= maxSlots) {
-      if (maxSlots < SECRET_CRUSH_MAX_SLOTS) {
-        return NextResponse.json(
-          {
-            error: `You have filled all ${maxSlots} secret crush slots. Reach ${SECRET_CRUSH_EXPANSION_LP_THRESHOLD} Loop Points (LP) to unlock 50 slots! You currently have ${userPoints} LP.`,
-          },
-          { status: 400 }
-        );
-      }
+    if (recentAttempt) {
       return NextResponse.json(
-        { error: `You have reached the maximum limit of ${maxSlots} secret crushes. Remove an existing one to add a new crush.` },
+        {
+          error: `A 7-day cooldown applies before you can send a Secret Crush to ${targetProfile.displayName || "this person"} again.`,
+        },
         { status: 400 }
       );
     }
 
-    // Check if target already has an active secret crush on sender
+    // 5. Check if target already has an active secret crush on sender (Mutual Match!)
     const reverseCrush = await db.query.secretCrushes.findFirst({
       where: and(
         eq(secretCrushes.senderId, targetId),
@@ -173,6 +211,12 @@ export async function POST(req: NextRequest) {
     });
 
     const isMutualMatch = !!reverseCrush;
+
+    // Log the attempt
+    await db.insert(secretCrushAttempts).values({
+      senderId: profile.id,
+      targetId,
+    });
 
     // Insert new crush
     const [newCrush] = await db
@@ -195,7 +239,6 @@ export async function POST(req: NextRequest) {
       // 2. Find or create 1-on-1 chat conversation
       let conversationId: string | null = null;
 
-      // Check if conversation already exists
       const userConvs = await db.query.conversationParticipants.findMany({
         where: eq(conversationParticipants.userId, profile.id),
       });
@@ -227,7 +270,7 @@ export async function POST(req: NextRequest) {
       await db.insert(messages).values({
         conversationId,
         senderId: profile.id,
-        body: "💘 It's a Secret Crush Match! We both secretly liked each other.",
+        body: "💕 It's a Secret Crush Match! We both secretly liked each other.",
       });
 
       // 4. Send match notifications to both users
@@ -238,14 +281,14 @@ export async function POST(req: NextRequest) {
             actorId: profile.id,
             type: "MATCH",
             referenceId: conversationId,
-            previewText: "It's a Mutual Secret Crush Match! 🎉 Say hello in chat.",
+            previewText: "💕 It's a Secret Crush Match! We both secretly liked each other.",
           },
           {
             userId: profile.id,
             actorId: targetId,
             type: "MATCH",
             referenceId: conversationId,
-            previewText: "It's a Mutual Secret Crush Match! 🎉 Say hello in chat.",
+            previewText: "💕 It's a Secret Crush Match! We both secretly liked each other.",
           },
         ]);
       }
@@ -267,20 +310,22 @@ export async function POST(req: NextRequest) {
     // If not mutual yet: Send anonymous alert to target (intent strictly hidden!)
     await db.insert(notifications).values({
       userId: targetId,
-      actorId: profile.id, // Stored safely in db for moderation/safety, but displayed as anonymous
+      actorId: profile.id,
       type: "CRUSH_ALERT",
       referenceId: "/app/crush",
       previewText: "Someone from your campus added you to their Secret Crush vault! 🔒 Add your crushes to see if it's mutual.",
     });
 
-
     return NextResponse.json({
       success: true,
       matched: false,
       crush: newCrush,
-      usedSlots: currentCount + 1,
-      maxSlots,
-      remainingSlots: Math.max(0, maxSlots - currentCount - 1),
+      usedSlots: activeCount + 1,
+      maxSlots: MAX_ACTIVE_SLOTS,
+      remainingSlots: Math.max(0, MAX_ACTIVE_SLOTS - activeCount - 1),
+      attemptsUsedIn7Days: attemptsInLast7Days + 1,
+      maxAttemptsIn7Days: MAX_ATTEMPTS_7_DAYS,
+      remainingAttemptsIn7Days: Math.max(0, MAX_ATTEMPTS_7_DAYS - attemptsInLast7Days - 1),
     });
   } catch (error) {
     console.error("POST /api/dating/crush error:", error);
@@ -288,7 +333,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// DELETE /api/dating/crush — Remove a secret crush
+// DELETE /api/dating/crush — Remove a secret crush (does NOT restore rolling 7-day attempt)
 export async function DELETE(req: NextRequest) {
   try {
     const user = await hexclaveServerApp.getUser();

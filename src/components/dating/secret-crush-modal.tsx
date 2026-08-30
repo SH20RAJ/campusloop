@@ -37,15 +37,17 @@ interface SecretCrushItem {
   createdAt: string;
 }
 
-interface SecretCrushResponse {
+export interface SecretCrushResponse {
   crushes: SecretCrushItem[];
   usedSlots: number;
   maxSlots: number;
   remainingSlots: number;
+  attemptsUsedIn7Days?: number;
+  maxAttemptsIn7Days?: number;
+  remainingAttemptsIn7Days?: number;
   receivedCrushesCount: number;
   slotProgress?: {
     isExpanded: boolean;
-    maxSlots: number;
     points: number;
     threshold: number;
     pointsNeeded: number;
@@ -53,16 +55,16 @@ interface SecretCrushResponse {
   };
 }
 
+interface SecretCrushModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 const fetcher = <T,>(url: string): Promise<T> =>
   fetch(url).then((res) => {
     if (!res.ok) throw new Error("Failed to fetch");
     return res.json() as Promise<T>;
   });
-
-interface SecretCrushModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 
 export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -77,8 +79,10 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
   );
 
   const crushes = data?.crushes || [];
-  const usedSlots = data?.usedSlots || 0;
+  const usedSlots = data?.usedSlots || crushes.length;
   const maxSlots = data?.maxSlots || 5;
+  const attemptsUsedIn7Days = data?.attemptsUsedIn7Days ?? usedSlots;
+  const maxAttemptsIn7Days = data?.maxAttemptsIn7Days ?? 5;
   const receivedCrushesCount = data?.receivedCrushesCount || 0;
   const slotProgress = data?.slotProgress;
 
@@ -113,21 +117,23 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
       });
 
       const resData = (await res.json()) as { error?: string; matched?: boolean };
+
       if (!res.ok) {
         throw new Error(resData.error || "Failed to add secret crush");
       }
 
-
       if (resData.matched) {
-        toast.success("💘 IT'S A MUTUAL MATCH! You both secretly liked each other!");
+        toast.success("💕 It's a Secret Crush Match! You both secretly liked each other.", {
+          duration: 6000,
+        });
       } else {
         toast.success("Secret crush locked in! 🔒 Your identity stays 100% hidden unless mutual.");
       }
 
+      mutate();
       setShowAddSearch(false);
       setSearchQuery("");
       setSearchResults([]);
-      mutate();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to add crush");
     } finally {
@@ -142,8 +148,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
       });
 
       if (!res.ok) throw new Error("Failed to remove crush");
-
-      toast.success("Crush removed. Slot freed up!");
+      toast.success("Crush removed from vault. Note: Rolling 7-day attempt is not refunded.");
       mutate();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to remove crush");
@@ -153,30 +158,23 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 select-none animate-in fade-in duration-200">
-      <div
-        className="absolute inset-0 bg-black/75 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl border border-border/40 bg-card p-5 sm:p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto no-scrollbar">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border/30 pb-4">
+        <div className="flex items-center justify-between border-b border-border/40 pb-4">
           <div className="flex items-center gap-3">
-            <div className="size-11 rounded-2xl bg-linear-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
-              <Heart className="size-6 fill-white" />
+            <div className="size-11 rounded-2xl bg-linear-to-tr from-rose-500/20 to-pink-500/20 border border-rose-500/30 flex items-center justify-center text-rose-500">
+              <Heart className="size-5.5 fill-rose-500 stroke-rose-500" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-foreground tracking-tight">
-                  Secret Crush
-                </h2>
-                <span className="text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-500 px-2 py-0.5 rounded-full">
-                  18+ Verified
+              <h2 className="text-base font-black tracking-tight text-foreground flex items-center gap-2">
+                Secret Crush Vault
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                  Zero Doxxing
                 </span>
-              </div>
+              </h2>
               <p className="text-xs text-muted-foreground font-medium">
-                Your intent stays 100% hidden unless it&apos;s mutual.
+                Intent-hidden campus matching • 100% anonymous until mutual
               </p>
             </div>
           </div>
@@ -203,48 +201,31 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
           </div>
         )}
 
-        {/* Loop Points Clout Expansion Banner */}
-        {slotProgress && !slotProgress.isExpanded && (
-          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Zap className="size-4 shrink-0 text-amber-500 fill-amber-500" />
-                <span className="text-xs font-black">
-                  Expand Vault to 50 Slots ({slotProgress.points}/{slotProgress.threshold} LP)
-                </span>
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-full">
-                {slotProgress.pointsNeeded} LP to unlock
-              </span>
-            </div>
-            <div className="w-full h-1.5 bg-amber-500/20 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-amber-500 rounded-full transition-all duration-500"
-                style={{ width: `${slotProgress.progressPercent}%` }}
-              />
-            </div>
-            <p className="text-[11px] text-amber-700/90 dark:text-amber-300/90 font-medium leading-relaxed">
-              Earn 150 Loop Points (LP) via posts, polls, and invites to unlock <strong>50 Secret Crush slots</strong>!
-            </p>
+        {/* Rules & Policy Pill Banner */}
+        <div className="p-3 rounded-2xl bg-muted/40 border border-border/40 text-[11px] text-muted-foreground space-y-1">
+          <div className="flex items-center justify-between font-bold text-foreground">
+            <span className="flex items-center gap-1 text-rose-500">
+              <Lock className="size-3" />
+              <span>{usedSlots}/5 Active Slots</span>
+            </span>
+            <span className="text-[10px] uppercase tracking-wider bg-muted px-2 py-0.5 rounded-md text-foreground">
+              {attemptsUsedIn7Days}/5 Attempts this week
+            </span>
           </div>
-        )}
-
-        {slotProgress?.isExpanded && (
-          <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-violet-500/10 border border-violet-500/20 text-violet-600 dark:text-violet-400 text-xs font-bold">
-            <Crown className="size-4 shrink-0 text-violet-500" />
-            <span>Vault Expanded: 50 Secret Crush Slots Unlocked with Gold Star Clout!</span>
-          </div>
-        )}
+          <p className="text-[10px] leading-relaxed text-muted-foreground pt-0.5">
+            5 active slots + 5 new crush attempts per rolling 7 days. Removing a crush never refunds an attempt. 7-day cooldown applies per person.
+          </p>
+        </div>
 
         {/* Secret Crush Slots */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <Lock className="size-3.5" />
-              Your Secret Crush Vault ({usedSlots}/{maxSlots})
+              Active Crushes ({usedSlots}/{maxSlots})
             </span>
 
-            {usedSlots < maxSlots && !showAddSearch && (
+            {usedSlots < maxSlots && attemptsUsedIn7Days < maxAttemptsIn7Days && !showAddSearch && (
               <button
                 type="button"
                 onClick={() => setShowAddSearch(true)}

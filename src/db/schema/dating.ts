@@ -49,3 +49,25 @@ export const secretCrushes = pgTable(
 
 export type SecretCrush = typeof secretCrushes.$inferSelect;
 export type NewSecretCrush = typeof secretCrushes.$inferInsert;
+
+export const secretCrushAttempts = pgTable(
+  "secret_crush_attempts",
+  {
+    id: id(),
+    senderId: text("sender_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    targetId: text("target_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    createdAt,
+  },
+  (table) => [
+    index("secret_crush_attempts_sender_created_idx").on(table.senderId, table.createdAt),
+    index("secret_crush_attempts_sender_target_idx").on(table.senderId, table.targetId),
+  ]
+);
+
+export type SecretCrushAttempt = typeof secretCrushAttempts.$inferSelect;
+export type NewSecretCrushAttempt = typeof secretCrushAttempts.$inferInsert;
+

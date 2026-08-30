@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,ilike,ne,or } from "drizzle-orm";
+import { and,desc,eq,ilike,ne,or,type SQL } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -16,25 +16,25 @@ export async function GET(request: Request) {
     const limit = Number(searchParams.get("limit")) || 12;
     const offset = (page - 1) * limit;
 
-    const conditions = [ne(institutions.slug, "viewer-hub")];
+    const conditions: (SQL | undefined)[] = [ne(institutions.slug, "viewer-hub")];
 
     if (q.trim()) {
       const searchPattern = `%${q.trim()}%`;
-      conditions.push(
-        or(
-          ilike(institutions.name, searchPattern),
-          ilike(institutions.state, searchPattern),
-          ilike(institutions.district, searchPattern),
-          ilike(institutions.slug, searchPattern)
-        )
+      const searchCond = or(
+        ilike(institutions.name, searchPattern),
+        ilike(institutions.state, searchPattern),
+        ilike(institutions.district, searchPattern),
+        ilike(institutions.slug, searchPattern)
       );
+      if (searchCond) conditions.push(searchCond);
     }
 
     if (state && state !== "ALL") {
       conditions.push(eq(institutions.state, state));
     }
 
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const validConditions = conditions.filter((c): c is SQL => Boolean(c));
+    const whereClause = validConditions.length > 0 ? and(...validConditions) : undefined;
 
     const list = await db.query.institutions.findMany({
       where: whereClause,

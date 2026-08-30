@@ -1,16 +1,13 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card,CardContent } from "@/components/ui/card";
-import {
-Check,Flame,Heart,MessageSquare,ShieldCheck,X,
-Zap
-} from "lucide-react";
-import { AnimatePresence,motion } from "motion/react";
+import { Check, Flame, Heart, MessageSquare, ShieldCheck, X, Zap } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "./reveal";
 
 const MOCK_PROFILES = [
@@ -108,7 +105,8 @@ export function MatchmakingShowcase() {
             Swipe on real classmates. Zero catfish.
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Unlike your group project members who do 0% work, everyone here cleared the same college email check.
+            Unlike your group project members who do 0% work, everyone here cleared the same college email
+            check.
           </p>
         </Reveal>
 
@@ -144,11 +142,17 @@ export function MatchmakingShowcase() {
                       <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/40" />
 
                       <div className="flex items-center justify-between z-10">
-                        <Badge variant="outline" className="bg-black/60 text-white border-white/20 backdrop-blur-md text-[10px] gap-1 px-2 py-0.5 font-semibold">
+                        <Badge
+                          variant="outline"
+                          className="bg-black/60 text-white border-white/20 backdrop-blur-md text-[10px] gap-1 px-2 py-0.5 font-semibold"
+                        >
                           <ShieldCheck className="size-3 text-emerald-400" />
                           Verified Student
                         </Badge>
-                        <Badge variant="secondary" className="bg-black/60 text-white border-white/20 backdrop-blur-md text-[10px] font-semibold">
+                        <Badge
+                          variant="secondary"
+                          className="bg-black/60 text-white border-white/20 backdrop-blur-md text-[10px] font-semibold"
+                        >
                           {currentProfile.college}
                         </Badge>
                       </div>
@@ -158,7 +162,9 @@ export function MatchmakingShowcase() {
                           <h3 className="text-xl font-black drop-shadow-sm">{currentProfile.name}</h3>
                           <span className="text-base font-bold opacity-80">{currentProfile.age}</span>
                         </div>
-                        <p className="text-xs text-white/80 font-semibold drop-shadow-xs">{currentProfile.branch}</p>
+                        <p className="text-xs text-white/80 font-semibold drop-shadow-xs">
+                          {currentProfile.branch}
+                        </p>
                       </div>
                     </div>
 
@@ -219,7 +225,9 @@ export function MatchmakingShowcase() {
                       IT&apos;S A MATCH! 🎉
                     </h3>
                     <p className="mt-1.5 text-xs text-muted-foreground max-w-xs leading-relaxed">
-                      You and <strong className="text-foreground">{currentProfile.name}</strong> ({currentProfile.college}) liked each other! Now don&apos;t ghost them like your 8 AM lecture.
+                      You and <strong className="text-foreground">{currentProfile.name}</strong> (
+                      {currentProfile.college}) liked each other! Now don&apos;t ghost them like your 8 AM
+                      lecture.
                     </p>
 
                     <div className="mt-5 flex w-full flex-col gap-2">
@@ -253,7 +261,8 @@ export function MatchmakingShowcase() {
                 No random creeps. Just students in your loop.
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Tired of fake accounts and creepy alumni? CampusLoop verifies every single account with an official institutional OTP.
+                Tired of fake accounts and creepy alumni? CampusLoop verifies every single account with an
+                official institutional OTP.
               </p>
             </div>
 
@@ -276,7 +285,10 @@ export function MatchmakingShowcase() {
                   desc: "Find someone who also thinks the main library AC is set to the North Pole.",
                 },
               ].map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 rounded-lg border border-border bg-card p-3.5 shadow-sm">
+                <div
+                  key={idx}
+                  className="flex items-start gap-3 rounded-lg border border-border bg-card p-3.5 shadow-sm"
+                >
                   <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-rose-500/10 text-rose-500 mt-0.5">
                     <Check className="size-3.5" />
                   </div>
@@ -287,7 +299,6 @@ export function MatchmakingShowcase() {
                 </div>
               ))}
             </div>
-
 
             <div className="pt-1">
               <Link href="/join?mode=signup">

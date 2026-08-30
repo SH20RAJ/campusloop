@@ -1,7 +1,7 @@
+import { and, desc, eq } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { articles, userProfiles } from "@/db/schema";
-import { and, desc, eq } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

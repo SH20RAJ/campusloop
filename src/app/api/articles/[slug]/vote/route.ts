@@ -1,9 +1,9 @@
+import { and, eq, or } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { articles, articleVotes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { awardPoints } from "@/lib/gamification-server";
-import { and, eq, or, sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -40,10 +40,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     const voteValue: number = body.value === -1 ? -1 : 1; // 1 = upvote, -1 = downvote
 
     const existingVote = await db.query.articleVotes.findFirst({
-      where: and(
-        eq(articleVotes.articleId, article.id),
-        eq(articleVotes.profileId, currentProfile.id)
-      ),
+      where: and(eq(articleVotes.articleId, article.id), eq(articleVotes.profileId, currentProfile.id)),
     });
 
     let nextVote = 0;
@@ -55,10 +52,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         nextVote = 0;
       } else {
         // Switch vote
-        await db
-          .update(articleVotes)
-          .set({ value: voteValue })
-          .where(eq(articleVotes.id, existingVote.id));
+        await db.update(articleVotes).set({ value: voteValue }).where(eq(articleVotes.id, existingVote.id));
         nextVote = voteValue;
       }
     } else {
@@ -90,10 +84,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     const upvotesCount = allVotes.filter((v) => v.value === 1).length;
     const downvotesCount = allVotes.filter((v) => v.value === -1).length;
 
-    await db
-      .update(articles)
-      .set({ upvotesCount, downvotesCount })
-      .where(eq(articles.id, article.id));
+    await db.update(articles).set({ upvotesCount, downvotesCount }).where(eq(articles.id, article.id));
 
     return NextResponse.json({
       userVote: nextVote,

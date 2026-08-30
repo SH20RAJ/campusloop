@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { FeedClient } from "../../feed-client";
 
 interface PostsTypePageProps {
@@ -8,7 +8,7 @@ interface PostsTypePageProps {
 export async function generateMetadata({ params }: PostsTypePageProps): Promise<Metadata> {
   const { type } = await params;
   const uppercaseType = type.toUpperCase();
-  
+
   let label = "Posts";
   if (uppercaseType === "POLL") label = "Campus Polls";
   else if (uppercaseType === "CONFESSION") label = "Campus Confessions";
@@ -35,10 +35,7 @@ export default async function PostsTypePage({ params }: PostsTypePageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <FeedClient forcedType={uppercaseType} />
     </>
   );

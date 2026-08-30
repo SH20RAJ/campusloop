@@ -1,20 +1,19 @@
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { and, desc, eq } from "drizzle-orm";
+import { Lock, School } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ShareQrButton } from "@/components/common/share-qr-button";
+import { PublicFollowButton } from "@/components/profile/public-follow-button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Navigation } from "@/components/ui/navigation";
 import { RightSidebar } from "@/components/ui/right-sidebar";
 import { getBranchIcon } from "@/constants";
-
-import { ShareQrButton } from "@/components/common/share-qr-button";
-import { PublicFollowButton } from "@/components/profile/public-follow-button";
 import { getDb } from "@/db";
-import { institutions,posts,userProfiles } from "@/db/schema";
+import { institutions, posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { FeedPost } from "@/hooks/use-feed";
-import { getFollowCounts,getFollowState } from "@/lib/follows";
-import { and,desc,eq } from "drizzle-orm";
-import { Lock,School } from "lucide-react";
-import { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import type { FeedPost } from "@/hooks/use-feed";
+import { getFollowCounts, getFollowState } from "@/lib/follows";
 import { ProfileClientView } from "../app/(main)/profile/profile-client";
 
 interface VanityProfileProps {
@@ -24,13 +23,13 @@ interface VanityProfileProps {
 export async function generateMetadata({ params }: VanityProfileProps): Promise<Metadata> {
   const resolved = await params;
   const rawUsername = decodeURIComponent(resolved.username);
-  
+
   if (!rawUsername.startsWith("@")) {
     return {
       title: "Profile",
     };
   }
-  
+
   const username = rawUsername.slice(1);
   const db = getDb();
   const profile = await db.query.userProfiles.findFirst({
@@ -75,7 +74,6 @@ export async function generateMetadata({ params }: VanityProfileProps): Promise<
       images: profile?.avatarUrl ? [profile.avatarUrl] : ["https://campusloop.space/og-image.png"],
     },
   };
-
 }
 
 export default async function VanityProfilePage({ params }: VanityProfileProps) {
@@ -97,7 +95,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
     where: eq(userProfiles.username, username),
     with: {
       institution: true,
-    }
+    },
   });
 
   if (!profile) {
@@ -106,11 +104,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
   // Fetch posts written by this user (never expose anonymous posts on public profile)
   const userPosts = await db.query.posts.findMany({
-    where: and(
-      eq(posts.authorId, profile.id),
-      eq(posts.status, "PUBLISHED"),
-      eq(posts.isAnonymous, false)
-    ),
+    where: and(eq(posts.authorId, profile.id), eq(posts.status, "PUBLISHED"), eq(posts.isAnonymous, false)),
     orderBy: [desc(posts.createdAt)],
     limit: 20,
     with: {
@@ -119,9 +113,9 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
       votes: true,
       comments: true,
       pollOptions: {
-        with: { votes: true }
-      }
-    }
+        with: { votes: true },
+      },
+    },
   });
 
   // If user is authenticated, render with sidebar layout
@@ -134,18 +128,18 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
       const isOwnProfile = profile.id === currentProfile.id;
 
       // Format posts to match FeedPost type required by FeedCard
-      const formattedPosts = userPosts.map(post => {
+      const formattedPosts = userPosts.map((post) => {
         const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
         const commentsCount = post.comments.length;
-        const userVote = post.votes.find(v => v.userId === currentProfile.id)?.value || 0;
+        const userVote = post.votes.find((v) => v.userId === currentProfile.id)?.value || 0;
 
-        const formattedPollOptions = post.pollOptions?.map(opt => {
+        const formattedPollOptions = post.pollOptions?.map((opt) => {
           const optVotesCount = opt.votes.length;
-          const userVoted = opt.votes.some(v => v.userId === currentProfile.id);
+          const userVoted = opt.votes.some((v) => v.userId === currentProfile.id);
           return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
         });
 
-        const hasVotedPoll = formattedPollOptions?.some(opt => opt.userVoted) || false;
+        const hasVotedPoll = formattedPollOptions?.some((opt) => opt.userVoted) || false;
         const totalPollVotes = formattedPollOptions?.reduce((acc, opt) => acc + opt.votesCount, 0) || 0;
 
         return {
@@ -170,10 +164,10 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
       return (
         <div className="relative min-h-screen bg-background">
-          <Navigation 
-            profile={currentProfile} 
-            collegeName={college?.name ?? "Your College"} 
-            isAdmin={currentProfile.role === "ADMIN"} 
+          <Navigation
+            profile={currentProfile}
+            collegeName={college?.name ?? "Your College"}
+            isAdmin={currentProfile.role === "ADMIN"}
           />
 
           <div className="flex md:pl-64 min-h-screen max-w-full overflow-x-clip">
@@ -196,7 +190,6 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
           </div>
         </div>
       );
-
     }
   }
 
@@ -237,151 +230,157 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
         <main className="flex-1 w-full max-w-2xl space-y-4">
           {/* Profile Card with Aurora Mesh Banner (Reference 1 & 2) */}
           <div className="relative overflow-hidden rounded-3xl bg-card shadow-lg">
-
-          <div className="relative h-36 sm:h-44 w-full bg-aurora-mesh overflow-hidden">
-            {profile.bannerUrl && (
-              <img src={profile.bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
-            )}
-          </div>
-
-          <div className="px-5 pb-5 pt-0 space-y-3">
-            <div className="flex items-end justify-between -mt-12 sm:-mt-14">
-              <div className="relative">
-                <Avatar className="size-22 sm:size-24 rounded-full border-4 border-card shadow-2xl bg-background">
-                  <AvatarImage src={profile.avatarUrl || ""} className="rounded-full object-cover" />
-                  <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary rounded-full">
-                    {profile.displayName[0]?.toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                {(profile.points || 0) >= 150 && (
-                  <span className="absolute bottom-0 right-0 size-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md text-xs font-black border-2 border-card">
-                    ✓
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <ShareQrButton
-                  title={profile.displayName}
-                  subtitle={`@${profile.username} • ${profile.institution?.name || "Verified Student"}`}
-                  badgeText="Verified Student Network"
-                  shortUrl={`https://campusloop.space/@${profile.username}`}
-                  avatarUrl={profile.avatarUrl}
-                  category="profile"
-                />
-                <PublicFollowButton
-                  username={profile.username}
-                  displayName={profile.displayName}
-                  profileId={profile.id}
-                  isSignedIn={false}
-                />
-              </div>
+            <div className="relative h-36 sm:h-44 w-full bg-aurora-mesh overflow-hidden">
+              {profile.bannerUrl && (
+                <img src={profile.bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
+              )}
             </div>
 
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black tracking-tight text-foreground">
-                  {profile.displayName}
-                </h2>
-                {(profile.points || 0) >= 150 && (
-                  <span className="text-blue-500 font-bold" title="Verified Campus Star">
-                    ✓
+            <div className="px-5 pb-5 pt-0 space-y-3">
+              <div className="flex items-end justify-between -mt-12 sm:-mt-14">
+                <div className="relative">
+                  <Avatar className="size-22 sm:size-24 rounded-full border-4 border-card shadow-2xl bg-background">
+                    <AvatarImage src={profile.avatarUrl || ""} className="rounded-full object-cover" />
+                    <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary rounded-full">
+                      {profile.displayName[0]?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  {(profile.points || 0) >= 150 && (
+                    <span className="absolute bottom-0 right-0 size-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md text-xs font-black border-2 border-card">
+                      ✓
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <ShareQrButton
+                    title={profile.displayName}
+                    subtitle={`@${profile.username} • ${profile.institution?.name || "Verified Student"}`}
+                    badgeText="Verified Student Network"
+                    shortUrl={`https://campusloop.space/@${profile.username}`}
+                    avatarUrl={profile.avatarUrl}
+                    category="profile"
+                  />
+                  <PublicFollowButton
+                    username={profile.username}
+                    displayName={profile.displayName}
+                    profileId={profile.id}
+                    isSignedIn={false}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-black tracking-tight text-foreground">
+                    {profile.displayName}
+                  </h2>
+                  {(profile.points || 0) >= 150 && (
+                    <span className="text-blue-500 font-bold" title="Verified Campus Star">
+                      ✓
+                    </span>
+                  )}
+                </div>
+
+                {/* Stats Row (Exact match to Reference: Following / Followers / LP) */}
+                <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground pt-0.5">
+                  <Link href={`/@${profile.username}/following`} className="hover:underline">
+                    <strong className="text-foreground font-black">
+                      {publicFollowCounts.followingCount}
+                    </strong>{" "}
+                    Following
+                  </Link>
+                  <Link href={`/@${profile.username}/followers`} className="hover:underline">
+                    <strong className="text-foreground font-black">
+                      {publicFollowCounts.followersCount}
+                    </strong>{" "}
+                    Followers
+                  </Link>
+                  <span>
+                    <strong className="text-foreground font-black">{profile.points || 0}</strong> LP Clout
                   </span>
-                )}
-              </div>
+                </div>
 
-              {/* Stats Row (Exact match to Reference: Following / Followers / LP) */}
-              <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground pt-0.5">
-                <Link href={`/@${profile.username}/following`} className="hover:underline">
-                  <strong className="text-foreground font-black">{publicFollowCounts.followingCount}</strong> Following
-                </Link>
-                <Link href={`/@${profile.username}/followers`} className="hover:underline">
-                  <strong className="text-foreground font-black">{publicFollowCounts.followersCount}</strong> Followers
-                </Link>
-                <span>
-                  <strong className="text-foreground font-black">{profile.points || 0}</strong> LP Clout
-                </span>
-              </div>
+                <p className="text-xs sm:text-sm font-semibold text-foreground/90 leading-snug pt-1">
+                  {profile.headline ||
+                    (profile.branch && profile.course
+                      ? `${profile.course} in ${profile.branch} @ ${campusShort}`
+                      : `Student @ ${campusShort}`)}
+                </p>
 
-              <p className="text-xs sm:text-sm font-semibold text-foreground/90 leading-snug pt-1">
-                {profile.headline || (
-                  profile.branch && profile.course
-                    ? `${profile.course} in ${profile.branch} @ ${campusShort}`
-                    : `Student @ ${campusShort}`
-                )}
+                <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium pt-0.5">
+                  <span>@{profile.username}</span>
+                  <span>•</span>
+                  <span>{campusShort}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Education & Discipline Card */}
+          <div className="rounded-3xl bg-card p-5 shadow-xs space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <School className="size-4 text-primary" /> Campus & Academic Discipline
+            </h3>
+
+            <div className="flex items-start gap-3.5 pt-1">
+              <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-xl shrink-0">
+                {branchIcon}
+              </div>
+              <div className="min-w-0 flex-1 space-y-1">
+                <p className="text-xs sm:text-sm font-bold text-foreground truncate">{institutionName}</p>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-medium">
+                  {profile.course && <span>{profile.course}</span>}
+                  {profile.course && profile.branch && <span>·</span>}
+                  {profile.branch && <span className="text-primary font-bold">{profile.branch}</span>}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* About Card */}
+          {profile.bio && (
+            <div className="rounded-3xl bg-card p-5 shadow-xs space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">About</h3>
+              <p className="text-xs text-foreground/90 font-medium leading-relaxed whitespace-pre-wrap">
+                {profile.bio}
               </p>
+            </div>
+          )}
 
-              <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium pt-0.5">
-                <span>@{profile.username}</span>
-                <span>•</span>
-                <span>{campusShort}</span>
-              </div>
+          {/* Locked Teaser CTA */}
+          <div className="rounded-3xl bg-card/60 p-6 text-center space-y-4 shadow-sm border border-border/40">
+            <div className="size-11 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto">
+              <Lock className="size-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-foreground">
+                Connect with @{profile.username} on CampusLoop
+              </h3>
+              <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
+                Verify your student email to join your campus feed, swipe matches, and private message fellow
+                classmates.
+              </p>
+            </div>
+            <div className="flex gap-2.5 justify-center pt-1">
+              <Link href="/join?mode=signin">
+                <button className="rounded-full border border-border/80 h-9 px-5 text-xs font-bold hover:bg-muted text-foreground transition-all cursor-pointer">
+                  Sign In
+                </button>
+              </Link>
+              <Link href="/join?mode=signup">
+                <button className="rounded-full bg-primary h-9 px-5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
+                  Verify & Join
+                </button>
+              </Link>
             </div>
           </div>
-        </div>
+        </main>
 
-        {/* Education & Discipline Card */}
-        <div className="rounded-3xl bg-card p-5 shadow-xs space-y-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <School className="size-4 text-primary" /> Campus & Academic Discipline
-          </h3>
-
-          <div className="flex items-start gap-3.5 pt-1">
-            <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-xl shrink-0">
-              {branchIcon}
-            </div>
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="text-xs sm:text-sm font-bold text-foreground truncate">{institutionName}</p>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-medium">
-                {profile.course && <span>{profile.course}</span>}
-                {profile.course && profile.branch && <span>·</span>}
-                {profile.branch && <span className="text-primary font-bold">{profile.branch}</span>}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* About Card */}
-        {profile.bio && (
-          <div className="rounded-3xl bg-card p-5 shadow-xs space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">About</h3>
-            <p className="text-xs text-foreground/90 font-medium leading-relaxed whitespace-pre-wrap">
-              {profile.bio}
-            </p>
-          </div>
-        )}
-
-        {/* Locked Teaser CTA */}
-        <div className="rounded-3xl bg-card/60 p-6 text-center space-y-4 shadow-sm border border-border/40">
-          <div className="size-11 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto">
-            <Lock className="size-5" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-sm font-bold text-foreground">Connect with @{profile.username} on CampusLoop</h3>
-            <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
-              Verify your student email to join your campus feed, swipe matches, and private message fellow classmates.
-            </p>
-          </div>
-          <div className="flex gap-2.5 justify-center pt-1">
-            <Link href="/join?mode=signin">
-              <button className="rounded-full border border-border/80 h-9 px-5 text-xs font-bold hover:bg-muted text-foreground transition-all cursor-pointer">
-                Sign In
-              </button>
-            </Link>
-            <Link href="/join?mode=signup">
-              <button className="rounded-full bg-primary h-9 px-5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
-                Verify & Join
-              </button>
-            </Link>
-          </div>
-        </div>
-      </main>
-
-      <aside className="hidden lg:block w-80 shrink-0 sticky top-24">
-        <RightSidebar />
-      </aside>
+        <aside className="hidden lg:block w-80 shrink-0 sticky top-24">
+          <RightSidebar />
+        </aside>
+      </div>
     </div>
-  </div>
-);
+  );
 }
-

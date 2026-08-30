@@ -1,8 +1,8 @@
+import { and, desc, eq, ne, sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { bikeBookings, bikes, merchants } from "@/db/schema";
 import { resolveMerchantSession } from "@/lib/merchant-session";
-import { and, desc, eq, ne, sql } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,7 @@ export async function GET() {
     let merchant = await resolveMerchantSession();
     const db = getDb();
 
-    if (!merchant || merchant.categorySlug !== "rentals") {
+    if (merchant?.categorySlug !== "rentals") {
       // Fallback to first rental merchant
       const rentalMerchant = await db.query.merchants.findFirst({
         where: eq(merchants.categorySlug, "rentals"),

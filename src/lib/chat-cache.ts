@@ -1,6 +1,6 @@
 "use client";
 
-import { Message,UserProfile } from "@/db/schema";
+import type { Message, UserProfile } from "@/db/schema";
 
 export type ReactionItem = { emoji: string; userId: string; userDisplayName?: string };
 
@@ -120,4 +120,3 @@ export function updateCachedConversationLastMessage(
   });
   setCachedConversations(updated);
 }
-

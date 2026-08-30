@@ -1,15 +1,15 @@
+import type { Metadata } from "next";
 import {
-DocLayout,
-DocList,
-DocNote,
-DocSection,
-DocTable,
-LegalDocHeader,
-type DocSectionRef,
+  DocLayout,
+  DocList,
+  DocNote,
+  DocSection,
+  type DocSectionRef,
+  DocTable,
+  LegalDocHeader,
 } from "@/components/marketing/legal-doc";
 import { LegalNav } from "@/components/marketing/legal-nav";
-import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
-import type { Metadata } from "next";
+import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | CampusLoop",
@@ -50,7 +50,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 const SECTIONS: DocSectionRef[] = [
   { id: "collect", label: "What we collect" },
   { id: "anonymity", label: "How anonymity works" },
@@ -66,8 +65,7 @@ export default function PrivacyPage() {
     "@type": "WebPage",
     name: "CampusLoop Privacy Policy",
     url: "https://campusloop.space/privacy",
-    description:
-      "How CampusLoop collects, uses, and protects student data under the DPDP Act 2023.",
+    description: "How CampusLoop collects, uses, and protects student data under the DPDP Act 2023.",
     publisher: {
       "@type": "Organization",
       name: "CampusLoop Inc.",
@@ -81,10 +79,7 @@ export default function PrivacyPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <MarketingHeader />
       <LegalNav />
 
@@ -126,8 +121,8 @@ export default function PrivacyPage() {
 
           <DocSection id="anonymity" number={2} title="How anonymity works">
             <p>
-              Anonymous posts and confessions are not simply hidden in the interface — the link to
-              your profile is removed before the post is written.
+              Anonymous posts and confessions are not simply hidden in the interface — the link to your
+              profile is removed before the post is written.
             </p>
             <DocList
               items={[
@@ -138,8 +133,8 @@ export default function PrivacyPage() {
               ]}
             />
             <DocNote>
-              Anonymity protects you from other students. It is not a shield against a court order,
-              and it never covers threats, doxxing, or content involving minors.
+              Anonymity protects you from other students. It is not a shield against a court order, and it
+              never covers threats, doxxing, or content involving minors.
             </DocNote>
           </DocSection>
 
@@ -156,22 +151,22 @@ export default function PrivacyPage() {
 
           <DocSection id="rights" number={4} title="Your rights">
             <p>
-              As a Data Principal under the Digital Personal Data Protection Act, 2023, you hold
-              these rights, and you can exercise all of them without giving a reason.
+              As a Data Principal under the Digital Personal Data Protection Act, 2023, you hold these rights,
+              and you can exercise all of them without giving a reason.
             </p>
             <DocList
               items={[
                 <>
-                  <span className="text-foreground">Access.</span> Review everything linked to your
-                  account from Profile Settings.
+                  <span className="text-foreground">Access.</span> Review everything linked to your account
+                  from Profile Settings.
                 </>,
                 <>
-                  <span className="text-foreground">Correction.</span> Edit any profile information
-                  at any time.
+                  <span className="text-foreground">Correction.</span> Edit any profile information at any
+                  time.
                 </>,
                 <>
-                  <span className="text-foreground">Erasure.</span> Request permanent deletion of
-                  your account and its data at{" "}
+                  <span className="text-foreground">Erasure.</span> Request permanent deletion of your account
+                  and its data at{" "}
                   <a
                     href="mailto:privacy@campusloop.space"
                     className="text-primary underline-offset-4 hover:underline"
@@ -181,8 +176,8 @@ export default function PrivacyPage() {
                   .
                 </>,
                 <>
-                  <span className="text-foreground">Grievance redressal.</span> Escalate any
-                  concern to our Grievance Officer, listed below.
+                  <span className="text-foreground">Grievance redressal.</span> Escalate any concern to our
+                  Grievance Officer, listed below.
                 </>,
               ]}
             />
@@ -191,15 +186,15 @@ export default function PrivacyPage() {
           <DocSection id="security" number={5} title="Storage and encryption">
             <p>
               Data is encrypted in transit with TLS 1.3 and at rest with AES-256, on Neon serverless
-              PostgreSQL behind the Cloudflare edge network. Anonymous author identities are sealed
-              with a separate key that the application database never holds.
+              PostgreSQL behind the Cloudflare edge network. Anonymous author identities are sealed with a
+              separate key that the application database never holds.
             </p>
           </DocSection>
 
           <DocSection id="officer" number={6} title="Grievance officer">
             <p>
-              Appointed under the DPDP Act, 2023 and Rule 3(2) of the IT (Intermediary Guidelines
-              and Digital Media Ethics Code) Rules, 2021.
+              Appointed under the DPDP Act, 2023 and Rule 3(2) of the IT (Intermediary Guidelines and Digital
+              Media Ethics Code) Rules, 2021.
             </p>
             <DocTable
               rows={[

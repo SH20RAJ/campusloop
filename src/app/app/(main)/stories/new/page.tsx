@@ -1,10 +1,10 @@
+import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { isViewerProfile } from "@/lib/viewer";
-import { eq } from "drizzle-orm";
-import { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { StoryCreator } from "./story-creator";
 
 export const metadata: Metadata = {
@@ -17,13 +17,12 @@ export default async function CreateStoryPage() {
     redirect("/handler/sign-in");
   }
 
-
   const db = getDb();
   const profile = await db.query.userProfiles.findFirst({
     where: eq(userProfiles.userId, user.id),
     with: {
       institution: true,
-    }
+    },
   });
 
   if (!profile) {
@@ -34,7 +33,5 @@ export default async function CreateStoryPage() {
     redirect("/app");
   }
 
-  return (
-    <StoryCreator profile={profile} />
-  );
+  return <StoryCreator profile={profile} />;
 }

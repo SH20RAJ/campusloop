@@ -1,5 +1,5 @@
-import { boolean,index,pgTable,text } from "drizzle-orm/pg-core";
-import { createdAt,id } from "./common";
+import { boolean, index, pgTable, text } from "drizzle-orm/pg-core";
+import { createdAt, id } from "./common";
 import { userProfiles } from "./users";
 
 export const notifications = pgTable(

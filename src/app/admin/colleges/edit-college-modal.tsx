@@ -1,20 +1,10 @@
 "use client";
 
+import { Globe, Image as ImageIcon, Loader2, Save, School, Trophy, Upload, X, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { fetchCollegeWikipediaSummary } from "@/lib/college-enricher";
 import { uploadImageToImgBB } from "@/lib/upload";
-import {
-Globe,
-Image as ImageIcon,
-Loader2,
-Save,
-School,
-Trophy,
-Upload,
-X,
-Zap,
-} from "lucide-react";
-import { useEffect,useRef,useState } from "react";
-import { toast } from "sonner";
 import { updateCollegeDetails } from "./actions";
 
 export interface CollegeEditData {
@@ -38,18 +28,12 @@ interface EditCollegeModalProps {
   onSaved: () => void;
 }
 
-export function EditCollegeModal({
-  college,
-  onClose,
-  onSaved,
-}: EditCollegeModalProps) {
+export function EditCollegeModal({ college, onClose, onSaved }: EditCollegeModalProps) {
   const [name, setName] = useState(college?.name || "");
   const [logoUrl, setLogoUrl] = useState(college?.logoUrl || "");
   const [bannerUrl, setBannerUrl] = useState(college?.bannerUrl || "");
   const [website, setWebsite] = useState(college?.website || "");
-  const [nirfRank, setNirfRank] = useState<string>(
-    college?.nirfRank ? String(college.nirfRank) : ""
-  );
+  const [nirfRank, setNirfRank] = useState<string>(college?.nirfRank ? String(college.nirfRank) : "");
   const [yearOfEstablishment, setYearOfEstablishment] = useState<string>(
     college?.yearOfEstablishment ? String(college.yearOfEstablishment) : ""
   );
@@ -72,9 +56,7 @@ export function EditCollegeModal({
       setBannerUrl(college.bannerUrl || "");
       setWebsite(college.website || "");
       setNirfRank(college.nirfRank ? String(college.nirfRank) : "");
-      setYearOfEstablishment(
-        college.yearOfEstablishment ? String(college.yearOfEstablishment) : ""
-      );
+      setYearOfEstablishment(college.yearOfEstablishment ? String(college.yearOfEstablishment) : "");
       setState(college.state || "");
       setDistrict(college.district || "");
       setDescription(college.description || "");
@@ -161,9 +143,7 @@ export function EditCollegeModal({
         bannerUrl: bannerUrl.trim() || null,
         website: website.trim() || null,
         nirfRank: nirfRank ? parseInt(nirfRank, 10) : null,
-        yearOfEstablishment: yearOfEstablishment
-          ? parseInt(yearOfEstablishment, 10)
-          : null,
+        yearOfEstablishment: yearOfEstablishment ? parseInt(yearOfEstablishment, 10) : null,
         state: state.trim() || null,
         district: district.trim() || null,
         description: description.trim() || null,
@@ -186,9 +166,7 @@ export function EditCollegeModal({
         <div className="flex items-center justify-between border-b border-border/60 pb-3">
           <div className="flex items-center gap-2">
             <School className="size-5 text-primary" />
-            <h3 className="text-base font-extrabold text-foreground">
-              Edit College Hub Media &amp; Info
-            </h3>
+            <h3 className="text-base font-extrabold text-foreground">Edit College Hub Media &amp; Info</h3>
           </div>
           <button
             type="button"
@@ -225,11 +203,7 @@ export function EditCollegeModal({
             {/* Live Banner Preview Card */}
             <div className="relative h-32 w-full rounded-2xl overflow-hidden border border-border bg-muted/40 flex items-center justify-center group">
               {bannerUrl ? (
-                <img
-                  src={bannerUrl}
-                  alt="Banner preview"
-                  className="w-full h-full object-cover"
-                />
+                <img src={bannerUrl} alt="Banner preview" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-[11px] text-muted-foreground">
                   No banner set. Upload or paste URL below.
@@ -239,11 +213,7 @@ export function EditCollegeModal({
               {/* Logo Overlay Preview */}
               <div className="absolute bottom-2 left-3 size-14 rounded-xl bg-card border-2 border-border shadow-lg p-1 flex items-center justify-center overflow-hidden">
                 {logoUrl ? (
-                  <img
-                    src={logoUrl}
-                    alt="Logo preview"
-                    className="w-full h-full object-contain"
-                  />
+                  <img src={logoUrl} alt="Logo preview" className="w-full h-full object-contain" />
                 ) : (
                   <School className="size-6 text-primary/60" />
                 )}
@@ -328,9 +298,7 @@ export function EditCollegeModal({
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground">
-                  State
-                </label>
+                <label className="text-[10px] font-bold uppercase text-muted-foreground">State</label>
                 <input
                   type="text"
                   value={state}
@@ -339,9 +307,7 @@ export function EditCollegeModal({
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground">
-                  District
-                </label>
+                <label className="text-[10px] font-bold uppercase text-muted-foreground">District</label>
                 <input
                   type="text"
                   value={district}
@@ -350,9 +316,7 @@ export function EditCollegeModal({
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground">
-                  Est. Year
-                </label>
+                <label className="text-[10px] font-bold uppercase text-muted-foreground">Est. Year</label>
                 <input
                   type="number"
                   placeholder="1955"
@@ -400,11 +364,7 @@ export function EditCollegeModal({
                   onClick={handleAutoEnrich}
                   className="text-[11px] font-bold text-primary hover:underline cursor-pointer flex items-center gap-1"
                 >
-                  {isEnriching ? (
-                    <Loader2 className="size-3 animate-spin" />
-                  ) : (
-                    <Zap className="size-3" />
-                  )}
+                  {isEnriching ? <Loader2 className="size-3 animate-spin" /> : <Zap className="size-3" />}
                   <span>Auto-Fetch from Wikipedia</span>
                 </button>
               </div>
@@ -432,11 +392,7 @@ export function EditCollegeModal({
               disabled={isSaving}
               className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer shadow-md flex items-center gap-1.5"
             >
-              {isSaving ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <Save className="size-3.5" />
-              )}
+              {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
               <span>Save Changes</span>
             </button>
           </div>

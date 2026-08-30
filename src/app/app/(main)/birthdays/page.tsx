@@ -1,5 +1,5 @@
+import type { Metadata } from "next";
 import { BirthdaysClient } from "@/components/birthdays/birthdays-client";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Campus Birthdays & Celebrations | CampusLoop",

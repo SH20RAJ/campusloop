@@ -3,8 +3,9 @@
  * Provides atomic optimistic post prepending, server confirmation, and cache synchronization
  * across all active SWR feed queries.
  */
-import { FeedPost } from "@/hooks/use-feed";
+
 import { mutate } from "swr";
+import type { FeedPost } from "@/hooks/use-feed";
 
 // In-memory feed cache shared across mounts
 export const feedPagesCache = new Map<string, FeedPost[][]>();

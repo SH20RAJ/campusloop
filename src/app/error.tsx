@@ -1,6 +1,6 @@
 "use client";
 
-import { Home,RefreshCw,TriangleAlert } from "lucide-react";
+import { Home, RefreshCw, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -24,13 +24,11 @@ export default function GlobalAppError({
       <div className="space-y-2">
         <h1 className="text-lg font-black tracking-tight text-foreground">Something broke here</h1>
         <p className="mx-auto max-w-sm text-sm text-muted-foreground leading-relaxed">
-          This page hit an unexpected error. Trying again usually clears it — nothing you posted
-          has been lost.
+          This page hit an unexpected error. Trying again usually clears it — nothing you posted has been
+          lost.
         </p>
         {error.digest && (
-          <p className="pt-1 font-mono text-[10px] text-muted-foreground/70">
-            Reference: {error.digest}
-          </p>
+          <p className="pt-1 font-mono text-[10px] text-muted-foreground/70">Reference: {error.digest}</p>
         )}
       </div>
 

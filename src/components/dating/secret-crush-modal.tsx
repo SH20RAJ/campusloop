@@ -1,25 +1,23 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { UserProfile } from "@/db/schema";
 import {
-Crown,
-Flame,
-Heart,
-Loader2,
-Lock,
-MessageCircle,
-Plus,
-Search,
-ShieldCheck,
-Trash2,
-X,
-Zap,
+  Flame,
+  Heart,
+  Loader2,
+  Lock,
+  MessageCircle,
+  Plus,
+  Search,
+  ShieldCheck,
+  Trash2,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { UserProfile } from "@/db/schema";
 
 interface SecretCrushItem {
   id: string;
@@ -196,7 +194,9 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
               {receivedCrushesCount === 1
                 ? "1 student on your campus secretly added you!"
                 : `${receivedCrushesCount} students on your campus secretly added you!`}{" "}
-              <span className="font-normal text-rose-500/80">Add your crushes below to discover if it&apos;s a match.</span>
+              <span className="font-normal text-rose-500/80">
+                Add your crushes below to discover if it&apos;s a match.
+              </span>
             </p>
           </div>
         )}
@@ -213,7 +213,8 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
             </span>
           </div>
           <p className="text-[10px] leading-relaxed text-muted-foreground pt-0.5">
-            5 active slots + 5 new crush attempts per rolling 7 days. Removing a crush never refunds an attempt. 7-day cooldown applies per person.
+            5 active slots + 5 new crush attempts per rolling 7 days. Removing a crush never refunds an
+            attempt. 7-day cooldown applies per person.
           </p>
         </div>
 
@@ -282,9 +283,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Avatar className="size-8 shrink-0">
                           <AvatarImage src={u.avatarUrl || ""} />
-                          <AvatarFallback className="text-[9px] font-bold">
-                            {u.displayName[0]}
-                          </AvatarFallback>
+                          <AvatarFallback className="text-[9px] font-bold">{u.displayName[0]}</AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-foreground truncate">{u.displayName}</p>
@@ -326,9 +325,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
                   className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/30 transition-all shadow-2xs"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-[10px] font-black text-muted-foreground w-4">
-                      #{idx + 1}
-                    </span>
+                    <span className="text-[10px] font-black text-muted-foreground w-4">#{idx + 1}</span>
 
                     <Avatar className="size-10 shrink-0 border border-border/40">
                       <AvatarImage src={c.target?.avatarUrl || ""} />
@@ -384,7 +381,8 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
                 </div>
                 <h3 className="text-xs font-black text-foreground">Your Secret Crush vault is empty</h3>
                 <p className="text-[11px] text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                  Add up to {maxSlots} verified students you secretly like. They will NEVER know unless they add you too!
+                  Add up to {maxSlots} verified students you secretly like. They will NEVER know unless they
+                  add you too!
                 </p>
                 <button
                   type="button"
@@ -406,7 +404,8 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
             CampusLoop Zero-Embarrassment Guarantee
           </p>
           <p>
-            Your crushes are end-to-end intent-hidden. No one can see your list, and no notification reveals your name until a mutual match occurs.
+            Your crushes are end-to-end intent-hidden. No one can see your list, and no notification reveals
+            your name until a mutual match occurs.
           </p>
         </div>
       </div>

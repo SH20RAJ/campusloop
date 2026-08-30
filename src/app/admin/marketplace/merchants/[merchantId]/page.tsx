@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { AdminMerchantEditClient } from "./admin-merchant-edit-client";
 
 interface AdminMerchantEditPageProps {

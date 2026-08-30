@@ -1,16 +1,16 @@
+import { and, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import {
-conversationParticipants,
-conversations,
-messages,
-notifications,
-swipes,
-userProfiles
+  conversationParticipants,
+  conversations,
+  messages,
+  notifications,
+  swipes,
+  userProfiles,
 } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { and,eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
@@ -31,11 +31,11 @@ export async function POST(req: Request) {
     const viewerBlocked = await rejectViewerWrite(profile);
     if (viewerBlocked) return viewerBlocked;
 
-    const body = (await req.json()) as { 
-      targetId?: string; 
-      targetUserId?: string; 
-      direction?: "LIKE" | "PASS"; 
-      action?: "like" | "pass"; 
+    const body = (await req.json()) as {
+      targetId?: string;
+      targetUserId?: string;
+      direction?: "LIKE" | "PASS";
+      action?: "like" | "pass";
     };
 
     const targetId = body.targetId || body.targetUserId;
@@ -66,16 +66,16 @@ export async function POST(req: Request) {
           eq(swipes.swiperId, targetId),
           eq(swipes.targetId, profile.id),
           eq(swipes.direction, "LIKE")
-        )
+        ),
       });
 
       if (mutual) {
         // Create conversation
         const [newConv] = await db.insert(conversations).values({}).returning();
-        
+
         await db.insert(conversationParticipants).values([
           { conversationId: newConv.id, userId: profile.id },
-          { conversationId: newConv.id, userId: targetId }
+          { conversationId: newConv.id, userId: targetId },
         ]);
 
         // Insert notifications
@@ -96,7 +96,6 @@ export async function POST(req: Request) {
           },
         ]);
 
-
         // Send match greeting
         await db.insert(messages).values({
           conversationId: newConv.id,
@@ -109,13 +108,15 @@ export async function POST(req: Request) {
           where: eq(userProfiles.id, targetId),
         });
 
-        return NextResponse.json({ 
-          matched: true, 
+        return NextResponse.json({
+          matched: true,
           conversationId: newConv.id,
-          matchedUser: matchedUser ? {
-            displayName: matchedUser.displayName,
-            avatarUrl: matchedUser.avatarUrl,
-          } : null
+          matchedUser: matchedUser
+            ? {
+                displayName: matchedUser.displayName,
+                avatarUrl: matchedUser.avatarUrl,
+              }
+            : null,
         });
       }
     }
@@ -152,9 +153,7 @@ export async function DELETE(req: Request) {
     const targetId = searchParams.get("targetId");
 
     if (targetId) {
-      await db
-        .delete(swipes)
-        .where(and(eq(swipes.swiperId, profile.id), eq(swipes.targetId, targetId)));
+      await db.delete(swipes).where(and(eq(swipes.swiperId, profile.id), eq(swipes.targetId, targetId)));
       return NextResponse.json({ success: true, message: "Swipe undone" });
     }
 

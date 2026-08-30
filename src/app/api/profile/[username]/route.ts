@@ -1,12 +1,9 @@
-import { getDb } from "@/db";
-import { userProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { userProfiles } from "@/db/schema";
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ username: string }> }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ username: string }> }) {
   try {
     const { username } = await params;
     const db = getDb();

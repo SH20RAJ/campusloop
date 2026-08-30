@@ -1,15 +1,15 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { getBranchIcon } from "@/constants";
-import type { Institution,UserProfile } from "@/db/schema";
-import { fetcher } from "@/lib/api";
-import { getAvatarUrl } from "@/lib/utils";
-import { ArrowLeft,Globe,MessageSquare,School,Search,ShieldCheck } from "lucide-react";
+import { ArrowLeft, Globe, MessageSquare, School, Search, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useParams,useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getBranchIcon } from "@/constants";
+import type { Institution, UserProfile } from "@/db/schema";
+import { fetcher } from "@/lib/api";
+import { getAvatarUrl } from "@/lib/utils";
 
 type BranchStudent = UserProfile & { institution?: Institution | null };
 
@@ -63,10 +63,7 @@ export function BranchDirectoryClient() {
           </div>
         </div>
 
-        <Link
-          href="/app/colleges"
-          className="text-xs font-bold text-primary hover:underline shrink-0 pl-2"
-        >
+        <Link href="/app/colleges" className="text-xs font-bold text-primary hover:underline shrink-0 pl-2">
           All Colleges
         </Link>
       </header>
@@ -186,9 +183,7 @@ export function BranchDirectoryClient() {
                   <Link href={`/@${student.username}`} className="min-w-0 group/name block">
                     <p className="text-sm font-bold text-foreground truncate group-hover/name:underline flex items-center gap-1">
                       <span className="truncate">{student.displayName}</span>
-                      {student.points >= 150 && (
-                        <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
-                      )}
+                      {student.points >= 150 && <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
                       @{student.username}

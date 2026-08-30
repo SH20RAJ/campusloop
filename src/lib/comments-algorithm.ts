@@ -25,11 +25,7 @@ export function calculateCommentScore(
   let score = 0;
 
   // 1. OP (Author) Boost — Highest priority in Instagram & Twitter
-  const isOp = Boolean(
-    options.postAuthorId &&
-    comment.authorId &&
-    comment.authorId === options.postAuthorId
-  );
+  const isOp = Boolean(options.postAuthorId && comment.authorId && comment.authorId === options.postAuthorId);
   if (isOp) {
     score += 1500;
   }
@@ -95,18 +91,14 @@ export function rankAndThreadComments(
 
   // Sort child replies chronologically (natural conversational flow like Twitter threads)
   for (const replyList of repliesMap.values()) {
-    replyList.sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
+    replyList.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   }
 
   const sortMode = options.sortMode || "TOP";
 
   if (sortMode === "LATEST") {
     // Newest first
-    topLevel.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    topLevel.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   } else {
     // Twitter & Instagram algorithmic relevance
     topLevel.sort((a, b) => {

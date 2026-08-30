@@ -1,10 +1,10 @@
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { followUser,getFollowCounts,unfollowUser } from "@/lib/follows";
+import { followUser, getFollowCounts, unfollowUser } from "@/lib/follows";
 import { createNotification } from "@/lib/notifications";
-import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

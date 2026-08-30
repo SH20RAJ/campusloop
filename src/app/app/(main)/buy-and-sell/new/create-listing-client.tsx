@@ -1,29 +1,29 @@
 "use client";
 
+import {
+  ArrowLeft,
+  Bike,
+  BookOpen,
+  CheckCircle2,
+  Compass,
+  Home,
+  ImagePlus,
+  Laptop,
+  Loader2,
+  MapPin,
+  Send,
+  Tag,
+  Wind,
+  X,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { mutate } from "swr";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
-import {
-ArrowLeft,
-Bike,
-BookOpen,
-CheckCircle2,
-Compass,
-Home,
-ImagePlus,
-Laptop,
-Loader2,
-MapPin,
-Send,
-Tag,
-Wind,
-X
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRef,useState } from "react";
-import { toast } from "sonner";
-import { mutate } from "swr";
 
 interface CreateListingClientProps {
   profileId: string;
@@ -213,7 +213,12 @@ export function CreateListingClient({ profileId }: CreateListingClientProps) {
                 >
                   <Icon className={cn("size-5 mb-1.5", isSelected ? "text-background" : "text-primary")} />
                   <span className="text-xs font-bold leading-snug">{cat.label}</span>
-                  <span className={cn("text-[10px] mt-0.5 line-clamp-1", isSelected ? "text-background/75" : "text-muted-foreground")}>
+                  <span
+                    className={cn(
+                      "text-[10px] mt-0.5 line-clamp-1",
+                      isSelected ? "text-background/75" : "text-muted-foreground"
+                    )}
+                  >
                     {cat.hint}
                   </span>
                 </button>
@@ -233,7 +238,10 @@ export function CreateListingClient({ profileId }: CreateListingClientProps) {
 
           <div className="flex flex-wrap items-center gap-2.5">
             {images.map((url, i) => (
-              <div key={url} className="relative size-20 rounded-2xl overflow-hidden border border-border/50 bg-muted group">
+              <div
+                key={url}
+                className="relative size-20 rounded-2xl overflow-hidden border border-border/50 bg-muted group"
+              >
                 <img src={url} alt={`Photo ${i + 1}`} className="size-full object-cover" />
                 <button
                   type="button"
@@ -315,7 +323,9 @@ export function CreateListingClient({ profileId }: CreateListingClientProps) {
             <div className="space-y-1.5">
               <span className="text-[11px] font-semibold text-muted-foreground">Selling Price (₹) *</span>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground">₹</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground">
+                  ₹
+                </span>
                 <input
                   type="number"
                   required
@@ -331,7 +341,9 @@ export function CreateListingClient({ profileId }: CreateListingClientProps) {
             <div className="space-y-1.5">
               <span className="text-[11px] font-semibold text-muted-foreground">Original MRP (Optional)</span>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground">₹</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground">
+                  ₹
+                </span>
                 <input
                   type="number"
                   min="0"
@@ -390,7 +402,12 @@ export function CreateListingClient({ profileId }: CreateListingClientProps) {
                   )}
                 >
                   <p className="text-xs font-bold">{cond.label}</p>
-                  <p className={cn("text-[10px] mt-0.5", isSelected ? "text-background/75" : "text-muted-foreground")}>
+                  <p
+                    className={cn(
+                      "text-[10px] mt-0.5",
+                      isSelected ? "text-background/75" : "text-muted-foreground"
+                    )}
+                  >
                     {cond.desc}
                   </p>
                 </button>

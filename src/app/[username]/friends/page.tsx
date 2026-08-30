@@ -1,5 +1,5 @@
-import { FollowListPageView,generateFollowListMetadata } from "@/components/profile/follow-list-page";
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import { FollowListPageView, generateFollowListMetadata } from "@/components/profile/follow-list-page";
 
 interface FriendsPageProps {
   params: Promise<{ username: string }>;

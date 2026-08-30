@@ -1,11 +1,11 @@
 "use client";
 
-import { uploadImageToImgBB } from "@/lib/upload";
-import { cn } from "@/lib/utils";
-import { haptics } from "@/lib/haptics";
 import { Check, ImageUp, Loader2, Move, RotateCw, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { haptics } from "@/lib/haptics";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { cn } from "@/lib/utils";
 
 interface ImageCropModalProps {
   isOpen: boolean;
@@ -35,16 +35,8 @@ export function computeCropDraw(params: {
   offsetX: number;
   offsetY: number;
 }) {
-  const {
-    naturalWidth,
-    naturalHeight,
-    frameWidth,
-    frameHeight,
-    outputWidth,
-    zoom,
-    offsetX,
-    offsetY,
-  } = params;
+  const { naturalWidth, naturalHeight, frameWidth, frameHeight, outputWidth, zoom, offsetX, offsetY } =
+    params;
 
   const coverScale = Math.max(frameWidth / naturalWidth, frameHeight / naturalHeight);
   const previewToOutput = outputWidth / frameWidth;
@@ -62,13 +54,7 @@ export function computeCropDraw(params: {
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 4;
 
-export function ImageCropModal({
-  isOpen,
-  onClose,
-  imageUrl,
-  mode,
-  onCropComplete,
-}: ImageCropModalProps) {
+export function ImageCropModal({ isOpen, onClose, imageUrl, mode, onCropComplete }: ImageCropModalProps) {
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -91,7 +77,7 @@ export function ImageCropModal({
       setOffset({ x: 0, y: 0 });
       setNaturalSize(null);
     }
-  }, [isOpen, imageUrl]);
+  }, [isOpen]);
 
   /**
    * The preview renders the image with `object-cover`, which scales it to fill
@@ -159,9 +145,7 @@ export function ImageCropModal({
 
   function handlePointerMove(e: React.PointerEvent) {
     if (!isDragging || pinchStart.current) return;
-    setOffset(
-      clampOffset({ x: e.clientX - dragStart.current.x, y: e.clientY - dragStart.current.y })
-    );
+    setOffset(clampOffset({ x: e.clientX - dragStart.current.x, y: e.clientY - dragStart.current.y }));
   }
 
   function handlePointerUp(e: React.PointerEvent) {
@@ -325,9 +309,7 @@ export function ImageCropModal({
             className={cn(
               "relative touch-none overflow-hidden border-2 border-primary/60 shadow-lg",
               isDragging ? "cursor-grabbing" : "cursor-grab",
-              mode === "avatar"
-                ? "size-64 rounded-full sm:size-72"
-                : "aspect-[3/1] w-full rounded-2xl"
+              mode === "avatar" ? "size-64 rounded-full sm:size-72" : "aspect-[3/1] w-full rounded-2xl"
             )}
           >
             <img
@@ -449,11 +431,7 @@ export function ImageCropModal({
               disabled={busy}
               className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 disabled:opacity-50"
             >
-              {isProcessing ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <Check className="size-3.5" />
-              )}
+              {isProcessing ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
               <span>Apply</span>
             </button>
           </div>

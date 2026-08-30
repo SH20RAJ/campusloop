@@ -1,12 +1,12 @@
+import { desc, eq, ne } from "drizzle-orm";
+import type { Metadata } from "next";
+import { notFound, redirect } from "next/navigation";
 import { CommunityDetailClient } from "@/components/communities/community-detail-client";
 import { getDb } from "@/db";
-import { communities,communityMembers,posts } from "@/db/schema";
-import { FeedPost } from "@/hooks/use-feed";
+import { communities, communityMembers, posts } from "@/db/schema";
+import type { FeedPost } from "@/hooks/use-feed";
 import { sanitizeAnonRow } from "@/lib/anonymity";
-import { getCachedAuthUser,getCachedCommunity,getCachedUserProfile } from "@/lib/server-cache";
-import { desc,eq,ne } from "drizzle-orm";
-import { Metadata } from "next";
-import { notFound,redirect } from "next/navigation";
+import { getCachedAuthUser, getCachedCommunity, getCachedUserProfile } from "@/lib/server-cache";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -74,10 +74,7 @@ export default async function CommunityDetailPage({ params }: PageProps) {
   if (!user) redirect("/handler/sign-in");
 
   // Parallelize user profile and community lookup
-  const [profile, comm] = await Promise.all([
-    getCachedUserProfile(user.id),
-    getCachedCommunity(id),
-  ]);
+  const [profile, comm] = await Promise.all([getCachedUserProfile(user.id), getCachedCommunity(id)]);
 
   if (!profile) redirect("/app/onboarding");
   if (!comm) notFound();
@@ -219,5 +216,3 @@ export default async function CommunityDetailPage({ params }: PageProps) {
     </>
   );
 }
-
-

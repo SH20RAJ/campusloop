@@ -1,8 +1,8 @@
+import { and, eq, ilike, ne, or } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,eq,ilike,ne,or } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -33,10 +33,7 @@ export async function GET(req: Request) {
     const matches = await db.query.userProfiles.findMany({
       where: and(
         ne(userProfiles.id, profile.id), // Exclude self
-        or(
-          ilike(userProfiles.displayName, `%${query}%`),
-          ilike(userProfiles.username, `%${query}%`)
-        )
+        or(ilike(userProfiles.displayName, `%${query}%`), ilike(userProfiles.username, `%${query}%`))
       ),
       limit: 10,
     });

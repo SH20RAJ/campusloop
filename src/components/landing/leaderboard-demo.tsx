@@ -1,11 +1,11 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card,CardContent } from "@/components/ui/card";
-import { ArrowRight,Award,Star,Trophy,Zap } from "lucide-react";
+import { ArrowRight, Award, Star, Trophy, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "./reveal";
 
 const TOP_CAMPUSES = [
@@ -51,7 +51,8 @@ export function LeaderboardShowcase() {
             Reputation you can flex when your GPA won&apos;t.
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Earn Loop Points (LP) by posting confessions, settling canteen debates, and bringing classmates who actually reply.
+            Earn Loop Points (LP) by posting confessions, settling canteen debates, and bringing classmates
+            who actually reply.
           </p>
         </Reveal>
 
@@ -62,7 +63,9 @@ export function LeaderboardShowcase() {
               <h3 className="font-heading text-base font-bold flex items-center gap-2">
                 <Trophy className="size-4 text-muted-foreground" /> Top College Rankings
               </h3>
-              <Badge variant="outline" className="text-[10px]">Updated Live</Badge>
+              <Badge variant="outline" className="text-[10px]">
+                Updated Live
+              </Badge>
             </div>
 
             <Card className="border border-border bg-card shadow-sm overflow-hidden">
@@ -78,7 +81,9 @@ export function LeaderboardShowcase() {
                       </div>
                       <div>
                         <p className="text-sm font-bold text-foreground leading-tight">{campus.name}</p>
-                        <span className="text-[10px] text-muted-foreground font-semibold">{campus.badge}</span>
+                        <span className="text-[10px] text-muted-foreground font-semibold">
+                          {campus.badge}
+                        </span>
                       </div>
                     </div>
 
@@ -99,14 +104,18 @@ export function LeaderboardShowcase() {
               <h3 className="font-heading text-base font-bold flex items-center gap-2">
                 <Zap className="size-4 text-primary" /> Test Your Campus Rank Calculator
               </h3>
-              <Badge variant="secondary" className="text-[10px]">Interactive Demo</Badge>
+              <Badge variant="secondary" className="text-[10px]">
+                Interactive Demo
+              </Badge>
             </div>
 
             <Card className="border border-border bg-card shadow-sm p-5 space-y-5">
               {/* Live Rank Result Card */}
               <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Your Campus Rank</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Your Campus Rank
+                  </span>
                   <span className="inline-flex items-center gap-1 text-xs font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
                     <RankIcon className="size-3" />
                     {currentRank.title}
@@ -118,7 +127,8 @@ export function LeaderboardShowcase() {
                   <span className="text-base font-bold text-primary">LP</span>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  You earn <strong className="text-foreground">20 LP per friend invite</strong> and <strong className="text-foreground">5 LP per post</strong>.
+                  You earn <strong className="text-foreground">20 LP per friend invite</strong> and{" "}
+                  <strong className="text-foreground">5 LP per post</strong>.
                 </p>
               </div>
 

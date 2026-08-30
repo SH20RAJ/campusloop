@@ -1,30 +1,33 @@
 "use client";
 
+import { Bike, Edit3, Gauge, Loader2, Plus, Search, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-Bike,
-Edit3,
-Gauge,
-Loader2,
-Plus,
-Search,
-Trash2,
-X
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
 
 const STATUS_OPTIONS = [
-  { value: "AVAILABLE", label: "🟢 Available", color: "text-emerald-500 bg-emerald-500/15 border-emerald-500/30" },
-  { value: "BOOKED", label: "🔵 Booked (Reserved)", color: "text-blue-400 bg-blue-500/15 border-blue-500/30" },
+  {
+    value: "AVAILABLE",
+    label: "🟢 Available",
+    color: "text-emerald-500 bg-emerald-500/15 border-emerald-500/30",
+  },
+  {
+    value: "BOOKED",
+    label: "🔵 Booked (Reserved)",
+    color: "text-blue-400 bg-blue-500/15 border-blue-500/30",
+  },
   { value: "RENTED", label: "🟡 Rented Out", color: "text-amber-500 bg-amber-500/15 border-amber-500/30" },
-  { value: "MAINTENANCE", label: "🔴 In Maintenance", color: "text-rose-500 bg-rose-500/15 border-rose-500/30" },
+  {
+    value: "MAINTENANCE",
+    label: "🔴 In Maintenance",
+    color: "text-rose-500 bg-rose-500/15 border-rose-500/30",
+  },
 ];
 
 export function MerchantFleetClient() {
@@ -97,7 +100,12 @@ export function MerchantFleetClient() {
   }
 
   async function handleDeleteBike(id: string) {
-    if (!confirm("Are you sure you want to deactivate this bike from your fleet? Historical bookings will be preserved.")) return;
+    if (
+      !confirm(
+        "Are you sure you want to deactivate this bike from your fleet? Historical bookings will be preserved."
+      )
+    )
+      return;
     sounds.tap();
     haptics.light();
 
@@ -159,8 +167,7 @@ export function MerchantFleetClient() {
       ) : filteredFleet.length > 0 ? (
         <div className="grid grid-cols-1 gap-3">
           {filteredFleet.map((bike) => {
-            const statusConfig =
-              STATUS_OPTIONS.find((s) => s.value === bike.status) || STATUS_OPTIONS[0];
+            const statusConfig = STATUS_OPTIONS.find((s) => s.value === bike.status) || STATUS_OPTIONS[0];
 
             return (
               <div

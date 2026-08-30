@@ -1,20 +1,12 @@
 "use client";
 
+import { ArrowUpDown, Compass, Hash, Loader2, Lock, Plus, Search } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FeedCard } from "@/components/ui/feed-card";
 import type { FeedPost } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
-import {
-ArrowUpDown,
-Compass,
-Hash,
-Loader2,
-Lock,
-Plus,
-Search
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback,useEffect,useMemo,useRef,useState } from "react";
 import { CollegeClubsView } from "./college-clubs-view";
 import { CollegeHeroHeader } from "./college-hero-header";
 import { CollegeLeaderboardPodium } from "./college-leaderboard-podium";
@@ -154,8 +146,8 @@ export function CollegeHubClient({
       result = result.filter(
         (p) =>
           p.body.toLowerCase().includes(q) ||
-          (p.author?.displayName && p.author.displayName.toLowerCase().includes(q)) ||
-          (p.author?.username && p.author.username.toLowerCase().includes(q))
+          p.author?.displayName?.toLowerCase().includes(q) ||
+          p.author?.username?.toLowerCase().includes(q)
       );
     }
 
@@ -210,7 +202,12 @@ export function CollegeHubClient({
             )}
           >
             <span>Feed</span>
-            <span className={cn("text-[10px] px-1.5 py-0.2 rounded-full", activeTab === "feed" ? "bg-background/20 text-background" : "bg-muted text-muted-foreground")}>
+            <span
+              className={cn(
+                "text-[10px] px-1.5 py-0.2 rounded-full",
+                activeTab === "feed" ? "bg-background/20 text-background" : "bg-muted text-muted-foreground"
+              )}
+            >
               {posts.length}
             </span>
           </button>
@@ -358,8 +355,8 @@ export function CollegeHubClient({
                       sortOrder === "LATEST"
                         ? "TOP_VOTED"
                         : sortOrder === "TOP_VOTED"
-                        ? "MOST_DISCUSSED"
-                        : "LATEST"
+                          ? "MOST_DISCUSSED"
+                          : "LATEST"
                     )
                   }
                   className="px-3 py-1 rounded-full border border-border/80 bg-card text-[11px] font-bold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
@@ -369,8 +366,8 @@ export function CollegeHubClient({
                     {sortOrder === "LATEST"
                       ? "Latest"
                       : sortOrder === "TOP_VOTED"
-                      ? "Top Voted"
-                      : "Most Discussed"}
+                        ? "Top Voted"
+                        : "Most Discussed"}
                   </span>
                 </button>
               </div>
@@ -474,7 +471,8 @@ export function CollegeHubClient({
               <Lock className="size-4 text-primary" /> Are you a student at {shortName}?
             </h4>
             <p className="text-xs text-muted-foreground">
-              Sign up with your college email to unlock verified student badges, campus leaderboards, and direct messaging.
+              Sign up with your college email to unlock verified student badges, campus leaderboards, and
+              direct messaging.
             </p>
           </div>
 

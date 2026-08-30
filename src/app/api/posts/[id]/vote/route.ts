@@ -1,11 +1,10 @@
+import { and, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { posts,userProfiles,votes } from "@/db/schema";
+import { posts, userProfiles, votes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { createNotification } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { and,eq } from "drizzle-orm";
-
-import { NextResponse } from "next/server";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -39,10 +38,7 @@ export async function POST(req: Request, { params }: RouteParams) {
 
     // Check if vote already exists
     const existingVote = await db.query.votes.findFirst({
-      where: and(
-        eq(votes.postId, id),
-        eq(votes.userId, profile.id)
-      )
+      where: and(eq(votes.postId, id), eq(votes.userId, profile.id)),
     });
 
     if (existingVote) {
@@ -74,7 +70,7 @@ export async function POST(req: Request, { params }: RouteParams) {
           });
           // Anonymous posts have no addressable author — skip to avoid a
           // notification FK failure or an identity leak.
-          if (targetPost && targetPost.authorId && targetPost.authorId !== profile.id) {
+          if (targetPost?.authorId && targetPost.authorId !== profile.id) {
             createNotification({
               userId: targetPost.authorId,
               type: "LIKE",

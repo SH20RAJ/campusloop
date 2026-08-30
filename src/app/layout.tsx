@@ -1,11 +1,11 @@
+import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
+import type { Metadata, Viewport } from "next";
+import { Toaster } from "sonner";
 import { SWRProvider } from "@/components/providers/swr-provider";
 import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
 import { OfflineIndicator } from "@/components/ui/offline-indicator";
 import { RouteProgress } from "@/components/ui/route-progress";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { HexclaveProvider,HexclaveTheme } from "@hexclave/next";
-import type { Metadata,Viewport } from "next";
-import { Toaster } from "sonner";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -60,9 +60,7 @@ export const metadata: Metadata = {
       { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
       { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: [
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
-    ],
+    apple: [{ url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" }],
   },
   robots: {
     index: true,
@@ -111,7 +109,6 @@ export const metadata: Metadata = {
   category: "social networking",
   classification: "Student Community Platform",
 };
-
 
 export default function RootLayout({
   children,
@@ -162,7 +159,8 @@ export default function RootLayout({
               url: "https://campusloop.space",
               logo: "https://campusloop.space/logo.png",
               sameAs: ["https://twitter.com/campusloop", "https://instagram.com/campusloop"],
-              description: "CampusLoop connects students across 1,350+ Indian colleges with verified campus feeds, confessions, dating matches, and sub-hubs.",
+              description:
+                "CampusLoop connects students across 1,350+ Indian colleges with verified campus feeds, confessions, dating matches, and sub-hubs.",
             }),
           }}
         />
@@ -182,7 +180,7 @@ export default function RootLayout({
                   navigator.serviceWorker.register('/sw.js').catch(err => console.error('SW registration failed:', err));
                 });
               }
-            `
+            `,
           }}
         />
       </head>

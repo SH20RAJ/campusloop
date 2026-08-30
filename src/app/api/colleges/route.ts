@@ -1,8 +1,8 @@
+import { and, desc, eq, ilike, ne, or, type SQL } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,ilike,ne,or,type SQL } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
     };
     const { name, state, district, website } = body;
 
-    if (!name || !name.trim()) {
+    if (!name?.trim()) {
       return NextResponse.json({ error: "College name is required" }, { status: 400 });
     }
 
@@ -134,4 +134,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to add college" }, { status: 500 });
   }
 }
-

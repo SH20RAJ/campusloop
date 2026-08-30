@@ -1,20 +1,11 @@
 "use client";
 
+import { Clock, Compass, Flame, Lock, MessageSquare, ShieldCheck, Trophy, Zap } from "lucide-react";
+import { useMemo, useState } from "react";
 import { PostComposer } from "@/app/app/(main)/post/new/post-composer";
 import { FeedCard } from "@/components/ui/feed-card";
-import { FeedPost } from "@/hooks/use-feed";
+import type { FeedPost } from "@/hooks/use-feed";
 import { cn } from "@/lib/utils";
-import {
-Clock,
-Compass,
-Flame,
-Lock,
-MessageSquare,
-ShieldCheck,
-Trophy,
-Zap
-} from "lucide-react";
-import { useMemo,useState } from "react";
 
 interface CommunityFeedViewProps {
   community: {
@@ -32,12 +23,7 @@ interface CommunityFeedViewProps {
 
 type SortType = "hot" | "latest" | "top" | "discussed";
 
-export function CommunityFeedView({
-  community,
-  posts,
-  isMember,
-  currentUserId,
-}: CommunityFeedViewProps) {
+export function CommunityFeedView({ community, posts, isMember, currentUserId }: CommunityFeedViewProps) {
   const [sort, setSort] = useState<SortType>("hot");
 
   const parsedRules = useMemo(() => {
@@ -83,9 +69,7 @@ export function CommunityFeedView({
                   {idx + 1}. {rule.title}
                 </p>
                 {rule.description && (
-                  <p className="text-[11px] text-muted-foreground line-clamp-1">
-                    {rule.description}
-                  </p>
+                  <p className="text-[11px] text-muted-foreground line-clamp-1">{rule.description}</p>
                 )}
               </div>
             ))}
@@ -168,9 +152,7 @@ export function CommunityFeedView({
           <div className="text-center py-16 rounded-3xl bg-card text-muted-foreground text-xs font-semibold space-y-3 shadow-2xs">
             <Compass className="size-8 mx-auto text-muted-foreground/40" />
             <p className="font-bold text-foreground">No discussions in c/{community.name} yet.</p>
-            {isMember && (
-              <p className="text-primary font-bold">Be the first to share a thought or poll!</p>
-            )}
+            {isMember && <p className="text-primary font-bold">Be the first to share a thought or poll!</p>}
           </div>
         )}
       </div>

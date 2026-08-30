@@ -1,5 +1,31 @@
 "use client";
 
+import {
+  ArrowLeft,
+  Check,
+  ChevronRight,
+  Clock,
+  Loader2,
+  MapPin,
+  Minus,
+  Percent,
+  Phone,
+  Plus,
+  QrCode,
+  Search,
+  Share2,
+  ShieldCheck,
+  ShoppingBag,
+  Star,
+  Truck,
+  UtensilsCrossed,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
@@ -7,32 +33,6 @@ import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
-import {
-ArrowLeft,
-Check,
-ChevronRight,
-Clock,
-Loader2,
-MapPin,
-Minus,
-Percent,
-Phone,
-Plus,
-QrCode,
-Search,
-Share2,
-ShieldCheck,
-ShoppingBag,
-Star,
-Truck,
-UtensilsCrossed,
-X
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo,useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
 
 interface StoreClientProps {
   merchantId: string;
@@ -53,11 +53,9 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
 
   const { addItem, items, merchantGroups, totalItemsCount } = useMarketplaceCart();
 
-  const { data, isLoading, error } = useSWR<{ store: any }>(
-    `/api/marketplace/store/${merchantId}`,
-    fetcher,
-    { dedupingInterval: 15000 }
-  );
+  const { data, isLoading, error } = useSWR<{ store: any }>(`/api/marketplace/store/${merchantId}`, fetcher, {
+    dedupingInterval: 15000,
+  });
 
   const { data: reviewsData, mutate: mutateReviews } = useSWR<{
     reviews: any[];
@@ -109,7 +107,12 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
   // Group products by category when showing all categories
   const groupedProducts = useMemo(() => {
     if (activeCategoryTab !== "all" || searchMenuQuery.trim()) {
-      return [{ category: activeCategoryTab === "all" ? "Search Results" : activeCategoryTab, items: filteredProducts }];
+      return [
+        {
+          category: activeCategoryTab === "all" ? "Search Results" : activeCategoryTab,
+          items: filteredProducts,
+        },
+      ];
     }
 
     const groups: Record<string, any[]> = {};
@@ -339,7 +342,10 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
       {/* ─── Store Cover Banner ─── */}
       <div className="relative h-44 sm:h-52 w-full overflow-hidden bg-muted">
         <img
-          src={store.coverUrl || "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop"}
+          src={
+            store.coverUrl ||
+            "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop"
+          }
           alt={store.name}
           className="size-full object-cover"
         />
@@ -569,9 +575,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                             <span
                               className={cn(
                                 "size-3.5 rounded-sm border flex items-center justify-center shrink-0",
-                                product.isVeg
-                                  ? "border-emerald-500"
-                                  : "border-rose-500"
+                                product.isVeg ? "border-emerald-500" : "border-rose-500"
                               )}
                               title={product.isVeg ? "Pure Veg" : "Non-Veg"}
                             >
@@ -590,9 +594,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                             )}
                           </div>
 
-                          <h4 className="text-sm font-bold text-foreground leading-snug">
-                            {product.name}
-                          </h4>
+                          <h4 className="text-sm font-bold text-foreground leading-snug">{product.name}</h4>
 
                           {/* Price Row */}
                           <div className="flex items-center gap-2 text-xs">
@@ -620,7 +622,10 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                         <div className="relative shrink-0 flex flex-col items-center">
                           <div className="size-24 rounded-2xl overflow-hidden bg-muted border border-border/40">
                             <img
-                              src={product.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop"}
+                              src={
+                                product.imageUrl ||
+                                "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop"
+                              }
                               alt={product.name}
                               className="size-full object-cover"
                             />
@@ -671,13 +676,13 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                     {offer.code}
                   </span>
                   <span className="text-xs font-bold text-foreground">
-                    {offer.discountType === "PERCENTAGE" ? `${offer.discountValue}% OFF` : `₹${offer.discountValue} FLAT OFF`}
+                    {offer.discountType === "PERCENTAGE"
+                      ? `${offer.discountValue}% OFF`
+                      : `₹${offer.discountValue} FLAT OFF`}
                   </span>
                 </div>
                 <h4 className="text-sm font-bold text-foreground">{offer.title}</h4>
-                {offer.description && (
-                  <p className="text-xs text-muted-foreground">{offer.description}</p>
-                )}
+                {offer.description && <p className="text-xs text-muted-foreground">{offer.description}</p>}
               </div>
             ))
           ) : (
@@ -697,7 +702,9 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="size-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex flex-col items-center justify-center text-amber-500 shrink-0">
-                  <span className="text-2xl font-black">{reviewsData?.averageRating || store.rating || "4.8"}</span>
+                  <span className="text-2xl font-black">
+                    {reviewsData?.averageRating || store.rating || "4.8"}
+                  </span>
                   <span className="text-[10px] font-bold">/ 5.0</span>
                 </div>
                 <div>
@@ -762,14 +769,18 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                                 key={s}
                                 className={cn(
                                   "size-2.5",
-                                  s <= rev.rating ? "fill-amber-500 stroke-amber-500" : "fill-transparent stroke-muted-foreground/30"
+                                  s <= rev.rating
+                                    ? "fill-amber-500 stroke-amber-500"
+                                    : "fill-transparent stroke-muted-foreground/30"
                                 )}
                               />
                             ))}
                           </div>
                         </div>
                       </div>
-                      <span className="text-[10px] text-muted-foreground">{formatTimeAgo(rev.createdAt)}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {formatTimeAgo(rev.createdAt)}
+                      </span>
                     </div>
                     {rev.comment && (
                       <p className="text-xs text-foreground/90 leading-relaxed font-normal pl-10.5">
@@ -782,7 +793,9 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
             ) : (
               <div className="py-16 text-center space-y-2">
                 <Star className="size-8 text-muted-foreground/40 mx-auto" />
-                <p className="text-xs font-bold text-muted-foreground">No reviews yet. Be the first to order and review!</p>
+                <p className="text-xs font-bold text-muted-foreground">
+                  No reviews yet. Be the first to order and review!
+                </p>
               </div>
             )}
           </div>
@@ -793,18 +806,36 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
       {activeTab === "about" && (
         <section className="p-4 space-y-4">
           <div className="p-5 rounded-2xl border border-border/40 bg-card space-y-3 shadow-xs">
-            <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Store Details</h3>
+            <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+              Store Details
+            </h3>
             <div className="space-y-2 text-xs text-foreground/90">
-              <p><strong>Campus Location:</strong> {store.address}</p>
-              {store.phone && <p><strong>Direct Phone:</strong> {store.phone}</p>}
-              {store.email && <p><strong>Email:</strong> {store.email}</p>}
-              <p><strong>Delivery Fee:</strong> ₹{store.deliveryFee} across campus hostels</p>
-              <p><strong>Min Order:</strong> ₹{store.minOrderValue}</p>
+              <p>
+                <strong>Campus Location:</strong> {store.address}
+              </p>
+              {store.phone && (
+                <p>
+                  <strong>Direct Phone:</strong> {store.phone}
+                </p>
+              )}
+              {store.email && (
+                <p>
+                  <strong>Email:</strong> {store.email}
+                </p>
+              )}
+              <p>
+                <strong>Delivery Fee:</strong> ₹{store.deliveryFee} across campus hostels
+              </p>
+              <p>
+                <strong>Min Order:</strong> ₹{store.minOrderValue}
+              </p>
             </div>
           </div>
 
           <div className="p-5 rounded-2xl border border-border/40 bg-card text-center space-y-3 shadow-xs">
-            <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Table QR Stand</h3>
+            <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+              Table QR Stand
+            </h3>
             <div className="size-40 mx-auto bg-white p-3 rounded-2xl border border-border">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://campusloop.space/app/marketplace/store/${store.id}`}
@@ -812,7 +843,9 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                 className="size-full object-contain"
               />
             </div>
-            <p className="text-xs text-muted-foreground">Scan at dining table for instant contactless ordering</p>
+            <p className="text-xs text-muted-foreground">
+              Scan at dining table for instant contactless ordering
+            </p>
           </div>
         </section>
       )}
@@ -841,7 +874,10 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
 
               <div className="flex items-center gap-2 font-black text-sm">
                 <span>
-                  ₹{currentStoreGroup.items.reduce((s, i) => s + i.price * i.quantity, 0).toLocaleString("en-IN")}
+                  ₹
+                  {currentStoreGroup.items
+                    .reduce((s, i) => s + i.price * i.quantity, 0)
+                    .toLocaleString("en-IN")}
                 </span>
                 <ChevronRight className="size-4 stroke-3" />
               </div>

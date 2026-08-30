@@ -1,17 +1,11 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Card,CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { Heart,Lock,MessageCircle } from "lucide-react";
-import {
-motion,
-useMotionValue,
-useReducedMotion,
-useSpring,
-useTransform,
-} from "motion/react";
+import { Heart, Lock, MessageCircle } from "lucide-react";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const POLL_OPTIONS = [
   { id: "nescafe", text: "Nescafe booth", votes: 212 },
@@ -42,9 +36,7 @@ export function HeroPreview() {
   function vote(id: string) {
     if (votedId) return;
     setVotedId(id);
-    setOptions((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, votes: o.votes + 1 } : o))
-    );
+    setOptions((prev) => prev.map((o) => (o.id === id ? { ...o, votes: o.votes + 1 } : o)));
   }
 
   function toggleLike() {
@@ -80,9 +72,7 @@ export function HeroPreview() {
       onMouseMove={handleTilt}
       onMouseLeave={resetTilt}
     >
-      <motion.div
-        style={reduce ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
-      >
+      <motion.div style={reduce ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}>
         <motion.div {...rise(0.15)}>
           <Card className="relative z-10 shadow-lg">
             <CardContent className="space-y-4">
@@ -115,14 +105,8 @@ export function HeroPreview() {
                         style={{ width: "100%", transformOrigin: "left" }}
                       />
                       <div className="relative flex items-center justify-between px-3 py-2.5 text-sm">
-                        <span
-                          className={cn("font-medium", isMine && "text-primary")}
-                        >
-                          {option.text}
-                        </span>
-                        <span className="font-semibold text-muted-foreground">
-                          {pct}%
-                        </span>
+                        <span className={cn("font-medium", isMine && "text-primary")}>{option.text}</span>
+                        <span className="font-semibold text-muted-foreground">{pct}%</span>
                       </div>
                     </div>
                   ) : (
@@ -140,10 +124,7 @@ export function HeroPreview() {
           </Card>
         </motion.div>
 
-        <motion.div
-          {...rise(0.35)}
-          className="absolute -bottom-2 right-0 z-20 w-56 rotate-2 sm:-right-6"
-        >
+        <motion.div {...rise(0.35)} className="absolute -bottom-2 right-0 z-20 w-56 rotate-2 sm:-right-6">
           <Card size="sm" className="shadow-xl">
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between">
@@ -151,13 +132,10 @@ export function HeroPreview() {
                   <Lock className="size-3" />
                   Confession
                 </Badge>
-                <span className="text-[11px] text-muted-foreground">
-                  anon_4f2a
-                </span>
+                <span className="text-[11px] text-muted-foreground">anon_4f2a</span>
               </div>
               <p className="text-sm leading-snug">
-                the library AC is set to Antarctica and i am once again
-                studying in a hoodie in May
+                the library AC is set to Antarctica and i am once again studying in a hoodie in May
               </p>
               <div className="flex items-center gap-4 pt-1 text-xs text-muted-foreground">
                 <button

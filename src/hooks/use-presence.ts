@@ -1,7 +1,7 @@
 "use client";
 
-import { HEARTBEAT_INTERVAL_MS,isOnline,presenceLabel } from "@/lib/presence";
 import { useEffect } from "react";
+import { HEARTBEAT_INTERVAL_MS, isOnline, presenceLabel } from "@/lib/presence";
 
 /**
  * Keeps the signed-in student's presence fresh.
@@ -56,4 +56,4 @@ export function usePresenceHeartbeat(enabled = true) {
   }, [enabled]);
 }
 
-export { isOnline,presenceLabel };
+export { isOnline, presenceLabel };

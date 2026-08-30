@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 /**
  * Public mirrors for signed-out visitors and search crawlers.
@@ -25,12 +25,7 @@ const PUBLIC_MIRRORS: Array<{ gated: string; publicPath: string }> = [
   { gated: "/app/events/", publicPath: "/e/" },
 ];
 
-const AUTH_COOKIE_HINTS = [
-  "hexclave-access",
-  "hexclave-refresh",
-  "stack-access",
-  "stack-refresh",
-];
+const AUTH_COOKIE_HINTS = ["hexclave-access", "hexclave-refresh", "stack-access", "stack-refresh"];
 
 function hasSessionCookie(req: NextRequest): boolean {
   return req.cookies

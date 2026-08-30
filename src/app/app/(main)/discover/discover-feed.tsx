@@ -1,19 +1,6 @@
 "use client";
 
-import { FeaturedCampusCard } from "@/components/discover/featured-campus-card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { FeedCard } from "@/components/ui/feed-card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { FeedSkeleton } from "@/components/ui/skeleton-card";
-import type { UserProfile } from "@/db/schema";
-import { useColleges } from "@/hooks/use-colleges";
-import { useFeed, type FeedPost } from "@/hooks/use-feed";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
   Globe,
   GraduationCap,
   Hash,
@@ -25,7 +12,6 @@ import {
   ShieldCheck,
   Users,
   X,
-  Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -33,6 +19,18 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { FeaturedCampusCard } from "@/components/discover/featured-campus-card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FeedCard } from "@/components/ui/feed-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FeedSkeleton } from "@/components/ui/skeleton-card";
+import type { UserProfile } from "@/db/schema";
+import { useColleges } from "@/hooks/use-colleges";
+import { type FeedPost, useFeed } from "@/hooks/use-feed";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 
 const TABS = [
   { id: "EXPLORE", label: "Explore" },
@@ -141,21 +139,16 @@ export function DiscoverFeed() {
     colleges?: CollegeItem[];
     users?: UserItem[];
     communities?: CommunityItem[];
-  }>(
-    trimmedSearch ? `/api/search?q=${encodeURIComponent(trimmedSearch)}` : null,
-    fetcher,
-    { dedupingInterval: 5000 }
-  );
+  }>(trimmedSearch ? `/api/search?q=${encodeURIComponent(trimmedSearch)}` : null, fetcher, {
+    dedupingInterval: 5000,
+  });
 
   const searchUsers = searchResults?.users || [];
   const searchPosts = searchResults?.posts || [];
   const searchCollegesList = searchResults?.colleges || [];
   const searchCommunities = searchResults?.communities || [];
   const totalSearchResults =
-    searchUsers.length +
-    searchPosts.length +
-    searchCollegesList.length +
-    searchCommunities.length;
+    searchUsers.length + searchPosts.length + searchCollegesList.length + searchCommunities.length;
 
   // Sync state when URL search params change externally
   useEffect(() => {
@@ -176,7 +169,7 @@ export function DiscoverFeed() {
     if (currentTab !== activeTab) {
       setActiveTab(currentTab);
     }
-  }, [searchParams]);
+  }, [searchParams, validTabs.includes, searchQuery, scope, activeTab]);
 
   function handleSearchChange(val: string) {
     setSearchQuery(val);
@@ -219,33 +212,26 @@ export function DiscoverFeed() {
   }
 
   // Dynamic live trends from real database
-  const { data: trendsData } = useSWR<TrendsResponse>(
-    `/api/trends?scope=${scope}`,
-    fetcher,
-    { dedupingInterval: 20000 }
-  );
+  const { data: trendsData } = useSWR<TrendsResponse>(`/api/trends?scope=${scope}`, fetcher, {
+    dedupingInterval: 20000,
+  });
 
   // Suggested peers for inline "Who to follow"
-  const { data: suggestedPeers } = useSWR<UserProfile[]>(
-    "/api/profile/suggested",
-    fetcher,
-    { dedupingInterval: 30000 }
-  );
+  const { data: suggestedPeers } = useSWR<UserProfile[]>("/api/profile/suggested", fetcher, {
+    dedupingInterval: 30000,
+  });
 
   // Discover Algorithmic Feed Tuning
   const feedType = activeTab === "CONFESSIONS" ? "CONFESSION" : undefined;
-  const feedSort =
-    activeTab === "TRENDING"
-      ? "viral"
-      : activeTab === "CONFESSIONS"
-      ? "spicy"
-      : "for_you";
+  const feedSort = activeTab === "TRENDING" ? "viral" : activeTab === "CONFESSIONS" ? "spicy" : "for_you";
 
-  const { feed, isLoading: feedLoading, isLoadingMore, isReachingEnd, setSize } = useFeed(
-    scope,
-    feedType,
-    feedSort
-  );
+  const {
+    feed,
+    isLoading: feedLoading,
+    isLoadingMore,
+    isReachingEnd,
+    setSize,
+  } = useFeed(scope, feedType, feedSort);
   const { colleges, isLoading: collegesLoading } = useColleges(120);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -443,7 +429,8 @@ export function DiscoverFeed() {
             <>
               {/* Results count banner */}
               <div className="text-[12px] font-semibold text-muted-foreground px-1">
-                About {totalSearchResults} {totalSearchResults === 1 ? "result" : "results"} for &ldquo;{trimmedSearch}&rdquo;
+                About {totalSearchResults} {totalSearchResults === 1 ? "result" : "results"} for &ldquo;
+                {trimmedSearch}&rdquo;
               </div>
 
               {/* 1. People / Students Search Results */}
@@ -488,15 +475,11 @@ export function DiscoverFeed() {
                                 {(user.points || 0) >= 150 && (
                                   <ShieldCheck className="size-4 text-[#1d9bf0] shrink-0" />
                                 )}
-                                <span className="text-xs text-muted-foreground">
-                                  @{user.username}
-                                </span>
+                                <span className="text-xs text-muted-foreground">@{user.username}</span>
                               </div>
 
                               {headline && (
-                                <p className="text-xs font-medium text-foreground line-clamp-1">
-                                  {headline}
-                                </p>
+                                <p className="text-xs font-medium text-foreground line-clamp-1">{headline}</p>
                               )}
                             </Link>
 
@@ -568,9 +551,7 @@ export function DiscoverFeed() {
                           </div>
                         </div>
                         {college.description && (
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            {college.description}
-                          </p>
+                          <p className="text-xs text-muted-foreground line-clamp-2">{college.description}</p>
                         )}
                       </Link>
                     ))}
@@ -726,9 +707,7 @@ export function DiscoverFeed() {
               {/* Who to Follow / Connect */}
               {suggestedPeers && suggestedPeers.length > 0 && (
                 <div className="border-b border-border/30 pb-4 px-4 space-y-3">
-                  <h3 className="text-[17px] font-black text-foreground tracking-tight">
-                    Who to follow
-                  </h3>
+                  <h3 className="text-[17px] font-black text-foreground tracking-tight">Who to follow</h3>
                   <div className="space-y-3">
                     {suggestedPeers.slice(0, 3).map((peer) => {
                       const isFollowed = Boolean(followedIds[peer.id]);
@@ -750,9 +729,7 @@ export function DiscoverFeed() {
                                   <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
                                 )}
                               </div>
-                              <p className="text-xs text-muted-foreground truncate">
-                                @{peer.username}
-                              </p>
+                              <p className="text-xs text-muted-foreground truncate">@{peer.username}</p>
                             </div>
                           </Link>
                           <button
@@ -830,9 +807,7 @@ export function DiscoverFeed() {
               {/* Trending Ranked Posts Feed */}
               <div className="px-4 pt-4 space-y-4">
                 <h2 className="text-[17px] font-black text-foreground tracking-tight">
-                  {scope === "CAMPUS"
-                    ? `Top Trending in ${collegeName}`
-                    : "Viral Posts Across India"}
+                  {scope === "CAMPUS" ? `Top Trending in ${collegeName}` : "Viral Posts Across India"}
                 </h2>
 
                 {feedLoading ? (

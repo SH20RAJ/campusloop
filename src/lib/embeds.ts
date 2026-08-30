@@ -222,7 +222,8 @@ export function extractEmbedsFromText(text: string): ParsedEmbed[] {
   }
 
   // 2. Look for standalone internal paths like `/@username`, `/c/coding`, `/app/events/123`, or `https://campusloop.space/@username`
-  const internalPathRegex = /(?:^|\s)(?:https?:\/\/(?:campusloop\.space|localhost(?::\d+)?)\/)?(?:\/)?(?:@|u\/|app\/profile\/)([a-zA-Z0-9_]+)/g;
+  const internalPathRegex =
+    /(?:^|\s)(?:https?:\/\/(?:campusloop\.space|localhost(?::\d+)?)\/)?(?:\/)?(?:@|u\/|app\/profile\/)([a-zA-Z0-9_]+)/g;
   while ((match = internalPathRegex.exec(text)) !== null) {
     const username = match[1];
     if (username && !embeds.some((e) => e.type === "internal_profile" && e.username === username)) {
@@ -234,7 +235,8 @@ export function extractEmbedsFromText(text: string): ParsedEmbed[] {
     }
   }
 
-  const internalCommRegex = /(?:^|\s)(?:https?:\/\/(?:campusloop\.space|localhost(?::\d+)?)\/)?(?:\/)?(?:c\/|app\/communities\/)([a-zA-Z0-9_-]+)/g;
+  const internalCommRegex =
+    /(?:^|\s)(?:https?:\/\/(?:campusloop\.space|localhost(?::\d+)?)\/)?(?:\/)?(?:c\/|app\/communities\/)([a-zA-Z0-9_-]+)/g;
   while ((match = internalCommRegex.exec(text)) !== null) {
     const slug = match[1];
     if (slug && !embeds.some((e) => e.type === "internal_community" && e.slug === slug)) {
@@ -246,7 +248,8 @@ export function extractEmbedsFromText(text: string): ParsedEmbed[] {
     }
   }
 
-  const internalEventRegex = /(?:^|\s)(?:https?:\/\/(?:campusloop\.space|localhost(?::\d+)?)\/)?(?:\/)?(?:app\/events\/|events\/)([a-zA-Z0-9_-]+)/g;
+  const internalEventRegex =
+    /(?:^|\s)(?:https?:\/\/(?:campusloop\.space|localhost(?::\d+)?)\/)?(?:\/)?(?:app\/events\/|events\/)([a-zA-Z0-9_-]+)/g;
   while ((match = internalEventRegex.exec(text)) !== null) {
     const id = match[1];
     if (id && id !== "new" && !embeds.some((e) => e.type === "internal_event" && e.id === id)) {

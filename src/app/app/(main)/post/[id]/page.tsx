@@ -1,11 +1,11 @@
+import { ArrowLeft, Lock } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { FeedCard } from "@/components/ui/feed-card";
 import type { FeedPost } from "@/hooks/use-feed";
 import { sanitizeAnonRow } from "@/lib/anonymity";
-import { getCachedAuthUser,getCachedPostDetail,getCachedUserProfile } from "@/lib/server-cache";
-import { ArrowLeft,Lock } from "lucide-react";
-import { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { getCachedAuthUser, getCachedPostDetail, getCachedUserProfile } from "@/lib/server-cache";
 import { PostComments } from "./post-comments";
 
 interface PostPageProps {
@@ -63,7 +63,6 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
     },
     robots: { index: true, follow: true },
   };
-
 }
 
 export default async function PostDetailPage({ params }: PostPageProps) {
@@ -163,9 +162,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
             <ArrowLeft className="size-4.5" />
           </Link>
           <div className="min-w-0">
-            <h1 className="text-base font-black tracking-tight text-foreground truncate">
-              Post
-            </h1>
+            <h1 className="text-base font-black tracking-tight text-foreground truncate">Post</h1>
             {rawPost.institution && (
               <Link
                 href={`/app/college/${rawPost.institution.slug || rawPost.institution.id}`}
@@ -185,7 +182,11 @@ export default async function PostDetailPage({ params }: PostPageProps) {
           </Link>
         ) : (
           <span className="text-[11px] font-bold text-muted-foreground bg-muted/60 px-3 py-1 rounded-full border border-border/40">
-            {post.type === "CONFESSION" ? "🙈 Confession" : post.type === "POLL" ? "📊 Poll" : "💬 Discussion"}
+            {post.type === "CONFESSION"
+              ? "🙈 Confession"
+              : post.type === "POLL"
+                ? "📊 Poll"
+                : "💬 Discussion"}
           </span>
         )}
       </header>
@@ -193,7 +194,6 @@ export default async function PostDetailPage({ params }: PostPageProps) {
       <div className="flex flex-col">
         {/* Main Post Card */}
         <FeedCard post={post as FeedPost} currentUserId={profile?.id} disableNavigation />
-
 
         {/* Comments Section */}
         {profile ? (
@@ -203,7 +203,6 @@ export default async function PostDetailPage({ params }: PostPageProps) {
             postAuthorHandle={rawPost.isAnonymous ? "anonymous" : rawPost.author?.username || "student"}
           />
         ) : (
-
           <div className="space-y-4">
             {/* Read-Only Comments List for Guests & Crawlers */}
             <div className="rounded-3xl bg-card p-4 space-y-3 shadow-2xs">

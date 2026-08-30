@@ -1,17 +1,17 @@
+import { and, desc, eq, isNotNull, lt } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
 import {
-academicResources,
-gamingLobbies,
-housingListings,
-lostAndFoundItems,
-marketplaceItems,
-posts,
-ridesharePools,
-userProfiles,
+  academicResources,
+  gamingLobbies,
+  housingListings,
+  lostAndFoundItems,
+  marketplaceItems,
+  posts,
+  ridesharePools,
+  userProfiles,
 } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,isNotNull,lt } from "drizzle-orm";
-import { NextRequest,NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 
     const cursorDate = cursor ? new Date(cursor) : undefined;
 
-    let feedItems: any[] = [];
+    const feedItems: any[] = [];
 
     // Helper to format posts
     const formatPost = (post: any) => {
@@ -53,7 +53,8 @@ export async function GET(req: NextRequest) {
       });
 
       const hasVotedPoll = formattedPollOptions?.some((opt: any) => opt.userVoted) || false;
-      const totalPollVotes = formattedPollOptions?.reduce((acc: number, opt: any) => acc + opt.votesCount, 0) || 0;
+      const totalPollVotes =
+        formattedPollOptions?.reduce((acc: number, opt: any) => acc + opt.votesCount, 0) || 0;
 
       return {
         itemType: "POST",
@@ -269,9 +270,7 @@ export async function GET(req: NextRequest) {
     const pageItems = feedItems.slice(0, limit);
     const hasMore = feedItems.length > limit;
     const nextCursor =
-      pageItems.length > 0
-        ? new Date(pageItems[pageItems.length - 1].createdAt).toISOString()
-        : null;
+      pageItems.length > 0 ? new Date(pageItems[pageItems.length - 1].createdAt).toISOString() : null;
 
     return NextResponse.json({
       items: pageItems,

@@ -63,7 +63,7 @@ async function importVapidSigningKey(keys: VapidKeys): Promise<CryptoKey> {
     },
     { name: "ECDSA", namedCurve: "P-256" },
     false,
-    ["sign"],
+    ["sign"]
   );
 }
 
@@ -81,7 +81,7 @@ async function createVapidHeader(endpoint: string, keys: VapidKeys): Promise<str
   const signature = await crypto.subtle.sign(
     { name: "ECDSA", hash: "SHA-256" },
     signingKey,
-    new TextEncoder().encode(signingInput),
+    new TextEncoder().encode(signingInput)
   );
 
   return `vapid t=${signingInput}.${bytesToBase64Url(signature)}, k=${keys.publicKey}`;
@@ -93,7 +93,10 @@ export type PushResult = "sent" | "expired" | "failed" | "not-configured";
  * Send one payload-less push. "expired" means the endpoint is dead (404/410)
  * and the caller should drop the stored subscription.
  */
-export async function sendPushTickle(endpoint: string, urgency: "normal" | "high" = "normal"): Promise<PushResult> {
+export async function sendPushTickle(
+  endpoint: string,
+  urgency: "normal" | "high" = "normal"
+): Promise<PushResult> {
   const keys = getVapidKeys();
   if (!keys) return "not-configured";
 

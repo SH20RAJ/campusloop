@@ -1,26 +1,26 @@
 "use client";
 
-import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { SignOutButton } from "@/components/ui/sign-out-button";
-import { cn,getAvatarUrl } from "@/lib/utils";
 import {
-Bell,
-Check,
-Globe,
-Lock,
-RotateCcw,
-School,
-ShieldCheck,
-Sliders,
-User,
-VenetianMask,
-Zap,
+  Bell,
+  Check,
+  Globe,
+  Lock,
+  RotateCcw,
+  School,
+  ShieldCheck,
+  Sliders,
+  User,
+  VenetianMask,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SignOutButton } from "@/components/ui/sign-out-button";
+import { cn, getAvatarUrl } from "@/lib/utils";
 
 interface SettingsClientProps {
   profile: {
@@ -110,7 +110,6 @@ export function SettingsClient({ profile }: SettingsClientProps) {
         throw new Error(data.error || "Failed to save settings");
       }
 
-
       toast.success("Settings saved successfully!");
       router.refresh();
     } catch (err: unknown) {
@@ -120,7 +119,6 @@ export function SettingsClient({ profile }: SettingsClientProps) {
     }
   }
 
-
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24 text-foreground">
       {/* Header */}
@@ -129,7 +127,9 @@ export function SettingsClient({ profile }: SettingsClientProps) {
           <h1 className="text-xl font-black tracking-tight flex items-center gap-2 text-foreground">
             <Sliders className="h-5 w-5 text-primary" /> Settings & Account
           </h1>
-          <p className="text-xs text-muted-foreground">Manage your campus identity, preferences, & privacy.</p>
+          <p className="text-xs text-muted-foreground">
+            Manage your campus identity, preferences, & privacy.
+          </p>
         </div>
       </header>
 
@@ -193,16 +193,17 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                   <VenetianMask className="size-3.5 text-primary" /> Custom Anonymous Username
                 </label>
                 {anonUsername && (
-                  <span className="text-[10px] text-primary font-bold">
-                    @{anonUsername.toLowerCase()}
-                  </span>
+                  <span className="text-[10px] text-primary font-bold">@{anonUsername.toLowerCase()}</span>
                 )}
               </div>
               <p className="text-[11px] text-muted-foreground">
-                All your anonymous confessions, polls, and questions will appear under this username instead of a random anon ID.
+                All your anonymous confessions, polls, and questions will appear under this username instead
+                of a random anon ID.
               </p>
               <div className="relative pt-1">
-                <span className="absolute left-3.5 top-3.5 text-xs font-bold text-muted-foreground">🎭 @</span>
+                <span className="absolute left-3.5 top-3.5 text-xs font-bold text-muted-foreground">
+                  🎭 @
+                </span>
                 <input
                   type="text"
                   value={anonUsername}
@@ -255,7 +256,8 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                   <Sliders className="size-3.5 text-primary" /> Feed Content & Anonymity Mode
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Toggle feed display mode. Choose whether anonymous posts and confessions appear in your timeline.
+                  Toggle feed display mode. Choose whether anonymous posts and confessions appear in your
+                  timeline.
                 </p>
               </div>
 
@@ -275,12 +277,11 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                     <span className="text-xs font-black text-foreground flex items-center gap-1.5">
                       <Globe className="size-3.5 text-primary" /> 1. All Types of Posts
                     </span>
-                    {feedVisibility === "ALL" && (
-                      <Check className="size-3.5 text-primary stroke-3" />
-                    )}
+                    {feedVisibility === "ALL" && <Check className="size-3.5 text-primary stroke-3" />}
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    All types of posts will be visible (Normal posts, Confessions, Polls, and Anonymous thoughts).
+                    All types of posts will be visible (Normal posts, Confessions, Polls, and Anonymous
+                    thoughts).
                   </p>
                 </button>
 
@@ -304,7 +305,8 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                     )}
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    Only non-anonymous posts will be visible. Hides all anonymous confessions and pseudonymous posts.
+                    Only non-anonymous posts will be visible. Hides all anonymous confessions and pseudonymous
+                    posts.
                   </p>
                 </button>
               </div>
@@ -313,7 +315,9 @@ export function SettingsClient({ profile }: SettingsClientProps) {
             <div className="flex items-center justify-between p-3.5 rounded-2xl border border-border/60 bg-muted/20">
               <div>
                 <p className="text-xs font-bold text-foreground">Default Feed Scope</p>
-                <p className="text-[11px] text-muted-foreground">Select what you see first when opening CampusLoop.</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Select what you see first when opening CampusLoop.
+                </p>
               </div>
 
               <div className="flex rounded-xl bg-muted p-1 text-xs font-bold border border-border/40">
@@ -321,7 +325,9 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                   type="button"
                   onClick={() => setDefaultScope("GLOBAL")}
                   className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                    defaultScope === "GLOBAL" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground"
+                    defaultScope === "GLOBAL"
+                      ? "bg-background text-foreground shadow-xs"
+                      : "text-muted-foreground"
                   }`}
                 >
                   Global
@@ -330,7 +336,9 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                   type="button"
                   onClick={() => setDefaultScope("CAMPUS")}
                   className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                    defaultScope === "CAMPUS" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground"
+                    defaultScope === "CAMPUS"
+                      ? "bg-background text-foreground shadow-xs"
+                      : "text-muted-foreground"
                   }`}
                 >
                   My College
@@ -338,13 +346,14 @@ export function SettingsClient({ profile }: SettingsClientProps) {
               </div>
             </div>
 
-
             <div className="flex items-center justify-between p-3.5 rounded-2xl border border-border/60 bg-muted/20">
               <div>
                 <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <Bell className="h-3.5 w-3.5 text-primary" /> Upvote Alerts
                 </p>
-                <p className="text-[11px] text-muted-foreground">Receive real-time alerts when students upvote your posts.</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Receive real-time alerts when students upvote your posts.
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -359,7 +368,9 @@ export function SettingsClient({ profile }: SettingsClientProps) {
                 <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <Bell className="h-3.5 w-3.5 text-primary" /> Comment & DM Alerts
                 </p>
-                <p className="text-[11px] text-muted-foreground">Notify when someone replies or sends a direct message.</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Notify when someone replies or sends a direct message.
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -381,7 +392,8 @@ export function SettingsClient({ profile }: SettingsClientProps) {
           </div>
 
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Earn +20 LP for every classmate who joins CampusLoop using your referral link. Unlock blue-tick verified star badges at 150 LP!
+            Earn +20 LP for every classmate who joins CampusLoop using your referral link. Unlock blue-tick
+            verified star badges at 150 LP!
           </p>
 
           <Link

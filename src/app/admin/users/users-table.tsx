@@ -1,31 +1,31 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { isOnline,presenceLabel } from "@/lib/presence";
-import { formatTimeAgo } from "@/lib/utils";
 import { format } from "date-fns";
 import {
-Calendar,
-ChevronLeft,
-ChevronRight,
-ExternalLink,
-Plus,
-Radio,
-School,
-SearchIcon,
-ShieldCheck,
-Trash2,
-TrendingUp,
-UserPlus,
-Users,
-Zap
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Plus,
+  Radio,
+  School,
+  SearchIcon,
+  ShieldCheck,
+  Trash2,
+  TrendingUp,
+  UserPlus,
+  Users,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter,useSearchParams } from "next/navigation";
-import { useEffect,useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { createUserProfile,deleteUserProfile,updateUserRole,updateUserStatus } from "./actions";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { isOnline, presenceLabel } from "@/lib/presence";
+import { formatTimeAgo } from "@/lib/utils";
+import { createUserProfile, deleteUserProfile, updateUserRole, updateUserStatus } from "./actions";
 
 export interface UserAnalyticsStats {
   total: number;
@@ -253,9 +253,7 @@ export function UsersTable({
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-foreground">
-              {analytics.total.toLocaleString()}
-            </span>
+            <span className="text-2xl font-black text-foreground">{analytics.total.toLocaleString()}</span>
             <span className="text-xs font-semibold text-emerald-500">
               {analytics.active.toLocaleString()} active
             </span>
@@ -463,7 +461,9 @@ export function UsersTable({
             </div>
 
             <div className="space-y-1.5 sm:col-span-2">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase">College / Institution</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                College / Institution
+              </label>
               <select
                 required
                 value={newInstitutionId}
@@ -577,7 +577,10 @@ export function UsersTable({
 
                           <div className="flex flex-col min-w-0">
                             <div className="flex items-center gap-1">
-                              <span className="font-bold text-foreground truncate max-w-[140px]" title={p.displayName}>
+                              <span
+                                className="font-bold text-foreground truncate max-w-[140px]"
+                                title={p.displayName}
+                              >
                                 {p.displayName}
                               </span>
                               {hasBlueBadge && (
@@ -598,7 +601,10 @@ export function UsersTable({
                               {(p.branch || p.year) && (
                                 <>
                                   <span>·</span>
-                                  <span className="truncate max-w-[90px]" title={`${p.branch || ""} ${p.year ? `'${p.year.toString().slice(-2)}` : ""}`}>
+                                  <span
+                                    className="truncate max-w-[90px]"
+                                    title={`${p.branch || ""} ${p.year ? `'${p.year.toString().slice(-2)}` : ""}`}
+                                  >
                                     {p.branch || "Student"} {p.year ? `'${p.year.toString().slice(-2)}` : ""}
                                   </span>
                                 </>
@@ -610,7 +616,10 @@ export function UsersTable({
 
                       {/* Column 2: Campus / Institution */}
                       <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-1.5 min-w-0 max-w-[180px]" title={p.institution?.name || "No College"}>
+                        <div
+                          className="flex items-center gap-1.5 min-w-0 max-w-[180px]"
+                          title={p.institution?.name || "No College"}
+                        >
                           <School className="size-3.5 text-muted-foreground shrink-0" />
                           <span className="font-medium text-foreground truncate">
                             {p.institution?.name?.split(",")[0] || "Independent Student"}
@@ -650,9 +659,7 @@ export function UsersTable({
                             </span>
                           </div>
                         ) : (
-                          <span className="text-[11px] text-muted-foreground/60 italic">
-                            Never active
-                          </span>
+                          <span className="text-[11px] text-muted-foreground/60 italic">Never active</span>
                         )}
                       </td>
 
@@ -663,10 +670,10 @@ export function UsersTable({
                             (p.points ?? 0) >= 300
                               ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30"
                               : (p.points ?? 0) >= 150
-                              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
-                              : (p.points ?? 0) >= 50
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30"
-                              : "bg-muted/40 text-muted-foreground border-border/50"
+                                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                                : (p.points ?? 0) >= 50
+                                  ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30"
+                                  : "bg-muted/40 text-muted-foreground border-border/50"
                           }`}
                           title={`Loop Points: ${p.points ?? 0}`}
                         >
@@ -699,8 +706,8 @@ export function UsersTable({
                             p.status === "ACTIVE"
                               ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5"
                               : p.status === "SUSPENDED"
-                              ? "border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5"
-                              : "border-destructive/40 text-destructive bg-destructive/5"
+                                ? "border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5"
+                                : "border-destructive/40 text-destructive bg-destructive/5"
                           }`}
                         >
                           <option value="ACTIVE">Active</option>

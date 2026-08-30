@@ -1,19 +1,13 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { HousingListing } from "@/db/schema";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import {
-Check,
-MapPin,
-MessageCircle,
-Share2,
-ShieldCheck,
-} from "lucide-react";
+import { Check, MapPin, MessageCircle, Share2, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { HousingListing } from "@/db/schema";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface HousingCardProps {
   item: HousingListing & {
@@ -91,9 +85,7 @@ export function HousingCard({ item }: HousingCardProps) {
               {(item.author.points || 0) >= 150 && (
                 <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
               )}
-              <span className="text-[11px] text-muted-foreground truncate">
-                @{item.author.username}
-              </span>
+              <span className="text-[11px] text-muted-foreground truncate">@{item.author.username}</span>
               <span className="text-[10px] text-muted-foreground/60">·</span>
               <span className="text-[11px] text-muted-foreground/80 shrink-0">
                 {formatTimeAgo(item.createdAt)}
@@ -127,18 +119,12 @@ export function HousingCard({ item }: HousingCardProps) {
       <div className="flex flex-col sm:flex-row gap-3.5">
         {images.length > 0 && (
           <div className="size-24 sm:size-28 rounded-2xl overflow-hidden border border-border/40 shrink-0 bg-muted/20">
-            <img
-              src={images[0]}
-              alt={item.title}
-              className="size-full object-cover"
-            />
+            <img src={images[0]} alt={item.title} className="size-full object-cover" />
           </div>
         )}
 
         <div className="flex-1 min-w-0 space-y-1.5">
-          <h3 className="text-sm font-bold text-foreground leading-snug">
-            {item.title}
-          </h3>
+          <h3 className="text-sm font-bold text-foreground leading-snug">{item.title}</h3>
 
           {item.description && (
             <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal line-clamp-2">

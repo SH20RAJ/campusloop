@@ -1,35 +1,35 @@
 "use client";
 
+import {
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  Check,
+  CheckCircle2,
+  CreditCard,
+  Fuel,
+  Gauge,
+  HardHat,
+  IdCard,
+  ImagePlus,
+  Loader2,
+  Lock,
+  MapPin,
+  ShieldCheck,
+  Star,
+  Wallet,
+  X,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
-import {
-AlertCircle,
-ArrowLeft,
-Calendar,
-Check,
-CheckCircle2,
-CreditCard,
-Fuel,
-Gauge,
-HardHat,
-IdCard,
-ImagePlus,
-Loader2,
-Lock,
-MapPin,
-ShieldCheck,
-Star,
-Wallet,
-X
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRef,useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
 
 interface BikeDetailClientProps {
   bikeId: string;
@@ -223,14 +223,18 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
             </span>
             <span className="flex items-center gap-1 text-xs font-bold text-amber-300">
               <Star className="size-3.5 fill-amber-300" />
-              <span>{bike.rating} ({bike.reviewCount} rentals)</span>
+              <span>
+                {bike.rating} ({bike.reviewCount} rentals)
+              </span>
             </span>
           </div>
 
           <h1 className="text-xl font-black tracking-tight">{bike.name}</h1>
           <p className="text-xs text-white/80 flex items-center gap-1.5">
             <MapPin className="size-3.5 text-rose-400" />
-            <span>Pickup: {bike.pickupLocation} · {bike.merchant?.name}</span>
+            <span>
+              Pickup: {bike.pickupLocation} · {bike.merchant?.name}
+            </span>
           </p>
         </div>
       </div>
@@ -266,9 +270,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Start Date &amp; Time *
-              </label>
+              <label className="text-[11px] font-bold text-muted-foreground">Start Date &amp; Time *</label>
               <input
                 type="datetime-local"
                 value={startDateTime}
@@ -278,9 +280,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Return Date &amp; Time *
-              </label>
+              <label className="text-[11px] font-bold text-muted-foreground">Return Date &amp; Time *</label>
               <input
                 type="datetime-local"
                 value={endDateTime}
@@ -342,13 +342,17 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
             </div>
 
             <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-400 font-medium leading-relaxed">
-              💡 <strong>Note:</strong> The ₹{bike.securityDeposit} security deposit is held safely during your trip and refunded 100% directly upon returning the vehicle.
+              💡 <strong>Note:</strong> The ₹{bike.securityDeposit} security deposit is held safely during
+              your trip and refunded 100% directly upon returning the vehicle.
             </div>
 
             <div className="pt-2 border-t border-border/30 flex items-center justify-between text-sm font-black text-foreground">
               <span>Total Payable Amount</span>
               <span className="text-base text-emerald-500">
-                ₹{(availability?.totalPayable || bike.dailyPrice + bike.securityDeposit).toLocaleString("en-IN")}
+                ₹
+                {(availability?.totalPayable || bike.dailyPrice + bike.securityDeposit).toLocaleString(
+                  "en-IN"
+                )}
               </span>
             </div>
           </div>
@@ -384,9 +388,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
           >
             <div className="flex items-center justify-between border-b border-border/30 pb-3">
               <div>
-                <h3 className="text-base font-black text-foreground">
-                  Rental Identity Verification
-                </h3>
+                <h3 className="text-base font-black text-foreground">Rental Identity Verification</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Required for vehicle handover on campus
                 </p>
@@ -482,9 +484,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
               {/* Aadhaar Last 4 & Contact Phone */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-muted-foreground">
-                    Aadhaar Last 4 Digits
-                  </label>
+                  <label className="text-[11px] font-bold text-muted-foreground">Aadhaar Last 4 Digits</label>
                   <input
                     type="text"
                     maxLength={4}
@@ -496,9 +496,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-muted-foreground">
-                    Phone Number *
-                  </label>
+                  <label className="text-[11px] font-bold text-muted-foreground">Phone Number *</label>
                   <input
                     type="tel"
                     required
@@ -527,9 +525,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
 
               {/* Payment Mode */}
               <div className="space-y-1.5 pt-1">
-                <label className="text-[11px] font-bold text-muted-foreground">
-                  Payment Method
-                </label>
+                <label className="text-[11px] font-bold text-muted-foreground">Payment Method</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"

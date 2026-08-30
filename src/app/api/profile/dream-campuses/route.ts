@@ -1,8 +1,8 @@
+import { eq, inArray } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { institutions, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq, inArray } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

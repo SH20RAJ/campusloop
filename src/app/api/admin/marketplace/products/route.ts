@@ -1,8 +1,8 @@
+import { desc, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { getDb } from "@/db";
 import { products } from "@/db/schema";
-import { desc,eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -57,10 +57,7 @@ export async function POST(req: Request) {
     } = body;
 
     if (!merchantId || !name || typeof price !== "number") {
-      return NextResponse.json(
-        { error: "Merchant ID, Name, and Price are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Merchant ID, Name, and Price are required" }, { status: 400 });
     }
 
     const [created] = await db
@@ -72,8 +69,12 @@ export async function POST(req: Request) {
         price: Math.max(0, price),
         originalPrice: typeof originalPrice === "number" ? originalPrice : null,
         categoryName: categoryName?.trim() || "General",
-        imageUrl: imageUrl?.trim() || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop",
-        options: [{ name: "Diet", choices: [isVeg ? "Veg" : "Non-Veg"], defaultChoice: isVeg ? "Veg" : "Non-Veg" }],
+        imageUrl:
+          imageUrl?.trim() ||
+          "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop",
+        options: [
+          { name: "Diet", choices: [isVeg ? "Veg" : "Non-Veg"], defaultChoice: isVeg ? "Veg" : "Non-Veg" },
+        ],
         isAvailable: Boolean(isAvailable),
         status: "ACTIVE",
       })
@@ -107,14 +108,12 @@ export async function PATCH(req: Request) {
     if (typeof description === "string") updatePayload.description = description.trim();
     if (typeof imageUrl === "string") updatePayload.imageUrl = imageUrl.trim();
     if (typeof isVeg === "boolean") {
-      updatePayload.options = [{ name: "Diet", choices: [isVeg ? "Veg" : "Non-Veg"], defaultChoice: isVeg ? "Veg" : "Non-Veg" }];
+      updatePayload.options = [
+        { name: "Diet", choices: [isVeg ? "Veg" : "Non-Veg"], defaultChoice: isVeg ? "Veg" : "Non-Veg" },
+      ];
     }
 
-    const [updated] = await db
-      .update(products)
-      .set(updatePayload)
-      .where(eq(products.id, id))
-      .returning();
+    const [updated] = await db.update(products).set(updatePayload).where(eq(products.id, id)).returning();
 
     return NextResponse.json({ success: true, product: updated });
   } catch (error) {

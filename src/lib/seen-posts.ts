@@ -9,7 +9,8 @@ const MAX_SEEN_IDS = 150;
 export function getSeenPostIds(): string[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(SEEN_POSTS_STORAGE_KEY) || sessionStorage.getItem(SEEN_POSTS_STORAGE_KEY);
+    const raw =
+      localStorage.getItem(SEEN_POSTS_STORAGE_KEY) || sessionStorage.getItem(SEEN_POSTS_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.slice(-MAX_SEEN_IDS) : [];

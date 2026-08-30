@@ -1,6 +1,6 @@
-import { getCachedAuthUser } from "@/lib/server-cache";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getCachedAuthUser } from "@/lib/server-cache";
 import { OrderTrackingClient } from "./order-tracking-client";
 
 interface OrderTrackingPageProps {

@@ -1,9 +1,9 @@
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { articles, articleVotes, institutions, userProfiles } from "@/db/schema";
+import { articles, articleVotes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { awardPoints } from "@/lib/gamification-server";
-import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Check viewer votes if logged in
-    let userVotesMap: Record<string, number> = {};
+    const userVotesMap: Record<string, number> = {};
     if (currentProfile && articleList.length > 0) {
       const articleIds = articleList.map((a) => a.id);
       const userVotes = await db.query.articleVotes.findMany({
@@ -164,11 +164,11 @@ export async function POST(req: NextRequest) {
       status = "PUBLISHED",
     } = body;
 
-    if (!title || !title.trim()) {
+    if (!title?.trim()) {
       return NextResponse.json({ error: "Article title is required" }, { status: 400 });
     }
 
-    if (!content || !content.trim()) {
+    if (!content?.trim()) {
       return NextResponse.json({ error: "Article content is required" }, { status: 400 });
     }
 

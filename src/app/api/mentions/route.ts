@@ -1,10 +1,9 @@
+import { desc, eq, ilike, or } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getTrendingHashtags } from "@/lib/trending-hashtags";
-import { desc,eq,ilike,or } from "drizzle-orm";
-import { NextResponse } from "next/server";
-
 
 export const dynamic = "force-dynamic";
 
@@ -31,17 +30,13 @@ export async function GET(req: Request) {
       // Unauthenticated / guest viewer
     }
 
-
     let matchingUsers: any[] = [];
     let matchingHashtags: any[] = [];
 
     // 1. Mentions (@users)
     if (type === "users" || type === "all") {
       const userCondition = q
-        ? or(
-            ilike(userProfiles.username, `%${q}%`),
-            ilike(userProfiles.displayName, `%${q}%`)
-          )
+        ? or(ilike(userProfiles.username, `%${q}%`), ilike(userProfiles.displayName, `%${q}%`))
         : undefined;
 
       const rawUsers = await db.query.userProfiles.findMany({
@@ -89,7 +84,6 @@ export async function GET(req: Request) {
         isHot: t.isHot,
       }));
     }
-
 
     return NextResponse.json({
       users: matchingUsers,

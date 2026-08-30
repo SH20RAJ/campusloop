@@ -1,5 +1,5 @@
-import { integer,pgTable,text } from "drizzle-orm/pg-core";
-import { createdAt,id,updatedAt } from "./common";
+import { integer, pgTable, text } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "./common";
 import { institutions } from "./institutions";
 import { userProfiles } from "./users";
 

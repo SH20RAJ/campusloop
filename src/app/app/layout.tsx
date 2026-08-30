@@ -1,7 +1,7 @@
-import { PresenceHeartbeat } from "@/components/pwa/presence-heartbeat";
-import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { PresenceHeartbeat } from "@/components/pwa/presence-heartbeat";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 /**
  * Default for everything behind auth: stay out of search indexes.
@@ -10,22 +10,17 @@ import { redirect } from "next/navigation";
  * with `robots: { index: true }` in their own metadata.
  */
 export const metadata: Metadata = {
-	robots: {
-		index: false,
-		follow: true,
-	},
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
-export default async function AppRootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function AppRootLayout({ children }: { children: React.ReactNode }) {
   const user = await getCachedAuthUser();
   if (!user) {
     redirect("/handler/sign-in");
   }
-
 
   const profile = await getCachedUserProfile(user.id);
 
@@ -55,4 +50,3 @@ export default async function AppRootLayout({
     </>
   );
 }
-

@@ -1,17 +1,14 @@
-import { getDb } from "@/db";
-import { eventRegistrations, events, notifications, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { hasCapability, rejectIfLacksCapability } from "@/lib/capabilities";
 import { and, eq, or, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { eventRegistrations, events, notifications, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { rejectIfLacksCapability } from "@/lib/capabilities";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const user = await hexclaveServerApp.getUser();
@@ -45,10 +42,7 @@ export async function POST(
 
     // Check registration deadline
     if (event.registrationDeadline && new Date() > new Date(event.registrationDeadline)) {
-      return NextResponse.json(
-        { error: "Registration deadline for this event has passed" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Registration deadline for this event has passed" }, { status: 400 });
     }
 
     // Check eligibility restrictions
@@ -57,7 +51,8 @@ export async function POST(
     if (!isOpenToAll && !eligibleIds.includes(profile.institutionId)) {
       return NextResponse.json(
         {
-          error: "This event is restricted to specific college students. Your campus is not in the eligible list.",
+          error:
+            "This event is restricted to specific college students. Your campus is not in the eligible list.",
         },
         { status: 403 }
       );
@@ -65,10 +60,7 @@ export async function POST(
 
     // Check if already registered
     const existing = await db.query.eventRegistrations.findFirst({
-      where: and(
-        eq(eventRegistrations.eventId, event.id),
-        eq(eventRegistrations.profileId, profile.id)
-      ),
+      where: and(eq(eventRegistrations.eventId, event.id), eq(eventRegistrations.profileId, profile.id)),
     });
 
     if (existing) {
@@ -79,13 +71,7 @@ export async function POST(
     }
 
     const body = ((await req.json().catch(() => ({}))) || {}) as Record<string, any>;
-    const {
-      registrationType = "SOLO",
-      teamName,
-      teamMembers = [],
-      contactPhone,
-      notes,
-    } = body;
+    const { registrationType = "SOLO", teamName, teamMembers = [], contactPhone, notes } = body;
 
     const regId = `ereg_${nanoid(12)}`;
 
@@ -140,10 +126,7 @@ export async function POST(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const user = await hexclaveServerApp.getUser();
@@ -170,12 +153,7 @@ export async function DELETE(
 
     await db
       .delete(eventRegistrations)
-      .where(
-        and(
-          eq(eventRegistrations.eventId, event.id),
-          eq(eventRegistrations.profileId, profile.id)
-        )
-      );
+      .where(and(eq(eventRegistrations.eventId, event.id), eq(eventRegistrations.profileId, profile.id)));
 
     return NextResponse.json({ success: true, message: "Registration cancelled" });
   } catch (error) {

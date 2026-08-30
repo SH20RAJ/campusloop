@@ -1,12 +1,9 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-MessageCircle,
-Zap
-} from "lucide-react";
+import { MessageCircle, Zap } from "lucide-react";
 import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 interface MatchResult {
   matched: boolean;
@@ -37,7 +34,8 @@ export function DatingMatchModal({ matchResult, onClose }: DatingMatchModalProps
         <div className="space-y-1">
           <h2 className="text-xl font-extrabold text-foreground">It's a Vibe Match! 🎉</h2>
           <p className="text-xs text-muted-foreground">
-            You and <strong className="text-foreground">{matchResult.matchedUser.displayName}</strong> liked each other!
+            You and <strong className="text-foreground">{matchResult.matchedUser.displayName}</strong> liked
+            each other!
           </p>
         </div>
 

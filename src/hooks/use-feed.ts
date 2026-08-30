@@ -1,11 +1,10 @@
-import { Institution,Post,UserProfile } from "@/db/schema";
-import { feedPagesCache,feedSizeCache,getPendingFeedPosts } from "@/lib/feed-mutations";
-import { getSeenPostIds,markPostsAsSeen } from "@/lib/seen-posts";
-import { useCallback,useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import useSWRInfinite from "swr/infinite";
+import type { Institution, Post, UserProfile } from "@/db/schema";
+import { feedPagesCache, feedSizeCache, getPendingFeedPosts } from "@/lib/feed-mutations";
+import { getSeenPostIds, markPostsAsSeen } from "@/lib/seen-posts";
 
 export type TopCommentPreview = {
-
   id: string;
   body: string;
   createdAt: Date | string;
@@ -41,8 +40,7 @@ export type FeedPost = Post & {
   isSaved?: boolean;
 };
 
-
-const feedFetcher = async <T,>(url: string): Promise<T> => {
+const feedFetcher = async <T>(url: string): Promise<T> => {
   const seenIds = getSeenPostIds();
   const headers: Record<string, string> = {};
   if (seenIds.length > 0) {
@@ -61,7 +59,7 @@ export function useFeed(
   sort?: string,
   visibility?: string,
   hashtag?: string,
-  seed?: string | number,
+  seed?: string | number
 ) {
   const cacheKey = `${scope}_${type || "ALL"}_${sort || "latest"}_${visibility || "all"}_${hashtag || ""}_${seed || ""}`;
   const initialSize = feedSizeCache.get(cacheKey) || 1;
@@ -70,7 +68,10 @@ export function useFeed(
   const getKey = (pageIndex: number, previousPageData: FeedPost[] | null) => {
     if (previousPageData && previousPageData.length < PAGE_LIMIT) return null;
 
-    const url = new URL("/api/feed", typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+    const url = new URL(
+      "/api/feed",
+      typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"
+    );
     url.searchParams.set("scope", scope);
     if (type && type !== "ALL") url.searchParams.set("type", type);
     if (sort) url.searchParams.set("sort", sort);
@@ -131,9 +132,7 @@ export function useFeed(
   // them, so the author always sees their post land in the feed.
   const pending = rawFeed ? getPendingFeedPosts() : [];
   const merged = rawFeed ? [...pending, ...rawFeed] : undefined;
-  const feed = merged
-    ? Array.from(new Map(merged.map((post) => [post.id, post])).values())
-    : undefined;
+  const feed = merged ? Array.from(new Map(merged.map((post) => [post.id, post])).values()) : undefined;
 
   // Track impressions when feed items load
   useEffect(() => {
@@ -160,6 +159,5 @@ export function useFeed(
     refresh,
   };
 }
-
 
 export { useStories } from "./use-stories";

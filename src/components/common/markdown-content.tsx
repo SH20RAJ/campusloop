@@ -1,8 +1,8 @@
 "use client";
 
-import { CodeBlock } from "./code-block";
+import type React from "react";
 import { cn } from "@/lib/utils";
-import React from "react";
+import { CodeBlock } from "./code-block";
 
 /**
  * CampusLoop Markdown Renderer
@@ -59,8 +59,7 @@ function parseInline(text: string, keyPrefix: string, depth = 0): React.ReactNod
     }
 
     const key = `${keyPrefix}-${match.index}`;
-    const [, imgAlt, imgUrl, linkText, linkUrl, code, bold, boldAlt, strike, italic, bareUrl] =
-      match;
+    const [, imgAlt, imgUrl, linkText, linkUrl, code, bold, boldAlt, strike, italic, bareUrl] = match;
 
     if (imgUrl !== undefined) {
       nodes.push(
@@ -257,7 +256,10 @@ export function MarkdownContent({ content, className, compact = false }: Markdow
         index++;
       }
       blocks.push(
-        <ol key={key++} className="list-decimal space-y-1.5 pl-5 font-medium marker:font-black marker:text-primary">
+        <ol
+          key={key++}
+          className="list-decimal space-y-1.5 pl-5 font-medium marker:font-black marker:text-primary"
+        >
           {items.map((item, i) => (
             <li key={i}>{parseInline(item, `ol${key}-${i}`)}</li>
           ))}

@@ -1,11 +1,11 @@
 "use client";
 
+import { Download, WifiOff, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { Download,WifiOff,X } from "lucide-react";
-import { useEffect,useState } from "react";
-import { toast } from "sonner";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;

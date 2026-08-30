@@ -1,15 +1,11 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Crown, Search, Users } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCloutTier } from "@/lib/gamification";
 import { cn } from "@/lib/utils";
-import {
-Crown,
-Search,
-Users,
-} from "lucide-react";
-import Link from "next/link";
-import { useMemo,useState } from "react";
 
 interface StudentItem {
   id: string;
@@ -28,10 +24,7 @@ interface CollegeLeaderboardPodiumProps {
   collegeName: string;
 }
 
-export function CollegeLeaderboardPodium({
-  students,
-  collegeName,
-}: CollegeLeaderboardPodiumProps) {
+export function CollegeLeaderboardPodium({ students, collegeName }: CollegeLeaderboardPodiumProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("ALL");
   const [selectedYear, setSelectedYear] = useState<number | "ALL">("ALL");
@@ -62,15 +55,14 @@ export function CollegeLeaderboardPodium({
         !searchQuery.trim() ||
         student.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         student.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (student.branch && student.branch.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (student.headline && student.headline.toLowerCase().includes(searchQuery.toLowerCase()));
+        student.branch?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.headline?.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesBranch =
         selectedBranch === "ALL" ||
         (student.branch && student.branch.toLowerCase() === selectedBranch.toLowerCase());
 
-      const matchesYear =
-        selectedYear === "ALL" || student.year === selectedYear;
+      const matchesYear = selectedYear === "ALL" || student.year === selectedYear;
 
       return matchesQuery && matchesBranch && matchesYear;
     });
@@ -122,11 +114,16 @@ export function CollegeLeaderboardPodium({
 
             {/* Rank 1 (Gold / Crown) */}
             {top1 && (
-              <Link href={`/@${top1.username}`} className="group flex flex-col items-center cursor-pointer -mt-4">
+              <Link
+                href={`/@${top1.username}`}
+                className="group flex flex-col items-center cursor-pointer -mt-4"
+              >
                 <div className="relative mb-2">
                   <Avatar className="size-18 sm:size-20 rounded-full border-4 border-amber-400 shadow-xl group-hover:scale-105 transition-transform">
                     <AvatarImage src={top1.avatarUrl || ""} className="rounded-full object-cover" />
-                    <AvatarFallback className="font-black text-sm bg-amber-500/10 text-amber-600">{top1.displayName[0]}</AvatarFallback>
+                    <AvatarFallback className="font-black text-sm bg-amber-500/10 text-amber-600">
+                      {top1.displayName[0]}
+                    </AvatarFallback>
                   </Avatar>
                   <span className="absolute -bottom-0.5 right-0 size-6 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center font-black text-xs shadow-lg">
                     1
@@ -135,13 +132,19 @@ export function CollegeLeaderboardPodium({
                 <div className="text-center w-full min-w-0">
                   <p className="text-xs font-extrabold text-foreground truncate flex items-center justify-center gap-1">
                     <span>{top1.displayName}</span>
-                    <span className="text-blue-500 text-[11px]" title="Verified">✓</span>
+                    <span className="text-blue-500 text-[11px]" title="Verified">
+                      ✓
+                    </span>
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">@{top1.username}</p>
                 </div>
                 <div className="w-full mt-2 rounded-t-2xl bg-amber-500/15 p-2.5 text-center h-24 flex flex-col items-center justify-center">
-                  <span className="text-sm font-black text-amber-600 dark:text-amber-400">{top1.points || 0}</span>
-                  <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300">CAMPUS ICON</span>
+                  <span className="text-sm font-black text-amber-600 dark:text-amber-400">
+                    {top1.points || 0}
+                  </span>
+                  <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                    CAMPUS ICON
+                  </span>
                 </div>
               </Link>
             )}
@@ -231,7 +234,7 @@ export function CollegeLeaderboardPodium({
 
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
             <span className="text-[10px] font-bold uppercase text-muted-foreground pl-1">Batch:</span>
-            {([ "ALL", 1, 2, 3, 4 ] as const).map((yr) => (
+            {(["ALL", 1, 2, 3, 4] as const).map((yr) => (
               <button
                 key={yr}
                 type="button"
@@ -256,9 +259,7 @@ export function CollegeLeaderboardPodium({
           <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
             Showing {filteredStudents.length} Students
           </span>
-          <span className="text-[11px] font-bold text-muted-foreground">
-            Ranked by Loop Points (LP)
-          </span>
+          <span className="text-[11px] font-bold text-muted-foreground">Ranked by Loop Points (LP)</span>
         </div>
 
         <div className="grid gap-2.5 sm:grid-cols-2">
@@ -274,27 +275,32 @@ export function CollegeLeaderboardPodium({
 
                     <Avatar className="size-10 group-hover:scale-105 transition-transform shrink-0">
                       <AvatarImage src={student.avatarUrl || ""} />
-                      <AvatarFallback className="font-bold text-xs bg-primary/10 text-primary">{student.displayName[0]}</AvatarFallback>
+                      <AvatarFallback className="font-bold text-xs bg-primary/10 text-primary">
+                        {student.displayName[0]}
+                      </AvatarFallback>
                     </Avatar>
 
                     <div className="min-w-0 space-y-0.5">
                       <p className="text-xs font-extrabold text-foreground truncate flex items-center gap-1">
                         <span>{student.displayName}</span>
                         {(student.points || 0) >= 150 && (
-                          <span className="text-blue-500 text-[10px]" title="Verified Student">✓</span>
+                          <span className="text-blue-500 text-[10px]" title="Verified Student">
+                            ✓
+                          </span>
                         )}
                       </p>
                       <p className="text-[10px] text-muted-foreground truncate">
-                        @{student.username} {student.branch ? `• ${student.branch}` : ""} {student.year ? `(Yr ${student.year})` : ""}
+                        @{student.username} {student.branch ? `• ${student.branch}` : ""}{" "}
+                        {student.year ? `(Yr ${student.year})` : ""}
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-black text-primary">
-                      {student.points || 0} LP
-                    </span>
-                    <p className="text-[9px] font-bold text-muted-foreground">{tier.tierName.split(" ")[0]}</p>
+                    <span className="text-xs font-black text-primary">{student.points || 0} LP</span>
+                    <p className="text-[9px] font-bold text-muted-foreground">
+                      {tier.tierName.split(" ")[0]}
+                    </p>
                   </div>
                 </div>
               </Link>

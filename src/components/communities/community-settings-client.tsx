@@ -1,19 +1,11 @@
 "use client";
 
-import { updateCommunitySettings } from "@/app/app/(main)/communities/actions";
-import { cn } from "@/lib/utils";
-import {
-CheckCircle2,
-EyeOff,
-Globe,
-Loader2,
-Lock,
-Plus,
-Trash2
-} from "lucide-react";
+import { CheckCircle2, EyeOff, Globe, Loader2, Lock, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { updateCommunitySettings } from "@/app/app/(main)/communities/actions";
+import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
   "Tech & Coding",
@@ -48,9 +40,7 @@ export function CommunitySettingsClient({ community }: CommunitySettingsClientPr
   const [privacy, setPrivacy] = useState<"PUBLIC" | "PRIVATE" | "UNLISTED">(
     (community.privacy as "PUBLIC" | "PRIVATE" | "UNLISTED") || "PUBLIC"
   );
-  const [allowAnonymousPosts, setAllowAnonymousPosts] = useState(
-    community.allowAnonymousPosts ?? true
-  );
+  const [allowAnonymousPosts, setAllowAnonymousPosts] = useState(community.allowAnonymousPosts ?? true);
 
   const initialRules = (() => {
     if (!community.rules) return [];
@@ -64,9 +54,7 @@ export function CommunitySettingsClient({ community }: CommunitySettingsClientPr
   const [rules, setRules] = useState(
     initialRules.length > 0
       ? initialRules
-      : [
-          { title: "Be respectful to peers", description: "No hate speech or harassment." },
-        ]
+      : [{ title: "Be respectful to peers", description: "No hate speech or harassment." }]
   );
 
   function handleAddRule() {
@@ -119,9 +107,7 @@ export function CommunitySettingsClient({ community }: CommunitySettingsClientPr
     <form onSubmit={handleSave} className="space-y-5 select-none animate-in fade-in">
       {/* Identity */}
       <div className="rounded-2xl border border-border/60 bg-card p-5 sm:p-6 shadow-2xs space-y-4">
-        <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
-          1. General Details
-        </h2>
+        <h2 className="text-xs font-black uppercase tracking-wider text-foreground">1. General Details</h2>
 
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-foreground">Community Name *</label>

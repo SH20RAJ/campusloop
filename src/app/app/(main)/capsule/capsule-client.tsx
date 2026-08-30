@@ -1,18 +1,14 @@
 "use client";
 
+import { Archive, History, Hourglass } from "lucide-react";
+import { useState } from "react";
+import useSWR from "swr";
 import { CapsuleBuryModal } from "@/components/capsule/capsule-bury-modal";
 import { CapsuleCard } from "@/components/capsule/capsule-card";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-Archive,
-History,
-Hourglass
-} from "lucide-react";
-import { useState } from "react";
-import useSWR from "swr";
 
 interface CapsuleClientProps {
   initialCapsules: any[];
@@ -20,10 +16,7 @@ interface CapsuleClientProps {
   collegeName?: string;
 }
 
-export function CapsuleClient({
-  initialCapsules,
-  profileId,
-}: CapsuleClientProps) {
+export function CapsuleClient({ initialCapsules, profileId }: CapsuleClientProps) {
   const { data, mutate } = useSWR<{ capsules: any[] }>("/api/capsules", fetcher, {
     fallbackData: { capsules: initialCapsules },
   });
@@ -109,7 +102,8 @@ export function CapsuleClient({
             Bury predictions & letters for your future campus self.
           </h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Every contribution is cryptographically sealed until the target date. When the timer strikes zero, the vault erupts in an interactive campus museum wall.
+            Every contribution is cryptographically sealed until the target date. When the timer strikes zero,
+            the vault erupts in an interactive campus museum wall.
           </p>
         </div>
       </div>
@@ -128,9 +122,7 @@ export function CapsuleClient({
         {filteredCapsules.length === 0 && (
           <div className="py-20 text-center space-y-3">
             <History className="size-10 text-muted-foreground mx-auto" />
-            <h3 className="text-sm font-bold text-foreground">
-              No capsules in this category
-            </h3>
+            <h3 className="text-sm font-bold text-foreground">No capsules in this category</h3>
             <p className="text-xs text-muted-foreground">
               Check back soon as your college batch creates new milestone vaults!
             </p>

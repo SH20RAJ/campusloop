@@ -1,8 +1,8 @@
+import { and, desc, eq, ilike, or } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { getDb } from "@/db";
 import { merchantUsers, userProfiles } from "@/db/schema";
-import { and, desc, eq, ilike, or } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -49,20 +49,14 @@ export async function POST(req: Request, { params }: RouteParams) {
     const { usernameOrEmail, role = "OWNER" } = body;
 
     if (!usernameOrEmail || typeof usernameOrEmail !== "string") {
-      return NextResponse.json(
-        { error: "Username or email is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Username or email is required" }, { status: 400 });
     }
 
     const queryClean = usernameOrEmail.trim().replace(/^@/, "");
 
     // Find the user by username or email
     const targetUser = await db.query.userProfiles.findFirst({
-      where: or(
-        ilike(userProfiles.username, queryClean),
-        ilike(userProfiles.email, queryClean)
-      ),
+      where: or(ilike(userProfiles.username, queryClean), ilike(userProfiles.email, queryClean)),
     });
 
     if (!targetUser) {
@@ -74,10 +68,7 @@ export async function POST(req: Request, { params }: RouteParams) {
 
     // Check if already mapped
     const existing = await db.query.merchantUsers.findFirst({
-      where: and(
-        eq(merchantUsers.merchantId, merchantId),
-        eq(merchantUsers.userId, targetUser.id)
-      ),
+      where: and(eq(merchantUsers.merchantId, merchantId), eq(merchantUsers.userId, targetUser.id)),
     });
 
     if (existing) {
@@ -123,17 +114,9 @@ export async function DELETE(req: Request, { params }: RouteParams) {
     } else if (targetUserId) {
       await db
         .delete(merchantUsers)
-        .where(
-          and(
-            eq(merchantUsers.merchantId, merchantId),
-            eq(merchantUsers.userId, targetUserId)
-          )
-        );
+        .where(and(eq(merchantUsers.merchantId, merchantId), eq(merchantUsers.userId, targetUserId)));
     } else {
-      return NextResponse.json(
-        { error: "Staff ID or User ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Staff ID or User ID is required" }, { status: 400 });
     }
 
     return NextResponse.json({ success: true });

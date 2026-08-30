@@ -1,9 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   Bike,
@@ -27,6 +23,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 
 interface MerchantLayoutClientProps {
   children: React.ReactNode;
@@ -122,9 +122,7 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
                 <span className="text-sm font-black tracking-tight text-foreground leading-none block">
                   Campus<span className="text-emerald-500">Merchant</span>
                 </span>
-                <span className="text-[10px] font-bold text-muted-foreground">
-                  Partner Console
-                </span>
+                <span className="text-[10px] font-bold text-muted-foreground">Partner Console</span>
               </div>
             </Link>
           </div>
@@ -216,12 +214,8 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <p className="font-bold text-foreground truncate leading-none">
-                  {profile.displayName}
-                </p>
-                <p className="text-[10px] text-muted-foreground truncate mt-0.5">
-                  @{profile.username}
-                </p>
+                <p className="font-bold text-foreground truncate leading-none">{profile.displayName}</p>
+                <p className="text-[10px] text-muted-foreground truncate mt-0.5">@{profile.username}</p>
               </div>
             </div>
 
@@ -264,7 +258,9 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold",
-                      pathname === item.href ? "bg-foreground text-background font-black" : "text-muted-foreground hover:text-foreground"
+                      pathname === item.href
+                        ? "bg-foreground text-background font-black"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <item.icon className="size-4" />
@@ -282,7 +278,9 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold",
-                      pathname === item.href ? "bg-emerald-500 text-black font-black" : "text-muted-foreground hover:text-foreground"
+                      pathname === item.href
+                        ? "bg-emerald-500 text-black font-black"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <item.icon className="size-4" />
@@ -307,9 +305,7 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
       )}
 
       {/* ─── Main Content Body ─── */}
-      <main className="flex-1 md:ml-64 p-4 sm:p-6 pb-20 md:pb-8 max-w-5xl mx-auto w-full">
-        {children}
-      </main>
+      <main className="flex-1 md:ml-64 p-4 sm:p-6 pb-20 md:pb-8 max-w-5xl mx-auto w-full">{children}</main>
     </div>
   );
 }

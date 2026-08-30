@@ -1,40 +1,39 @@
 import { relations } from "drizzle-orm";
 import { academicResources } from "./academic-resources";
 import { articleComments, articleCommentVotes, articles, articleVotes } from "./articles";
-import { conversationParticipants,conversations,messages } from "./chat";
+import { conversationParticipants, conversations, messages } from "./chat";
 import {
-bikeAvailabilityBlocks,
-bikeBookingDocuments,
-bikeBookings,
-bikeBookingStatusHistory,
-bikeInspections,
-bikes,
-marketplaceOffers,
-marketplaceOrderItems,
-marketplaceOrders,
-marketplaceReviews,
-merchantBusinessHours,
-merchants,
-merchantUsers,
-products,
-savedMarketplaceItems
+  bikeAvailabilityBlocks,
+  bikeBookingDocuments,
+  bikeBookingStatusHistory,
+  bikeBookings,
+  bikeInspections,
+  bikes,
+  marketplaceOffers,
+  marketplaceOrderItems,
+  marketplaceOrders,
+  marketplaceReviews,
+  merchantBusinessHours,
+  merchants,
+  merchantUsers,
+  products,
+  savedMarketplaceItems,
 } from "./commercial-marketplace";
-import { communities,communityMembers } from "./communities";
-import { secretCrushes,swipes } from "./dating";
+import { communities, communityMembers } from "./communities";
+import { secretCrushes, swipes } from "./dating";
 import { eventRegistrations, events } from "./events";
 import { gamingLobbies } from "./gaming";
 import { housingListings } from "./housing";
-import { institutionDomains,institutions } from "./institutions";
+import { institutionDomains, institutions } from "./institutions";
 import { lostAndFoundItems } from "./lost-and-found";
 import { marketplaceItems } from "./marketplace";
 import { notifications } from "./notifications";
-import { comments,pollOptions,pollVotes,posts,votes } from "./posts";
+import { comments, pollOptions, pollVotes, posts, votes } from "./posts";
 import { ridesharePools } from "./rideshare";
 import { savedPosts } from "./saved-posts";
-import { stories,storyHighlights,storyLikes } from "./stories";
-import { capsuleEntries,timeCapsules } from "./time-capsule";
-import { follows,userProfiles } from "./users";
-
+import { stories, storyHighlights, storyLikes } from "./stories";
+import { capsuleEntries, timeCapsules } from "./time-capsule";
+import { follows, userProfiles } from "./users";
 
 export const institutionsRelations = relations(institutions, ({ many }) => ({
   domains: many(institutionDomains),
@@ -616,9 +615,3 @@ export const articleCommentVotesRelations = relations(articleCommentVotes, ({ on
     references: [userProfiles.id],
   }),
 }));
-
-
-
-
-
-

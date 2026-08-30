@@ -1,10 +1,5 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 import {
   ArrowLeft,
   Copy,
@@ -35,6 +30,10 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface AdminMerchantEditClientProps {
   merchantId: string;
@@ -96,8 +95,13 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
     setPhone(merchant.phone || "");
     setEmail(merchant.email || "");
     setUpiId(merchant.upiId || "");
-    setLogoUrl(merchant.logoUrl || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=300&fit=crop");
-    setCoverUrl(merchant.coverUrl || "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop");
+    setLogoUrl(
+      merchant.logoUrl || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=300&fit=crop"
+    );
+    setCoverUrl(
+      merchant.coverUrl ||
+        "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop"
+    );
     setDeliveryFee(String(merchant.deliveryFee ?? 20));
     setMinOrderValue(String(merchant.minOrderValue ?? 80));
     setEstimatedPrepTime(merchant.estimatedPrepTime || "15–20 min");
@@ -127,7 +131,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
     const prods = merchant?.products || [];
     if (!productSearch.trim()) return prods;
     const q = productSearch.toLowerCase();
-    return prods.filter((p: any) => p.name?.toLowerCase().includes(q) || p.categoryName?.toLowerCase().includes(q));
+    return prods.filter(
+      (p: any) => p.name?.toLowerCase().includes(q) || p.categoryName?.toLowerCase().includes(q)
+    );
   }, [merchant?.products, productSearch]);
 
   function handleGeneratePassword() {
@@ -392,7 +398,8 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                 </span>
               </div>
               <p className="text-xs text-muted-foreground font-medium truncate">
-                {merchant.institution?.name?.split(",")[0] || "BIT Mesra"} · {merchant.categorySlug} · ⭐ {merchant.rating} ({merchant.reviewCount} reviews)
+                {merchant.institution?.name?.split(",")[0] || "BIT Mesra"} · {merchant.categorySlug} · ⭐{" "}
+                {merchant.rating} ({merchant.reviewCount} reviews)
               </p>
             </div>
           </div>
@@ -426,7 +433,11 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
           { id: "credentials", label: "Credentials & Auth", icon: KeyRound },
           { id: "products", label: `Catalog (${merchant.products?.length || 0})`, icon: Package },
           { id: "orders", label: `Orders (${merchant.orders?.length || 0})`, icon: ShoppingBag },
-          { id: "reviews", label: `Reviews (${reviewsData?.totalCount || merchant.reviewCount || 0})`, icon: Star },
+          {
+            id: "reviews",
+            label: `Reviews (${reviewsData?.totalCount || merchant.reviewCount || 0})`,
+            icon: Star,
+          },
           { id: "qr", label: "Table Poster QR", icon: QrCode },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -475,7 +486,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   <img src={logoUrl} alt="Logo Preview" className="size-full object-cover" />
                 </div>
                 <div className="text-white">
-                  <h3 className="text-base font-black leading-tight drop-shadow-sm">{name || "Store Name"}</h3>
+                  <h3 className="text-base font-black leading-tight drop-shadow-sm">
+                    {name || "Store Name"}
+                  </h3>
                   <p className="text-xs text-white/80 font-medium drop-shadow-sm">
                     {categorySlug} · {address || "Campus Location"}
                   </p>
@@ -485,7 +498,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Logo / Profile Picture URL</span>
+                <span className="text-[11px] font-bold text-muted-foreground">
+                  Logo / Profile Picture URL
+                </span>
                 <input
                   type="url"
                   value={logoUrl}
@@ -496,7 +511,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
               </div>
 
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Cover / Background Banner URL</span>
+                <span className="text-[11px] font-bold text-muted-foreground">
+                  Cover / Background Banner URL
+                </span>
                 <input
                   type="url"
                   value={coverUrl}
@@ -791,7 +808,11 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   disabled={isSavingCredentials}
                   className="px-5 py-2.5 rounded-xl bg-foreground text-background font-black text-xs hover:opacity-90 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
                 >
-                  {isSavingCredentials ? <Loader2 className="size-3.5 animate-spin" /> : <KeyRound className="size-3.5" />}
+                  {isSavingCredentials ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <KeyRound className="size-3.5" />
+                  )}
                   <span>Save Credentials</span>
                 </button>
               </div>
@@ -830,11 +851,16 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
               <div className="text-center py-12 space-y-2">
                 <Package className="size-8 mx-auto text-muted-foreground" />
                 <p className="text-xs font-bold text-foreground">No menu items found</p>
-                <p className="text-[11px] text-muted-foreground">Add products to make them available to students.</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Add products to make them available to students.
+                </p>
               </div>
             ) : (
               productsList.map((p: any) => (
-                <div key={p.id} className="p-4 flex items-center justify-between gap-3 hover:bg-muted/10 transition-colors">
+                <div
+                  key={p.id}
+                  className="p-4 flex items-center justify-between gap-3 hover:bg-muted/10 transition-colors"
+                >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="size-12 rounded-xl bg-muted overflow-hidden shrink-0 border border-border">
                       {p.imageUrl ? (
@@ -852,7 +878,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
                         <span className="font-black text-foreground">₹{p.price}</span>
-                        {p.originalPrice && <span className="line-through text-[11px]">₹{p.originalPrice}</span>}
+                        {p.originalPrice && (
+                          <span className="line-through text-[11px]">₹{p.originalPrice}</span>
+                        )}
                         <span>· {p.isAvailable ? "🟢 In Stock" : "🔴 Out of Stock"}</span>
                       </div>
                     </div>
@@ -908,7 +936,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
               <div key={o.id} className="p-4 flex items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black text-foreground">#{o.orderNumber || o.id.slice(0, 8)}</span>
+                    <span className="text-xs font-black text-foreground">
+                      #{o.orderNumber || o.id.slice(0, 8)}
+                    </span>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-primary/10 text-primary border border-primary/20">
                       {o.status}
                     </span>
@@ -970,7 +1000,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
               <div className="text-center py-12 space-y-2">
                 <Star className="size-8 mx-auto text-muted-foreground" />
                 <p className="text-xs font-bold text-foreground">No student reviews yet</p>
-                <p className="text-[11px] text-muted-foreground">Students can review this store from the store page.</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Students can review this store from the store page.
+                </p>
               </div>
             ) : (
               reviewsData?.reviews.map((r: any) => (
@@ -986,8 +1018,12 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-bold text-foreground">{r.student?.displayName || "Student"}</span>
-                          <span className="text-[10px] text-muted-foreground">@{r.student?.username || "student"}</span>
+                          <span className="text-xs font-bold text-foreground">
+                            {r.student?.displayName || "Student"}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">
+                            @{r.student?.username || "student"}
+                          </span>
                         </div>
                         <div className="flex items-center gap-0.5 text-amber-500">
                           {[1, 2, 3, 4, 5].map((s) => (
@@ -995,7 +1031,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                               key={s}
                               className={cn(
                                 "size-2.5",
-                                s <= r.rating ? "fill-amber-500 stroke-amber-500" : "fill-transparent stroke-muted-foreground/30"
+                                s <= r.rating
+                                  ? "fill-amber-500 stroke-amber-500"
+                                  : "fill-transparent stroke-muted-foreground/30"
                               )}
                             />
                           ))}
@@ -1006,9 +1044,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   </div>
 
                   {r.comment && (
-                    <p className="text-xs text-foreground/90 leading-relaxed font-medium pl-9">
-                      {r.comment}
-                    </p>
+                    <p className="text-xs text-foreground/90 leading-relaxed font-medium pl-9">{r.comment}</p>
                   )}
                 </div>
               ))

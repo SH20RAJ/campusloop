@@ -1,21 +1,12 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import { FileText, Image as ImageIcon, Loader2, Lock, UserCheck, UserX, Wand2, X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { AnimatePresence,motion } from "framer-motion";
-import {
-FileText,
-Image as ImageIcon,
-Loader2,
-Lock,
-UserCheck,
-UserX,
-Wand2,
-X,
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface CapsuleBuryModalProps {
   isOpen: boolean;
@@ -102,9 +93,7 @@ export function CapsuleBuryModal({
                 <Lock className="size-3.5" />
                 <span>Bury in Time Capsule</span>
               </div>
-              <h3 className="text-base font-black text-foreground line-clamp-1">
-                {capsuleTitle}
-              </h3>
+              <h3 className="text-base font-black text-foreground line-clamp-1">{capsuleTitle}</h3>
               <p className="text-xs text-muted-foreground font-medium">
                 Sealed until unlock date. No one on campus can read this until the vault opens!
               </p>
@@ -152,9 +141,7 @@ export function CapsuleBuryModal({
 
           <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
             <div>
-              <label className="text-xs font-bold text-foreground block mb-1">
-                Subject / Headline *
-              </label>
+              <label className="text-xs font-bold text-foreground block mb-1">Subject / Headline *</label>
               <input
                 type="text"
                 value={title}
@@ -163,8 +150,8 @@ export function CapsuleBuryModal({
                   entryType === "PREDICTION"
                     ? "e.g. In 2027, who will be the first founder from our batch?"
                     : entryType === "PHOTO"
-                    ? "e.g. 3 AM Maggi run during End-Sems"
-                    : "e.g. A letter to myself before graduating"
+                      ? "e.g. 3 AM Maggi run during End-Sems"
+                      : "e.g. A letter to myself before graduating"
                 }
                 className="w-full rounded-xl border border-border/80 bg-background px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-amber-500"
                 required
@@ -187,9 +174,7 @@ export function CapsuleBuryModal({
 
             {entryType === "PHOTO" && (
               <div>
-                <label className="text-xs font-bold text-foreground block mb-1">
-                  Photo URL
-                </label>
+                <label className="text-xs font-bold text-foreground block mb-1">Photo URL</label>
                 <input
                   type="url"
                   value={mediaUrl}
@@ -240,9 +225,7 @@ export function CapsuleBuryModal({
 
             {isAnonymous && (
               <div>
-                <label className="text-xs font-bold text-foreground block mb-1">
-                  Anonymous Pseudonym
-                </label>
+                <label className="text-xs font-bold text-foreground block mb-1">Anonymous Pseudonym</label>
                 <input
                   type="text"
                   value={pseudonym}

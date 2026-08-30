@@ -1,23 +1,14 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { GamingLobby } from "@/db/schema";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import {
-Clock,
-Copy,
-ExternalLink,
-Gamepad2,
-Share2,
-ShieldCheck,
-Sword,
-Users,
-} from "lucide-react";
+import { Clock, Copy, ExternalLink, Gamepad2, Share2, ShieldCheck, Sword, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { GamingLobby } from "@/db/schema";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface GamingLobbyCardProps {
   item: GamingLobby & {
@@ -132,9 +123,7 @@ export function GamingLobbyCard({ item }: GamingLobbyCardProps) {
           <Link href={`/@${item.host.username}`} className="shrink-0">
             <Avatar className="size-9 rounded-full border border-border/50">
               <AvatarImage src={avatar} />
-              <AvatarFallback className="text-xs font-bold">
-                {item.host.displayName[0] || "U"}
-              </AvatarFallback>
+              <AvatarFallback className="text-xs font-bold">{item.host.displayName[0] || "U"}</AvatarFallback>
             </Avatar>
           </Link>
           <div className="min-w-0">
@@ -145,12 +134,8 @@ export function GamingLobbyCard({ item }: GamingLobbyCardProps) {
               >
                 {item.host.displayName}
               </Link>
-              {(item.host.points || 0) >= 150 && (
-                <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
-              )}
-              <span className="text-[11px] text-muted-foreground truncate">
-                @{item.host.username}
-              </span>
+              {(item.host.points || 0) >= 150 && <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />}
+              <span className="text-[11px] text-muted-foreground truncate">@{item.host.username}</span>
               <span className="text-[10px] text-muted-foreground/60">·</span>
               <span className="text-[11px] text-muted-foreground/80 shrink-0">
                 {formatTimeAgo(item.createdAt)}
@@ -189,13 +174,9 @@ export function GamingLobbyCard({ item }: GamingLobbyCardProps) {
 
       {/* Lobby Title & Description */}
       <div className="space-y-1.5">
-        <h3 className="text-sm font-black text-foreground leading-snug">
-          {item.title}
-        </h3>
+        <h3 className="text-sm font-black text-foreground leading-snug">{item.title}</h3>
         {item.description && (
-          <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">
-            {item.description}
-          </p>
+          <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">{item.description}</p>
         )}
       </div>
 
@@ -264,8 +245,8 @@ export function GamingLobbyCard({ item }: GamingLobbyCardProps) {
             joined
               ? "bg-muted text-foreground hover:bg-muted/80"
               : isFull
-              ? "bg-muted text-muted-foreground cursor-not-allowed"
-              : "bg-purple-500 text-white hover:bg-purple-600 shadow-purple-500/20"
+                ? "bg-muted text-muted-foreground cursor-not-allowed"
+                : "bg-purple-500 text-white hover:bg-purple-600 shadow-purple-500/20"
           )}
         >
           <Gamepad2 className="size-3.5" />

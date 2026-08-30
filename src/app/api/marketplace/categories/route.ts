@@ -1,7 +1,7 @@
+import { asc, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { marketplaceCategories } from "@/db/schema";
-import { asc,eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

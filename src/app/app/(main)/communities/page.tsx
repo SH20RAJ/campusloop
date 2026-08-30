@@ -1,21 +1,19 @@
-import { CommunitiesIndexClient,CommunityItem } from "@/components/communities/communities-index-client";
-import { getDb } from "@/db";
-import { communities,posts } from "@/db/schema";
-import { FeedPost } from "@/hooks/use-feed";
-import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
-import { desc,isNotNull } from "drizzle-orm";
-import { Metadata } from "next";
+import { desc, isNotNull } from "drizzle-orm";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import {
+  CommunitiesIndexClient,
+  type CommunityItem,
+} from "@/components/communities/communities-index-client";
+import { getDb } from "@/db";
+import { communities, posts } from "@/db/schema";
+import type { FeedPost } from "@/hooks/use-feed";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
   title: "Student Communities & Sub-Hubs | CampusLoop",
   description: "Browse interest groups, technical societies, and student-created communities on CampusLoop.",
-  keywords: [
-    "Student Communities",
-    "College Sub-Hubs",
-    "Campus Clubs",
-    "Student Groups India",
-  ],
+  keywords: ["Student Communities", "College Sub-Hubs", "Campus Clubs", "Student Groups India"],
   alternates: { canonical: "https://campusloop.space/app/communities" },
   openGraph: {
     title: "Student Communities & Sub-Hubs | CampusLoop",
@@ -42,11 +40,9 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 export default async function CommunitiesPage() {
   const user = await getCachedAuthUser();
   if (!user) redirect("/handler/sign-in");
-
 
   const db = getDb();
 
@@ -71,7 +67,6 @@ export default async function CommunitiesPage() {
       orderBy: [desc(posts.createdAt)],
       limit: 40,
       with: {
-
         author: true,
         institution: true,
         community: true,
@@ -121,5 +116,3 @@ export default async function CommunitiesPage() {
     />
   );
 }
-
-

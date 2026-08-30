@@ -1,9 +1,10 @@
 "use client";
 
-import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
 import { ExternalLink, X, ZoomIn } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
+import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
 
 interface RichTextProps {
   content: string;
@@ -18,7 +19,7 @@ export function RichText({ content, className = "", disableEmbeds = false }: Ric
   if (!content) return null;
 
   // Regular expression to match markdown images: ![alt](url)
-  const imageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s\)]+)\)/g;
+  const imageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g;
 
   // Extract all markdown images
   const images: { alt: string; url: string }[] = [];
@@ -38,7 +39,8 @@ export function RichText({ content, className = "", disableEmbeds = false }: Ric
     // 2. Bare URL: https?://...
     // 3. Hashtag: #tag
     // 4. Mention: @username
-    const tokenRegex = /(\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)|https?:\/\/[^\s]+|#[a-zA-Z0-9_]+|@[a-zA-Z0-9_\-\.]+)/g;
+    const tokenRegex =
+      /(\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|https?:\/\/[^\s]+|#[a-zA-Z0-9_]+|@[a-zA-Z0-9_\-.]+)/g;
 
     const parts: React.ReactNode[] = [];
     let lastIndex = 0;
@@ -142,9 +144,7 @@ export function RichText({ content, className = "", disableEmbeds = false }: Ric
     <div className={`space-y-2 leading-relaxed ${className}`}>
       {/* Render Text */}
       {textWithoutMdImages && (
-        <div className="whitespace-pre-wrap break-words">
-          {parseText(textWithoutMdImages)}
-        </div>
+        <div className="whitespace-pre-wrap break-words">{parseText(textWithoutMdImages)}</div>
       )}
 
       {/* Render Markdown Images */}

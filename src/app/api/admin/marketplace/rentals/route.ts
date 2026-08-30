@@ -1,8 +1,8 @@
+import { desc, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { getDb } from "@/db";
-import { bikeBookings,bikes } from "@/db/schema";
-import { desc,eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { bikeBookings, bikes } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 

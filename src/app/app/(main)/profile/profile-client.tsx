@@ -1,53 +1,52 @@
 "use client";
 
-import { archivePost,deletePost } from "@/app/app/(main)/post/actions";
+import {
+  Archive,
+  ArrowLeft,
+  ArrowUpRight,
+  BookOpen,
+  Calendar,
+  Camera,
+  Edit3,
+  Eye,
+  Flame,
+  Globe,
+  GraduationCap,
+  Loader2,
+  MessageSquare,
+  Move,
+  PenTool,
+  QrCode,
+  School,
+  Share2,
+  Shield,
+  ShieldCheck,
+  Trash2,
+  TrendingUp,
+  Trophy,
+  Upload,
+  VenetianMask,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
+import { archivePost, deletePost } from "@/app/app/(main)/post/actions";
+import { ArticleCard } from "@/components/articles/article-card";
+import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
 import { FollowButton } from "@/components/profile/follow-button";
 import { ProfileHighlights } from "@/components/profile/profile-highlights";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
-import { getBranchIcon,slugifyBranch } from "@/constants";
+import { getBranchIcon, slugifyBranch } from "@/constants";
 import type { FeedPost } from "@/hooks/use-feed";
+import { fetcher } from "@/lib/api";
 import { getCloutTier } from "@/lib/gamification";
 import { cn } from "@/lib/utils";
-import { ArticleCard } from "@/components/articles/article-card";
-import { BrandedQrModal } from "@/components/common/branded-qr-modal";
-import { fetcher } from "@/lib/api";
-import useSWR from "swr";
-import {
-Archive,
-ArrowLeft,
-ArrowUpRight,
-BookOpen,
-Calendar,
-Camera,
-Edit3,
-Eye,
-Flame,
-Globe,
-GraduationCap,
-Loader2,
-MessageSquare,
-Move,
-PenTool,
-QrCode,
-School,
-Share2,
-Shield,
-ShieldCheck,
-Trash2,
-TrendingUp,
-Trophy,
-Upload,
-VenetianMask,
-X
-} from "lucide-react";
-
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback,useEffect,useRef,useState } from "react";
-import { toast } from "sonner";
 
 interface ProfileClientViewProps {
   profile: {
@@ -234,8 +233,8 @@ export function ProfileClientView({
     profile.photos && profile.photos.length > 0
       ? profile.photos
       : profile.avatarUrl
-      ? [profile.avatarUrl]
-      : [];
+        ? [profile.avatarUrl]
+        : [];
 
   const branchSlug = profile.branch ? slugifyBranch(profile.branch) : null;
   const branchIcon = getBranchIcon(profile.branch || profile.course);
@@ -403,11 +402,7 @@ export function ProfileClientView({
           {/* Cover Banner Photo - Full-Width Edge-to-Edge */}
           <div className="relative h-36 sm:h-52 w-full bg-aurora-mesh overflow-hidden">
             {profile.bannerUrl && (
-              <img
-                src={profile.bannerUrl}
-                alt="Profile Banner"
-                className="w-full h-full object-cover"
-              />
+              <img src={profile.bannerUrl} alt="Profile Banner" className="w-full h-full object-cover" />
             )}
 
             {/* Banner Change Button for Owner */}
@@ -501,10 +496,7 @@ export function ProfileClientView({
                   </div>
                 ) : (
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <SecretCrushButton
-                      targetId={profile.id}
-                      targetName={profile.displayName}
-                    />
+                    <SecretCrushButton targetId={profile.id} targetName={profile.displayName} />
                     <Link
                       href={`/app/chat?userId=${profile.id}`}
                       className="h-9 px-3.5 rounded-full border border-border/70 bg-card hover:bg-muted text-xs font-bold text-foreground shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
@@ -550,7 +542,9 @@ export function ProfileClientView({
 
               {/* Bio */}
               <p className="text-xs sm:text-sm font-normal text-foreground leading-relaxed pt-1 whitespace-pre-wrap break-words">
-                {profile.bio || (profile.headline || `Student @ ${campusShort}. Exploring campus vibes and connecting with fellow peers.`)}
+                {profile.bio ||
+                  profile.headline ||
+                  `Student @ ${campusShort}. Exploring campus vibes and connecting with fellow peers.`}
               </p>
 
               {/* Twitter-Style Metadata Row (College, Branch, Year, Link) */}
@@ -571,7 +565,10 @@ export function ProfileClientView({
                     className="hover:underline inline-flex items-center gap-1 text-foreground/80 font-medium truncate max-w-full"
                   >
                     <GraduationCap className="size-3.5 shrink-0 text-primary/70" />
-                    <span>{profile.course ? `${profile.course} · ` : ""}{profile.branch}</span>
+                    <span>
+                      {profile.course ? `${profile.course} · ` : ""}
+                      {profile.branch}
+                    </span>
                   </Link>
                 )}
 
@@ -633,7 +630,6 @@ export function ProfileClientView({
               </div>
             )}
 
-
             {/* Campus Tags / Interest Badges (Exact match to Reference 2 Center Screen) */}
             {profile.interests && profile.interests.length > 0 && (
               <div className="flex flex-wrap gap-1.5 pt-2">
@@ -664,11 +660,7 @@ export function ProfileClientView({
         </div>
 
         {/* ─── Instagram-Style Story Highlights & Archive ─── */}
-        <ProfileHighlights
-          userId={profile.id}
-          username={profile.username}
-          isOwnProfile={isOwnProfile}
-        />
+        <ProfileHighlights userId={profile.id} username={profile.username} isOwnProfile={isOwnProfile} />
 
         {/* ─── Campus & Academic Discipline Card (Minimal & Clean) ─── */}
         <div className="mx-4 my-3 rounded-2xl border border-border/40 bg-card/60 p-4 space-y-3">
@@ -677,7 +669,10 @@ export function ProfileClientView({
               <GraduationCap className="size-4 text-primary" /> Campus & Academic Discipline
             </h3>
             {isOwnProfile && (
-              <Link href="/app/profile/edit" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link
+                href="/app/profile/edit"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
                 <Edit3 className="size-3.5" />
               </Link>
             )}
@@ -758,9 +753,7 @@ export function ProfileClientView({
             onClick={() => setActiveTab("posts")}
             className={cn(
               "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold",
-              activeTab === "posts"
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              activeTab === "posts" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <span>Activity ({posts.length})</span>
@@ -774,9 +767,7 @@ export function ProfileClientView({
             onClick={() => setActiveTab("articles")}
             className={cn(
               "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
-              activeTab === "articles"
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              activeTab === "articles" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <BookOpen className="size-3.5" />
@@ -791,9 +782,7 @@ export function ProfileClientView({
             onClick={() => setActiveTab("photos")}
             className={cn(
               "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
-              activeTab === "photos"
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              activeTab === "photos" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <Camera className="size-3.5" />
@@ -808,9 +797,7 @@ export function ProfileClientView({
             onClick={() => setActiveTab("clout")}
             className={cn(
               "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold",
-              activeTab === "clout"
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              activeTab === "clout" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <span>LP Perks</span>
@@ -825,9 +812,7 @@ export function ProfileClientView({
               onClick={() => setActiveTab("archived")}
               className={cn(
                 "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
-                activeTab === "archived"
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                activeTab === "archived" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Archive className="size-3.5" />
@@ -973,7 +958,8 @@ export function ProfileClientView({
               <Trophy className="size-4 text-amber-500" /> Loop Points (LP) Rules & Privileges
             </h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Earn Loop Points to unlock Verified Campus Star status, top your college leaderboard, and unlock unlimited matching.
+              Earn Loop Points to unlock Verified Campus Star status, top your college leaderboard, and unlock
+              unlimited matching.
             </p>
 
             <div className="grid gap-2 sm:grid-cols-2 text-xs font-semibold text-muted-foreground pt-1">
@@ -1005,7 +991,9 @@ export function ProfileClientView({
                 <Archive className="size-4" />
               </div>
               <p>
-                <strong className="text-foreground font-bold">Private Post Archive:</strong> These posts are hidden from public campus feeds and your public profile. Only you can view, restore, or delete them.
+                <strong className="text-foreground font-bold">Private Post Archive:</strong> These posts are
+                hidden from public campus feeds and your public profile. Only you can view, restore, or delete
+                them.
               </p>
             </div>
 
@@ -1143,7 +1131,6 @@ export function ProfileClientView({
                     <Flame className="size-4 text-amber-500" />
                     <span>Generate Random Avatar</span>
                   </button>
-
                 </>
               )}
             </div>

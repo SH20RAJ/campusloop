@@ -1,7 +1,7 @@
 "use client";
 
-import { Avatar,AvatarFallback } from "@/components/ui/avatar";
 import { Star } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const SAMPLE_REVIEWS = [
   {
@@ -10,7 +10,8 @@ const SAMPLE_REVIEWS = [
     username: "sh20raj",
     rating: 5,
     date: "Yesterday",
-    comment: "Steamed chicken momos were steaming hot and delivered to Hostel 11 in under 15 minutes! The spicy garlic chutney is unbeatable.",
+    comment:
+      "Steamed chicken momos were steaming hot and delivered to Hostel 11 in under 15 minutes! The spicy garlic chutney is unbeatable.",
     reply: "Thank you Shaswat! Glad you loved the extra chutney.",
   },
   {
@@ -67,9 +68,7 @@ export function MerchantReviewsClient() {
 
       {/* ─── Reviews List ─── */}
       <div className="space-y-3.5">
-        <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-          Recent Reviews
-        </h2>
+        <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Recent Reviews</h2>
 
         {SAMPLE_REVIEWS.map((r) => (
           <div key={r.id} className="p-4 rounded-2xl bg-card border border-border/40 space-y-2.5 shadow-xs">
@@ -80,7 +79,9 @@ export function MerchantReviewsClient() {
                 </Avatar>
                 <div>
                   <p className="text-xs font-bold text-foreground">{r.author}</p>
-                  <p className="text-[10px] text-muted-foreground">@{r.username} · {r.date}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    @{r.username} · {r.date}
+                  </p>
                 </div>
               </div>
 

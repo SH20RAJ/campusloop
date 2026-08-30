@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect,useMemo,useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export interface CartItem {
   id: string; // Unique key: `${productId}_${optionsKey}_${addonsKey}`
@@ -52,9 +52,7 @@ export function useMarketplaceCart() {
     setItems((prev) => {
       const existing = prev.find((i) => i.id === id);
       if (existing) {
-        return prev.map((i) =>
-          i.id === id ? { ...i, quantity: i.quantity + item.quantity } : i
-        );
+        return prev.map((i) => (i.id === id ? { ...i, quantity: i.quantity + item.quantity } : i));
       }
       return [...prev, { ...item, id }];
     });

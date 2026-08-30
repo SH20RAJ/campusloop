@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { LogoutClient } from "./logout-client";
 

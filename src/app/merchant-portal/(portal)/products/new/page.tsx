@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { NewProductClient } from "./new-product-client";
 
 export const metadata: Metadata = {

@@ -1,25 +1,25 @@
 "use client";
 
-import { MarketingHeader } from "@/components/marketing/system";
-import { AnimatePresence,motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-ArrowLeft,
-BookOpen,
-CheckCircle2,
-DollarSign,
-ExternalLink,
-Flame,
-Heart,
-HelpCircle,
-Layers,
-MessageSquare,
-School,
-ShieldCheck,
-TrendingUp,
-Users,
+  ArrowLeft,
+  BookOpen,
+  CheckCircle2,
+  DollarSign,
+  ExternalLink,
+  Flame,
+  Heart,
+  HelpCircle,
+  Layers,
+  MessageSquare,
+  School,
+  ShieldCheck,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { MarketingHeader } from "@/components/marketing/system";
 
 const SECTIONS = [
   { id: "concept", label: "Core Motive", icon: Flame },
@@ -80,11 +80,15 @@ export function OverviewClient() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-foreground leading-tight">
-            Platform Overview &amp; <span className="bg-linear-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">Strategic Brief</span>
+            Platform Overview &amp;{" "}
+            <span className="bg-linear-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">
+              Strategic Brief
+            </span>
           </h1>
 
           <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl font-medium leading-relaxed">
-            The comprehensive guide to CampusLoop: our verified student graph, network density moat, product architecture, market size, and monetization engine.
+            The comprehensive guide to CampusLoop: our verified student graph, network density moat, product
+            architecture, market size, and monetization engine.
           </p>
         </div>
 
@@ -129,7 +133,9 @@ export function OverviewClient() {
                     What CampusLoop Actually Is
                   </h2>
                   <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground font-medium">
-                    CampusLoop is not just another social app. It is the verified social layer for college campuses — a private digital layer where students connect, communicate, discover communities, and participate in campus life.
+                    CampusLoop is not just another social app. It is the verified social layer for college
+                    campuses — a private digital layer where students connect, communicate, discover
+                    communities, and participate in campus life.
                   </p>
                 </div>
 
@@ -140,7 +146,8 @@ export function OverviewClient() {
                     </h4>
                     <p className="text-base font-extrabold text-primary">"Your campus, unfiltered."</p>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      Safe, verified yapping, confessions, canteen polls, lost &amp; found, and peer connections without corporate eyes.
+                      Safe, verified yapping, confessions, canteen polls, lost &amp; found, and peer
+                      connections without corporate eyes.
                     </p>
                   </div>
 
@@ -152,7 +159,8 @@ export function OverviewClient() {
                       The verified social graph for higher education in India.
                     </p>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      Building campus-by-campus network density across 1,350+ colleges, monetizing attention and hyper-local transactions.
+                      Building campus-by-campus network density across 1,350+ colleges, monetizing attention
+                      and hyper-local transactions.
                     </p>
                   </div>
                 </div>
@@ -170,7 +178,9 @@ export function OverviewClient() {
             >
               <div className="space-y-1">
                 <h2 className="text-xl font-black text-foreground">The 5 Core Product Layers</h2>
-                <p className="text-xs text-muted-foreground">Every layer solves a specific fragmentation in student life.</p>
+                <p className="text-xs text-muted-foreground">
+                  Every layer solves a specific fragmentation in student life.
+                </p>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -223,7 +233,10 @@ export function OverviewClient() {
                 ].map((item, idx) => {
                   const Icon = item.icon;
                   return (
-                    <div key={idx} className="rounded-2xl border border-border/60 bg-card p-5 space-y-3 shadow-sm">
+                    <div
+                      key={idx}
+                      className="rounded-2xl border border-border/60 bg-card p-5 space-y-3 shadow-sm"
+                    >
                       <div className="flex items-center gap-2">
                         <Icon className={`size-5 ${item.color}`} />
                         <h3 className="text-sm font-bold text-foreground">{item.title}</h3>
@@ -259,7 +272,8 @@ export function OverviewClient() {
                   Campus Density &gt; Total User Count
                 </h2>
                 <p className="text-xs sm:text-sm text-muted-foreground font-medium leading-relaxed">
-                  The primary strategic insight of CampusLoop: the value is not in having 20 features, but in opening the app and seeing hundreds of classmates from your own campus.
+                  The primary strategic insight of CampusLoop: the value is not in having 20 features, but in
+                  opening the app and seeing hundreds of classmates from your own campus.
                 </p>
               </div>
 
@@ -270,7 +284,8 @@ export function OverviewClient() {
                   </h4>
                   <p className="text-lg font-black text-foreground">5,000 Random Users</p>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Scattered across 500 different colleges in India. Zero local network effect or daily retention pull.
+                    Scattered across 500 different colleges in India. Zero local network effect or daily
+                    retention pull.
                   </p>
                 </div>
 
@@ -280,7 +295,8 @@ export function OverviewClient() {
                   </h4>
                   <p className="text-lg font-black text-foreground">5,000 Classmates in 1 Campus</p>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    25%+ campus penetration creates an unbreakable local moat. Extremely high daily engagement &amp; viral word-of-mouth.
+                    25%+ campus penetration creates an unbreakable local moat. Extremely high daily engagement
+                    &amp; viral word-of-mouth.
                   </p>
                 </div>
               </div>
@@ -303,7 +319,8 @@ export function OverviewClient() {
                   India Higher Education Market Sizing
                 </h2>
                 <p className="text-xs sm:text-sm text-muted-foreground font-medium leading-relaxed">
-                  India hosts the second largest higher education system in the world with over 43 Million enrolled students across 1,350+ indexed universities &amp; colleges.
+                  India hosts the second largest higher education system in the world with over 43 Million
+                  enrolled students across 1,350+ indexed universities &amp; colleges.
                 </p>
               </div>
 
@@ -317,11 +334,15 @@ export function OverviewClient() {
                 <div className="rounded-2xl border border-border/50 bg-muted/20 p-4 text-center space-y-1">
                   <p className="text-[10px] font-bold text-primary uppercase tracking-wider">SAM</p>
                   <p className="text-2xl font-black text-primary">12.5M+</p>
-                  <p className="text-[11px] text-muted-foreground">Engineering, Tech &amp; Management Colleges</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Engineering, Tech &amp; Management Colleges
+                  </p>
                 </div>
 
                 <div className="rounded-2xl border border-border/50 bg-muted/20 p-4 text-center space-y-1">
-                  <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Indexed Hubs</p>
+                  <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">
+                    Indexed Hubs
+                  </p>
                   <p className="text-2xl font-black text-emerald-500">1,350+</p>
                   <p className="text-[11px] text-muted-foreground">Verified Indian University Campuses</p>
                 </div>
@@ -339,7 +360,9 @@ export function OverviewClient() {
             >
               <div className="space-y-1">
                 <h2 className="text-xl font-black text-foreground">Monetization Engine</h2>
-                <p className="text-xs text-muted-foreground">Multi-channel revenue stream built on top of campus network density.</p>
+                <p className="text-xs text-muted-foreground">
+                  Multi-channel revenue stream built on top of campus network density.
+                </p>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -361,7 +384,10 @@ export function OverviewClient() {
                     desc: "Verified student talent pool discovery for tech startups and corporate campus recruiters.",
                   },
                 ].map((m, i) => (
-                  <div key={i} className="rounded-2xl border border-border/60 bg-card p-5 space-y-2 shadow-sm">
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-border/60 bg-card p-5 space-y-2 shadow-sm"
+                  >
                     <div className="flex items-center gap-2">
                       <DollarSign className="size-4 text-emerald-500" />
                       <h3 className="text-sm font-bold text-foreground">{m.title}</h3>
@@ -383,7 +409,9 @@ export function OverviewClient() {
             >
               <div className="space-y-1">
                 <h2 className="text-xl font-black text-foreground">Investor Q&amp;A Highlights</h2>
-                <p className="text-xs text-muted-foreground">Core answers to common strategic &amp; defensibility questions.</p>
+                <p className="text-xs text-muted-foreground">
+                  Core answers to common strategic &amp; defensibility questions.
+                </p>
               </div>
 
               <div className="space-y-3">
@@ -401,14 +429,15 @@ export function OverviewClient() {
                     a: "Automated real-time keyword filtering, PII scrubbing (phone numbers & email masking), student report queues, and LP karma penalties keep discussions clean and safe.",
                   },
                 ].map((item, i) => (
-                  <div key={i} className="rounded-2xl border border-border/60 bg-card p-5 space-y-2 shadow-sm">
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-border/60 bg-card p-5 space-y-2 shadow-sm"
+                  >
                     <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                       <HelpCircle className="size-4 text-primary shrink-0" />
                       {item.q}
                     </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed font-medium pl-6">
-                      {item.a}
-                    </p>
+                    <p className="text-xs text-muted-foreground leading-relaxed font-medium pl-6">{item.a}</p>
                   </div>
                 ))}
               </div>
@@ -427,7 +456,8 @@ export function OverviewClient() {
                 CampusLoop Structured Notion Documentation
               </h3>
               <p className="text-xs text-muted-foreground max-w-lg leading-relaxed font-medium">
-                Access our live structured data, roadmap phases, market research notes, and continuous updates on Notion.
+                Access our live structured data, roadmap phases, market research notes, and continuous updates
+                on Notion.
               </p>
             </div>
 

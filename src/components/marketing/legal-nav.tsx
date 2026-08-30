@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const LEGAL_TABS = [
   { href: "/privacy", label: "Privacy" },
@@ -34,7 +34,7 @@ export function LegalNav() {
                 "shrink-0 border-b-2 px-3 py-3.5 text-[13.5px] transition-colors",
                 isActive
                   ? "border-foreground font-medium text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               )}
             >
               {tab.label}

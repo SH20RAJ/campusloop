@@ -1,11 +1,12 @@
-import { DedicatedHubClient } from "@/components/communities/dedicated-hub-client";
-import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { DedicatedHubClient } from "@/components/communities/dedicated-hub-client";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
   title: "Lost & Found | CampusLoop",
-  description: "Report lost student IDs, keys, earphones, and reclaim found items safely on your college campus.",
+  description:
+    "Report lost student IDs, keys, earphones, and reclaim found items safely on your college campus.",
   alternates: { canonical: "https://campusloop.space/app/lost-and-found" },
 };
 

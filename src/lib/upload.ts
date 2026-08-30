@@ -4,9 +4,7 @@
  */
 
 const IMGBB_API_KEY =
-  process.env.NEXT_PUBLIC_IMGBB_API_KEY ||
-  process.env.IMGBB_API_KEY ||
-  "c0c864f0d9aadb0f7de371582b301397";
+  process.env.NEXT_PUBLIC_IMGBB_API_KEY || process.env.IMGBB_API_KEY || "c0c864f0d9aadb0f7de371582b301397";
 
 export type ImgBBUploadResponse = {
   url: string;

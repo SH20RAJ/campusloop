@@ -1,9 +1,8 @@
-import { getDb } from "@/db";
-import { comments,communities,institutions,posts,userProfiles } from "@/db/schema";
-
-import { formatApiFeedPosts } from "@/lib/feed";
-import { and,desc,eq,ilike,or } from "drizzle-orm";
+import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { comments, communities, institutions, posts, userProfiles } from "@/db/schema";
+import { formatApiFeedPosts } from "@/lib/feed";
 
 export async function GET(request: Request) {
   try {
@@ -74,10 +73,7 @@ export async function GET(request: Request) {
 
     // 4. Search Communities
     const foundCommunities = await db.query.communities.findMany({
-      where: or(
-        ilike(communities.name, searchPattern),
-        ilike(communities.description, searchPattern)
-      ),
+      where: or(ilike(communities.name, searchPattern), ilike(communities.description, searchPattern)),
       limit: 10,
     });
 

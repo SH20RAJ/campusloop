@@ -1,5 +1,22 @@
 "use client";
 
+import {
+  ArrowLeft,
+  BookOpen,
+  Car,
+  CheckCheck,
+  Compass,
+  Gamepad2,
+  Home,
+  Loader2,
+  PackageSearch,
+  Plus,
+  Search,
+  ShoppingBag,
+} from "lucide-react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
+import useSWRInfinite from "swr/infinite";
 import { AcademicCard } from "@/components/communities/academic-card";
 import { GamingLobbyCard } from "@/components/communities/gaming-lobby-card";
 import { HousingCard } from "@/components/communities/housing-card";
@@ -8,23 +25,6 @@ import { MarketplaceCard } from "@/components/communities/marketplace-card";
 import { RideshareCard } from "@/components/communities/rideshare-card";
 import { fetcher } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import {
-ArrowLeft,
-BookOpen,
-Car,
-CheckCheck,
-Compass,
-Gamepad2,
-Home,
-Loader2,
-PackageSearch,
-Plus,
-Search,
-ShoppingBag,
-} from "lucide-react";
-import Link from "next/link";
-import { useEffect,useMemo,useRef,useState } from "react";
-import useSWRInfinite from "swr/infinite";
 
 export type DedicatedHubType =
   | "lost_found"
@@ -138,14 +138,10 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
     return `/api/communities/feed?tab=${hubType}&cursor=${encodeURIComponent(cursor)}&limit=10`;
   };
 
-  const { data, size, setSize, isValidating, mutate } = useSWRInfinite<FeedPageResponse>(
-    getKey,
-    fetcher,
-    {
-      revalidateFirstPage: false,
-      dedupingInterval: 6000,
-    }
-  );
+  const { data, size, setSize, isValidating, mutate } = useSWRInfinite<FeedPageResponse>(getKey, fetcher, {
+    revalidateFirstPage: false,
+    dedupingInterval: 6000,
+  });
 
   const feedItems = useMemo(() => {
     if (!data) return [];
@@ -204,12 +200,12 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
           </Link>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <div className={cn("size-6 rounded-lg flex items-center justify-center border", meta.badgeColor)}>
+              <div
+                className={cn("size-6 rounded-lg flex items-center justify-center border", meta.badgeColor)}
+              >
                 <Icon className="size-3.5" />
               </div>
-              <h1 className="text-base font-black tracking-tight text-foreground truncate">
-                {meta.title}
-              </h1>
+              <h1 className="text-base font-black tracking-tight text-foreground truncate">{meta.title}</h1>
             </div>
             <p className="text-xs text-muted-foreground truncate">{meta.subtitle}</p>
           </div>
@@ -228,9 +224,7 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
       <div className="px-4 py-4 border-b border-border/20 bg-muted/10 relative overflow-hidden">
         <div className={cn("absolute inset-0 bg-linear-to-r pointer-events-none", meta.gradient)} />
         <div className="relative z-10 space-y-2">
-          <p className="text-xs text-foreground/90 leading-relaxed font-medium">
-            {meta.description}
-          </p>
+          <p className="text-xs text-foreground/90 leading-relaxed font-medium">{meta.description}</p>
 
           {/* Quick Search */}
           <div className="relative w-full pt-1">

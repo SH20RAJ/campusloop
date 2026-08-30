@@ -1,13 +1,14 @@
 "use client";
 
+import { ArrowDown, Loader2 } from "lucide-react";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { ArrowDown, Loader2 } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface PullToRefreshProps {
-  onRefresh: () => Promise<unknown> | void;
+  onRefresh: () => Promise<unknown> | undefined;
   children: React.ReactNode;
   disabled?: boolean;
 }
@@ -55,7 +56,7 @@ export function PullToRefresh({ onRefresh, children, disabled = false }: PullToR
 
       if (diffY > 0 && scrollTop <= 5) {
         isPullingRef.current = true;
-        const dampened = Math.min(Math.pow(diffY, 0.8) * 1.5, MAX_PULL_DISTANCE);
+        const dampened = Math.min(diffY ** 0.8 * 1.5, MAX_PULL_DISTANCE);
         setPullDistance(dampened);
 
         if (e.cancelable && diffY > 15) {

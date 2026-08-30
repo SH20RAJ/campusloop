@@ -140,10 +140,7 @@ export function getDatingCandidatePhotoSet(
   gender?: string | null,
   seedKey?: string | null
 ): CandidatePhotoSet {
-  const pool =
-    gender === "MALE"
-      ? MALE_DATING_PHOTOS
-      : FEMALE_DATING_PHOTOS;
+  const pool = gender === "MALE" ? MALE_DATING_PHOTOS : FEMALE_DATING_PHOTOS;
 
   const key = seedKey || "candidate";
   let hash = 0;

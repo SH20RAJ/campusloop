@@ -1,11 +1,11 @@
 "use client";
 
+import { ArrowLeft, ChevronRight, Shield } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MORE_HUB_SECTIONS } from "@/constants/navigation";
 import { useProfile } from "@/hooks/use-profile";
 import { cn } from "@/lib/utils";
-import { ArrowLeft,ChevronRight,Shield } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 interface MoreClientProps {
   isAdmin?: boolean;
@@ -14,8 +14,7 @@ interface MoreClientProps {
 export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
   const router = useRouter();
   const { profile } = useProfile();
-  const isAdmin = propIsAdmin ?? (profile?.role === "ADMIN");
-
+  const isAdmin = propIsAdmin ?? profile?.role === "ADMIN";
 
   return (
     <div className="min-h-screen pb-24 text-foreground select-none max-w-2xl mx-auto px-4 pt-3 space-y-5">
@@ -30,9 +29,7 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
             <ArrowLeft className="size-4.5" />
           </button>
           <div>
-            <h1 className="text-base font-black text-foreground tracking-tight">
-              More on CampusLoop
-            </h1>
+            <h1 className="text-base font-black text-foreground tracking-tight">More on CampusLoop</h1>
             <p className="text-[11px] text-muted-foreground font-medium">
               Explore secondary features, directories &amp; settings
             </p>
@@ -78,11 +75,7 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
                             </span>
                           )}
                         </div>
-                        {item.desc && (
-                          <p className="text-xs text-muted-foreground truncate">
-                            {item.desc}
-                          </p>
-                        )}
+                        {item.desc && <p className="text-xs text-muted-foreground truncate">{item.desc}</p>}
                       </div>
                     </div>
 
@@ -110,7 +103,9 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
                   </div>
                   <div>
                     <p className="text-sm font-black text-destructive">Admin Moderation Console</p>
-                    <p className="text-xs text-muted-foreground">Manage reports, content &amp; campus audit logs</p>
+                    <p className="text-xs text-muted-foreground">
+                      Manage reports, content &amp; campus audit logs
+                    </p>
                   </div>
                 </div>
                 <ChevronRight className="size-4 text-destructive/50" />

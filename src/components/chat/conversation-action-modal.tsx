@@ -1,24 +1,24 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { CachedConversation } from "@/lib/chat-cache";
 import {
-Archive,
-ArchiveRestore,
-Bell,
-BellOff,
-CheckCheck,
-Eraser,
-Pin,
-PinOff,
-ShieldCheck,
-Trash2,
-User,
-X,
+  Archive,
+  ArchiveRestore,
+  Bell,
+  BellOff,
+  CheckCheck,
+  Eraser,
+  Pin,
+  PinOff,
+  ShieldCheck,
+  Trash2,
+  User,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { CachedConversation } from "@/lib/chat-cache";
 
 interface ConversationActionModalProps {
   isOpen: boolean;
@@ -102,11 +102,7 @@ export function ConversationActionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-150">
-      <div
-        className="fixed inset-0"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
 
       <div className="relative z-10 w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl border border-border/40 bg-card p-4 sm:p-5 shadow-2xl space-y-4 animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
         {/* Header with user preview */}
@@ -173,14 +169,15 @@ export function ConversationActionModal({
               type="button"
               disabled={isSubmitting}
               onClick={() =>
-                handleAction(
-                  isPinned ? "unpin" : "pin",
-                  isPinned ? "Chat unpinned" : "Chat pinned to top 📌"
-                )
+                handleAction(isPinned ? "unpin" : "pin", isPinned ? "Chat unpinned" : "Chat pinned to top 📌")
               }
               className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted text-xs font-semibold text-foreground transition-colors cursor-pointer"
             >
-              {isPinned ? <PinOff className="size-4 text-muted-foreground" /> : <Pin className="size-4 text-amber-500" />}
+              {isPinned ? (
+                <PinOff className="size-4 text-muted-foreground" />
+              ) : (
+                <Pin className="size-4 text-amber-500" />
+              )}
               <span>{isPinned ? "Unpin chat" : "Pin chat to top"}</span>
             </button>
 
@@ -189,14 +186,15 @@ export function ConversationActionModal({
               type="button"
               disabled={isSubmitting}
               onClick={() =>
-                handleAction(
-                  isMuted ? "unmute" : "mute",
-                  isMuted ? "Notifications unmuted" : "Chat muted 🔕"
-                )
+                handleAction(isMuted ? "unmute" : "mute", isMuted ? "Notifications unmuted" : "Chat muted 🔕")
               }
               className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted text-xs font-semibold text-foreground transition-colors cursor-pointer"
             >
-              {isMuted ? <Bell className="size-4 text-muted-foreground" /> : <BellOff className="size-4 text-rose-500" />}
+              {isMuted ? (
+                <Bell className="size-4 text-muted-foreground" />
+              ) : (
+                <BellOff className="size-4 text-rose-500" />
+              )}
               <span>{isMuted ? "Unmute notifications" : "Mute notifications"}</span>
             </button>
 
@@ -252,9 +250,7 @@ export function ConversationActionModal({
             <button
               type="button"
               disabled={isSubmitting}
-              onClick={() =>
-                handleAction("clear", "Chat history cleared")
-              }
+              onClick={() => handleAction("clear", "Chat history cleared")}
               className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted text-xs font-semibold text-foreground transition-colors cursor-pointer"
             >
               <Eraser className="size-4 text-muted-foreground" />

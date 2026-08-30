@@ -1,8 +1,8 @@
 "use client";
 
+import { ArrowRight, CheckCircle2, Lock, School, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { UserCapability } from "@/lib/capabilities";
-import { ArrowRight, CheckCircle2, Lock, School, ShieldCheck, X } from "lucide-react";
 
 interface PreviewLockedModalProps {
   isOpen: boolean;
@@ -85,12 +85,8 @@ export function PreviewLockedModal({
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-500 border border-amber-500/20">
             <School className="size-3" /> Campus Preview Mode
           </span>
-          <h2 className="text-lg font-black tracking-tight text-foreground">
-            {content.title}
-          </h2>
-          <p className="text-xs text-muted-foreground leading-relaxed max-w-xs mx-auto">
-            {content.desc}
-          </p>
+          <h2 className="text-lg font-black tracking-tight text-foreground">{content.title}</h2>
+          <p className="text-xs text-muted-foreground leading-relaxed max-w-xs mx-auto">{content.desc}</p>
         </div>
 
         {/* Benefits List */}

@@ -47,9 +47,7 @@ function SinglePostSkeleton({ hasMedia }: { hasMedia?: boolean }) {
         </div>
 
         {/* Optional Media Box */}
-        {hasMedia && (
-          <Skeleton className="h-48 w-full rounded-2xl mt-2.5" />
-        )}
+        {hasMedia && <Skeleton className="h-48 w-full rounded-2xl mt-2.5" />}
 
         {/* Actions bar */}
         <div className="flex items-center justify-between max-w-md pt-2">

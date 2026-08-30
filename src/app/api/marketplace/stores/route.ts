@@ -1,8 +1,8 @@
-import { getDb } from "@/db";
-import { marketplaceOffers,merchants,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,ilike,or } from "drizzle-orm";
+import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { marketplaceOffers, merchants, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 export const dynamic = "force-dynamic";
 
@@ -27,15 +27,13 @@ export async function GET(req: Request) {
       }
     }
 
-    const conditions: any[] = [
-      eq(merchants.status, "ACTIVE"),
-    ];
+    const conditions: any[] = [eq(merchants.status, "ACTIVE")];
 
     if (categorySlug && categorySlug !== "all" && categorySlug !== "deals") {
       conditions.push(eq(merchants.categorySlug, categorySlug));
     }
 
-    if (query && query.trim()) {
+    if (query?.trim()) {
       const pattern = `%${query.trim()}%`;
       conditions.push(
         or(

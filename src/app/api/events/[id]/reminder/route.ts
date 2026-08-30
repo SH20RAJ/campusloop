@@ -1,16 +1,13 @@
-import { getDb } from "@/db";
-import { eventRegistrations, events, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
 import { and, eq, or } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { eventRegistrations, events, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const user = await hexclaveServerApp.getUser();
@@ -36,10 +33,7 @@ export async function POST(
     }
 
     const reg = await db.query.eventRegistrations.findFirst({
-      where: and(
-        eq(eventRegistrations.eventId, event.id),
-        eq(eventRegistrations.profileId, profile.id)
-      ),
+      where: and(eq(eventRegistrations.eventId, event.id), eq(eventRegistrations.profileId, profile.id)),
     });
 
     if (!reg) {

@@ -1,11 +1,11 @@
 "use client";
 
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { ChevronLeft,ChevronRight,Eye,SearchIcon,Trash2 } from "lucide-react";
-import { useRouter,useSearchParams } from "next/navigation";
+import { ChevronLeft, ChevronRight, Eye, SearchIcon, Trash2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { revealAnonymousAuthor,type RevealedIdentity } from "../anonymity-actions";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { type RevealedIdentity, revealAnonymousAuthor } from "../anonymity-actions";
 import { deleteComment } from "./actions";
 
 interface CommentRow {
@@ -124,7 +124,9 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
                       <span className="font-semibold text-foreground">
-                        {c.isAnonymous ? (revealed[c.id]?.displayName ?? "👻 Anonymous") : c.author?.displayName}
+                        {c.isAnonymous
+                          ? (revealed[c.id]?.displayName ?? "👻 Anonymous")
+                          : c.author?.displayName}
                       </span>
                       <span className="text-xs text-muted-foreground">
                         {c.isAnonymous
@@ -135,15 +137,11 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-foreground">
-                    {c.body}
-                  </td>
+                  <td className="px-6 py-4 text-foreground">{c.body}</td>
                   <td className="px-6 py-4 text-xs max-w-xs truncate">
                     {c.post?.body || "Original post deleted"}
                   </td>
-                  <td className="px-6 py-4 text-xs">
-                    {new Date(c.createdAt).toLocaleDateString()}
-                  </td>
+                  <td className="px-6 py-4 text-xs">{new Date(c.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-1">
                       {c.isAnonymous && !revealed[c.id] && (
@@ -169,7 +167,9 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
               ))}
               {initialComments.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center">No comments found.</td>
+                  <td colSpan={5} className="px-6 py-8 text-center">
+                    No comments found.
+                  </td>
                 </tr>
               )}
             </tbody>

@@ -1,6 +1,6 @@
-import { fetcher } from "@/lib/api";
 import { useMemo } from "react";
 import useSWR from "swr";
+import { fetcher } from "@/lib/api";
 
 export interface College {
   id: string;
@@ -31,7 +31,6 @@ export function useColleges(limit = 100, page = 1) {
       dedupingInterval: 30000,
     }
   );
-
 
   const colleges = useMemo(() => {
     if (!data) return [];

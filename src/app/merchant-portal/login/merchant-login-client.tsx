@@ -1,23 +1,12 @@
 "use client";
 
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
-import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  KeyRound,
-  Loader2,
-  Lock,
-  ShieldCheck,
-  Store,
-  User,
-} from "lucide-react";
+import { ArrowRight, Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Store, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 
 export function MerchantLoginClient() {
   const router = useRouter();
@@ -226,7 +215,8 @@ export function MerchantLoginClient() {
             Need credentials for your campus stall? Request access from the{" "}
             <Link href="/contact" className="underline hover:text-foreground">
               CampusLoop Admin
-            </Link>.
+            </Link>
+            .
           </p>
         </div>
       </main>

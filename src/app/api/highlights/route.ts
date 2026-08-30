@@ -1,9 +1,9 @@
+import { desc, eq, inArray } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { stories,storyHighlights,userProfiles } from "@/db/schema";
+import { stories, storyHighlights, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { desc,eq,inArray } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -43,11 +43,9 @@ export async function GET(req: Request) {
     });
 
     // Populate story previews for each highlight
-    const allStoryIds = Array.from(
-      new Set(highlights.flatMap((h) => (h.storyIds as string[]) || []))
-    );
+    const allStoryIds = Array.from(new Set(highlights.flatMap((h) => (h.storyIds as string[]) || [])));
 
-    let storiesMap = new Map<string, any>();
+    const storiesMap = new Map<string, any>();
     if (allStoryIds.length > 0) {
       const fetchedStories = await db.query.stories.findMany({
         where: inArray(stories.id, allStoryIds),
@@ -63,9 +61,7 @@ export async function GET(req: Request) {
 
     const formatted = highlights.map((h) => {
       const sIds = (h.storyIds as string[]) || [];
-      const populatedStories = sIds
-        .map((sid) => storiesMap.get(sid))
-        .filter(Boolean);
+      const populatedStories = sIds.map((sid) => storiesMap.get(sid)).filter(Boolean);
 
       const cover =
         h.coverUrl ||
@@ -116,7 +112,7 @@ export async function POST(req: Request) {
       storyIds?: string[];
     };
 
-    if (!title || !title.trim()) {
+    if (!title?.trim()) {
       return NextResponse.json({ error: "Highlight title is required" }, { status: 400 });
     }
 
@@ -129,9 +125,7 @@ export async function POST(req: Request) {
       where: inArray(stories.id, storyIds),
     });
 
-    const validStoryIds = userStories
-      .filter((s) => s.userId === profile.id)
-      .map((s) => s.id);
+    const validStoryIds = userStories.filter((s) => s.userId === profile.id).map((s) => s.id);
 
     if (validStoryIds.length === 0) {
       return NextResponse.json({ error: "No valid stories found for user" }, { status: 400 });

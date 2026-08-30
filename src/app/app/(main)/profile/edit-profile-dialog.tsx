@@ -46,7 +46,6 @@ export function EditProfileDialog({
     }
   }
 
-
   return (
     <>
       <button
@@ -61,12 +60,16 @@ export function EditProfileDialog({
           <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl animate-in fade-in zoom-in-95 space-y-4">
             <div>
               <h3 className="text-sm font-black uppercase tracking-wider text-foreground">Edit Profile</h3>
-              <p className="text-[10px] text-muted-foreground font-semibold">Update your display name, username, bio, and profile picture.</p>
+              <p className="text-[10px] text-muted-foreground font-semibold">
+                Update your display name, username, bio, and profile picture.
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Display Name</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Display Name
+                </label>
                 <input
                   type="text"
                   required
@@ -77,7 +80,9 @@ export function EditProfileDialog({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Username</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Username
+                </label>
                 <input
                   type="text"
                   required
@@ -93,9 +98,7 @@ export function EditProfileDialog({
                     Anonymous Persona Username
                   </label>
                   {anonUsername && (
-                    <span className="text-[10px] text-primary font-bold">
-                      @{anonUsername.toLowerCase()}
-                    </span>
+                    <span className="text-[10px] text-primary font-bold">@{anonUsername.toLowerCase()}</span>
                   )}
                 </div>
                 <input
@@ -111,7 +114,9 @@ export function EditProfileDialog({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Profile Picture URL</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Profile Picture URL
+                </label>
                 <input
                   type="text"
                   placeholder="https://api.dicebear.com/7.x/adventurer/svg?seed=username"
@@ -121,9 +126,10 @@ export function EditProfileDialog({
                 />
               </div>
 
-
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Bio</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Bio
+                </label>
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}

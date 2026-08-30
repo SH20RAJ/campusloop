@@ -1,11 +1,11 @@
+import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
+import { notFound, redirect } from "next/navigation";
 import { CommunityHeader } from "@/components/communities/community-header";
 import { CommunityMembersClient } from "@/components/communities/community-members-client";
 import { getDb } from "@/db";
 import { posts } from "@/db/schema";
-import { getCachedAuthUser,getCachedCommunity,getCachedUserProfile } from "@/lib/server-cache";
-import { eq } from "drizzle-orm";
-import { Metadata } from "next";
-import { notFound,redirect } from "next/navigation";
+import { getCachedAuthUser, getCachedCommunity, getCachedUserProfile } from "@/lib/server-cache";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -37,12 +37,8 @@ export default async function CommunityMembersPage({ params }: PageProps) {
   const user = await getCachedAuthUser();
   if (!user) redirect("/handler/sign-in");
 
-
   // Parallelize user profile and community lookup with request cache
-  const [profile, comm] = await Promise.all([
-    getCachedUserProfile(user.id),
-    getCachedCommunity(id),
-  ]);
+  const [profile, comm] = await Promise.all([getCachedUserProfile(user.id), getCachedCommunity(id)]);
 
   if (!profile) redirect("/app/onboarding");
   if (!comm) notFound();
@@ -55,7 +51,6 @@ export default async function CommunityMembersPage({ params }: PageProps) {
       columns: { id: true },
     })
   ).length;
-
 
   const userMembership = comm.members.find((m) => m.userId === profile.id);
   const isMember = Boolean(userMembership && userMembership.status === "ACTIVE");

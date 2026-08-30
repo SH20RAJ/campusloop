@@ -1,18 +1,13 @@
 "use client";
 
+import { ExternalLink, Plus, Search, Store } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import {
-ExternalLink,
-Plus,
-Search,
-Store
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import useSWR from "swr";
 
 export function AdminMerchantsClient() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,8 +29,7 @@ export function AdminMerchantsClient() {
       m.institution?.name?.toLowerCase().includes(q);
 
     const matchesCategory =
-      selectedCategory === "all" ||
-      m.categorySlug?.toLowerCase() === selectedCategory.toLowerCase();
+      selectedCategory === "all" || m.categorySlug?.toLowerCase() === selectedCategory.toLowerCase();
 
     return matchesSearch && matchesCategory;
   });
@@ -139,9 +133,7 @@ export function AdminMerchantsClient() {
                     <td className="p-3 text-muted-foreground font-medium">
                       {m.institution?.name?.split(",")[0] || "BIT Mesra"}
                     </td>
-                    <td className="p-3 font-bold uppercase text-[10px] text-primary">
-                      {m.categorySlug}
-                    </td>
+                    <td className="p-3 font-bold uppercase text-[10px] text-primary">{m.categorySlug}</td>
                     <td className="p-3 font-bold">{m.products?.length || 0} items</td>
                     <td className="p-3 text-muted-foreground">{m.phone || "—"}</td>
                     <td className="p-3 font-bold text-amber-500">⭐ {m.rating}</td>

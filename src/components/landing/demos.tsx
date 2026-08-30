@@ -1,22 +1,13 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Heart, MailCheck, MessageSquare, ShieldAlert, ShieldCheck, UserPlus, Vote, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useRef, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card,CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-Heart,
-MailCheck,
-MessageSquare,
-ShieldAlert,
-ShieldCheck,
-UserPlus,
-Vote,
-X,
-} from "lucide-react";
-import { AnimatePresence,motion } from "motion/react";
-import { useRef,useState } from "react";
 
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const PHONE_RE = /\b\d{10}\b/g;
@@ -27,14 +18,12 @@ function anonKey(input: string) {
     h = (h << 5) - h + input.charCodeAt(i);
     h |= 0;
   }
-  return "anon_" + Math.abs(h).toString(16).padStart(8, "0").slice(0, 8);
+  return `anon_${Math.abs(h).toString(16).padStart(8, "0").slice(0, 8)}`;
 }
 
 export function ConfessionDemo() {
   const [text, setText] = useState("");
-  const scrubbed = text
-    .replace(PHONE_RE, "[removed]")
-    .replace(EMAIL_RE, "[removed]");
+  const scrubbed = text.replace(PHONE_RE, "[removed]").replace(EMAIL_RE, "[removed]");
   const hadPii = scrubbed !== text;
 
   const presets = [
@@ -117,20 +106,17 @@ export function ConfessionDemo() {
                 <p className="text-[9px] text-muted-foreground">Verified Student</p>
               </div>
             </div>
-            <Badge className="bg-primary/10 text-primary border-none text-[9px] px-1.5 py-0">
-              Just Now
-            </Badge>
+            <Badge className="bg-primary/10 text-primary border-none text-[9px] px-1.5 py-0">Just Now</Badge>
           </div>
 
           {/* Body */}
           <div className="py-4 min-h-[70px]">
             {text ? (
-              <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
-                {scrubbed}
-              </p>
+              <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">{scrubbed}</p>
             ) : (
               <p className="text-sm italic text-muted-foreground/80">
-                Your words appear here exactly as they would be stored... try typing phone numbers or emails to see the auto-scrubbing.
+                Your words appear here exactly as they would be stored... try typing phone numbers or emails
+                to see the auto-scrubbing.
               </p>
             )}
           </div>
@@ -212,8 +198,7 @@ export function MatchDemo() {
             </div>
             <p className="font-heading text-lg font-semibold">It&apos;s a match</p>
             <p className="max-w-[24ch] text-sm text-muted-foreground">
-              You and {profile.firstName} both swiped right. Chat unlocks when
-              you join.
+              You and {profile.firstName} both swiped right. Chat unlocks when you join.
             </p>
             <Button
               variant="outline"
@@ -242,12 +227,8 @@ export function MatchDemo() {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-heading font-semibold leading-tight">
-                  {profile.name}
-                </p>
-                <p className="text-xs font-medium text-primary">
-                  {profile.college}
-                </p>
+                <p className="font-heading font-semibold leading-tight">{profile.name}</p>
+                <p className="text-xs font-medium text-primary">{profile.college}</p>
               </div>
             </div>
             <p className="rounded-lg bg-muted/60 p-3 text-sm leading-relaxed text-muted-foreground">
@@ -310,9 +291,7 @@ export function PointsDemo() {
         <div className="relative w-fit">
           <p className="font-heading text-5xl font-bold tracking-tight tabular-nums">
             {lp}
-            <span className="ml-1 text-base font-medium text-muted-foreground">
-              LP
-            </span>
+            <span className="ml-1 text-base font-medium text-muted-foreground">LP</span>
           </p>
           <div className="pointer-events-none absolute -top-1 right-0">
             <AnimatePresence>
@@ -333,19 +312,15 @@ export function PointsDemo() {
         </div>
         <div className="flex flex-wrap gap-2">
           {RANKS.map((r) => (
-            <Badge
-              key={r.name}
-              variant={r.name === rank.name ? "default" : "outline"}
-              className="h-6"
-            >
+            <Badge key={r.name} variant={r.name === rank.name ? "default" : "outline"} className="h-6">
               {r.name}
               <span className="opacity-70">{r.at} LP</span>
             </Badge>
           ))}
         </div>
         <p className="text-sm text-muted-foreground">
-          You are a <span className="font-semibold text-foreground">{rank.name}</span>.
-          Every post, vote, and referral moves you up.
+          You are a <span className="font-semibold text-foreground">{rank.name}</span>. Every post, vote, and
+          referral moves you up.
         </p>
       </div>
 
@@ -417,8 +392,7 @@ export function VerifyDemo() {
           <>
             <ShieldAlert className="size-3.5 text-primary" />
             <span className="font-medium text-primary">
-              We do not recognize that domain. Use the email your college gave
-              you.
+              We do not recognize that domain. Use the email your college gave you.
             </span>
           </>
         )}

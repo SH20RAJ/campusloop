@@ -1,14 +1,14 @@
 "use client";
 
-import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
-import { Button } from "@/components/ui/button";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
 import { Share2, Users } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
+import { Button } from "@/components/ui/button";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
 
 interface CommunityEmbedProps {
   slugOrId: string;
@@ -24,18 +24,20 @@ interface Community {
 }
 
 export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
-  const { data: communitiesList, isLoading } = useSWR<Community[]>(
-    "/api/communities",
-    fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 60000 }
-  );
+  const { data: communitiesList, isLoading } = useSWR<Community[]>("/api/communities", fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60000,
+  });
 
   const community = useMemo(() => {
     if (!communitiesList || !Array.isArray(communitiesList)) return null;
     const clean = slugOrId.toLowerCase().replace(/^c\//, "");
     return (
       communitiesList.find(
-        (c) => c.id === slugOrId || c.name.toLowerCase().replace(/\s+/g, "-") === clean || c.name.toLowerCase() === clean
+        (c) =>
+          c.id === slugOrId ||
+          c.name.toLowerCase().replace(/\s+/g, "-") === clean ||
+          c.name.toLowerCase() === clean
       ) || communitiesList.find((c) => c.id.includes(clean))
     );
   }, [communitiesList, slugOrId]);
@@ -96,9 +98,7 @@ export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
             <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5 font-medium">
               <Users className="size-3 shrink-0 text-muted-foreground" />
               <span>{memberCount} members</span>
-              {community.description && (
-                <span className="truncate">· {community.description}</span>
-              )}
+              {community.description && <span className="truncate">· {community.description}</span>}
             </p>
           </div>
         </div>

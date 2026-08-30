@@ -1,12 +1,9 @@
-import { NextRequest,NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 // No hardcoded fallback: a real key used to live here, which put it in the
 // public git history and in every build.
 const GIPHY_API_KEY =
-  process.env.GIPHY_API_KEY ||
-  process.env.GIFY_API_KEY ||
-  process.env.NEXT_PUBLIC_GIPHY_API_KEY ||
-  "";
+  process.env.GIPHY_API_KEY || process.env.GIFY_API_KEY || process.env.NEXT_PUBLIC_GIPHY_API_KEY || "";
 
 export interface GifItem {
   id: string;
@@ -68,9 +65,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ gifs });
   } catch (error) {
     console.error("[GIF Search] Error fetching from GIPHY:", error);
-    return NextResponse.json(
-      { gifs: [], error: "Failed to fetch GIFs" },
-      { status: 500 }
-    );
+    return NextResponse.json({ gifs: [], error: "Failed to fetch GIFs" }, { status: 500 });
   }
 }

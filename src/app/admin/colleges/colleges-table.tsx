@@ -1,12 +1,12 @@
 "use client";
 
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Edit3,Globe,PlusIcon,School,Search,Trash2Icon } from "lucide-react";
+import { Edit3, Globe, PlusIcon, School, Search, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo,useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { addDomain,deleteCollege,removeDomain } from "./actions";
-import { CollegeEditData,EditCollegeModal } from "./edit-college-modal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { addDomain, deleteCollege, removeDomain } from "./actions";
+import { type CollegeEditData, EditCollegeModal } from "./edit-college-modal";
 
 interface CollegeRow {
   id: string;
@@ -41,8 +41,8 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
       (c) =>
         c.name.toLowerCase().includes(q) ||
         c.slug.toLowerCase().includes(q) ||
-        (c.state && c.state.toLowerCase().includes(q)) ||
-        (c.district && c.district.toLowerCase().includes(q))
+        c.state?.toLowerCase().includes(q) ||
+        c.district?.toLowerCase().includes(q)
     );
   }, [initialColleges, searchQuery]);
 
@@ -136,9 +136,7 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
 
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="font-extrabold text-xs text-foreground">
-                          {college.name}
-                        </span>
+                        <span className="font-extrabold text-xs text-foreground">{college.name}</span>
                         {college.bannerUrl && (
                           <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">
                             Banner
@@ -146,10 +144,16 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
                         )}
                       </div>
                       <div className="text-[11px] text-muted-foreground flex items-center gap-2">
-                        <span>slug: <code className="text-foreground">{college.slug}</code></span>
+                        <span>
+                          slug: <code className="text-foreground">{college.slug}</code>
+                        </span>
                         {college.website && (
                           <a
-                            href={college.website.startsWith("http") ? college.website : `https://${college.website}`}
+                            href={
+                              college.website.startsWith("http")
+                                ? college.website
+                                : `https://${college.website}`
+                            }
                             target="_blank"
                             rel="noreferrer"
                             className="hover:text-primary flex items-center gap-0.5"
@@ -165,7 +169,8 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
                 <td className="px-6 py-3.5 text-xs">
                   <div>
                     <span className="font-medium text-foreground">
-                      {college.district ? `${college.district}, ` : ""}{college.state || college.country}
+                      {college.district ? `${college.district}, ` : ""}
+                      {college.state || college.country}
                     </span>
                     {college.nirfRank && (
                       <span className="block text-[10px] text-amber-500 font-bold">

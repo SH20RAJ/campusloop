@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 
 interface CapsuleCountdownProps {
   targetDate: string | Date;
@@ -23,7 +23,7 @@ export function CapsuleCountdown({ targetDate }: CapsuleCountdownProps) {
 
   useEffect(() => {
     function calculateTime() {
-      const difference = new Date(targetDate).getTime() - new Date().getTime();
+      const difference = new Date(targetDate).getTime() - Date.now();
       if (difference <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isPast: true });
         return;
@@ -68,7 +68,9 @@ export function CapsuleCountdown({ targetDate }: CapsuleCountdownProps) {
       </div>
       <span className="text-muted-foreground font-black">:</span>
       <div className="flex flex-col items-center bg-background/80 border border-border/40 px-2 py-1 rounded-lg">
-        <span className="text-sm font-black tabular-nums text-amber-500">{String(timeLeft.seconds).padStart(2, "0")}</span>
+        <span className="text-sm font-black tabular-nums text-amber-500">
+          {String(timeLeft.seconds).padStart(2, "0")}
+        </span>
         <span className="text-[9px] text-muted-foreground uppercase font-sans">Sec</span>
       </div>
     </div>

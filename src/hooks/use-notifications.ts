@@ -1,15 +1,9 @@
 "use client";
 
-import { fetcher } from "@/lib/api";
 import useSWR from "swr";
+import { fetcher } from "@/lib/api";
 
-export type NotificationTab =
-  | "all"
-  | "mentions"
-  | "replies"
-  | "reactions"
-  | "crushes"
-  | "verified";
+export type NotificationTab = "all" | "mentions" | "replies" | "reactions" | "crushes" | "verified";
 
 export interface NotificationItem {
   id: string;
@@ -52,8 +46,8 @@ interface NotificationsResponse {
   unreadCount: number;
 }
 
+import { useEffect, useRef } from "react";
 import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
-import { useEffect,useRef } from "react";
 
 export function useNotifications(tab: NotificationTab = "all") {
   const lastTopIdRef = useRef<string | null>(null);
@@ -98,16 +92,13 @@ export function useNotifications(tab: NotificationTab = "all") {
 
   async function markAllAsRead() {
     // Optimistically mark all as read
-    mutate(
-      (prev) => {
-        if (!prev) return prev;
-        return {
-          notifications: prev.notifications.map((n) => ({ ...n, isRead: true })),
-          unreadCount: 0,
-        };
-      },
-      false
-    );
+    mutate((prev) => {
+      if (!prev) return prev;
+      return {
+        notifications: prev.notifications.map((n) => ({ ...n, isRead: true })),
+        unreadCount: 0,
+      };
+    }, false);
 
     try {
       await fetch("/api/notifications", {
@@ -123,18 +114,13 @@ export function useNotifications(tab: NotificationTab = "all") {
   }
 
   async function markAsRead(id: string) {
-    mutate(
-      (prev) => {
-        if (!prev) return prev;
-        return {
-          notifications: prev.notifications.map((n) =>
-            n.id === id ? { ...n, isRead: true } : n
-          ),
-          unreadCount: Math.max(0, prev.unreadCount - 1),
-        };
-      },
-      false
-    );
+    mutate((prev) => {
+      if (!prev) return prev;
+      return {
+        notifications: prev.notifications.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
+        unreadCount: Math.max(0, prev.unreadCount - 1),
+      };
+    }, false);
 
     try {
       await fetch("/api/notifications", {
@@ -154,23 +140,19 @@ export function useNotifications(tab: NotificationTab = "all") {
   async function clearAll(scope: "all" | "read" = "all") {
     const previous = data;
 
-    mutate(
-      (prev) => {
-        if (!prev) return prev;
-        if (scope === "read") {
-          const remaining = prev.notifications.filter((n) => !n.isRead);
-          return { notifications: remaining, unreadCount: remaining.length };
-        }
-        return { notifications: [], unreadCount: 0 };
-      },
-      false
-    );
+    mutate((prev) => {
+      if (!prev) return prev;
+      if (scope === "read") {
+        const remaining = prev.notifications.filter((n) => !n.isRead);
+        return { notifications: remaining, unreadCount: remaining.length };
+      }
+      return { notifications: [], unreadCount: 0 };
+    }, false);
 
     try {
-      const res = await fetch(
-        `/api/notifications?scope=${scope}&tab=${encodeURIComponent(tab)}`,
-        { method: "DELETE" }
-      );
+      const res = await fetch(`/api/notifications?scope=${scope}&tab=${encodeURIComponent(tab)}`, {
+        method: "DELETE",
+      });
       if (!res.ok) throw new Error("Request failed");
       await mutate();
       return true;
@@ -185,18 +167,14 @@ export function useNotifications(tab: NotificationTab = "all") {
   async function deleteOne(id: string) {
     const previous = data;
 
-    mutate(
-      (prev) => {
-        if (!prev) return prev;
-        const target = prev.notifications.find((n) => n.id === id);
-        return {
-          notifications: prev.notifications.filter((n) => n.id !== id),
-          unreadCount:
-            target && !target.isRead ? Math.max(0, prev.unreadCount - 1) : prev.unreadCount,
-        };
-      },
-      false
-    );
+    mutate((prev) => {
+      if (!prev) return prev;
+      const target = prev.notifications.find((n) => n.id === id);
+      return {
+        notifications: prev.notifications.filter((n) => n.id !== id),
+        unreadCount: target && !target.isRead ? Math.max(0, prev.unreadCount - 1) : prev.unreadCount,
+      };
+    }, false);
 
     try {
       const res = await fetch(`/api/notifications?id=${encodeURIComponent(id)}`, {
@@ -225,11 +203,10 @@ export function useNotifications(tab: NotificationTab = "all") {
 }
 
 export function useUnreadNotificationsCount() {
-  const { data } = useSWR<{ unreadCount: number }>(
-    "/api/notifications/unread-count",
-    fetcher,
-    { refreshInterval: 25000, dedupingInterval: 8000 }
-  );
+  const { data } = useSWR<{ unreadCount: number }>("/api/notifications/unread-count", fetcher, {
+    refreshInterval: 25000,
+    dedupingInterval: 8000,
+  });
 
   return data?.unreadCount || 0;
 }

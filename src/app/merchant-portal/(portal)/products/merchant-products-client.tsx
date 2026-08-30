@@ -1,20 +1,15 @@
 "use client";
 
+import { Plus, Search, Trash2, UtensilsCrossed } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-Plus,
-Search,
-Trash2,
-UtensilsCrossed
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
 
 export function MerchantProductsClient() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,9 +43,7 @@ export function MerchantProductsClient() {
 
       if (!res.ok) throw new Error();
       mutate();
-      toast.success(
-        !currentAvailable ? "Item marked as AVAILABLE ✅" : "Item marked as OUT OF STOCK 🔴"
-      );
+      toast.success(!currentAvailable ? "Item marked as AVAILABLE ✅" : "Item marked as OUT OF STOCK 🔴");
     } catch {
       toast.error("Failed to update availability");
     } finally {
@@ -143,9 +136,7 @@ export function MerchantProductsClient() {
                   <p className="text-muted-foreground line-clamp-1 text-[11px]">
                     {p.description || "No description provided"}
                   </p>
-                  <p className="text-xs font-black text-foreground">
-                    ₹{p.price.toLocaleString("en-IN")}
-                  </p>
+                  <p className="text-xs font-black text-foreground">₹{p.price.toLocaleString("en-IN")}</p>
                 </div>
               </div>
 

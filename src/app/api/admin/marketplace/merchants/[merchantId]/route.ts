@@ -1,8 +1,8 @@
+import { desc, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { getDb } from "@/db";
-import { merchants,products } from "@/db/schema";
-import { desc,eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { merchants, products } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -86,8 +86,11 @@ export async function PATCH(req: Request, { params }: RouteParams) {
     if (upiId !== undefined) updateData.upiId = upiId?.trim() || null;
     if (logoUrl !== undefined) updateData.logoUrl = logoUrl?.trim() || null;
     if (coverUrl !== undefined) updateData.coverUrl = coverUrl?.trim() || null;
-    if (deliveryFee !== undefined) updateData.deliveryFee = typeof deliveryFee === "number" ? deliveryFee : parseInt(deliveryFee, 10) || 0;
-    if (minOrderValue !== undefined) updateData.minOrderValue = typeof minOrderValue === "number" ? minOrderValue : parseInt(minOrderValue, 10) || 0;
+    if (deliveryFee !== undefined)
+      updateData.deliveryFee = typeof deliveryFee === "number" ? deliveryFee : parseInt(deliveryFee, 10) || 0;
+    if (minOrderValue !== undefined)
+      updateData.minOrderValue =
+        typeof minOrderValue === "number" ? minOrderValue : parseInt(minOrderValue, 10) || 0;
     if (estimatedPrepTime !== undefined) updateData.estimatedPrepTime = estimatedPrepTime?.trim() || null;
     if (status !== undefined) updateData.status = status;
     if (isOpen !== undefined) updateData.isOpen = Boolean(isOpen);

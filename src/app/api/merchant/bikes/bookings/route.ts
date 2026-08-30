@@ -1,8 +1,8 @@
-import { getDb } from "@/db";
-import { bikeBookings,merchants } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, type SQL } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { bikeBookings, merchants } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "No rental merchant found" }, { status: 404 });
     }
 
-    let statusCondition = undefined;
+    let statusCondition: SQL | undefined;
     if (filter === "pending") {
       statusCondition = eq(bikeBookings.status, "REQUESTED");
     } else if (filter === "confirmed") {

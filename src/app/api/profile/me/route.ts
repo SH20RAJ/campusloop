@@ -1,10 +1,9 @@
+import { and, eq, ne, sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { validateDisplayName,validateUsername } from "@/lib/validation";
-import { and,eq,ne,sql } from "drizzle-orm";
-import { NextResponse } from "next/server";
-
+import { validateDisplayName, validateUsername } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -109,7 +108,6 @@ export async function PATCH(req: Request) {
       updateData.dob = body.dob ? body.dob.trim() : null;
     }
 
-
     if (body.isDobPrivate !== undefined) {
       updateData.isDobPrivate = Boolean(body.isDobPrivate);
     }
@@ -155,7 +153,9 @@ export async function PATCH(req: Request) {
     if (body.avatarUrl !== undefined) updateData.avatarUrl = body.avatarUrl.trim() || null;
     if (body.bannerUrl !== undefined) updateData.bannerUrl = body.bannerUrl.trim() || null;
     if (body.photos !== undefined && Array.isArray(body.photos)) {
-      updateData.photos = body.photos.slice(0, 6).filter((url) => typeof url === "string" && url.trim().length > 0);
+      updateData.photos = body.photos
+        .slice(0, 6)
+        .filter((url) => typeof url === "string" && url.trim().length > 0);
     }
     if (body.bio !== undefined) {
       if (body.bio.length > 300) {

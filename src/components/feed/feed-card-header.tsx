@@ -1,23 +1,14 @@
 "use client";
 
-import { archivePost,deletePost } from "@/app/app/(main)/post/actions";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { FeedPost } from "@/hooks/use-feed";
-import { formatTimeAgo } from "@/lib/utils";
-import {
-Archive,
-Flag,
-Link2,
-MoreHorizontal,
-Repeat2,
-School,
-ShieldCheck,
-Trash2
-} from "lucide-react";
+import { Archive, Flag, Link2, MoreHorizontal, Repeat2, School, ShieldCheck, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { archivePost, deletePost } from "@/app/app/(main)/post/actions";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import type { FeedPost } from "@/hooks/use-feed";
+import { formatTimeAgo } from "@/lib/utils";
 
 interface FeedCardHeaderProps {
   post: FeedPost;
@@ -45,7 +36,9 @@ export function FeedCardHeader({
     setShowMenu(false);
     try {
       const res = await archivePost(post.id);
-      toast.success(res.isArchived ? "Post moved to your private archive 📦" : "Post restored to public feeds 🚀");
+      toast.success(
+        res.isArchived ? "Post moved to your private archive 📦" : "Post restored to public feeds 🚀"
+      );
       router.refresh();
     } catch {
       toast.error("Failed to update post archive status");
@@ -55,14 +48,17 @@ export function FeedCardHeader({
   }
 
   const authorName = post.isAnonymous
-    ? (post.pseudonym ? `🫣 @${post.pseudonym}` : "🫣 Anonymous")
+    ? post.pseudonym
+      ? `🫣 @${post.pseudonym}`
+      : "🫣 Anonymous"
     : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? null : `@${post.author?.username || "student"}`;
-  const isVerified = Boolean(!post.isAnonymous && ((post.author?.points || 0) >= 150 || post.author?.role === "ADMIN"));
+  const isVerified = Boolean(
+    !post.isAnonymous && ((post.author?.points || 0) >= 150 || post.author?.role === "ADMIN")
+  );
 
   const institutionDisplayName =
-    post.institution?.name?.split(",")?.[0]?.replace(/^(Birla Institute of Technology)/i, "BIT") ||
-    null;
+    post.institution?.name?.split(",")?.[0]?.replace(/^(Birla Institute of Technology)/i, "BIT") || null;
 
   return (
     <div className="flex items-center justify-between gap-2 min-w-0 select-none">
@@ -79,21 +75,13 @@ export function FeedCardHeader({
           <span className="font-bold text-foreground truncate">{authorName}</span>
         )}
 
-        {isVerified && (
-          <ShieldCheck className="size-4 text-[#1d9bf0] shrink-0" />
-        )}
+        {isVerified && <ShieldCheck className="size-4 text-[#1d9bf0] shrink-0" />}
 
-        {authorHandle && (
-          <span className="text-muted-foreground text-[14px] truncate">
-            {authorHandle}
-          </span>
-        )}
+        {authorHandle && <span className="text-muted-foreground text-[14px] truncate">{authorHandle}</span>}
 
         <span className="text-muted-foreground/60 text-xs">·</span>
 
-        <span className="text-muted-foreground/70 text-xs shrink-0">
-          {formatTimeAgo(post.createdAt)}
-        </span>
+        <span className="text-muted-foreground/70 text-xs shrink-0">{formatTimeAgo(post.createdAt)}</span>
 
         {institutionDisplayName && (
           <>
@@ -114,10 +102,7 @@ export function FeedCardHeader({
       {/* Right Side: Category Pill & Twitter 3 Dots */}
       <div className="flex items-center gap-1.5 shrink-0">
         {post.community && (
-          <Link
-            href={`/app/communities/${post.community.id}`}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <Link href={`/app/communities/${post.community.id}`} onClick={(e) => e.stopPropagation()}>
             <span className="text-[11px] font-bold text-muted-foreground hover:text-foreground transition-colors">
               c/{post.community.name}
             </span>
@@ -245,7 +230,6 @@ export function FeedCardHeader({
         confirmText={isDeleting ? "Deleting..." : "Delete"}
         variant="danger"
       />
-
     </div>
   );
 }

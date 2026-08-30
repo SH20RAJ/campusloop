@@ -1,22 +1,22 @@
 "use client";
 
-import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import {
-ArrowLeft,
-CheckCircle2,
-CreditCard,
-Loader2,
-ShieldCheck,
-Store,
-Truck,
-Wallet
+  ArrowLeft,
+  CheckCircle2,
+  CreditCard,
+  Loader2,
+  ShieldCheck,
+  Store,
+  Truck,
+  Wallet,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 
 interface CheckoutClientProps {
   profileId: string;
@@ -25,12 +25,7 @@ interface CheckoutClientProps {
 
 export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: CheckoutClientProps) {
   const router = useRouter();
-  const {
-    items,
-    merchantGroups,
-    overallSubtotal,
-    clearCart,
-  } = useMarketplaceCart();
+  const { items, merchantGroups, overallSubtotal, clearCart } = useMarketplaceCart();
 
   const [fulfillmentType, setFulfillmentType] = useState<"DELIVERY" | "PICKUP">("DELIVERY");
   const [hostelName, setHostelName] = useState("Hostel 11 (Boys)");
@@ -41,15 +36,17 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Rental specific fields if any rental item in cart
-  const hasRentalItems = items.some((i) =>
-    i.productName.toLowerCase().includes("rental") || i.merchantSlug.includes("rental") || i.merchantSlug.includes("wheels")
+  const hasRentalItems = items.some(
+    (i) =>
+      i.productName.toLowerCase().includes("rental") ||
+      i.merchantSlug.includes("rental") ||
+      i.merchantSlug.includes("wheels")
   );
   const [drivingLicenseNumber, setDrivingLicenseNumber] = useState("");
   const [rentalStartDate, setRentalStartDate] = useState("Today 4:00 PM");
 
-  const totalDeliveryFee = fulfillmentType === "DELIVERY"
-    ? merchantGroups.reduce((sum, g) => sum + g.finalDeliveryFee, 0)
-    : 0;
+  const totalDeliveryFee =
+    fulfillmentType === "DELIVERY" ? merchantGroups.reduce((sum, g) => sum + g.finalDeliveryFee, 0) : 0;
 
   const grandTotal = overallSubtotal + totalDeliveryFee;
 
@@ -118,7 +115,9 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
       clearCart();
       router.push(`/app/marketplace/order/${data.primaryOrderId}`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Checkout failed. Please try again.", { id: "checkout" });
+      toast.error(err instanceof Error ? err.message : "Checkout failed. Please try again.", {
+        id: "checkout",
+      });
       setIsSubmitting(false);
     }
   }
@@ -136,11 +135,10 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
             <ArrowLeft className="size-4.5" />
           </button>
           <div>
-            <h1 className="text-base font-black text-foreground tracking-tight leading-none">
-              Checkout
-            </h1>
+            <h1 className="text-base font-black text-foreground tracking-tight leading-none">Checkout</h1>
             <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
-              {collegeName} · {merchantGroups.length} {merchantGroups.length === 1 ? "store order" : "store orders"}
+              {collegeName} · {merchantGroups.length}{" "}
+              {merchantGroups.length === 1 ? "store order" : "store orders"}
             </p>
           </div>
         </div>
@@ -200,7 +198,9 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
           {fulfillmentType === "DELIVERY" ? (
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Select Hostel / Campus Building *</span>
+                <span className="text-[11px] font-bold text-muted-foreground">
+                  Select Hostel / Campus Building *
+                </span>
                 <select
                   value={hostelName}
                   onChange={(e) => setHostelName(e.target.value)}
@@ -249,12 +249,15 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
               <div className="p-3 rounded-2xl bg-muted/30 border border-border/30 text-xs text-muted-foreground space-y-1">
                 <p className="font-bold text-foreground">Pickup from Store Counter</p>
                 <p className="text-[11px]">
-                  Your order will be prepared in 15–20 minutes. Collect from the store counter by showing your order number.
+                  Your order will be prepared in 15–20 minutes. Collect from the store counter by showing your
+                  order number.
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Phone Number for Order Alert *</span>
+                <span className="text-[11px] font-bold text-muted-foreground">
+                  Phone Number for Order Alert *
+                </span>
                 <input
                   type="tel"
                   required
@@ -355,9 +358,7 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
           </h3>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>Items Subtotal</span>
-            <span className="text-foreground font-bold">
-              ₹{overallSubtotal.toLocaleString("en-IN")}
-            </span>
+            <span className="text-foreground font-bold">₹{overallSubtotal.toLocaleString("en-IN")}</span>
           </div>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>Delivery Fee</span>
@@ -367,9 +368,7 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
           </div>
           <div className="pt-2 border-t border-border/30 flex items-center justify-between text-sm font-black text-foreground">
             <span>Total Payable Amount</span>
-            <span className="text-base text-emerald-500">
-              ₹{grandTotal.toLocaleString("en-IN")}
-            </span>
+            <span className="text-base text-emerald-500">₹{grandTotal.toLocaleString("en-IN")}</span>
           </div>
         </div>
 

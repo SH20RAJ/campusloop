@@ -39,7 +39,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 export default function ConfessionsPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -57,11 +56,10 @@ export default function ConfessionsPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <Suspense fallback={<div className="p-4 text-center text-xs text-muted-foreground">Loading confessions...</div>}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Suspense
+        fallback={<div className="p-4 text-center text-xs text-muted-foreground">Loading confessions...</div>}
+      >
         <ConfessionsFeed />
       </Suspense>
     </>

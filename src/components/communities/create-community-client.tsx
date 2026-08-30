@@ -1,23 +1,23 @@
 "use client";
 
-import { createCommunity } from "@/app/app/(main)/communities/actions";
-import { cn } from "@/lib/utils";
 import {
-ArrowLeft,
-CheckCircle2,
-EyeOff,
-Globe,
-Loader2,
-Lock,
-Plus,
-Trash2,
-Users2,
-Zap
+  ArrowLeft,
+  CheckCircle2,
+  EyeOff,
+  Globe,
+  Loader2,
+  Lock,
+  Plus,
+  Trash2,
+  Users2,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { createCommunity } from "@/app/app/(main)/communities/actions";
+import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
   "Tech & Coding",
@@ -160,7 +160,8 @@ export function CreateCommunityClient() {
             </div>
             {name.trim() && (
               <p className="text-[11px] text-muted-foreground pl-3">
-                URL Preview: <strong className="text-foreground">campusloop.space/app/communities/{generatedSlug}</strong>
+                URL Preview:{" "}
+                <strong className="text-foreground">campusloop.space/app/communities/{generatedSlug}</strong>
               </p>
             )}
           </div>
@@ -249,7 +250,8 @@ export function CreateCommunityClient() {
               <div className="space-y-0.5 min-w-0">
                 <h3 className="text-xs font-bold text-foreground">Private Hub</h3>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Only approved members can view posts and participate. Non-members must submit a join request.
+                  Only approved members can view posts and participate. Non-members must submit a join
+                  request.
                 </p>
               </div>
             </div>
@@ -319,7 +321,10 @@ export function CreateCommunityClient() {
 
           <div className="space-y-3">
             {rules.map((rule, idx) => (
-              <div key={idx} className="p-3 rounded-2xl bg-muted/20 border border-border/60 space-y-2 relative">
+              <div
+                key={idx}
+                className="p-3 rounded-2xl bg-muted/20 border border-border/60 space-y-2 relative"
+              >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] font-black text-muted-foreground">Rule #{idx + 1}</span>
                   {rules.length > 1 && (

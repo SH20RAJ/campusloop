@@ -1,7 +1,7 @@
-import { getDb } from "@/db";
-import { bikeAvailabilityBlocks,bikeBookings,bikes } from "@/db/schema";
-import { and,eq,inArray,sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { bikeAvailabilityBlocks, bikeBookings, bikes } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 

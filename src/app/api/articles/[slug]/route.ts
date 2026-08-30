@@ -1,8 +1,8 @@
+import { and, eq, or, sql } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { articles, articleVotes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and, eq, or, sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -51,10 +51,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     let userVote = 0;
     if (currentProfile) {
       const vote = await db.query.articleVotes.findFirst({
-        where: and(
-          eq(articleVotes.articleId, article.id),
-          eq(articleVotes.profileId, currentProfile.id)
-        ),
+        where: and(eq(articleVotes.articleId, article.id), eq(articleVotes.profileId, currentProfile.id)),
       });
       if (vote) {
         userVote = vote.value;

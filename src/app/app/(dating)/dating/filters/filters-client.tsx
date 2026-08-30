@@ -1,12 +1,12 @@
 "use client";
 
-import { fetcher } from "@/lib/api";
-import { cn } from "@/lib/utils";
-import { ArrowLeft,Check,Loader2,RotateCcw } from "lucide-react";
+import { ArrowLeft, Check, Loader2, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { fetcher } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 type Prefs = {
   gender: "DEFAULT" | "MALE" | "FEMALE" | "ALL";
@@ -57,10 +57,7 @@ export function FiltersClient() {
     if (!prefs) return;
     setSaving(true);
     // Optimistic UI, silent persist
-    void mutate(
-      data ? { ...data, preferences: { ...prefs, ...updates } } : data,
-      { revalidate: false }
-    );
+    void mutate(data ? { ...data, preferences: { ...prefs, ...updates } } : data, { revalidate: false });
     try {
       const res = await fetch("/api/dating/preferences", {
         method: "PATCH",

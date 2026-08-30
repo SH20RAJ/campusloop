@@ -1,17 +1,10 @@
 "use client";
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import {
-  Check,
-  Copy,
-  Download,
-  QrCode,
-  Share2,
-  X,
-} from "lucide-react";
+import { Check, Copy, Download, QrCode, Share2, X } from "lucide-react";
 import QRCode from "qrcode";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 /**
  * Per-surface accent themes
@@ -129,7 +122,14 @@ export function BrandedQrModal({
       ctx.fillStyle = radGrad1;
       ctx.fillRect(0, 0, width, height);
 
-      const radGrad2 = ctx.createRadialGradient(width - 150, height - 150, 20, width - 150, height - 150, 550);
+      const radGrad2 = ctx.createRadialGradient(
+        width - 150,
+        height - 150,
+        20,
+        width - 150,
+        height - 150,
+        550
+      );
       radGrad2.addColorStop(0, "rgba(125, 211, 252, 0.35)");
       radGrad2.addColorStop(1, "rgba(125, 211, 252, 0)");
       ctx.fillStyle = radGrad2;
@@ -376,7 +376,10 @@ export function BrandedQrModal({
       // 10. Export Download File
       const dataUrl = canvas.toDataURL("image/png");
       const a = document.createElement("a");
-      const safeSlug = title.toLowerCase().replace(/[^a-z0-9]/g, "-").slice(0, 24);
+      const safeSlug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "-")
+        .slice(0, 24);
       a.download = `campusloop-${safeSlug}-qr.png`;
       a.href = dataUrl;
       a.click();
@@ -401,9 +404,7 @@ export function BrandedQrModal({
             <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <QrCode className="size-4" />
             </div>
-            <span className="text-sm font-black text-foreground tracking-tight">
-              Share QR Code
-            </span>
+            <span className="text-sm font-black text-foreground tracking-tight">Share QR Code</span>
           </div>
           <button
             type="button"
@@ -421,11 +422,7 @@ export function BrandedQrModal({
             <div className="relative rounded-2xl bg-white p-5 text-center shadow-xl border border-black/5 space-y-3">
               {/* Brand Header with /logo.png */}
               <div className="flex items-center justify-center gap-2.5">
-                <img
-                  src="/logo.png"
-                  alt="CampusLoop"
-                  className="size-8 object-contain shrink-0"
-                />
+                <img src="/logo.png" alt="CampusLoop" className="size-8 object-contain shrink-0" />
                 <span className="text-xl font-black tracking-tight text-[#0f172a]">
                   Campus<span className="text-[#2563eb]">Loop</span>
                 </span>
@@ -455,9 +452,7 @@ export function BrandedQrModal({
                   {title}
                 </h3>
                 {subtitle && (
-                  <p className="text-[11px] font-semibold text-[#64748b] line-clamp-1">
-                    {subtitle}
-                  </p>
+                  <p className="text-[11px] font-semibold text-[#64748b] line-clamp-1">{subtitle}</p>
                 )}
               </div>
 

@@ -1,43 +1,43 @@
 "use client";
 
-import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions";
-import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
-import { ShareQrButton } from "@/components/common/share-qr-button";
-import { PostComposer } from "@/app/app/(main)/post/new/post-composer";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { FeedCard } from "@/components/ui/feed-card";
-import { FeedPost } from "@/hooks/use-feed";
-import { useProfile } from "@/hooks/use-profile";
-import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import {
-ArrowLeft,
-BarChart3,
-Check,
-Clock,
-Compass,
-Flame,
-Globe,
-Image as ImageIcon,
-Loader2,
-Lock,
-MessageSquare,
-Settings,
-Share2,
-ShieldCheck,
-Smile,
-TrendingUp,
-Trophy,
-Users,
-VenetianMask
+  ArrowLeft,
+  BarChart3,
+  Check,
+  Clock,
+  Compass,
+  Flame,
+  Globe,
+  Image as ImageIcon,
+  Loader2,
+  Lock,
+  MessageSquare,
+  Settings,
+  Share2,
+  ShieldCheck,
+  Smile,
+  TrendingUp,
+  Trophy,
+  Users,
+  VenetianMask,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React,{ useMemo,useState } from "react";
+import type React from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-
+import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions";
+import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
+import { PostComposer } from "@/app/app/(main)/post/new/post-composer";
+import { ShareQrButton } from "@/components/common/share-qr-button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FeedCard } from "@/components/ui/feed-card";
+import type { FeedPost } from "@/hooks/use-feed";
+import { useProfile } from "@/hooks/use-profile";
+import { confirmOptimisticPost, optimisticAddPost, revertOptimisticPost } from "@/lib/feed-mutations";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 
 export interface CommunityDetailProps {
   community: {
@@ -101,7 +101,9 @@ export function CommunityDetailClient({
   const router = useRouter();
   const { profile } = useProfile();
 
-  const [activeTab, setActiveTab] = useState<"trending" | "latest" | "polls" | "members" | "rules">("trending");
+  const [activeTab, setActiveTab] = useState<"trending" | "latest" | "polls" | "members" | "rules">(
+    "trending"
+  );
   const [redditSort, setRedditSort] = useState<"hot" | "new" | "top" | "rising" | "discussed">("hot");
   const [topTimeWindow, setTopTimeWindow] = useState<"today" | "week" | "month" | "all">("all");
   const [isMember, setIsMember] = useState(initialIsMember);
@@ -184,24 +186,22 @@ export function CommunityDetailClient({
         const candidates = timeFiltered.length > 0 ? timeFiltered : list;
         return candidates.sort((a, b) => (b.votesCount || 0) - (a.votesCount || 0));
       }
-
-      case "hot":
       default:
         return list.sort((a, b) => {
           const ageHoursA = Math.max(1, (now - new Date(a.createdAt).getTime()) / (3600 * 1000));
           const ageHoursB = Math.max(1, (now - new Date(b.createdAt).getTime()) / (3600 * 1000));
-          const scoreA = (a.votesCount * 2 + a.commentsCount * 3 + 5) / Math.pow(ageHoursA, 0.7);
-          const scoreB = (b.votesCount * 2 + b.commentsCount * 3 + 5) / Math.pow(ageHoursB, 0.7);
+          const scoreA = (a.votesCount * 2 + a.commentsCount * 3 + 5) / ageHoursA ** 0.7;
+          const scoreB = (b.votesCount * 2 + b.commentsCount * 3 + 5) / ageHoursB ** 0.7;
           return scoreB - scoreA;
         });
     }
   }, [posts, activeTab, redditSort, topTimeWindow]);
 
-
   async function handleShareInvite() {
-    const shareUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/app/communities/${identifier}`
-      : `https://campusloop.space/app/communities/${identifier}`;
+    const shareUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/app/communities/${identifier}`
+        : `https://campusloop.space/app/communities/${identifier}`;
 
     const shareText = `🚀 Join c/${community.name} on CampusLoop!\n${community.description || "Campus sub-hub for students."}\n\n👉 ${shareUrl}`;
 
@@ -420,9 +420,7 @@ export function CommunityDetailClient({
             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
               {community.name}
             </h1>
-            <p className="text-xs font-bold text-primary mt-0.5">
-              {community.category} · Campus Sub-Hub
-            </p>
+            <p className="text-xs font-bold text-primary mt-0.5">{community.category} · Campus Sub-Hub</p>
           </div>
 
           {community.description && (
@@ -477,13 +475,13 @@ export function CommunityDetailClient({
             onClick={() => setActiveTab(tab.key as typeof activeTab)}
             className={cn(
               "relative flex-1 py-3 text-center text-sm transition-colors cursor-pointer flex flex-col items-center justify-center font-bold",
-              activeTab === tab.key ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground font-medium"
+              activeTab === tab.key
+                ? "text-foreground font-black"
+                : "text-muted-foreground hover:text-foreground font-medium"
             )}
           >
             <span>{tab.label}</span>
-            {activeTab === tab.key && (
-              <div className="absolute bottom-0 h-1 w-12 bg-primary rounded-full" />
-            )}
+            {activeTab === tab.key && <div className="absolute bottom-0 h-1 w-12 bg-primary rounded-full" />}
           </button>
         ))}
       </div>
@@ -498,7 +496,10 @@ export function CommunityDetailClient({
             </div>
           ) : (
             membersList.map((m) => (
-              <div key={m.id} className="flex items-center justify-between px-4 py-3 hover:bg-muted/20 transition-colors">
+              <div
+                key={m.id}
+                className="flex items-center justify-between px-4 py-3 hover:bg-muted/20 transition-colors"
+              >
                 <Link href={`/app/profile/${m.user.username}`} className="flex items-center gap-3">
                   <Avatar className="size-10 rounded-full border border-border/40">
                     <AvatarImage src={m.user.avatarUrl || ""} />
@@ -556,9 +557,7 @@ export function CommunityDetailClient({
                     {idx + 1}. {rule.title}
                   </p>
                   {rule.description && (
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {rule.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{rule.description}</p>
                   )}
                 </div>
               ))}
@@ -611,10 +610,30 @@ export function CommunityDetailClient({
                     {/* Rich composer entry points — same tools as /app/post/new */}
                     <div className="flex items-center gap-0.5">
                       {[
-                        { id: "photo", label: "Add photo", icon: ImageIcon, color: "text-emerald-500 hover:bg-emerald-500/10" },
-                        { id: "gif", label: "Add GIF", icon: Smile, color: "text-primary hover:bg-primary/10" },
-                        { id: "poll", label: "Create poll", icon: BarChart3, color: "text-blue-500 hover:bg-blue-500/10" },
-                        { id: "anon", label: "Post anonymously", icon: VenetianMask, color: "text-violet-500 hover:bg-violet-500/10" },
+                        {
+                          id: "photo",
+                          label: "Add photo",
+                          icon: ImageIcon,
+                          color: "text-emerald-500 hover:bg-emerald-500/10",
+                        },
+                        {
+                          id: "gif",
+                          label: "Add GIF",
+                          icon: Smile,
+                          color: "text-primary hover:bg-primary/10",
+                        },
+                        {
+                          id: "poll",
+                          label: "Create poll",
+                          icon: BarChart3,
+                          color: "text-blue-500 hover:bg-blue-500/10",
+                        },
+                        {
+                          id: "anon",
+                          label: "Post anonymously",
+                          icon: VenetianMask,
+                          color: "text-violet-500 hover:bg-violet-500/10",
+                        },
                       ].map((tool) => (
                         <button
                           key={tool.id}
@@ -624,7 +643,7 @@ export function CommunityDetailClient({
                           onClick={() => setShowFullComposer(true)}
                           className={cn(
                             "flex size-8 items-center justify-center rounded-full transition-all cursor-pointer active:scale-90",
-                            tool.color,
+                            tool.color
                           )}
                         >
                           <tool.icon className="size-4.5" />
@@ -647,7 +666,9 @@ export function CommunityDetailClient({
             <div className="border-b border-border/30 p-4 bg-muted/10 flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold text-foreground">Join c/{community.name}</p>
-                <p className="text-[11px] text-muted-foreground">Post questions, participate in polls, and connect.</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Post questions, participate in polls, and connect.
+                </p>
               </div>
               <JoinCommunityButton
                 communityId={community.id}
@@ -757,7 +778,13 @@ export function CommunityDetailClient({
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    {range === "today" ? "24h" : range === "week" ? "Week" : range === "month" ? "Month" : "All"}
+                    {range === "today"
+                      ? "24h"
+                      : range === "week"
+                        ? "Week"
+                        : range === "month"
+                          ? "Month"
+                          : "All"}
                   </button>
                 ))}
               </div>
@@ -785,11 +812,13 @@ export function CommunityDetailClient({
                         <span className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
                           <Compass className="size-3.5 text-primary" /> Related Campus Hubs
                         </span>
-                        <Link href="/app/communities" className="text-xs text-primary font-bold hover:underline">
+                        <Link
+                          href="/app/communities"
+                          className="text-xs text-primary font-bold hover:underline"
+                        >
                           See all
                         </Link>
                       </div>
-
 
                       <div className="grid gap-2 sm:grid-cols-2">
                         {relatedCommunities.slice(0, 2).map((rel) => (
@@ -806,7 +835,9 @@ export function CommunityDetailClient({
                             </Avatar>
                             <div className="min-w-0 flex-1">
                               <p className="text-xs font-bold text-foreground truncate">c/{rel.name}</p>
-                              <p className="text-[11px] text-muted-foreground truncate">{rel.membersCount} members</p>
+                              <p className="text-[11px] text-muted-foreground truncate">
+                                {rel.membersCount} members
+                              </p>
                             </div>
                           </Link>
                         ))}
@@ -819,17 +850,14 @@ export function CommunityDetailClient({
           )}
         </div>
       )}
-    
+
       {/* ─── Full Composer Modal — same tools as /app/post/new, locked to this hub ─── */}
       {showFullComposer && (
         <div
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-0 backdrop-blur-sm sm:p-6"
           onClick={() => setShowFullComposer(false)}
         >
-          <div
-            className="w-full max-w-2xl sm:my-4"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="w-full max-w-2xl sm:my-4" onClick={(e) => e.stopPropagation()}>
             <PostComposer
               variant="modal"
               communityId={community.id}
@@ -843,13 +871,13 @@ export function CommunityDetailClient({
                 setPosts((prev) =>
                   realPost
                     ? prev.map((p) => (p.id === tempId ? realPost : p))
-                    : prev.filter((p) => p.id !== tempId),
+                    : prev.filter((p) => p.id !== tempId)
                 );
               }}
             />
           </div>
         </div>
       )}
-</main>
+    </main>
   );
 }

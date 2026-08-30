@@ -1,23 +1,23 @@
 "use client";
 
-import { DedicatedHubType } from "@/components/communities/dedicated-hub-client";
+import {
+  ArrowLeft,
+  BookOpen,
+  Car,
+  Gamepad2,
+  Home,
+  Loader2,
+  PackageSearch,
+  Send,
+  ShoppingBag,
+} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { DedicatedHubType } from "@/components/communities/dedicated-hub-client";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-ArrowLeft,
-BookOpen,
-Car,
-Gamepad2,
-Home,
-Loader2,
-PackageSearch,
-Send,
-ShoppingBag
-} from "lucide-react";
-import { useRouter,useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface HubCreateClientProps {
   initialType?: DedicatedHubType;
@@ -302,14 +302,14 @@ export function HubCreateClient({ initialType = "lost_found", profileId }: HubCr
               hubType === "lost_found"
                 ? "e.g. Titan Watch with black leather strap found in Library"
                 : hubType === "marketplace"
-                ? "e.g. Hero Sprint Cycle in great condition with lock"
-                : hubType === "gaming"
-                ? "e.g. Valorant 5v5 Custom Room - Need 2 Players"
-                : hubType === "rideshare"
-                ? "e.g. Cab share from Campus to Airport"
-                : hubType === "housing"
-                ? "e.g. 1 BHK Flat Available near Gate 2"
-                : "e.g. Endsem Notes & Previous Year Questions for CS201"
+                  ? "e.g. Hero Sprint Cycle in great condition with lock"
+                  : hubType === "gaming"
+                    ? "e.g. Valorant 5v5 Custom Room - Need 2 Players"
+                    : hubType === "rideshare"
+                      ? "e.g. Cab share from Campus to Airport"
+                      : hubType === "housing"
+                        ? "e.g. 1 BHK Flat Available near Gate 2"
+                        : "e.g. Endsem Notes & Previous Year Questions for CS201"
             }
             className="w-full h-11 px-4 rounded-2xl border border-border/60 bg-muted/20 text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary transition-all"
           />

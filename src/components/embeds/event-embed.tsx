@@ -1,15 +1,14 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { Calendar, Check, Clock, MapPin, Sparkles, Trophy, Users } from "lucide-react";
+import { Calendar, Check, MapPin } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
+import { Button } from "@/components/ui/button";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 
 interface EventEmbedProps {
   eventId: string;

@@ -1,13 +1,13 @@
 "use client";
 
+import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { StoryAvatarItem } from "@/components/stories/story-avatar-item";
 import { useProfile } from "@/hooks/use-profile";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { Avatar,AvatarFallback,AvatarImage } from "./avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 
 interface Story {
   id: string;

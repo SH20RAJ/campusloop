@@ -1,4 +1,4 @@
-import { describe,expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("Chat Media & Links Extractor", () => {
   it("extracts direct image URLs and hosted images from message bodies", () => {
@@ -27,7 +27,8 @@ describe("Chat Media & Links Extractor", () => {
   });
 
   it("extracts hyperlinks from messages and skips pure image URLs", () => {
-    const body = "Visit https://campusloop.space and read the docs at https://github.com/SH20RAJ/campusloop also see https://example.com/pic.jpg";
+    const body =
+      "Visit https://campusloop.space and read the docs at https://github.com/SH20RAJ/campusloop also see https://example.com/pic.jpg";
     const urlRegex = /(https?:\/\/[^\s]+)/gi;
 
     const matches = body.match(urlRegex) || [];

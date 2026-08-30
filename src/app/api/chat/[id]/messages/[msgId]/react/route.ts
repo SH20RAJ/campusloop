@@ -1,9 +1,9 @@
-import { getDb } from "@/db";
-import { messages,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { rejectViewerWrite } from "@/lib/viewer";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { messages, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -48,9 +48,7 @@ export async function POST(req: Request, { params }: RouteParams) {
     const currentReactions: ReactionItem[] = (targetMsg.reactions as ReactionItem[]) || [];
 
     // Toggle reaction: If user already reacted with this emoji, remove it. Otherwise add/replace.
-    const existingIdx = currentReactions.findIndex(
-      (r) => r.userId === profile.id && r.emoji === emoji
-    );
+    const existingIdx = currentReactions.findIndex((r) => r.userId === profile.id && r.emoji === emoji);
 
     let updatedReactions: ReactionItem[];
     if (existingIdx >= 0) {

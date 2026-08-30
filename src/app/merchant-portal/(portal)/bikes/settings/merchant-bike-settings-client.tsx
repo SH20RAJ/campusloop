@@ -1,10 +1,10 @@
 "use client";
 
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { Loader2,Save,Settings } from "lucide-react";
+import { Loader2, Save, Settings } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 
 export function MerchantBikeSettingsClient() {
   const [rentalMode, setRentalMode] = useState<"BOTH" | "DAILY" | "HOURLY">("BOTH");
@@ -113,9 +113,7 @@ export function MerchantBikeSettingsClient() {
           </h2>
 
           <div className="space-y-1.5">
-            <span className="text-[11px] font-bold text-muted-foreground">
-              Default Security Deposit (₹)
-            </span>
+            <span className="text-[11px] font-bold text-muted-foreground">Default Security Deposit (₹)</span>
             <input
               type="number"
               value={defaultDeposit}
@@ -125,9 +123,7 @@ export function MerchantBikeSettingsClient() {
           </div>
 
           <div className="space-y-1.5">
-            <span className="text-[11px] font-bold text-muted-foreground">
-              Default Pickup Stand Location
-            </span>
+            <span className="text-[11px] font-bold text-muted-foreground">Default Pickup Stand Location</span>
             <input
               type="text"
               value={pickupLocation}

@@ -1,20 +1,12 @@
 "use client";
 
+import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
+import { GraduationCap, Heart, School, ShieldCheck, UserRound, X, Zap } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { AnimatePresence,motion,useMotionValue,useTransform } from "framer-motion";
-import {
-GraduationCap,
-Heart,
-School,
-ShieldCheck,
-UserRound,
-X,
-Zap,
-} from "lucide-react";
-import Link from "next/link";
-import { useEffect,useState } from "react";
 
 export type Candidate = {
   id: string;
@@ -61,7 +53,7 @@ function TopCard({
     x.set(0);
     setPhotoIdx(0);
     setExitX(0);
-  }, [candidate.id, x]);
+  }, [x]);
 
   function fireSwipe(direction: "like" | "pass") {
     setExitX(direction === "like" ? 500 : -500);
@@ -79,9 +71,7 @@ function TopCard({
 
   function tapPhoto(e: React.MouseEvent, side: "prev" | "next") {
     e.stopPropagation();
-    setPhotoIdx((i) =>
-      side === "prev" ? Math.max(0, i - 1) : Math.min(photos.length - 1, i + 1)
-    );
+    setPhotoIdx((i) => (side === "prev" ? Math.max(0, i - 1) : Math.min(photos.length - 1, i + 1)));
   }
 
   return (
@@ -128,7 +118,10 @@ function TopCard({
       {photos.length > 1 && (
         <>
           <div className="absolute bottom-40 left-0 top-16 z-20 w-1/3" onClick={(e) => tapPhoto(e, "prev")} />
-          <div className="absolute bottom-40 right-0 top-16 z-20 w-1/3" onClick={(e) => tapPhoto(e, "next")} />
+          <div
+            className="absolute bottom-40 right-0 top-16 z-20 w-1/3"
+            onClick={(e) => tapPhoto(e, "next")}
+          />
         </>
       )}
 
@@ -196,7 +189,9 @@ function TopCard({
                 {candidate.displayName}
               </h2>
               {candidate.year && (
-                <span className="text-lg sm:text-xl font-bold text-white/85 shrink-0">Yr {candidate.year}</span>
+                <span className="text-lg sm:text-xl font-bold text-white/85 shrink-0">
+                  Yr {candidate.year}
+                </span>
               )}
             </div>
           </div>
@@ -263,7 +258,12 @@ function BackCard({ candidate, depth }: { candidate: Candidate; depth: 1 | 2 }) 
         zIndex: -depth,
       }}
     >
-      <img src={photo} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80" loading="eager" />
+      <img
+        src={photo}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover opacity-80"
+        loading="eager"
+      />
       <div className="absolute inset-0 bg-black/40" />
     </div>
   );
@@ -333,7 +333,15 @@ export function SwipeActions({
         aria-label="Undo last swipe"
         className="flex size-12 items-center justify-center rounded-full border border-white/15 bg-white/5 text-amber-400 backdrop-blur-md transition-all hover:scale-110 hover:bg-white/10 active:scale-95 cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
       >
-        <svg viewBox="0 0 24 24" fill="none" className="size-5" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          className="size-5"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M3 7v6h6" />
           <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
         </svg>

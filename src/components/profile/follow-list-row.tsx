@@ -1,10 +1,10 @@
 "use client";
 
-import { FollowButton } from "@/components/profile/follow-button";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { getAvatarUrl } from "@/lib/utils";
 import { Users } from "lucide-react";
 import Link from "next/link";
+import { FollowButton } from "@/components/profile/follow-button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getAvatarUrl } from "@/lib/utils";
 
 export interface FollowListItem {
   id: string;
@@ -70,8 +70,8 @@ export function FollowListRow({
         )}
       </div>
 
-      {!user.isViewer && (
-        showFollowButton ? (
+      {!user.isViewer &&
+        (showFollowButton ? (
           <FollowButton
             username={user.username}
             displayName={user.displayName}
@@ -86,8 +86,7 @@ export function FollowListRow({
           >
             Follow
           </Link>
-        )
-      )}
+        ))}
     </li>
   );
 }

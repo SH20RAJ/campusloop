@@ -1,7 +1,7 @@
+import { eq, or } from "drizzle-orm";
+import type { Metadata } from "next";
 import { getDb } from "@/db";
 import { events } from "@/db/schema";
-import { eq, or } from "drizzle-orm";
-import { Metadata } from "next";
 import { EventDetailClient } from "./event-detail-client";
 
 interface EventPageProps {
@@ -25,8 +25,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
   const canonical = `https://campusloop.space/app/events/${key}`;
   const title = `${event.title} | ${event.clubName} — CampusLoop Events`;
   const description =
-    event.tagline ||
-    `${event.title} hosted by ${event.clubName}. Register solo or in teams on CampusLoop.`;
+    event.tagline || `${event.title} hosted by ${event.clubName}. Register solo or in teams on CampusLoop.`;
   const images = event.bannerUrl
     ? [{ url: event.bannerUrl }]
     : [{ url: "https://campusloop.space/og-image.png" }];
@@ -121,10 +120,7 @@ export default async function EventPage({ params }: EventPageProps) {
   return (
     <>
       {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       )}
       <EventDetailClient eventId={id} />
     </>

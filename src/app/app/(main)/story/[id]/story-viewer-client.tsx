@@ -1,24 +1,14 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Bookmark, ChevronLeft, ChevronRight, Heart, Loader2, Plus, Send, Share2, X } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-Bookmark,
-ChevronLeft,
-ChevronRight,
-Heart,
-Loader2,
-Plus,
-Send,
-Share2,
-X,
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback,useEffect,useRef,useState } from "react";
-import { toast } from "sonner";
 
 interface StoryViewerClientProps {
   story: {
@@ -125,7 +115,7 @@ export function StoryViewerClient({
     }, interval);
 
     return () => clearInterval(timer);
-  }, [story.id, isPaused, replyText, showHighlightModal, navigateNext]);
+  }, [isPaused, replyText, showHighlightModal, navigateNext]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -517,7 +507,12 @@ export function StoryViewerClient({
                 : "bg-white/15 border border-white/20 text-white hover:bg-white/25"
             )}
           >
-            <Heart className={cn("size-4.5 transition-transform", liked && "fill-rose-500 text-rose-500 scale-110")} />
+            <Heart
+              className={cn(
+                "size-4.5 transition-transform",
+                liked && "fill-rose-500 text-rose-500 scale-110"
+              )}
+            />
             {likesCount > 0 && <span className="text-xs font-bold">{likesCount}</span>}
           </button>
 

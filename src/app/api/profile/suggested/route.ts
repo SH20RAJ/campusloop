@@ -1,9 +1,9 @@
+import { and, desc, eq, ne, notInArray, sql } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { follows, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getViewerInstitutionId } from "@/lib/viewer";
-import { and, desc, eq, ne, notInArray, sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -67,10 +67,18 @@ export async function GET(req: NextRequest) {
       }
 
       // 2. Same Academic Course / Branch (+15 pts)
-      if (currentProfile?.course && cand.course && currentProfile.course.toLowerCase() === cand.course.toLowerCase()) {
+      if (
+        currentProfile?.course &&
+        cand.course &&
+        currentProfile.course.toLowerCase() === cand.course.toLowerCase()
+      ) {
         score += 10;
       }
-      if (currentProfile?.branch && cand.branch && currentProfile.branch.toLowerCase() === cand.branch.toLowerCase()) {
+      if (
+        currentProfile?.branch &&
+        cand.branch &&
+        currentProfile.branch.toLowerCase() === cand.branch.toLowerCase()
+      ) {
         score += 8;
       }
 

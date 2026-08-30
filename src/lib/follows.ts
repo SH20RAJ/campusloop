@@ -1,6 +1,6 @@
+import { and, desc, eq, inArray, lt, or, sql } from "drizzle-orm";
 import { getDb } from "@/db";
-import { follows,institutions,userProfiles } from "@/db/schema";
-import { and,desc,eq,inArray,lt,or,sql } from "drizzle-orm";
+import { follows, institutions, userProfiles } from "@/db/schema";
 
 export const FOLLOW_LIST_PAGE_SIZE = 20;
 
@@ -108,10 +108,7 @@ export interface FollowMutationResult {
  * edge already exists. The unique (follower_id, following_id) index makes a
  * repeat call a no-op rather than a duplicate row.
  */
-export async function followUser(
-  followerId: string,
-  followingId: string,
-): Promise<FollowMutationResult> {
+export async function followUser(followerId: string, followingId: string): Promise<FollowMutationResult> {
   const db = getDb();
 
   const inserted = await db
@@ -151,10 +148,7 @@ export async function followUser(
  * Remove a follow edge. The reverse edge survives but is demoted out of
  * "friends", since the relationship is no longer mutual.
  */
-export async function unfollowUser(
-  followerId: string,
-  followingId: string,
-): Promise<FollowMutationResult> {
+export async function unfollowUser(followerId: string, followingId: string): Promise<FollowMutationResult> {
   const db = getDb();
 
   await db
@@ -168,8 +162,8 @@ export async function unfollowUser(
       and(
         eq(follows.followerId, followingId),
         eq(follows.followingId, followerId),
-        eq(follows.isMutual, true),
-      ),
+        eq(follows.isMutual, true)
+      )
     );
 
   return { isFollowing: false, created: false, isFriend: false };
@@ -239,8 +233,8 @@ export async function getFollowListPage({
     conditions.push(
       or(
         lt(follows.createdAt, decoded.createdAt),
-        and(eq(follows.createdAt, decoded.createdAt), lt(follows.id, decoded.rowId)),
-      )!,
+        and(eq(follows.createdAt, decoded.createdAt), lt(follows.id, decoded.rowId))
+      )!
     );
   }
 

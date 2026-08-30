@@ -1,15 +1,15 @@
+import type { Metadata } from "next";
 import {
-DocLayout,
-DocList,
-DocNote,
-DocSection,
-DocTable,
-LegalDocHeader,
-type DocSectionRef,
+  DocLayout,
+  DocList,
+  DocNote,
+  DocSection,
+  type DocSectionRef,
+  DocTable,
+  LegalDocHeader,
 } from "@/components/marketing/legal-doc";
 import { LegalNav } from "@/components/marketing/legal-nav";
-import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
-import type { Metadata } from "next";
+import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
 
 export const metadata: Metadata = {
   title: "Safety & Community Standards | CampusLoop",
@@ -27,7 +27,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://campusloop.space/safety" },
   openGraph: {
     title: "Safety & Community Standards | CampusLoop",
-    description: "Learn how CampusLoop protects students with zero-tolerance anti-ragging and AI safety shields.",
+    description:
+      "Learn how CampusLoop protects students with zero-tolerance anti-ragging and AI safety shields.",
     url: "https://campusloop.space/safety",
     siteName: "CampusLoop",
     locale: "en_IN",
@@ -44,12 +45,12 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Safety & Community Standards | CampusLoop",
-    description: "Learn how CampusLoop protects students with zero-tolerance anti-ragging and AI safety shields.",
+    description:
+      "Learn how CampusLoop protects students with zero-tolerance anti-ragging and AI safety shields.",
     images: ["https://campusloop.space/og-image.png"],
   },
   robots: { index: true, follow: true },
 };
-
 
 const SECTIONS: DocSectionRef[] = [
   { id: "standards", label: "Community standards" },
@@ -81,10 +82,7 @@ export default function SafetyPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <MarketingHeader />
       <LegalNav />
 
@@ -99,9 +97,9 @@ export default function SafetyPage() {
 
           <DocSection id="standards" number={1} title="What we expect">
             <p>
-              Every account belongs to a real student at a real institution. That verification is
-              what makes the network worth being part of, and it is also what makes misuse
-              traceable. Treat people the way you would in a shared hostel corridor.
+              Every account belongs to a real student at a real institution. That verification is what makes
+              the network worth being part of, and it is also what makes misuse traceable. Treat people the
+              way you would in a shared hostel corridor.
             </p>
             <DocList
               items={[
@@ -117,25 +115,23 @@ export default function SafetyPage() {
             <p>
               In line with the{" "}
               <span className="text-foreground">
-                UGC Regulations on Curbing the Menace of Ragging in Higher Educational
-                Institutions, 2009
+                UGC Regulations on Curbing the Menace of Ragging in Higher Educational Institutions, 2009
               </span>
-              , CampusLoop treats digital hazing as the same offence as its physical counterpart.
-              This covers intimidation, coerced tasks, blackmail, and targeted humiliation of
-              juniors, whether it happens in a public hub or a private message.
+              , CampusLoop treats digital hazing as the same offence as its physical counterpart. This covers
+              intimidation, coerced tasks, blackmail, and targeted humiliation of juniors, whether it happens
+              in a public hub or a private message.
             </p>
             <DocNote>
-              A confirmed ragging report results in immediate permanent removal, forfeiture of all
-              Loop Points, and escalation to the institution&apos;s anti-ragging committee — and to
-              law enforcement where the conduct is criminal.
+              A confirmed ragging report results in immediate permanent removal, forfeiture of all Loop
+              Points, and escalation to the institution&apos;s anti-ragging committee — and to law enforcement
+              where the conduct is criminal.
             </DocNote>
           </DocSection>
 
           <DocSection id="doxxing" number={3} title="Personal information">
             <p>
-              Our moderation engine flags or redacts content that exposes a student&apos;s physical
-              location or private contact details, because on a residential campus that information
-              carries real risk.
+              Our moderation engine flags or redacts content that exposes a student&apos;s physical location
+              or private contact details, because on a residential campus that information carries real risk.
             </p>
             <DocList
               items={[
@@ -149,9 +145,8 @@ export default function SafetyPage() {
 
           <DocSection id="moderation" number={4} title="Reporting and moderation">
             <p>
-              Any verified student can report any post, comment, or confession in one tap. Reports
-              are weighted, not counted blindly — a brigade cannot bury a post it simply disagrees
-              with.
+              Any verified student can report any post, comment, or confession in one tap. Reports are
+              weighted, not counted blindly — a brigade cannot bury a post it simply disagrees with.
             </p>
             <DocTable
               rows={[
@@ -176,22 +171,22 @@ export default function SafetyPage() {
 
           <DocSection id="match" number={5} title="Campus Match and Secret Crush">
             <p>
-              Match and Secret Crush are restricted to verified students aged 18 and over. They are
-              built so that interest is never disclosed one-sidedly.
+              Match and Secret Crush are restricted to verified students aged 18 and over. They are built so
+              that interest is never disclosed one-sidedly.
             </p>
             <DocList
               items={[
                 <>
-                  <span className="text-foreground">Secret Crush stays sealed.</span> A crush is
-                  invisible to its subject unless both students independently add each other.
+                  <span className="text-foreground">Secret Crush stays sealed.</span> A crush is invisible to
+                  its subject unless both students independently add each other.
                 </>,
                 <>
-                  <span className="text-foreground">Unmatch and block are immediate.</span> Blocking
-                  removes the other student from your feeds, search, and discovery entirely.
+                  <span className="text-foreground">Unmatch and block are immediate.</span> Blocking removes
+                  the other student from your feeds, search, and discovery entirely.
                 </>,
                 <>
-                  <span className="text-foreground">Meeting in person is your call.</span> Choose a
-                  public place on campus, and tell a friend where you will be.
+                  <span className="text-foreground">Meeting in person is your call.</span> Choose a public
+                  place on campus, and tell a friend where you will be.
                 </>,
               ]}
             />
@@ -199,8 +194,8 @@ export default function SafetyPage() {
 
           <DocSection id="helplines" number={6} title="If you need help now">
             <p>
-              If you or another student is in immediate danger, contact emergency services first.
-              These lines are free and staffed around the clock.
+              If you or another student is in immediate danger, contact emergency services first. These lines
+              are free and staffed around the clock.
             </p>
             <DocTable
               rows={[

@@ -1,14 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useColleges, type College } from "@/hooks/use-colleges";
-import { cn } from "@/lib/utils";
 import { Check, Compass, MapPin, Plus, School, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-
+import { Button } from "@/components/ui/button";
+import { type College, useColleges } from "@/hooks/use-colleges";
 import { fetcher } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 interface DreamCampusesModalProps {
   isOpen: boolean;
@@ -159,9 +158,7 @@ export function DreamCampusesModal({ isOpen, onClose, onSuccess }: DreamCampuses
         {/* College Results List */}
         <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[220px] max-h-[300px]">
           {isLoading ? (
-            <div className="py-12 text-center text-xs text-muted-foreground">
-              Loading 1,350+ campuses...
-            </div>
+            <div className="py-12 text-center text-xs text-muted-foreground">Loading 1,350+ campuses...</div>
           ) : filteredColleges.length > 0 ? (
             filteredColleges.map((college) => {
               const isSelected = selectedIds.includes(college.id);
@@ -179,20 +176,14 @@ export function DreamCampusesModal({ isOpen, onClose, onSuccess }: DreamCampuses
                   <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
                     <div className="size-9 rounded-xl bg-card border border-border/80 p-1 flex items-center justify-center shrink-0">
                       {college.logoUrl ? (
-                        <img
-                          src={college.logoUrl}
-                          alt={college.name}
-                          className="size-full object-contain"
-                        />
+                        <img src={college.logoUrl} alt={college.name} className="size-full object-contain" />
                       ) : (
                         <School className="size-4.5 text-primary" />
                       )}
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-bold text-foreground truncate">
-                        {college.name}
-                      </p>
+                      <p className="text-xs font-bold text-foreground truncate">{college.name}</p>
                       <p className="text-[10px] text-muted-foreground flex items-center gap-1 truncate">
                         <MapPin className="size-2.5 shrink-0" />
                         {college.district ? `${college.district}, ` : ""}
@@ -204,9 +195,7 @@ export function DreamCampusesModal({ isOpen, onClose, onSuccess }: DreamCampuses
                   <div
                     className={cn(
                       "size-7 rounded-full flex items-center justify-center transition-all shrink-0",
-                      isSelected
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted/60 text-muted-foreground"
+                      isSelected ? "bg-primary text-primary-foreground" : "bg-muted/60 text-muted-foreground"
                     )}
                   >
                     {isSelected ? <Check className="size-3.5" /> : <Plus className="size-3.5" />}

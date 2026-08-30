@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { Check, ChevronDown, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 export interface SearchableOption {
   value: string;
@@ -69,7 +69,7 @@ export function SearchableSelect({
 
   useEffect(() => {
     setActiveIndex(0);
-  }, [query]);
+  }, []);
 
   // Close on any outside click.
   useEffect(() => {
@@ -93,7 +93,7 @@ export function SearchableSelect({
     if (!isOpen || !listRef.current) return;
     const active = listRef.current.querySelector<HTMLElement>('[data-active="true"]');
     active?.scrollIntoView({ block: "nearest" });
-  }, [activeIndex, isOpen]);
+  }, [isOpen]);
 
   function commit(option: SearchableOption) {
     onChange(option.value);

@@ -34,9 +34,7 @@ describe("campus upgrade contract", () => {
   });
 
   it("resolves the campus only from the whitelisted domain table", async () => {
-    const source = await import("node:fs").then((fs) =>
-      fs.readFileSync("src/lib/campus-upgrade.ts", "utf8")
-    );
+    const source = await import("node:fs").then((fs) => fs.readFileSync("src/lib/campus-upgrade.ts", "utf8"));
     expect(source).toMatch(/institutionDomains\.domain/);
     // Fuzzy website/slug matching is not proof of enrolment.
     expect(source).not.toMatch(/ilike\(institutions\.website/);

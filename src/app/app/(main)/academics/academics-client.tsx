@@ -1,25 +1,16 @@
 "use client";
 
+import { BookOpen, FileCode2, FileText, Library, Plus, Search, X, Zap } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import useSWR from "swr";
 import { AcademicCard } from "@/components/communities/academic-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-BookOpen,
-FileCode2,
-FileText,
-Library,
-Plus,
-Search,
-X,
-Zap
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter,useSearchParams } from "next/navigation";
-import { useEffect,useMemo,useState } from "react";
-import useSWR from "swr";
 
 interface AcademicsClientProps {
   profileId: string;

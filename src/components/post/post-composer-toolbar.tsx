@@ -1,8 +1,8 @@
 "use client";
 
+import type { Editor } from "@tiptap/react";
+import { Bold, Code, Heading2, Italic, List, Quote, Smile } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Editor } from "@tiptap/react";
-import { Bold,Code,Heading2,Italic,List,Quote,Smile } from "lucide-react";
 
 interface PostComposerToolbarProps {
   editor: Editor | null;
@@ -10,7 +10,11 @@ interface PostComposerToolbarProps {
   onOpenStickerPicker?: () => void;
 }
 
-export function PostComposerToolbar({ editor, onOpenGifPicker, onOpenStickerPicker }: PostComposerToolbarProps) {
+export function PostComposerToolbar({
+  editor,
+  onOpenGifPicker,
+  onOpenStickerPicker,
+}: PostComposerToolbarProps) {
   if (!editor) return null;
 
   return (
@@ -22,7 +26,7 @@ export function PostComposerToolbar({ editor, onOpenGifPicker, onOpenStickerPick
       >
         <Bold className="size-3.5" />
       </ToolbarChip>
-      
+
       <ToolbarChip
         label="Italic"
         active={editor.isActive("italic")}
@@ -30,7 +34,7 @@ export function PostComposerToolbar({ editor, onOpenGifPicker, onOpenStickerPick
       >
         <Italic className="size-3.5" />
       </ToolbarChip>
-      
+
       <ToolbarChip
         label="Heading"
         active={editor.isActive("heading", { level: 2 })}

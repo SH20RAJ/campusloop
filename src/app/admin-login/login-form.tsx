@@ -24,8 +24,13 @@ export function AdminLoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <label htmlFor="passkey" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Passkey</label>
-        <input 
+        <label
+          htmlFor="passkey"
+          className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+        >
+          Passkey
+        </label>
+        <input
           id="passkey"
           name="passkey"
           type="password"

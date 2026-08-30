@@ -1,18 +1,12 @@
 "use client";
 
+import { ArrowLeft, Check, ImagePlus, Loader2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
-import {
-ArrowLeft,
-Check,
-ImagePlus,
-Loader2,
-X
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRef,useState } from "react";
-import { toast } from "sonner";
 
 export function MerchantNewBikeClient() {
   const router = useRouter();
@@ -84,8 +78,7 @@ export function MerchantNewBikeClient() {
           pickupLocation: pickupLocation.trim() || "Campus Gate 1 Stand",
           fuelType,
           imageUrl:
-            imageUrl ||
-            "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600&h=400&fit=crop",
+            imageUrl || "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600&h=400&fit=crop",
           specs: {
             mileage: mileage.trim() || "45 kmpl",
             helmetIncluded: true,
@@ -177,9 +170,7 @@ export function MerchantNewBikeClient() {
           </h2>
 
           <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-muted-foreground">
-              Bike / Scooter Name *
-            </label>
+            <label className="text-[11px] font-bold text-muted-foreground">Bike / Scooter Name *</label>
             <input
               type="text"
               required
@@ -192,9 +183,7 @@ export function MerchantNewBikeClient() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Model Name
-              </label>
+              <label className="text-[11px] font-bold text-muted-foreground">Model Name</label>
               <input
                 type="text"
                 value={model}
@@ -205,9 +194,7 @@ export function MerchantNewBikeClient() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Registration Plate # *
-              </label>
+              <label className="text-[11px] font-bold text-muted-foreground">Registration Plate # *</label>
               <input
                 type="text"
                 required
@@ -221,9 +208,7 @@ export function MerchantNewBikeClient() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Fuel Type
-              </label>
+              <label className="text-[11px] font-bold text-muted-foreground">Fuel Type</label>
               <select
                 value={fuelType}
                 onChange={(e) => setFuelType(e.target.value as any)}
@@ -235,9 +220,7 @@ export function MerchantNewBikeClient() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Mileage / Range
-              </label>
+              <label className="text-[11px] font-bold text-muted-foreground">Mileage / Range</label>
               <input
                 type="text"
                 value={mileage}
@@ -257,9 +240,7 @@ export function MerchantNewBikeClient() {
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Daily Price (₹) *
-              </label>
+              <label className="text-[11px] font-bold text-muted-foreground">Daily Price (₹) *</label>
               <input
                 type="number"
                 required
@@ -271,9 +252,7 @@ export function MerchantNewBikeClient() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Hourly Price (₹)
-              </label>
+              <label className="text-[11px] font-bold text-muted-foreground">Hourly Price (₹)</label>
               <input
                 type="number"
                 min="0"
@@ -284,9 +263,7 @@ export function MerchantNewBikeClient() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Deposit (₹)
-              </label>
+              <label className="text-[11px] font-bold text-muted-foreground">Deposit (₹)</label>
               <input
                 type="number"
                 min="0"
@@ -298,9 +275,7 @@ export function MerchantNewBikeClient() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-muted-foreground">
-              Pickup Stand Location
-            </label>
+            <label className="text-[11px] font-bold text-muted-foreground">Pickup Stand Location</label>
             <input
               type="text"
               value={pickupLocation}

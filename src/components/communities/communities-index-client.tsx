@@ -1,29 +1,29 @@
 "use client";
 
+import {
+  CheckCheck,
+  Compass,
+  Globe,
+  Loader2,
+  Lock,
+  MessageSquare,
+  Plus,
+  Search,
+  Users,
+  Users2,
+} from "lucide-react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
+import useSWRInfinite from "swr/infinite";
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
 import { CampusHubStrip } from "@/components/communities/campus-hub-strip";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
-import { FeedPost } from "@/hooks/use-feed";
+import type { FeedPost } from "@/hooks/use-feed";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn,getAvatarUrl } from "@/lib/utils";
-import {
-CheckCheck,
-Compass,
-Globe,
-Loader2,
-Lock,
-MessageSquare,
-Plus,
-Search,
-Users,
-Users2
-} from "lucide-react";
-import Link from "next/link";
-import { useEffect,useMemo,useRef,useState } from "react";
-import useSWRInfinite from "swr/infinite";
+import { cn, getAvatarUrl } from "@/lib/utils";
 
 export interface CommunityItem {
   id: string;
@@ -287,9 +287,7 @@ export function CommunitiesIndexClient({
                     >
                       <Avatar className="size-12 rounded-2xl border border-border/50 shrink-0 ring-2 ring-border/20">
                         <AvatarImage src={avatar} />
-                        <AvatarFallback className="text-xs font-black bg-muted">
-                          {c.name[0]}
-                        </AvatarFallback>
+                        <AvatarFallback className="text-xs font-black bg-muted">{c.name[0]}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center gap-2">
@@ -377,23 +375,16 @@ export function CommunitiesIndexClient({
           {/* Loaded Infinite Feed Items */}
           {feedItems.map((item: any) => {
             if (item.itemType === "POST") {
-              return (
-                <FeedCard
-                  key={item.id}
-                  post={item.data}
-                  currentUserId={profileId}
-                />
-              );
+              return <FeedCard key={item.id} post={item.data} currentUserId={profileId} />;
             }
             return null;
           })}
 
           {/* Initial Posts Instant Fallback */}
-          {feedItems.length === 0 && !isValidating && initialPosts.length > 0 && (
-            initialPosts.map((post) => (
-              <FeedCard key={post.id} post={post} currentUserId={profileId} />
-            ))
-          )}
+          {feedItems.length === 0 &&
+            !isValidating &&
+            initialPosts.length > 0 &&
+            initialPosts.map((post) => <FeedCard key={post.id} post={post} currentUserId={profileId} />)}
 
           {/* Infinite Scroll Sentinel */}
           <div ref={sentinelRef} className="py-6 flex justify-center items-center">
@@ -450,9 +441,7 @@ export function CommunitiesIndexClient({
                   >
                     <Avatar className="size-11 rounded-2xl border border-border/50 shrink-0">
                       <AvatarImage src={avatar} />
-                      <AvatarFallback className="text-xs font-black bg-muted">
-                        {c.name[0]}
-                      </AvatarFallback>
+                      <AvatarFallback className="text-xs font-black bg-muted">{c.name[0]}</AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center gap-1.5">

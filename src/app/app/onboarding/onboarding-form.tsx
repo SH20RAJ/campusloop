@@ -1,26 +1,17 @@
 "use client";
 
+import { AlertCircle, Check, Loader2, Lock, School, Search, Sparkles, Upload } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { isUsernameBlocking, UsernameStatusHint } from "@/components/ui/username-status";
 import { DEGREE_CATEGORIES, getBranchOptionsForDegree } from "@/constants";
 import { useColleges } from "@/hooks/use-colleges";
 import { useUsernameAvailability } from "@/hooks/use-username-availability";
-import { SearchableSelect } from "@/components/ui/searchable-select";
-import { isUsernameBlocking, UsernameStatusHint } from "@/components/ui/username-status";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
-import {
-  AlertCircle,
-  Check,
-  Loader2,
-  Lock,
-  School,
-  Search,
-  Sparkles,
-  Upload,
-} from "lucide-react";
-import { useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
 import { completeOnboarding } from "./actions";
 
 const POPULAR_INTERESTS = [
@@ -39,24 +30,9 @@ const POPULAR_INTERESTS = [
 ];
 
 /** What an aspirant is preparing for, in place of a degree and branch. */
-const TARGET_EXAMS = [
-  "JEE Main",
-  "JEE Advanced",
-  "NEET",
-  "CUET",
-  "BITSAT",
-  "CAT",
-  "GATE",
-  "Still deciding",
-];
+const TARGET_EXAMS = ["JEE Main", "JEE Advanced", "NEET", "CUET", "BITSAT", "CAT", "GATE", "Still deciding"];
 
-const ASPIRANT_STAGES = [
-  "Class 11",
-  "Class 12",
-  "Drop year",
-  "Awaiting results",
-  "Just exploring",
-];
+const ASPIRANT_STAGES = ["Class 11", "Class 12", "Drop year", "Awaiting results", "Just exploring"];
 
 const MAX_DREAM_CAMPUSES = 5;
 
@@ -351,11 +327,7 @@ export function OnboardingForm({
         </div>
 
         <div className="space-y-1.5">
-          <FieldLabel
-            htmlFor="username"
-            required
-            hint={<UsernameStatusHint status={usernameStatus} />}
-          >
+          <FieldLabel htmlFor="username" required hint={<UsernameStatusHint status={usernameStatus} />}>
             Username
           </FieldLabel>
           <div className="relative">
@@ -427,11 +399,7 @@ export function OnboardingForm({
             <FieldLabel>Where are you right now?</FieldLabel>
             <div className="flex flex-wrap gap-2">
               {ASPIRANT_STAGES.map((stage) => (
-                <Pill
-                  key={stage}
-                  selected={aspirantStage === stage}
-                  onClick={() => setAspirantStage(stage)}
-                >
+                <Pill key={stage} selected={aspirantStage === stage} onClick={() => setAspirantStage(stage)}>
                   {stage}
                 </Pill>
               ))}
@@ -504,9 +472,7 @@ export function OnboardingForm({
                     >
                       <School className="size-4 shrink-0 text-muted-foreground" />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[13px] font-bold text-foreground">
-                          {c.name}
-                        </span>
+                        <span className="block truncate text-[13px] font-bold text-foreground">{c.name}</span>
                         <span className="block truncate text-[11px] text-muted-foreground">
                           {[c.district, c.state].filter(Boolean).join(", ") || "India"}
                         </span>
@@ -594,11 +560,7 @@ export function OnboardingForm({
         </p>
         <div className="flex flex-wrap gap-2 pt-0.5">
           {POPULAR_INTERESTS.map((tag) => (
-            <Pill
-              key={tag}
-              selected={interests.includes(tag)}
-              onClick={() => toggleInterest(tag)}
-            >
+            <Pill key={tag} selected={interests.includes(tag)} onClick={() => toggleInterest(tag)}>
               {tag}
             </Pill>
           ))}
@@ -607,10 +569,7 @@ export function OnboardingForm({
 
       {/* ─── Bio ─── */}
       <section className="space-y-1.5 border-t border-border/40 py-6">
-        <FieldLabel
-          htmlFor="bio"
-          hint={<span className="text-[11px] text-muted-foreground">Optional</span>}
-        >
+        <FieldLabel htmlFor="bio" hint={<span className="text-[11px] text-muted-foreground">Optional</span>}>
           Bio
         </FieldLabel>
         <textarea

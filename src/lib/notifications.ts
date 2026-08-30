@@ -1,13 +1,23 @@
+import { inArray, sql } from "drizzle-orm";
 import { getDb } from "@/db";
-import { notifications,userProfiles } from "@/db/schema";
+import { notifications, userProfiles } from "@/db/schema";
 import { dispatchNotificationEmail } from "@/lib/notifications-email";
 import { pushToUser } from "@/lib/push-dispatch";
-import { inArray,sql } from "drizzle-orm";
 
 export interface CreateNotificationParams {
   userId: string;
   actorId: string;
-  type: "LIKE" | "COMMENT" | "REPLY" | "MENTION" | "REPOST" | "MATCH" | "CRUSH_ALERT" | "MILESTONE" | "FOLLOW" | "FRIEND";
+  type:
+    | "LIKE"
+    | "COMMENT"
+    | "REPLY"
+    | "MENTION"
+    | "REPOST"
+    | "MATCH"
+    | "CRUSH_ALERT"
+    | "MILESTONE"
+    | "FOLLOW"
+    | "FRIEND";
   referenceId?: string | null;
   previewText?: string | null;
 }
@@ -36,9 +46,7 @@ export function extractMentionUsernames(text: string): string[] {
   const matches = text.match(/(?:^|\s)@([a-zA-Z0-9_]+)/g);
   if (!matches) return [];
 
-  const handles = matches
-    .map((m) => m.trim().replace(/^@/, "").toLowerCase())
-    .filter(Boolean);
+  const handles = matches.map((m) => m.trim().replace(/^@/, "").toLowerCase()).filter(Boolean);
 
   return Array.from(new Set(handles));
 }

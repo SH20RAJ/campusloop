@@ -15,9 +15,7 @@ export const savedPosts = pgTable(
       .references(() => posts.id, { onDelete: "cascade" }),
     createdAt,
   },
-  (t) => [
-    uniqueIndex("saved_posts_profile_post_idx").on(t.profileId, t.postId),
-  ]
+  (t) => [uniqueIndex("saved_posts_profile_post_idx").on(t.profileId, t.postId)]
 );
 
 export type SavedPost = typeof savedPosts.$inferSelect;

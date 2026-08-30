@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hasCapability, UserCapability } from "./capabilities";
+import { hasCapability, type UserCapability } from "./capabilities";
 
 describe("Campus Preview Capabilities Engine", () => {
   it("allows unauthenticated/guest users only READ_PUBLIC_CONTENT", async () => {

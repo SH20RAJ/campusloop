@@ -1,25 +1,25 @@
 "use client";
 
-import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions";
-import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 import {
-ArrowLeft,
-Check,
-EyeOff,
-Globe,
-Lock,
-MessageSquare,
-Settings,
-Share2,
-ShieldCheck,
-Users,
+  ArrowLeft,
+  Check,
+  EyeOff,
+  Globe,
+  Lock,
+  MessageSquare,
+  Settings,
+  Share2,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions";
+import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface CommunityHeaderProps {
   community: {
@@ -166,9 +166,7 @@ export function CommunityHeader({
         ) : (
           <div className="w-full h-full bg-linear-to-r from-neutral-900 via-neutral-950 to-neutral-900 relative">
             <div
-              className={`w-full h-full bg-linear-to-r ${getInitialsGradient(
-                community.name
-              )} opacity-25`}
+              className={`w-full h-full bg-linear-to-r ${getInitialsGradient(community.name)} opacity-25`}
             />
           </div>
         )}

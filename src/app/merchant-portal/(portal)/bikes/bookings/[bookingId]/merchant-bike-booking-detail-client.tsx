@@ -1,37 +1,35 @@
 "use client";
 
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Bike,
+  Camera,
+  Check,
+  CheckCircle2,
+  KeyRound,
+  Loader2,
+  Phone,
+  RotateCcw,
+  User,
+  X,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
-import { cn,formatTimeAgo } from "@/lib/utils";
-import {
-AlertTriangle,
-ArrowLeft,
-Bike,
-Camera,
-Check,
-CheckCircle2,
-KeyRound,
-Loader2,
-Phone,
-RotateCcw,
-User,
-X
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRef,useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
+import { cn, formatTimeAgo } from "@/lib/utils";
 
 interface MerchantBikeBookingDetailClientProps {
   bookingId: string;
 }
 
-export function MerchantBikeBookingDetailClient({
-  bookingId,
-}: MerchantBikeBookingDetailClientProps) {
+export function MerchantBikeBookingDetailClient({ bookingId }: MerchantBikeBookingDetailClientProps) {
   const router = useRouter();
 
   // Modals for Handover and Return
@@ -246,7 +244,9 @@ export function MerchantBikeBookingDetailClient({
             <AlertTriangle className="size-4 animate-bounce" />
             <span>⚠️ Return is OVERDUE by {lateHours} hour(s)</span>
           </div>
-          <span>Expected: {new Date(booking.endAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+          <span>
+            Expected: {new Date(booking.endAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </span>
         </div>
       )}
 
@@ -285,7 +285,9 @@ export function MerchantBikeBookingDetailClient({
           <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-center space-y-0.5">
             <CheckCircle2 className="size-3.5 text-emerald-500 mx-auto" />
             <p className="text-[10px] font-bold text-emerald-500">Driving Licence</p>
-            <p className="text-[9px] text-muted-foreground truncate">{booking.documents?.drivingLicenseNumber}</p>
+            <p className="text-[9px] text-muted-foreground truncate">
+              {booking.documents?.drivingLicenseNumber}
+            </p>
           </div>
 
           <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-center space-y-0.5">
@@ -410,9 +412,7 @@ export function MerchantBikeBookingDetailClient({
           >
             <div className="flex items-center justify-between border-b border-border/30 pb-2.5">
               <div>
-                <h3 className="text-base font-black text-foreground">
-                  Pickup Handover Checklist
-                </h3>
+                <h3 className="text-base font-black text-foreground">Pickup Handover Checklist</h3>
                 <p className="text-xs text-muted-foreground">Verify vehicle condition with student</p>
               </div>
               <button
@@ -488,7 +488,11 @@ export function MerchantBikeBookingDetailClient({
                     disabled={isUploadingPhoto}
                     className="size-16 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
                   >
-                    {isUploadingPhoto ? <Loader2 className="size-4 animate-spin" /> : <Camera className="size-4" />}
+                    {isUploadingPhoto ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Camera className="size-4" />
+                    )}
                     <span className="text-[9px] font-bold mt-0.5">Photo</span>
                   </button>
                   <input
@@ -507,7 +511,11 @@ export function MerchantBikeBookingDetailClient({
                   disabled={isSubmittingHandover}
                   className="w-full h-12 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
                 >
-                  {isSubmittingHandover ? <Loader2 className="size-4 animate-spin" /> : "Start Rental (Keys Handed Over)"}
+                  {isSubmittingHandover ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    "Start Rental (Keys Handed Over)"
+                  )}
                 </button>
               </div>
             </form>

@@ -1,32 +1,23 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  detectMentionTrigger,
-  MentionSuggestions,
-  TriggerContext,
-} from "@/components/ui/mention-autocomplete";
-import { RichText } from "@/components/ui/rich-text";
-import { FeedPost } from "@/hooks/use-feed";
-import { useProfile } from "@/hooks/use-profile";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowUp,
-  Heart,
-  Loader2,
-  MessageCircle,
-  Reply,
-  Shield,
-  User,
-  X,
-} from "lucide-react";
+import { ArrowUp, Heart, Loader2, MessageCircle, Reply, Shield, User, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  detectMentionTrigger,
+  MentionSuggestions,
+  type TriggerContext,
+} from "@/components/ui/mention-autocomplete";
+import { RichText } from "@/components/ui/rich-text";
+import type { FeedPost } from "@/hooks/use-feed";
+import { useProfile } from "@/hooks/use-profile";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 export interface FastComment {
   id: string;
@@ -62,12 +53,7 @@ const fetcher = <T,>(url: string): Promise<T> =>
 
 const QUICK_REACTIONS = ["❤️", "🔥", "😂", "👏", "😮", "💯"];
 
-export function FastCommentsModal({
-  post,
-  isOpen,
-  onClose,
-  onCommentCountChange,
-}: FastCommentsModalProps) {
+export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange }: FastCommentsModalProps) {
   const { profile } = useProfile();
 
   const [commentText, setCommentText] = useState("");
@@ -110,11 +96,10 @@ export function FastCommentsModal({
     data: comments,
     mutate,
     isLoading,
-  } = useSWR<FastComment[]>(
-    isOpen ? `/api/posts/${post.id}/comments` : null,
-    fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 4000 }
-  );
+  } = useSWR<FastComment[]>(isOpen ? `/api/posts/${post.id}/comments` : null, fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 4000,
+  });
 
   // Auto-focus input on open
   useEffect(() => {
@@ -236,9 +221,7 @@ export function FastCommentsModal({
   };
 
   const commentsList = comments || [];
-  const authorHandle = post.isAnonymous
-    ? post.pseudonym || "anonymous"
-    : post.author?.username || "student";
+  const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
 
   return (
     <AnimatePresence>
@@ -272,9 +255,7 @@ export function FastCommentsModal({
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-border/30 shrink-0">
               <div className="flex items-center gap-2">
                 <MessageCircle className="size-4.5 text-primary" />
-                <h3 className="text-sm font-black text-foreground tracking-tight">
-                  Comments
-                </h3>
+                <h3 className="text-sm font-black text-foreground tracking-tight">Comments</h3>
                 <span className="text-[11px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                   {commentsList.length}
                 </span>
@@ -295,9 +276,7 @@ export function FastCommentsModal({
               <span className="text-[11px] font-bold text-foreground truncate max-w-[130px]">
                 @{authorHandle}:
               </span>
-              <p className="text-xs text-muted-foreground truncate flex-1">
-                {post.body}
-              </p>
+              <p className="text-xs text-muted-foreground truncate flex-1">{post.body}</p>
             </div>
 
             {/* Scrollable Comments List */}
@@ -330,33 +309,22 @@ export function FastCommentsModal({
               ) : (
                 commentsList.map((c) => {
                   const isAnon = c.isAnonymous;
-                  const cDisplayName = isAnon
-                    ? "Anonymous Student"
-                    : c.author?.displayName || "Student";
-                  const cHandle = isAnon
-                    ? c.pseudonym || "anonymous"
-                    : c.author?.username || "student";
+                  const cDisplayName = isAnon ? "Anonymous Student" : c.author?.displayName || "Student";
+                  const cHandle = isAnon ? c.pseudonym || "anonymous" : c.author?.username || "student";
                   const cAvatar = isAnon
                     ? ""
                     : getAvatarUrl(c.author?.avatarUrl, c.author?.username ?? "student");
                   const isLiked = Boolean(likedComments[c.id]);
 
                   return (
-                    <div
-                      key={c.id}
-                      className="flex items-start justify-between gap-3 pt-3 first:pt-0 group"
-                    >
+                    <div key={c.id} className="flex items-start justify-between gap-3 pt-3 first:pt-0 group">
                       <div className="flex items-start gap-2.5 min-w-0 flex-1">
                         {isAnon ? (
                           <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
                             <Shield className="size-4" />
                           </div>
                         ) : (
-                          <Link
-                            href={`/@${cHandle}`}
-                            onClick={onClose}
-                            className="shrink-0"
-                          >
+                          <Link href={`/@${cHandle}`} onClick={onClose} className="shrink-0">
                             <Avatar className="size-8 rounded-full border border-border/40 hover:opacity-90 transition-opacity">
                               <AvatarImage src={cAvatar} />
                               <AvatarFallback className="text-[10px] font-bold">
@@ -368,12 +336,8 @@ export function FastCommentsModal({
 
                         <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-xs font-bold text-foreground truncate">
-                              {cDisplayName}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground truncate">
-                              @{cHandle}
-                            </span>
+                            <span className="text-xs font-bold text-foreground truncate">{cDisplayName}</span>
+                            <span className="text-[10px] text-muted-foreground truncate">@{cHandle}</span>
                             <span className="text-[10px] text-muted-foreground">
                               • {formatTimeAgo(c.createdAt)}
                             </span>
@@ -489,8 +453,8 @@ export function FastCommentsModal({
                       replyingTo
                         ? `Reply to @${replyingTo.handle}...`
                         : isAnonymous
-                        ? "Comment anonymously..."
-                        : `Add a comment as @${profile?.username || "you"}...`
+                          ? "Comment anonymously..."
+                          : `Add a comment as @${profile?.username || "you"}...`
                     }
                     value={commentText}
                     onChange={handleInputChange}

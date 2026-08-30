@@ -1,9 +1,9 @@
+import { count, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { savedPosts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { checkCampusUpgradeEligibility } from "@/lib/campus-upgrade";
-import { count, eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

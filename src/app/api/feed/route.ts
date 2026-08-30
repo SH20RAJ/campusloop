@@ -1,10 +1,10 @@
-import { getDb } from "@/db";
-import { posts,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { formatApiFeedPosts,normalizeApiFeedSort,resolveFeedPage } from "@/lib/feed";
-import { isViewerProfile } from "@/lib/viewer";
-import { eq,inArray,sql,type SQL } from "drizzle-orm";
+import { eq, inArray, type SQL, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { posts, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { formatApiFeedPosts, normalizeApiFeedSort, resolveFeedPage } from "@/lib/feed";
+import { isViewerProfile } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -64,7 +64,8 @@ export async function GET(req: Request) {
     // Confessions are by definition anonymous; never block them due to visibility filter
     if (type !== "CONFESSION") {
       const explicitVisibility = visibility && visibility !== "all" ? visibility : null;
-      const effectiveVisibility = explicitVisibility || (userFeedVisibility === "NON_ANONYMOUS" ? "non_anonymous" : "all");
+      const effectiveVisibility =
+        explicitVisibility || (userFeedVisibility === "NON_ANONYMOUS" ? "non_anonymous" : "all");
 
       if (effectiveVisibility === "anonymous") {
         conditions.push(eq(posts.isAnonymous, true));
@@ -77,18 +78,20 @@ export async function GET(req: Request) {
       }
     }
 
-
     if (hashtag) {
       const cleanHashtag = decodeURIComponent(hashtag).replace(/^#/, "").trim();
       conditions.push(sql`${posts.body} ILIKE ${`%#${cleanHashtag}%`}`);
     }
 
-
     const authorId = searchParams.get("authorId");
     const authorUsername = searchParams.get("authorUsername");
     const seenIdsParam = searchParams.get("seenIds") || req.headers.get("x-seen-ids");
-    const seenIds = seenIdsParam ? seenIdsParam.split(",").map((s) => s.trim()).filter(Boolean) : undefined;
-
+    const seenIds = seenIdsParam
+      ? seenIdsParam
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : undefined;
 
     if (authorId) {
       conditions.push(eq(posts.authorId, authorId));

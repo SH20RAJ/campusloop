@@ -1,29 +1,29 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { UserProfile } from "@/db/schema";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
 import {
-ArrowLeft,
-Crown,
-Flame,
-Heart,
-Loader2,
-Lock,
-MessageSquare,
-Plus,
-Search,
-ShieldCheck,
-Trash2,
-X,
-Zap,
+  ArrowLeft,
+  Crown,
+  Flame,
+  Heart,
+  Loader2,
+  Lock,
+  MessageSquare,
+  Plus,
+  Search,
+  ShieldCheck,
+  Trash2,
+  X,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { UserProfile } from "@/db/schema";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 
 interface SecretCrushItem {
   id: string;
@@ -72,10 +72,7 @@ export function CrushClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  const { data, mutate, isLoading } = useSWR<SecretCrushResponse>(
-    "/api/dating/crush",
-    fetcher
-  );
+  const { data, mutate, isLoading } = useSWR<SecretCrushResponse>("/api/dating/crush", fetcher);
 
   const crushes = data?.crushes || [];
   const usedSlots = data?.usedSlots || 0;
@@ -228,9 +225,7 @@ export function CrushClient() {
                 <Zap className="size-4 fill-amber-500" />
               </div>
               <div>
-                <h3 className="text-xs font-black text-foreground">
-                  Expand Vault from 5 to 50 Slots
-                </h3>
+                <h3 className="text-xs font-black text-foreground">Expand Vault from 5 to 50 Slots</h3>
                 <p className="text-[11px] text-muted-foreground">
                   {slotProgress.points} / {slotProgress.threshold} LP earned
                 </p>
@@ -249,7 +244,8 @@ export function CrushClient() {
           </div>
 
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Reach <strong>150 Loop Points (LP)</strong> by sharing campus posts, participating in polls, and inviting friends to automatically expand your Secret Crush vault to <strong>50 slots</strong>.
+            Reach <strong>150 Loop Points (LP)</strong> by sharing campus posts, participating in polls, and
+            inviting friends to automatically expand your Secret Crush vault to <strong>50 slots</strong>.
           </p>
         </div>
       )}
@@ -260,9 +256,7 @@ export function CrushClient() {
             <Crown className="size-4" />
           </div>
           <div>
-            <p className="text-xs font-black text-foreground">
-              Vault Expanded to 50 Slots
-            </p>
+            <p className="text-xs font-black text-foreground">Vault Expanded to 50 Slots</p>
             <p className="text-[11px] text-violet-600/80 dark:text-violet-400/80">
               Gold Star verified clout unlocked. You have access to the maximum 50 secret crush slots.
             </p>
@@ -383,7 +377,9 @@ export function CrushClient() {
         {maxSlots > displaySlotCount && (
           <div className="p-3.5 text-center rounded-2xl border border-dashed border-border/50 bg-muted/10 text-xs font-bold text-muted-foreground flex items-center justify-center gap-2">
             <Lock className="size-3.5" />
-            <span>+{maxSlots - usedSlots} more slots unlocked in your expanded vault ({usedSlots}/{maxSlots} used)</span>
+            <span>
+              +{maxSlots - usedSlots} more slots unlocked in your expanded vault ({usedSlots}/{maxSlots} used)
+            </span>
           </div>
         )}
       </div>
@@ -395,7 +391,8 @@ export function CrushClient() {
           How Secret Crush Works
         </p>
         <p className="text-[11px] leading-relaxed">
-          Your selections are <strong>100% intent-hidden</strong>. No classmate can see your list, and no notifications reveal your identity until both of you select each other.
+          Your selections are <strong>100% intent-hidden</strong>. No classmate can see your list, and no
+          notifications reveal your identity until both of you select each other.
         </p>
       </div>
 
@@ -446,9 +443,7 @@ export function CrushClient() {
                     <div className="flex items-center gap-2.5 min-w-0">
                       <Avatar className="size-8.5 shrink-0">
                         <AvatarImage src={u.avatarUrl || ""} />
-                        <AvatarFallback className="text-[9px] font-bold">
-                          {u.displayName[0]}
-                        </AvatarFallback>
+                        <AvatarFallback className="text-[9px] font-bold">{u.displayName[0]}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
                         <p className="text-xs font-black text-foreground truncate">{u.displayName}</p>

@@ -1,19 +1,15 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo } from "@/lib/utils";
-import {
-CalendarCheck2,
-CheckCircle2,
-ShieldCheck
-} from "lucide-react";
+import { CalendarCheck2, CheckCircle2, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo } from "@/lib/utils";
 
 const PIPELINE_TABS = [
   { id: "pending", label: "Pending Approval" },
@@ -123,9 +119,7 @@ export function MerchantBikeBookingsClient() {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/30 pb-3">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-sm font-black text-foreground">
-                      #{booking.bookingNumber}
-                    </span>
+                    <span className="text-sm font-black text-foreground">#{booking.bookingNumber}</span>
                     <span className="text-xs font-bold text-foreground">
                       · {booking.bike?.name} ({booking.bike?.registrationNumber})
                     </span>

@@ -1,50 +1,36 @@
+import {
+  ArrowRight,
+  Bookmark,
+  Eye,
+  Heart,
+  HeartHandshake,
+  Hourglass,
+  Lock,
+  MailCheck,
+  Repeat2,
+  School,
+  ShieldCheck,
+  ShoppingBag,
+} from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { ArtifactsShowcase } from "@/components/landing/artifacts-demos";
 import { CampusHubShowcase } from "@/components/landing/campus-hub-showcase";
 import { ComparisonShowcase } from "@/components/landing/comparison-table";
-import {
-ConfessionDemo,
-MatchDemo,
-PointsDemo,
-VerifyDemo,
-} from "@/components/landing/demos";
-import {
-FAQSection,
-SafetySection,
-StatsSection
-} from "@/components/landing/extra-sections";
+import { ConfessionDemo, MatchDemo, PointsDemo, VerifyDemo } from "@/components/landing/demos";
+import { FAQSection, SafetySection, StatsSection } from "@/components/landing/extra-sections";
 import { HeroPreview } from "@/components/landing/hero-preview";
 import { InteractiveBentoCard } from "@/components/landing/interactive-bento-card";
 import { LeaderboardShowcase } from "@/components/landing/leaderboard-demo";
 import { MatchmakingShowcase } from "@/components/landing/matchmaking-demo";
 import { Reveal } from "@/components/landing/reveal";
 import { TimeCapsuleShowcase } from "@/components/landing/time-capsule-showcase";
-import {
-CTABand,
-GradientText,
-MarketingFooter,
-MarketingHeader,
-} from "@/components/marketing/system";
+import { CTABand, GradientText, MarketingFooter, MarketingHeader } from "@/components/marketing/system";
 import { buttonVariants } from "@/components/ui/button";
-import { Card,CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Marquee } from "@/components/ui/marquee";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { cn } from "@/lib/utils";
-import {
-ArrowRight,
-Bookmark,
-Eye,
-Heart,
-HeartHandshake,
-Hourglass,
-Lock,
-MailCheck,
-Repeat2,
-School,
-ShieldCheck,
-ShoppingBag
-} from "lucide-react";
-import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://campusloop.space"),
@@ -228,30 +214,23 @@ export default async function LandingPage() {
               </GradientText>
             </h1>
             <p className="max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
-              The verified collegiate network for India. Canteen polls, anonymous confessions, campus marketplace, 18+ student matching, and batch time capsules — with zero recruiters, zero faculty, and zero outsiders.
+              The verified collegiate network for India. Canteen polls, anonymous confessions, campus
+              marketplace, 18+ student matching, and batch time capsules — with zero recruiters, zero faculty,
+              and zero outsiders.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               {isAuthenticated ? (
-                <Link
-                  href="/app"
-                  className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}
-                >
+                <Link href="/app" className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}>
                   Open app
                   <ArrowRight className="size-4" />
                 </Link>
               ) : (
-                <Link
-                  href="/handler/sign-up"
-                  className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}
-                >
+                <Link href="/handler/sign-up" className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}>
                   Get verified with college email
                   <ArrowRight className="size-4" />
                 </Link>
               )}
-              <Link
-                href="#inside"
-                className={buttonVariants({ variant: "outline", size: "lg" })}
-              >
+              <Link href="#inside" className={buttonVariants({ variant: "outline", size: "lg" })}>
                 See what&apos;s inside
               </Link>
             </div>
@@ -259,10 +238,7 @@ export default async function LandingPage() {
             {!isAuthenticated && (
               <p className="text-xs font-medium text-muted-foreground">
                 JEE/NEET aspirant or prospective student?{" "}
-                <Link
-                  href="/handler/sign-up"
-                  className="font-bold text-primary hover:underline"
-                >
+                <Link href="/handler/sign-up" className="font-bold text-primary hover:underline">
                   Browse in Viewer Mode
                 </Link>{" "}
                 with any email — read-only, no college ID required.
@@ -290,10 +266,8 @@ export default async function LandingPage() {
           <div className="pb-5 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 flex flex-col sm:flex-row items-center justify-center gap-x-2.5 gap-y-1 px-6">
             <span>
               Colleges Enrolled:{" "}
-              <strong className="text-primary font-extrabold text-sm tracking-normal">
-                1,350+
-              </strong>{" "}
-              and adding more
+              <strong className="text-primary font-extrabold text-sm tracking-normal">1,350+</strong> and
+              adding more
             </span>
             <span className="hidden sm:inline-block text-muted-foreground/30">•</span>
             <span>
@@ -329,7 +303,8 @@ export default async function LandingPage() {
               Everything on campus, in one loop.
             </h2>
             <p className="text-base leading-relaxed text-muted-foreground">
-              Built specifically for the realities of Indian college life — from midnight canteen Maggi debates to exam-night notes.
+              Built specifically for the realities of Indian college life — from midnight canteen Maggi
+              debates to exam-night notes.
             </p>
           </Reveal>
 
@@ -349,7 +324,9 @@ export default async function LandingPage() {
                     Confess without a name, repost with a chime
                   </h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Spill confessions safely with automatic client-side PII scrubbing. Settle debates with live polls, vote on trending topics, and celebrate quotes with crystalline Web Audio chimes and emerald confetti bursts.
+                    Spill confessions safely with automatic client-side PII scrubbing. Settle debates with
+                    live polls, vote on trending topics, and celebrate quotes with crystalline Web Audio
+                    chimes and emerald confetti bursts.
                   </p>
                   <ConfessionDemo />
                 </div>
@@ -367,11 +344,10 @@ export default async function LandingPage() {
                     <Heart className="size-4" />
                     <span>Campus Match &amp; Crush</span>
                   </div>
-                  <h3 className="font-heading text-xl font-bold text-foreground">
-                    Match inside the gate
-                  </h3>
+                  <h3 className="font-heading text-xl font-bold text-foreground">Match inside the gate</h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Swipe on real classmates who cleared the same college domain check. Plus, lock up to 5 campus crushes in our zero-doxxing vault where identity only reveals upon mutual lock!
+                    Swipe on real classmates who cleared the same college domain check. Plus, lock up to 5
+                    campus crushes in our zero-doxxing vault where identity only reveals upon mutual lock!
                   </p>
                   <MatchDemo />
                 </div>
@@ -393,11 +369,15 @@ export default async function LandingPage() {
                     Campus Hub &amp; Marketplace
                   </h3>
                   <p className="text-xs leading-relaxed text-muted-foreground">
-                    Lost &amp; found registry, buy/sell cycles and coolers in ₹, station cab pools, flatmates finder, and 5v5 gaming scrims.
+                    Lost &amp; found registry, buy/sell cycles and coolers in ₹, station cab pools, flatmates
+                    finder, and 5v5 gaming scrims.
                   </p>
                   <div className="flex flex-wrap gap-1.5 pt-2">
                     {["Cycles & Drafters", "Valorant 5v5", "Lost IDs", "Cab Pools"].map((chip) => (
-                      <span key={chip} className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-muted/60 text-foreground/80 border border-border/40 group-hover:border-emerald-500/40 transition-colors">
+                      <span
+                        key={chip}
+                        className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-muted/60 text-foreground/80 border border-border/40 group-hover:border-emerald-500/40 transition-colors"
+                      >
                         {chip}
                       </span>
                     ))}
@@ -417,11 +397,10 @@ export default async function LandingPage() {
                     <Hourglass className="size-4" />
                     <span>Unique Feature</span>
                   </div>
-                  <h3 className="font-heading text-lg font-bold text-foreground">
-                    Batch Time Capsule Vault
-                  </h3>
+                  <h3 className="font-heading text-lg font-bold text-foreground">Batch Time Capsule Vault</h3>
                   <p className="text-xs leading-relaxed text-muted-foreground">
-                    Bury predictions, letters, and memories for your future batch. Sealed cryptographically until Convocation Day with live countdown tickers.
+                    Bury predictions, letters, and memories for your future batch. Sealed cryptographically
+                    until Convocation Day with live countdown tickers.
                   </p>
                   <div className="rounded-xl bg-background/80 border border-border/40 p-2.5 text-xs text-center font-mono font-bold text-amber-500 shadow-inner group-hover:border-amber-500/40 transition-colors">
                     <span>Unlocks in 280d 14h 32m ⏳</span>
@@ -441,11 +420,10 @@ export default async function LandingPage() {
                     <ShieldCheck className="size-4" />
                     <span>Reputation System</span>
                   </div>
-                  <h3 className="font-heading text-lg font-bold text-foreground">
-                    Loop Points Clout Tiers
-                  </h3>
+                  <h3 className="font-heading text-lg font-bold text-foreground">Loop Points Clout Tiers</h3>
                   <p className="text-xs leading-relaxed text-muted-foreground">
-                    Campus reputation you can count. Earn Loop Points from upvotes and helpful notes to unlock Bronze Rookie, Gold Star, and the verified blue tick.
+                    Campus reputation you can count. Earn Loop Points from upvotes and helpful notes to unlock
+                    Bronze Rookie, Gold Star, and the verified blue tick.
                   </p>
                   <div className="pt-2">
                     <PointsDemo />
@@ -499,12 +477,8 @@ export default async function LandingPage() {
                     <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <step.icon className="size-5" />
                     </span>
-                    <h3 className="font-heading text-lg font-semibold">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {step.body}
-                    </p>
+                    <h3 className="font-heading text-lg font-semibold">{step.title}</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{step.body}</p>
                   </div>
                 </Reveal>
               ))}
@@ -513,9 +487,7 @@ export default async function LandingPage() {
             <Reveal delay={0.1} className="pt-14">
               <Card className="max-w-xl">
                 <CardContent className="space-y-3">
-                  <h3 className="font-heading text-lg font-semibold">
-                    Check your college domain
-                  </h3>
+                  <h3 className="font-heading text-lg font-semibold">Check your college domain</h3>
                   <VerifyDemo />
                 </CardContent>
               </Card>
@@ -534,10 +506,10 @@ export default async function LandingPage() {
                 Campus Preview, for everyone still deciding.
               </h2>
               <p className="text-base leading-relaxed text-muted-foreground">
-                JEE, NEET and CUET aspirants can sign up with a personal email and read the
-                campuses they are aiming for — the confessions, the placement threads, the hostel
-                tea and the fest chaos. What you cannot do is post, vote, chat or match. Those stay
-                with verified students, which is what keeps the content worth reading.
+                JEE, NEET and CUET aspirants can sign up with a personal email and read the campuses they are
+                aiming for — the confessions, the placement threads, the hostel tea and the fest chaos. What
+                you cannot do is post, vote, chat or match. Those stay with verified students, which is what
+                keeps the content worth reading.
               </p>
             </Reveal>
 

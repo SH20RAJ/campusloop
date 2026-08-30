@@ -1,8 +1,8 @@
-import { getDb } from "@/db";
-import { posts,reports,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { eq,sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { posts, reports, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -51,10 +51,7 @@ export async function POST(req: Request, { params }: RouteParams) {
 
     // Auto-hide rule: Hide post if reports >= 5
     if (reportsCount >= 5) {
-      await db
-        .update(posts)
-        .set({ status: "PENDING_REVIEW" })
-        .where(eq(posts.id, id));
+      await db.update(posts).set({ status: "PENDING_REVIEW" }).where(eq(posts.id, id));
     }
 
     return NextResponse.json({ message: "Post reported successfully" }, { status: 201 });

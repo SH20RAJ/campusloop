@@ -1,25 +1,25 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { MarketplaceItem } from "@/db/schema";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-CheckCircle2,
-Loader2,
-MapPin,
-MessageCircle,
-Share2,
-ShieldCheck,
-Tag,
-Trash2,
-X
+  CheckCircle2,
+  Loader2,
+  MapPin,
+  MessageCircle,
+  Share2,
+  ShieldCheck,
+  Tag,
+  Trash2,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { MarketplaceItem } from "@/db/schema";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface MarketplaceCardProps {
   item: MarketplaceItem & {
@@ -199,9 +199,7 @@ export function MarketplaceCard({ item, currentUserId, onDeleted }: MarketplaceC
                 {(item.seller.points || 0) >= 150 && (
                   <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
                 )}
-                <span className="text-[11px] text-muted-foreground truncate">
-                  @{item.seller.username}
-                </span>
+                <span className="text-[11px] text-muted-foreground truncate">@{item.seller.username}</span>
                 <span className="text-[10px] text-muted-foreground/60">·</span>
                 <span className="text-[11px] text-muted-foreground/80 shrink-0">
                   {formatTimeAgo(item.createdAt)}
@@ -285,15 +283,11 @@ export function MarketplaceCard({ item, currentUserId, onDeleted }: MarketplaceC
             </div>
 
             {/* Title */}
-            <h3 className="text-sm font-bold text-foreground leading-snug">
-              {item.title}
-            </h3>
+            <h3 className="text-sm font-bold text-foreground leading-snug">{item.title}</h3>
 
             {/* Description */}
             {item.description && (
-              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                {item.description}
-              </p>
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{item.description}</p>
             )}
 
             {/* Meta Tags: Location & Category */}

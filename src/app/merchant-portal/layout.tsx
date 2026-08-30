@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Merchant Portal | CampusLoop",
@@ -11,10 +11,6 @@ export const metadata: Metadata = {
  * that `/merchant-portal/login` — which sits outside it — is reachable while
  * signed out. Gating here redirected the login page to itself forever.
  */
-export default function MerchantPortalRootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function MerchantPortalRootLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

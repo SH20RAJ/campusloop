@@ -1,32 +1,32 @@
 "use client";
 
-import { Avatar,AvatarFallback } from "@/components/ui/avatar";
+import {
+  ArrowUpRight,
+  BarChart3,
+  Calendar,
+  Check,
+  Clock,
+  Eye,
+  Heart,
+  HelpCircle,
+  Lock,
+  MessageCircle,
+  Search,
+  Share2,
+  ShieldAlert,
+  ShieldCheck,
+  ThumbsUp,
+  UserPlus,
+  Users,
+  X,
+  Zap,
+} from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-ArrowUpRight,
-BarChart3,
-Calendar,
-Check,
-Clock,
-Eye,
-Heart,
-HelpCircle,
-Lock,
-MessageCircle,
-Search,
-Share2,
-ShieldAlert,
-ShieldCheck,
-ThumbsUp,
-UserPlus,
-Users,
-X,
-Zap,
-} from "lucide-react";
-import { AnimatePresence,motion } from "motion/react";
-import { useEffect,useState } from "react";
 import { Reveal } from "./reveal";
 
 // ──────── Artifact Config ────────
@@ -185,7 +185,15 @@ const ARTIFACTS = [
   },
 ] as const;
 
-type ArtifactId = "polls" | "questions" | "memes" | "events" | "lost-found" | "confessions" | "stories" | "communities";
+type ArtifactId =
+  | "polls"
+  | "questions"
+  | "memes"
+  | "events"
+  | "lost-found"
+  | "confessions"
+  | "stories"
+  | "communities";
 
 type ArtifactConfig = {
   readonly id: ArtifactId;
@@ -214,9 +222,7 @@ function PollDemo() {
   function vote(id: string) {
     if (voted) return;
     setVoted(id);
-    setOptions((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, votes: o.votes + 1 } : o))
-    );
+    setOptions((prev) => prev.map((o) => (o.id === id ? { ...o, votes: o.votes + 1 } : o)));
   }
 
   return (
@@ -256,11 +262,7 @@ function PollDemo() {
                   {isMine && <Check className="size-3.5" />}
                   {opt.text}
                 </span>
-                {voted && (
-                  <span className="font-semibold tabular-nums text-muted-foreground">
-                    {pct}%
-                  </span>
-                )}
+                {voted && <span className="font-semibold tabular-nums text-muted-foreground">{pct}%</span>}
               </div>
             </button>
           );
@@ -268,9 +270,7 @@ function PollDemo() {
       </div>
       <p className="text-xs text-muted-foreground">
         {total + (voted ? 1 : 0)} votes so far
-        {voted && (
-          <span className="text-primary"> &middot; You voted</span>
-        )}
+        {voted && <span className="text-primary"> &middot; You voted</span>}
       </p>
     </div>
   );
@@ -281,26 +281,32 @@ function PollDemo() {
 function QuestionDemo() {
   const [upvoted, setUpvoted] = useState<string | null>(null);
   const [answers, setAnswers] = useState([
-    { id: "a", text: "Check the library lost & found — they keep things for a month before discarding.", upvotes: 24, author: "Ananya", initials: "AN" },
-    { id: "b", text: "Try asking on the batch WhatsApp group. Someone usually picks it up.", upvotes: 18, author: "Rahul", initials: "RH" },
+    {
+      id: "a",
+      text: "Check the library lost & found — they keep things for a month before discarding.",
+      upvotes: 24,
+      author: "Ananya",
+      initials: "AN",
+    },
+    {
+      id: "b",
+      text: "Try asking on the batch WhatsApp group. Someone usually picks it up.",
+      upvotes: 18,
+      author: "Rahul",
+      initials: "RH",
+    },
   ]);
 
   function handleUpvote(id: string) {
     if (upvoted === id) {
       setUpvoted(null);
-      setAnswers((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, upvotes: a.upvotes - 1 } : a))
-      );
+      setAnswers((prev) => prev.map((a) => (a.id === id ? { ...a, upvotes: a.upvotes - 1 } : a)));
     } else {
       if (upvoted) {
-        setAnswers((prev) =>
-          prev.map((a) => (a.id === upvoted ? { ...a, upvotes: a.upvotes - 1 } : a))
-        );
+        setAnswers((prev) => prev.map((a) => (a.id === upvoted ? { ...a, upvotes: a.upvotes - 1 } : a)));
       }
       setUpvoted(id);
-      setAnswers((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, upvotes: a.upvotes + 1 } : a))
-      );
+      setAnswers((prev) => prev.map((a) => (a.id === id ? { ...a, upvotes: a.upvotes + 1 } : a)));
     }
   }
 
@@ -311,7 +317,8 @@ function QuestionDemo() {
           Question
         </p>
         <p className="text-sm font-medium leading-snug">
-          Lost my grey water bottle with a &ldquo;CAT 2026&rdquo; sticker — has anyone seen it around the library?
+          Lost my grey water bottle with a &ldquo;CAT 2026&rdquo; sticker — has anyone seen it around the
+          library?
         </p>
         <p className="mt-1.5 text-xs text-muted-foreground">
           Asked by <span className="font-medium text-foreground">Priya S.</span> &middot; 2h ago
@@ -335,9 +342,7 @@ function QuestionDemo() {
               </Avatar>
               <span className="text-xs font-medium">{answer.author}</span>
             </div>
-            <p className="mb-2 text-xs leading-relaxed text-muted-foreground">
-              {answer.text}
-            </p>
+            <p className="mb-2 text-xs leading-relaxed text-muted-foreground">{answer.text}</p>
             <button
               onClick={() => handleUpvote(answer.id)}
               className={cn(
@@ -373,9 +378,7 @@ function MemeDemo() {
       {/* Meme Header */}
       <div className="flex items-center gap-2.5">
         <Avatar className="size-8">
-          <AvatarFallback className="bg-pink-500/10 text-pink-500 font-bold text-xs">
-            ME
-          </AvatarFallback>
+          <AvatarFallback className="bg-pink-500/10 text-pink-500 font-bold text-xs">ME</AvatarFallback>
         </Avatar>
         <div>
           <p className="text-xs font-semibold">meme_engineer</p>
@@ -389,9 +392,7 @@ function MemeDemo() {
           <div className="flex flex-col items-center gap-2 text-center">
             <Zap className="size-8 text-pink-400/60" />
             <div className="space-y-1">
-              <p className="text-sm font-bold leading-tight text-foreground/80">
-                When the professor says
-              </p>
+              <p className="text-sm font-bold leading-tight text-foreground/80">When the professor says</p>
               <p className="text-lg font-black leading-tight text-foreground">
                 &ldquo;This won&apos;t be on the exam&rdquo;
               </p>
@@ -448,16 +449,14 @@ function EventDemo() {
           <span className="text-xl font-bold leading-none tracking-tight">15</span>
         </div>
         <div>
-          <p className="font-heading text-base font-semibold leading-snug">
-            Spring Fest &apos;26
-          </p>
+          <p className="font-heading text-base font-semibold leading-snug">Spring Fest &apos;26</p>
           <p className="text-xs text-muted-foreground">Main Auditorium &middot; 4:00 PM</p>
         </div>
       </div>
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        Live bands, food stalls, and the annual talent show. Open for all
-        verified students. Bring your campus ID.
+        Live bands, food stalls, and the annual talent show. Open for all verified students. Bring your campus
+        ID.
       </p>
 
       {/* Tags */}
@@ -480,9 +479,7 @@ function EventDemo() {
               key={i}
               className={cn(
                 "flex size-6 items-center justify-center rounded-full border-2 border-background text-[9px] font-semibold",
-                init === "+"
-                  ? "bg-muted text-muted-foreground"
-                  : "bg-primary/10 text-primary"
+                init === "+" ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary"
               )}
             >
               {init}
@@ -496,10 +493,7 @@ function EventDemo() {
         variant={interested ? "default" : "outline"}
         size="sm"
         onClick={toggleInterested}
-        className={cn(
-          "w-full transition-all",
-          interested && "bg-emerald-600 hover:bg-emerald-700"
-        )}
+        className={cn("w-full transition-all", interested && "bg-emerald-600 hover:bg-emerald-700")}
       >
         {interested ? (
           <>
@@ -534,29 +528,21 @@ function LostFoundDemo() {
           <Search className="size-5 text-purple-500" />
         </div>
         <div className="min-w-0">
-          <p className="font-heading text-base font-semibold leading-snug">
-            Found: Black Wallet
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Near the library entrance &middot; 30m ago
-          </p>
+          <p className="font-heading text-base font-semibold leading-snug">Found: Black Wallet</p>
+          <p className="text-xs text-muted-foreground">Near the library entrance &middot; 30m ago</p>
         </div>
       </div>
 
       <div className="rounded-lg border border-border bg-muted/20 p-3">
         <p className="text-xs leading-relaxed text-muted-foreground">
-          Found a black leather wallet near the library turnstile around 2:30 PM.
-          Has an ID card and some cash. Tell me what&apos;s inside to claim it.
+          Found a black leather wallet near the library turnstile around 2:30 PM. Has an ID card and some
+          cash. Tell me what&apos;s inside to claim it.
         </p>
       </div>
 
       <AnimatePresence>
         {!claimed ? (
-          <motion.div
-            key="claim-btn"
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
+          <motion.div key="claim-btn" exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
             <Button
               variant="default"
               size="sm"
@@ -573,11 +559,13 @@ function LostFoundDemo() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className={cn(
-              "rounded-lg p-3 text-center text-xs font-medium transition-opacity",
-              fading ? "opacity-100" : "opacity-80",
-              "bg-purple-500/10 text-purple-600 dark:text-purple-400"
-            )}>
+            <div
+              className={cn(
+                "rounded-lg p-3 text-center text-xs font-medium transition-opacity",
+                fading ? "opacity-100" : "opacity-80",
+                "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+              )}
+            >
               <Check className="mx-auto mb-1 size-5" />
               Owner notified! You&apos;ll get a match if the details line up.
             </div>
@@ -599,7 +587,7 @@ function anonKey(input: string) {
     h = (h << 5) - h + input.charCodeAt(i);
     h |= 0;
   }
-  return "anon_" + Math.abs(h).toString(16).padStart(8, "0").slice(0, 8);
+  return `anon_${Math.abs(h).toString(16).padStart(8, "0").slice(0, 8)}`;
 }
 
 function ConfessionDemo() {
@@ -623,13 +611,9 @@ function ConfessionDemo() {
             <div className="flex size-5 items-center justify-center rounded-full bg-linear-to-br from-red-500 to-orange-500 text-[7px] font-bold text-white">
               {text ? anonKey(text).slice(5, 7).toUpperCase() : "??"}
             </div>
-            <span className="text-[10px] font-mono font-bold">
-              {text ? anonKey(text) : "anon_user"}
-            </span>
+            <span className="text-[10px] font-mono font-bold">{text ? anonKey(text) : "anon_user"}</span>
           </div>
-          <Badge className="bg-red-500/10 text-red-500 border-none text-[8px] px-1.5 py-0">
-            Just Now
-          </Badge>
+          <Badge className="bg-red-500/10 text-red-500 border-none text-[8px] px-1.5 py-0">Just Now</Badge>
         </div>
         <div className="px-3 py-2.5 min-h-[40px]">
           {text ? (
@@ -698,24 +682,30 @@ function StoryDemo() {
             onClick={() => openStory(story.id)}
             className="flex cursor-pointer flex-col items-center gap-1 transition-transform active:scale-90"
           >
-            <div className={cn(
-              "rounded-full p-[2px] bg-linear-to-br transition-all duration-300",
-              story.viewed ? "from-gray-400 to-gray-300" : story.color,
-              viewing === story.id && "scale-110"
-            )}>
+            <div
+              className={cn(
+                "rounded-full p-[2px] bg-linear-to-br transition-all duration-300",
+                story.viewed ? "from-gray-400 to-gray-300" : story.color,
+                viewing === story.id && "scale-110"
+              )}
+            >
               <div className="flex size-12 items-center justify-center rounded-full bg-card">
-                <span className={cn(
-                  "text-xs font-bold",
-                  story.viewed ? "text-muted-foreground" : "text-foreground"
-                )}>
+                <span
+                  className={cn(
+                    "text-xs font-bold",
+                    story.viewed ? "text-muted-foreground" : "text-foreground"
+                  )}
+                >
                   {story.initials}
                 </span>
               </div>
             </div>
-            <span className={cn(
-              "text-[9px] font-medium",
-              story.viewed ? "text-muted-foreground/60" : "text-muted-foreground"
-            )}>
+            <span
+              className={cn(
+                "text-[9px] font-medium",
+                story.viewed ? "text-muted-foreground/60" : "text-muted-foreground"
+              )}
+            >
               {story.user}
             </span>
           </button>
@@ -746,9 +736,7 @@ function StoryDemo() {
             {/* Content */}
             <div className="flex aspect-[3/1] items-center justify-center bg-linear-to-br from-gray-900 via-primary/20 to-gray-900 px-4">
               <div className="text-center">
-                <p className="text-sm font-semibold text-white/90">
-                  Morning library grind 🫠
-                </p>
+                <p className="text-sm font-semibold text-white/90">Morning library grind 🫠</p>
                 <p className="mt-1 text-xs text-white/50">
                   {stories.find((s) => s.id === viewing)?.user} &middot; 2h ago
                 </p>
@@ -758,9 +746,7 @@ function StoryDemo() {
         )}
       </AnimatePresence>
 
-      <p className="text-center text-[10px] text-muted-foreground">
-        Tap a story ring to watch it disappear
-      </p>
+      <p className="text-center text-[10px] text-muted-foreground">Tap a story ring to watch it disappear</p>
     </div>
   );
 }
@@ -786,17 +772,15 @@ function CommunityDemo() {
             <Users className="size-5 text-indigo-500" />
           </div>
           <div>
-            <p className="font-heading text-sm font-bold leading-tight text-foreground">
-              Coding@Campus
-            </p>
+            <p className="font-heading text-sm font-bold leading-tight text-foreground">Coding@Campus</p>
             <p className="text-[10px] text-muted-foreground">Tech community</p>
           </div>
         </div>
       </div>
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        LeetCode grinders, hackathon warriors, and people who think tabs are
-        better than spaces. Weekly DSA sessions every Saturday.
+        LeetCode grinders, hackathon warriors, and people who think tabs are better than spaces. Weekly DSA
+        sessions every Saturday.
       </p>
 
       {/* Members */}
@@ -832,10 +816,7 @@ function CommunityDemo() {
         variant={joined ? "default" : "outline"}
         size="sm"
         onClick={toggleJoin}
-        className={cn(
-          "w-full transition-all",
-          joined && "bg-indigo-600 hover:bg-indigo-700"
-        )}
+        className={cn("w-full transition-all", joined && "bg-indigo-600 hover:bg-indigo-700")}
       >
         {joined ? (
           <>
@@ -962,13 +943,7 @@ function ArtifactCard({
 
 // ──────── Overlay Modal ────────
 
-function OverlayModal({
-  artifact,
-  onClose,
-}: {
-  artifact: ArtifactConfig | null;
-  onClose: () => void;
-}) {
+function OverlayModal({ artifact, onClose }: { artifact: ArtifactConfig | null; onClose: () => void }) {
   // Capture escape key and lock body scroll
   useEffect(() => {
     if (!artifact) return;
@@ -1023,9 +998,7 @@ function OverlayModal({
                     <artifact.icon className="size-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-black tracking-tight text-foreground">
-                      {artifact.title}
-                    </h3>
+                    <h3 className="text-base font-black tracking-tight text-foreground">{artifact.title}</h3>
                     <p className="text-xs text-muted-foreground font-medium">
                       Click around — this is a live interactive demo
                     </p>
@@ -1065,9 +1038,7 @@ function OverlayModal({
 export function ArtifactsShowcase() {
   const [activeArtifact, setActiveArtifact] = useState<ArtifactId | null>(null);
 
-  const selected = activeArtifact
-    ? ARTIFACTS.find((a) => a.id === activeArtifact) ?? null
-    : null;
+  const selected = activeArtifact ? (ARTIFACTS.find((a) => a.id === activeArtifact) ?? null) : null;
 
   return (
     <section className="relative">
@@ -1085,7 +1056,8 @@ export function ArtifactsShowcase() {
             Eight expressive ways to spark campus chatter.
           </h2>
           <p className="max-w-xl text-sm leading-relaxed text-muted-foreground font-medium">
-            From anonymous confessions to instant polls and student memes — every format has its own interactive personality. Click any card below to test live.
+            From anonymous confessions to instant polls and student memes — every format has its own
+            interactive personality. Click any card below to test live.
           </p>
         </Reveal>
 
@@ -1105,8 +1077,8 @@ export function ArtifactsShowcase() {
           <div className="relative overflow-hidden rounded-3xl bg-card p-5 sm:p-6 shadow-2xs">
             <div className="relative flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs font-semibold text-muted-foreground">
-                <strong className="text-foreground font-bold">One Verified Student Account.</strong>{" "}
-                Total pseudonymity on confessions. Zero spam.
+                <strong className="text-foreground font-bold">One Verified Student Account.</strong> Total
+                pseudonymity on confessions. Zero spam.
               </p>
               <div className="flex shrink-0 items-center gap-2 text-xs font-bold text-primary">
                 <span className="relative flex size-2">
@@ -1121,10 +1093,7 @@ export function ArtifactsShowcase() {
       </div>
 
       {/* Interactive Overlay */}
-      <OverlayModal
-        artifact={selected}
-        onClose={() => setActiveArtifact(null)}
-      />
+      <OverlayModal artifact={selected} onClose={() => setActiveArtifact(null)} />
     </section>
   );
 }

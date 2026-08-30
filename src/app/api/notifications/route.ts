@@ -1,8 +1,8 @@
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { notifications,userProfiles } from "@/db/schema";
+import { notifications, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,inArray,sql } from "drizzle-orm";
-import { NextRequest,NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -88,9 +88,7 @@ export async function GET(req: NextRequest) {
 
     // If verified tab is chosen, filter where actor is verified (points >= 150 or admin)
     if (tab === "verified") {
-      sanitized = sanitized.filter(
-        (n) => (n.actor?.points || 0) >= 150 || n.actor?.role === "ADMIN"
-      );
+      sanitized = sanitized.filter((n) => (n.actor?.points || 0) >= 150 || n.actor?.role === "ADMIN");
     }
 
     // Count total unread notifications for this user
@@ -148,7 +146,6 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-
 export async function DELETE(req: NextRequest) {
   try {
     const user = await hexclaveServerApp.getUser();
@@ -203,10 +200,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ success: true, deleted: "all" });
     }
 
-    return NextResponse.json(
-      { error: "Provide an `id`, or `scope=all` / `scope=read`" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Provide an `id`, or `scope=all` / `scope=read`" }, { status: 400 });
   } catch (error) {
     console.error("DELETE /api/notifications error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

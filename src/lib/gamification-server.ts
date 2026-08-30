@@ -6,9 +6,9 @@
  * database (and therefore `node:crypto`) imports.
  */
 
+import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
 
 /**
  * Atomically credits Loop Points to a student's profile.

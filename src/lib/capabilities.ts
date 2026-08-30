@@ -1,6 +1,5 @@
-import { UserProfile } from "@/db/schema";
-import { isViewerProfile } from "@/lib/viewer";
 import { NextResponse } from "next/server";
+import { isViewerProfile } from "@/lib/viewer";
 
 export type UserCapability =
   | "READ_PUBLIC_CONTENT"
@@ -15,10 +14,7 @@ export type UserCapability =
   | "ANONYMOUS_POST"
   | "MARKETPLACE_ORDER";
 
-const VIEWER_ALLOWED_CAPABILITIES: Set<UserCapability> = new Set([
-  "READ_PUBLIC_CONTENT",
-  "SAVE_POST",
-]);
+const VIEWER_ALLOWED_CAPABILITIES: Set<UserCapability> = new Set(["READ_PUBLIC_CONTENT", "SAVE_POST"]);
 
 const CAPABILITY_MESSAGES: Record<UserCapability, { title: string; desc: string }> = {
   READ_PUBLIC_CONTENT: {

@@ -1,12 +1,12 @@
 "use client";
 
-import { FeedPost } from "@/hooks/use-feed";
+import { Bookmark, Heart, MessageCircle, Repeat2, Share } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { FeedPost } from "@/hooks/use-feed";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { Bookmark,Heart,MessageCircle,Repeat2,Share } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface FeedCardActionsProps {
   post: FeedPost;
@@ -120,7 +120,9 @@ export function FeedCardActions({
           onClick={onVote}
           className={cn(
             "size-8 rounded-full flex items-center justify-center transition-colors cursor-pointer group",
-            userVote === 1 ? "text-rose-500 hover:bg-rose-500/10" : "text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10"
+            userVote === 1
+              ? "text-rose-500 hover:bg-rose-500/10"
+              : "text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10"
           )}
           aria-label="Like"
         >

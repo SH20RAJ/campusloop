@@ -1,12 +1,5 @@
 "use client";
 
-import { MarkdownEditor } from "@/components/common/markdown-editor";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { uploadImageToImgBB } from "@/lib/upload";
-import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   Calendar,
@@ -26,6 +19,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
+import { MarkdownEditor } from "@/components/common/markdown-editor";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { cn } from "@/lib/utils";
 
 const EVENT_TYPES = [
   { id: "HACKATHON", label: "Hackathon" },
@@ -142,8 +142,7 @@ export function NewEventClient() {
       if (typeof d.meetingUrl === "string") setMeetingUrl(d.meetingUrl);
       if (typeof d.startDate === "string") setStartDate(d.startDate);
       if (typeof d.endDate === "string") setEndDate(d.endDate);
-      if (typeof d.registrationDeadline === "string")
-        setRegistrationDeadline(d.registrationDeadline);
+      if (typeof d.registrationDeadline === "string") setRegistrationDeadline(d.registrationDeadline);
       if (typeof d.participationType === "string") setParticipationType(d.participationType);
       if (typeof d.prizesDescription === "string") setPrizesDescription(d.prizesDescription);
       if (Array.isArray(d.perks)) setPerks(d.perks as string[]);
@@ -371,9 +370,7 @@ export function NewEventClient() {
 
       {draftRestored && (
         <div className="flex items-center justify-between gap-3 border-b border-border/40 bg-primary/5 px-4 py-2.5">
-          <p className="text-[11px] font-bold text-foreground">
-            Restored your unfinished event draft.
-          </p>
+          <p className="text-[11px] font-bold text-foreground">Restored your unfinished event draft.</p>
           <button
             type="button"
             onClick={() => {
@@ -566,9 +563,7 @@ export function NewEventClient() {
             )}
             {needsLink && (
               <div>
-                <label className="text-xs font-bold text-foreground">
-                  Online Link (Meet / Discord)
-                </label>
+                <label className="text-xs font-bold text-foreground">Online Link (Meet / Discord)</label>
                 <Input
                   placeholder="https://meet.google.com/..."
                   value={meetingUrl}
@@ -616,9 +611,7 @@ export function NewEventClient() {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-foreground">
-              Registrations Close (optional)
-            </label>
+            <label className="text-xs font-bold text-foreground">Registrations Close (optional)</label>
             <Input
               type="datetime-local"
               max={startDate || undefined}
@@ -687,9 +680,7 @@ export function NewEventClient() {
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="text-xs font-bold text-foreground">
-                Participant Cap (optional)
-              </label>
+              <label className="text-xs font-bold text-foreground">Participant Cap (optional)</label>
               <Input
                 type="number"
                 min={1}

@@ -1,14 +1,14 @@
 import {
-boolean,
-index,
-integer,
-pgEnum,
-pgTable,
-text,
-uniqueIndex,
-type AnyPgColumn,
+  type AnyPgColumn,
+  boolean,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { contentStatusEnum,createdAt,id,updatedAt } from "./common";
+import { contentStatusEnum, createdAt, id, updatedAt } from "./common";
 import { institutions } from "./institutions";
 import { userProfiles } from "./users";
 
@@ -55,7 +55,7 @@ export const posts = pgTable(
     index("posts_type_status_created_idx").on(table.type, table.status, table.createdAt),
     index("posts_community_status_created_idx").on(table.communityId, table.status, table.createdAt),
     index("posts_repost_idx").on(table.repostOfId),
-  ],
+  ]
 );
 
 export const comments = pgTable(
@@ -67,8 +67,7 @@ export const comments = pgTable(
       .references(() => posts.id, { onDelete: "cascade" }),
     authorId: text("author_id").references(() => userProfiles.id, { onDelete: "cascade" }),
     pseudonym: text("pseudonym"),
-    parentId: text("parent_id")
-      .references((): AnyPgColumn => comments.id, { onDelete: "cascade" }),
+    parentId: text("parent_id").references((): AnyPgColumn => comments.id, { onDelete: "cascade" }),
     body: text("body").notNull(),
     isAnonymous: boolean("is_anonymous").default(false).notNull(),
     status: contentStatusEnum("status").default("PUBLISHED").notNull(),
@@ -79,7 +78,7 @@ export const comments = pgTable(
     index("comments_post_created_idx").on(table.postId, table.createdAt),
     index("comments_parent_created_idx").on(table.parentId, table.createdAt),
     index("comments_author_idx").on(table.authorId),
-  ],
+  ]
 );
 
 export const pollOptions = pgTable(
@@ -92,7 +91,7 @@ export const pollOptions = pgTable(
     text: text("text").notNull(),
     createdAt,
   },
-  (table) => [index("poll_options_post_idx").on(table.postId)],
+  (table) => [index("poll_options_post_idx").on(table.postId)]
 );
 
 export const pollVotes = pgTable(
@@ -113,7 +112,7 @@ export const pollVotes = pgTable(
   (table) => [
     uniqueIndex("poll_votes_user_post_idx").on(table.userId, table.postId),
     index("poll_votes_option_idx").on(table.optionId),
-  ],
+  ]
 );
 
 export const votes = pgTable(
@@ -132,7 +131,7 @@ export const votes = pgTable(
   (table) => [
     uniqueIndex("votes_user_post_idx").on(table.userId, table.postId),
     index("votes_post_idx").on(table.postId),
-  ],
+  ]
 );
 
 export type Post = typeof posts.$inferSelect;

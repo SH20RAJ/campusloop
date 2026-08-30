@@ -1,11 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { Heart,Loader2,Lock } from "lucide-react";
+import { Heart, Loader2, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
-
+import { cn } from "@/lib/utils";
 
 interface SecretCrushButtonProps {
   targetId: string;
@@ -13,11 +12,7 @@ interface SecretCrushButtonProps {
   className?: string;
 }
 
-export function SecretCrushButton({
-  targetId,
-  targetName,
-  className,
-}: SecretCrushButtonProps) {
+export function SecretCrushButton({ targetId, targetName, className }: SecretCrushButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -34,7 +29,6 @@ export function SecretCrushButton({
       if (!res.ok) {
         throw new Error(data.error || "Failed to add secret crush");
       }
-
 
       if (data.matched) {
         toast.success(`💘 IT'S A MUTUAL MATCH! You and ${targetName} both secretly liked each other!`);
@@ -79,11 +73,10 @@ export function SecretCrushButton({
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-base font-black text-foreground">
-                Secret Crush on {targetName}?
-              </h3>
+              <h3 className="text-base font-black text-foreground">Secret Crush on {targetName}?</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Your intent is <strong>100% hidden</strong>. {targetName} will <strong>never</strong> know you crushed on them unless they secretly crush on you too!
+                Your intent is <strong>100% hidden</strong>. {targetName} will <strong>never</strong> know you
+                crushed on them unless they secretly crush on you too!
               </p>
             </div>
 
@@ -109,7 +102,11 @@ export function SecretCrushButton({
                 onClick={handleCrush}
                 className="flex-1 py-2 rounded-full bg-foreground text-background hover:opacity-90 text-xs font-black shadow-xs transition-transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
-                {isLoading ? <Loader2 className="size-3.5 animate-spin" /> : <Heart className="size-3.5 fill-rose-500 text-rose-500" />}
+                {isLoading ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <Heart className="size-3.5 fill-rose-500 text-rose-500" />
+                )}
                 <span>Lock In</span>
               </button>
             </div>
@@ -119,4 +116,3 @@ export function SecretCrushButton({
     </>
   );
 }
-

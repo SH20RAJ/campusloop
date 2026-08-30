@@ -1,9 +1,9 @@
-import { getDb } from "@/db";
-import { posts,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { rejectViewerWrite } from "@/lib/viewer";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { posts, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -43,19 +43,13 @@ export async function POST(req: Request, { params }: RouteParams) {
     const isAdmin = profile.role === "ADMIN";
 
     if (!isAuthor && !isAdmin) {
-      return NextResponse.json(
-        { error: "Forbidden. You can only archive your own posts." },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Forbidden. You can only archive your own posts." }, { status: 403 });
     }
 
     const isCurrentlyArchived = targetPost.status === "ARCHIVED";
     const newStatus = isCurrentlyArchived ? "PUBLISHED" : "ARCHIVED";
 
-    await db
-      .update(posts)
-      .set({ status: newStatus })
-      .where(eq(posts.id, id));
+    await db.update(posts).set({ status: newStatus }).where(eq(posts.id, id));
 
     return NextResponse.json({
       success: true,

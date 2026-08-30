@@ -1,12 +1,12 @@
-import {
-deletePost as deleteApi,
-reportPost as reportApi,
-repostPost as repostApi,
-voteOnPoll,
-voteOnPost,
-} from "@/lib/api";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  deletePost as deleteApi,
+  reportPost as reportApi,
+  repostPost as repostApi,
+  voteOnPoll,
+  voteOnPost,
+} from "@/lib/api";
 
 export function usePostActions(onMutationSuccess?: () => void) {
   const [isActionPending, setIsActionPending] = useState(false);

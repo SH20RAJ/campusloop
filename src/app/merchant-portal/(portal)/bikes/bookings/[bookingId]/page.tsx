@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { MerchantBikeBookingDetailClient } from "./merchant-bike-booking-detail-client";
 
 interface MerchantBikeBookingDetailPageProps {
@@ -11,9 +11,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function MerchantBikeBookingDetailPage({
-  params,
-}: MerchantBikeBookingDetailPageProps) {
+export default async function MerchantBikeBookingDetailPage({ params }: MerchantBikeBookingDetailPageProps) {
   const { bookingId } = await params;
   return <MerchantBikeBookingDetailClient bookingId={bookingId} />;
 }

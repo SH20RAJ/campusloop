@@ -1,10 +1,10 @@
 "use client";
 
+import { Check, Copy, Terminal } from "lucide-react";
+import Prism from "prismjs";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { Check, Copy, Terminal } from "lucide-react";
-import Prism from "prismjs";
 import "prismjs/components/prism-bash";
 import "prismjs/components/prism-c";
 import "prismjs/components/prism-clike";
@@ -23,7 +23,7 @@ import "prismjs/components/prism-sql";
 import "prismjs/components/prism-tsx";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-yaml";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 interface CodeBlockProps {
@@ -155,10 +155,7 @@ export function CodeBlock({
           </div>
         ) : (
           <pre className="overflow-x-auto font-mono">
-            <code
-              className={`language-${prismLang}`}
-              dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-            />
+            <code className={`language-${prismLang}`} dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
           </pre>
         )}
       </div>

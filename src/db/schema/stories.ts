@@ -1,5 +1,5 @@
-import { index,jsonb,pgTable,text,timestamp,uniqueIndex } from "drizzle-orm/pg-core";
-import { createdAt,id,updatedAt } from "./common";
+import { index, jsonb, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "./common";
 import { userProfiles } from "./users";
 
 export const stories = pgTable(
@@ -53,9 +53,7 @@ export const storyHighlights = pgTable(
     createdAt,
     updatedAt,
   },
-  (table) => [
-    index("story_highlights_user_idx").on(table.userId),
-  ]
+  (table) => [index("story_highlights_user_idx").on(table.userId)]
 );
 
 export type Story = typeof stories.$inferSelect;

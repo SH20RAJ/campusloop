@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { AdminLoginForm } from "./login-form";
 
 export const metadata: Metadata = {

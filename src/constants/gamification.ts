@@ -88,9 +88,7 @@ export const SECRET_CRUSH_MAX_SLOTS = 50;
 export const SECRET_CRUSH_EXPANSION_LP_THRESHOLD = 150; // Unlocked at Gold Star (150 LP)
 
 export function getSecretCrushSlotLimit(points: number = 0): number {
-  return points >= SECRET_CRUSH_EXPANSION_LP_THRESHOLD
-    ? SECRET_CRUSH_MAX_SLOTS
-    : SECRET_CRUSH_BASE_SLOTS;
+  return points >= SECRET_CRUSH_EXPANSION_LP_THRESHOLD ? SECRET_CRUSH_MAX_SLOTS : SECRET_CRUSH_BASE_SLOTS;
 }
 
 export interface SecretCrushSlotProgress {

@@ -1,28 +1,25 @@
 "use server";
 
-import {
-institutionDomains,
-institutions,
-} from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { institutionDomains, institutions } from "@/db/schema";
 
 import { getAdminDb } from "../_lib/guard";
 
 function slugify(text: string): string {
-	return text
-		.toString()
-		.toLowerCase()
-		.trim()
-		.replace(/\s+/g, "-")
-		.replace(/[^\w-]+/g, "")
-		.replace(/--+/g, "-")
-		.replace(/^-+|-+$/g, "");
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 export async function createCollege(formData: FormData) {
-	const db = await getAdminDb();
+  const db = await getAdminDb();
 
   const name = formData.get("name") as string;
   const slug = (formData.get("slug") as string) || slugify(name);
@@ -109,18 +106,21 @@ export async function removeDomain(domainId: string) {
   revalidatePath("/admin/colleges");
 }
 
-export async function updateCollegeDetails(id: string, data: {
-  name: string;
-  logoUrl?: string | null;
-  bannerUrl?: string | null;
-  nirfRank?: number | null;
-  description?: string | null;
-  website?: string | null;
-  state?: string | null;
-  district?: string | null;
-  yearOfEstablishment?: number | null;
-  extraData?: Record<string, unknown> | null;
-}) {
+export async function updateCollegeDetails(
+  id: string,
+  data: {
+    name: string;
+    logoUrl?: string | null;
+    bannerUrl?: string | null;
+    nirfRank?: number | null;
+    description?: string | null;
+    website?: string | null;
+    state?: string | null;
+    district?: string | null;
+    yearOfEstablishment?: number | null;
+    extraData?: Record<string, unknown> | null;
+  }
+) {
   const db = await getAdminDb();
 
   await db
@@ -142,4 +142,3 @@ export async function updateCollegeDetails(id: string, data: {
   revalidatePath("/admin/colleges");
   revalidatePath("/colleges");
 }
-

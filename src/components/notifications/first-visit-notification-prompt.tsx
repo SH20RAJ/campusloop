@@ -1,11 +1,11 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import { Bell, BellRing, Loader2, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { AnimatePresence,motion } from "framer-motion";
-import { Bell,BellRing,Loader2,X } from "lucide-react";
-import { useEffect,useState } from "react";
 
 const PROMPT_STORAGE_KEY = "campusloop_notif_prompted_v1";
 
@@ -80,9 +80,7 @@ export function FirstVisitNotificationPrompt() {
 
             <div className="space-y-1 min-w-0 pr-5">
               <div className="flex items-center gap-1.5">
-                <h3 className="text-sm font-black text-foreground tracking-tight">
-                  Turn on Campus Alerts?
-                </h3>
+                <h3 className="text-sm font-black text-foreground tracking-tight">Turn on Campus Alerts?</h3>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Never miss instant replies, anonymous confessions, secret crushes, or direct chat messages.

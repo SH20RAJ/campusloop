@@ -1,20 +1,14 @@
 "use client";
 
+import { AlertCircle, Check, Loader2, X } from "lucide-react";
 import type { UsernameStatus } from "@/hooks/use-username-availability";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Check, Loader2, X } from "lucide-react";
 
 /**
  * Inline availability readout for a username field, shared by onboarding and
  * profile editing so both read identically.
  */
-export function UsernameStatusHint({
-  status,
-  className,
-}: {
-  status: UsernameStatus;
-  className?: string;
-}) {
+export function UsernameStatusHint({ status, className }: { status: UsernameStatus; className?: string }) {
   if (status.state === "idle") return null;
 
   const base = cn("flex items-center gap-1 text-[11px] font-semibold", className);

@@ -1,9 +1,9 @@
 "use client";
 
-import { fetcher } from "@/lib/api";
 import { Flame } from "lucide-react";
 import { useState } from "react";
 import useSWR from "swr";
+import { fetcher } from "@/lib/api";
 
 export function MerchantOffersClient() {
   const [title, setTitle] = useState("");

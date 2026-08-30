@@ -1,14 +1,11 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import { Download, PlusSquare, Share, X, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { AnimatePresence,motion } from "framer-motion";
-import {
-Download,PlusSquare,Share,X,
-Zap
-} from "lucide-react";
-import { useEffect,useState } from "react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -206,7 +203,8 @@ export function PWAInstallBanner() {
                     1
                   </div>
                   <p className="text-xs text-foreground font-medium leading-snug">
-                    Tap the <strong>Share</strong> button <Share className="inline size-3.5 text-primary mx-0.5" /> at the bottom of Safari.
+                    Tap the <strong>Share</strong> button{" "}
+                    <Share className="inline size-3.5 text-primary mx-0.5" /> at the bottom of Safari.
                   </p>
                 </div>
 
@@ -215,7 +213,8 @@ export function PWAInstallBanner() {
                     2
                   </div>
                   <p className="text-xs text-foreground font-medium leading-snug">
-                    Scroll down and tap <strong>Add to Home Screen</strong> <PlusSquare className="inline size-3.5 text-primary mx-0.5" />.
+                    Scroll down and tap <strong>Add to Home Screen</strong>{" "}
+                    <PlusSquare className="inline size-3.5 text-primary mx-0.5" />.
                   </p>
                 </div>
 

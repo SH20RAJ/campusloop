@@ -1,9 +1,9 @@
 "use client";
 
+import { ArrowUp } from "lucide-react";
+import { useEffect, useState } from "react";
 import { haptics } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
-import { ArrowUp } from "lucide-react";
-import { useEffect,useState } from "react";
 
 /**
  * Floating "back to top" button for long scrolling surfaces.
@@ -47,7 +47,7 @@ export function ScrollToTop({ threshold = 1200, className }: { threshold?: numbe
       className={cn(
         "fixed bottom-24 right-4 z-40 flex size-11 items-center justify-center rounded-full border border-border/60 bg-card/95 text-foreground shadow-lg backdrop-blur-xl transition-all duration-200 cursor-pointer hover:bg-muted active:scale-90 md:bottom-8 md:right-8",
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0",
-        className,
+        className
       )}
     >
       <ArrowUp className="size-4.5" />

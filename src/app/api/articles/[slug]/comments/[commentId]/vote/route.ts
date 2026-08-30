@@ -1,8 +1,8 @@
+import { and, eq, sql } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { articleComments, articleCommentVotes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and, eq, sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
 
 interface RouteProps {
   params: Promise<{ slug: string; commentId: string }>;
@@ -34,10 +34,7 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
     }
 
     const existingVote = await db.query.articleCommentVotes.findFirst({
-      where: and(
-        eq(articleCommentVotes.commentId, commentId),
-        eq(articleCommentVotes.profileId, profile.id)
-      ),
+      where: and(eq(articleCommentVotes.commentId, commentId), eq(articleCommentVotes.profileId, profile.id)),
     });
 
     let newVote = 0;
@@ -58,10 +55,7 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
       await db
         .delete(articleCommentVotes)
         .where(
-          and(
-            eq(articleCommentVotes.commentId, commentId),
-            eq(articleCommentVotes.profileId, profile.id)
-          )
+          and(eq(articleCommentVotes.commentId, commentId), eq(articleCommentVotes.profileId, profile.id))
         );
       await db
         .update(articleComments)

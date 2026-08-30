@@ -50,7 +50,7 @@ export function ReportDialog({ postId, isOpen, onClose }: ReportDialogProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
       <div className="relative w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg animate-in fade-in zoom-in-95">
-        <button 
+        <button
           onClick={onClose}
           className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity"
         >
@@ -66,7 +66,12 @@ export function ReportDialog({ postId, isOpen, onClose }: ReportDialogProps) {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="reason" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Reason</label>
+              <label
+                htmlFor="reason"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Reason
+              </label>
               <select
                 id="reason"
                 value={reason}
@@ -82,7 +87,12 @@ export function ReportDialog({ postId, isOpen, onClose }: ReportDialogProps) {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="details" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Details (Optional)</label>
+              <label
+                htmlFor="details"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Details (Optional)
+              </label>
               <textarea
                 id="details"
                 value={details}

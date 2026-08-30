@@ -1,15 +1,12 @@
-import { getDb } from "@/db";
-import { eventRegistrations, events, institutions, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and, desc, eq, or } from "drizzle-orm";
+import { desc, eq, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { eventRegistrations, events, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const db = getDb();
@@ -84,10 +81,7 @@ export async function GET(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const user = await hexclaveServerApp.getUser();

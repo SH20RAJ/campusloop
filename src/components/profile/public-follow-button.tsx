@@ -1,11 +1,11 @@
 "use client";
 
-import { FollowButton } from "@/components/profile/follow-button";
-import { MessageSquare,UserPlus } from "lucide-react";
+import { MessageSquare, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { FollowButton } from "@/components/profile/follow-button";
 
 interface PublicFollowButtonProps {
   username: string;
@@ -35,11 +35,7 @@ export function PublicFollowButton({
           <MessageSquare className="size-3.5" />
           <span className="hidden sm:inline">Message</span>
         </Link>
-        <FollowButton
-          username={username}
-          displayName={displayName}
-          initialIsFollowing={initialIsFollowing}
-        />
+        <FollowButton username={username} displayName={displayName} initialIsFollowing={initialIsFollowing} />
       </div>
     );
   }

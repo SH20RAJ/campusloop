@@ -1,22 +1,14 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { RidesharePool } from "@/db/schema";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import {
-ArrowRight,
-Car,
-Clock,
-MessageCircle,
-Share2,
-ShieldCheck,
-Users,
-} from "lucide-react";
+import { ArrowRight, Car, Clock, MessageCircle, Share2, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { RidesharePool } from "@/db/schema";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface RideshareCardProps {
   item: RidesharePool & {
@@ -116,9 +108,7 @@ export function RideshareCard({ item }: RideshareCardProps) {
               {(item.creator.points || 0) >= 150 && (
                 <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
               )}
-              <span className="text-[11px] text-muted-foreground truncate">
-                @{item.creator.username}
-              </span>
+              <span className="text-[11px] text-muted-foreground truncate">@{item.creator.username}</span>
               <span className="text-[10px] text-muted-foreground/60">·</span>
               <span className="text-[11px] text-muted-foreground/80 shrink-0">
                 {formatTimeAgo(item.createdAt)}
@@ -170,9 +160,7 @@ export function RideshareCard({ item }: RideshareCardProps) {
       </div>
 
       {item.notes && (
-        <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">
-          {item.notes}
-        </p>
+        <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">{item.notes}</p>
       )}
 
       {/* Action Footer */}
@@ -201,8 +189,8 @@ export function RideshareCard({ item }: RideshareCardProps) {
               reserved
                 ? "bg-muted text-foreground hover:bg-muted/80"
                 : isFull
-                ? "bg-muted text-muted-foreground cursor-not-allowed"
-                : "bg-sky-500 text-white hover:bg-sky-600 shadow-sky-500/20"
+                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                  : "bg-sky-500 text-white hover:bg-sky-600 shadow-sky-500/20"
             )}
           >
             {reserved ? "Cancel Seat" : isFull ? "Full" : "Book Seat"}

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-AlertTriangle,RefreshCw,
-Zap
-} from "lucide-react";
+import { AlertTriangle, RefreshCw, Zap } from "lucide-react";
 import Link from "next/link";
 
 export function FeedEmptyState() {
@@ -12,9 +9,7 @@ export function FeedEmptyState() {
       <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 mb-4">
         <Zap className="h-6 w-6 text-muted-foreground/50" />
       </div>
-      <h3 className="font-semibold text-foreground text-sm">
-        Your feed is quiet
-      </h3>
+      <h3 className="font-semibold text-foreground text-sm">Your feed is quiet</h3>
       <p className="text-xs text-muted-foreground mt-1 max-w-xs px-4 leading-relaxed">
         No posts matched your active filter settings. Try resetting filters or post something yourself!
       </p>

@@ -1,11 +1,11 @@
+import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
+import { notFound, redirect } from "next/navigation";
 import { CommunityHeader } from "@/components/communities/community-header";
 import { CommunitySettingsClient } from "@/components/communities/community-settings-client";
 import { getDb } from "@/db";
 import { posts } from "@/db/schema";
-import { getCachedAuthUser,getCachedCommunity,getCachedUserProfile } from "@/lib/server-cache";
-import { eq } from "drizzle-orm";
-import { Metadata } from "next";
-import { notFound,redirect } from "next/navigation";
+import { getCachedAuthUser, getCachedCommunity, getCachedUserProfile } from "@/lib/server-cache";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -34,12 +34,8 @@ export default async function CommunitySettingsPage({ params }: PageProps) {
   const user = await getCachedAuthUser();
   if (!user) redirect("/handler/sign-in");
 
-
   // Parallelize user profile and community lookup with request cache
-  const [profile, comm] = await Promise.all([
-    getCachedUserProfile(user.id),
-    getCachedCommunity(id),
-  ]);
+  const [profile, comm] = await Promise.all([getCachedUserProfile(user.id), getCachedCommunity(id)]);
 
   if (!profile) redirect("/app/onboarding");
   if (!comm) notFound();
@@ -63,7 +59,6 @@ export default async function CommunitySettingsPage({ params }: PageProps) {
   ).length;
 
   const activeMembersCount = comm.members.filter((m) => m.status === "ACTIVE").length;
-
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen bg-background text-foreground pb-24 border-x border-border/30 select-none">

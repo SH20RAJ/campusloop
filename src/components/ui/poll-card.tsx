@@ -1,7 +1,7 @@
 "use client";
 
-import { FeedPost } from "@/hooks/use-feed";
 import { useState } from "react";
+import type { FeedPost } from "@/hooks/use-feed";
 
 interface PollCardProps {
   post: FeedPost;
@@ -20,12 +20,14 @@ export function PollCard({ post }: PollCardProps) {
     setIsLoading(true);
     setHasVoted(true);
     setTotalVotes(totalVotes + 1);
-    setOptions(prev => prev.map(opt => {
-      if (opt.id === optionId) {
-        return { ...opt, votesCount: opt.votesCount + 1, userVoted: true };
-      }
-      return opt;
-    }));
+    setOptions((prev) =>
+      prev.map((opt) => {
+        if (opt.id === optionId) {
+          return { ...opt, votesCount: opt.votesCount + 1, userVoted: true };
+        }
+        return opt;
+      })
+    );
 
     try {
       const res = await fetch(`/api/posts/${post.id}/poll-vote`, {
@@ -52,13 +54,13 @@ export function PollCard({ post }: PollCardProps) {
     <div className="space-y-3 mt-3">
       {options.map((option) => {
         const percentage = totalVotes > 0 ? Math.round((option.votesCount / totalVotes) * 100) : 0;
-        
+
         return (
           <div key={option.id} className="relative overflow-hidden rounded-lg border border-border">
             {hasVoted ? (
               <>
                 {/* Progress bar background fill */}
-                <div 
+                <div
                   className={`absolute inset-y-0 left-0 bg-primary/10 transition-all duration-500 ${option.userVoted ? "bg-primary/20" : ""}`}
                   style={{ width: `${percentage}%` }}
                 />
@@ -81,9 +83,11 @@ export function PollCard({ post }: PollCardProps) {
           </div>
         );
       })}
-      
+
       {hasVoted && (
-        <p className="text-xs text-muted-foreground px-1">{totalVotes} {totalVotes === 1 ? "vote" : "votes"}</p>
+        <p className="text-xs text-muted-foreground px-1">
+          {totalVotes} {totalVotes === 1 ? "vote" : "votes"}
+        </p>
       )}
     </div>
   );

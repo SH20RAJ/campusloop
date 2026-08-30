@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { NewEventClient } from "./new-event-client";
 
 export const metadata: Metadata = {

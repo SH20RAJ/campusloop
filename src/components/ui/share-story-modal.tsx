@@ -1,9 +1,9 @@
 "use client";
 
-import { FeedPost } from "@/hooks/use-feed";
-import { Check,Copy,Download,MessageCircle,Share2,X } from "lucide-react";
-import { useEffect,useRef,useState } from "react";
+import { Check, Copy, Download, MessageCircle, Share2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import type { FeedPost } from "@/hooks/use-feed";
 
 interface ShareStoryModalProps {
   post: FeedPost;
@@ -23,7 +23,10 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
   const [copied, setCopied] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const postUrl = typeof window !== "undefined" ? `${window.location.origin}/app/post/${post.id}` : `https://campusloop.space/app/post/${post.id}`;
+  const postUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/app/post/${post.id}`
+      : `https://campusloop.space/app/post/${post.id}`;
 
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
 
@@ -53,7 +56,7 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
       canvasRef.current.toBlob(async (blob) => {
         if (blob) {
           const file = new File([blob], `campusloop-story-${post.id}.png`, { type: "image/png" });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          if (navigator.canShare?.({ files: [file] })) {
             try {
               await navigator.share({
                 title: "CampusLoop Story",
@@ -155,7 +158,12 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
     // 4. Draw Post Type Tag / Institution
     ctx.fillStyle = selectedTheme.id === "dark" ? "#f97316" : "#ffffff";
     ctx.font = "bold 32px sans-serif";
-    const postTypeBadge = post.type === "CONFESSION" ? "🤫 ANONYMOUS CONFESSION" : post.type === "POLL" ? "📊 CAMPUS POLL" : "🔥 CAMPUS PULSE";
+    const postTypeBadge =
+      post.type === "CONFESSION"
+        ? "🤫 ANONYMOUS CONFESSION"
+        : post.type === "POLL"
+          ? "📊 CAMPUS POLL"
+          : "🔥 CAMPUS PULSE";
     ctx.fillText(postTypeBadge, 140, 420);
 
     ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
@@ -177,12 +185,12 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
     const maxWidth = 800;
 
     for (let n = 0; n < words.length; n++) {
-      const testLine = line + words[n] + " ";
+      const testLine = `${line + words[n]} `;
       const metrics = ctx.measureText(testLine);
       const testWidth = metrics.width;
       if (testWidth > maxWidth && n > 0) {
         ctx.fillText(line, 140, y);
-        line = words[n] + " ";
+        line = `${words[n]} `;
         y += lineHeight;
         if (y > 1320) {
           ctx.fillText("...", 140, y);

@@ -1,6 +1,6 @@
+import { NextResponse } from "next/server";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { checkCampusUpgradeEligibility } from "@/lib/campus-upgrade";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

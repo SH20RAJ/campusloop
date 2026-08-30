@@ -1,19 +1,12 @@
 "use client";
 
+import { ArrowLeft, ImagePlus, Loader2, Send, Trash2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
-import {
-ArrowLeft,
-ImagePlus,
-Loader2,
-Send,
-Trash2,
-X
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRef,useState } from "react";
-import { toast } from "sonner";
 
 export function NewProductClient() {
   const router = useRouter();

@@ -60,10 +60,9 @@ export function useUsernameAvailability(
 
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `/api/profile/username-available?username=${encodeURIComponent(candidate)}`,
-          { signal: controller.signal }
-        );
+        const res = await fetch(`/api/profile/username-available?username=${encodeURIComponent(candidate)}`, {
+          signal: controller.signal,
+        });
         if (!res.ok) throw new Error("Request failed");
 
         const data = (await res.json()) as AvailabilityResponse;

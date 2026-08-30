@@ -1,7 +1,7 @@
-import { getDb } from "@/db";
-import { institutions } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { institutions } from "@/db/schema";
 
 /**
  * Viewer-Only Mode
@@ -88,11 +88,10 @@ export async function rejectViewerWrite(profile: {
   if (await isViewerProfile(profile)) {
     return NextResponse.json(
       {
-        error:
-          "You're in Viewer Mode. Sign up with your official college email to post, vote, and interact.",
+        error: "You're in Viewer Mode. Sign up with your official college email to post, vote, and interact.",
         viewerMode: true,
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
   return null;

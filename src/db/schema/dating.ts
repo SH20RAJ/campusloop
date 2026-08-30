@@ -1,5 +1,5 @@
-import { boolean,index,pgEnum,pgTable,text,timestamp,uniqueIndex } from "drizzle-orm/pg-core";
-import { createdAt,id } from "./common";
+import { boolean, index, pgEnum, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { createdAt, id } from "./common";
 import { userProfiles } from "./users";
 
 export const swipeDirectionEnum = pgEnum("swipe_direction", ["LIKE", "PASS"]);
@@ -70,4 +70,3 @@ export const secretCrushAttempts = pgTable(
 
 export type SecretCrushAttempt = typeof secretCrushAttempts.$inferSelect;
 export type NewSecretCrushAttempt = typeof secretCrushAttempts.$inferInsert;
-

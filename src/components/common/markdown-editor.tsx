@@ -1,9 +1,5 @@
 "use client";
 
-import { MarkdownContent } from "@/components/common/markdown-content";
-import { haptics } from "@/lib/haptics";
-import { uploadImageToImgBB } from "@/lib/upload";
-import { cn } from "@/lib/utils";
 import {
   Bold,
   Code,
@@ -24,6 +20,10 @@ import {
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { MarkdownContent } from "@/components/common/markdown-content";
+import { haptics } from "@/lib/haptics";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { cn } from "@/lib/utils";
 
 /**
  * Shared markdown authoring surface used by the article editor and the event
@@ -240,11 +240,7 @@ export function MarkdownEditor({
               onClick={() => fileInputRef.current?.click()}
               className="flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-black text-primary transition-colors hover:bg-primary/10 active:scale-95 disabled:opacity-60"
             >
-              {isUploading ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <ImageIcon className="size-4" />
-              )}
+              {isUploading ? <Loader2 className="size-4 animate-spin" /> : <ImageIcon className="size-4" />}
               <span className="hidden sm:inline">{isUploading ? "Uploading" : "Image"}</span>
             </button>
 

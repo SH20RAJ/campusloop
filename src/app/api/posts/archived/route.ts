@@ -1,8 +1,8 @@
-import { getDb } from "@/db";
-import { posts,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { posts, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 export const dynamic = "force-dynamic";
 
@@ -23,10 +23,7 @@ export async function GET() {
     }
 
     const archivedPosts = await db.query.posts.findMany({
-      where: and(
-        eq(posts.authorId, profile.id),
-        eq(posts.status, "ARCHIVED")
-      ),
+      where: and(eq(posts.authorId, profile.id), eq(posts.status, "ARCHIVED")),
       orderBy: [desc(posts.createdAt)],
       with: {
         author: true,

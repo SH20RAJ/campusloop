@@ -1,8 +1,8 @@
+import { and, eq } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { conversationParticipants,conversations,messages,userProfiles } from "@/db/schema";
+import { conversationParticipants, conversations, messages, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,eq } from "drizzle-orm";
-import { NextRequest,NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -99,25 +99,23 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
           .set({ readAt: new Date() })
           .where(
             and(
-              eq(messages.conversationId, conversationId),
+              eq(messages.conversationId, conversationId)
               // sender is NOT the current user
             )
           );
         break;
 
-      case "mark_unread":
+      case "mark_unread": {
         // Reset readAt for the last received message
         const lastReceived = await db.query.messages.findFirst({
           where: eq(messages.conversationId, conversationId),
           orderBy: (messages, { desc }) => [desc(messages.createdAt)],
         });
         if (lastReceived && lastReceived.senderId !== profile.id) {
-          await db
-            .update(messages)
-            .set({ readAt: null })
-            .where(eq(messages.id, lastReceived.id));
+          await db.update(messages).set({ readAt: null }).where(eq(messages.id, lastReceived.id));
         }
         break;
+      }
 
       default:
         return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });

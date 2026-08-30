@@ -1,8 +1,8 @@
+import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { merchants, merchantUsers, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getAuthenticatedMerchant } from "@/lib/merchant-auth";
-import { eq } from "drizzle-orm";
 
 export async function resolveMerchantSession(): Promise<typeof merchants.$inferSelect | null> {
   // 1. Direct merchant session cookie
@@ -23,7 +23,7 @@ export async function resolveMerchantSession(): Promise<typeof merchants.$inferS
 
     if (!profile) return null;
 
-    let merchantUser = await db.query.merchantUsers.findFirst({
+    const merchantUser = await db.query.merchantUsers.findFirst({
       where: eq(merchantUsers.userId, profile.id),
       with: { merchant: true },
     });

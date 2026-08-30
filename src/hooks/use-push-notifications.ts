@@ -1,9 +1,9 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { useCallback,useEffect,useState } from "react";
-import { toast } from "sonner";
 
 export type PushPermission = "unsupported" | "default" | "granted" | "denied";
 
@@ -18,11 +18,14 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
  * Trigger a native browser or PWA system notification.
  * Works across desktop Chrome/Edge/Safari/Firefox, Android Chrome, and iOS PWA.
  */
-export async function triggerBrowserNotification(title: string, options?: {
-  body?: string;
-  url?: string;
-  tag?: string;
-}) {
+export async function triggerBrowserNotification(
+  title: string,
+  options?: {
+    body?: string;
+    url?: string;
+    tag?: string;
+  }
+) {
   if (typeof window === "undefined" || !("Notification" in window)) return;
   if (Notification.permission !== "granted") return;
 
@@ -33,7 +36,7 @@ export async function triggerBrowserNotification(title: string, options?: {
   try {
     if ("serviceWorker" in navigator) {
       const reg = await navigator.serviceWorker.ready;
-      if (reg && reg.showNotification) {
+      if (reg?.showNotification) {
         await reg.showNotification(title, {
           body,
           icon: "/logo.png",
@@ -109,7 +112,7 @@ export function usePushNotifications() {
         toast.info(
           result === "denied"
             ? "Notifications are blocked. Please enable them in your browser site settings."
-            : "Notification permission was not granted.",
+            : "Notification permission was not granted."
         );
         setIsSubscribed(false);
         return false;
@@ -138,7 +141,10 @@ export function usePushNotifications() {
             body: JSON.stringify(subscription.toJSON()),
           });
         } catch (pushErr) {
-          console.warn("Optional WebPush subscription failed (browser notifications remain active):", pushErr);
+          console.warn(
+            "Optional WebPush subscription failed (browser notifications remain active):",
+            pushErr
+          );
         }
       }
 

@@ -1,8 +1,8 @@
+import { desc, ne } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
-import { desc, ne } from "drizzle-orm";
 import { VIEWER_INSTITUTION_SLUG } from "@/lib/viewer";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

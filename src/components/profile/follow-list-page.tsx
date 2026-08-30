@@ -1,14 +1,14 @@
+import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { FollowListClient } from "@/components/profile/follow-list-client";
 import { Navigation } from "@/components/ui/navigation";
 import { RightSidebar } from "@/components/ui/right-sidebar";
 import { getDb } from "@/db";
-import { institutions,userProfiles } from "@/db/schema";
+import { institutions, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { FollowDirection,getFollowCounts,getFollowListPage } from "@/lib/follows";
-import { eq } from "drizzle-orm";
-import { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { type FollowDirection, getFollowCounts, getFollowListPage } from "@/lib/follows";
 
 type Direction = FollowDirection;
 
@@ -20,21 +20,20 @@ function parseHandle(rawUsername: string): string | null {
 
 export async function generateFollowListMetadata(
   rawUsername: string,
-  direction: Direction,
+  direction: Direction
 ): Promise<Metadata> {
   const username = parseHandle(rawUsername);
   if (!username) return { title: "Profile" };
 
-  const label =
-    direction === "followers" ? "Followers" : direction === "following" ? "Following" : "Friends";
+  const label = direction === "followers" ? "Followers" : direction === "following" ? "Following" : "Friends";
   return {
     title: `@${username}'s ${label} | CampusLoop`,
     description:
       direction === "followers"
         ? `Students following @${username} on CampusLoop.`
         : direction === "following"
-        ? `Students @${username} follows on CampusLoop.`
-        : `Students who are mutual campus friends with @${username} on CampusLoop.`,
+          ? `Students @${username} follows on CampusLoop.`
+          : `Students who are mutual campus friends with @${username} on CampusLoop.`,
     alternates: { canonical: `https://campusloop.space/@${username}/${direction}` },
     robots: { index: false, follow: true },
   };
@@ -56,7 +55,7 @@ export async function FollowListPageView({
     columns: { id: true, username: true, displayName: true, status: true },
   });
 
-  if (!profile || profile.status !== "ACTIVE") notFound();
+  if (profile?.status !== "ACTIVE") notFound();
 
   const user = await hexclaveServerApp.getUser();
   const currentProfile = user

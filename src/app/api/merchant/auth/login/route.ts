@@ -1,8 +1,8 @@
+import { ilike } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { merchants } from "@/db/schema";
 import { createMerchantSessionToken, setMerchantSessionCookie } from "@/lib/merchant-auth";
-import { eq, ilike } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -12,10 +12,7 @@ export async function POST(req: Request) {
     const { username, password } = body;
 
     if (!username || !password || typeof username !== "string" || typeof password !== "string") {
-      return NextResponse.json(
-        { error: "Username and password are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Username and password are required" }, { status: 400 });
     }
 
     const cleanUsername = username.trim().toLowerCase();
@@ -27,17 +24,11 @@ export async function POST(req: Request) {
     });
 
     if (!merchant) {
-      return NextResponse.json(
-        { error: "Invalid merchant username or store not found" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid merchant username or store not found" }, { status: 401 });
     }
 
     if (!merchant.loginPassword || merchant.loginPassword !== cleanPassword) {
-      return NextResponse.json(
-        { error: "Incorrect password for this merchant account" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Incorrect password for this merchant account" }, { status: 401 });
     }
 
     if (merchant.status === "SUSPENDED" || merchant.status === "CLOSED") {

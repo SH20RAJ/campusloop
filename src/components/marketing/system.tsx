@@ -1,9 +1,9 @@
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 
 export const BRAND_GRADIENT = "bg-linear-to-r from-indigo-500 via-violet-600 to-purple-600";
 
@@ -97,8 +97,8 @@ export function MarketingFooter() {
         <div className="space-y-3">
           <BrandMark size="sm" />
           <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
-            The verified student-only social network for Indian colleges. Built for students, gated
-            by a college email.
+            The verified student-only social network for Indian colleges. Built for students, gated by a
+            college email.
           </p>
         </div>
 
@@ -170,9 +170,7 @@ export function SectionHeading({
 }) {
   return (
     <div className={cn("max-w-2xl space-y-3 pb-12", align === "center" && "mx-auto text-center", className)}>
-      {eyebrow && (
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{eyebrow}</p>
-      )}
+      {eyebrow && <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{eyebrow}</p>}
       <h2 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h2>
       {lede && <p className="text-base leading-relaxed text-muted-foreground">{lede}</p>}
     </div>

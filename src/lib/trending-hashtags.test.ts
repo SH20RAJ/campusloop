@@ -1,4 +1,4 @@
-import { describe,expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { getTrendingHashtags } from "./trending-hashtags";
 
 describe("trending-hashtags engine", () => {

@@ -1,10 +1,10 @@
 "use server";
 
+import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
 export async function updateProfile(
   displayName: string,
@@ -38,9 +38,15 @@ export async function updateProfile(
     throw new Error("Username is already taken");
   }
 
-  let cleanAnon = anonymousUsername ? anonymousUsername.trim().toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_]/g, "") : null;
+  let cleanAnon = anonymousUsername
+    ? anonymousUsername
+        .trim()
+        .toLowerCase()
+        .replace(/^@/, "")
+        .replace(/[^a-z0-9_]/g, "")
+    : null;
   if (cleanAnon && cleanAnon.length === 0) cleanAnon = null;
-  
+
   await db
     .update(userProfiles)
     .set({
@@ -49,10 +55,9 @@ export async function updateProfile(
       bio,
       avatarUrl: avatarUrl || null,
       anonymousUsername: cleanAnon,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     })
     .where(eq(userProfiles.userId, user.id));
-
 
   revalidatePath("/app/profile");
   revalidatePath("/app");

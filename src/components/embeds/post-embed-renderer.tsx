@@ -1,7 +1,7 @@
 "use client";
 
-import { extractEmbedsFromText, ParsedEmbed } from "@/lib/embeds";
 import { useMemo } from "react";
+import { extractEmbedsFromText } from "@/lib/embeds";
 import { CommunityEmbed } from "./community-embed";
 import { EventEmbed } from "./event-embed";
 import { LinkPreviewEmbed } from "./link-preview-embed";
@@ -31,29 +31,19 @@ export function PostEmbedRenderer({ content }: PostEmbedRendererProps) {
 
         switch (embed.type) {
           case "youtube":
-            return embed.id ? (
-              <YouTubeEmbed key={key} videoId={embed.id} rawUrl={embed.rawUrl} />
-            ) : null;
+            return embed.id ? <YouTubeEmbed key={key} videoId={embed.id} rawUrl={embed.rawUrl} /> : null;
 
           case "spotify":
-            return embed.embedUrl ? (
-              <SpotifyEmbed key={key} embedUrl={embed.embedUrl} />
-            ) : null;
+            return embed.embedUrl ? <SpotifyEmbed key={key} embedUrl={embed.embedUrl} /> : null;
 
           case "internal_profile":
-            return embed.username ? (
-              <UserProfileEmbed key={key} username={embed.username} />
-            ) : null;
+            return embed.username ? <UserProfileEmbed key={key} username={embed.username} /> : null;
 
           case "internal_community":
-            return embed.slug ? (
-              <CommunityEmbed key={key} slugOrId={embed.slug} />
-            ) : null;
+            return embed.slug ? <CommunityEmbed key={key} slugOrId={embed.slug} /> : null;
 
           case "internal_event":
-            return embed.id ? (
-              <EventEmbed key={key} eventId={embed.id} />
-            ) : null;
+            return embed.id ? <EventEmbed key={key} eventId={embed.id} /> : null;
 
           case "opengraph":
             return <LinkPreviewEmbed key={key} url={embed.rawUrl} />;

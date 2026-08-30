@@ -1,5 +1,5 @@
-import { boolean,index,jsonb,pgTable,text,timestamp,uniqueIndex } from "drizzle-orm/pg-core";
-import { createdAt,id,updatedAt } from "./common";
+import { boolean, index, jsonb, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "./common";
 import { communities } from "./communities";
 import { userProfiles } from "./users";
 
@@ -54,7 +54,9 @@ export const messages = pgTable(
       .references(() => userProfiles.id, { onDelete: "cascade" }),
     body: text("body").notNull(),
     readAt: timestamp("read_at", { withTimezone: true }),
-    reactions: jsonb("reactions").$type<{ emoji: string; userId: string; userDisplayName?: string }[]>().default([]),
+    reactions: jsonb("reactions")
+      .$type<{ emoji: string; userId: string; userDisplayName?: string }[]>()
+      .default([]),
     createdAt,
     updatedAt,
   },
@@ -64,7 +66,6 @@ export const messages = pgTable(
     index("messages_read_idx").on(table.conversationId, table.readAt),
   ]
 );
-
 
 export type Conversation = typeof conversations.$inferSelect;
 export type NewConversation = typeof conversations.$inferInsert;

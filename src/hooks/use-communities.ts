@@ -1,5 +1,5 @@
-import { fetcher } from "@/lib/api";
 import useSWR from "swr";
+import { fetcher } from "@/lib/api";
 
 export interface Community {
   id: string;
@@ -17,16 +17,11 @@ export interface Community {
 }
 
 export function useCommunities() {
-  const { data, error, isLoading, mutate } = useSWR<Community[]>(
-    "/api/communities",
-    fetcher,
-    {
-      revalidateIfStale: true,
-      keepPreviousData: true,
-      dedupingInterval: 20000,
-    }
-  );
-
+  const { data, error, isLoading, mutate } = useSWR<Community[]>("/api/communities", fetcher, {
+    revalidateIfStale: true,
+    keepPreviousData: true,
+    dedupingInterval: 20000,
+  });
 
   return {
     communities: data || [],

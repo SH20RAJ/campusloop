@@ -1,26 +1,26 @@
-import { getDb } from "@/db";
-import { institutionDomains,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
 import { eq } from "drizzle-orm";
-import { SignOutButton } from "@/components/ui/sign-out-button";
 import { Lock } from "lucide-react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { SignOutButton } from "@/components/ui/sign-out-button";
+import { getDb } from "@/db";
+import { institutionDomains, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { OnboardingForm } from "./onboarding-form";
 
 export const metadata: Metadata = {
-	title: "Complete Your Profile",
-	description: "Set up your CampusLoop profile — pick your branch, year, and interests to join your campus feed.",
-	robots: { index: false, follow: false },
+  title: "Complete Your Profile",
+  description:
+    "Set up your CampusLoop profile — pick your branch, year, and interests to join your campus feed.",
+  robots: { index: false, follow: false },
 };
 
 export default async function OnboardingPage() {
   const user = await hexclaveServerApp.getUser();
-  
+
   if (!user) {
     redirect("/handler/sign-in");
   }
-
 
   const db = getDb();
   const profile = await db.query.userProfiles.findFirst({
@@ -48,10 +48,10 @@ export default async function OnboardingPage() {
   function parseNameFromEmail(raw: string): string {
     const parts = raw
       .replace(/[0-9]+/g, " ")
-      .split(/[\._\-\+ ]+/)
+      .split(/[._\-+ ]+/)
       .filter((p) => p.length > 0)
       .map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase());
-    
+
     if (parts.length > 0) {
       return parts.join(" ");
     }
@@ -60,7 +60,13 @@ export default async function OnboardingPage() {
 
   const extractedName = parseNameFromEmail(rawEmailUser);
   const initialDisplayName = (user as { name?: string }).name || profile?.displayName || extractedName || "";
-  const initialUsername = profile?.username || rawEmailUser.toLowerCase().replace(/[^a-z0-9_]/g, "_").replace(/^_+|_+$/g, "") || "student";
+  const initialUsername =
+    profile?.username ||
+    rawEmailUser
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "_")
+      .replace(/^_+|_+$/g, "") ||
+    "student";
   const initialAvatarUrl = profile?.avatarUrl || (user as { picture?: string }).picture || "";
 
   return (
@@ -112,13 +118,12 @@ export default async function OnboardingPage() {
               You&apos;ll need a college email to interact
             </p>
             <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
-              Browse feeds, confessions, polls and campus hubs across 1,350+ colleges, and save
-              anything worth keeping. Posting, voting, chat and matching unlock when you verify an
-              official college email on this same account — nothing you save is lost.
+              Browse feeds, confessions, polls and campus hubs across 1,350+ colleges, and save anything worth
+              keeping. Posting, voting, chat and matching unlock when you verify an official college email on
+              this same account — nothing you save is lost.
             </p>
             <p className="mt-2.5 text-[13px] text-muted-foreground">
-              Signed in with the wrong address? Sign out above and come back with your college
-              email.
+              Signed in with the wrong address? Sign out above and come back with your college email.
             </p>
           </div>
         )}

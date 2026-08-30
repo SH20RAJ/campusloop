@@ -1,9 +1,9 @@
 "use client";
 
+import { Bell, BellOff, BellRing, Check, Loader2, Send } from "lucide-react";
+import { useState } from "react";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { cn } from "@/lib/utils";
-import { Bell,BellOff,BellRing,Check,Loader2,Send } from "lucide-react";
-import { useState } from "react";
 
 /**
  * Modern Push & Browser Notification opt-in.
@@ -11,15 +11,8 @@ import { useState } from "react";
  * and an interactive "row" in settings.
  */
 export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | "banner" }) {
-  const {
-    permission,
-    isSubscribed,
-    isBusy,
-    isSupported,
-    subscribe,
-    sendTestNotification,
-    unsubscribe,
-  } = usePushNotifications();
+  const { permission, isSubscribed, isBusy, isSupported, subscribe, sendTestNotification, unsubscribe } =
+    usePushNotifications();
 
   const [dismissed, setDismissed] = useState(false);
 
@@ -113,7 +106,7 @@ export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | 
         <div
           className={cn(
             "flex size-9 shrink-0 items-center justify-center rounded-xl",
-            isSubscribed ? "bg-emerald-500/15 text-emerald-500" : "bg-muted text-muted-foreground",
+            isSubscribed ? "bg-emerald-500/15 text-emerald-500" : "bg-muted text-muted-foreground"
           )}
         >
           {isSubscribed ? <BellRing className="size-4.5" /> : <BellOff className="size-4.5" />}
@@ -124,8 +117,8 @@ export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | 
             {blocked
               ? "Blocked in your browser settings — re-allow them there to switch this on"
               : isSubscribed
-              ? "Active for this device. Tap test ping to verify."
-              : "Off — campus replies, matches, and chats won't alert your screen"}
+                ? "Active for this device. Tap test ping to verify."
+                : "Off — campus replies, matches, and chats won't alert your screen"}
           </p>
         </div>
       </div>
@@ -149,7 +142,7 @@ export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | 
             "flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-xs font-black transition-all active:scale-95 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
             isSubscribed
               ? "border border-border bg-card text-foreground hover:bg-muted"
-              : "bg-primary text-primary-foreground shadow-2xs hover:bg-primary/95",
+              : "bg-primary text-primary-foreground shadow-2xs hover:bg-primary/95"
           )}
         >
           {isBusy && <Loader2 className="size-3.5 animate-spin" />}

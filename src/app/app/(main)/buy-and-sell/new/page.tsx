@@ -1,11 +1,12 @@
-import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { CreateListingClient } from "./create-listing-client";
 
 export const metadata: Metadata = {
   title: "Sell Campus Gear & Books | Buy & Sell Hub | CampusLoop",
-  description: "List textbooks, cycles, coolers, mattresses, and hostel gear for verified peer-to-peer campus trades.",
+  description:
+    "List textbooks, cycles, coolers, mattresses, and hostel gear for verified peer-to-peer campus trades.",
   alternates: { canonical: "https://campusloop.space/app/buy-and-sell/new" },
   openGraph: {
     title: "Sell Campus Gear & Books | Buy & Sell Hub | CampusLoop",

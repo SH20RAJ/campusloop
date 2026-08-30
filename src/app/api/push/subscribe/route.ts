@@ -1,8 +1,8 @@
+import { and, eq } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { pushSubscriptions,userProfiles } from "@/db/schema";
+import { pushSubscriptions, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,eq } from "drizzle-orm";
-import { NextRequest,NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

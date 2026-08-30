@@ -1,10 +1,10 @@
-import { getDb } from "@/db";
-import { eventRegistrations, events, institutions, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { hasCapability, rejectIfLacksCapability } from "@/lib/capabilities";
 import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { events, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { rejectIfLacksCapability } from "@/lib/capabilities";
 
 export const dynamic = "force-dynamic";
 
@@ -98,9 +98,7 @@ export async function GET(req: Request) {
       const isRegistered = currentProfile
         ? ev.registrations.some((r) => r.profileId === currentProfile.id)
         : false;
-      const userReg = currentProfile
-        ? ev.registrations.find((r) => r.profileId === currentProfile.id)
-        : null;
+      const userReg = currentProfile ? ev.registrations.find((r) => r.profileId === currentProfile.id) : null;
 
       return {
         id: ev.id,
@@ -166,7 +164,10 @@ export async function GET(req: Request) {
     } else if (sort === "upcoming") {
       enriched.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
     } else if (sort === "latest") {
-      enriched.sort((a, b) => new Date(b.createdAt || b.startDate).getTime() - new Date(a.createdAt || a.startDate).getTime());
+      enriched.sort(
+        (a, b) =>
+          new Date(b.createdAt || b.startDate).getTime() - new Date(a.createdAt || a.startDate).getTime()
+      );
     }
 
     return NextResponse.json({ events: enriched });
@@ -238,10 +239,7 @@ export async function POST(req: Request) {
     }
 
     if (end <= start) {
-      return NextResponse.json(
-        { error: "The event end time must be after its start time" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "The event end time must be after its start time" }, { status: 400 });
     }
 
     const deadline = registrationDeadline ? new Date(registrationDeadline) : null;

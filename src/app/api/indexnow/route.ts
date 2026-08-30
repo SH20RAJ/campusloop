@@ -1,7 +1,7 @@
-import { getDb } from "@/db";
-import { communities,institutions,posts,userProfiles } from "@/db/schema";
-import { desc,eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { communities, institutions, posts, userProfiles } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 

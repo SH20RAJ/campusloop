@@ -1,19 +1,15 @@
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { FOLLOW_LIST_PAGE_SIZE,FollowDirection,getFollowListPage } from "@/lib/follows";
-import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { FOLLOW_LIST_PAGE_SIZE, type FollowDirection, getFollowListPage } from "@/lib/follows";
 
 /**
  * Shared handler for GET /api/profile/[username]/followers and .../following.
  * Both routes only differ by which side of the follow edge they walk.
  */
-export async function getFollowListResponse(
-  request: Request,
-  username: string,
-  direction: FollowDirection,
-) {
+export async function getFollowListResponse(request: Request, username: string, direction: FollowDirection) {
   try {
     const db = getDb();
     const target = await db.query.userProfiles.findFirst({
@@ -21,7 +17,7 @@ export async function getFollowListResponse(
       columns: { id: true, status: true },
     });
 
-    if (!target || target.status !== "ACTIVE") {
+    if (target?.status !== "ACTIVE") {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 

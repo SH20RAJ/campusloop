@@ -1,13 +1,13 @@
 "use client";
 
-import { FollowListItem,FollowListRow } from "@/components/profile/follow-list-row";
+import { ArrowLeft, Loader2, Users } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef } from "react";
+import useSWRInfinite from "swr/infinite";
+import { type FollowListItem, FollowListRow } from "@/components/profile/follow-list-row";
 import { fetcher } from "@/lib/api";
 import type { FollowDirection } from "@/lib/follows";
 import { cn } from "@/lib/utils";
-import { ArrowLeft,Loader2,Users } from "lucide-react";
-import Link from "next/link";
-import { useEffect,useMemo,useRef } from "react";
-import useSWRInfinite from "swr/infinite";
 
 export interface FollowListPageData {
   items: FollowListItem[];
@@ -40,7 +40,7 @@ export function FollowListClient({
     if (previousPageData && !previousPageData.hasMore) return null;
     const cursor = pageIndex === 0 ? "" : previousPageData?.nextCursor || "";
     return `/api/profile/${encodeURIComponent(username)}/${direction}?cursor=${encodeURIComponent(
-      cursor,
+      cursor
     )}&limit=20`;
   };
 
@@ -80,7 +80,7 @@ export function FollowListClient({
           setSize((prev) => prev + 1);
         }
       },
-      { rootMargin: "400px" },
+      { rootMargin: "400px" }
     );
 
     const currentSentinel = sentinelRef.current;
@@ -109,9 +109,7 @@ export function FollowListClient({
             <ArrowLeft className="size-4" />
           </Link>
           <div className="min-w-0">
-            <h1 className="text-base font-black tracking-tight text-foreground truncate">
-              {displayName}
-            </h1>
+            <h1 className="text-base font-black tracking-tight text-foreground truncate">{displayName}</h1>
             <p className="text-xs font-semibold text-muted-foreground">@{username}</p>
           </div>
         </div>
@@ -125,7 +123,7 @@ export function FollowListClient({
                 "py-3 text-center text-xs font-black transition-colors border-b-2",
                 tab.id === direction
                   ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40",
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40"
               )}
             >
               {tab.count} {tab.label}
@@ -143,15 +141,15 @@ export function FollowListClient({
             {direction === "followers"
               ? `No one follows @${username} yet`
               : direction === "following"
-              ? `@${username} isn't following anyone yet`
-              : `@${username} has no campus friends yet`}
+                ? `@${username} isn't following anyone yet`
+                : `@${username} has no campus friends yet`}
           </p>
           <p className="text-xs text-muted-foreground max-w-xs">
             {direction === "followers"
               ? "Campus connections show up here as soon as students hit follow."
               : direction === "following"
-              ? "When they start following students, you'll see them here."
-              : "Friends appear once two students follow each other back."}
+                ? "When they start following students, you'll see them here."
+                : "Friends appear once two students follow each other back."}
           </p>
         </div>
       ) : (

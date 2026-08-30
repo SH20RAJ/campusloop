@@ -1,20 +1,11 @@
 "use client";
 
+import { AlertCircle, ArrowLeft, ChevronRight, Minus, Plus, ShoppingBag, Store, Truck } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import {
-AlertCircle,
-ArrowLeft,
-ChevronRight,
-Minus,
-Plus,
-ShoppingBag,
-Store,
-Truck
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export function CartClient() {
   const router = useRouter();
@@ -29,10 +20,7 @@ export function CartClient() {
     isMultiMerchant,
   } = useMarketplaceCart();
 
-  const totalDeliveryFee = merchantGroups.reduce(
-    (sum, g) => sum + g.finalDeliveryFee,
-    0
-  );
+  const totalDeliveryFee = merchantGroups.reduce((sum, g) => sum + g.finalDeliveryFee, 0);
   const grandTotal = overallSubtotal + totalDeliveryFee;
 
   if (!isLoaded) {
@@ -94,9 +82,7 @@ export function CartClient() {
             <ArrowLeft className="size-4.5" />
           </button>
           <div>
-            <h1 className="text-base font-black text-foreground tracking-tight leading-none">
-              Your Cart
-            </h1>
+            <h1 className="text-base font-black text-foreground tracking-tight leading-none">Your Cart</h1>
             <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
               {merchantGroups.length} {merchantGroups.length === 1 ? "store order" : "store orders"}
             </p>
@@ -124,7 +110,8 @@ export function CartClient() {
             <div>
               <p className="font-bold">Items from {merchantGroups.length} different stores</p>
               <p className="text-[11px] text-amber-500/85 mt-0.5">
-                Your cart contains items from multiple stores. They will be placed as separate orders so each merchant can fulfill them directly.
+                Your cart contains items from multiple stores. They will be placed as separate orders so each
+                merchant can fulfill them directly.
               </p>
             </div>
           </div>
@@ -154,10 +141,7 @@ export function CartClient() {
               {/* Items List */}
               <div className="space-y-3 divide-y divide-border/20">
                 {group.items.map((item) => {
-                  const addonsPrice = (item.selectedAddons || []).reduce(
-                    (sum, a) => sum + a.price,
-                    0
-                  );
+                  const addonsPrice = (item.selectedAddons || []).reduce((sum, a) => sum + a.price, 0);
                   const itemUnitPrice = item.price + addonsPrice;
                   const itemTotal = itemUnitPrice * item.quantity;
 
@@ -219,9 +203,7 @@ export function CartClient() {
               {/* Group Subtotal & Delivery */}
               <div className="pt-2 border-t border-border/30 flex items-center justify-between text-xs font-bold text-muted-foreground">
                 <span>Store Subtotal</span>
-                <span className="text-foreground font-black">
-                  ₹{group.subtotal.toLocaleString("en-IN")}
-                </span>
+                <span className="text-foreground font-black">₹{group.subtotal.toLocaleString("en-IN")}</span>
               </div>
             </div>
           ))}
@@ -229,14 +211,10 @@ export function CartClient() {
 
         {/* ─── Bill Summary ─── */}
         <div className="rounded-3xl border border-border/40 bg-card p-4 space-y-2.5 shadow-xs">
-          <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-            Bill Summary
-          </h3>
+          <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Bill Summary</h3>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>Items Total</span>
-            <span className="text-foreground font-bold">
-              ₹{overallSubtotal.toLocaleString("en-IN")}
-            </span>
+            <span className="text-foreground font-bold">₹{overallSubtotal.toLocaleString("en-IN")}</span>
           </div>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
@@ -249,9 +227,7 @@ export function CartClient() {
           </div>
           <div className="pt-2 border-t border-border/30 flex items-center justify-between text-sm font-black text-foreground">
             <span>To Pay</span>
-            <span className="text-base text-emerald-500">
-              ₹{grandTotal.toLocaleString("en-IN")}
-            </span>
+            <span className="text-base text-emerald-500">₹{grandTotal.toLocaleString("en-IN")}</span>
           </div>
         </div>
 

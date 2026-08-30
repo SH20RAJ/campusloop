@@ -1,28 +1,15 @@
 "use client";
 
-import { EventCard, EventItem } from "@/components/events/event-card";
+import { Calendar, Globe, Plus, School, Search, X } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import useSWR from "swr";
+import { EventCard, type EventItem } from "@/components/events/event-card";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-  Calendar,
-  Code,
-  Flame,
-  Globe,
-  GraduationCap,
-  Music,
-  Plus,
-  School,
-  Search,
-  Sparkles,
-  Trophy,
-  X,
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import useSWR from "swr";
 
 const EVENT_TABS = [
   { id: "trending", label: "Trending 🔥" },
@@ -47,11 +34,10 @@ export function EventsClient() {
   const endpoint = `/api/events?category=${activeCategory}&scope=${scope}&sort=${activeTab}&q=${encodeURIComponent(
     searchQuery
   )}`;
-  const { data, isLoading, mutate } = useSWR<{ events: EventItem[] }>(
-    endpoint,
-    fetcher,
-    { dedupingInterval: 15000, revalidateOnFocus: true }
-  );
+  const { data, isLoading, mutate } = useSWR<{ events: EventItem[] }>(endpoint, fetcher, {
+    dedupingInterval: 15000,
+    revalidateOnFocus: true,
+  });
 
   const events = data?.events || [];
 
@@ -67,169 +53,169 @@ export function EventsClient() {
                 <Calendar className="size-4 text-primary shrink-0" />
               </h1>
 
-            {/* Scope Pill Toggle */}
-            <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  sounds.tap();
-                  haptics.light();
-                  setScope("ALL");
-                }}
-                className={cn(
-                  "px-2.5 py-0.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
-                  scope === "ALL"
-                    ? "bg-foreground text-background shadow-xs font-black"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Globe className="size-3" />
-                <span>India</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  sounds.tap();
-                  haptics.light();
-                  setScope("MY_CAMPUS");
-                }}
-                className={cn(
-                  "px-2.5 py-0.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
-                  scope === "MY_CAMPUS"
-                    ? "bg-foreground text-background shadow-xs font-black"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <School className="size-3" />
-                <span>Campus</span>
-              </button>
+              {/* Scope Pill Toggle */}
+              <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    sounds.tap();
+                    haptics.light();
+                    setScope("ALL");
+                  }}
+                  className={cn(
+                    "px-2.5 py-0.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                    scope === "ALL"
+                      ? "bg-foreground text-background shadow-xs font-black"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Globe className="size-3" />
+                  <span>India</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    sounds.tap();
+                    haptics.light();
+                    setScope("MY_CAMPUS");
+                  }}
+                  className={cn(
+                    "px-2.5 py-0.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                    scope === "MY_CAMPUS"
+                      ? "bg-foreground text-background shadow-xs font-black"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <School className="size-3" />
+                  <span>Campus</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <Link
-            href="/app/events/new"
-            onClick={() => {
-              sounds.tap();
-              haptics.light();
-            }}
-            className="flex h-8 shrink-0 cursor-pointer items-center gap-1 rounded-full bg-primary px-3.5 text-xs font-black text-primary-foreground transition-all hover:opacity-90 active:scale-95 shadow-sm"
-          >
-            <Plus className="size-3.5" />
-            <span>Host (+25 LP)</span>
-          </Link>
-        </div>
-
-        {/* ─── Flat Twitter Tabs ─── */}
-        <div className="grid grid-cols-3 border-t border-border/20 text-center font-bold text-xs sm:text-sm">
-          {EVENT_TABS.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => {
-                  sounds.tap();
-                  haptics.light();
-                  setActiveTab(tab.id);
-                }}
-                className={cn(
-                  "py-3 transition-colors relative cursor-pointer flex items-center justify-center gap-1",
-                  isActive
-                    ? "text-foreground font-black"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                )}
-              >
-                <span>{tab.label}</span>
-                {isActive && (
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-primary" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </header>
-
-      {/* ─── Search & Category Strip (Zero Clutter) ─── */}
-      <div className="space-y-2.5 px-4 pt-3 pb-2 border-b border-border/30">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search hackathons, fests, workshops or clubs..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-10 w-full rounded-2xl border border-border/40 bg-muted/40 pl-10 pr-9 text-xs sm:text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              aria-label="Clear search"
-              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
-            >
-              <X className="size-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Category filter pills */}
-        <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto py-0.5">
-          {CATEGORIES.map((cat) => {
-            const isActive = activeCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => {
-                  sounds.tap();
-                  haptics.light();
-                  setActiveCategory(cat.id);
-                }}
-                className={cn(
-                  "flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0",
-                  isActive
-                    ? "bg-foreground text-background shadow-xs font-black"
-                    : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/40"
-                )}
-              >
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ─── Stream of Event Cards (Immediate, Content-First) ─── */}
-      <div className="flex flex-col p-4 gap-4">
-        {isLoading ? (
-          <div className="space-y-4">
-            <div className="h-44 rounded-2xl bg-muted/40 animate-pulse" />
-            <div className="h-44 rounded-2xl bg-muted/40 animate-pulse" />
-          </div>
-        ) : events.length > 0 ? (
-          events.map((ev) => <EventCard key={ev.id} event={ev} />)
-        ) : (
-          <div className="py-20 text-center space-y-3">
-            <div className="flex size-12 items-center justify-center rounded-full bg-muted/60 text-muted-foreground mx-auto">
-              <Calendar className="size-6" />
-            </div>
-            <p className="text-sm font-bold text-foreground">No events found</p>
-            <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-              {searchQuery
-                ? "Try searching for a different keyword or category."
-                : "Be the pioneer organizer to host the next big hackathon or workshop on your campus."}
-            </p>
             <Link
               href="/app/events/new"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+              onClick={() => {
+                sounds.tap();
+                haptics.light();
+              }}
+              className="flex h-8 shrink-0 cursor-pointer items-center gap-1 rounded-full bg-primary px-3.5 text-xs font-black text-primary-foreground transition-all hover:opacity-90 active:scale-95 shadow-sm"
             >
               <Plus className="size-3.5" />
-              <span>Host First Event (+25 LP)</span>
+              <span>Host (+25 LP)</span>
             </Link>
           </div>
-        )}
-      </div>
-    </main>
+
+          {/* ─── Flat Twitter Tabs ─── */}
+          <div className="grid grid-cols-3 border-t border-border/20 text-center font-bold text-xs sm:text-sm">
+            {EVENT_TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    sounds.tap();
+                    haptics.light();
+                    setActiveTab(tab.id);
+                  }}
+                  className={cn(
+                    "py-3 transition-colors relative cursor-pointer flex items-center justify-center gap-1",
+                    isActive
+                      ? "text-foreground font-black"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                  )}
+                >
+                  <span>{tab.label}</span>
+                  {isActive && (
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-primary" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </header>
+
+        {/* ─── Search & Category Strip (Zero Clutter) ─── */}
+        <div className="space-y-2.5 px-4 pt-3 pb-2 border-b border-border/30">
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search hackathons, fests, workshops or clubs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-10 w-full rounded-2xl border border-border/40 bg-muted/40 pl-10 pr-9 text-xs sm:text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Category filter pills */}
+          <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto py-0.5">
+            {CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => {
+                    sounds.tap();
+                    haptics.light();
+                    setActiveCategory(cat.id);
+                  }}
+                  className={cn(
+                    "flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0",
+                    isActive
+                      ? "bg-foreground text-background shadow-xs font-black"
+                      : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/40"
+                  )}
+                >
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ─── Stream of Event Cards (Immediate, Content-First) ─── */}
+        <div className="flex flex-col p-4 gap-4">
+          {isLoading ? (
+            <div className="space-y-4">
+              <div className="h-44 rounded-2xl bg-muted/40 animate-pulse" />
+              <div className="h-44 rounded-2xl bg-muted/40 animate-pulse" />
+            </div>
+          ) : events.length > 0 ? (
+            events.map((ev) => <EventCard key={ev.id} event={ev} />)
+          ) : (
+            <div className="py-20 text-center space-y-3">
+              <div className="flex size-12 items-center justify-center rounded-full bg-muted/60 text-muted-foreground mx-auto">
+                <Calendar className="size-6" />
+              </div>
+              <p className="text-sm font-bold text-foreground">No events found</p>
+              <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                {searchQuery
+                  ? "Try searching for a different keyword or category."
+                  : "Be the pioneer organizer to host the next big hackathon or workshop on your campus."}
+              </p>
+              <Link
+                href="/app/events/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+              >
+                <Plus className="size-3.5" />
+                <span>Host First Event (+25 LP)</span>
+              </Link>
+            </div>
+          )}
+        </div>
+      </main>
     </PullToRefresh>
   );
 }

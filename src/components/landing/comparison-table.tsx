@@ -1,9 +1,6 @@
 "use client";
 
-import {
-Check,ShieldCheck,X,
-Zap
-} from "lucide-react";
+import { Check, ShieldCheck, X, Zap } from "lucide-react";
 import { Reveal } from "./reveal";
 
 const COMPARISONS = [
@@ -93,9 +90,7 @@ export function ComparisonShowcase() {
               <tbody className="divide-y divide-border/60 font-medium">
                 {COMPARISONS.map((row, idx) => (
                   <tr key={idx} className="hover:bg-muted/20 transition-colors">
-                    <td className="p-4 text-foreground font-semibold">
-                      {row.feature}
-                    </td>
+                    <td className="p-4 text-foreground font-semibold">{row.feature}</td>
 
                     {/* CampusLoop Column */}
                     <td className="p-4 text-center bg-primary/[0.03] border-x border-primary/10 font-bold">

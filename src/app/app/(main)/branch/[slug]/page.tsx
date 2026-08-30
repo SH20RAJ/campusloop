@@ -1,5 +1,5 @@
+import type { Metadata } from "next";
 import { findBranchBySlug } from "@/constants";
-import { Metadata } from "next";
 import { BranchDirectoryClient } from "./branch-client";
 
 interface BranchPageProps {
@@ -43,7 +43,6 @@ export async function generateMetadata({ params }: BranchPageProps): Promise<Met
     },
     robots: { index: true, follow: true },
   };
-
 }
 
 export default async function BranchDirectoryPage({ params }: BranchPageProps) {
@@ -62,10 +61,7 @@ export default async function BranchDirectoryPage({ params }: BranchPageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <BranchDirectoryClient />
     </>
   );

@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 import * as React from "react";
+import { cn } from "@/lib/utils";
 
 interface DialogContextType {
   open: boolean;
@@ -36,24 +36,14 @@ export function Dialog({
   return (
     <DialogContext.Provider value={{ open, onOpenChange }}>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-        <div
-          className="fixed inset-0"
-          onClick={() => onOpenChange(false)}
-          aria-hidden="true"
-        />
+        <div className="fixed inset-0" onClick={() => onOpenChange(false)} aria-hidden="true" />
         {children}
       </div>
     </DialogContext.Provider>
   );
 }
 
-export function DialogContent({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+export function DialogContent({ className, children }: { className?: string; children: React.ReactNode }) {
   const ctx = React.useContext(DialogContext);
 
   return (
@@ -78,34 +68,13 @@ export function DialogContent({
   );
 }
 
-export function DialogHeader({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={cn("flex flex-col space-y-1.5 text-left mb-4", className)}>
-      {children}
-    </div>
-  );
+export function DialogHeader({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <div className={cn("flex flex-col space-y-1.5 text-left mb-4", className)}>{children}</div>;
 }
 
-export function DialogTitle({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+export function DialogTitle({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
-    <h2
-      className={cn(
-        "text-lg font-black leading-none tracking-tight text-foreground",
-        className
-      )}
-    >
+    <h2 className={cn("text-lg font-black leading-none tracking-tight text-foreground", className)}>
       {children}
     </h2>
   );
@@ -118,9 +87,5 @@ export function DialogDescription({
   className?: string;
   children: React.ReactNode;
 }) {
-  return (
-    <p className={cn("text-xs text-muted-foreground", className)}>
-      {children}
-    </p>
-  );
+  return <p className={cn("text-xs text-muted-foreground", className)}>{children}</p>;
 }

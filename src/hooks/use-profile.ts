@@ -1,5 +1,5 @@
-import { fetcher,updateProfile as updateProfileApi } from "@/lib/api";
 import useSWR from "swr";
+import { fetcher, updateProfile as updateProfileApi } from "@/lib/api";
 
 export interface UserProfileData {
   id: string;
@@ -36,16 +36,11 @@ export interface UserProfileData {
 }
 
 export function useProfile() {
-  const { data, error, isLoading, mutate } = useSWR<UserProfileData>(
-    "/api/profile/me",
-    fetcher,
-    {
-      revalidateIfStale: true,
-      keepPreviousData: true,
-      dedupingInterval: 15000,
-    }
-  );
-
+  const { data, error, isLoading, mutate } = useSWR<UserProfileData>("/api/profile/me", fetcher, {
+    revalidateIfStale: true,
+    keepPreviousData: true,
+    dedupingInterval: 15000,
+  });
 
   async function updateProfile(updatedFields: Partial<UserProfileData>) {
     try {

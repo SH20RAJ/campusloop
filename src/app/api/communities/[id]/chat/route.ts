@@ -1,8 +1,8 @@
-import { getDb } from "@/db";
-import { communities,conversationParticipants,conversations,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and,eq,or } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { communities, conversationParticipants, conversations, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -29,10 +29,7 @@ export async function POST(req: Request, { params }: RouteParams) {
     // Find the community by id or slug
     const cleanId = id.trim();
     const comm = await db.query.communities.findFirst({
-      where: or(
-        eq(communities.id, cleanId),
-        eq(communities.slug, cleanId.toLowerCase())
-      ),
+      where: or(eq(communities.id, cleanId), eq(communities.slug, cleanId.toLowerCase())),
     });
 
     if (!comm) {
@@ -41,10 +38,7 @@ export async function POST(req: Request, { params }: RouteParams) {
 
     // Find existing community conversation
     let conv = await db.query.conversations.findFirst({
-      where: and(
-        eq(conversations.communityId, comm.id),
-        eq(conversations.type, "COMMUNITY")
-      ),
+      where: and(eq(conversations.communityId, comm.id), eq(conversations.type, "COMMUNITY")),
     });
 
     if (!conv) {
@@ -84,9 +78,6 @@ export async function POST(req: Request, { params }: RouteParams) {
     });
   } catch (error) {
     console.error("Error opening community group chat:", error);
-    return NextResponse.json(
-      { error: "Failed to open community group chat" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to open community group chat" }, { status: 500 });
   }
 }

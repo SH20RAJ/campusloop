@@ -1,14 +1,13 @@
-import { getDb } from "@/db";
-import { anonIdentityVault,comments,posts,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { deriveAnonHandle,sealIdentity } from "@/lib/anonymity";
-import { runSafetyCheck } from "@/lib/moderation/rules";
-import { cleanNotificationSnippet,createNotification,notifyMentions } from "@/lib/notifications";
-import { rejectViewerWrite } from "@/lib/viewer";
-import { and,asc,eq,sql } from "drizzle-orm";
-
-import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
+import { and, asc, eq, sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { anonIdentityVault, comments, posts, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
+import { runSafetyCheck } from "@/lib/moderation/rules";
+import { cleanNotificationSnippet, createNotification, notifyMentions } from "@/lib/notifications";
+import { rejectViewerWrite } from "@/lib/viewer";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -24,10 +23,7 @@ export async function GET(req: Request, { params }: RouteParams) {
     const { id } = await params;
     const db = getDb();
     const postComments = await db.query.comments.findMany({
-      where: and(
-        eq(comments.postId, id),
-        eq(comments.status, "PUBLISHED")
-      ),
+      where: and(eq(comments.postId, id), eq(comments.status, "PUBLISHED")),
       orderBy: [asc(comments.createdAt)],
       with: {
         author: true,
@@ -83,7 +79,7 @@ export async function POST(req: Request, { params }: RouteParams) {
     if (safety.blocked) {
       return NextResponse.json(
         { error: safety.messages.join(" "), messages: safety.messages, riskScore: safety.riskScore },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -103,7 +99,6 @@ export async function POST(req: Request, { params }: RouteParams) {
         }
       }
     }
-
 
     // Direct sequential insert (no nested db.transaction which breaks in Neon HTTP driver)
     const [newComment] = await db
@@ -152,7 +147,7 @@ export async function POST(req: Request, { params }: RouteParams) {
         const parentComment = await db.query.comments.findFirst({
           where: eq(comments.id, parentId),
         });
-        if (parentComment && parentComment.authorId && parentComment.authorId !== profile.id) {
+        if (parentComment?.authorId && parentComment.authorId !== profile.id) {
           await createNotification({
             userId: parentComment.authorId,
             type: "REPLY",
@@ -165,7 +160,7 @@ export async function POST(req: Request, { params }: RouteParams) {
         const targetPost = await db.query.posts.findFirst({
           where: eq(posts.id, id),
         });
-        if (targetPost && targetPost.authorId && targetPost.authorId !== profile.id) {
+        if (targetPost?.authorId && targetPost.authorId !== profile.id) {
           await createNotification({
             userId: targetPost.authorId,
             type: "COMMENT",
@@ -186,10 +181,12 @@ export async function POST(req: Request, { params }: RouteParams) {
       console.warn("Notification insert warning:", notifErr);
     }
 
-
     return NextResponse.json(newComment, { status: 201 });
   } catch (error) {
     console.error("Error creating comment:", error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Failed to create comment" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to create comment" },
+      { status: 500 }
+    );
   }
 }

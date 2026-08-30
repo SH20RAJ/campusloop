@@ -1,13 +1,13 @@
 "use client";
 
-import { haptics } from "@/lib/haptics";
-import { cn } from "@/lib/utils";
-import { sounds } from "@/lib/sounds";
 import { Calendar, Check, Clock, Globe, MapPin, School, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 
 export interface EventItem {
   id: string;
@@ -66,8 +66,7 @@ export function EventCard({ event }: EventCardProps) {
   });
 
   const isRestricted =
-    Array.isArray(event.eligibleInstitutionIds) &&
-    !event.eligibleInstitutionIds.includes("ALL");
+    Array.isArray(event.eligibleInstitutionIds) && !event.eligibleInstitutionIds.includes("ALL");
 
   async function handleQuickRegister(e: React.MouseEvent) {
     e.preventDefault();
@@ -108,12 +107,7 @@ export function EventCard({ event }: EventCardProps) {
       {/* Thumbnail */}
       <div className="relative size-24 shrink-0 overflow-hidden rounded-xl bg-muted/40 sm:size-28">
         {event.bannerUrl ? (
-          <img
-            src={event.bannerUrl}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
+          <img src={event.bannerUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-muted/60">
             <Calendar className="size-7 text-muted-foreground" />

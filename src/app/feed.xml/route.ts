@@ -1,7 +1,7 @@
+import { and, desc, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { posts } from "@/db/schema";
-import { and,desc,eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -21,12 +21,18 @@ export async function GET() {
       const title = item.title || `Post by @${item.author?.username || "student"}`;
       const description = item.body.replace(/[<>&'"]/g, (c) => {
         switch (c) {
-          case "<": return "&lt;";
-          case ">": return "&gt;";
-          case "&": return "&amp;";
-          case "'": return "&apos;";
-          case '"': return "&quot;";
-          default: return c;
+          case "<":
+            return "&lt;";
+          case ">":
+            return "&gt;";
+          case "&":
+            return "&amp;";
+          case "'":
+            return "&apos;";
+          case '"':
+            return "&quot;";
+          default:
+            return c;
         }
       });
 
@@ -59,7 +65,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error("RSS feed error:", error);
-    return new NextResponse("<rss version=\"2.0\"><channel></channel></rss>", {
+    return new NextResponse('<rss version="2.0"><channel></channel></rss>', {
       headers: { "Content-Type": "application/xml" },
     });
   }

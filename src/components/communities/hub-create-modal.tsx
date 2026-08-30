@@ -1,13 +1,13 @@
 "use client";
 
-import { HubTabType } from "@/components/communities/campus-hub-strip";
+import { AnimatePresence, motion } from "framer-motion";
+import { Loader2, Plus, X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { HubTabType } from "@/components/communities/campus-hub-strip";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { AnimatePresence,motion } from "framer-motion";
-import { Loader2,Plus,X } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface HubCreateModalProps {
   isOpen: boolean;
@@ -16,12 +16,7 @@ interface HubCreateModalProps {
   onItemCreated?: (item: any) => void;
 }
 
-export function HubCreateModal({
-  isOpen,
-  onClose,
-  defaultHub,
-  onItemCreated,
-}: HubCreateModalProps) {
+export function HubCreateModal({ isOpen, onClose, defaultHub, onItemCreated }: HubCreateModalProps) {
   const [hubType, setHubType] = useState<HubTabType>(
     defaultHub === "all" || defaultHub === "discussions" ? "lost_found" : defaultHub
   );
@@ -166,9 +161,7 @@ export function HubCreateModal({
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-black text-foreground">
-                Post to Campus Hub
-              </h3>
+              <h3 className="text-base font-black text-foreground">Post to Campus Hub</h3>
               <p className="text-xs text-muted-foreground font-medium">
                 Connect with verified classmates in your college network
               </p>
@@ -215,9 +208,7 @@ export function HubCreateModal({
           <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
             {/* Title */}
             <div>
-              <label className="text-xs font-bold text-foreground block mb-1">
-                Title / Headline *
-              </label>
+              <label className="text-xs font-bold text-foreground block mb-1">Title / Headline *</label>
               <input
                 type="text"
                 value={title}
@@ -226,14 +217,14 @@ export function HubCreateModal({
                   hubType === "lost_found"
                     ? "e.g. Titan Watch with black leather strap"
                     : hubType === "marketplace"
-                    ? "e.g. Hero Sprint 21-Speed Cycle with lock"
-                    : hubType === "gaming"
-                    ? "e.g. Plat/Diamond 5v5 Valorant Scrims • Need 2 Duelists"
-                    : hubType === "rideshare"
-                    ? "e.g. Cab split to Ranchi Rly Station"
-                    : hubType === "housing"
-                    ? "e.g. 1 Room available in 3BHK flat near Back Gate"
-                    : "e.g. DSA Handwritten End-Sem Notes + Solved PYQs"
+                      ? "e.g. Hero Sprint 21-Speed Cycle with lock"
+                      : hubType === "gaming"
+                        ? "e.g. Plat/Diamond 5v5 Valorant Scrims • Need 2 Duelists"
+                        : hubType === "rideshare"
+                          ? "e.g. Cab split to Ranchi Rly Station"
+                          : hubType === "housing"
+                            ? "e.g. 1 Room available in 3BHK flat near Back Gate"
+                            : "e.g. DSA Handwritten End-Sem Notes + Solved PYQs"
                 }
                 className="w-full rounded-xl border border-border/80 bg-background px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary"
                 required
@@ -244,9 +235,7 @@ export function HubCreateModal({
             {hubType === "lost_found" && (
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Report Type
-                  </label>
+                  <label className="text-xs font-bold text-foreground block mb-1">Report Type</label>
                   <select
                     value={lfType}
                     onChange={(e) => setLfType(e.target.value as any)}
@@ -257,9 +246,7 @@ export function HubCreateModal({
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Campus Location *
-                  </label>
+                  <label className="text-xs font-bold text-foreground block mb-1">Campus Location *</label>
                   <input
                     type="text"
                     value={location}
@@ -274,9 +261,7 @@ export function HubCreateModal({
             {hubType === "marketplace" && (
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Price (₹) *
-                  </label>
+                  <label className="text-xs font-bold text-foreground block mb-1">Price (₹) *</label>
                   <input
                     type="number"
                     value={price}
@@ -287,9 +272,7 @@ export function HubCreateModal({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Condition
-                  </label>
+                  <label className="text-xs font-bold text-foreground block mb-1">Condition</label>
                   <select
                     value={condition}
                     onChange={(e) => setCondition(e.target.value)}
@@ -307,9 +290,7 @@ export function HubCreateModal({
             {hubType === "gaming" && (
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Game
-                  </label>
+                  <label className="text-xs font-bold text-foreground block mb-1">Game</label>
                   <select
                     value={gameName}
                     onChange={(e) => setGameName(e.target.value)}
@@ -323,9 +304,7 @@ export function HubCreateModal({
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Gamer / Riot Tag
-                  </label>
+                  <label className="text-xs font-bold text-foreground block mb-1">Gamer / Riot Tag</label>
                   <input
                     type="text"
                     value={gamerTag}
@@ -340,9 +319,7 @@ export function HubCreateModal({
             {hubType === "rideshare" && (
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Origin & Destination
-                  </label>
+                  <label className="text-xs font-bold text-foreground block mb-1">Origin & Destination</label>
                   <input
                     type="text"
                     value={destination}
@@ -353,9 +330,7 @@ export function HubCreateModal({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Price per seat (₹)
-                  </label>
+                  <label className="text-xs font-bold text-foreground block mb-1">Price per seat (₹)</label>
                   <input
                     type="number"
                     value={pricePerSeat}
@@ -370,9 +345,7 @@ export function HubCreateModal({
             {hubType === "academics" && (
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Subject Code & Name
-                  </label>
+                  <label className="text-xs font-bold text-foreground block mb-1">Subject Code & Name</label>
                   <input
                     type="text"
                     value={subjectCode}
@@ -398,9 +371,7 @@ export function HubCreateModal({
 
             {/* Description */}
             <div>
-              <label className="text-xs font-bold text-foreground block mb-1">
-                Details & Description
-              </label>
+              <label className="text-xs font-bold text-foreground block mb-1">Details & Description</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}

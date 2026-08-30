@@ -1,9 +1,9 @@
+import { and, desc, eq, ne } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { bikes,merchants,userProfiles } from "@/db/schema";
+import { bikes, merchants, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { and,desc,eq,ne } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -98,8 +98,7 @@ export async function POST(req: Request) {
         model: model?.trim() || name.trim(),
         registrationNumber: registrationNumber.trim().toUpperCase(),
         imageUrl:
-          imageUrl ||
-          "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600&h=400&fit=crop",
+          imageUrl || "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600&h=400&fit=crop",
         hourlyPrice: typeof hourlyPrice === "number" ? hourlyPrice : 50,
         dailyPrice: Math.max(0, dailyPrice),
         securityDeposit: typeof securityDeposit === "number" ? securityDeposit : 1500,
@@ -152,11 +151,7 @@ export async function PATCH(req: Request) {
     if (typeof name === "string") updatePayload.name = name.trim();
     if (specs) updatePayload.specs = specs;
 
-    const [updated] = await db
-      .update(bikes)
-      .set(updatePayload)
-      .where(eq(bikes.id, id))
-      .returning();
+    const [updated] = await db.update(bikes).set(updatePayload).where(eq(bikes.id, id)).returning();
 
     return NextResponse.json({ success: true, bike: updated });
   } catch (error) {
@@ -181,10 +176,7 @@ export async function DELETE(req: Request) {
 
     const db = getDb();
     // Soft-delete to preserve booking history (PRD item 18)
-    await db
-      .update(bikes)
-      .set({ status: "INACTIVE", updatedAt: new Date() })
-      .where(eq(bikes.id, id));
+    await db.update(bikes).set({ status: "INACTIVE", updatedAt: new Date() }).where(eq(bikes.id, id));
 
     return NextResponse.json({ success: true });
   } catch (error) {

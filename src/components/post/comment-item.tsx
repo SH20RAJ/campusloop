@@ -1,19 +1,19 @@
 "use client";
 
+import { Heart, MessageCircle, MoreHorizontal, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   detectMentionTrigger,
   MentionSuggestions,
-  TriggerContext,
+  type TriggerContext,
 } from "@/components/ui/mention-autocomplete";
 import { RichText } from "@/components/ui/rich-text";
-import { Comment } from "@/db/schema";
+import type { Comment } from "@/db/schema";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import { Heart,MessageCircle,MoreHorizontal,ShieldCheck } from "lucide-react";
-import Link from "next/link";
-import { useRef,useState } from "react";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 export type CommentWithAuthor = Omit<Comment, "createdAt" | "updatedAt"> & {
   createdAt: Date | string;
@@ -68,7 +68,9 @@ export function CommentItem({
   const displayName = isAnon ? "Anonymous Student" : comment.author?.displayName || "Student";
   const handle = isAnon ? comment.pseudonym || "anonymous" : comment.author?.username || "student";
   const fallback = isAnon ? "🙈" : (comment.author?.displayName?.[0] ?? "S").toUpperCase();
-  const avatarUrl = isAnon ? "" : getAvatarUrl(comment.author?.avatarUrl, comment.author?.username ?? "student");
+  const avatarUrl = isAnon
+    ? ""
+    : getAvatarUrl(comment.author?.avatarUrl, comment.author?.username ?? "student");
   const isVerified = Boolean(!isAnon && (comment.author?.points || 0) >= 150);
 
   const isReplying = replyingToId === comment.id;
@@ -119,7 +121,8 @@ export function CommentItem({
       <div
         className={cn(
           "flex gap-3 py-3 text-foreground transition-colors",
-          depth > 0 && "pl-8 sm:pl-10 relative before:absolute before:left-3.5 before:top-0 before:bottom-6 before:w-0.5 before:bg-border/40"
+          depth > 0 &&
+            "pl-8 sm:pl-10 relative before:absolute before:left-3.5 before:top-0 before:bottom-6 before:w-0.5 before:bg-border/40"
         )}
       >
         {/* Avatar */}
@@ -135,9 +138,7 @@ export function CommentItem({
             </Link>
           ) : (
             <Avatar className="size-9 rounded-full border border-border/40 bg-muted">
-              <AvatarFallback className="text-xs font-bold">
-                {fallback}
-              </AvatarFallback>
+              <AvatarFallback className="text-xs font-bold">{fallback}</AvatarFallback>
             </Avatar>
           )}
         </div>
@@ -148,21 +149,14 @@ export function CommentItem({
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 flex-wrap text-[13px] leading-none">
               {!isAnon ? (
-                <Link
-                  href={`/@${handle}`}
-                  className="font-bold text-foreground hover:underline truncate"
-                >
+                <Link href={`/@${handle}`} className="font-bold text-foreground hover:underline truncate">
                   {displayName}
                 </Link>
               ) : (
-                <span className="font-bold text-foreground truncate">
-                  {displayName}
-                </span>
+                <span className="font-bold text-foreground truncate">{displayName}</span>
               )}
 
-              {isVerified && (
-                <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
-              )}
+              {isVerified && <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />}
 
               {/* OP / Author Badge */}
               {isPostAuthor && (
@@ -171,9 +165,7 @@ export function CommentItem({
                 </span>
               )}
 
-              <span className="text-xs text-muted-foreground truncate">
-                @{handle}
-              </span>
+              <span className="text-xs text-muted-foreground truncate">@{handle}</span>
 
               <span className="text-muted-foreground/60">·</span>
 
@@ -230,9 +222,7 @@ export function CommentItem({
               <div className="size-7 rounded-full group-hover/like:bg-rose-500/10 flex items-center justify-center transition-colors">
                 <Heart className={cn("size-4", liked && "fill-rose-500 text-rose-500")} />
               </div>
-              {likesCount > 0 && (
-                <span className="text-[11px] font-semibold">{likesCount}</span>
-              )}
+              {likesCount > 0 && <span className="text-[11px] font-semibold">{likesCount}</span>}
             </button>
           </div>
 

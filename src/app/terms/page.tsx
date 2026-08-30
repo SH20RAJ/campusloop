@@ -1,15 +1,15 @@
+import type { Metadata } from "next";
 import {
-DocLayout,
-DocList,
-DocNote,
-DocSection,
-DocTable,
-LegalDocHeader,
-type DocSectionRef,
+  DocLayout,
+  DocList,
+  DocNote,
+  DocSection,
+  type DocSectionRef,
+  DocTable,
+  LegalDocHeader,
 } from "@/components/marketing/legal-doc";
 import { LegalNav } from "@/components/marketing/legal-nav";
-import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
-import type { Metadata } from "next";
+import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
 
 export const metadata: Metadata = {
   title: "Terms of Service | CampusLoop",
@@ -50,7 +50,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 const SECTIONS: DocSectionRef[] = [
   { id: "eligibility", label: "Who can join" },
   { id: "account", label: "Your account" },
@@ -82,10 +81,7 @@ export default function TermsPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <MarketingHeader />
       <LegalNav />
 
@@ -100,8 +96,8 @@ export default function TermsPage() {
 
           <DocSection id="eligibility" number={1} title="Who can join">
             <p>
-              CampusLoop is for students, recent alumni, and campus community members at recognised
-              Indian institutions. Posting requires a verified college email address.
+              CampusLoop is for students, recent alumni, and campus community members at recognised Indian
+              institutions. Posting requires a verified college email address.
             </p>
             <DocTable
               rows={[
@@ -126,8 +122,8 @@ export default function TermsPage() {
 
           <DocSection id="account" number={2} title="Your account">
             <p>
-              One person, one account. You are responsible for what happens under yours, so keep
-              your college email secure.
+              One person, one account. You are responsible for what happens under yours, so keep your college
+              email secure.
             </p>
             <DocList
               items={[
@@ -140,8 +136,8 @@ export default function TermsPage() {
 
           <DocSection id="prohibited" number={3} title="Prohibited content">
             <p>
-              Under Rule 3(1)(b) of the IT (Intermediary Guidelines and Digital Media Ethics Code)
-              Rules, 2021, you may not host, upload, publish, or transmit content that:
+              Under Rule 3(1)(b) of the IT (Intermediary Guidelines and Digital Media Ethics Code) Rules,
+              2021, you may not host, upload, publish, or transmit content that:
             </p>
             <DocList
               items={[
@@ -156,44 +152,43 @@ export default function TermsPage() {
 
           <DocSection id="anonymity" number={4} title="Responsible anonymity">
             <p>
-              Anonymity exists so students can raise problems with hostel conditions, administration,
-              or mental health without risking their standing. It is a shield, not a weapon.
+              Anonymity exists so students can raise problems with hostel conditions, administration, or
+              mental health without risking their standing. It is a shield, not a weapon.
             </p>
             <DocNote>
-              Anonymity does not exempt a post from these terms. Accounts used for targeted
-              harassment behind a pseudonym are suspended, and unmasked where the law requires it.
+              Anonymity does not exempt a post from these terms. Accounts used for targeted harassment behind
+              a pseudonym are suspended, and unmasked where the law requires it.
             </DocNote>
           </DocSection>
 
           <DocSection id="moderation" number={5} title="Moderation and takedown">
             <p>
-              Content reaching three independent reports enters moderation escrow and is hidden from
-              campus feeds pending review. Moderators and automated checks resolve reports within
-              24 hours, as required by Rule 3(2) of the IT Rules, 2021.
+              Content reaching three independent reports enters moderation escrow and is hidden from campus
+              feeds pending review. Moderators and automated checks resolve reports within 24 hours, as
+              required by Rule 3(2) of the IT Rules, 2021.
             </p>
             <p>
-              If your content is removed you are told which rule it broke, and you can reply to the
-              decision. Moderator actions are logged.
+              If your content is removed you are told which rule it broke, and you can reply to the decision.
+              Moderator actions are logged.
             </p>
           </DocSection>
 
           <DocSection id="termination" number={6} title="Suspension and removal">
             <p>
-              We may suspend or permanently remove an account that repeatedly breaks these terms.
-              Serious cases — ragging, threats, sexual content involving minors — result in
-              immediate removal on the first instance, with escalation to the institution and to law
-              enforcement where applicable.
+              We may suspend or permanently remove an account that repeatedly breaks these terms. Serious
+              cases — ragging, threats, sexual content involving minors — result in immediate removal on the
+              first instance, with escalation to the institution and to law enforcement where applicable.
             </p>
             <p>
-              You can delete your own account at any time from Settings. Deletion removes your
-              profile and content, subject to any records we are legally required to retain.
+              You can delete your own account at any time from Settings. Deletion removes your profile and
+              content, subject to any records we are legally required to retain.
             </p>
           </DocSection>
 
           <DocSection id="grievance" number={7} title="Grievance officer">
             <p>
-              Appointed under Rule 3(2) of the IT (Intermediary Guidelines and Digital Media Ethics
-              Code) Rules, 2021.
+              Appointed under Rule 3(2) of the IT (Intermediary Guidelines and Digital Media Ethics Code)
+              Rules, 2021.
             </p>
             <DocTable
               rows={[

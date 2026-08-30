@@ -1,9 +1,6 @@
 "use client";
 
-import {
-ArrowRight,Check,Copy,Flame,Gift,ShieldCheck,Users,
-Zap
-} from "lucide-react";
+import { ArrowRight, Check, Copy, Flame, Gift, ShieldCheck, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -38,18 +35,34 @@ export function AmbassadorShowcase() {
             </h2>
 
             <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground">
-              Share your invite link in your batch WhatsApp groups & hostel chats. Every verified classmate who joins boosts your college ranking!
+              Share your invite link in your batch WhatsApp groups & hostel chats. Every verified classmate
+              who joins boosts your college ranking!
             </p>
 
             <div className="space-y-2.5 pt-1">
               {[
-                { icon: Flame, title: "+20 Loop Points per verified peer", desc: "Climb from Rookie to Campus Star & Legend tier." },
-                { icon: ShieldCheck, title: "Verified Ambassador Badge", desc: "Get featured at the top of your college directory." },
-                { icon: Users, title: "Bring your whole batch", desc: "Unlock exclusive batch discussion threads & confessions." },
+                {
+                  icon: Flame,
+                  title: "+20 Loop Points per verified peer",
+                  desc: "Climb from Rookie to Campus Star & Legend tier.",
+                },
+                {
+                  icon: ShieldCheck,
+                  title: "Verified Ambassador Badge",
+                  desc: "Get featured at the top of your college directory.",
+                },
+                {
+                  icon: Users,
+                  title: "Bring your whole batch",
+                  desc: "Unlock exclusive batch discussion threads & confessions.",
+                },
               ].map((perk, idx) => {
                 const Icon = perk.icon;
                 return (
-                  <div key={idx} className="flex items-start gap-3 rounded-2xl border border-border/50 bg-card/60 p-3 shadow-2xs">
+                  <div
+                    key={idx}
+                    className="flex items-start gap-3 rounded-2xl border border-border/50 bg-card/60 p-3 shadow-2xs"
+                  >
                     <div className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary mt-0.5">
                       <Icon className="size-3.5" />
                     </div>
@@ -77,7 +90,9 @@ export function AmbassadorShowcase() {
 
               {/* Handle Input */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-muted-foreground">Type your campus username:</label>
+                <label className="text-[11px] font-bold text-muted-foreground">
+                  Type your campus username:
+                </label>
                 <div className="relative flex items-center">
                   <span className="absolute left-3 text-xs font-bold text-muted-foreground">@</span>
                   <input
@@ -114,7 +129,8 @@ export function AmbassadorShowcase() {
               {/* Pro-Tip Box */}
               <div className="rounded-2xl bg-muted/30 p-3 text-[11px] text-muted-foreground leading-relaxed border border-border/40 space-y-1">
                 <p className="font-medium">
-                  💡 <strong className="text-foreground">Pro-tip:</strong> Share this link in your college WhatsApp or Telegram group to farm +20 Loop Points per peer!
+                  💡 <strong className="text-foreground">Pro-tip:</strong> Share this link in your college
+                  WhatsApp or Telegram group to farm +20 Loop Points per peer!
                 </p>
               </div>
 

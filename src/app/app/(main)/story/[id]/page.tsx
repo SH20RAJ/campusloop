@@ -1,9 +1,9 @@
+import { desc, eq, gt } from "drizzle-orm";
+import type { Metadata } from "next";
+import { notFound, redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { stories,userProfiles } from "@/db/schema";
+import { stories, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { desc,eq,gt } from "drizzle-orm";
-import { Metadata } from "next";
-import { notFound,redirect } from "next/navigation";
 import { StoryViewerClient } from "./story-viewer-client";
 
 interface PageProps {
@@ -42,7 +42,6 @@ export default async function StoryPage({ params }: PageProps) {
   const user = await hexclaveServerApp.getUser();
   if (!user) redirect("/handler/sign-in");
 
-
   const db = getDb();
   const profile = await db.query.userProfiles.findFirst({
     where: eq(userProfiles.userId, user.id),
@@ -63,7 +62,7 @@ export default async function StoryPage({ params }: PageProps) {
     },
   });
 
-  if (!rawStory || !rawStory.user) {
+  if (!rawStory?.user) {
     notFound();
   }
 
@@ -77,7 +76,8 @@ export default async function StoryPage({ params }: PageProps) {
   const storyIds = allStories.map((s) => s.id);
   const currentIndex = storyIds.indexOf(id);
   const prevStoryId = currentIndex > 0 ? storyIds[currentIndex - 1] : null;
-  const nextStoryId = currentIndex >= 0 && currentIndex < storyIds.length - 1 ? storyIds[currentIndex + 1] : null;
+  const nextStoryId =
+    currentIndex >= 0 && currentIndex < storyIds.length - 1 ? storyIds[currentIndex + 1] : null;
 
   const initialLiked = rawStory.likes ? rawStory.likes.some((l) => l.userId === profile.id) : false;
   const initialLikesCount = rawStory.likes ? rawStory.likes.length : 0;

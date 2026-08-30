@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import HashtagFeed from "./hashtag-feed";
 
 interface PageProps {
@@ -40,7 +40,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     robots: { index: true, follow: true },
   };
-
 }
 
 export default async function HashtagPage({ params }: PageProps) {
@@ -55,10 +54,7 @@ export default async function HashtagPage({ params }: PageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <HashtagFeed />
     </>
   );

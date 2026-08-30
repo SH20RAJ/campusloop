@@ -1,22 +1,14 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { LostAndFoundItem } from "@/db/schema";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import {
-Calendar,
-CheckCircle2,
-Gift,
-MapPin,
-MessageCircle,
-Share2,
-ShieldCheck,
-} from "lucide-react";
+import { Calendar, CheckCircle2, Gift, MapPin, MessageCircle, Share2, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { LostAndFoundItem } from "@/db/schema";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface LostFoundCardProps {
   item: LostAndFoundItem & {
@@ -102,9 +94,7 @@ export function LostFoundCard({ item, currentUserId }: LostFoundCardProps) {
               {(item.author.points || 0) >= 150 && (
                 <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
               )}
-              <span className="text-[11px] text-muted-foreground truncate">
-                @{item.author.username}
-              </span>
+              <span className="text-[11px] text-muted-foreground truncate">@{item.author.username}</span>
               <span className="text-[10px] text-muted-foreground/60">·</span>
               <span className="text-[11px] text-muted-foreground/80 shrink-0">
                 {formatTimeAgo(item.createdAt)}
@@ -126,8 +116,8 @@ export function LostFoundCard({ item, currentUserId }: LostFoundCardProps) {
               resolved
                 ? "bg-muted text-muted-foreground border-border/60"
                 : isLost
-                ? "bg-rose-500/15 text-rose-500 border-rose-500/30"
-                : "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
+                  ? "bg-rose-500/15 text-rose-500 border-rose-500/30"
+                  : "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
             )}
           >
             {resolved ? "Resolved" : isLost ? "Lost Item" : "Found Item"}
@@ -146,13 +136,9 @@ export function LostFoundCard({ item, currentUserId }: LostFoundCardProps) {
 
       {/* Title & Description */}
       <div className="space-y-1.5">
-        <h3 className="text-sm font-black text-foreground leading-snug">
-          {item.title}
-        </h3>
+        <h3 className="text-sm font-black text-foreground leading-snug">{item.title}</h3>
         {item.description && (
-          <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">
-            {item.description}
-          </p>
+          <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">{item.description}</p>
         )}
       </div>
 
@@ -181,11 +167,7 @@ export function LostFoundCard({ item, currentUserId }: LostFoundCardProps) {
       {/* Optional Photo */}
       {item.imageUrl && (
         <div className="mt-3 rounded-2xl overflow-hidden border border-border/40 max-h-60 bg-muted/20">
-          <img
-            src={item.imageUrl}
-            alt={item.title}
-            className="w-full h-full object-cover"
-          />
+          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
         </div>
       )}
 

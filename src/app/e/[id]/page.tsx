@@ -1,8 +1,8 @@
-import { getDb } from "@/db";
-import { events } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import type { Metadata } from "next";
 import EventDetailPage from "@/app/app/(main)/events/[id]/page";
+import { getDb } from "@/db";
+import { events } from "@/db/schema";
 
 interface EventShortLinkProps {
   params: Promise<{ id: string }>;
@@ -32,7 +32,9 @@ export async function generateMetadata({ params }: EventShortLinkProps): Promise
       title,
       description,
       url,
-      images: event.bannerUrl ? [{ url: event.bannerUrl }] : [{ url: "https://campusloop.space/og-image.png" }],
+      images: event.bannerUrl
+        ? [{ url: event.bannerUrl }]
+        : [{ url: "https://campusloop.space/og-image.png" }],
     },
     twitter: {
       card: "summary_large_image",

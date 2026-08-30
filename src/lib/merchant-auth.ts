@@ -1,8 +1,8 @@
-import { getDb } from "@/db";
-import { merchants } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import type { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { merchants } from "@/db/schema";
 
 const MERCHANT_COOKIE_NAME = "campusloop_merchant_session";
 const SESSION_SECRET = process.env.MERCHANT_AUTH_SECRET || "campusloop-merchant-secret-key-2026";
@@ -47,9 +47,7 @@ export async function verifyMerchantSessionToken(token: string): Promise<string 
       ["verify"]
     );
 
-    const sigBytes = new Uint8Array(
-      sigHex.match(/.{1,2}/g)?.map((byte: string) => parseInt(byte, 16)) || []
-    );
+    const sigBytes = new Uint8Array(sigHex.match(/.{1,2}/g)?.map((byte: string) => parseInt(byte, 16)) || []);
 
     const isValid = await crypto.subtle.verify("HMAC", key, sigBytes, encoder.encode(data));
     return isValid ? merchantId : null;

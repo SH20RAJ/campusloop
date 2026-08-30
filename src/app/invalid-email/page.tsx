@@ -1,15 +1,15 @@
 import { ShieldAlertIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-
+import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-	title: "Invalid Email",
-	description: "The email used to sign up is not a verified student email. Sign up again with your official college email.",
-	robots: { index: false, follow: false },
+  title: "Invalid Email",
+  description:
+    "The email used to sign up is not a verified student email. Sign up again with your official college email.",
+  robots: { index: false, follow: false },
 };
 
 export default async function InvalidEmailPage() {
@@ -25,18 +25,25 @@ export default async function InvalidEmailPage() {
             <ShieldAlertIcon className="h-6 w-6" />
           </div>
         </div>
-        
+
         <h1 className="text-xl font-bold tracking-tight text-foreground">College Email Required</h1>
-        
+
         <p className="text-sm text-muted-foreground leading-relaxed">
-          CampusLoop is a verified student-only network. To join your campus feed, you must sign up using your official college-provided email address.
+          CampusLoop is a verified student-only network. To join your campus feed, you must sign up using your
+          official college-provided email address.
         </p>
 
         <div className="rounded-lg bg-muted p-4 text-left border border-border">
           <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">Your options:</h3>
           <ul className="mt-2 list-disc list-inside text-xs text-muted-foreground space-y-1">
-            <li>Sign up again using your student email (e.g. <code className="font-semibold text-foreground">name@college.edu</code>) to post &amp; interact</li>
-            <li>Or continue in <strong className="text-foreground">Viewer Mode</strong> — browse campus feeds, confessions, and polls read-only. Great for JEE/NEET aspirants exploring colleges!</li>
+            <li>
+              Sign up again using your student email (e.g.{" "}
+              <code className="font-semibold text-foreground">name@college.edu</code>) to post &amp; interact
+            </li>
+            <li>
+              Or continue in <strong className="text-foreground">Viewer Mode</strong> — browse campus feeds,
+              confessions, and polls read-only. Great for JEE/NEET aspirants exploring colleges!
+            </li>
           </ul>
         </div>
 
@@ -47,9 +54,7 @@ export default async function InvalidEmailPage() {
           >
             Continue in Viewer Mode 👀
           </Link>
-          <SignOutButton
-            className="flex w-full items-center justify-center rounded-lg border border-border bg-background h-10 px-4 text-sm font-medium text-foreground shadow-sm hover:bg-muted transition-colors cursor-pointer"
-          >
+          <SignOutButton className="flex w-full items-center justify-center rounded-lg border border-border bg-background h-10 px-4 text-sm font-medium text-foreground shadow-sm hover:bg-muted transition-colors cursor-pointer">
             <span>Sign Out &amp; Use College Email</span>
           </SignOutButton>
         </div>

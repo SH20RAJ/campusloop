@@ -1,5 +1,5 @@
-import { boolean,integer,pgTable,text,timestamp } from "drizzle-orm/pg-core";
-import { createdAt,id,updatedAt } from "./common";
+import { boolean, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "./common";
 import { institutions } from "./institutions";
 import { userProfiles } from "./users";
 

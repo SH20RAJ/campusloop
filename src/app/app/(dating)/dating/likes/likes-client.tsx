@@ -1,13 +1,13 @@
 "use client";
 
-import { DatingMatchModal } from "@/components/dating/dating-match-modal";
-import { fetcher } from "@/lib/api";
-import { getAvatarUrl } from "@/lib/utils";
-import { ArrowLeft,Heart,Loader2,School,X } from "lucide-react";
+import { ArrowLeft, Heart, Loader2, School, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { DatingMatchModal } from "@/components/dating/dating-match-modal";
+import { fetcher } from "@/lib/api";
+import { getAvatarUrl } from "@/lib/utils";
 
 type Admirer = {
   id: string;

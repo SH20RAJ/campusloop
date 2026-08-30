@@ -1,7 +1,7 @@
+import { eq, inArray } from "drizzle-orm";
 import { getDb } from "@/db";
 import { pushSubscriptions } from "@/db/schema";
 import { sendPushTickle } from "@/lib/web-push";
-import { eq,inArray } from "drizzle-orm";
 
 /**
  * Wake every device a student has registered. Dead endpoints are pruned as we
@@ -21,7 +21,7 @@ export async function pushToUser(userId: string, urgency: "normal" | "high" = "n
     if (subs.length === 0) return;
 
     const results = await Promise.all(
-      subs.map(async (sub) => ({ id: sub.id, result: await sendPushTickle(sub.endpoint, urgency) })),
+      subs.map(async (sub) => ({ id: sub.id, result: await sendPushTickle(sub.endpoint, urgency) }))
     );
 
     const expired = results.filter((r) => r.result === "expired").map((r) => r.id);

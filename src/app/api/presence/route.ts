@@ -1,10 +1,10 @@
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { HEARTBEAT_INTERVAL_MS } from "@/lib/presence";
 import { recordHeartbeat } from "@/lib/presence-server";
-import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

@@ -1,15 +1,14 @@
 "use client";
 
-import {
-FEED_CATEGORY_OPTIONS as CATEGORY_OPTIONS,
-FEED_SORT_TABS as SORT_TABS,
-FEED_VISIBILITY_OPTIONS as VISIBILITY_OPTIONS,
-} from "@/constants";
-import { cn } from "@/lib/utils";
 import { Flame, Globe, ListFilter, RotateCw, School } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-
+import {
+  FEED_CATEGORY_OPTIONS as CATEGORY_OPTIONS,
+  FEED_SORT_TABS as SORT_TABS,
+  FEED_VISIBILITY_OPTIONS as VISIBILITY_OPTIONS,
+} from "@/constants";
+import { cn } from "@/lib/utils";
 
 interface FeedHeaderProps {
   scope: "CAMPUS" | "GLOBAL";
@@ -21,10 +20,9 @@ interface FeedHeaderProps {
   visibility: string;
   onVisibilityChange: (visibility: string) => void;
   institutionSlug?: string | null;
-  onRefresh?: () => Promise<unknown> | void;
+  onRefresh?: () => Promise<unknown> | undefined;
   isRefreshing?: boolean;
 }
-
 
 export function FeedHeader({
   scope,
@@ -67,7 +65,9 @@ export function FeedHeader({
               title="Refresh feed"
               aria-label="Refresh feed"
             >
-              <RotateCw className={cn("size-3.5 transition-transform", isRefreshing && "animate-spin text-primary")} />
+              <RotateCw
+                className={cn("size-3.5 transition-transform", isRefreshing && "animate-spin text-primary")}
+              />
             </button>
           )}
 
@@ -77,17 +77,25 @@ export function FeedHeader({
               onClick={() => onScopeChange("CAMPUS")}
               className={cn(
                 "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
-                scope === "CAMPUS" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                scope === "CAMPUS"
+                  ? "bg-background text-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <School className="h-3 w-3" />
-              <span className="truncate max-w-[120px]">{institutionSlug ? `${institutionSlug.charAt(0).toUpperCase() + institutionSlug.slice(1)}` : "Campus"}</span>
+              <span className="truncate max-w-[120px]">
+                {institutionSlug
+                  ? `${institutionSlug.charAt(0).toUpperCase() + institutionSlug.slice(1)}`
+                  : "Campus"}
+              </span>
             </button>
             <button
               onClick={() => onScopeChange("GLOBAL")}
               className={cn(
                 "flex items-center gap-1 px-3 py-1 rounded-full transition-all cursor-pointer",
-                scope === "GLOBAL" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                scope === "GLOBAL"
+                  ? "bg-background text-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Globe className="h-3 w-3" />
@@ -96,7 +104,6 @@ export function FeedHeader({
           </div>
         </div>
       </div>
-
 
       {/* Twitter/X Style Segmented Sort Tabs */}
       <div className="flex items-center justify-between border-t border-border/25 pt-1 -mb-4 -mx-4 px-2">
@@ -153,7 +160,6 @@ export function FeedHeader({
         </button>
       </div>
 
-
       {/* Advanced Filters Dropdown */}
       <div
         className={cn(
@@ -164,7 +170,9 @@ export function FeedHeader({
         <div className="grid grid-cols-2 gap-4">
           {/* Identity filter */}
           <div className="space-y-1">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Show Posts By</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+              Show Posts By
+            </span>
             <div className="flex rounded-lg bg-muted/65 p-0.5 border border-border/40 text-[9px] font-bold">
               {VISIBILITY_OPTIONS.map((option) => (
                 <button
@@ -172,7 +180,9 @@ export function FeedHeader({
                   onClick={() => onVisibilityChange(option.id)}
                   className={cn(
                     "flex-1 py-1 rounded-md transition-all cursor-pointer",
-                    visibility === option.id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                    visibility === option.id
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground"
                   )}
                 >
                   {option.label}
@@ -183,7 +193,9 @@ export function FeedHeader({
 
           {/* Category selection */}
           <div className="space-y-1">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Category</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+              Category
+            </span>
             <div className="flex rounded-lg bg-muted/65 p-0.5 border border-border/40 text-[9px] font-bold">
               {CATEGORY_OPTIONS.map((option) => (
                 <button

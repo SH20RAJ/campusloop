@@ -1,8 +1,8 @@
+import { asc, eq, or } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { articleComments, articleCommentVotes, articles, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and, asc, desc, eq, isNull, or } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
 
 interface RouteProps {
   params: Promise<{ slug: string }>;

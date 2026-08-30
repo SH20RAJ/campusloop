@@ -1,6 +1,6 @@
 "use client";
 
-import { Bookmark,Plus } from "lucide-react";
+import { Bookmark, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -75,11 +75,7 @@ export function ProfileHighlights({ userId, isOwnProfile }: ProfileHighlightsPro
             >
               <div className="size-full rounded-full bg-card border-2 border-card overflow-hidden flex items-center justify-center">
                 {h.coverUrl ? (
-                  <img
-                    src={h.coverUrl}
-                    alt={h.title}
-                    className="size-full object-cover"
-                  />
+                  <img src={h.coverUrl} alt={h.title} className="size-full object-cover" />
                 ) : (
                   <div className="size-full bg-linear-to-tr from-primary/20 to-violet-500/20 flex items-center justify-center text-primary">
                     <Bookmark className="size-6" />
@@ -104,9 +100,7 @@ export function ProfileHighlights({ userId, isOwnProfile }: ProfileHighlightsPro
             >
               <Bookmark className="size-5 text-amber-500" />
             </button>
-            <span className="text-[11px] font-bold text-muted-foreground truncate max-w-[72px]">
-              Archive
-            </span>
+            <span className="text-[11px] font-bold text-muted-foreground truncate max-w-[72px]">Archive</span>
           </div>
         )}
       </div>

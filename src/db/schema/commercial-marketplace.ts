@@ -1,5 +1,5 @@
-import { boolean,integer,jsonb,pgTable,text,timestamp } from "drizzle-orm/pg-core";
-import { createdAt,id,updatedAt } from "./common";
+import { boolean, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "./common";
 import { institutions } from "./institutions";
 import { userProfiles } from "./users";
 
@@ -35,7 +35,7 @@ export const merchants = pgTable("merchants", {
   locationPin: text("location_pin"), // e.g. "250m from Inner Circle"
   rating: text("rating").default("4.7").notNull(),
   reviewCount: integer("review_count").default(24).notNull(),
-  
+
   // Delivery & Fulfillment Configuration
   isDeliveryEnabled: boolean("is_delivery_enabled").default(true).notNull(),
   isPickupEnabled: boolean("is_pickup_enabled").default(true).notNull(),
@@ -44,20 +44,22 @@ export const merchants = pgTable("merchants", {
   minOrderValue: integer("min_order_value").default(80).notNull(), // in Rupees
   freeDeliveryAbove: integer("free_delivery_above").default(299),
   estimatedPrepTime: text("estimated_prep_time").default("15–25 min").notNull(),
-  pickupInstructions: text("pickup_instructions").default("Collect from the main counter by showing your order number."),
-  
+  pickupInstructions: text("pickup_instructions").default(
+    "Collect from the main counter by showing your order number."
+  ),
+
   // Status: DRAFT, PENDING_REVIEW, ACTIVE, PAUSED, SUSPENDED, CLOSED
   status: text("status").default("ACTIVE").notNull(),
   isOpen: boolean("is_open").default(true).notNull(), // Merchant toggle (Open/Busy/Closed)
-  
+
   // Direct Portal Credentials
   loginUsername: text("login_username"),
   loginPassword: text("login_password"),
-  
+
   // Banking / Settlement
   upiId: text("upi_id"),
   bankAccountDetails: jsonb("bank_account_details"),
-  
+
   createdAt,
   updatedAt,
 });
@@ -104,14 +106,16 @@ export const products = pgTable("products", {
   preparationTime: text("preparation_time").default("15 min"),
   isAvailable: boolean("is_available").default(true).notNull(),
   status: text("status").default("ACTIVE").notNull(), // "ACTIVE", "DRAFT", "OUT_OF_STOCK", "HIDDEN", "ARCHIVED"
-  
+
   // Customization Options (e.g. Spice level, Size) and Add-ons (e.g. Extra Chutney, Cheese)
-  options: jsonb("options").$type<Array<{ name: string; choices: string[]; defaultChoice?: string }>>().default([]),
+  options: jsonb("options")
+    .$type<Array<{ name: string; choices: string[]; defaultChoice?: string }>>()
+    .default([]),
   addons: jsonb("addons").$type<Array<{ id: string; name: string; price: number }>>().default([]),
-  
+
   // Fulfillment Modes: ["delivery", "pickup", "booking"]
   fulfillmentModes: jsonb("fulfillment_modes").$type<string[]>().default(["delivery", "pickup"]).notNull(),
-  
+
   displayOrder: integer("display_order").default(0).notNull(),
   createdAt,
   updatedAt,
@@ -131,26 +135,26 @@ export const marketplaceOrders = pgTable("marketplace_orders", {
     .notNull()
     .references(() => institutions.id, { onDelete: "cascade" }),
   categorySlug: text("category_slug").default("food").notNull(),
-  
+
   fulfillmentType: text("fulfillment_type").default("DELIVERY").notNull(), // "DELIVERY", "PICKUP", "BOOKING"
-  
+
   // State Machine:
   // Food/Delivery: PLACED -> ACCEPTED -> PREPARING -> READY -> OUT_FOR_DELIVERY -> DELIVERED (or REJECTED/CANCELLED)
   // Pickup: PLACED -> ACCEPTED -> PREPARING -> READY_FOR_PICKUP -> PICKED_UP
   // Rental: BOOKING_REQUESTED -> ACCEPTED -> ACTIVE_RENTAL -> RETURNED
   status: text("status").default("PLACED").notNull(),
-  
+
   subtotal: integer("subtotal").notNull(),
   deliveryFee: integer("delivery_fee").default(0).notNull(),
   discount: integer("discount").default(0).notNull(),
   total: integer("total").notNull(),
-  
+
   paymentStatus: text("payment_status").default("PENDING").notNull(), // "PENDING", "PAID", "COD"
   paymentMethod: text("payment_method").default("COD").notNull(), // "COD", "UPI", "CAMPUS_PAY"
-  
+
   customerNote: text("customer_note"),
   rejectionReason: text("rejection_reason"),
-  
+
   // Dynamic Delivery Address / Booking Info
   deliveryAddress: jsonb("delivery_address").$type<{
     hostelName?: string;
@@ -162,7 +166,7 @@ export const marketplaceOrders = pgTable("marketplace_orders", {
     drivingLicenseNumber?: string;
     aadhaarLast4?: string;
   }>(),
-  
+
   createdAt,
   updatedAt,
 });
@@ -245,14 +249,16 @@ export const bikes = pgTable("bikes", {
   securityDeposit: integer("security_deposit").default(1500).notNull(), // in Rupees
   pickupLocation: text("pickup_location").default("Campus Main Gate").notNull(),
   fuelType: text("fuel_type").default("PETROL").notNull(), // "PETROL", "ELECTRIC"
-  specs: jsonb("specs").$type<{
-    engineCapacity?: string;
-    mileage?: string;
-    helmetIncluded?: boolean;
-    fuelLevel?: string;
-    notes?: string;
-  }>().default({ helmetIncluded: true }),
-  
+  specs: jsonb("specs")
+    .$type<{
+      engineCapacity?: string;
+      mileage?: string;
+      helmetIncluded?: boolean;
+      fuelLevel?: string;
+      notes?: string;
+    }>()
+    .default({ helmetIncluded: true }),
+
   // Operational Status: AVAILABLE, BOOKED, RENTED, MAINTENANCE, INACTIVE
   status: text("status").default("AVAILABLE").notNull(),
   rating: text("rating").default("4.8").notNull(),
@@ -277,32 +283,32 @@ export const bikeBookings = pgTable("bike_bookings", {
   institutionId: text("institution_id")
     .notNull()
     .references(() => institutions.id, { onDelete: "cascade" }),
-    
+
   startAt: timestamp("start_at", { withTimezone: true, mode: "date" }).notNull(),
   endAt: timestamp("end_at", { withTimezone: true, mode: "date" }).notNull(),
   actualPickupAt: timestamp("actual_pickup_at", { withTimezone: true, mode: "date" }),
   actualReturnAt: timestamp("actual_return_at", { withTimezone: true, mode: "date" }),
-  
+
   rentalAmount: integer("rental_amount").notNull(), // in Rupees
   depositAmount: integer("deposit_amount").notNull(), // in Rupees (refundable)
   lateFeeAmount: integer("late_fee_amount").default(0).notNull(),
   damageFeeAmount: integer("damage_fee_amount").default(0).notNull(),
   totalAmount: integer("total_amount").notNull(), // rentalAmount + depositAmount
-  
+
   // Status: REQUESTED -> CONFIRMED -> READY_FOR_PICKUP -> ACTIVE -> RETURNED -> COMPLETED
   // Terminal / Exception: REJECTED, CANCELLED, DISPUTED
   status: text("status").default("REQUESTED").notNull(),
   paymentStatus: text("payment_status").default("PENDING").notNull(), // PENDING, PAID, COD, REFUND_PROCESSING, REFUNDED
   paymentMethod: text("payment_method").default("COD").notNull(), // COD, UPI
   depositRefundStatus: text("deposit_refund_status").default("HELD").notNull(), // HELD, INITIATED, REFUNDED, DISPUTED
-  
+
   cancellationReason: text("cancellation_reason"),
   cancelledBy: text("cancelled_by"), // STUDENT, MERCHANT, ADMIN
-  
+
   customerPhone: text("customer_phone").notNull(),
   hostelAddress: text("hostel_address").notNull(),
   specialNotes: text("special_notes"),
-  
+
   createdAt,
   updatedAt,
 });
@@ -395,4 +401,3 @@ export type NewBikeBooking = typeof bikeBookings.$inferInsert;
 export type BikeAvailabilityBlock = typeof bikeAvailabilityBlocks.$inferSelect;
 export type BikeInspection = typeof bikeInspections.$inferSelect;
 export type BikeBookingDocument = typeof bikeBookingDocuments.$inferSelect;
-

@@ -1,15 +1,15 @@
-import { getDb } from "@/db";
-import { institutions } from "@/db/schema";
 import { desc } from "drizzle-orm";
 import { Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getDb } from "@/db";
+import { institutions } from "@/db/schema";
 import { CollegesTable } from "./colleges-table";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-	title: "Colleges",
+  title: "Colleges",
 };
 
 export default async function CollegesAdminPage() {
@@ -18,7 +18,7 @@ export default async function CollegesAdminPage() {
     orderBy: [desc(institutions.createdAt)],
     with: {
       domains: true,
-    }
+    },
   });
 
   return (
@@ -26,7 +26,9 @@ export default async function CollegesAdminPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Manage Colleges</h2>
-          <p className="text-muted-foreground">Add, edit, or remove participating institutions and their allowed email domains.</p>
+          <p className="text-muted-foreground">
+            Add, edit, or remove participating institutions and their allowed email domains.
+          </p>
         </div>
         <Link
           href="/admin/colleges/new"

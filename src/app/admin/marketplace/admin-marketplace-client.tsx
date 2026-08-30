@@ -1,32 +1,22 @@
 "use client";
 
+import { Bike, Edit2, ExternalLink, Package, Plus, Search, Store } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-Bike,
-Edit2,
-ExternalLink,
-Package,
-Plus,
-Search,
-Store
-} from "lucide-react";
-import Link from "next/link";
-import { useMemo,useState } from "react";
-import useSWR from "swr";
 
 export function AdminMarketplaceClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const { data, isLoading } = useSWR<{ merchants: any[] }>(
-    "/api/admin/marketplace/merchants",
-    fetcher,
-    { dedupingInterval: 10000 }
-  );
+  const { data, isLoading } = useSWR<{ merchants: any[] }>("/api/admin/marketplace/merchants", fetcher, {
+    dedupingInterval: 10000,
+  });
 
   const merchants = data?.merchants || [];
   const totalProducts = merchants.reduce((sum, m) => sum + (m.products?.length || 0), 0);
@@ -128,7 +118,9 @@ export function AdminMarketplaceClient() {
         <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-black text-foreground">Campus Merchants Directory</h2>
-            <p className="text-[11px] text-muted-foreground">Click Manage to edit menu items, prices, or store details</p>
+            <p className="text-[11px] text-muted-foreground">
+              Click Manage to edit menu items, prices, or store details
+            </p>
           </div>
 
           <div className="flex items-center gap-2">

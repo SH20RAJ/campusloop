@@ -1,21 +1,15 @@
 "use client";
 
+import { ExternalLink, Loader2, Package, Search, UtensilsCrossed } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-ExternalLink,
-Loader2,
-Package,
-Search,
-UtensilsCrossed
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
 
 export function AdminProductsClient() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,10 +17,7 @@ export function AdminProductsClient() {
   const [stockFilter, setStockFilter] = useState<"all" | "in_stock" | "out_of_stock">("all");
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  const { data, isLoading, mutate } = useSWR<{ products: any[] }>(
-    "/api/admin/marketplace/products",
-    fetcher
-  );
+  const { data, isLoading, mutate } = useSWR<{ products: any[] }>("/api/admin/marketplace/products", fetcher);
 
   const products = data?.products || [];
 
@@ -69,9 +60,7 @@ export function AdminProductsClient() {
       if (!res.ok) throw new Error();
       mutate();
       toast.success(
-        !product.isAvailable
-          ? `${product.name} is now In Stock`
-          : `${product.name} marked Out of Stock`
+        !product.isAvailable ? `${product.name} is now In Stock` : `${product.name} marked Out of Stock`
       );
     } catch {
       toast.error("Failed to update product availability");
@@ -176,9 +165,7 @@ export function AdminProductsClient() {
                         <div>
                           <p className="font-bold text-foreground">{p.name}</p>
                           {p.description && (
-                            <p className="text-[10px] text-muted-foreground line-clamp-1">
-                              {p.description}
-                            </p>
+                            <p className="text-[10px] text-muted-foreground line-clamp-1">{p.description}</p>
                           )}
                         </div>
                       </div>
@@ -210,9 +197,7 @@ export function AdminProductsClient() {
                           🔴 NON-VEG
                         </span>
                       )}
-                      {p.isVeg === null && (
-                        <span className="text-[10px] text-muted-foreground">—</span>
-                      )}
+                      {p.isVeg === null && <span className="text-[10px] text-muted-foreground">—</span>}
                     </td>
                     <td className="p-3">
                       <button
@@ -239,7 +224,10 @@ export function AdminProductsClient() {
                       <button
                         type="button"
                         onClick={async () => {
-                          const newPriceStr = prompt(`Update price for ${p.name} (Current: ₹${p.price}):`, String(p.price));
+                          const newPriceStr = prompt(
+                            `Update price for ${p.name} (Current: ₹${p.price}):`,
+                            String(p.price)
+                          );
                           if (newPriceStr !== null) {
                             const newPrice = parseInt(newPriceStr, 10);
                             if (!isNaN(newPrice) && newPrice >= 0) {

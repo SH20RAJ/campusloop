@@ -1,33 +1,39 @@
 "use client";
 
-import { fetcher } from "@/lib/api";
-import type { TrendingHashtag } from "@/lib/trending-hashtags";
-import { cn } from "@/lib/utils";
-import {
-  ArrowRight,
-  BookOpen,
-  Clock,
-  Flame,
-  Gift,
-  Hash,
-  Heart,
-  ThumbsUp,
-  Users,
-} from "lucide-react";
+import { ArrowRight, BookOpen, Clock, Flame, Gift, Hash, Heart, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-
+import { fetcher } from "@/lib/api";
+import type { TrendingHashtag } from "@/lib/trending-hashtags";
+import { cn } from "@/lib/utils";
 
 // ──────── 1. Suggested Communities Widget (Twitter / X Timeline Style) ────────
 
 const SUGGESTED_COMMUNITIES = [
-  { id: "comm_music", name: "Music Jams & Dhwani", slug: "music-jams", members: 17, desc: "Acoustic jams, Bitotsav battle of bands, and indie chords 🎸" },
-  { id: "comm_coding", name: "Coders Club & Hackers", slug: "coders-club", members: 18, desc: "LeetCode daily grinds, system design & HackBIT squads 💻" },
-  { id: "comm_placements", name: "Placement & Career Prep", slug: "placement-prep", members: 15, desc: "Mock interviews, coding test patterns & alumni referrals 💼" },
+  {
+    id: "comm_music",
+    name: "Music Jams & Dhwani",
+    slug: "music-jams",
+    members: 17,
+    desc: "Acoustic jams, Bitotsav battle of bands, and indie chords 🎸",
+  },
+  {
+    id: "comm_coding",
+    name: "Coders Club & Hackers",
+    slug: "coders-club",
+    members: 18,
+    desc: "LeetCode daily grinds, system design & HackBIT squads 💻",
+  },
+  {
+    id: "comm_placements",
+    name: "Placement & Career Prep",
+    slug: "placement-prep",
+    members: 15,
+    desc: "Mock interviews, coding test patterns & alumni referrals 💼",
+  },
 ];
-
 
 export function InlineCommunitiesWidget() {
   const [joined, setJoined] = useState<Record<string, boolean>>({});
@@ -48,9 +54,7 @@ export function InlineCommunitiesWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Users className="size-4 text-primary" />
-          <h3 className="text-[15px] font-black text-foreground tracking-tight">
-            Communities for you
-          </h3>
+          <h3 className="text-[15px] font-black text-foreground tracking-tight">Communities for you</h3>
         </div>
         <Link
           href="/app/communities"
@@ -83,9 +87,7 @@ export function InlineCommunitiesWidget() {
                 <p className="text-xs text-muted-foreground truncate">
                   <span className="font-medium">c/{comm.slug}</span> · {comm.members} members
                 </p>
-                <p className="text-[11px] text-muted-foreground/80 truncate">
-                  {comm.desc}
-                </p>
+                <p className="text-[11px] text-muted-foreground/80 truncate">{comm.desc}</p>
               </div>
             </div>
 
@@ -120,9 +122,7 @@ export function InlineDatingWidget() {
 
         <div className="space-y-0.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="text-[14px] font-black text-foreground">
-              Campus Match &amp; Dating
-            </h4>
+            <h4 className="text-[14px] font-black text-foreground">Campus Match &amp; Dating</h4>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-600 dark:text-pink-400">
               18+ Verified
             </span>
@@ -146,37 +146,31 @@ export function InlineDatingWidget() {
 // ──────── 3. Trending Hashtags Widget ────────
 
 export function InlineHashtagsWidget() {
-  const { data } = useSWR<{ trending: TrendingHashtag[] }>(
-    "/api/hashtags/trending?limit=4",
-    fetcher,
-    { dedupingInterval: 30000 }
-  );
+  const { data } = useSWR<{ trending: TrendingHashtag[] }>("/api/hashtags/trending?limit=4", fetcher, {
+    dedupingInterval: 30000,
+  });
 
-  const tags = data?.trending && data.trending.length > 0
-    ? data.trending.map((t) => ({
-        tag: t.tag.replace(/^#/, ""),
-        count: t.formattedCount,
-      }))
-    : [
-        { tag: "HostelLife", count: "62 posts" },
-        { tag: "BITMesra", count: "39 posts" },
-        { tag: "Confession", count: "36 posts" },
-        { tag: "CampusHelp", count: "25 posts" },
-      ];
+  const tags =
+    data?.trending && data.trending.length > 0
+      ? data.trending.map((t) => ({
+          tag: t.tag.replace(/^#/, ""),
+          count: t.formattedCount,
+        }))
+      : [
+          { tag: "HostelLife", count: "62 posts" },
+          { tag: "BITMesra", count: "39 posts" },
+          { tag: "Confession", count: "36 posts" },
+          { tag: "CampusHelp", count: "25 posts" },
+        ];
 
   return (
     <div className="py-2.5 px-4 space-y-2 select-none">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Flame className="size-4 text-primary" />
-          <h3 className="text-[15px] font-black text-foreground tracking-tight">
-            Trending on Campus
-          </h3>
+          <h3 className="text-[15px] font-black text-foreground tracking-tight">Trending on Campus</h3>
         </div>
-        <Link
-          href="/app/discover"
-          className="text-xs font-bold text-primary hover:underline cursor-pointer"
-        >
+        <Link href="/app/discover" className="text-xs font-bold text-primary hover:underline cursor-pointer">
           Explore
         </Link>
       </div>
@@ -200,7 +194,6 @@ export function InlineHashtagsWidget() {
   );
 }
 
-
 // ──────── 4. Referral / Ambassador Perk Widget ────────
 
 export function InlineReferralWidget() {
@@ -218,9 +211,7 @@ export function InlineReferralWidget() {
           <Gift className="size-5" />
         </div>
         <div className="min-w-0 space-y-0.5">
-          <h4 className="text-[14px] font-black text-foreground truncate">
-            Invite Classmates · Earn 20 LP
-          </h4>
+          <h4 className="text-[14px] font-black text-foreground truncate">Invite Classmates · Earn 20 LP</h4>
           <p className="text-xs text-muted-foreground truncate">
             Unlock the verified campus star badge and boost your clout tier.
           </p>
@@ -254,9 +245,7 @@ export function InlineArticlesWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpen className="size-4 text-primary" />
-          <h3 className="text-[15px] font-black text-foreground tracking-tight">
-            Articles & Long Reads
-          </h3>
+          <h3 className="text-[15px] font-black text-foreground tracking-tight">Articles & Long Reads</h3>
         </div>
         <Link
           href="/app/articles"
@@ -276,9 +265,7 @@ export function InlineArticlesWidget() {
           >
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-1 text-[10px]">
-                <span className="font-black text-primary uppercase">
-                  {art.category || "General"}
-                </span>
+                <span className="font-black text-primary uppercase">{art.category || "General"}</span>
                 <span className="text-muted-foreground flex items-center gap-1 font-medium">
                   <Clock className="size-2.5" />
                   {art.readingTimeMinutes || 3} min
@@ -287,11 +274,7 @@ export function InlineArticlesWidget() {
               <h4 className="font-bold text-xs text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
                 {art.title}
               </h4>
-              {art.excerpt && (
-                <p className="text-[11px] text-muted-foreground line-clamp-2">
-                  {art.excerpt}
-                </p>
-              )}
+              {art.excerpt && <p className="text-[11px] text-muted-foreground line-clamp-2">{art.excerpt}</p>}
             </div>
 
             <div className="mt-2.5 flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/20 pt-2 font-medium">
@@ -304,4 +287,3 @@ export function InlineArticlesWidget() {
     </div>
   );
 }
-

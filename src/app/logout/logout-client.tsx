@@ -1,9 +1,9 @@
 "use client";
 
-import { BrandLogo } from "@/components/ui/brand-logo";
 import { useUser } from "@hexclave/next";
 import { Loader2 } from "lucide-react";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 export function LogoutClient() {
   const user = useUser({ or: "return-null" });
@@ -80,9 +80,7 @@ export function LogoutClient() {
           <span>{status}</span>
         </div>
 
-        <p className="text-xs text-muted-foreground">
-          Clearing campus session tokens and caches securely.
-        </p>
+        <p className="text-xs text-muted-foreground">Clearing campus session tokens and caches securely.</p>
       </div>
     </div>
   );

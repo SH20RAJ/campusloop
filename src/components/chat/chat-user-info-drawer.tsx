@@ -1,31 +1,31 @@
 "use client";
 
-import { SecretCrushButton } from "@/components/dating/secret-crush-button";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { UserProfile } from "@/db/schema";
-import { CachedMessage } from "@/lib/chat-cache";
-import { isOnline,presenceLabel } from "@/lib/presence";
-import { cn } from "@/lib/utils";
 import {
-Bell,
-BellOff,
-Calendar,
-Eraser,
-ExternalLink,
-GraduationCap,
-Image as ImageIcon,
-Link2,
-School,
-Search,
-ShieldAlert,
-ShieldCheck,
-Trash2,
-User,
-X
+  Bell,
+  BellOff,
+  Calendar,
+  Eraser,
+  ExternalLink,
+  GraduationCap,
+  Image as ImageIcon,
+  Link2,
+  School,
+  Search,
+  ShieldAlert,
+  ShieldCheck,
+  Trash2,
+  User,
+  X,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo,useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { SecretCrushButton } from "@/components/dating/secret-crush-button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { UserProfile } from "@/db/schema";
+import type { CachedMessage } from "@/lib/chat-cache";
+import { isOnline, presenceLabel } from "@/lib/presence";
+import { cn } from "@/lib/utils";
 
 interface ChatUserInfoDrawerProps {
   isOpen: boolean;
@@ -260,7 +260,10 @@ export function ChatUserInfoDrawer({
             {otherParticipant.branch && (
               <span className="inline-flex items-center gap-1 text-foreground/80 font-medium">
                 <GraduationCap className="size-3.5 text-primary/70" />
-                <span>{otherParticipant.course ? `${otherParticipant.course} · ` : ""}{otherParticipant.branch}</span>
+                <span>
+                  {otherParticipant.course ? `${otherParticipant.course} · ` : ""}
+                  {otherParticipant.branch}
+                </span>
               </span>
             )}
             {otherParticipant.year && (
@@ -293,10 +296,7 @@ export function ChatUserInfoDrawer({
           </Link>
 
           <div className="flex flex-col items-center gap-1.5 p-2">
-            <SecretCrushButton
-              targetId={otherParticipant.id}
-              targetName={otherParticipant.displayName}
-            />
+            <SecretCrushButton targetId={otherParticipant.id} targetName={otherParticipant.displayName} />
             <span className="text-[10px] font-bold text-muted-foreground">Crush</span>
           </div>
 
@@ -338,9 +338,7 @@ export function ChatUserInfoDrawer({
               onClick={() => setActiveTab("media")}
               className={cn(
                 "flex-1 py-2.5 text-center relative transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5",
-                activeTab === "media"
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                activeTab === "media" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
               <ImageIcon className="size-3.5" />
@@ -355,9 +353,7 @@ export function ChatUserInfoDrawer({
               onClick={() => setActiveTab("links")}
               className={cn(
                 "flex-1 py-2.5 text-center relative transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5",
-                activeTab === "links"
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                activeTab === "links" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Link2 className="size-3.5" />
@@ -407,9 +403,7 @@ export function ChatUserInfoDrawer({
                       <ExternalLink className="size-3.5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold truncate text-primary group-hover:underline">
-                        {item.domain}
-                      </p>
+                      <p className="font-bold truncate text-primary group-hover:underline">{item.domain}</p>
                       <p className="text-[10px] text-muted-foreground truncate">{item.url}</p>
                     </div>
                   </a>
@@ -436,12 +430,14 @@ export function ChatUserInfoDrawer({
             className="flex w-full items-center justify-between px-3 py-2.5 rounded-xl hover:bg-muted text-xs font-semibold text-foreground transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
-              {isMuted ? <BellOff className="size-4 text-rose-500" /> : <Bell className="size-4 text-muted-foreground" />}
+              {isMuted ? (
+                <BellOff className="size-4 text-rose-500" />
+              ) : (
+                <Bell className="size-4 text-muted-foreground" />
+              )}
               <span>Mute Notifications</span>
             </div>
-            <span className="text-[11px] text-muted-foreground font-bold">
-              {isMuted ? "Muted" : "On"}
-            </span>
+            <span className="text-[11px] text-muted-foreground font-bold">{isMuted ? "Muted" : "On"}</span>
           </button>
 
           {showClearConfirm ? (

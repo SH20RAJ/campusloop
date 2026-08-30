@@ -1,19 +1,11 @@
 "use client";
 
-import { approveJoinRequest,rejectJoinRequest } from "@/app/app/(main)/communities/actions";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import {
-CheckCircle2,
-Clock,
-Crown,
-Loader2,
-Search,
-Users,
-XCircle
-} from "lucide-react";
+import { CheckCircle2, Clock, Crown, Loader2, Search, Users, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { approveJoinRequest, rejectJoinRequest } from "@/app/app/(main)/communities/actions";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface MemberItem {
   id: string;
@@ -68,9 +60,7 @@ export function CommunityMembersClient({
     setProcessingId(targetUserId);
     try {
       await approveJoinRequest(communityId, targetUserId);
-      setMembers((prev) =>
-        prev.map((m) => (m.userId === targetUserId ? { ...m, status: "ACTIVE" } : m))
-      );
+      setMembers((prev) => prev.map((m) => (m.userId === targetUserId ? { ...m, status: "ACTIVE" } : m)));
       toast.success("Member approved!");
     } catch (err: unknown) {
       toast.error((err as Error)?.message || "Failed to approve member");
@@ -138,9 +128,7 @@ export function CommunityMembersClient({
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
-                    <p className="text-xs font-extrabold text-foreground truncate">
-                      {m.user.displayName}
-                    </p>
+                    <p className="text-xs font-extrabold text-foreground truncate">{m.user.displayName}</p>
                     <p className="text-[10px] text-muted-foreground truncate">
                       @{m.user.username} {m.user.branch ? `• ${m.user.branch}` : ""}
                     </p>
@@ -233,9 +221,7 @@ export function CommunityMembersClient({
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 space-y-0.5">
-                    <p className="text-xs font-extrabold text-foreground truncate">
-                      {m.user.displayName}
-                    </p>
+                    <p className="text-xs font-extrabold text-foreground truncate">{m.user.displayName}</p>
                     <p className="text-[10px] text-muted-foreground truncate">
                       @{m.user.username} {m.user.branch ? `• ${m.user.branch}` : ""}
                     </p>

@@ -1,16 +1,16 @@
 import { sql } from "drizzle-orm";
 import {
-boolean,
-index,
-integer,
-jsonb,
-pgTable,
-text,
-timestamp,
-uniqueIndex,
-type AnyPgColumn,
+  type AnyPgColumn,
+  boolean,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { createdAt,id,updatedAt,userRoleEnum,userStatusEnum } from "./common";
+import { createdAt, id, updatedAt, userRoleEnum, userStatusEnum } from "./common";
 import { institutions } from "./institutions";
 
 export const userProfiles = pgTable(
@@ -37,7 +37,10 @@ export const userProfiles = pgTable(
     isDobPrivate: boolean("is_dob_private").default(false).notNull(),
     interests: jsonb("interests").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
     photos: jsonb("photos").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
-    targetInstitutionIds: jsonb("target_institution_ids").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
+    targetInstitutionIds: jsonb("target_institution_ids")
+      .$type<string[]>()
+      .default(sql`'[]'::jsonb`)
+      .notNull(),
     datingPreferences: jsonb("dating_preferences").$type<{
       gender?: "DEFAULT" | "MALE" | "FEMALE" | "ALL";
       scope?: "GLOBAL" | "CAMPUS";
@@ -47,7 +50,9 @@ export const userProfiles = pgTable(
     role: userRoleEnum("role").default("STUDENT").notNull(),
     status: userStatusEnum("status").default("ACTIVE").notNull(),
     referralCount: integer("referral_count").default(0).notNull(),
-    referredById: text("referred_by_id").references((): AnyPgColumn => userProfiles.id, { onDelete: "set null" }),
+    referredById: text("referred_by_id").references((): AnyPgColumn => userProfiles.id, {
+      onDelete: "set null",
+    }),
     points: integer("points").default(0).notNull(),
     anonymousUsername: text("anonymous_username"),
     feedVisibility: text("feed_visibility").default("ALL").notNull(),
@@ -69,9 +74,8 @@ export const userProfiles = pgTable(
     index("user_profiles_points_idx").on(table.points),
     index("user_profiles_branch_idx").on(table.branch),
     index("user_profiles_last_seen_idx").on(table.lastSeenAt),
-  ],
+  ]
 );
-
 
 export const blocks = pgTable(
   "blocks",
@@ -85,7 +89,7 @@ export const blocks = pgTable(
       .references(() => userProfiles.id, { onDelete: "cascade" }),
     createdAt,
   },
-  (table) => [uniqueIndex("blocks_blocker_blocked_idx").on(table.blockerId, table.blockedUserId)],
+  (table) => [uniqueIndex("blocks_blocker_blocked_idx").on(table.blockerId, table.blockedUserId)]
 );
 
 export const follows = pgTable(
@@ -115,10 +119,8 @@ export const follows = pgTable(
     index("follows_following_created_idx").on(table.followingId, table.createdAt),
     index("follows_follower_created_idx").on(table.followerId, table.createdAt),
     // Partial index — the friends list only ever scans mutual edges
-    index("follows_mutual_created_idx")
-      .on(table.followerId, table.createdAt)
-      .where(sql`${table.isMutual}`),
-  ],
+    index("follows_mutual_created_idx").on(table.followerId, table.createdAt).where(sql`${table.isMutual}`),
+  ]
 );
 
 /**
@@ -144,7 +146,7 @@ export const pushSubscriptions = pgTable(
   (table) => [
     uniqueIndex("push_subscriptions_endpoint_idx").on(table.endpoint),
     index("push_subscriptions_user_idx").on(table.userId),
-  ],
+  ]
 );
 
 /**
@@ -162,9 +164,7 @@ export const anonIdentityVault = pgTable(
     createdAt,
     updatedAt,
   },
-  (table) => [
-    uniqueIndex("anon_identity_vault_handle_idx").on(table.handle),
-  ],
+  (table) => [uniqueIndex("anon_identity_vault_handle_idx").on(table.handle)]
 );
 
 export type UserProfile = typeof userProfiles.$inferSelect;

@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { FeedClient } from "./feed-client";
 
 export const metadata: Metadata = {
@@ -25,7 +25,6 @@ export const metadata: Metadata = {
   },
 };
 
-
 export default function AppPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -37,10 +36,7 @@ export default function AppPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <FeedClient />
     </>
   );

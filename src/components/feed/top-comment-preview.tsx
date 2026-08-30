@@ -1,9 +1,9 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { TopCommentPreview as TopCommentType } from "@/hooks/use-feed";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import { Flame,MessageCircle,Shield } from "lucide-react";
+import { Flame, MessageCircle, Shield } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { TopCommentPreview as TopCommentType } from "@/hooks/use-feed";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface TopCommentCardProps {
   topComment: TopCommentType;
@@ -12,19 +12,10 @@ interface TopCommentCardProps {
   className?: string;
 }
 
-export function TopCommentCard({
-  topComment,
-  commentsCount,
-  onClick,
-  className,
-}: TopCommentCardProps) {
+export function TopCommentCard({ topComment, commentsCount, onClick, className }: TopCommentCardProps) {
   const isAnon = topComment.isAnonymous;
-  const displayName = isAnon
-    ? "Anonymous Student"
-    : topComment.author?.displayName || "Student";
-  const handle = isAnon
-    ? topComment.pseudonym || "anonymous"
-    : topComment.author?.username || "student";
+  const displayName = isAnon ? "Anonymous Student" : topComment.author?.displayName || "Student";
+  const handle = isAnon ? topComment.pseudonym || "anonymous" : topComment.author?.username || "student";
   const avatarUrl = isAnon
     ? ""
     : getAvatarUrl(topComment.author?.avatarUrl, topComment.author?.username ?? "student");
@@ -49,18 +40,12 @@ export function TopCommentCard({
           ) : (
             <Avatar className="size-5 rounded-full border border-border/40 shrink-0">
               <AvatarImage src={avatarUrl} />
-              <AvatarFallback className="text-[8px] font-bold">
-                {displayName[0] || "U"}
-              </AvatarFallback>
+              <AvatarFallback className="text-[8px] font-bold">{displayName[0] || "U"}</AvatarFallback>
             </Avatar>
           )}
 
-          <span className="text-[11px] font-bold text-foreground truncate max-w-[120px]">
-            {displayName}
-          </span>
-          <span className="text-[10px] text-muted-foreground truncate hidden sm:inline">
-            @{handle}
-          </span>
+          <span className="text-[11px] font-bold text-foreground truncate max-w-[120px]">{displayName}</span>
+          <span className="text-[10px] text-muted-foreground truncate hidden sm:inline">@{handle}</span>
           <span className="text-[10px] text-muted-foreground shrink-0">
             • {formatTimeAgo(topComment.createdAt)}
           </span>

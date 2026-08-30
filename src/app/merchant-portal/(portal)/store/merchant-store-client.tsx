@@ -1,18 +1,13 @@
 "use client";
 
+import { Loader2, Save, Store, Truck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import {
-Loader2,
-Save,
-Store,
-Truck
-} from "lucide-react";
-import { useEffect,useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
 
 export function MerchantStoreClient() {
   const { data, isLoading, mutate } = useSWR<{ merchant: any; hours: any[] }>(
@@ -148,7 +143,9 @@ export function MerchantStoreClient() {
               />
             </div>
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">Location Pin (e.g. 250m from Gate)</span>
+              <span className="text-[11px] font-bold text-muted-foreground">
+                Location Pin (e.g. 250m from Gate)
+              </span>
               <input
                 type="text"
                 value={locationPin}
@@ -247,7 +244,9 @@ export function MerchantStoreClient() {
           </div>
 
           <div className="space-y-1.5">
-            <span className="text-[11px] font-bold text-muted-foreground">Pickup Instructions for Students</span>
+            <span className="text-[11px] font-bold text-muted-foreground">
+              Pickup Instructions for Students
+            </span>
             <input
               type="text"
               value={pickupInstructions}

@@ -1,26 +1,6 @@
 "use client";
 
-import { PollOptionsEditor } from "@/components/post/poll-options-editor";
-import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { GifPickerModal } from "@/components/ui/gif-picker-modal";
-import {
-detectMentionTrigger,
-MentionSuggestions,
-TriggerContext,
-} from "@/components/ui/mention-autocomplete";
-import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
-import { useCommunities } from "@/hooks/use-communities";
-import { FeedPost } from "@/hooks/use-feed";
-import { useProfile } from "@/hooks/use-profile";
-import { fetcher } from "@/lib/api";
-import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import type { TrendingHashtag } from "@/lib/trending-hashtags";
-import { uploadImageToImgBB } from "@/lib/upload";
-import { cn } from "@/lib/utils";
-import { EditorContent,useEditor } from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
   AlertTriangle,
@@ -28,7 +8,6 @@ import {
   BarChart3,
   Check,
   ChevronDown,
-  Film,
   Flame,
   Globe,
   HelpCircle,
@@ -45,9 +24,29 @@ import {
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef,useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { PollOptionsEditor } from "@/components/post/poll-options-editor";
+import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { GifPickerModal } from "@/components/ui/gif-picker-modal";
+import {
+  detectMentionTrigger,
+  MentionSuggestions,
+  type TriggerContext,
+} from "@/components/ui/mention-autocomplete";
+import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
+import { useCommunities } from "@/hooks/use-communities";
+import type { FeedPost } from "@/hooks/use-feed";
+import { useProfile } from "@/hooks/use-profile";
+import { fetcher } from "@/lib/api";
+import { confirmOptimisticPost, optimisticAddPost, revertOptimisticPost } from "@/lib/feed-mutations";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import type { TrendingHashtag } from "@/lib/trending-hashtags";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { cn } from "@/lib/utils";
 
 export type PostType = "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
 
@@ -116,7 +115,7 @@ export function PostComposer({
   const { data: trendingHashtagsData } = useSWR<{ trending: TrendingHashtag[] }>(
     "/api/hashtags/trending?limit=14",
     fetcher,
-    { dedupingInterval: 30000 },
+    { dedupingInterval: 30000 }
   );
   const trendingTags = trendingHashtagsData?.trending || [];
 
@@ -131,7 +130,7 @@ export function PostComposer({
         class: cn(
           "w-full outline-none prose prose-lg dark:prose-invert max-w-none",
           "px-5 py-4 text-[17px] leading-relaxed",
-          isModal ? "min-h-[120px]" : "min-h-[180px] sm:min-h-[220px]",
+          isModal ? "min-h-[120px]" : "min-h-[180px] sm:min-h-[220px]"
         ),
       },
     },
@@ -148,12 +147,7 @@ export function PostComposer({
     const { from } = editor.state.selection;
     const lengthToReplace = trigger.query.length + 1; // including @ or #
     const rangeStart = Math.max(0, from - lengthToReplace);
-    editor
-      .chain()
-      .focus()
-      .deleteRange({ from: rangeStart, to: from })
-      .insertContent(replacement)
-      .run();
+    editor.chain().focus().deleteRange({ from: rangeStart, to: from }).insertContent(replacement).run();
     setMentionTrigger(null);
   }
 
@@ -394,7 +388,7 @@ export function PostComposer({
       icon: VenetianMask,
       color: cn(
         "hover:bg-violet-500/10",
-        anonActive ? "text-violet-500" : "text-muted-foreground hover:text-violet-500",
+        anonActive ? "text-violet-500" : "text-muted-foreground hover:text-violet-500"
       ),
       onClick: () => {
         if (!isConfession) {
@@ -420,9 +414,7 @@ export function PostComposer({
       <div
         className={cn(
           "flex flex-col bg-background",
-          isModal
-            ? "rounded-3xl overflow-hidden bg-card border border-border/50 shadow-2xl"
-            : "min-h-screen",
+          isModal ? "rounded-3xl overflow-hidden bg-card border border-border/50 shadow-2xl" : "min-h-screen"
         )}
       >
         {/* ─── Sticky top bar (Twitter / X minimalist style) ─── */}
@@ -441,12 +433,12 @@ export function PostComposer({
             {lockedCommunityName
               ? `Post to c/${lockedCommunityName}`
               : isConfession
-              ? "Anonymous Confession"
-              : postType === "POLL"
-              ? "Campus Poll"
-              : postType === "QUESTION"
-              ? "Ask Campus"
-              : "New Post"}
+                ? "Anonymous Confession"
+                : postType === "POLL"
+                  ? "Campus Poll"
+                  : postType === "QUESTION"
+                    ? "Ask Campus"
+                    : "New Post"}
           </p>
 
           <div className="flex items-center gap-2">
@@ -461,7 +453,7 @@ export function PostComposer({
                 "flex h-8.5 min-w-[70px] items-center justify-center gap-1.5 rounded-full px-4 text-xs font-black transition-all cursor-pointer active:scale-95 shadow-xs",
                 canPost
                   ? "bg-primary text-primary-foreground hover:opacity-90"
-                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-50",
+                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
               )}
             >
               {isLoading ? (
@@ -486,7 +478,7 @@ export function PostComposer({
                   "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-black transition-all cursor-pointer active:scale-95",
                   active
                     ? "bg-foreground text-background shadow-2xs"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 <t.icon className={cn("size-3.5", active ? "" : t.accent)} />
@@ -501,7 +493,7 @@ export function PostComposer({
           <Avatar
             className={cn(
               "size-11 shrink-0 border-2 transition-all",
-              anonActive ? "border-violet-500/60 opacity-80 grayscale" : "border-border/50",
+              anonActive ? "border-violet-500/60 opacity-80 grayscale" : "border-border/50"
             )}
           >
             <AvatarImage src={anonActive ? "" : profile?.avatarUrl || ""} />
@@ -541,22 +533,20 @@ export function PostComposer({
                       <>
                         <div className="fixed inset-0 z-30" onClick={() => setShowAudienceMenu(false)} />
                         <div className="absolute left-0 top-8 z-40 w-56 rounded-2xl border border-border bg-card p-1.5 shadow-xl">
-                          {(
-                            [
-                              {
-                                id: "GLOBAL" as const,
-                                icon: Globe,
-                                label: "All Colleges",
-                                desc: "Every campus across India",
-                              },
-                              {
-                                id: "CAMPUS" as const,
-                                icon: School,
-                                label: "My College",
-                                desc: profile?.institution?.name?.split(",")[0] || "Only your campus",
-                              },
-                            ]
-                          ).map((opt) => (
+                          {[
+                            {
+                              id: "GLOBAL" as const,
+                              icon: Globe,
+                              label: "All Colleges",
+                              desc: "Every campus across India",
+                            },
+                            {
+                              id: "CAMPUS" as const,
+                              icon: School,
+                              label: "My College",
+                              desc: profile?.institution?.name?.split(",")[0] || "Only your campus",
+                            },
+                          ].map((opt) => (
                             <button
                               key={opt.id}
                               type="button"
@@ -626,10 +616,10 @@ export function PostComposer({
               {isConfession
                 ? "Confess it. Nobody will ever know it's you... 🤫"
                 : postType === "QUESTION"
-                ? "Ask your campus anything..."
-                : postType === "POLL"
-                ? "What should the campus vote on?"
-                : `What's on your mind${firstName ? `, ${firstName}` : ""}?`}
+                  ? "Ask your campus anything..."
+                  : postType === "POLL"
+                    ? "What should the campus vote on?"
+                    : `What's on your mind${firstName ? `, ${firstName}` : ""}?`}
             </span>
           )}
           <EditorContent editor={editor} />
@@ -640,7 +630,7 @@ export function PostComposer({
           <div
             className={cn(
               "gap-1.5 px-4 pb-3",
-              uploadedImages.length === 1 ? "flex" : "grid grid-cols-3 sm:grid-cols-4",
+              uploadedImages.length === 1 ? "flex" : "grid grid-cols-3 sm:grid-cols-4"
             )}
           >
             {uploadedImages.map((imgUrl, i) => (
@@ -648,7 +638,7 @@ export function PostComposer({
                 key={`${imgUrl}-${i}`}
                 className={cn(
                   "group relative overflow-hidden rounded-2xl border border-border/60 bg-muted",
-                  uploadedImages.length === 1 ? "max-h-[420px] w-full" : "aspect-square",
+                  uploadedImages.length === 1 ? "max-h-[420px] w-full" : "aspect-square"
                 )}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -748,7 +738,7 @@ export function PostComposer({
                 onClick={action.onClick}
                 className={cn(
                   "flex size-9 cursor-pointer items-center justify-center rounded-full transition-all active:scale-90 disabled:cursor-not-allowed disabled:opacity-40",
-                  action.color,
+                  action.color
                 )}
               >
                 {action.loading ? (
@@ -767,14 +757,21 @@ export function PostComposer({
                   <span
                     className={cn(
                       "font-mono text-[11px] font-bold tabular-nums",
-                      overLimit ? "text-destructive" : "text-muted-foreground",
+                      overLimit ? "text-destructive" : "text-muted-foreground"
                     )}
                   >
                     {remaining}
                   </span>
                 )}
                 <svg width="24" height="24" viewBox="0 0 24 24" className="-rotate-90">
-                  <circle cx="12" cy="12" r={ringRadius} fill="none" strokeWidth="2.5" className="stroke-muted" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r={ringRadius}
+                    fill="none"
+                    strokeWidth="2.5"
+                    className="stroke-muted"
+                  />
                   <circle
                     cx="12"
                     cy="12"
@@ -789,8 +786,8 @@ export function PostComposer({
                       overLimit
                         ? "stroke-destructive"
                         : remaining <= 200
-                        ? "stroke-amber-500"
-                        : "stroke-primary",
+                          ? "stroke-amber-500"
+                          : "stroke-primary"
                     )}
                   />
                 </svg>

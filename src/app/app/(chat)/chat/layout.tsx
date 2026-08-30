@@ -1,7 +1,7 @@
-import { Navigation } from "@/components/ui/navigation";
-import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { Navigation } from "@/components/ui/navigation";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
   title: "Messages | CampusLoop",
@@ -31,14 +31,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function ChatLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function ChatLayout({ children }: { children: React.ReactNode }) {
   const user = await getCachedAuthUser();
   if (!user) redirect("/handler/sign-in");
-
 
   const profile = await getCachedUserProfile(user.id);
   if (!profile) redirect("/app/onboarding");
@@ -53,9 +48,7 @@ export default async function ChatLayout({
       />
 
       {/* Main Messenger Area */}
-      <div className="flex-1 md:pl-64 h-full overflow-hidden">
-        {children}
-      </div>
+      <div className="flex-1 md:pl-64 h-full overflow-hidden">{children}</div>
     </div>
   );
 }

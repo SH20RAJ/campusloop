@@ -1,5 +1,5 @@
-import { boolean,integer,pgTable,text,uniqueIndex } from "drizzle-orm/pg-core";
-import { createdAt,id,updatedAt } from "./common";
+import { boolean, integer, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "./common";
 import { userProfiles } from "./users";
 
 export const communities = pgTable(
@@ -23,9 +23,7 @@ export const communities = pgTable(
     createdAt,
     updatedAt,
   },
-  (table) => [
-    uniqueIndex("communities_name_idx").on(table.name),
-  ]
+  (table) => [uniqueIndex("communities_name_idx").on(table.name)]
 );
 
 export const communityMembers = pgTable(
@@ -42,13 +40,10 @@ export const communityMembers = pgTable(
     status: text("status").default("ACTIVE").notNull(), // 'ACTIVE' | 'PENDING' | 'BANNED'
     createdAt,
   },
-  (table) => [
-    uniqueIndex("community_members_join_idx").on(table.communityId, table.userId),
-  ]
+  (table) => [uniqueIndex("community_members_join_idx").on(table.communityId, table.userId)]
 );
 
 export type Community = typeof communities.$inferSelect;
 export type NewCommunity = typeof communities.$inferInsert;
 export type CommunityMember = typeof communityMembers.$inferSelect;
 export type NewCommunityMember = typeof communityMembers.$inferInsert;
-

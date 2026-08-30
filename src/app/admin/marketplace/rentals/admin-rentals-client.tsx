@@ -1,16 +1,14 @@
 "use client";
 
+import { Bike } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo } from "@/lib/utils";
-import {
-Bike
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
+import { cn, formatTimeAgo } from "@/lib/utils";
 
 export function AdminRentalsClient() {
   const [activeTab, setActiveTab] = useState<"fleet" | "bookings">("bookings");
@@ -43,9 +41,7 @@ export function AdminRentalsClient() {
       if (!res.ok) throw new Error();
       mutate();
       toast.success(
-        resolution === "REFUNDED"
-          ? "Deposit Refund Released to Student"
-          : "Deposit Held / Paid for Damage"
+        resolution === "REFUNDED" ? "Deposit Refund Released to Student" : "Deposit Held / Paid for Damage"
       );
     } catch {
       toast.error("Failed to update dispute status");
@@ -108,9 +104,7 @@ export function AdminRentalsClient() {
         <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h2 className="text-sm font-black text-foreground">Campus Reservations Log</h2>
-            <span className="text-xs text-muted-foreground">
-              {bookings.length} reservations recorded
-            </span>
+            <span className="text-xs text-muted-foreground">{bookings.length} reservations recorded</span>
           </div>
 
           {isLoading ? (
@@ -148,12 +142,20 @@ export function AdminRentalsClient() {
                         <p className="text-[10px] text-muted-foreground">📞 {b.customerPhone}</p>
                       </td>
                       <td className="p-3 text-muted-foreground text-[11px]">
-                        <p>{new Date(b.startAt).toLocaleDateString()} {new Date(b.startAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
-                        <p>→ {new Date(b.endAt).toLocaleDateString()} {new Date(b.endAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
+                        <p>
+                          {new Date(b.startAt).toLocaleDateString()}{" "}
+                          {new Date(b.startAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                        <p>
+                          → {new Date(b.endAt).toLocaleDateString()}{" "}
+                          {new Date(b.endAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </p>
                       </td>
                       <td className="p-3">
                         <p className="font-black text-emerald-500">₹{b.totalAmount}</p>
-                        <p className="text-[10px] text-muted-foreground">Deposit: ₹{b.depositAmount} ({b.depositRefundStatus})</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          Deposit: ₹{b.depositAmount} ({b.depositRefundStatus})
+                        </p>
                       </td>
                       <td className="p-3">
                         <span
@@ -162,8 +164,8 @@ export function AdminRentalsClient() {
                             b.status === "ACTIVE" || b.status === "CONFIRMED"
                               ? "bg-emerald-500/15 text-emerald-500"
                               : b.status === "DISPUTED"
-                              ? "bg-rose-500/15 text-rose-500"
-                              : "bg-muted text-muted-foreground"
+                                ? "bg-rose-500/15 text-rose-500"
+                                : "bg-muted text-muted-foreground"
                           )}
                         >
                           {b.status}

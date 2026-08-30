@@ -1,10 +1,10 @@
 "use server";
 
-import { getDb } from "@/db";
-import { comments,pollOptions,pollVotes,posts,userProfiles,votes } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getDb } from "@/db";
+import { comments, pollOptions, pollVotes, posts, userProfiles, votes } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 export async function deletePost(postId: string) {
   const user = await hexclaveServerApp.getUser();
@@ -31,10 +31,22 @@ export async function deletePost(postId: string) {
   }
 
   // Delete dependent rows and post record
-  await db.delete(votes).where(eq(votes.postId, postId)).catch(() => {});
-  await db.delete(comments).where(eq(comments.postId, postId)).catch(() => {});
-  await db.delete(pollVotes).where(eq(pollVotes.postId, postId)).catch(() => {});
-  await db.delete(pollOptions).where(eq(pollOptions.postId, postId)).catch(() => {});
+  await db
+    .delete(votes)
+    .where(eq(votes.postId, postId))
+    .catch(() => {});
+  await db
+    .delete(comments)
+    .where(eq(comments.postId, postId))
+    .catch(() => {});
+  await db
+    .delete(pollVotes)
+    .where(eq(pollVotes.postId, postId))
+    .catch(() => {});
+  await db
+    .delete(pollOptions)
+    .where(eq(pollOptions.postId, postId))
+    .catch(() => {});
   await db.delete(posts).where(eq(posts.id, postId));
 
   revalidatePath("/app");
@@ -79,4 +91,3 @@ export async function archivePost(postId: string) {
 
   return { success: true, isArchived: newStatus === "ARCHIVED", newStatus };
 }
-

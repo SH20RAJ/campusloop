@@ -1,7 +1,7 @@
 "use client";
 
-import { usePathname,useSearchParams } from "next/navigation";
-import { Suspense,useEffect,useRef,useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 /**
  * Thin loading bar across the top of the viewport during navigation.
@@ -67,7 +67,7 @@ function RouteProgressInner() {
       stopTrickle();
       if (hideRef.current) clearTimeout(hideRef.current);
     };
-  }, []);
+  }, [stopTrickle]);
 
   // The route settled — snap to full, then fade out.
   useEffect(() => {
@@ -81,7 +81,7 @@ function RouteProgressInner() {
     return () => {
       if (hideRef.current) clearTimeout(hideRef.current);
     };
-  }, [pathname, searchParams]);
+  }, [stopTrickle]);
 
   if (!visible) return null;
 

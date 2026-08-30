@@ -1,12 +1,12 @@
 "use client";
 
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { Copy,Printer,QrCode } from "lucide-react";
+import { Copy, Printer, QrCode } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 
 export function MerchantQrClient() {
   const [selectedQrType, setSelectedQrType] = useState<"store" | "menu" | "pickup">("store");
@@ -14,9 +14,7 @@ export function MerchantQrClient() {
   const { data } = useSWR<{ merchant: any }>("/api/merchant/store", fetcher);
   const merchant = data?.merchant;
 
-  const baseUrl = typeof window !== "undefined"
-    ? window.location.origin
-    : "https://campusloop.space";
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://campusloop.space";
 
   const targetUrl = merchant
     ? `${baseUrl}/app/marketplace/store/${merchant.id}`
@@ -100,9 +98,7 @@ export function MerchantQrClient() {
         </div>
 
         <div className="space-y-1 text-center">
-          <p className="text-xs font-black text-foreground">
-            ⚡ Quick Order · Instant Campus Pickup
-          </p>
+          <p className="text-xs font-black text-foreground">⚡ Quick Order · Instant Campus Pickup</p>
           <p className="text-[10px] text-muted-foreground">
             Powered by CampusLoop Marketplace · campusloop.space
           </p>

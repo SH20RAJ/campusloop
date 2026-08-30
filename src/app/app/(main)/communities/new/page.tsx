@@ -1,11 +1,12 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { CreateCommunityClient } from "@/components/communities/create-community-client";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Create a Student Community | CampusLoop",
-  description: "Found a college sub-hub, branch group, or student community on CampusLoop and earn +100 LP Clout.",
+  description:
+    "Found a college sub-hub, branch group, or student community on CampusLoop and earn +100 LP Clout.",
   alternates: { canonical: "https://campusloop.space/app/communities/new" },
   openGraph: {
     title: "Create a Student Community | CampusLoop",
@@ -32,11 +33,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-
 export default async function NewCommunityPage() {
   const user = await hexclaveServerApp.getUser();
   if (!user) redirect("/handler/sign-in");
-
 
   return <CreateCommunityClient />;
 }

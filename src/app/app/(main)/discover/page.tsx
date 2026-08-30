@@ -39,7 +39,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 export default function DiscoverPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -57,10 +56,7 @@ export default function DiscoverPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Suspense fallback={<DiscoverLoading />}>
         <DiscoverFeed />
       </Suspense>

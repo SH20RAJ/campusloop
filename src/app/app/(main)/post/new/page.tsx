@@ -1,10 +1,10 @@
+import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { isViewerProfile } from "@/lib/viewer";
-import { eq } from "drizzle-orm";
-import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { PostComposer } from "./post-composer";
 
 export const metadata: Metadata = {

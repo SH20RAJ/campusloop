@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { EditProfileClient } from "./edit-profile-client";
 
 export const metadata: Metadata = {

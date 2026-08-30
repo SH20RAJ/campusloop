@@ -1,19 +1,19 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import {
-AlertTriangle,
-Briefcase,
-Building2,
-CheckCircle2,
-ChevronDown,
-Code,
-HelpCircle,
-PartyPopper,
-Star,
-Utensils
+  AlertTriangle,
+  Briefcase,
+  Building2,
+  CheckCircle2,
+  ChevronDown,
+  Code,
+  HelpCircle,
+  PartyPopper,
+  Star,
+  Utensils,
 } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface CollegeRealityScorecardProps {
   collegeName: string;
@@ -48,7 +48,8 @@ export function CollegeRealityScorecard({
       votes: "142 student votes",
       icon: Code,
       color: "text-blue-500",
-      description: "Active ACM & IEEE chapters, ICPC regionals participation, and weekly open-source hackathons.",
+      description:
+        "Active ACM & IEEE chapters, ICPC regionals participation, and weekly open-source hackathons.",
     },
     {
       category: "Campus Fests & Cultural Vibes",
@@ -56,7 +57,8 @@ export function CollegeRealityScorecard({
       votes: "210 student votes",
       icon: PartyPopper,
       color: "text-rose-500",
-      description: "BITOTSAV & Pantheon are East India's premier college festivals attracting stars and 10k+ crowds.",
+      description:
+        "BITOTSAV & Pantheon are East India's premier college festivals attracting stars and 10k+ crowds.",
     },
     {
       category: "Placements & Internships",
@@ -64,7 +66,8 @@ export function CollegeRealityScorecard({
       votes: "185 student votes",
       icon: Briefcase,
       color: "text-emerald-500",
-      description: "High placement rate across CSE/ECE with visits from Microsoft, Google, Atlassian, and top PSUs.",
+      description:
+        "High placement rate across CSE/ECE with visits from Microsoft, Google, Atlassian, and top PSUs.",
     },
     {
       category: "Hostel Life & Campus Freedom",
@@ -72,7 +75,8 @@ export function CollegeRealityScorecard({
       votes: "160 student votes",
       icon: Building2,
       color: "text-amber-500",
-      description: "Sprawling 780-acre green campus, single-room allotments for seniors, and late-night canteen access.",
+      description:
+        "Sprawling 780-acre green campus, single-room allotments for seniors, and late-night canteen access.",
     },
     {
       category: "Mess & Canteen Food",
@@ -80,7 +84,8 @@ export function CollegeRealityScorecard({
       votes: "198 student votes",
       icon: Utensils,
       color: "text-orange-500",
-      description: "Hostel mess is average, but legendary spots like Sharma Ji, C-Shop, and SAR make up for it.",
+      description:
+        "Hostel mess is average, but legendary spots like Sharma Ji, C-Shop, and SAR make up for it.",
     },
   ];
 
@@ -124,11 +129,7 @@ export function CollegeRealityScorecard({
           )}
         </div>
 
-        {description && (
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {description}
-          </p>
-        )}
+        {description && <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>}
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
           {nirfRank && (
@@ -151,8 +152,12 @@ export function CollegeRealityScorecard({
           )}
           {extraData?.affiliation && (
             <div className="rounded-2xl bg-muted/40 p-3">
-              <span className="text-[10px] text-muted-foreground font-bold uppercase block">Accreditation</span>
-              <span className="text-xs font-bold text-foreground truncate block">{extraData.affiliation}</span>
+              <span className="text-[10px] text-muted-foreground font-bold uppercase block">
+                Accreditation
+              </span>
+              <span className="text-xs font-bold text-foreground truncate block">
+                {extraData.affiliation}
+              </span>
             </div>
           )}
         </div>
@@ -163,10 +168,7 @@ export function CollegeRealityScorecard({
         {RATINGS.map((r, i) => {
           const Icon = r.icon;
           return (
-            <div
-              key={i}
-              className="rounded-3xl bg-card p-4 space-y-2.5 shadow-2xs"
-            >
+            <div key={i} className="rounded-3xl bg-card p-4 space-y-2.5 shadow-2xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className={cn("p-2 rounded-xl bg-muted/40", r.color)}>
@@ -201,15 +203,22 @@ export function CollegeRealityScorecard({
           <ul className="space-y-2 text-xs text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-emerald-500 font-bold">•</span>
-              <span>Rich 65+ year legacy with powerful alumni network in Silicon Valley, top startups, and civil services.</span>
+              <span>
+                Rich 65+ year legacy with powerful alumni network in Silicon Valley, top startups, and civil
+                services.
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-emerald-500 font-bold">•</span>
-              <span>Spacious green 780-acre lush campus with BIT Lake, scenic running tracks, and sports complex.</span>
+              <span>
+                Spacious green 780-acre lush campus with BIT Lake, scenic running tracks, and sports complex.
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-emerald-500 font-bold">•</span>
-              <span>Epic fest culture — BITOTSAV is one of the most vibrant experiences of college life.</span>
+              <span>
+                Epic fest culture — BITOTSAV is one of the most vibrant experiences of college life.
+              </span>
             </li>
           </ul>
         </div>
@@ -222,7 +231,9 @@ export function CollegeRealityScorecard({
           <ul className="space-y-2 text-xs text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-amber-500 font-bold">•</span>
-              <span>Located ~16 km from Ranchi city center; reliant on campus shuttles and auto services.</span>
+              <span>
+                Located ~16 km from Ranchi city center; reliant on campus shuttles and auto services.
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-500 font-bold">•</span>

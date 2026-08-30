@@ -58,7 +58,11 @@ export function reportPost(postId: string, reason: string, details?: string) {
 }
 
 export function createComment(postId: string, text: string) {
-  return apiRequest<{ id: string; text: string; createdAt: string }>(`/api/posts/${postId}/comments`, "POST", { text });
+  return apiRequest<{ id: string; text: string; createdAt: string }>(
+    `/api/posts/${postId}/comments`,
+    "POST",
+    { text }
+  );
 }
 
 // ─── Profile API Actions ───

@@ -1,36 +1,33 @@
 "use client";
 
+import { Flame } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { FeedHeader } from "@/components/feed/feed-header";
-import { FeedCaughtUpCard,FeedEmptyState,FeedErrorState } from "@/components/feed/feed-state-cards";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { FeedCaughtUpCard, FeedEmptyState, FeedErrorState } from "@/components/feed/feed-state-cards";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import {
-InlineArticlesWidget,
-InlineCommunitiesWidget,
-InlineDatingWidget,
-InlineHashtagsWidget,
-InlineReferralWidget,
+  InlineArticlesWidget,
+  InlineCommunitiesWidget,
+  InlineDatingWidget,
+  InlineHashtagsWidget,
+  InlineReferralWidget,
 } from "@/components/ui/inline-feed-widgets";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
-import { FeedLoadingMoreSkeleton,FeedSkeleton } from "@/components/ui/skeleton-card";
+import { FeedLoadingMoreSkeleton, FeedSkeleton } from "@/components/ui/skeleton-card";
 import { StoryRing } from "@/components/ui/story-ring";
-
-import { FeedPost,useFeed,useStories } from "@/hooks/use-feed";
+import { type FeedPost, useFeed, useStories } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
-import { confirmOptimisticPost,optimisticAddPost,revertOptimisticPost } from "@/lib/feed-mutations";
+import { confirmOptimisticPost, optimisticAddPost, revertOptimisticPost } from "@/lib/feed-mutations";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import type { TrendingHashtag } from "@/lib/trending-hashtags";
-import { Flame } from "lucide-react";
-import Link from "next/link";
-import { usePathname,useRouter,useSearchParams } from "next/navigation";
-import { useEffect,useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
-
-
 
 export function FeedClient({ forcedType }: { forcedType?: string }) {
   const router = useRouter();
@@ -48,7 +45,6 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
   const { profile } = useProfile();
 
   useEffect(() => {
-
     if (forcedType) {
       setTypeState(forcedType);
       return;
@@ -91,7 +87,8 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
   }
 
   useEffect(() => {
-    const savedMode = typeof window !== "undefined" ? localStorage.getItem("campusloop_feed_visibility") : null;
+    const savedMode =
+      typeof window !== "undefined" ? localStorage.getItem("campusloop_feed_visibility") : null;
     const mode = profile?.feedVisibility ?? savedMode ?? "ALL";
     if (mode === "NON_ANONYMOUS") {
       setVisibility("public");
@@ -107,8 +104,6 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     }
   }
 
-
-
   const {
     feed,
     isLoading: feedLoading,
@@ -123,7 +118,6 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
   const { stories, mutate: mutateStories, isLoading: storiesLoading } = useStories();
 
   const { data: trendingData } = useSWR<{ trending: TrendingHashtag[] }>(
-
     "/api/hashtags/trending?limit=8",
     fetcher,
     { dedupingInterval: 30000 }
@@ -132,7 +126,6 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
 
   const [quickText, setQuickText] = useState("");
   const [isQuickPosting, setIsQuickPosting] = useState(false);
-
 
   async function handleQuickPost(e: React.FormEvent) {
     e.preventDefault();
@@ -171,7 +164,6 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
         name: "Campus",
       }) as unknown as FeedPost["institution"],
     };
-
 
     sounds.ting();
     haptics.success();
@@ -241,8 +233,10 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
           onTypeChange={handleTypeChange}
           visibility={visibility}
           onVisibilityChange={handleVisibilityChange}
-          institutionSlug={profile?.institution?.slug || (profile?.institution?.name ? profile.institution.name.split(",")[0] : null)}
-
+          institutionSlug={
+            profile?.institution?.slug ||
+            (profile?.institution?.name ? profile.institution.name.split(",")[0] : null)
+          }
           onRefresh={refresh}
           isRefreshing={isValidating}
         />
@@ -333,7 +327,6 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
                   </div>
                 </div>
               )}
-
             </div>
             {!quickText && (
               <div className="flex items-center gap-1.5 shrink-0 pt-1">
@@ -406,4 +399,3 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     </PullToRefresh>
   );
 }
-

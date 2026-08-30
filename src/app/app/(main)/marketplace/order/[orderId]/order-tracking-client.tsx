@@ -1,18 +1,12 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
-import { cn,formatTimeAgo } from "@/lib/utils";
-import {
-ArrowLeft,
-CheckCircle2,
-MapPin,
-Phone,
-Store
-} from "lucide-react";
+import { ArrowLeft, CheckCircle2, MapPin, Phone, Store } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetcher } from "@/lib/api";
+import { cn, formatTimeAgo } from "@/lib/utils";
 
 interface OrderTrackingClientProps {
   orderId: string;
@@ -116,8 +110,8 @@ export function OrderTrackingClient({ orderId }: OrderTrackingClientProps) {
             isRejected
               ? "bg-rose-500/10 border-rose-500/30 text-rose-500"
               : order.status === "DELIVERED" || order.status === "PICKED_UP"
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
-              : "bg-card border-border/40 text-foreground"
+                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+                : "bg-card border-border/40 text-foreground"
           )}
         >
           <div className="flex items-center justify-between">
@@ -126,13 +120,11 @@ export function OrderTrackingClient({ orderId }: OrderTrackingClientProps) {
                 {isRejected
                   ? "Order Cancelled / Rejected"
                   : order.status === "DELIVERED" || order.status === "PICKED_UP"
-                  ? "Order Completed 🎉"
-                  : "Order in Progress"}
+                    ? "Order Completed 🎉"
+                    : "Order in Progress"}
               </span>
             </div>
-            <span className="text-xs font-bold text-muted-foreground">
-              {order.fulfillmentType}
-            </span>
+            <span className="text-xs font-bold text-muted-foreground">{order.fulfillmentType}</span>
           </div>
 
           {order.rejectionReason && (
@@ -167,8 +159,8 @@ export function OrderTrackingClient({ orderId }: OrderTrackingClientProps) {
                         isCurrent
                           ? "bg-emerald-500 text-black ring-4 ring-emerald-500/20 animate-pulse"
                           : isPassed
-                          ? "bg-emerald-500 text-black"
-                          : "bg-muted text-muted-foreground border border-border/50"
+                            ? "bg-emerald-500 text-black"
+                            : "bg-muted text-muted-foreground border border-border/50"
                       )}
                     >
                       {isPassed ? <CheckCircle2 className="size-3.5" /> : idx + 1}
@@ -182,15 +174,13 @@ export function OrderTrackingClient({ orderId }: OrderTrackingClientProps) {
                           isCurrent
                             ? "text-foreground font-black"
                             : isPassed
-                            ? "text-foreground"
-                            : "text-muted-foreground"
+                              ? "text-foreground"
+                              : "text-muted-foreground"
                         )}
                       >
                         {step.label}
                       </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {step.desc}
-                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{step.desc}</p>
                     </div>
                   </div>
                 );
@@ -241,9 +231,7 @@ export function OrderTrackingClient({ orderId }: OrderTrackingClientProps) {
                     </p>
                   )}
                 </div>
-                <span className="font-black text-foreground">
-                  ₹{item.subtotal.toLocaleString("en-IN")}
-                </span>
+                <span className="font-black text-foreground">₹{item.subtotal.toLocaleString("en-IN")}</span>
               </div>
             ))}
           </div>

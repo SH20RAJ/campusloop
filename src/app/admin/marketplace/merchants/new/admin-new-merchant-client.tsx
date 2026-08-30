@@ -1,20 +1,12 @@
 "use client";
 
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import {
-  ArrowLeft,
-  Copy,
-  KeyRound,
-  Loader2,
-  RefreshCw,
-  Send,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowLeft, Copy, KeyRound, Loader2, RefreshCw, Send, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 
 export function AdminNewMerchantClient() {
   const router = useRouter();
@@ -30,8 +22,12 @@ export function AdminNewMerchantClient() {
   const [minOrderValue, setMinOrderValue] = useState("80");
   const [estimatedPrepTime, setEstimatedPrepTime] = useState("15–20 min");
   const [institutionId, setInstitutionId] = useState("inst_35df75700bb23dd30311ef5f"); // BIT Mesra default
-  const [logoUrl, setLogoUrl] = useState("https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=300&fit=crop");
-  const [coverUrl, setCoverUrl] = useState("https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop");
+  const [logoUrl, setLogoUrl] = useState(
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=300&fit=crop"
+  );
+  const [coverUrl, setCoverUrl] = useState(
+    "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop"
+  );
 
   // Portal Credentials
   const [loginUsername, setLoginUsername] = useState("");
@@ -122,9 +118,7 @@ export function AdminNewMerchantClient() {
           <ArrowLeft className="size-4.5" />
         </Link>
         <div>
-          <h1 className="text-xl font-black tracking-tight text-foreground">
-            Onboard New Campus Merchant
-          </h1>
+          <h1 className="text-xl font-black tracking-tight text-foreground">Onboard New Campus Merchant</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             Register a verified local business and generate direct portal login credentials
           </p>
@@ -202,7 +196,9 @@ export function AdminNewMerchantClient() {
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">Cover / Background Banner URL</span>
+              <span className="text-[11px] font-bold text-muted-foreground">
+                Cover / Background Banner URL
+              </span>
               <input
                 type="url"
                 value={coverUrl}
@@ -234,7 +230,9 @@ export function AdminNewMerchantClient() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">Location Pin (e.g. 200m from Gate)</span>
+              <span className="text-[11px] font-bold text-muted-foreground">
+                Location Pin (e.g. 200m from Gate)
+              </span>
               <input
                 type="text"
                 value={locationPin}
@@ -279,7 +277,11 @@ export function AdminNewMerchantClient() {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            The merchant will log in at <code className="text-foreground font-mono bg-muted px-1.5 py-0.5 rounded">/merchant-portal/login</code> with these credentials to manage their menu and live orders.
+            The merchant will log in at{" "}
+            <code className="text-foreground font-mono bg-muted px-1.5 py-0.5 rounded">
+              /merchant-portal/login
+            </code>{" "}
+            with these credentials to manage their menu and live orders.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">

@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar"
-import * as React from "react"
+import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar";
+import type * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Avatar({
   className,
   size = "default",
   ...props
 }: AvatarPrimitive.Root.Props & {
-  size?: "default" | "sm" | "lg"
+  size?: "default" | "sm" | "lg";
 }) {
   return (
     <AvatarPrimitive.Root
@@ -22,26 +22,20 @@ function Avatar({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarImage({ className, ...props }: AvatarPrimitive.Image.Props) {
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
-      className={cn(
-        "aspect-square size-full rounded-full object-cover",
-        className
-      )}
+      className={cn("aspect-square size-full rounded-full object-cover", className)}
       {...props}
     />
-  )
+  );
 }
 
-function AvatarFallback({
-  className,
-  ...props
-}: AvatarPrimitive.Fallback.Props) {
+function AvatarFallback({ className, ...props }: AvatarPrimitive.Fallback.Props) {
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
@@ -51,7 +45,7 @@ function AvatarFallback({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarBadge({ className, ...props }: React.ComponentProps<"span">) {
@@ -67,7 +61,7 @@ function AvatarBadge({ className, ...props }: React.ComponentProps<"span">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarGroup({ className, ...props }: React.ComponentProps<"div">) {
@@ -80,13 +74,10 @@ function AvatarGroup({ className, ...props }: React.ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
-function AvatarGroupCount({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function AvatarGroupCount({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="avatar-group-count"
@@ -96,11 +87,7 @@ function AvatarGroupCount({
       )}
       {...props}
     />
-  )
+  );
 }
 
-export {
-Avatar,AvatarBadge,AvatarFallback,
-AvatarGroup,
-AvatarGroupCount,AvatarImage
-}
+export { Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage };

@@ -1,38 +1,37 @@
 "use client";
 
-import { Reveal } from "@/components/landing/reveal";
 import {
-CTABand,
-GradientText,
-MarketingFooter,
-MarketingHeader,
-Section,
-SectionHeading,
-StatCard,
-} from "@/components/marketing/system";
-import {
-Ban,
-BookOpen,
-BriefcaseBusiness,
-ExternalLink,
-EyeOff,
-Flame,
-Heart,
-HeartHandshake,
-Layers,
-
-Megaphone,
-MessagesSquare,
-ShieldCheck,
-ShoppingBag,
-Split,
-Store,
-Ticket,
-TrendingUp,
-Trophy,
+  Ban,
+  BookOpen,
+  BriefcaseBusiness,
+  ExternalLink,
+  EyeOff,
+  Flame,
+  Heart,
+  HeartHandshake,
+  Layers,
+  Megaphone,
+  MessagesSquare,
+  ShieldCheck,
+  ShoppingBag,
+  Split,
+  Store,
+  Ticket,
+  TrendingUp,
+  Trophy,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Reveal } from "@/components/landing/reveal";
+import {
+  CTABand,
+  GradientText,
+  MarketingFooter,
+  MarketingHeader,
+  Section,
+  SectionHeading,
+  StatCard,
+} from "@/components/marketing/system";
 
 const PAIN_POINTS = [
   {
@@ -139,7 +138,9 @@ export function PitchClient() {
   const valuation = revenue * 8;
 
   const fmtUsd = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(
+      n
+    );
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -172,13 +173,12 @@ export function PitchClient() {
             <TrendingUp className="size-3.5" /> Investor pitch · Seed
           </p>
           <h1 className="text-4xl font-bold leading-[1.08] tracking-tight md:text-6xl">
-            The verified social graph for{" "}
-            <GradientText>43 million</GradientText> Indian students.
+            The verified social graph for <GradientText>43 million</GradientText> Indian students.
           </h1>
           <p className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-            CampusLoop pulls every college's fragmented social life into one
-            student-only network, gated by the one credential no outsider has:
-            a college email. Density per campus is the product — and the moat.
+            CampusLoop pulls every college's fragmented social life into one student-only network, gated by
+            the one credential no outsider has: a college email. Density per campus is the product — and the
+            moat.
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
             <Link
@@ -233,10 +233,26 @@ export function PitchClient() {
             lede="One OTP on a college domain does what no moderation team can: it makes every account on the network a provably-real student. That single guarantee unlocks honest confessions, safe matching, trusted commerce — and an audience advertisers can't buy anywhere else."
           />
           <div className="grid grid-cols-2 gap-4">
-            <StatCard value="1,350+" label="Colleges indexed" sub="Every hub pre-built and SEO-indexed before launch" />
-            <StatCard value=">20%" label="Target campus penetration" sub="Density per college beats scattered global users" />
-            <StatCard value="+20 LP" label="Referral incentive" sub="Every student is a distribution channel" />
-            <StatCard value="0" label="Outsiders with write access" sub="Recruiters and bots are read-only at best" />
+            <StatCard
+              value="1,350+"
+              label="Colleges indexed"
+              sub="Every hub pre-built and SEO-indexed before launch"
+            />
+            <StatCard
+              value=">20%"
+              label="Target campus penetration"
+              sub="Density per college beats scattered global users"
+            />
+            <StatCard
+              value="+20 LP"
+              label="Referral incentive"
+              sub="Every student is a distribution channel"
+            />
+            <StatCard
+              value="0"
+              label="Outsiders with write access"
+              sub="Recruiters and bots are read-only at best"
+            />
           </div>
         </div>
       </Section>
@@ -264,9 +280,8 @@ export function PitchClient() {
             <div className="flex h-full flex-col justify-center rounded-2xl border border-primary/30 bg-primary/5 p-5">
               <Layers className="size-5 text-primary" />
               <p className="mt-3 text-sm font-semibold leading-relaxed text-foreground">
-                Each layer compounds the others: identity makes matching safe,
-                matching drives feeds, feeds drive utility, utility drives
-                clout — and clout recruits the next campus.
+                Each layer compounds the others: identity makes matching safe, matching drives feeds, feeds
+                drive utility, utility drives clout — and clout recruits the next campus.
               </p>
             </div>
           </Reveal>
@@ -283,20 +298,29 @@ export function PitchClient() {
                 Secret Crush: Zero-Embarrassment Campus Matchmaking
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                College students dread public rejection. Secret Crush lets 18+ verified students express romantic interest in up to 5 classmates with <strong>100% hidden intent</strong>. The recipient sees nothing unless they secretly add them back — turning awkward campus crushes into instant mutual matches.
+                College students dread public rejection. Secret Crush lets 18+ verified students express
+                romantic interest in up to 5 classmates with <strong>100% hidden intent</strong>. The
+                recipient sees nothing unless they secretly add them back — turning awkward campus crushes
+                into instant mutual matches.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                 <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
                   <p className="text-xs font-black text-foreground">1. Hidden Intent</p>
-                  <p className="text-[11px] text-muted-foreground">Zero notification of who crushed on you.</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Zero notification of who crushed on you.
+                  </p>
                 </div>
                 <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
                   <p className="text-xs font-black text-rose-500">2. Mutual Unlock</p>
-                  <p className="text-[11px] text-muted-foreground">Match &amp; private chat open only if feeling is mutual.</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Match &amp; private chat open only if feeling is mutual.
+                  </p>
                 </div>
                 <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
                   <p className="text-xs font-black text-foreground">3. Safety Escrow</p>
-                  <p className="text-[11px] text-muted-foreground">18+ verified identity behind the scenes.</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    18+ verified identity behind the scenes.
+                  </p>
                 </div>
               </div>
             </div>
@@ -306,7 +330,9 @@ export function PitchClient() {
                 <Heart className="size-6 fill-rose-500" />
               </div>
               <p className="text-xs font-black text-foreground">Rahul ➔ Secret Crush ➔ Priya</p>
-              <p className="text-[11px] text-muted-foreground">Priya sees nothing. Later, Priya adds Rahul...</p>
+              <p className="text-[11px] text-muted-foreground">
+                Priya sees nothing. Later, Priya adds Rahul...
+              </p>
               <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
                 🎉 Mutual Match! Direct Chat Unlocked
               </div>
@@ -314,7 +340,6 @@ export function PitchClient() {
           </div>
         </div>
       </Section>
-
 
       {/* ── Market ── */}
       <Section>
@@ -324,9 +349,21 @@ export function PitchClient() {
           lede="Higher education is the densest, most identifiable segment of India's youth internet — and it graduates into every other market."
         />
         <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard value="43.3M" label="TAM — students in Indian higher ed" sub="Across 1,350+ indexed colleges" />
-          <StatCard value="12.5M" label="SAM — Tier-1/2 engineering, tech & management" sub="English-first, smartphone-native, hostel-dense" />
-          <StatCard value="25 campuses" label="SOM — first density beachhead" sub="Ambassador-led launches at >20% penetration each" />
+          <StatCard
+            value="43.3M"
+            label="TAM — students in Indian higher ed"
+            sub="Across 1,350+ indexed colleges"
+          />
+          <StatCard
+            value="12.5M"
+            label="SAM — Tier-1/2 engineering, tech & management"
+            sub="English-first, smartphone-native, hostel-dense"
+          />
+          <StatCard
+            value="25 campuses"
+            label="SOM — first density beachhead"
+            sub="Ambassador-led launches at >20% penetration each"
+          />
         </div>
       </Section>
 

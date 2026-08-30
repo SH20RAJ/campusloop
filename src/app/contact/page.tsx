@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { ContactClient } from "./contact-client";
 
 export const metadata: Metadata = {
@@ -38,7 +38,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 export default function ContactPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -72,10 +71,7 @@ export default function ContactPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <ContactClient />
     </>
   );

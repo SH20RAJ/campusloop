@@ -1,13 +1,13 @@
 "use server";
 
-import { getDb } from "@/db";
-import { institutionDomains,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { validateDisplayName,validateUsername } from "@/lib/validation";
-import { getViewerInstitutionId } from "@/lib/viewer";
-import { eq,sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getDb } from "@/db";
+import { institutionDomains, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { validateDisplayName, validateUsername } from "@/lib/validation";
+import { getViewerInstitutionId } from "@/lib/viewer";
 
 export async function completeOnboarding(formData: FormData) {
   const user = await hexclaveServerApp.getUser();
@@ -113,14 +113,16 @@ export async function completeOnboarding(formData: FormData) {
 
   const rawUsername = email.split("@")[0] || "student";
   const officialName = rawUsername
-    .split(/[\._\-]/)
+    .split(/[._-]/)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 
-  const cleanAvatarUrl = avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
+  const cleanAvatarUrl =
+    avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
 
   // Only aspirants carry a stage; for students the branch and year say it.
-  const headline = aspirantStage && !isVerifiedCollegeEmail ? `${aspirantStage} · ${branch ?? "Aspirant"}` : null;
+  const headline =
+    aspirantStage && !isVerifiedCollegeEmail ? `${aspirantStage} · ${branch ?? "Aspirant"}` : null;
 
   try {
     await db
@@ -180,7 +182,12 @@ export async function completeOnboarding(formData: FormData) {
         .where(eq(userProfiles.id, referrerProfile.id));
     }
   } catch (error: unknown) {
-    if (typeof error === "object" && error !== null && "code" in error && (error as { code?: string }).code === "23505") {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code?: string }).code === "23505"
+    ) {
       throw new Error("Username already taken. Please pick a different one.");
     }
     throw error;

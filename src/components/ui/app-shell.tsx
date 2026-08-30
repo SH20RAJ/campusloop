@@ -1,10 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { haptics } from "@/lib/haptics";
+import type { LucideIcon } from "lucide-react";
 import { Search, X } from "lucide-react";
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
+import { haptics } from "@/lib/haptics";
+import { cn } from "@/lib/utils";
 
 /**
  * CampusLoop app-surface primitives.
@@ -29,13 +29,7 @@ import type { LucideIcon } from "lucide-react";
 
 /* ── Column ───────────────────────────────────────────────────────────── */
 
-export function PageShell({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+export function PageShell({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <main
       className={cn(
@@ -75,9 +69,7 @@ export function PageHeader({
       <div className="flex items-center justify-between gap-2 px-4 py-3.5">
         <div className="min-w-0">
           <h1 className="text-lg font-black tracking-tight text-foreground">{title}</h1>
-          {subtitle && (
-            <p className="truncate text-[13px] text-muted-foreground">{subtitle}</p>
-          )}
+          {subtitle && <p className="truncate text-[13px] text-muted-foreground">{subtitle}</p>}
         </div>
         {action && <div className="shrink-0">{action}</div>}
       </div>
@@ -234,13 +226,7 @@ export function SearchField({
 
 /* ── List ─────────────────────────────────────────────────────────────── */
 
-export function PageList({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+export function PageList({ children, className }: { children: React.ReactNode; className?: string }) {
   return <div className={cn("divide-y divide-border/30", className)}>{children}</div>;
 }
 

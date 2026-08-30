@@ -1,30 +1,30 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  ImagePlus,
+  Loader2,
+  MapPin,
+  Music2,
+  Palette,
+  Send,
+  SlidersHorizontal,
+  Smile,
+  Trash2,
+  Type,
+  X,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { mutate } from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
-import {
-AlignCenter,
-AlignLeft,
-AlignRight,
-ImagePlus,
-Loader2,
-MapPin,
-Music2,
-Palette,
-Send,
-SlidersHorizontal,
-Smile,
-Trash2,
-Type,
-X
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect,useRef,useState } from "react";
-import { toast } from "sonner";
-import { mutate } from "swr";
 
 interface StoryCreatorProps {
   profile: {
@@ -43,10 +43,26 @@ const GRADIENTS = [
   { id: "pink-purple", class: "bg-linear-to-tr from-pink-500 to-purple-600", label: "Barbie Magic" },
   { id: "midnight", class: "bg-linear-to-tr from-neutral-950 to-neutral-900", label: "Midnight Onyx" },
   { id: "neon-cyan", class: "bg-linear-to-tr from-cyan-500 to-blue-600", label: "Electric Ocean" },
-  { id: "golden-hour", class: "bg-linear-to-tr from-amber-300 via-orange-400 to-rose-500", label: "Golden Hour" },
-  { id: "cyberpunk", class: "bg-linear-to-tr from-fuchsia-600 via-purple-600 to-cyan-500", label: "Cyberpunk Neon" },
-  { id: "synthwave", class: "bg-linear-to-tr from-rose-500 via-purple-700 to-indigo-900", label: "Retro Synthwave" },
-  { id: "aurora", class: "bg-linear-to-tr from-teal-400 via-emerald-600 to-indigo-950", label: "Northern Lights" },
+  {
+    id: "golden-hour",
+    class: "bg-linear-to-tr from-amber-300 via-orange-400 to-rose-500",
+    label: "Golden Hour",
+  },
+  {
+    id: "cyberpunk",
+    class: "bg-linear-to-tr from-fuchsia-600 via-purple-600 to-cyan-500",
+    label: "Cyberpunk Neon",
+  },
+  {
+    id: "synthwave",
+    class: "bg-linear-to-tr from-rose-500 via-purple-700 to-indigo-900",
+    label: "Retro Synthwave",
+  },
+  {
+    id: "aurora",
+    class: "bg-linear-to-tr from-teal-400 via-emerald-600 to-indigo-950",
+    label: "Northern Lights",
+  },
   { id: "cherry-velvet", class: "bg-linear-to-tr from-red-600 to-rose-950", label: "Cherry Velvet" },
   { id: "dark-carbon", class: "bg-linear-to-tr from-zinc-900 via-black to-zinc-950", label: "Dark Carbon" },
 ];
@@ -68,7 +84,11 @@ const TEXT_SIZES = [
 
 const HIGHLIGHT_STYLES = [
   { id: "none", label: "None", class: "" },
-  { id: "glass", label: "Glass", class: "bg-black/50 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-2xl" },
+  {
+    id: "glass",
+    label: "Glass",
+    class: "bg-black/50 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-2xl",
+  },
   { id: "solid-black", label: "Black", class: "bg-black text-white px-4 py-2.5 rounded-2xl shadow-xl" },
   { id: "solid-white", label: "White", class: "bg-white text-black px-4 py-2.5 rounded-2xl shadow-xl" },
 ];
@@ -119,7 +139,9 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
   const [selectedSong, setSelectedSong] = useState<{ title: string; artist: string } | null>(null);
   const [customSongInput, setCustomSongInput] = useState("");
 
-  const [activeTray, setActiveTray] = useState<"none" | "stickers" | "palette" | "music" | "location" | "text_format">("none");
+  const [activeTray, setActiveTray] = useState<
+    "none" | "stickers" | "palette" | "music" | "location" | "text_format"
+  >("none");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -129,7 +151,9 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
   const selectedTextSize = TEXT_SIZES[textSizeIndex];
   const selectedHighlight = HIGHLIGHT_STYLES[highlightStyleIndex];
 
-  const collegeShortName = profile.institution?.name ? profile.institution.name.split(",")[0].trim() : "Campus";
+  const collegeShortName = profile.institution?.name
+    ? profile.institution.name.split(",")[0].trim()
+    : "Campus";
   const defaultLocations = [
     collegeShortName,
     "Central Library",
@@ -217,7 +241,13 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
   }
 
   async function handleShare() {
-    if (!storyText.trim() && !mediaUrl && selectedStickers.length === 0 && !selectedSong && !selectedLocation) {
+    if (
+      !storyText.trim() &&
+      !mediaUrl &&
+      selectedStickers.length === 0 &&
+      !selectedSong &&
+      !selectedLocation
+    ) {
       toast.warning("Add some text, a song, or a photo first!");
       return;
     }
@@ -386,7 +416,9 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
               }}
               className={cn(
                 "size-8 rounded-full flex items-center justify-center transition-colors cursor-pointer active:scale-90",
-                selectedSong || activeTray === "music" ? "bg-emerald-500 text-white" : "text-white hover:bg-white/20"
+                selectedSong || activeTray === "music"
+                  ? "bg-emerald-500 text-white"
+                  : "text-white hover:bg-white/20"
               )}
               title="Add Music Vibe"
             >
@@ -402,7 +434,9 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
               }}
               className={cn(
                 "size-8 rounded-full flex items-center justify-center transition-colors cursor-pointer active:scale-90",
-                selectedLocation || activeTray === "location" ? "bg-sky-500 text-white" : "text-white hover:bg-white/20"
+                selectedLocation || activeTray === "location"
+                  ? "bg-sky-500 text-white"
+                  : "text-white hover:bg-white/20"
               )}
               title="Tag Campus Location"
             >
@@ -417,7 +451,11 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
               className="size-8 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors cursor-pointer active:scale-90 disabled:opacity-50"
               title="Add Photo"
             >
-              {isUploadingImage ? <Loader2 className="size-4 animate-spin" /> : <ImagePlus className="size-4" />}
+              {isUploadingImage ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <ImagePlus className="size-4" />
+              )}
             </button>
           </div>
         </div>
@@ -459,7 +497,9 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
                   <span className="w-0.5 h-2 bg-emerald-400 animate-pulse delay-75" />
                   <span className="w-0.5 h-3.5 bg-emerald-400 animate-pulse delay-150" />
                 </div>
-                <span>{selectedSong.title} — {selectedSong.artist}</span>
+                <span>
+                  {selectedSong.title} — {selectedSong.artist}
+                </span>
                 <button
                   type="button"
                   onClick={() => setSelectedSong(null)}
@@ -550,7 +590,9 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
                     }}
                     className={cn(
                       "px-3 py-1 rounded-lg text-xs font-black transition-all cursor-pointer",
-                      textSizeIndex === idx ? "bg-white text-black shadow-xs" : "text-white/70 hover:text-white"
+                      textSizeIndex === idx
+                        ? "bg-white text-black shadow-xs"
+                        : "text-white/70 hover:text-white"
                     )}
                   >
                     {size.label}
@@ -570,7 +612,9 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
                     }}
                     className={cn(
                       "px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer",
-                      highlightStyleIndex === idx ? "bg-white text-black shadow-xs" : "text-white/70 hover:text-white"
+                      highlightStyleIndex === idx
+                        ? "bg-white text-black shadow-xs"
+                        : "text-white/70 hover:text-white"
                     )}
                   >
                     {hl.label}
@@ -679,7 +723,9 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
                     className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/10 text-left transition-colors cursor-pointer group"
                   >
                     <div>
-                      <p className="text-xs font-bold group-hover:text-emerald-400 transition-colors">{song.title}</p>
+                      <p className="text-xs font-bold group-hover:text-emerald-400 transition-colors">
+                        {song.title}
+                      </p>
                       <p className="text-[10px] text-white/60">{song.artist}</p>
                     </div>
                     <Music2 className="size-3.5 text-white/40 group-hover:text-emerald-400" />

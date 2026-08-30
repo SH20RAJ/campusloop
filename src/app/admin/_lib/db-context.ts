@@ -1,5 +1,5 @@
 import "server-only";
 
-import { getDb } from "@/db";
+import type { getDb } from "@/db";
 
 export type Db = ReturnType<typeof getDb>;

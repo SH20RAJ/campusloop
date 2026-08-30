@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import CollegesClient from "./colleges-client";
 
 export const metadata: Metadata = {
@@ -39,15 +39,13 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 export default function CollegesPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Indian College Directory & Campus Hubs",
     url: "https://campusloop.space/colleges",
-    description:
-      "Directory of 1,350+ accredited Indian universities and colleges on the CampusLoop network.",
+    description: "Directory of 1,350+ accredited Indian universities and colleges on the CampusLoop network.",
     publisher: {
       "@type": "Organization",
       name: "CampusLoop Inc.",
@@ -58,10 +56,7 @@ export default function CollegesPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <CollegesClient />
     </>
   );

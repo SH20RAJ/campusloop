@@ -1,10 +1,10 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import { ChevronLeft,ChevronRight,Heart,Send,X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Send, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface Story {
   id: string;
@@ -89,12 +89,7 @@ export function StoryViewerModal({
               <div
                 className="h-full bg-white transition-all duration-100 ease-linear"
                 style={{
-                  width:
-                    idx < activeStoryIdx
-                      ? "100%"
-                      : idx === activeStoryIdx
-                      ? `${progress}%`
-                      : "0%",
+                  width: idx < activeStoryIdx ? "100%" : idx === activeStoryIdx ? `${progress}%` : "0%",
                 }}
               />
             </div>
@@ -131,7 +126,9 @@ export function StoryViewerModal({
             <p
               className={cn(
                 "text-lg sm:text-xl font-extrabold tracking-tight leading-relaxed max-w-[260px] break-words whitespace-pre-wrap drop-shadow-2xl",
-                currentStory.mediaUrl ? "bg-black/40 px-3.5 py-2 rounded-2xl backdrop-blur-xs border border-white/10" : ""
+                currentStory.mediaUrl
+                  ? "bg-black/40 px-3.5 py-2 rounded-2xl backdrop-blur-xs border border-white/10"
+                  : ""
               )}
             >
               {currentStory.text}
@@ -179,7 +176,9 @@ export function StoryViewerModal({
             onClick={handleLike}
             className={cn(
               "size-9 rounded-full border border-white/20 flex items-center justify-center cursor-pointer transition-all shrink-0 backdrop-blur-md",
-              liked ? "bg-rose-500 border-rose-500 text-white scale-110" : "bg-black/40 text-white hover:bg-black/60"
+              liked
+                ? "bg-rose-500 border-rose-500 text-white scale-110"
+                : "bg-black/40 text-white hover:bg-black/60"
             )}
           >
             <Heart className={cn("size-4", liked && "fill-current")} />

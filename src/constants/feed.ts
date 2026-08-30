@@ -6,7 +6,6 @@ export const FEED_SORT_TABS = [
   { id: "top_voted", label: "Top Voted" },
 ] as const;
 
-
 export const FEED_VISIBILITY_OPTIONS = [
   { id: "all", label: "All" },
   { id: "anonymous", label: "Anonymous" },

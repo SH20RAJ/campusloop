@@ -1,8 +1,8 @@
 "use client";
 
-import { AnimatePresence,motion } from "framer-motion";
-import { RefreshCw,Wifi,WifiOff } from "lucide-react";
-import { useEffect,useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useSWRConfig } from "swr";
 
 export function OfflineIndicator() {

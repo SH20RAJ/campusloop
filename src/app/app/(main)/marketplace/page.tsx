@@ -1,6 +1,6 @@
-import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { MarketplaceClient } from "./marketplace-client";
 
 export const metadata: Metadata = {

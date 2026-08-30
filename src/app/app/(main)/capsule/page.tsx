@@ -1,9 +1,9 @@
-import { getDb } from "@/db";
-import { timeCapsules,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { desc,eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getDb } from "@/db";
+import { timeCapsules, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { CapsuleClient } from "./capsule-client";
 
 export const dynamic = "force-dynamic";

@@ -1,8 +1,8 @@
 "use client";
 
+import { AlertTriangle, CheckCircle2, Info, Loader2, Trash2, X } from "lucide-react";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { AlertTriangle,CheckCircle2,Info,Loader2,Trash2,X } from "lucide-react";
-import { ReactNode } from "react";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -65,7 +65,12 @@ export function ConfirmDialog({
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className={cn("size-10 rounded-2xl border flex items-center justify-center shrink-0", bgVariants[variant])}>
+            <div
+              className={cn(
+                "size-10 rounded-2xl border flex items-center justify-center shrink-0",
+                bgVariants[variant]
+              )}
+            >
               {icons[variant]}
             </div>
             <div>

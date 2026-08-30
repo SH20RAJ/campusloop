@@ -1,12 +1,12 @@
 "use client";
 
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { CheckIcon,Eye,EyeOff,Trash2Icon,XCircle } from "lucide-react";
+import { CheckIcon, Eye, EyeOff, Trash2Icon, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { revealAnonymousAuthor,type RevealedIdentity } from "../anonymity-actions";
-import { deletePost,dismissReport,hidePost,keepPost } from "./actions";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { type RevealedIdentity, revealAnonymousAuthor } from "../anonymity-actions";
+import { deletePost, dismissReport, hidePost, keepPost } from "./actions";
 
 interface ReportRow {
   id: string;
@@ -89,7 +89,9 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
                   {report.reason}
                 </span>
                 {report.details && (
-                  <p className="text-xs text-muted-foreground mt-1 max-w-[200px] line-clamp-2">{report.details}</p>
+                  <p className="text-xs text-muted-foreground mt-1 max-w-[200px] line-clamp-2">
+                    {report.details}
+                  </p>
                 )}
               </td>
               <td className="px-6 py-4 font-medium text-foreground max-w-[300px]">
@@ -159,7 +161,9 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
           ))}
           {initialReports.length === 0 && (
             <tr>
-              <td colSpan={4} className="px-6 py-8 text-center">No open reports. All clean!</td>
+              <td colSpan={4} className="px-6 py-8 text-center">
+                No open reports. All clean!
+              </td>
             </tr>
           )}
         </tbody>

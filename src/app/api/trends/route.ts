@@ -1,9 +1,8 @@
-import { getDb } from "@/db";
-import { posts,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
-
+import { getDb } from "@/db";
+import { posts, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +35,6 @@ export async function GET(req: Request) {
     }
     const { searchParams } = new URL(req.url);
     const requestedScope = searchParams.get("scope") === "GLOBAL" ? "GLOBAL" : "CAMPUS";
-
 
     const db = getDb();
     let userInstitutionId: string | null = null;
@@ -73,8 +71,9 @@ export async function GET(req: Request) {
     });
 
     // 1. Extract and aggregate hashtags using high-performance PostgreSQL regexp_matches
-    const tagSql = requestedScope === "CAMPUS" && userInstitutionId
-      ? sql`
+    const tagSql =
+      requestedScope === "CAMPUS" && userInstitutionId
+        ? sql`
           SELECT 
             (regexp_matches(body, '#[a-zA-Z0-9_]+', 'g'))[1] as tag,
             count(*)::int as count
@@ -84,7 +83,7 @@ export async function GET(req: Request) {
           ORDER BY count DESC
           LIMIT 12;
         `
-      : sql`
+        : sql`
           SELECT 
             (regexp_matches(body, '#[a-zA-Z0-9_]+', 'g'))[1] as tag,
             count(*)::int as count
@@ -129,14 +128,16 @@ export async function GET(req: Request) {
       href: `/app/hashtag/${encodeURIComponent(r.tag.replace(/^#/, ""))}`,
     }));
 
-
     // 2. Extract Top News / Discussions (highest engagement)
-    const newsSource = recentPosts.length > 0 ? recentPosts : await db.query.posts.findMany({
-      where: eq(posts.status, "PUBLISHED"),
-      orderBy: [desc(posts.createdAt)],
-      limit: 50,
-      with: { author: true, institution: true, votes: true, comments: true },
-    });
+    const newsSource =
+      recentPosts.length > 0
+        ? recentPosts
+        : await db.query.posts.findMany({
+            where: eq(posts.status, "PUBLISHED"),
+            orderBy: [desc(posts.createdAt)],
+            limit: 50,
+            with: { author: true, institution: true, votes: true, comments: true },
+          });
 
     const newsItems: NewsItem[] = newsSource
       .map((p) => {

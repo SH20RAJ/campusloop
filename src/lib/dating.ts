@@ -58,7 +58,7 @@ export function sharedInterestsBetween(me: CompatibilityProfile, cand: Compatibi
 export function computeCompatibility(
   me: CompatibilityProfile,
   cand: CompatibilityProfile,
-  opts: { likedMe?: boolean } = {},
+  opts: { likedMe?: boolean } = {}
 ): CompatibilityResult {
   let score = BASELINE;
 
@@ -120,7 +120,7 @@ export function computeCompatibility(
  */
 export function resolveGenderPreference(
   myGender: string | null | undefined,
-  requested: string | null | undefined,
+  requested: string | null | undefined
 ): "MALE" | "FEMALE" | "ALL" {
   if (requested === "MALE" || requested === "FEMALE" || requested === "ALL") {
     return requested;

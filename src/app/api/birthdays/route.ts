@@ -1,8 +1,8 @@
+import { and, eq, isNotNull } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,eq,isNotNull } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -55,7 +55,9 @@ export async function GET(req: Request) {
     const currentDay = now.getDate(); // 1-31
 
     const todayMMDD = targetDateParam
-      ? (targetDateParam.length === 10 ? targetDateParam.substring(5) : targetDateParam)
+      ? targetDateParam.length === 10
+        ? targetDateParam.substring(5)
+        : targetDateParam
       : `${String(currentMonth).padStart(2, "0")}-${String(currentDay).padStart(2, "0")}`;
 
     const todayCelebrants: typeof profiles = [];
@@ -91,7 +93,7 @@ export async function GET(req: Request) {
       // Calculate days until next birthday
       const thisYearBirthday = new Date(now.getFullYear(), birthMonth - 1, birthDay);
       let diffDays = Math.ceil((thisYearBirthday.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      
+
       if (diffDays < 0) {
         // Birthday already occurred this year, calculate for next year
         const nextYearBirthday = new Date(now.getFullYear() + 1, birthMonth - 1, birthDay);

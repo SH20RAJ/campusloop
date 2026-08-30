@@ -43,10 +43,7 @@ export function CollegeForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label
-            htmlFor="name"
-            className="mb-1.5 block text-xs font-semibold text-foreground"
-          >
+          <label htmlFor="name" className="mb-1.5 block text-xs font-semibold text-foreground">
             College Name *
           </label>
           <input
@@ -62,10 +59,7 @@ export function CollegeForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="slug"
-            className="mb-1.5 block text-xs font-semibold text-foreground"
-          >
+          <label htmlFor="slug" className="mb-1.5 block text-xs font-semibold text-foreground">
             Slug *
           </label>
           <input
@@ -84,10 +78,7 @@ export function CollegeForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="websiteDomain"
-            className="mb-1.5 block text-xs font-semibold text-foreground"
-          >
+          <label htmlFor="websiteDomain" className="mb-1.5 block text-xs font-semibold text-foreground">
             Website Domain
           </label>
           <input
@@ -97,16 +88,11 @@ export function CollegeForm() {
             placeholder="iitb.ac.in"
             className="h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
           />
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Main website domain, e.g. iitb.ac.in
-          </p>
+          <p className="mt-1 text-[11px] text-muted-foreground">Main website domain, e.g. iitb.ac.in</p>
         </div>
 
         <div>
-          <label
-            htmlFor="state"
-            className="mb-1.5 block text-xs font-semibold text-foreground"
-          >
+          <label htmlFor="state" className="mb-1.5 block text-xs font-semibold text-foreground">
             State
           </label>
           <input
@@ -119,10 +105,7 @@ export function CollegeForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="district"
-            className="mb-1.5 block text-xs font-semibold text-foreground"
-          >
+          <label htmlFor="district" className="mb-1.5 block text-xs font-semibold text-foreground">
             District
           </label>
           <input
@@ -135,10 +118,7 @@ export function CollegeForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="website"
-            className="mb-1.5 block text-xs font-semibold text-foreground"
-          >
+          <label htmlFor="website" className="mb-1.5 block text-xs font-semibold text-foreground">
             Website URL
           </label>
           <input
@@ -152,10 +132,7 @@ export function CollegeForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="domains"
-          className="mb-1.5 block text-xs font-semibold text-foreground"
-        >
+        <label htmlFor="domains" className="mb-1.5 block text-xs font-semibold text-foreground">
           Allowed Email Domains
         </label>
         <input
@@ -166,8 +143,7 @@ export function CollegeForm() {
           className="h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         />
         <p className="mt-1 text-[11px] text-muted-foreground">
-          Comma or space-separated list of domains that students from this
-          college can use to sign up.
+          Comma or space-separated list of domains that students from this college can use to sign up.
         </p>
       </div>
 

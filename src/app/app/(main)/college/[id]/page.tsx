@@ -1,12 +1,12 @@
+import { desc, eq } from "drizzle-orm";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { CollegeHubClient } from "@/components/colleges/college-hub-client";
 import { getDb } from "@/db";
-import { institutions,posts } from "@/db/schema";
+import { institutions, posts } from "@/db/schema";
 import type { FeedPost } from "@/hooks/use-feed";
 import { sanitizeAnonRow } from "@/lib/anonymity";
-import { getCachedAuthUser,getCachedInstitution,getCachedUserProfile } from "@/lib/server-cache";
-import { desc,eq } from "drizzle-orm";
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { getCachedAuthUser, getCachedInstitution, getCachedUserProfile } from "@/lib/server-cache";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -65,7 +65,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     robots: { index: true, follow: true },
   };
-
 }
 
 export default async function MainCollegePage({ params }: PageProps) {
@@ -80,17 +79,17 @@ export default async function MainCollegePage({ params }: PageProps) {
   ]);
 
   if (!college && id === "viewer-hub") {
-    college = await db.query.institutions.findFirst({
-      with: {
-        profiles: true,
-      },
-    }) ?? null;
+    college =
+      (await db.query.institutions.findFirst({
+        with: {
+          profiles: true,
+        },
+      })) ?? null;
   }
 
   if (!college) {
     notFound();
   }
-
 
   // Fetch posts from this college
   const collegePosts = await db.query.posts.findMany({
@@ -154,9 +153,7 @@ export default async function MainCollegePage({ params }: PageProps) {
   const totalStudentPoints = students.reduce((acc, p) => acc + (p.points || 0), 0);
   const postsCount = collegePosts.length;
 
-  const collectivePoints = Math.round(
-    studentCount * 60 + totalStudentPoints * 1.5 + postsCount * 25 + 500
-  );
+  const collectivePoints = Math.round(studentCount * 60 + totalStudentPoints * 1.5 + postsCount * 25 + 500);
 
   // Extract hashtags from posts
   const hashtagSet = new Set<string>();
@@ -193,8 +190,8 @@ export default async function MainCollegePage({ params }: PageProps) {
       studentsCount: c.profiles?.length || 0,
       points: Math.round(
         (c.profiles?.length || 0) * 50 +
-        (c.profiles?.reduce((acc, p) => acc + (p.points || 0), 0) || 0) * 1.2 +
-        300
+          (c.profiles?.reduce((acc, p) => acc + (p.points || 0), 0) || 0) * 1.2 +
+          300
       ),
     }));
 

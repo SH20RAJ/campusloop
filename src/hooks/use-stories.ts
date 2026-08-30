@@ -1,5 +1,5 @@
-import { fetcher } from "@/lib/api";
 import useSWR from "swr";
+import { fetcher } from "@/lib/api";
 
 export interface StoryAuthor {
   id: string;
@@ -26,17 +26,12 @@ export interface UserStoryGroup {
 }
 
 export function useStories() {
-  const { data, error, isLoading, mutate } = useSWR<UserStoryGroup[]>(
-    "/api/stories",
-    fetcher,
-    {
-      revalidateIfStale: true,
-      keepPreviousData: true,
-      dedupingInterval: 15000,
-      refreshInterval: 60000,
-    }
-  );
-
+  const { data, error, isLoading, mutate } = useSWR<UserStoryGroup[]>("/api/stories", fetcher, {
+    revalidateIfStale: true,
+    keepPreviousData: true,
+    dedupingInterval: 15000,
+    refreshInterval: 60000,
+  });
 
   return {
     stories: data || [],

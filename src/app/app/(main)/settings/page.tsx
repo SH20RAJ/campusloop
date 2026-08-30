@@ -1,9 +1,9 @@
+import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq } from "drizzle-orm";
-import { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { SettingsClient } from "./settings-client";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,6 @@ export const metadata: Metadata = {
 export default async function SettingsPage() {
   const user = await hexclaveServerApp.getUser();
   if (!user) redirect("/handler/sign-in");
-
 
   const db = getDb();
   const profile = await db.query.userProfiles.findFirst({
@@ -48,4 +47,3 @@ export default async function SettingsPage() {
     />
   );
 }
-

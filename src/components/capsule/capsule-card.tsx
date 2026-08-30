@@ -1,19 +1,12 @@
 "use client";
 
+import { Eye, Hourglass, KeyRound, Lock, Plus, Unlock } from "lucide-react";
+import { useState } from "react";
 import { CapsuleCountdown } from "@/components/capsule/capsule-countdown";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import {
-Eye,
-Hourglass,
-KeyRound,
-Lock,
-Plus,
-Unlock
-} from "lucide-react";
-import { useState } from "react";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface CapsuleCardProps {
   capsule: any;
@@ -21,10 +14,7 @@ interface CapsuleCardProps {
   onOpenBuryModal: (capsuleId: string, capsuleTitle: string) => void;
 }
 
-export function CapsuleCard({
-  capsule,
-  onOpenBuryModal,
-}: CapsuleCardProps) {
+export function CapsuleCard({ capsule, onOpenBuryModal }: CapsuleCardProps) {
   const [showEntries, setShowEntries] = useState(capsule.isUnlocked);
   const isUnlocked = capsule.isUnlocked;
 
@@ -45,11 +35,7 @@ export function CapsuleCard({
       {/* Cover Image Banner */}
       <div className="relative h-44 sm:h-52 w-full overflow-hidden bg-muted">
         {capsule.coverImage && (
-          <img
-            src={capsule.coverImage}
-            alt={capsule.title}
-            className="w-full h-full object-cover"
-          />
+          <img src={capsule.coverImage} alt={capsule.title} className="w-full h-full object-cover" />
         )}
         <div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
 
@@ -90,9 +76,7 @@ export function CapsuleCard({
             {capsule.title}
           </h3>
           {capsule.description && (
-            <p className="text-xs text-muted-foreground line-clamp-1 font-medium">
-              {capsule.description}
-            </p>
+            <p className="text-xs text-muted-foreground line-clamp-1 font-medium">{capsule.description}</p>
           )}
         </div>
       </div>
@@ -167,9 +151,7 @@ export function CapsuleCard({
                   className="text-xs p-2 rounded-xl bg-card border border-border/30 text-foreground/90 font-medium"
                 >
                   <p className="font-bold text-foreground">"{e.title}"</p>
-                  <p className="text-muted-foreground line-clamp-1 mt-0.5 text-[11px]">
-                    {e.content}
-                  </p>
+                  <p className="text-muted-foreground line-clamp-1 mt-0.5 text-[11px]">{e.content}</p>
                 </div>
               ))}
             </div>
@@ -222,20 +204,12 @@ export function CapsuleCard({
                       </span>
                     </div>
 
-                    <p className="text-xs font-bold text-foreground">
-                      {entry.title}
-                    </p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {entry.content}
-                    </p>
+                    <p className="text-xs font-bold text-foreground">{entry.title}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{entry.content}</p>
 
                     {entry.mediaUrl && (
                       <div className="rounded-xl overflow-hidden max-h-48 border border-border/30 mt-2">
-                        <img
-                          src={entry.mediaUrl}
-                          alt={entry.title}
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={entry.mediaUrl} alt={entry.title} className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>

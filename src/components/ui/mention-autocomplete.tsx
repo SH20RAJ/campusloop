@@ -1,11 +1,11 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Hash, ShieldCheck, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetcher } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { Hash,ShieldCheck,Users } from "lucide-react";
-import { useEffect,useState } from "react";
-import useSWR from "swr";
 
 export interface MentionUser {
   id: string;
@@ -26,7 +26,6 @@ export interface MentionHashtag {
   isHot?: boolean;
 }
 
-
 interface MentionsResponse {
   users: MentionUser[];
   hashtags: MentionHashtag[];
@@ -39,10 +38,7 @@ export interface TriggerContext {
   endIndex: number;
 }
 
-export function detectMentionTrigger(
-  text: string,
-  cursorPosition: number
-): TriggerContext | null {
+export function detectMentionTrigger(text: string, cursorPosition: number): TriggerContext | null {
   if (cursorPosition < 0 || cursorPosition > text.length) return null;
 
   const textBeforeCursor = text.slice(0, cursorPosition);
@@ -71,12 +67,7 @@ interface MentionSuggestionsProps {
   className?: string;
 }
 
-export function MentionSuggestions({
-  trigger,
-  onSelect,
-  onClose,
-  className,
-}: MentionSuggestionsProps) {
+export function MentionSuggestions({ trigger, onSelect, onClose, className }: MentionSuggestionsProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const query = trigger?.query || "";
@@ -95,7 +86,7 @@ export function MentionSuggestions({
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [trigger?.query, trigger?.type]);
+  }, []);
 
   // Handle keyboard events
   useEffect(() => {
@@ -116,8 +107,7 @@ export function MentionSuggestions({
         } else if (trigger.type === "hashtag" && hashtags[selectedIndex]) {
           onSelect(`${hashtags[selectedIndex].tag} `, trigger);
         }
-      }
- else if (e.key === "Escape") {
+      } else if (e.key === "Escape") {
         onClose?.();
       }
     }
@@ -177,9 +167,7 @@ export function MentionSuggestions({
                 <div className="min-w-0 flex-1 space-y-0.5">
                   <p className="text-xs font-black text-foreground truncate flex items-center gap-1">
                     <span>{user.displayName}</span>
-                    {user.isVerified && (
-                      <ShieldCheck className="size-3 text-[#1d9bf0] shrink-0" />
-                    )}
+                    {user.isVerified && <ShieldCheck className="size-3 text-[#1d9bf0] shrink-0" />}
                   </p>
                   <p className="text-[11px] text-muted-foreground truncate">
                     @{user.username}
@@ -209,25 +197,18 @@ export function MentionSuggestions({
               >
                 <div className="min-w-0 flex-1 space-y-0.5">
                   <div className="flex items-center gap-1.5">
-                    <p className="text-xs font-black text-foreground truncate">
-                      {h.tag}
-                    </p>
+                    <p className="text-xs font-black text-foreground truncate">{h.tag}</p>
                     {h.isHot && (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-primary/10 text-primary">
                         HOT
                       </span>
                     )}
                   </div>
-                  {h.category && (
-                    <p className="text-[10px] text-muted-foreground truncate">
-                      {h.category}
-                    </p>
-                  )}
+                  {h.category && <p className="text-[10px] text-muted-foreground truncate">{h.category}</p>}
                 </div>
                 <span className="text-[11px] text-muted-foreground shrink-0 font-medium">
                   {h.formattedCount}
                 </span>
-
               </button>
             );
           })}

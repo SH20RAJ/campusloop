@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface BrandLogoProps {
   className?: string;
@@ -38,12 +38,7 @@ export function BrandLogoIcon({
   );
 }
 
-export function BrandLogo({
-  className,
-  size = "md",
-  showWordmark = true,
-  href = "/app",
-}: BrandLogoProps) {
+export function BrandLogo({ className, size = "md", showWordmark = true, href = "/app" }: BrandLogoProps) {
   const content = (
     <div className={cn("inline-flex items-center gap-2.5 select-none group", className)}>
       <BrandLogoIcon size={size} />

@@ -1,11 +1,9 @@
 "use client";
 
+import { DollarSign } from "lucide-react";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
-import {
-DollarSign
-} from "lucide-react";
-import useSWR from "swr";
 
 export function MerchantEarningsClient() {
   const { data, isLoading } = useSWR<{ orders: any[]; merchant: any }>(
@@ -50,9 +48,7 @@ export function MerchantEarningsClient() {
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Total Gross Sales
             </p>
-            <p className="text-2xl font-black text-emerald-500">
-              ₹{totalGrossSales.toLocaleString("en-IN")}
-            </p>
+            <p className="text-2xl font-black text-emerald-500">₹{totalGrossSales.toLocaleString("en-IN")}</p>
             <p className="text-[10px] text-muted-foreground font-semibold">
               {completedOrders.length} completed orders
             </p>
@@ -62,9 +58,7 @@ export function MerchantEarningsClient() {
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               UPI Payouts (Direct)
             </p>
-            <p className="text-2xl font-black text-foreground">
-              ₹{upiSales.toLocaleString("en-IN")}
-            </p>
+            <p className="text-2xl font-black text-foreground">₹{upiSales.toLocaleString("en-IN")}</p>
             <p className="text-[10px] text-emerald-500 font-bold">Instant settlement</p>
           </div>
 
@@ -72,9 +66,7 @@ export function MerchantEarningsClient() {
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Cash on Delivery (Collected)
             </p>
-            <p className="text-2xl font-black text-foreground">
-              ₹{cashSales.toLocaleString("en-IN")}
-            </p>
+            <p className="text-2xl font-black text-foreground">₹{cashSales.toLocaleString("en-IN")}</p>
             <p className="text-[10px] text-muted-foreground font-semibold">Self-collected at desk</p>
           </div>
         </div>
@@ -94,9 +86,7 @@ export function MerchantEarningsClient() {
         <div className="space-y-2 text-xs">
           <div className="flex items-center justify-between text-muted-foreground">
             <span>Gross Campus Sales</span>
-            <span className="text-foreground font-bold">
-              ₹{totalGrossSales.toLocaleString("en-IN")}
-            </span>
+            <span className="text-foreground font-bold">₹{totalGrossSales.toLocaleString("en-IN")}</span>
           </div>
           <div className="flex items-center justify-between text-muted-foreground">
             <span>CampusLoop Facilitation Fee</span>
@@ -104,9 +94,7 @@ export function MerchantEarningsClient() {
           </div>
           <div className="flex items-center justify-between text-muted-foreground">
             <span>Delivery Fees Collected</span>
-            <span className="text-foreground font-bold">
-              ₹{totalDeliveryFees.toLocaleString("en-IN")}
-            </span>
+            <span className="text-foreground font-bold">₹{totalDeliveryFees.toLocaleString("en-IN")}</span>
           </div>
           <div className="pt-2 border-t border-border/30 flex items-center justify-between text-sm font-black text-foreground">
             <span>Net Merchant Payout</span>

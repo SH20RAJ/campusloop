@@ -1,8 +1,8 @@
+import { desc, eq } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { timeCapsules,userProfiles } from "@/db/schema";
+import { timeCapsules, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { desc,eq } from "drizzle-orm";
-import { NextRequest,NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       where: eq(userProfiles.userId, user.id),
     });
 
-    if (!profile || !profile.institutionId) {
+    if (!profile?.institutionId) {
       return NextResponse.json({ error: "Institution required" }, { status: 400 });
     }
 
@@ -102,10 +102,7 @@ export async function POST(req: NextRequest) {
     };
 
     if (!body.title || !body.targetUnlockDate) {
-      return NextResponse.json(
-        { error: "Title and target unlock date are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Title and target unlock date are required" }, { status: 400 });
     }
 
     const unlockDate = new Date(body.targetUnlockDate);

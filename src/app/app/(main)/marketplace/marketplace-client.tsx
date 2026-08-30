@@ -1,21 +1,6 @@
 "use client";
 
 import {
-  EmptyState,
-  FilterPills,
-  ListRow,
-  PageHeader,
-  PageList,
-  PageShell,
-  RowSkeleton,
-  SearchField,
-} from "@/components/ui/app-shell";
-import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
-import {
   Car,
   ChevronRight,
   ShieldCheck,
@@ -29,8 +14,22 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo,useState } from "react";
+import { useMemo, useState } from "react";
 import useSWR from "swr";
+import {
+  EmptyState,
+  FilterPills,
+  ListRow,
+  PageHeader,
+  PageList,
+  PageShell,
+  RowSkeleton,
+  SearchField,
+} from "@/components/ui/app-shell";
+import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 
 interface MarketplaceClientProps {
   profileId: string;
@@ -90,8 +89,7 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
 
   const rentalBikes = bikesData?.bikes || [];
 
-  const categoryLabel =
-    CATEGORIES.find((c) => c.id === selectedCategory)?.label ?? "Stores";
+  const categoryLabel = CATEGORIES.find((c) => c.id === selectedCategory)?.label ?? "Stores";
 
   return (
     <PageShell>
@@ -119,11 +117,7 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
         placeholder="Search canteens, rentals or services"
       />
 
-      <FilterPills
-        pills={CATEGORY_PILLS}
-        value={selectedCategory}
-        onChange={handleCategorySelect}
-      />
+      <FilterPills pills={CATEGORY_PILLS} value={selectedCategory} onChange={handleCategorySelect} />
 
       {/* ─── Student deals ─── */}
       {deals.length > 0 && selectedCategory === "all" && !searchQuery && (
@@ -205,11 +199,7 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
             {stores.map((store) => (
               <ListRow key={store.id} href={`/app/marketplace/store/${store.id}`}>
                 <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-muted">
-                  <img
-                    src={store.coverUrl || store.logoUrl}
-                    alt=""
-                    className="size-full object-cover"
-                  />
+                  <img src={store.coverUrl || store.logoUrl} alt="" className="size-full object-cover" />
                   {!store.isOpen && (
                     <span className="absolute inset-0 flex items-center justify-center bg-black/65 text-[11px] font-bold text-white">
                       Closed
@@ -274,9 +264,7 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
             icon={Store}
             title="No stores found"
             description={
-              searchQuery
-                ? `Nothing matches "${searchQuery}".`
-                : "No businesses listed in this category yet."
+              searchQuery ? `Nothing matches "${searchQuery}".` : "No businesses listed in this category yet."
             }
           />
         )}

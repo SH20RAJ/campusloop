@@ -1,21 +1,13 @@
 "use client";
 
+import { CalendarCheck2, Clock, Loader2, Lock, Trash2, Wrench, X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import {
-CalendarCheck2,
-Clock,
-Loader2,
-Lock,
-Trash2,
-Wrench,
-X
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
 
 export function MerchantAvailabilityClient() {
   const [selectedBikeId, setSelectedBikeId] = useState<string>("");
@@ -40,10 +32,7 @@ export function MerchantAvailabilityClient() {
     selectedBikeId: string;
     blocks: any[];
     bookings: any[];
-  }>(
-    `/api/merchant/bikes/availability${selectedBikeId ? `?bikeId=${selectedBikeId}` : ""}`,
-    fetcher
-  );
+  }>(`/api/merchant/bikes/availability${selectedBikeId ? `?bikeId=${selectedBikeId}` : ""}`, fetcher);
 
   const fleet = data?.fleet || [];
   const currentBikeId = selectedBikeId || data?.selectedBikeId || fleet[0]?.id;
@@ -139,9 +128,7 @@ export function MerchantAvailabilityClient() {
 
       {/* ─── Select Vehicle Dropdown Strip ─── */}
       <div className="p-4 rounded-3xl bg-card border border-border/40 space-y-2 shadow-xs">
-        <label className="text-xs font-bold uppercase text-muted-foreground">
-          Select Fleet Vehicle
-        </label>
+        <label className="text-xs font-bold uppercase text-muted-foreground">Select Fleet Vehicle</label>
         <select
           value={currentBikeId}
           onChange={(e) => {
@@ -227,9 +214,7 @@ export function MerchantAvailabilityClient() {
                 >
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-black text-rose-500 uppercase">
-                        {block.reason}
-                      </span>
+                      <span className="font-black text-rose-500 uppercase">{block.reason}</span>
                       {block.notes && <span className="text-muted-foreground">· {block.notes}</span>}
                     </div>
                     <p className="text-muted-foreground text-[11px]">
@@ -259,9 +244,7 @@ export function MerchantAvailabilityClient() {
               ))}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground">
-              No maintenance blocks scheduled for this bike.
-            </p>
+            <p className="text-xs text-muted-foreground">No maintenance blocks scheduled for this bike.</p>
           )}
         </div>
       </div>
@@ -334,9 +317,7 @@ export function MerchantAvailabilityClient() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase text-muted-foreground">
-                  Notes (Optional)
-                </label>
+                <label className="text-xs font-bold uppercase text-muted-foreground">Notes (Optional)</label>
                 <input
                   type="text"
                   value={blockNotes}
@@ -352,11 +333,7 @@ export function MerchantAvailabilityClient() {
                   disabled={isSubmittingBlock}
                   className="w-full h-11 rounded-2xl bg-rose-500 hover:bg-rose-400 text-white font-black text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
                 >
-                  {isSubmittingBlock ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    "Confirm & Lock Slot"
-                  )}
+                  {isSubmittingBlock ? <Loader2 className="size-4 animate-spin" /> : "Confirm & Lock Slot"}
                 </button>
               </div>
             </form>

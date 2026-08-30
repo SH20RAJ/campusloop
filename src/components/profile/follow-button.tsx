@@ -1,12 +1,12 @@
 "use client";
 
+import { Loader2, UserCheck, UserPlus } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { apiRequest } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { Loader2,UserCheck,UserPlus } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface FollowButtonProps {
   username: string;
@@ -49,7 +49,7 @@ export function FollowButton({
     try {
       const data = await apiRequest<FollowResponse>(
         `/api/profile/${encodeURIComponent(username)}/follow`,
-        next ? "POST" : "DELETE",
+        next ? "POST" : "DELETE"
       );
       setIsFollowing(data.isFollowing);
       onChange?.(data.isFollowing, {
@@ -62,7 +62,7 @@ export function FollowButton({
       toast.error(
         err instanceof Error
           ? err.message
-          : `Could not ${next ? "follow" : "unfollow"} ${displayName || `@${username}`}`,
+          : `Could not ${next ? "follow" : "unfollow"} ${displayName || `@${username}`}`
       );
     } finally {
       setIsPending(false);
@@ -85,7 +85,7 @@ export function FollowButton({
         isFollowing
           ? "border border-border bg-card text-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
           : "bg-primary text-primary-foreground hover:bg-primary/95 shadow-md",
-        className,
+        className
       )}
     >
       {isPending ? (

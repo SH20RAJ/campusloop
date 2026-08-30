@@ -1,8 +1,8 @@
-import { getDb } from "@/db";
-import { communities,institutions,posts,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
 import { eq, ilike, or } from "drizzle-orm";
 import { cache } from "react";
+import { getDb } from "@/db";
+import { communities, institutions, posts, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 /**
  * Per-request memoized current user from Hexclave auth.

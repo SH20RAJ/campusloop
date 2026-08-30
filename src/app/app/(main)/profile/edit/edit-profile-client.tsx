@@ -1,39 +1,38 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Cake,
+  Camera,
+  Check,
+  Image as ImageIcon,
+  Loader2,
+  Lock,
+  Move,
+  Plus,
+  Save,
+  ShieldCheck,
+  Upload,
+  User,
+  VenetianMask,
+  X,
+  Zap,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { isUsernameBlocking, UsernameStatusHint } from "@/components/ui/username-status";
 import { getBranchOptionsForDegree } from "@/constants";
 import { useProfile } from "@/hooks/use-profile";
 import { useUsernameAvailability } from "@/hooks/use-username-availability";
-import { isUsernameBlocking, UsernameStatusHint } from "@/components/ui/username-status";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { getAvatarUrl } from "@/lib/utils";
-import { validateDisplayName,validateUsername } from "@/lib/validation";
-import {
-AlertCircle,
-ArrowLeft,
-Cake,
-Camera,
-Check,
-Image as ImageIcon,
-Loader2,
-Lock,
-Move,
-Plus,
-Save,
-ShieldCheck,
-Upload,
-User,
-VenetianMask,
-X,
-Zap,
-} from "lucide-react";
-
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect,useRef,useState } from "react";
-import { toast } from "sonner";
+import { validateDisplayName, validateUsername } from "@/lib/validation";
 
 const INTEREST_SUGGESTIONS = [
   "Tech & Coding",
@@ -110,11 +109,8 @@ export function EditProfileClient() {
     }
   }, [profile]);
 
-
   function handleToggleInterest(tag: string) {
-    setInterests((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
+    setInterests((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
   }
 
   function handlePfpFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
@@ -237,7 +233,6 @@ export function EditProfileClient() {
           anonymousUsername: anonUsername ? anonUsername.trim().toLowerCase().replace(/^@/, "") : null,
         }),
       });
-
 
       const data = (await res.json()) as { error?: string };
 
@@ -482,7 +477,7 @@ export function EditProfileClient() {
                   <AlertCircle className="size-3" /> {nameVal.error}
                 </span>
               )}
-              {nameVal && nameVal.isValid && (
+              {nameVal?.isValid && (
                 <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
                   <Check className="size-3" /> Valid name
                 </span>
@@ -519,8 +514,8 @@ export function EditProfileClient() {
                   usernameStatus.state === "taken" || usernameStatus.state === "invalid"
                     ? "border-destructive focus:border-destructive"
                     : usernameStatus.state === "available"
-                    ? "border-emerald-500/60 focus:bg-background"
-                    : "border-border/60 focus:border-primary focus:bg-background"
+                      ? "border-emerald-500/60 focus:bg-background"
+                      : "border-border/60 focus:border-primary focus:bg-background"
                 }`}
               />
             </div>
@@ -529,7 +524,9 @@ export function EditProfileClient() {
           {/* Student Headline / Tagline */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-muted-foreground">Profile Headline / Tagline</label>
+              <label className="text-xs font-semibold text-muted-foreground">
+                Profile Headline / Tagline
+              </label>
               <span className="text-[10px] text-muted-foreground">{headline.length}/100</span>
             </div>
             <input
@@ -566,7 +563,10 @@ export function EditProfileClient() {
           {/* Birthday / Date of Birth */}
           <div className="space-y-2 pt-2 border-t border-border/40">
             <div className="flex items-center justify-between">
-              <label htmlFor="edit-dob" className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+              <label
+                htmlFor="edit-dob"
+                className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5"
+              >
                 <Cake className="size-3.5 text-pink-500" /> Birthday / Date of Birth
               </label>
               <span className="text-[10px] text-muted-foreground">Used for campus birthday wishes</span>
@@ -587,7 +587,8 @@ export function EditProfileClient() {
                 className="size-3.5 rounded border-border accent-primary cursor-pointer"
               />
               <span className="flex items-center gap-1">
-                <Lock className="size-3 text-muted-foreground" /> Keep birthday private (do not display in campus celebrations)
+                <Lock className="size-3 text-muted-foreground" /> Keep birthday private (do not display in
+                campus celebrations)
               </span>
             </label>
           </div>
@@ -601,7 +602,9 @@ export function EditProfileClient() {
                 <VenetianMask className="size-4 text-primary" /> Anonymous Persona & Custom Username
               </h3>
               <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
-                Create a custom anonymous alias for confessions, polls, and anonymous questions. All your anonymous posts will appear under this username instead of a random ID. Your real identity remains 100% cryptographically sealed.
+                Create a custom anonymous alias for confessions, polls, and anonymous questions. All your
+                anonymous posts will appear under this username instead of a random ID. Your real identity
+                remains 100% cryptographically sealed.
               </p>
             </div>
             <span className="text-[10px] font-black uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full shrink-0">
@@ -638,7 +641,6 @@ export function EditProfileClient() {
         {/* ─── Academic Info with Presets ─── */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
           <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-
             <ShieldCheck className="size-3.5 text-blue-500" /> Academic & Campus Info
           </h3>
 
@@ -646,20 +648,22 @@ export function EditProfileClient() {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-muted-foreground">Degree / Course</label>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 pb-1">
-                {["B.Tech", "B.Arch", "MCA", "MBA", "MBBS", "BBA", "B.Com", "BCA", "PhD", "M.Tech"].map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setCourse(c)}
-                    className={`py-1.5 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer truncate ${
-                      course === c
-                        ? "border-primary bg-primary/10 text-primary shadow-xs"
-                        : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {c}
-                  </button>
-                ))}
+                {["B.Tech", "B.Arch", "MCA", "MBA", "MBBS", "BBA", "B.Com", "BCA", "PhD", "M.Tech"].map(
+                  (c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setCourse(c)}
+                      className={`py-1.5 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer truncate ${
+                        course === c
+                          ? "border-primary bg-primary/10 text-primary shadow-xs"
+                          : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {c}
+                    </button>
+                  )
+                )}
               </div>
               <input
                 type="text"
@@ -750,9 +754,7 @@ export function EditProfileClient() {
           </div>
         </div>
 
-        {error && (
-          <p className="text-xs font-semibold text-destructive text-center">{error}</p>
-        )}
+        {error && <p className="text-xs font-semibold text-destructive text-center">{error}</p>}
 
         {/* Action Button */}
         <button

@@ -1,15 +1,12 @@
+import { eq, sql } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { capsuleEntries,timeCapsules,userProfiles } from "@/db/schema";
+import { capsuleEntries, timeCapsules, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { eq,sql } from "drizzle-orm";
-import { NextRequest,NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {
@@ -51,10 +48,7 @@ export async function POST(
     };
 
     if (!body.title || !body.content) {
-      return NextResponse.json(
-        { error: "Title and content are required to bury a memory" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Title and content are required to bury a memory" }, { status: 400 });
     }
 
     const [entry] = await db

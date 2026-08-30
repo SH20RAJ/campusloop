@@ -1,13 +1,13 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { fetcher } from "@/lib/api";
-import { cn } from "@/lib/utils";
-import { Heart,Loader2,ShieldCheck,UserCheck,UserPlus,X } from "lucide-react";
+import { Heart, Loader2, ShieldCheck, UserCheck, UserPlus, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { fetcher } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export interface LikedUser {
   id: string;
@@ -34,12 +34,7 @@ interface PostLikesModalProps {
   currentUserId?: string;
 }
 
-export function PostLikesModal({
-  postId,
-  isOpen,
-  onClose,
-  currentUserId,
-}: PostLikesModalProps) {
+export function PostLikesModal({ postId, isOpen, onClose, currentUserId }: PostLikesModalProps) {
   const [followingMap, setFollowingMap] = useState<Record<string, boolean>>({});
 
   const { data, isLoading, error } = useSWR<PostLikesResponse>(
@@ -78,9 +73,7 @@ export function PostLikesModal({
             <div className="size-7 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500">
               <Heart className="size-4 fill-rose-500 text-rose-500" />
             </div>
-            <h3 className="text-base font-black text-foreground">
-              Liked by
-            </h3>
+            <h3 className="text-base font-black text-foreground">Liked by</h3>
             {count > 0 && (
               <span className="text-xs font-bold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full border border-border/40">
                 {count}
@@ -106,9 +99,7 @@ export function PostLikesModal({
               <p className="text-xs font-semibold">Loading reactions...</p>
             </div>
           ) : error ? (
-            <div className="text-center py-16 text-xs text-destructive">
-              Could not load likes list.
-            </div>
+            <div className="text-center py-16 text-xs text-destructive">Could not load likes list.</div>
           ) : users.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center space-y-2">
               <div className="size-12 rounded-full bg-muted/40 flex items-center justify-center text-muted-foreground">
@@ -144,9 +135,7 @@ export function PostLikesModal({
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-black text-foreground truncate group-hover:underline flex items-center gap-1">
                         <span>{user.displayName}</span>
-                        {user.isVerified && (
-                          <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
-                        )}
+                        {user.isVerified && <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />}
                       </p>
                       <p className="text-xs text-muted-foreground truncate">
                         @{user.username}

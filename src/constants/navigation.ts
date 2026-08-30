@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
-  BookOpen,
   Bookmark,
+  BookOpen,
   Cake,
   Calendar,
   Compass,

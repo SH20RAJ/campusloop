@@ -1,13 +1,10 @@
 "use client";
 
+import { Image as ImageIcon, Loader2, Search, X, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { GifItem } from "@/app/api/gifs/search/route";
 import { GIF_POPULAR_TAGS } from "@/constants";
 import { cn } from "@/lib/utils";
-import {
-Image as ImageIcon,Loader2,Search,X,
-Zap
-} from "lucide-react";
-import { useEffect,useRef,useState } from "react";
 
 interface GifPickerModalProps {
   isOpen: boolean;
@@ -15,11 +12,7 @@ interface GifPickerModalProps {
   onSelectGif: (gifUrl: string) => void;
 }
 
-export function GifPickerModal({
-  isOpen,
-  onClose,
-  onSelectGif,
-}: GifPickerModalProps) {
+export function GifPickerModal({ isOpen, onClose, onSelectGif }: GifPickerModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string>("trending");
   const [gifs, setGifs] = useState<GifItem[]>([]);
@@ -31,7 +24,10 @@ export function GifPickerModal({
 
     // Load initial trending GIFs
     fetchGifs("");
-  }, [isOpen]);
+  }, [
+    isOpen, // Load initial trending GIFs
+    fetchGifs,
+  ]);
 
   async function fetchGifs(query: string) {
     setIsLoading(true);
@@ -179,7 +175,9 @@ export function GifPickerModal({
             <div className="flex flex-col items-center justify-center h-48 text-center text-muted-foreground space-y-1">
               <ImageIcon className="size-8 text-muted-foreground/40" />
               <p className="text-xs font-bold text-foreground">No GIFs found</p>
-              <p className="text-[11px]">Try searching for something else like "reaction", "exam", or "crush"</p>
+              <p className="text-[11px]">
+                Try searching for something else like "reaction", "exam", or "crush"
+              </p>
             </div>
           )}
         </div>

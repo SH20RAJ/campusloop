@@ -1,12 +1,16 @@
 "use client";
 
-import { CommentItem,CommentWithAuthor } from "@/components/post/comment-item";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Image as ImageIcon, Loader2, MessageCircle, Shield, Smile, User, X } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
+import { CommentItem, type CommentWithAuthor } from "@/components/post/comment-item";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 import {
-detectMentionTrigger,
-MentionSuggestions,
-TriggerContext,
+  detectMentionTrigger,
+  MentionSuggestions,
+  type TriggerContext,
 } from "@/components/ui/mention-autocomplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
@@ -17,18 +21,6 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
-import {
-Image as ImageIcon,
-Loader2,
-MessageCircle,
-Shield,
-Smile,
-User,
-X
-} from "lucide-react";
-import { useMemo,useRef,useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
 
 interface PostCommentsProps {
   postId: string;
@@ -36,16 +28,13 @@ interface PostCommentsProps {
   postAuthorHandle?: string | null;
 }
 
-export function PostComments({
-  postId,
-  postAuthorId,
-  postAuthorHandle,
-}: PostCommentsProps) {
+export function PostComments({ postId, postAuthorId, postAuthorHandle }: PostCommentsProps) {
   const { profile } = useProfile();
-  const { data: comments, isLoading, mutate } = useSWR<CommentWithAuthor[]>(
-    `/api/posts/${postId}/comments`,
-    fetcher
-  );
+  const {
+    data: comments,
+    isLoading,
+    mutate,
+  } = useSWR<CommentWithAuthor[]>(`/api/posts/${postId}/comments`, fetcher);
 
   const [commentText, setCommentText] = useState("");
   const [commentImage, setCommentImage] = useState<string | null>(null);
@@ -120,8 +109,8 @@ export function PostComments({
       id: `temp_${Date.now()}`,
       postId,
       authorId: profile?.id || null,
-      author: isAnonymous ? null : (profile || null),
-      pseudonym: isAnonymous ? (profile?.anonymousUsername || "Anonymous Student") : null,
+      author: isAnonymous ? null : profile || null,
+      pseudonym: isAnonymous ? profile?.anonymousUsername || "Anonymous Student" : null,
       parentId: null,
       body,
       isAnonymous,
@@ -164,8 +153,8 @@ export function PostComments({
       id: `temp_reply_${Date.now()}`,
       postId,
       authorId: profile?.id || null,
-      author: replyIsAnon ? null : (profile || null),
-      pseudonym: replyIsAnon ? (profile?.anonymousUsername || "Anonymous Student") : null,
+      author: replyIsAnon ? null : profile || null,
+      pseudonym: replyIsAnon ? profile?.anonymousUsername || "Anonymous Student" : null,
       parentId,
 
       body: replyBody.trim(),
@@ -258,10 +247,11 @@ export function PostComments({
               }}
               placeholder={
                 isAnonymous
-                  ? (profile?.anonymousUsername ? `Post anonymously as @${profile.anonymousUsername}...` : "Post your anonymous reply...")
+                  ? profile?.anonymousUsername
+                    ? `Post anonymously as @${profile.anonymousUsername}...`
+                    : "Post your anonymous reply..."
                   : `Post your reply as @${profile?.username || "student"}...`
               }
-
               rows={2}
               className="w-full bg-transparent text-[15px] text-foreground placeholder:text-muted-foreground/60 outline-none resize-none font-normal leading-relaxed pt-1"
             />

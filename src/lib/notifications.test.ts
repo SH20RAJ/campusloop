@@ -1,5 +1,5 @@
-import { describe,expect,it } from "vitest";
-import { cleanNotificationSnippet,extractMentionUsernames } from "./notifications";
+import { describe, expect, it } from "vitest";
+import { cleanNotificationSnippet, extractMentionUsernames } from "./notifications";
 
 describe("notifications helpers", () => {
   it("extracts unique lowercased usernames from text", () => {
@@ -15,7 +15,8 @@ describe("notifications helpers", () => {
   });
 
   it("cleans and truncates notification snippets", () => {
-    const markdown = "Check this out ![image](https://example.com/pic.png) [cool link](https://test.com) and some very long details about the exam schedule.";
+    const markdown =
+      "Check this out ![image](https://example.com/pic.png) [cool link](https://test.com) and some very long details about the exam schedule.";
     const snippet = cleanNotificationSnippet(markdown, 40);
     expect(snippet).not.toContain("![image]");
     expect(snippet).not.toContain("https://test.com");

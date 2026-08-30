@@ -1,8 +1,8 @@
-import { getDb } from "@/db";
-import { articles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import ArticleReaderPage from "@/app/app/(articles)/articles/[slug]/page";
+import { getDb } from "@/db";
+import { articles } from "@/db/schema";
 
 interface ArticleShortLinkProps {
   params: Promise<{ slug: string }>;
@@ -31,7 +31,9 @@ export async function generateMetadata({ params }: ArticleShortLinkProps): Promi
       title,
       description,
       url,
-      images: article.coverImageUrl ? [{ url: article.coverImageUrl }] : [{ url: "https://campusloop.space/og-image.png" }],
+      images: article.coverImageUrl
+        ? [{ url: article.coverImageUrl }]
+        : [{ url: "https://campusloop.space/og-image.png" }],
     },
     twitter: {
       card: "summary_large_image",

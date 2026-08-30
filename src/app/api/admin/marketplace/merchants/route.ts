@@ -1,8 +1,8 @@
+import { desc } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { getDb } from "@/db";
 import { merchants } from "@/db/schema";
-import { desc } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -69,13 +69,9 @@ export async function POST(req: Request) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-    const cleanLoginUsername =
-      loginUsername?.trim().toLowerCase() ||
-      cleanSlug.replace(/[^a-z0-9]/g, "");
+    const cleanLoginUsername = loginUsername?.trim().toLowerCase() || cleanSlug.replace(/[^a-z0-9]/g, "");
 
-    const cleanLoginPassword =
-      loginPassword?.trim() ||
-      `store@${Math.random().toString(36).slice(-6)}`;
+    const cleanLoginPassword = loginPassword?.trim() || `store@${Math.random().toString(36).slice(-6)}`;
 
     const [newMerchant] = await db
       .insert(merchants)
@@ -89,12 +85,9 @@ export async function POST(req: Request) {
         locationPin: locationPin?.trim() || null,
         phone: phone?.trim() || null,
         email: email?.trim() || null,
-        logoUrl:
-          logoUrl ||
-          "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=300&fit=crop",
+        logoUrl: logoUrl || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=300&fit=crop",
         coverUrl:
-          coverUrl ||
-          "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop",
+          coverUrl || "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop",
         deliveryFee: typeof deliveryFee === "number" ? deliveryFee : 20,
         minOrderValue: typeof minOrderValue === "number" ? minOrderValue : 80,
         estimatedPrepTime: estimatedPrepTime || "15–20 min",

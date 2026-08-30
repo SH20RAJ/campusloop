@@ -1,48 +1,41 @@
 "use client";
 
-import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import {
-NotificationItem,
-NotificationTab,
-useNotifications,
-} from "@/hooks/use-notifications";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
-import {
-AtSign,
-Bell,
-CheckCheck,
-Compass,
-Eraser,
-Heart,
-Lock,
-MessageCircle,
-Repeat2,
-ShieldCheck,
-MoreHorizontal,
-Trash2,
-Trophy,
-UserPlus,
-Users,
-Zap
+  AtSign,
+  Bell,
+  CheckCheck,
+  Compass,
+  Eraser,
+  Heart,
+  Lock,
+  MessageCircle,
+  MoreHorizontal,
+  Repeat2,
+  ShieldCheck,
+  Trash2,
+  Trophy,
+  UserPlus,
+  Users,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { type NotificationItem, type NotificationTab, useNotifications } from "@/hooks/use-notifications";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface NotificationsClientProps {
   initialNotifications: NotificationItem[];
   initialUnreadCount: number;
 }
 
-export function NotificationsClient({
-  initialNotifications,
-  initialUnreadCount,
-}: NotificationsClientProps) {
+export function NotificationsClient({ initialNotifications, initialUnreadCount }: NotificationsClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<NotificationTab>("all");
   const [showActionsMenu, setShowActionsMenu] = useState(false);
@@ -62,21 +55,11 @@ export function NotificationsClient({
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [showActionsMenu]);
 
-  const {
-    notifications,
-    unreadCount,
-    isLoading,
-    markAllAsRead,
-    markAsRead,
-    clearAll,
-  } = useNotifications(activeTab);
+  const { notifications, unreadCount, isLoading, markAllAsRead, markAsRead, clearAll } =
+    useNotifications(activeTab);
 
   const displayList =
-    notifications.length > 0
-      ? notifications
-      : activeTab === "all"
-      ? initialNotifications
-      : [];
+    notifications.length > 0 ? notifications : activeTab === "all" ? initialNotifications : [];
 
   const effectiveUnread = unreadCount ?? initialUnreadCount;
 
@@ -232,9 +215,7 @@ export function NotificationsClient({
       <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/30">
         <div className="flex items-center justify-between px-4 py-3.5">
           <div className="flex items-center gap-2.5">
-            <h1 className="text-lg font-black tracking-tight text-foreground">
-              Notifications
-            </h1>
+            <h1 className="text-lg font-black tracking-tight text-foreground">Notifications</h1>
             {effectiveUnread > 0 && (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-black bg-primary text-primary-foreground shadow-xs">
                 {effectiveUnread}
@@ -339,13 +320,8 @@ export function NotificationsClient({
       <div className="divide-y divide-border/20">
         {displayList.map((n) => {
           const meta = getNotificationMeta(n);
-          const isVerified = Boolean(
-            (n.actor?.points || 0) >= 150 || n.actor?.role === "ADMIN"
-          );
-          const actorAvatar = getAvatarUrl(
-            n.actor?.avatarUrl,
-            n.actor?.username || "student"
-          );
+          const isVerified = Boolean((n.actor?.points || 0) >= 150 || n.actor?.role === "ADMIN");
+          const actorAvatar = getAvatarUrl(n.actor?.avatarUrl, n.actor?.username || "student");
           const campusName = n.actor?.institution?.name?.split(",")[0] || null;
 
           return (
@@ -358,16 +334,11 @@ export function NotificationsClient({
               )}
             >
               {/* Unread Indicator Pill on Left Edge */}
-              {!n.isRead && (
-                <span className="absolute left-0 top-3 bottom-3 w-1 bg-primary rounded-r-full" />
-              )}
+              {!n.isRead && <span className="absolute left-0 top-3 bottom-3 w-1 bg-primary rounded-r-full" />}
 
               {/* Left Column: Avatar with Action Badge */}
               <div className="relative shrink-0 pt-0.5">
-                <Link
-                  href={`/@${n.actor?.username || "student"}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <Link href={`/@${n.actor?.username || "student"}`} onClick={(e) => e.stopPropagation()}>
                   <Avatar className="size-10 rounded-full border border-border/50 hover:opacity-90 transition-opacity">
                     <AvatarImage src={actorAvatar || ""} />
                     <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
@@ -398,13 +369,9 @@ export function NotificationsClient({
                     {n.actor?.displayName || "A Student"}
                   </Link>
 
-                  {isVerified && (
-                    <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
-                  )}
+                  {isVerified && <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />}
 
-                  <span className="text-muted-foreground font-medium">
-                    @{n.actor?.username || "student"}
-                  </span>
+                  <span className="text-muted-foreground font-medium">@{n.actor?.username || "student"}</span>
 
                   {campusName && (
                     <>
@@ -423,9 +390,7 @@ export function NotificationsClient({
                 </div>
 
                 {/* Action Descriptor */}
-                <p className="text-[13px] text-foreground/90 font-medium leading-snug">
-                  {meta.actionText}
-                </p>
+                <p className="text-[13px] text-foreground/90 font-medium leading-snug">{meta.actionText}</p>
 
                 {/* Quoted Snippet Box */}
                 {n.previewText && (
@@ -487,27 +452,27 @@ export function NotificationsClient({
                 {activeTab === "all"
                   ? "All caught up!"
                   : activeTab === "mentions"
-                  ? "No mentions yet"
-                  : activeTab === "replies"
-                  ? "No replies yet"
-                  : activeTab === "reactions"
-                  ? "No reactions yet"
-                  : activeTab === "crushes"
-                  ? "No crushes or matches yet"
-                  : "No verified notifications"}
+                    ? "No mentions yet"
+                    : activeTab === "replies"
+                      ? "No replies yet"
+                      : activeTab === "reactions"
+                        ? "No reactions yet"
+                        : activeTab === "crushes"
+                          ? "No crushes or matches yet"
+                          : "No verified notifications"}
               </h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {activeTab === "all"
                   ? "When students like your posts, tag you in discussions, or match with you on campus, you will see it here."
                   : activeTab === "mentions"
-                  ? "When fellow campus classmates tag your @handle in threads or confessions, you will find them here."
-                  : activeTab === "replies"
-                  ? "Replies to your campus questions and discussion threads will show up here."
-                  : activeTab === "reactions"
-                  ? "Upvotes, hearts, reposts, and story reactions will be recorded here."
-                  : activeTab === "crushes"
-                  ? "Crush alerts and match connections from Campus Match will be securely delivered here."
-                  : "Notifications from verified students and college leaders with 150+ LP will appear here."}
+                    ? "When fellow campus classmates tag your @handle in threads or confessions, you will find them here."
+                    : activeTab === "replies"
+                      ? "Replies to your campus questions and discussion threads will show up here."
+                      : activeTab === "reactions"
+                        ? "Upvotes, hearts, reposts, and story reactions will be recorded here."
+                        : activeTab === "crushes"
+                          ? "Crush alerts and match connections from Campus Match will be securely delivered here."
+                          : "Notifications from verified students and college leaders with 150+ LP will appear here."}
               </p>
             </div>
 
@@ -532,15 +497,15 @@ export function NotificationsClient({
           pendingClear === "read"
             ? "Clear read notifications?"
             : activeTab === "all"
-            ? "Delete all notifications?"
-            : "Delete all in this tab?"
+              ? "Delete all notifications?"
+              : "Delete all in this tab?"
         }
         description={
           pendingClear === "read"
             ? "Notifications you have already read will be permanently removed. Unread ones stay put."
             : activeTab === "all"
-            ? "This permanently removes every notification in your inbox. This cannot be undone."
-            : "This permanently removes every notification in the current filter. This cannot be undone."
+              ? "This permanently removes every notification in your inbox. This cannot be undone."
+              : "This permanently removes every notification in the current filter. This cannot be undone."
         }
         confirmText={pendingClear === "read" ? "Clear read" : "Delete all"}
         onConfirm={() => handleClear(pendingClear ?? "all")}
@@ -548,7 +513,6 @@ export function NotificationsClient({
           if (!isClearing) setPendingClear(null);
         }}
       />
-
     </main>
   );
 }

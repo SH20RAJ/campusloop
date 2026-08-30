@@ -1,20 +1,13 @@
 "use client";
 
+import { Bike, Calendar, CalendarCheck2, Clock, Gauge, Plus } from "lucide-react";
+import Link from "next/link";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-Bike,
-Calendar,
-CalendarCheck2,
-Clock,
-Gauge,
-Plus
-} from "lucide-react";
-import Link from "next/link";
-import useSWR from "swr";
 
 export function MerchantBikeDashboardClient() {
   const { data, isLoading } = useSWR<{
@@ -138,7 +131,8 @@ export function MerchantBikeDashboardClient() {
                     Student: {b.student?.displayName} (@{b.student?.username}) · Phone: {b.customerPhone}
                   </p>
                   <p className="text-[11px] text-muted-foreground">
-                    Time: {new Date(b.startAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} → {new Date(b.endAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    Time: {new Date(b.startAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}{" "}
+                    → {new Date(b.endAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </p>
                 </div>
 
@@ -176,9 +170,7 @@ export function MerchantBikeDashboardClient() {
 
       {/* ─── Quick Actions (PRD Item 7) ─── */}
       <section className="space-y-3">
-        <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-          Quick Actions
-        </h2>
+        <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Quick Actions</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Link
@@ -206,9 +198,7 @@ export function MerchantBikeDashboardClient() {
           >
             <CalendarCheck2 className="size-5 text-emerald-500" />
             <p className="text-sm font-bold text-foreground">Bookings Pipeline</p>
-            <p className="text-[11px] text-muted-foreground">
-              Approve requests &amp; process returns
-            </p>
+            <p className="text-[11px] text-muted-foreground">Approve requests &amp; process returns</p>
           </Link>
 
           <Link
@@ -221,9 +211,7 @@ export function MerchantBikeDashboardClient() {
           >
             <Clock className="size-5 text-amber-500" />
             <p className="text-sm font-bold text-foreground">Availability Calendar</p>
-            <p className="text-[11px] text-muted-foreground">
-              Block time slots &amp; maintenance
-            </p>
+            <p className="text-[11px] text-muted-foreground">Block time slots &amp; maintenance</p>
           </Link>
         </div>
       </section>

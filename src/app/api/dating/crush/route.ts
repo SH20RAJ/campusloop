@@ -1,3 +1,5 @@
+import { and, count, eq, gte } from "drizzle-orm";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
 import {
   conversationParticipants,
@@ -9,8 +11,6 @@ import {
   userProfiles,
 } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and, count, eq, gte } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
 
 const MAX_ACTIVE_SLOTS = 5;
 const MAX_ATTEMPTS_7_DAYS = 5;
@@ -57,10 +57,7 @@ export async function GET() {
       .select({ count: count() })
       .from(secretCrushAttempts)
       .where(
-        and(
-          eq(secretCrushAttempts.senderId, profile.id),
-          gte(secretCrushAttempts.createdAt, sevenDaysAgo)
-        )
+        and(eq(secretCrushAttempts.senderId, profile.id), gte(secretCrushAttempts.createdAt, sevenDaysAgo))
       );
 
     const attemptsUsed = Number(attemptsCountRow?.count || 0);
@@ -141,7 +138,9 @@ export async function POST(req: NextRequest) {
     const activeCount = Number(activeCountRow?.count || 0);
     if (activeCount >= MAX_ACTIVE_SLOTS) {
       return NextResponse.json(
-        { error: `You have filled all ${MAX_ACTIVE_SLOTS} active Secret Crush slots. Remove one to free up an active slot.` },
+        {
+          error: `You have filled all ${MAX_ACTIVE_SLOTS} active Secret Crush slots. Remove one to free up an active slot.`,
+        },
         { status: 400 }
       );
     }
@@ -152,10 +151,7 @@ export async function POST(req: NextRequest) {
       .select({ count: count() })
       .from(secretCrushAttempts)
       .where(
-        and(
-          eq(secretCrushAttempts.senderId, profile.id),
-          gte(secretCrushAttempts.createdAt, sevenDaysAgo)
-        )
+        and(eq(secretCrushAttempts.senderId, profile.id), gte(secretCrushAttempts.createdAt, sevenDaysAgo))
       );
 
     const attemptsInLast7Days = Number(attemptsCountRow?.count || 0);
@@ -170,10 +166,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Check if currently active crush on this person
     const existingActive = await db.query.secretCrushes.findFirst({
-      where: and(
-        eq(secretCrushes.senderId, profile.id),
-        eq(secretCrushes.targetId, targetId)
-      ),
+      where: and(eq(secretCrushes.senderId, profile.id), eq(secretCrushes.targetId, targetId)),
     });
 
     if (existingActive) {
@@ -204,10 +197,7 @@ export async function POST(req: NextRequest) {
 
     // 5. Check if target already has an active secret crush on sender (Mutual Match!)
     const reverseCrush = await db.query.secretCrushes.findFirst({
-      where: and(
-        eq(secretCrushes.senderId, targetId),
-        eq(secretCrushes.targetId, profile.id)
-      ),
+      where: and(eq(secretCrushes.senderId, targetId), eq(secretCrushes.targetId, profile.id)),
     });
 
     const isMutualMatch = !!reverseCrush;
@@ -313,7 +303,8 @@ export async function POST(req: NextRequest) {
       actorId: profile.id,
       type: "CRUSH_ALERT",
       referenceId: "/app/crush",
-      previewText: "Someone from your campus added you to their Secret Crush vault! 🔒 Add your crushes to see if it's mutual.",
+      previewText:
+        "Someone from your campus added you to their Secret Crush vault! 🔒 Add your crushes to see if it's mutual.",
     });
 
     return NextResponse.json({
@@ -361,21 +352,11 @@ export async function DELETE(req: NextRequest) {
     if (crushId) {
       await db
         .delete(secretCrushes)
-        .where(
-          and(
-            eq(secretCrushes.id, crushId),
-            eq(secretCrushes.senderId, profile.id)
-          )
-        );
+        .where(and(eq(secretCrushes.id, crushId), eq(secretCrushes.senderId, profile.id)));
     } else if (targetId) {
       await db
         .delete(secretCrushes)
-        .where(
-          and(
-            eq(secretCrushes.senderId, profile.id),
-            eq(secretCrushes.targetId, targetId)
-          )
-        );
+        .where(and(eq(secretCrushes.senderId, profile.id), eq(secretCrushes.targetId, targetId)));
     }
 
     return NextResponse.json({ success: true });

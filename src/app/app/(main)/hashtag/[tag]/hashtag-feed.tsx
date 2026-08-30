@@ -1,12 +1,12 @@
 "use client";
 
+import { ArrowLeft, Hash, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FeedCard } from "@/components/ui/feed-card";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
 import { useFeed } from "@/hooks/use-feed";
-import { ArrowLeft,Hash,TrendingUp } from "lucide-react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useEffect,useState } from "react";
 
 export default function HashtagFeed() {
   const params = useParams();
@@ -54,7 +54,8 @@ export default function HashtagFeed() {
           </Link>
           <div className="min-w-0">
             <h1 className="text-base font-black text-foreground flex items-center gap-1.5 truncate">
-              <span className="text-primary">#</span>{tag}
+              <span className="text-primary">#</span>
+              {tag}
             </h1>
             <p className="text-[10px] text-muted-foreground font-semibold flex items-center gap-1">
               <TrendingUp className="size-3 text-rose-500" /> Campus Discussion Topic

@@ -1,9 +1,9 @@
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { merchants, merchantUsers, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getAuthenticatedMerchant } from "@/lib/merchant-auth";
-import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +28,7 @@ export async function GET() {
       });
 
       if (profile) {
-        let merchantUser = await db.query.merchantUsers.findFirst({
+        const merchantUser = await db.query.merchantUsers.findFirst({
           where: eq(merchantUsers.userId, profile.id),
           with: { merchant: true },
         });

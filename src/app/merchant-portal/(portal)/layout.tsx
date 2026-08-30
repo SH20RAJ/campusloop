@@ -1,7 +1,7 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getAuthenticatedMerchant } from "@/lib/merchant-auth";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
-import { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { MerchantLayoutClient } from "../merchant-layout-client";
 
 export const metadata: Metadata = {
@@ -10,11 +10,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function MerchantPortalLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function MerchantPortalLayout({ children }: { children: React.ReactNode }) {
   // 1. Try direct merchant session cookie
   const directMerchant = await getAuthenticatedMerchant();
   if (directMerchant) {

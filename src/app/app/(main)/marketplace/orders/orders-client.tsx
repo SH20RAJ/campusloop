@@ -1,20 +1,15 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo } from "@/lib/utils";
-import {
-ArrowLeft,
-ChevronRight,
-Package,
-Store
-} from "lucide-react";
+import { ArrowLeft, ChevronRight, Package, Store } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo } from "@/lib/utils";
 
 const TABS = [
   { id: "all", label: "All Orders" },
@@ -48,9 +43,7 @@ export function OrdersClient() {
             <ArrowLeft className="size-4.5" />
           </button>
           <div>
-            <h1 className="text-base font-black text-foreground tracking-tight leading-none">
-              My Orders
-            </h1>
+            <h1 className="text-base font-black text-foreground tracking-tight leading-none">My Orders</h1>
             <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
               Campus marketplace order history &amp; active tracking
             </p>
@@ -120,9 +113,7 @@ export function OrdersClient() {
                     <h3 className="text-sm font-black text-foreground group-hover:underline truncate">
                       {order.merchant?.name}
                     </h3>
-                    <span className="text-[10px] font-bold text-muted-foreground">
-                      #{order.orderNumber}
-                    </span>
+                    <span className="text-[10px] font-bold text-muted-foreground">#{order.orderNumber}</span>
                   </div>
 
                   <p className="text-xs text-muted-foreground line-clamp-1">
@@ -132,9 +123,7 @@ export function OrdersClient() {
                   </p>
 
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground pt-0.5">
-                    <span className="font-black text-foreground">
-                      ₹{order.total.toLocaleString("en-IN")}
-                    </span>
+                    <span className="font-black text-foreground">₹{order.total.toLocaleString("en-IN")}</span>
                     <span>·</span>
                     <span>{formatTimeAgo(order.createdAt)}</span>
                   </div>
@@ -149,8 +138,8 @@ export function OrdersClient() {
                     order.status === "DELIVERED" || order.status === "PICKED_UP"
                       ? "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
                       : order.status === "REJECTED" || order.status === "CANCELLED"
-                      ? "bg-rose-500/15 text-rose-500 border-rose-500/30"
-                      : "bg-amber-500/15 text-amber-500 border-amber-500/30 animate-pulse"
+                        ? "bg-rose-500/15 text-rose-500 border-rose-500/30"
+                        : "bg-amber-500/15 text-amber-500 border-amber-500/30 animate-pulse"
                   )}
                 >
                   {order.status.replace("_", " ")}

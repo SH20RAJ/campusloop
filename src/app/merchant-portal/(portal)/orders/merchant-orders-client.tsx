@@ -1,19 +1,14 @@
 "use client";
 
+import { CheckCircle2, MapPin, Package, Phone } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo } from "@/lib/utils";
-import {
-CheckCircle2,
-MapPin,
-Package,
-Phone
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
+import { cn, formatTimeAgo } from "@/lib/utils";
 
 const PIPELINE_TABS = [
   { id: "new", label: "New Orders" },
@@ -106,9 +101,7 @@ export function MerchantOrdersClient() {
               {/* Order Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/30 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-sm font-black text-foreground">
-                    #{order.orderNumber}
-                  </span>
+                  <span className="text-sm font-black text-foreground">#{order.orderNumber}</span>
                   <span className="text-xs text-muted-foreground font-medium">
                     · {formatTimeAgo(order.createdAt)}
                   </span>
@@ -118,9 +111,7 @@ export function MerchantOrdersClient() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-muted-foreground">
-                    {order.paymentMethod}
-                  </span>
+                  <span className="text-xs font-bold text-muted-foreground">{order.paymentMethod}</span>
                   <span className="text-base font-black text-emerald-500">
                     ₹{order.total.toLocaleString("en-IN")}
                   </span>
@@ -134,9 +125,7 @@ export function MerchantOrdersClient() {
                     <span>
                       {item.quantity} × {item.productNameSnapshot}
                     </span>
-                    <span className="text-muted-foreground font-bold">
-                      ₹{item.subtotal}
-                    </span>
+                    <span className="text-muted-foreground font-bold">₹{item.subtotal}</span>
                   </div>
                 ))}
               </div>
@@ -158,9 +147,7 @@ export function MerchantOrdersClient() {
                       <span>Customer: {order.deliveryAddress.phone}</span>
                     </p>
                   )}
-                  {order.customerNote && (
-                    <p className="italic">Note: "{order.customerNote}"</p>
-                  )}
+                  {order.customerNote && <p className="italic">Note: "{order.customerNote}"</p>}
                 </div>
               )}
 

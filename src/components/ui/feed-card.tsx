@@ -1,23 +1,23 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import { Heart, Repeat2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
 import { FeedCardActions } from "@/components/feed/feed-card-actions";
 import { FeedCardHeader } from "@/components/feed/feed-card-header";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
 import { PostLikesModal } from "@/components/post/post-likes-modal";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RichText } from "@/components/ui/rich-text";
-import { FeedPost } from "@/hooks/use-feed";
-import { repostPost,voteOnPost } from "@/lib/api";
+import type { FeedPost } from "@/hooks/use-feed";
+import { repostPost, voteOnPost } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { getAvatarUrl } from "@/lib/utils";
-import { AnimatePresence,motion } from "framer-motion";
-import { Heart,Repeat2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect,useRef,useState } from "react";
-import { toast } from "sonner";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
 import { ShareStoryModal } from "./share-story-modal";
@@ -27,7 +27,6 @@ interface FeedCardProps {
   currentUserId?: string;
   disableNavigation?: boolean;
 }
-
 
 export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardProps) {
   const router = useRouter();
@@ -55,7 +54,9 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
   const avatarFallback = post.isAnonymous ? "🙈" : (post.author?.displayName?.[0] ?? "S");
-  const avatarUrl = post.isAnonymous ? "" : getAvatarUrl(post.author?.avatarUrl, post.author?.username ?? "student");
+  const avatarUrl = post.isAnonymous
+    ? ""
+    : getAvatarUrl(post.author?.avatarUrl, post.author?.username ?? "student");
 
   async function handleVote() {
     if (isLoading) return;
@@ -115,7 +116,10 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   async function handleSharePost() {
     sounds.tap();
     haptics.success();
-    const postUrl = typeof window !== "undefined" ? `${window.location.origin}/app/post/${post.id}` : `https://campusloop.space/app/post/${post.id}`;
+    const postUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/app/post/${post.id}`
+        : `https://campusloop.space/app/post/${post.id}`;
     if (typeof window !== "undefined" && navigator.share) {
       try {
         await navigator.share({
@@ -173,7 +177,6 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
             </motion.div>
           </div>
         )}
-
       </AnimatePresence>
 
       {/* Repost Banner Header */}
@@ -189,10 +192,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
         {/* Left Column: Author Avatar */}
         <div className="shrink-0 pt-0.5">
           {!post.isAnonymous ? (
-            <Link
-              href={`/@${authorHandle}`}
-              onClick={(e) => e.stopPropagation()}
-            >
+            <Link href={`/@${authorHandle}`} onClick={(e) => e.stopPropagation()}>
               <Avatar className="size-10 rounded-full border border-border/40 hover:opacity-90 transition-opacity">
                 <AvatarImage src={avatarUrl || ""} />
                 <AvatarFallback className="font-bold text-xs bg-muted text-foreground">
@@ -228,20 +228,20 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
             <RichText content={post.body} />
           </div>
 
-
           {/* Embedded Original Quoted Post */}
           {post.repostOf && (
-            <Link
-              href={`/app/post/${post.repostOf.id}`}
-              onClick={(e) => e.stopPropagation()}
-            >
+            <Link href={`/app/post/${post.repostOf.id}`} onClick={(e) => e.stopPropagation()}>
               <div className="mt-2.5 rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors p-3 text-xs space-y-1">
                 <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
-                  <span className="font-bold text-foreground">@{post.repostOf.author?.username || "student"}</span>
+                  <span className="font-bold text-foreground">
+                    @{post.repostOf.author?.username || "student"}
+                  </span>
                   {post.repostOf.institution?.name && (
                     <>
                       <span>·</span>
-                      <span className="truncate text-[11px]">{post.repostOf.institution.name.split(",")[0]}</span>
+                      <span className="truncate text-[11px]">
+                        {post.repostOf.institution.name.split(",")[0]}
+                      </span>
                     </>
                   )}
                 </div>
@@ -300,7 +300,6 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
 
       {/* Fast Instagram-Style Comments Modal */}
       <FastCommentsModal
-
         post={post}
         isOpen={showCommentsModal}
         onClose={() => setShowCommentsModal(false)}
@@ -318,11 +317,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
         originalPostAuthorHandle={authorHandle}
       />
 
-      <ReportDialog
-        postId={post.id}
-        isOpen={showReport}
-        onClose={() => setShowReport(false)}
-      />
+      <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
 
       <ShareStoryModal
         post={post}

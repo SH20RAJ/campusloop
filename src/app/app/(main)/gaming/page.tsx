@@ -1,7 +1,7 @@
-import { DedicatedHubClient } from "@/components/communities/dedicated-hub-client";
-import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { DedicatedHubClient } from "@/components/communities/dedicated-hub-client";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
   title: "Gaming Arena | Campus Esports | CampusLoop",

@@ -1,5 +1,5 @@
-import { clearMerchantSessionCookie } from "@/lib/merchant-auth";
 import { NextResponse } from "next/server";
+import { clearMerchantSessionCookie } from "@/lib/merchant-auth";
 
 export const dynamic = "force-dynamic";
 

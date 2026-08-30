@@ -1,9 +1,9 @@
-import { getDb } from "@/db";
-import { notifications,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,sql } from "drizzle-orm";
-import { Metadata } from "next";
+import { and, desc, eq, sql } from "drizzle-orm";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getDb } from "@/db";
+import { notifications, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 import { NotificationsClient } from "./notifications-client";
 
 export const dynamic = "force-dynamic";
@@ -88,10 +88,5 @@ export default async function NotificationsPage() {
     console.error("NotificationsPage server query error:", error);
   }
 
-  return (
-    <NotificationsClient
-      initialNotifications={sanitized}
-      initialUnreadCount={unreadCount}
-    />
-  );
+  return <NotificationsClient initialNotifications={sanitized} initialUnreadCount={unreadCount} />;
 }

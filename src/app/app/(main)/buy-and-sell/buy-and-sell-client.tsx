@@ -1,31 +1,31 @@
 "use client";
 
+import {
+  ArrowLeft,
+  Bike,
+  BookOpen,
+  CheckCircle2,
+  Compass,
+  Home,
+  Laptop,
+  Loader2,
+  Plus,
+  Search,
+  ShoppingBag,
+  Tag,
+  Wind,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import useSWRInfinite from "swr/infinite";
 import { MarketplaceCard } from "@/components/communities/marketplace-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-ArrowLeft,
-Bike,
-BookOpen,
-CheckCircle2,
-Compass,
-Home,
-Laptop,
-Loader2,
-Plus,
-Search,
-ShoppingBag,
-Tag,
-Wind,
-X
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect,useMemo,useRef,useState } from "react";
-import useSWRInfinite from "swr/infinite";
 
 interface BuyAndSellClientProps {
   profileId: string;
@@ -69,10 +69,13 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
     return `/api/communities/feed?tab=buy-and-sell&cursor=${encodeURIComponent(cursor)}&limit=15`;
   };
 
-  const { data, size, setSize, isLoading, isValidating, mutate } =
-    useSWRInfinite<FeedPageResponse>(getKey, fetcher, {
+  const { data, size, setSize, isLoading, isValidating, mutate } = useSWRInfinite<FeedPageResponse>(
+    getKey,
+    fetcher,
+    {
       dedupingInterval: 15000,
-    });
+    }
+  );
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -121,7 +124,9 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
         const matchesDesc = item.description?.toLowerCase().includes(q);
         const matchesLocation = item.hostelLocation?.toLowerCase().includes(q);
         const matchesCategory = item.category?.toLowerCase().includes(q);
-        const matchesSeller = item.seller?.displayName?.toLowerCase().includes(q) || item.seller?.username?.toLowerCase().includes(q);
+        const matchesSeller =
+          item.seller?.displayName?.toLowerCase().includes(q) ||
+          item.seller?.username?.toLowerCase().includes(q);
         if (!matchesTitle && !matchesDesc && !matchesLocation && !matchesCategory && !matchesSeller) {
           return false;
         }
@@ -131,9 +136,8 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
     });
   }, [marketplaceListings, selectedCategory, selectedPriceFilter, hideSold, searchQuery]);
 
-  const hasMore = data && data[data.length - 1]?.hasMore;
-  const isLoadingMore =
-    isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+  const hasMore = data?.[data.length - 1]?.hasMore;
+  const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
 
   // Infinite Scroll Trigger
   useEffect(() => {

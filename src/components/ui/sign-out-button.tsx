@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { useUser } from "@hexclave/next";
-import { Loader2,LogOut } from "lucide-react";
+import { Loader2, LogOut } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface SignOutButtonProps {
   className?: string;
@@ -29,7 +29,6 @@ export function SignOutButton({
     setIsSigningOut(true);
     window.location.href = "/logout";
   }
-
 
   if (variant === "icon") {
     return (

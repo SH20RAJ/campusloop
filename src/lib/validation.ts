@@ -36,7 +36,7 @@ export function validateDisplayName(name: string | null | undefined): Validation
   }
 
   // Disallow invalid characters (only letters, spaces, hyphens, dots, apostrophes allowed)
-  const validNameRegex = /^[\p{L}\s'\.\-]+$/u;
+  const validNameRegex = /^[\p{L}\s'.-]+$/u;
   if (!validNameRegex.test(trimmed)) {
     return {
       isValid: false,
@@ -45,7 +45,7 @@ export function validateDisplayName(name: string | null | undefined): Validation
   }
 
   // Reject consecutive special characters or spaces (e.g. "John...Doe", "A   B")
-  if (/\s{2,}|[\.\-']{2,}/.test(trimmed)) {
+  if (/\s{2,}|[.\-']{2,}/.test(trimmed)) {
     return { isValid: false, error: "Name contains repetitive formatting or spaces." };
   }
 

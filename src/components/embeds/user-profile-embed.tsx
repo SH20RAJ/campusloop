@@ -1,14 +1,14 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { fetcher } from "@/lib/api";
-import { getAvatarUrl } from "@/lib/utils";
 import { Check, School, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { fetcher } from "@/lib/api";
+import { getAvatarUrl } from "@/lib/utils";
 
 interface UserProfileEmbedProps {
   username: string;
@@ -94,9 +94,7 @@ export function UserProfileEmbed({ username }: UserProfileEmbedProps) {
         <div className="flex items-center gap-3 min-w-0">
           <Avatar className="size-11 shrink-0 border border-border/50">
             <AvatarImage src={avatar} alt={profile.displayName} />
-            <AvatarFallback className="font-bold text-xs">
-              {profile.displayName[0]}
-            </AvatarFallback>
+            <AvatarFallback className="font-bold text-xs">{profile.displayName[0]}</AvatarFallback>
           </Avatar>
 
           <div className="min-w-0">
@@ -116,9 +114,7 @@ export function UserProfileEmbed({ username }: UserProfileEmbedProps) {
                 {profile.branch && <span>· {profile.branch}</span>}
               </p>
             ) : profile.bio ? (
-              <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
-                {profile.bio}
-              </p>
+              <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">{profile.bio}</p>
             ) : null}
           </div>
         </div>

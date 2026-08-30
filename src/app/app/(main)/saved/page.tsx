@@ -15,8 +15,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://campusloop.space/app/saved" },
   openGraph: {
     title: "Saved Posts & Bookmarks Vault | CampusLoop",
-    description:
-      "Your private archive of saved campus posts, hostel insights, and placement realities.",
+    description: "Your private archive of saved campus posts, hostel insights, and placement realities.",
     url: "https://campusloop.space/app/saved",
     siteName: "CampusLoop",
     locale: "en_IN",
@@ -33,8 +32,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Saved Posts & Bookmarks Vault | CampusLoop",
-    description:
-      "Your private archive of saved campus posts, hostel insights, and placement realities.",
+    description: "Your private archive of saved campus posts, hostel insights, and placement realities.",
     images: ["https://campusloop.space/og-image.png"],
   },
   robots: { index: false, follow: false },

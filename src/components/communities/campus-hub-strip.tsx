@@ -1,19 +1,19 @@
 "use client";
 
+import {
+  ArrowUpRight,
+  BookOpen,
+  Car,
+  Compass,
+  Gamepad2,
+  Home,
+  PackageSearch,
+  ShoppingBag,
+} from "lucide-react";
+import Link from "next/link";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-ArrowUpRight,
-BookOpen,
-Car,
-Compass,
-Gamepad2,
-Home,
-PackageSearch,
-ShoppingBag,
-} from "lucide-react";
-import Link from "next/link";
 
 export type HubTabType =
   | "all"
@@ -119,14 +119,10 @@ export function CampusHubStrip({ activeTab }: CampusHubStripProps) {
           <div className="size-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
             <Compass className="size-3.5" />
           </div>
-          <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
-            Campus Utility Hubs
-          </h2>
+          <h2 className="text-xs font-black uppercase tracking-wider text-foreground">Campus Utility Hubs</h2>
           <span className="size-1.5 rounded-full bg-primary animate-pulse" />
         </div>
-        <span className="text-[11px] font-bold text-muted-foreground">
-          6 Dedicated Services
-        </span>
+        <span className="text-[11px] font-bold text-muted-foreground">6 Dedicated Services</span>
       </div>
 
       {/* Spacious 2-Column Mobile / 3-Column Tablet Grid */}

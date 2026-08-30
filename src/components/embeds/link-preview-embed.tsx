@@ -1,8 +1,8 @@
 "use client";
 
-import { fetcher } from "@/lib/api";
 import { ExternalLink, Globe } from "lucide-react";
 import useSWR from "swr";
+import { fetcher } from "@/lib/api";
 
 interface LinkPreviewEmbedProps {
   url: string;
@@ -18,11 +18,10 @@ interface OgData {
 }
 
 export function LinkPreviewEmbed({ url }: LinkPreviewEmbedProps) {
-  const { data, isLoading } = useSWR<OgData>(
-    `/api/embed/preview?url=${encodeURIComponent(url)}`,
-    fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 86400000 }
-  );
+  const { data, isLoading } = useSWR<OgData>(`/api/embed/preview?url=${encodeURIComponent(url)}`, fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 86400000,
+  });
 
   if (isLoading) {
     return (
@@ -94,9 +93,7 @@ export function LinkPreviewEmbed({ url }: LinkPreviewEmbedProps) {
         )}
 
         {data.description && (
-          <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
-            {data.description}
-          </p>
+          <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">{data.description}</p>
         )}
       </div>
     </a>

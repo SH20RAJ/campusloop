@@ -1,8 +1,8 @@
+import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { sendEmail } from "@/lib/email";
 import { buildNotificationEmail } from "@/lib/email-templates";
-import { eq } from "drizzle-orm";
 import type { CreateNotificationParams } from "./notifications";
 
 /**

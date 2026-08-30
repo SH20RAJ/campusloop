@@ -1,19 +1,12 @@
 "use client";
 
-import { Card,CardContent } from "@/components/ui/card";
+import { CheckCircle2, Eye, Hourglass, Lock, Unlock, Wand2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import {
-CheckCircle2,
-Eye,
-Hourglass,
-Lock,
-Unlock,
-Wand2,
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 import { Reveal } from "./reveal";
 
 export function TimeCapsuleShowcase() {
@@ -52,7 +45,8 @@ export function TimeCapsuleShowcase() {
             Campus Time Capsule &amp; Batch Legacy Vault
           </h2>
           <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
-            Bury predictions, hostel confessions, and convocation letters to your future selves. Everything is cryptographically locked until graduation day or landmark college dates.
+            Bury predictions, hostel confessions, and convocation letters to your future selves. Everything is
+            cryptographically locked until graduation day or landmark college dates.
           </p>
         </Reveal>
 
@@ -65,11 +59,10 @@ export function TimeCapsuleShowcase() {
                   <Lock className="size-4" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-sm font-bold text-foreground">
-                    1. Sealed Until Convocation
-                  </h4>
+                  <h4 className="text-sm font-bold text-foreground">1. Sealed Until Convocation</h4>
                   <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
-                    Contribute photos, voice notes, and predictions. No one on campus — not even moderators — can read them until the countdown timer expires.
+                    Contribute photos, voice notes, and predictions. No one on campus — not even moderators —
+                    can read them until the countdown timer expires.
                   </p>
                 </div>
               </div>
@@ -79,11 +72,10 @@ export function TimeCapsuleShowcase() {
                   <Wand2 className="size-4" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-sm font-bold text-foreground">
-                    2. Wild Campus Predictions
-                  </h4>
+                  <h4 className="text-sm font-bold text-foreground">2. Wild Campus Predictions</h4>
                   <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
-                    &ldquo;Who in our batch will start a unicorn?&rdquo;, &ldquo;Will the 2 AM canteen Maggi price ever drop?&rdquo;, &ldquo;Who will marry first?&rdquo;
+                    &ldquo;Who in our batch will start a unicorn?&rdquo;, &ldquo;Will the 2 AM canteen Maggi
+                    price ever drop?&rdquo;, &ldquo;Who will marry first?&rdquo;
                   </p>
                 </div>
               </div>
@@ -93,11 +85,10 @@ export function TimeCapsuleShowcase() {
                   <Unlock className="size-4" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-sm font-bold text-foreground">
-                    3. Unlocked Museum Timeline Wall
-                  </h4>
+                  <h4 className="text-sm font-bold text-foreground">3. Unlocked Museum Timeline Wall</h4>
                   <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
-                    When the timer strikes zero, the vault erupts in an interactive campus museum wall for the entire graduating class to celebrate.
+                    When the timer strikes zero, the vault erupts in an interactive campus museum wall for the
+                    entire graduating class to celebrate.
                   </p>
                 </div>
               </div>
@@ -174,17 +165,23 @@ export function TimeCapsuleShowcase() {
                     <div className="flex items-center gap-1.5 font-mono text-xs font-bold shrink-0 self-start sm:self-auto">
                       <div className="bg-background/80 border border-border/40 px-2 py-1 rounded-lg text-center min-w-[40px]">
                         <span className="text-sm font-black text-foreground">280</span>
-                        <span className="block text-[8px] text-muted-foreground font-sans uppercase">Days</span>
+                        <span className="block text-[8px] text-muted-foreground font-sans uppercase">
+                          Days
+                        </span>
                       </div>
                       <span className="font-black text-muted-foreground">:</span>
                       <div className="bg-background/80 border border-border/40 px-2 py-1 rounded-lg text-center min-w-[40px]">
                         <span className="text-sm font-black text-foreground">14</span>
-                        <span className="block text-[8px] text-muted-foreground font-sans uppercase">Hrs</span>
+                        <span className="block text-[8px] text-muted-foreground font-sans uppercase">
+                          Hrs
+                        </span>
                       </div>
                       <span className="font-black text-muted-foreground">:</span>
                       <div className="bg-background/80 border border-border/40 px-2 py-1 rounded-lg text-center min-w-[40px]">
                         <span className="text-sm font-black text-foreground">32</span>
-                        <span className="block text-[8px] text-muted-foreground font-sans uppercase">Min</span>
+                        <span className="block text-[8px] text-muted-foreground font-sans uppercase">
+                          Min
+                        </span>
                       </div>
                     </div>
                   ) : (
@@ -198,7 +195,8 @@ export function TimeCapsuleShowcase() {
                   <div className="space-y-3 w-full min-w-0">
                     <div className="flex items-center justify-between text-xs min-w-0">
                       <span className="font-bold text-muted-foreground truncate">
-                        <strong className="text-foreground font-black">{buriedCount}</strong> Memories &amp; Predictions Buried
+                        <strong className="text-foreground font-black">{buriedCount}</strong> Memories &amp;
+                        Predictions Buried
                       </span>
                       {hasBuried && (
                         <span className="text-amber-500 font-bold text-[11px] flex items-center gap-1 shrink-0 ml-2">
@@ -235,7 +233,8 @@ export function TimeCapsuleShowcase() {
                         <span className="text-muted-foreground shrink-0 ml-2">Batch Letter</span>
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed break-words">
-                        &ldquo;Remember that 2:00 AM Maggi session at Hostel 11 when our project failed 4 times. Hope we all stayed close.&rdquo;
+                        &ldquo;Remember that 2:00 AM Maggi session at Hostel 11 when our project failed 4
+                        times. Hope we all stayed close.&rdquo;
                       </p>
                     </div>
                     <div className="p-3 rounded-xl bg-muted/20 border border-border/30 space-y-1 w-full min-w-0">
@@ -244,7 +243,8 @@ export function TimeCapsuleShowcase() {
                         <span className="text-muted-foreground shrink-0 ml-2">Prediction Made 2025</span>
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed break-words">
-                        &ldquo;Prediction: In 2027, Ayush will move to Bangalore for fintech and I will still be debugging React hooks in production.&rdquo;
+                        &ldquo;Prediction: In 2027, Ayush will move to Bangalore for fintech and I will still
+                        be debugging React hooks in production.&rdquo;
                       </p>
                     </div>
                   </div>

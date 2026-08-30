@@ -1,21 +1,21 @@
 "use client";
 
+import {
+  BarChart3,
+  ChevronDown,
+  Clock,
+  FileText,
+  Heart,
+  Lock,
+  MessageCircle,
+  MessageSquare,
+  School,
+  ShieldAlert,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import { Reveal } from "@/components/landing/reveal";
 import { NumberTicker } from "@/components/ui/number-ticker";
-import {
-BarChart3,
-ChevronDown,
-Clock,
-FileText,
-Heart,
-Lock,
-MessageCircle,
-MessageSquare,
-School,
-ShieldAlert,
-ShieldCheck,
-Users,
-} from "lucide-react";
 
 // ──────── Section 1: Stats & Numbers ────────
 
@@ -51,9 +51,7 @@ export function StatsSection() {
     <section className="border-t border-border/60 bg-muted/10">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
         <Reveal className="mx-auto mb-12 max-w-xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            The numbers
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">The numbers</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
             Growing faster than your semester backlog.
           </h2>
@@ -71,9 +69,7 @@ export function StatsSection() {
                   <NumberTicker value={stat.value} delay={0.2 + i * 0.1} />
                   <span className="text-primary">{stat.suffix}</span>
                 </p>
-                <p className="mt-1 text-xs font-medium text-muted-foreground">
-                  {stat.label}
-                </p>
+                <p className="mt-1 text-xs font-medium text-muted-foreground">{stat.label}</p>
               </div>
             </Reveal>
           ))}
@@ -126,9 +122,7 @@ export function IntegrationsSection() {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Campus Survival Kit
           </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-            Everything a student needs.
-          </h2>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Everything a student needs.</h2>
         </Reveal>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -140,12 +134,8 @@ export function IntegrationsSection() {
                     <feature.icon className="size-4.5" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-heading text-sm font-semibold">
-                      {feature.title}
-                    </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {feature.desc}
-                    </p>
+                    <h3 className="font-heading text-sm font-semibold">{feature.title}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{feature.desc}</p>
                   </div>
                 </div>
               </div>
@@ -215,21 +205,15 @@ export function TestimonialsSection() {
           {TESTIMONIALS.map((t, i) => (
             <Reveal key={t.name} delay={i * 0.05}>
               <div className="rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-border/80">
-                <div className="mb-2 text-2xl leading-none font-serif text-muted-foreground/30">
-                  &ldquo;
-                </div>
-                <p className="mb-4 text-xs leading-relaxed text-foreground/90 font-medium">
-                  {t.quote}
-                </p>
+                <div className="mb-2 text-2xl leading-none font-serif text-muted-foreground/30">&ldquo;</div>
+                <p className="mb-4 text-xs leading-relaxed text-foreground/90 font-medium">{t.quote}</p>
                 <div className="flex items-center gap-2.5 border-t border-border/40 pt-3">
                   <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
                     {t.initials}
                   </div>
                   <div>
                     <p className="text-xs font-bold text-foreground">{t.name}</p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {t.role}
-                    </p>
+                    <p className="text-[10px] text-muted-foreground">{t.role}</p>
                   </div>
                 </div>
               </div>
@@ -275,9 +259,7 @@ export function SafetySection() {
     <section className="border-t border-border/60 bg-background">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
         <Reveal className="mx-auto mb-12 max-w-xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Safety First
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Safety First</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
             Speak freely without your HOD finding out.
           </h2>
@@ -296,17 +278,13 @@ export function SafetySection() {
                   </div>
                   <div className="min-w-0">
                     <div className="mb-1 flex items-center gap-2">
-                      <h3 className="font-heading text-sm font-bold text-foreground">
-                        {item.title}
-                      </h3>
+                      <h3 className="font-heading text-sm font-bold text-foreground">{item.title}</h3>
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[9px] font-semibold text-emerald-500">
                         <span className="size-1.5 rounded-full bg-emerald-500" />
                         {item.status}
                       </span>
                     </div>
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      {item.desc}
-                    </p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
                   </div>
                 </div>
               </div>
@@ -352,12 +330,8 @@ export function FAQSection() {
     <section className="border-t border-border/60 bg-muted/10">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
         <Reveal className="mx-auto mb-12 max-w-xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Quick Answers
-          </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-            Frequently Asked Questions.
-          </h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Quick Answers</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Frequently Asked Questions.</h2>
         </Reveal>
 
         <div className="mx-auto max-w-2xl space-y-3">
@@ -370,13 +344,7 @@ export function FAQSection() {
   );
 }
 
-function FAQItem({
-  faq,
-  index,
-}: {
-  faq: (typeof FAQS)[number];
-  index: number;
-}) {
+function FAQItem({ faq, index }: { faq: (typeof FAQS)[number]; index: number }) {
   return (
     <Reveal delay={index * 0.04}>
       <details className="group rounded-xl border border-border bg-card transition-all duration-200 [&[open]]:border-primary/30">
@@ -385,9 +353,7 @@ function FAQItem({
           <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
         </summary>
         <div className="border-t border-border/40 px-5 pb-4 pt-3">
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {faq.a}
-          </p>
+          <p className="text-xs leading-relaxed text-muted-foreground">{faq.a}</p>
         </div>
       </details>
     </Reveal>
@@ -424,9 +390,7 @@ export function HowItWorksSection() {
     <section className="border-t border-border/60 bg-background">
       <div className="mx-auto w-full max-w-6xl px-6 py-20">
         <Reveal className="mx-auto mb-12 max-w-xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            How It Works
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">How It Works</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
             Four steps to your campus loop.
           </h2>
@@ -439,12 +403,8 @@ export function HowItWorksSection() {
                 <span className="mb-3 flex size-8 items-center justify-center rounded-md text-xs font-bold bg-primary/10 text-primary border border-primary/20">
                   {step.step}
                 </span>
-                <h3 className="mb-1 font-heading text-sm font-bold text-foreground">
-                  {step.title}
-                </h3>
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {step.desc}
-                </p>
+                <h3 className="mb-1 font-heading text-sm font-bold text-foreground">{step.title}</h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">{step.desc}</p>
               </div>
             </Reveal>
           ))}

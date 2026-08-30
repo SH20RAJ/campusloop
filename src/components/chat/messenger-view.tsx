@@ -1,31 +1,27 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { PresenceDot } from "@/components/ui/presence-dot";
-import { UserProfile } from "@/db/schema";
 import {
-CachedConversation,
-getCachedConversations,
-setCachedConversations,
-} from "@/lib/chat-cache";
-import { cn } from "@/lib/utils";
-import {
-Archive,
-BellOff,
-CheckCheck,
-Loader2,
-MessageSquare,
-MoreVertical,
-Pin,
-Plus,
-Search,
-ShieldCheck,
-Users2,
+  Archive,
+  BellOff,
+  CheckCheck,
+  Loader2,
+  MessageSquare,
+  MoreVertical,
+  Pin,
+  Plus,
+  Search,
+  ShieldCheck,
+  Users2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback,useEffect,useMemo,useRef,useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PresenceDot } from "@/components/ui/presence-dot";
+import type { UserProfile } from "@/db/schema";
+import { type CachedConversation, getCachedConversations, setCachedConversations } from "@/lib/chat-cache";
+import { cn } from "@/lib/utils";
 import { ConversationActionModal } from "./conversation-action-modal";
 import { MessengerPane } from "./messenger-pane";
 
@@ -100,18 +96,18 @@ export function MessengerView({
   const initialCache = getCachedConversations();
 
   // SWR for conversations list (polls every 2.5s for real-time WhatsApp inbox sync)
-  const { data: conversations, isLoading: isLoadingConvs, mutate: mutateConvs } = useSWR<CachedConversation[]>(
-    "/api/chat",
-    fetcher,
-    {
-      fallbackData: initialCache || undefined,
-      refreshInterval: 2500,
-      revalidateOnFocus: true,
-      onSuccess: (data) => {
-        if (data) setCachedConversations(data);
-      },
-    }
-  );
+  const {
+    data: conversations,
+    isLoading: isLoadingConvs,
+    mutate: mutateConvs,
+  } = useSWR<CachedConversation[]>("/api/chat", fetcher, {
+    fallbackData: initialCache || undefined,
+    refreshInterval: 2500,
+    revalidateOnFocus: true,
+    onSuccess: (data) => {
+      if (data) setCachedConversations(data);
+    },
+  });
 
   // Auto-select first conversation on desktop if visiting /app/chat root
   useEffect(() => {
@@ -139,6 +135,13 @@ export function MessengerView({
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
+  const handleSelectConversation = useCallback((convId: string) => {
+    setActiveConversationId(convId);
+    if (typeof window !== "undefined") {
+      window.history.pushState(null, "", `/app/chat/${convId}`);
+    }
+  }, []);
+
   // Auto-start or select conversation if targetUserId was provided via URL query
   useEffect(() => {
     if (!initialTargetUserId || !conversations) return;
@@ -149,17 +152,7 @@ export function MessengerView({
     } else {
       startConversation(initialTargetUserId);
     }
-  }, [initialTargetUserId, conversations]);
-
-  const handleSelectConversation = useCallback(
-    (convId: string) => {
-      setActiveConversationId(convId);
-      if (typeof window !== "undefined") {
-        window.history.pushState(null, "", `/app/chat/${convId}`);
-      }
-    },
-    []
-  );
+  }, [initialTargetUserId, conversations, startConversation, handleSelectConversation]);
 
   const handleBackToInbox = useCallback(() => {
     setActiveConversationId(null);
@@ -333,9 +326,10 @@ export function MessengerView({
               )}
             >
               <span>Unread</span>
-              {conversations && conversations.filter((c) => (c.unreadCount || 0) > 0 && !c.isArchived).length > 0 && (
-                <span className="size-1.5 rounded-full bg-amber-400" />
-              )}
+              {conversations &&
+                conversations.filter((c) => (c.unreadCount || 0) > 0 && !c.isArchived).length > 0 && (
+                  <span className="size-1.5 rounded-full bg-amber-400" />
+                )}
             </button>
             <button
               type="button"
@@ -440,132 +434,133 @@ export function MessengerView({
               </div>
             ) : (
               filteredConversations.map((conv) => {
-              const other = conv.otherParticipant;
-              if (!other) return null;
+                const other = conv.otherParticipant;
+                if (!other) return null;
 
-              const isSelected = conv.id === activeConversationId;
-              const unread = conv.unreadCount || 0;
-              const isLastMe = conv.lastMessage?.senderId === currentUserId;
+                const isSelected = conv.id === activeConversationId;
+                const unread = conv.unreadCount || 0;
+                const isLastMe = conv.lastMessage?.senderId === currentUserId;
 
-              return (
-                <div
-                  key={conv.id}
-                  onTouchStart={() => handleTouchStart(conv)}
-                  onTouchEnd={handleTouchEnd}
-                  onTouchMove={handleTouchMove}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    setActionConv(conv);
-                    setShowActionModal(true);
-                  }}
-                  onClick={() => {
-                    if (isLongPressRef.current) {
-                      isLongPressRef.current = false;
-                      return;
-                    }
-                    handleSelectConversation(conv.id);
-                  }}
-                  className={cn(
-                    "flex items-center gap-3 p-3 rounded-2xl transition-all cursor-pointer group border-l-3 relative",
-                    isSelected
-                      ? "bg-muted/90 dark:bg-muted/50 border-primary shadow-2xs"
-                      : "border-transparent hover:bg-muted/40"
-                  )}
-                >
-                  {/* Avatar with Online presence indicator */}
-                  <div className="relative shrink-0">
-                    <Avatar className="size-11 border border-border/40 shadow-2xs">
-                      <AvatarImage src={other.avatarUrl || ""} />
-                      <AvatarFallback className="text-xs font-black bg-primary/10 text-primary">
-                        {(other.displayName?.[0] || "S").toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <PresenceDot lastSeenAt={other.lastSeenAt} />
-                  </div>
-
-                  {/* Body & Snippet */}
-                  <div className="min-w-0 flex-1 space-y-0.5">
-                    <div className="flex items-center justify-between gap-1">
-                      <div
-                        className={cn(
-                          "text-xs truncate flex items-center gap-1 min-w-0",
-                          isSelected ? "font-black text-foreground" : "font-bold text-foreground"
-                        )}
-                      >
-                        <span className="truncate">{other.displayName}</span>
-                        {other.points && other.points >= 150 && (
-                          <ShieldCheck className="size-3 text-[#1d9bf0] shrink-0" />
-                        )}
-                        {conv.isPinned && (
-                          <span title="Pinned chat">
-                            <Pin className="size-2.5 text-amber-500 shrink-0 fill-amber-500" />
-                          </span>
-                        )}
-                        {conv.isMuted && (
-                          <span title="Muted chat">
-                            <BellOff className="size-2.5 text-muted-foreground shrink-0" />
-                          </span>
-                        )}
-                      </div>
-                      {conv.lastMessage && (
-                        <span
-                          className={cn(
-                            "text-[10px] font-semibold shrink-0",
-                            unread > 0 ? "text-primary font-bold" : "text-muted-foreground"
-                          )}
-                        >
-                          {formatRelativeTime(conv.lastMessage.createdAt)}
-                        </span>
-                      )}
+                return (
+                  <div
+                    key={conv.id}
+                    onTouchStart={() => handleTouchStart(conv)}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchMove={handleTouchMove}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setActionConv(conv);
+                      setShowActionModal(true);
+                    }}
+                    onClick={() => {
+                      if (isLongPressRef.current) {
+                        isLongPressRef.current = false;
+                        return;
+                      }
+                      handleSelectConversation(conv.id);
+                    }}
+                    className={cn(
+                      "flex items-center gap-3 p-3 rounded-2xl transition-all cursor-pointer group border-l-3 relative",
+                      isSelected
+                        ? "bg-muted/90 dark:bg-muted/50 border-primary shadow-2xs"
+                        : "border-transparent hover:bg-muted/40"
+                    )}
+                  >
+                    {/* Avatar with Online presence indicator */}
+                    <div className="relative shrink-0">
+                      <Avatar className="size-11 border border-border/40 shadow-2xs">
+                        <AvatarImage src={other.avatarUrl || ""} />
+                        <AvatarFallback className="text-xs font-black bg-primary/10 text-primary">
+                          {(other.displayName?.[0] || "S").toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <PresenceDot lastSeenAt={other.lastSeenAt} />
                     </div>
 
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1 min-w-0 flex-1">
-                        {/* WhatsApp Seen Tick Indicator on last message */}
-                        {isLastMe && conv.lastMessage && (
-                          conv.lastMessage.readAt ? (
-                            <CheckCheck className="size-3.5 text-sky-400 shrink-0" />
-                          ) : (
-                            <CheckCheck className="size-3.5 text-muted-foreground shrink-0" />
-                          )
-                        )}
-                        <p
+                    {/* Body & Snippet */}
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="flex items-center justify-between gap-1">
+                        <div
                           className={cn(
-                            "text-[11px] truncate leading-tight",
-                            unread > 0 ? "text-foreground font-bold" : "text-muted-foreground font-medium"
+                            "text-xs truncate flex items-center gap-1 min-w-0",
+                            isSelected ? "font-black text-foreground" : "font-bold text-foreground"
                           )}
                         >
-                          {conv.lastMessage?.body || "Start a campus chat..."}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-1 shrink-0">
-                        {/* CampusLoop Primary Unread Badge */}
-                        {unread > 0 && (
-                          <span className="size-5 rounded-full bg-primary text-primary-foreground text-[10px] font-black flex items-center justify-center shrink-0 shadow-2xs animate-in zoom-in-75">
-                            {unread}
+                          <span className="truncate">{other.displayName}</span>
+                          {other.points && other.points >= 150 && (
+                            <ShieldCheck className="size-3 text-[#1d9bf0] shrink-0" />
+                          )}
+                          {conv.isPinned && (
+                            <span title="Pinned chat">
+                              <Pin className="size-2.5 text-amber-500 shrink-0 fill-amber-500" />
+                            </span>
+                          )}
+                          {conv.isMuted && (
+                            <span title="Muted chat">
+                              <BellOff className="size-2.5 text-muted-foreground shrink-0" />
+                            </span>
+                          )}
+                        </div>
+                        {conv.lastMessage && (
+                          <span
+                            className={cn(
+                              "text-[10px] font-semibold shrink-0",
+                              unread > 0 ? "text-primary font-bold" : "text-muted-foreground"
+                            )}
+                          >
+                            {formatRelativeTime(conv.lastMessage.createdAt)}
                           </span>
                         )}
+                      </div>
 
-                        {/* 3-Dots Action Button for PC/Desktop */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActionConv(conv);
-                            setShowActionModal(true);
-                          }}
-                          className="size-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 flex items-center justify-center transition-all opacity-80 sm:opacity-0 group-hover:opacity-100 cursor-pointer"
-                          title="Chat options"
-                        >
-                          <MoreVertical className="size-3.5" />
-                        </button>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1 min-w-0 flex-1">
+                          {/* WhatsApp Seen Tick Indicator on last message */}
+                          {isLastMe &&
+                            conv.lastMessage &&
+                            (conv.lastMessage.readAt ? (
+                              <CheckCheck className="size-3.5 text-sky-400 shrink-0" />
+                            ) : (
+                              <CheckCheck className="size-3.5 text-muted-foreground shrink-0" />
+                            ))}
+                          <p
+                            className={cn(
+                              "text-[11px] truncate leading-tight",
+                              unread > 0 ? "text-foreground font-bold" : "text-muted-foreground font-medium"
+                            )}
+                          >
+                            {conv.lastMessage?.body || "Start a campus chat..."}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          {/* CampusLoop Primary Unread Badge */}
+                          {unread > 0 && (
+                            <span className="size-5 rounded-full bg-primary text-primary-foreground text-[10px] font-black flex items-center justify-center shrink-0 shadow-2xs animate-in zoom-in-75">
+                              {unread}
+                            </span>
+                          )}
+
+                          {/* 3-Dots Action Button for PC/Desktop */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActionConv(conv);
+                              setShowActionModal(true);
+                            }}
+                            className="size-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 flex items-center justify-center transition-all opacity-80 sm:opacity-0 group-hover:opacity-100 cursor-pointer"
+                            title="Chat options"
+                          >
+                            <MoreVertical className="size-3.5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            }))}
+                );
+              })
+            )}
 
             {filteredConversations.length === 0 && (
               <div className="py-16 text-center space-y-3 px-4">

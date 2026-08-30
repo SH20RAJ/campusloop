@@ -1,24 +1,24 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { AcademicResource } from "@/db/schema";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo,getAvatarUrl } from "@/lib/utils";
 import {
-ArrowUp,
-BookOpen,
-CheckCircle,
-Download,
-ExternalLink,
-Eye,
-GraduationCap,
-Share2,
-ShieldCheck
+  ArrowUp,
+  BookOpen,
+  CheckCircle,
+  Download,
+  ExternalLink,
+  Eye,
+  GraduationCap,
+  Share2,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { AcademicResource } from "@/db/schema";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface AcademicCardProps {
   item: AcademicResource & {
@@ -138,9 +138,7 @@ export function AcademicCard({ item, isHighlighted }: AcademicCardProps) {
               {(item.uploader.points || 0) >= 150 && (
                 <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
               )}
-              <span className="text-[11px] text-muted-foreground truncate">
-                @{item.uploader.username}
-              </span>
+              <span className="text-[11px] text-muted-foreground truncate">@{item.uploader.username}</span>
               <span className="text-[10px] text-muted-foreground/60">·</span>
               <span className="text-[11px] text-muted-foreground/80 shrink-0">
                 {formatTimeAgo(item.createdAt)}
@@ -180,14 +178,10 @@ export function AcademicCard({ item, isHighlighted }: AcademicCardProps) {
           </span>
         </div>
 
-        <h3 className="text-sm font-bold text-foreground leading-snug">
-          {item.title}
-        </h3>
+        <h3 className="text-sm font-bold text-foreground leading-snug">{item.title}</h3>
 
         {item.description && (
-          <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">
-            {item.description}
-          </p>
+          <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">{item.description}</p>
         )}
       </div>
 

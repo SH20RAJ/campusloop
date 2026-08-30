@@ -1,11 +1,11 @@
+import { and, eq, ne, notInArray, type SQL } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
 import { getDb } from "@/db";
-import { swipes,userProfiles } from "@/db/schema";
+import { swipes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { computeCompatibility,resolveGenderPreference } from "@/lib/dating";
-import { getViewerInstitutionId,rejectViewerWrite } from "@/lib/viewer";
-import { and,eq,ne,notInArray,type SQL } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { computeCompatibility, resolveGenderPreference } from "@/lib/dating";
+import { getViewerInstitutionId, rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -132,9 +132,7 @@ export async function GET(req: Request) {
     });
 
     if (sort === "RECENT") {
-      scoredCandidates.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      scoredCandidates.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } else if (sort === "POPULAR") {
       scoredCandidates.sort((a, b) => (b.points || 0) - (a.points || 0));
     } else {

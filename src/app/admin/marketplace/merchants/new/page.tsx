@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { AdminNewMerchantClient } from "./admin-new-merchant-client";
 
 export const metadata: Metadata = {

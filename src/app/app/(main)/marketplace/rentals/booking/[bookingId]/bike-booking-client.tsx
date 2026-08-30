@@ -1,21 +1,15 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo } from "@/lib/utils";
-import {
-ArrowLeft,
-CheckCircle2,
-MapPin,
-Phone,
-ShieldCheck
-} from "lucide-react";
+import { ArrowLeft, CheckCircle2, MapPin, Phone, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo } from "@/lib/utils";
 
 interface BikeBookingClientProps {
   bookingId: string;
@@ -90,9 +84,7 @@ export function BikeBookingClient({ bookingId }: BikeBookingClientProps) {
   }
 
   const isCancelled =
-    booking.status === "CANCELLED" ||
-    booking.status === "REJECTED" ||
-    booking.status === "DISPUTED";
+    booking.status === "CANCELLED" || booking.status === "REJECTED" || booking.status === "DISPUTED";
 
   const currentStepIndex = RENTAL_TIMELINE_STEPS.findIndex((s) => s.key === booking.status);
   const activeStepNum = currentStepIndex !== -1 ? currentStepIndex : 0;
@@ -152,8 +144,8 @@ export function BikeBookingClient({ bookingId }: BikeBookingClientProps) {
             isCancelled
               ? "bg-rose-500/10 border-rose-500/30 text-rose-500"
               : booking.status === "COMPLETED"
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
-              : "bg-card border-border/40 text-foreground"
+                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+                : "bg-card border-border/40 text-foreground"
           )}
         >
           <div className="flex items-center justify-between">
@@ -209,8 +201,8 @@ export function BikeBookingClient({ bookingId }: BikeBookingClientProps) {
                         isCurrent
                           ? "bg-emerald-500 text-black ring-4 ring-emerald-500/20 animate-pulse"
                           : isPassed
-                          ? "bg-emerald-500 text-black"
-                          : "bg-muted text-muted-foreground border border-border/50"
+                            ? "bg-emerald-500 text-black"
+                            : "bg-muted text-muted-foreground border border-border/50"
                       )}
                     >
                       {isPassed ? <CheckCircle2 className="size-3.5" /> : idx + 1}
@@ -223,15 +215,13 @@ export function BikeBookingClient({ bookingId }: BikeBookingClientProps) {
                           isCurrent
                             ? "text-foreground font-black"
                             : isPassed
-                            ? "text-foreground"
-                            : "text-muted-foreground"
+                              ? "text-foreground"
+                              : "text-muted-foreground"
                         )}
                       >
                         {step.label}
                       </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {step.desc}
-                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{step.desc}</p>
                     </div>
                   </div>
                 );
@@ -287,9 +277,7 @@ export function BikeBookingClient({ bookingId }: BikeBookingClientProps) {
 
           <div className="flex items-center justify-between text-muted-foreground">
             <span>Rental Amount</span>
-            <span className="text-foreground font-bold">
-              ₹{booking.rentalAmount.toLocaleString("en-IN")}
-            </span>
+            <span className="text-foreground font-bold">₹{booking.rentalAmount.toLocaleString("en-IN")}</span>
           </div>
 
           <div className="flex items-center justify-between text-muted-foreground">
@@ -304,9 +292,7 @@ export function BikeBookingClient({ bookingId }: BikeBookingClientProps) {
 
           <div className="pt-2 border-t border-border/30 flex items-center justify-between text-sm font-black text-foreground">
             <span>Total Paid / Payable</span>
-            <span className="text-base text-emerald-500">
-              ₹{booking.totalAmount.toLocaleString("en-IN")}
-            </span>
+            <span className="text-base text-emerald-500">₹{booking.totalAmount.toLocaleString("en-IN")}</span>
           </div>
 
           {/* Deposit Status Badge */}
@@ -318,8 +304,8 @@ export function BikeBookingClient({ bookingId }: BikeBookingClientProps) {
                 booking.depositRefundStatus === "REFUNDED"
                   ? "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
                   : booking.depositRefundStatus === "DISPUTED"
-                  ? "bg-rose-500/15 text-rose-500 border-rose-500/30"
-                  : "bg-blue-500/15 text-blue-400 border-blue-500/30"
+                    ? "bg-rose-500/15 text-rose-500 border-rose-500/30"
+                    : "bg-blue-500/15 text-blue-400 border-blue-500/30"
               )}
             >
               {booking.depositRefundStatus}

@@ -1,16 +1,15 @@
 "use client";
 
-import { DatingMatchModal } from "@/components/dating/dating-match-modal";
-import { SecretCrushModal } from "@/components/dating/secret-crush-modal";
-import { SwipeActions,SwipeDeck,type Candidate } from "@/components/dating/swipe-deck";
-import { useProfile } from "@/hooks/use-profile";
-import { fetcher } from "@/lib/api";
-import { ArrowLeft,Camera,Globe,Heart,Loader2,Lock,RotateCcw,SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, Camera, Globe, Heart, Loader2, Lock, RotateCcw, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
-
-import { useCallback,useEffect,useMemo,useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { DatingMatchModal } from "@/components/dating/dating-match-modal";
+import { SecretCrushModal } from "@/components/dating/secret-crush-modal";
+import { type Candidate, SwipeActions, SwipeDeck } from "@/components/dating/swipe-deck";
+import { useProfile } from "@/hooks/use-profile";
+import { fetcher } from "@/lib/api";
 
 type MatchResult = {
   matched: boolean;
@@ -35,16 +34,11 @@ export function DatingAppClient() {
   const [isSavingGender, setIsSavingGender] = useState(false);
 
   // Saved DB preferences drive the deck server-side — no params needed.
-  const { data, error, isLoading, mutate } = useSWR<ProfilesResponse>(
-    "/api/dating/profiles",
-    fetcher,
-    {
-      revalidateIfStale: true,
-      keepPreviousData: true,
-      dedupingInterval: 15000,
-    }
-  );
-
+  const { data, error, isLoading, mutate } = useSWR<ProfilesResponse>("/api/dating/profiles", fetcher, {
+    revalidateIfStale: true,
+    keepPreviousData: true,
+    dedupingInterval: 15000,
+  });
 
   const candidates = useMemo(() => data?.candidates ?? [], [data]);
   const remaining = useMemo(() => candidates.slice(deckIndex), [candidates, deckIndex]);
@@ -206,7 +200,6 @@ export function DatingAppClient() {
             <span className="hidden sm:inline">Crush Vault</span>
           </Link>
 
-
           <Link
             href="/app/dating/likes"
             aria-label="Likes you"
@@ -230,10 +223,7 @@ export function DatingAppClient() {
       </header>
 
       {/* Secret Crush Modal */}
-      <SecretCrushModal
-        isOpen={showSecretCrushModal}
-        onClose={() => setShowSecretCrushModal(false)}
-      />
+      <SecretCrushModal isOpen={showSecretCrushModal} onClose={() => setShowSecretCrushModal(false)} />
 
       {/* ─── Deck ─── */}
       <main className="flex min-h-0 flex-1 flex-col pb-[max(env(safe-area-inset-bottom),1rem)]">

@@ -1,4 +1,4 @@
-import { Compass,Home,Search } from "lucide-react";
+import { Compass, Home, Search } from "lucide-react";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -14,8 +14,8 @@ export default function NotFound() {
           This corner of campus doesn&apos;t exist
         </h1>
         <p className="mx-auto max-w-sm text-sm text-muted-foreground leading-relaxed">
-          The page may have been deleted, or the link might be wrong. The rest of CampusLoop is
-          still right here.
+          The page may have been deleted, or the link might be wrong. The rest of CampusLoop is still right
+          here.
         </p>
       </div>
 

@@ -1,26 +1,10 @@
 "use client";
 
-import { AnimateIcon } from "@/components/animate-ui/icons/icon";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { BrandLogo } from "@/components/ui/brand-logo";
-import { Button } from "@/components/ui/button";
-import { SignOutButton } from "@/components/ui/sign-out-button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { DESKTOP_NAV_ITEMS,MOBILE_BOTTOM_ITEMS } from "@/constants/navigation";
-import type { UserProfile } from "@/db/schema";
-import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
-import { AnimatePresence,motion } from "framer-motion";
-import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
-import { DreamCampusesModal } from "@/components/preview/dream-campuses-modal";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Bell,
-  Compass,
   GraduationCap,
   HelpCircle,
-  Lock,
   Menu,
   MessageSquare,
   MoreHorizontal,
@@ -34,6 +18,20 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AnimateIcon } from "@/components/animate-ui/icons/icon";
+import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
+import { DreamCampusesModal } from "@/components/preview/dream-campuses-modal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BrandLogo } from "@/components/ui/brand-logo";
+import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/ui/sign-out-button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { DESKTOP_NAV_ITEMS, MOBILE_BOTTOM_ITEMS } from "@/constants/navigation";
+import type { UserProfile } from "@/db/schema";
+import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 
 interface NavigationProps {
   profile?: UserProfile;
@@ -112,11 +110,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
               </button>
 
               <Link href="/app" className="flex items-center gap-2">
-                <img
-                  src="/logo.png"
-                  alt="CampusLoop"
-                  className="size-7 object-contain"
-                />
+                <img src="/logo.png" alt="CampusLoop" className="size-7 object-contain" />
                 <span className="text-sm font-black tracking-tight text-foreground">
                   Campus<span className="text-primary font-black">Loop</span>
                 </span>
@@ -166,8 +160,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
           <nav className="space-y-1">
             {desktopNavItems.map((item) => {
               const isActive =
-                pathname === item.href ||
-                (item.href !== "/app" && pathname.startsWith(item.href));
+                pathname === item.href || (item.href !== "/app" && pathname.startsWith(item.href));
               const Icon = item.icon;
               const isNotifications = item.href === "/app/notifications";
 
@@ -210,7 +203,6 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
               );
             })}
           </nav>
-
 
           {/* Post Action Button or Campus Preview Unlock */}
           {isViewer ? (
@@ -334,7 +326,6 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
             >
               Sign In
             </Link>
-
           </div>
         )}
       </aside>
@@ -347,8 +338,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
           <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/30 bg-background/90 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
             {MOBILE_BOTTOM_ITEMS.map((item) => {
               const isActive =
-                pathname === item.href ||
-                (item.href !== "/app" && pathname.startsWith(item.href));
+                pathname === item.href || (item.href !== "/app" && pathname.startsWith(item.href));
               const Icon = item.icon;
 
               if (item.href === "/app/post/new") {
@@ -393,9 +383,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     )}
                   </div>
                   <span className="mt-0.5 text-[9px] font-semibold">{item.label}</span>
-                  {isActive && (
-                    <div className="absolute bottom-1 size-1 rounded-full bg-primary" />
-                  )}
+                  {isActive && <div className="absolute bottom-1 size-1 rounded-full bg-primary" />}
                 </Link>
               );
             })}
@@ -429,10 +417,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 {/* User Header Info */}
                 <div className="space-y-3 pb-4 border-b border-border/30">
                   <div className="flex items-center justify-between">
-                    <Link
-                      href={profile ? "/app/profile" : "/join"}
-                      onClick={() => setShowMobileMenu(false)}
-                    >
+                    <Link href={profile ? "/app/profile" : "/join"} onClick={() => setShowMobileMenu(false)}>
                       <Avatar className="size-11 border border-border/50 shadow-xs">
                         <AvatarImage src={profile?.avatarUrl || ""} />
                         <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
@@ -474,8 +459,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   {desktopNavItems.map((item) => {
                     const Icon = item.icon;
                     const isActive =
-                      pathname === item.href ||
-                      (item.href !== "/app" && pathname.startsWith(item.href));
+                      pathname === item.href || (item.href !== "/app" && pathname.startsWith(item.href));
 
                     return (
                       <Link
@@ -553,7 +537,6 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   >
                     Sign In
                   </Link>
-
                 )}
               </div>
             </motion.aside>
@@ -562,14 +545,8 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
       </AnimatePresence>
 
       {/* Campus Preview Modals */}
-      <CampusUnlockedModal
-        isOpen={showUnlockModal}
-        onClose={() => setShowUnlockModal(false)}
-      />
-      <DreamCampusesModal
-        isOpen={showDreamModal}
-        onClose={() => setShowDreamModal(false)}
-      />
+      <CampusUnlockedModal isOpen={showUnlockModal} onClose={() => setShowUnlockModal(false)} />
+      <DreamCampusesModal isOpen={showDreamModal} onClose={() => setShowDreamModal(false)} />
     </>
   );
 }

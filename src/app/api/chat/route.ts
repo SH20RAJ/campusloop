@@ -1,9 +1,9 @@
+import { desc, eq, inArray } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { conversationParticipants,conversations,messages,userProfiles } from "@/db/schema";
+import { conversationParticipants, conversations, messages, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { desc,eq,inArray } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +28,7 @@ export async function GET() {
       where: eq(conversationParticipants.userId, profile.id),
     });
 
-    const conversationIds = userParticipations.map(p => p.conversationId);
+    const conversationIds = userParticipations.map((p) => p.conversationId);
 
     if (conversationIds.length === 0) {
       return NextResponse.json([]);
@@ -85,9 +85,7 @@ export async function GET() {
 
         const lastMessage = validMessages[0] || null;
 
-        const unreadCount = validMessages.filter(
-          (m) => m.senderId !== profile.id && !m.readAt
-        ).length;
+        const unreadCount = validMessages.filter((m) => m.senderId !== profile.id && !m.readAt).length;
 
         return {
           id: conv.id,
@@ -120,8 +118,12 @@ export async function GET() {
       if (a.isPinned !== b.isPinned) {
         return (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0);
       }
-      const dateA = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : new Date(a.createdAt).getTime();
-      const dateB = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : new Date(b.createdAt).getTime();
+      const dateA = a.lastMessage
+        ? new Date(a.lastMessage.createdAt).getTime()
+        : new Date(a.createdAt).getTime();
+      const dateB = b.lastMessage
+        ? new Date(b.lastMessage.createdAt).getTime()
+        : new Date(b.createdAt).getTime();
       return dateB - dateA;
     });
 
@@ -181,7 +183,9 @@ export async function POST(req: Request) {
       where: eq(conversationParticipants.userId, targetUserId),
     });
 
-    const commonConv = myConvs.find(mc => targetConvs.some(tc => tc.conversationId === mc.conversationId));
+    const commonConv = myConvs.find((mc) =>
+      targetConvs.some((tc) => tc.conversationId === mc.conversationId)
+    );
 
     let conversationId = commonConv?.conversationId;
 
@@ -198,7 +202,7 @@ export async function POST(req: Request) {
     }
 
     // If message content was passed (e.g. story reply), insert message directly
-    if (messageContent && messageContent.trim()) {
+    if (messageContent?.trim()) {
       await db.insert(messages).values({
         conversationId,
         senderId: profile.id,

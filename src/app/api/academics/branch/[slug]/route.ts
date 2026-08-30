@@ -1,16 +1,13 @@
+import { and, desc, eq, ilike, or, type SQL, sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { findBranchBySlug } from "@/constants";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,ilike,or,sql,type SQL } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
     const { searchParams } = new URL(req.url);

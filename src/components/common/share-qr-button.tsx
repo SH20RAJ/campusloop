@@ -1,10 +1,10 @@
 "use client";
 
+import { QrCode, Share2 } from "lucide-react";
+import { useState } from "react";
 import { BrandedQrModal, type BrandedQrModalProps } from "@/components/common/branded-qr-modal";
 import { haptics } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
-import { QrCode, Share2 } from "lucide-react";
-import { useState } from "react";
 
 /**
  * Drop-in QR share trigger, so any surface (profile, event, article, community,
@@ -39,9 +39,7 @@ export function ShareQrButton({
         }}
         className={cn(
           "flex cursor-pointer items-center justify-center gap-1.5 border border-border/60 bg-card text-foreground transition-all hover:bg-muted active:scale-95",
-          variant === "icon"
-            ? "size-9 rounded-full"
-            : "h-9 rounded-full px-4 text-xs font-bold",
+          variant === "icon" ? "size-9 rounded-full" : "h-9 rounded-full px-4 text-xs font-bold",
           className
         )}
       >

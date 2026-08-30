@@ -1,15 +1,6 @@
 "use client";
 
-import {
-ArrowUpRight,
-Car,
-Code,
-Music,
-Plus,
-Rocket,
-Users,
-Zap,
-} from "lucide-react";
+import { ArrowUpRight, Car, Code, Music, Plus, Rocket, Users, Zap } from "lucide-react";
 import Link from "next/link";
 
 interface CollegeClubsViewProps {
@@ -69,7 +60,8 @@ const BIT_MESRA_CLUBS = [
     icon: Music,
     color: "from-pink-500/20 to-rose-500/20 text-pink-500 border-pink-500/30",
     members: 160,
-    description: "The creative heartbeat of BIT Mesra leading stage plays and BITOTSAV headline performances.",
+    description:
+      "The creative heartbeat of BIT Mesra leading stage plays and BITOTSAV headline performances.",
     tag: "BITOTSAV",
   },
 ];
@@ -123,9 +115,7 @@ export function CollegeClubsView({ collegeName }: CollegeClubsViewProps) {
                   </span>
                 </div>
 
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  {club.description}
-                </p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">{club.description}</p>
 
                 <div className="pt-0.5 flex items-center justify-between text-[10px] font-bold text-primary">
                   <span>#{club.tag}</span>

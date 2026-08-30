@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { MapPin, School, Trophy } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export interface CollegeItem {
   id: string;

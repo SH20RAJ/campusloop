@@ -1,15 +1,15 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import type { Institution,UserProfile } from "@/db/schema";
-import { fetcher } from "@/lib/api";
-import { cn } from "@/lib/utils";
 import { MoreHorizontal, RotateCw, Search, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { Institution, UserProfile } from "@/db/schema";
+import { fetcher } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 type SuggestedPeer = UserProfile & { institution?: Institution | null };
 
@@ -33,11 +33,10 @@ export function RightSidebar() {
   const [isRefreshingPeers, setIsRefreshingPeers] = useState(false);
 
   // Dynamic live trends from real database
-  const { data: trendsData } = useSWR<TrendsResponse>(
-    "/api/trends?scope=CAMPUS",
-    fetcher,
-    { revalidateIfStale: true, dedupingInterval: 15000 }
-  );
+  const { data: trendsData } = useSWR<TrendsResponse>("/api/trends?scope=CAMPUS", fetcher, {
+    revalidateIfStale: true,
+    dedupingInterval: 15000,
+  });
 
   // Suggested peers from real database (excludes already followed users)
   const { data: suggestedPeers, mutate: mutateSuggested } = useSWR<SuggestedPeer[]>(
@@ -105,9 +104,7 @@ export function RightSidebar() {
       {trends.length > 0 && (
         <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-1">
           <div className="px-1 pb-1">
-            <h3 className="text-[17px] font-black tracking-tight text-foreground">
-              What&apos;s happening
-            </h3>
+            <h3 className="text-[17px] font-black tracking-tight text-foreground">What&apos;s happening</h3>
           </div>
 
           <div className="divide-y divide-border/20">
@@ -118,15 +115,11 @@ export function RightSidebar() {
                 className="flex items-start justify-between px-2 py-2.5 hover:bg-muted/30 rounded-xl transition-colors group cursor-pointer"
               >
                 <div className="space-y-0.5 min-w-0 flex-1">
-                  <p className="text-[11px] text-muted-foreground font-medium truncate">
-                    {trend.category}
-                  </p>
+                  <p className="text-[11px] text-muted-foreground font-medium truncate">{trend.category}</p>
                   <p className="text-[14px] font-bold text-foreground group-hover:underline truncate">
                     {trend.topic}
                   </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {trend.formattedCount}
-                  </p>
+                  <p className="text-[11px] text-muted-foreground">{trend.formattedCount}</p>
                 </div>
                 <MoreHorizontal className="size-4 text-muted-foreground/50 group-hover:text-foreground shrink-0 mt-1" />
               </Link>
@@ -146,9 +139,7 @@ export function RightSidebar() {
       {peers.length > 0 && (
         <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-1">
           <div className="px-1 pb-1 flex items-center justify-between">
-            <h3 className="text-[17px] font-black tracking-tight text-foreground">
-              Who to follow
-            </h3>
+            <h3 className="text-[17px] font-black tracking-tight text-foreground">Who to follow</h3>
             <button
               type="button"
               onClick={handleRefreshPeers}
@@ -156,7 +147,12 @@ export function RightSidebar() {
               title="Shuffle suggestions"
               className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer active:scale-95"
             >
-              <RotateCw className={cn("size-3.5 transition-transform", isRefreshingPeers && "animate-spin text-primary")} />
+              <RotateCw
+                className={cn(
+                  "size-3.5 transition-transform",
+                  isRefreshingPeers && "animate-spin text-primary"
+                )}
+              />
             </button>
           </div>
 
@@ -182,13 +178,9 @@ export function RightSidebar() {
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-black text-foreground truncate group-hover:underline flex items-center gap-1">
                         <span>{peer.displayName}</span>
-                        {peer.points >= 150 && (
-                          <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
-                        )}
+                        {peer.points >= 150 && <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />}
                       </p>
-                      <p className="text-[11px] text-muted-foreground truncate">
-                        @{peer.username}
-                      </p>
+                      <p className="text-[11px] text-muted-foreground truncate">@{peer.username}</p>
                     </div>
                   </Link>
 
@@ -220,16 +212,23 @@ export function RightSidebar() {
 
       <hr className="border-border/30 my-3" />
 
-
       {/* ─── Twitter Minimal Footer ─── */}
       <footer className="px-3 pt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground/60 leading-relaxed">
-        <Link href="/terms" className="hover:underline">Terms of Service</Link>
+        <Link href="/terms" className="hover:underline">
+          Terms of Service
+        </Link>
         <span>·</span>
-        <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+        <Link href="/privacy" className="hover:underline">
+          Privacy Policy
+        </Link>
         <span>·</span>
-        <Link href="/safety" className="hover:underline">Safety</Link>
+        <Link href="/safety" className="hover:underline">
+          Safety
+        </Link>
         <span>·</span>
-        <Link href="/about" className="hover:underline">About</Link>
+        <Link href="/about" className="hover:underline">
+          About
+        </Link>
         <span>·</span>
         <span>© {new Date().getFullYear()} CampusLoop</span>
       </footer>

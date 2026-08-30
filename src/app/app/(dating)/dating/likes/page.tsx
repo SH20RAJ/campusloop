@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { LikesClient } from "./likes-client";
 
 export const metadata: Metadata = {

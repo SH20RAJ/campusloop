@@ -1,16 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import {
-Check,
-Flame,
-Share2,
-Swords,
-Trophy,
-} from "lucide-react";
+import { Check, Flame, Share2, Swords, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface CompetitorCollege {
   id: string;
@@ -33,10 +27,7 @@ interface CollegeInterBattleProps {
   relatedColleges: CompetitorCollege[];
 }
 
-export function CollegeInterBattle({
-  currentCollege,
-  relatedColleges,
-}: CollegeInterBattleProps) {
+export function CollegeInterBattle({ currentCollege, relatedColleges }: CollegeInterBattleProps) {
   const [copied, setCopied] = useState(false);
 
   // Combine and sort all colleges in state by points
@@ -82,7 +73,8 @@ export function CollegeInterBattle({
               {currentCollege.state || "State"} Inter-College Leaderboard
             </h2>
             <p className="text-xs text-muted-foreground">
-              Colleges compete weekly based on verified student engagement, discussion threads, and invite velocity.
+              Colleges compete weekly based on verified student engagement, discussion threads, and invite
+              velocity.
             </p>
           </div>
 
@@ -134,11 +126,7 @@ export function CollegeInterBattle({
 
         <div className="space-y-2">
           {allColleges.map((college, idx) => (
-            <Link
-              key={college.id}
-              href={`/college/${college.slug || college.id}`}
-              className="block"
-            >
+            <Link key={college.id} href={`/college/${college.slug || college.id}`} className="block">
               <div
                 className={cn(
                   "p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 cursor-pointer",
@@ -154,10 +142,10 @@ export function CollegeInterBattle({
                       idx === 0
                         ? "bg-amber-400 text-amber-950 font-black"
                         : idx === 1
-                        ? "bg-slate-300 text-slate-900"
-                        : idx === 2
-                        ? "bg-amber-700 text-white"
-                        : "bg-muted text-muted-foreground"
+                          ? "bg-slate-300 text-slate-900"
+                          : idx === 2
+                            ? "bg-amber-700 text-white"
+                            : "bg-muted text-muted-foreground"
                     )}
                   >
                     #{idx + 1}
@@ -180,7 +168,8 @@ export function CollegeInterBattle({
 
                 <div className="text-right shrink-0">
                   <span className="text-xs font-black text-foreground">
-                    {college.points.toLocaleString()} <span className="text-[10px] font-bold text-muted-foreground">LP</span>
+                    {college.points.toLocaleString()}{" "}
+                    <span className="text-[10px] font-bold text-muted-foreground">LP</span>
                   </span>
                   <p className="text-[9px] font-bold text-emerald-500">+150 this week</p>
                 </div>

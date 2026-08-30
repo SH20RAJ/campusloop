@@ -1,9 +1,9 @@
+import { and, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { stories,storyLikes,userProfiles } from "@/db/schema";
+import { stories, storyLikes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { and,eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -40,10 +40,7 @@ export async function POST(req: Request, { params }: RouteParams) {
     }
 
     const existingLike = await db.query.storyLikes.findFirst({
-      where: and(
-        eq(storyLikes.storyId, id),
-        eq(storyLikes.userId, profile.id)
-      ),
+      where: and(eq(storyLikes.storyId, id), eq(storyLikes.userId, profile.id)),
     });
 
     let liked = false;

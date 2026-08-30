@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { DatingAppClient } from "./dating-app-client";
 
 export const metadata: Metadata = {
@@ -38,7 +38,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 export default function DatingPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -46,17 +45,13 @@ export default function DatingPage() {
     name: "CampusLoop Campus Match",
     url: "https://campusloop.space/app/dating",
     applicationCategory: "SocialNetworkingApplication",
-    description:
-      "Verified student matchmaking deck with campus filters and instant messaging.",
+    description: "Verified student matchmaking deck with campus filters and instant messaging.",
     offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <DatingAppClient />
     </>
   );

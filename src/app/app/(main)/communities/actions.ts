@@ -1,10 +1,10 @@
 "use server";
 
-import { getDb } from "@/db";
-import { communities,communityMembers,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and,eq,sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getDb } from "@/db";
+import { communities, communityMembers, userProfiles } from "@/db/schema";
+import { hexclaveServerApp } from "@/hexclave/server";
 
 export interface CreateCommunityInput {
   name: string;
@@ -172,22 +172,14 @@ export async function joinCommunity(communityId: string) {
 
   // Check if already a member or requested
   const existing = await db.query.communityMembers.findFirst({
-    where: and(
-      eq(communityMembers.communityId, communityId),
-      eq(communityMembers.userId, profile.id)
-    ),
+    where: and(eq(communityMembers.communityId, communityId), eq(communityMembers.userId, profile.id)),
   });
 
   if (existing) {
     // Leave community / cancel request
     await db
       .delete(communityMembers)
-      .where(
-        and(
-          eq(communityMembers.communityId, communityId),
-          eq(communityMembers.userId, profile.id)
-        )
-      );
+      .where(and(eq(communityMembers.communityId, communityId), eq(communityMembers.userId, profile.id)));
 
     revalidatePath(`/app/communities/${communityId}`);
     revalidatePath("/app/communities");
@@ -249,12 +241,7 @@ export async function approveJoinRequest(communityId: string, targetUserId: stri
   await db
     .update(communityMembers)
     .set({ status: "ACTIVE" })
-    .where(
-      and(
-        eq(communityMembers.communityId, communityId),
-        eq(communityMembers.userId, targetUserId)
-      )
-    );
+    .where(and(eq(communityMembers.communityId, communityId), eq(communityMembers.userId, targetUserId)));
 
   // Award +15 LP to community
   await db
@@ -316,4 +303,3 @@ export async function recordCommunityInviteShare(communityId: string) {
 
   return { success: true, pointsAwarded: 10 };
 }
-

@@ -1,27 +1,13 @@
 "use client";
 
-import { BrandedQrModal } from "@/components/common/branded-qr-modal";
-import { MarkdownContent } from "@/components/common/markdown-content";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { getAvatarUrl } from "@/lib/utils";
 import {
   ArrowLeft,
   Bell,
-  BellOff,
   Calendar,
   Check,
-  Clock,
   Download,
   ExternalLink,
   Gift,
-  Globe,
   MapPin,
   QrCode,
   School,
@@ -34,6 +20,16 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
+import { BrandedQrModal } from "@/components/common/branded-qr-modal";
+import { MarkdownContent } from "@/components/common/markdown-content";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { getAvatarUrl } from "@/lib/utils";
 
 interface EventDetailClientProps {
   eventId: string;
@@ -78,8 +74,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
   }
 
   const isRestricted =
-    Array.isArray(event.eligibleInstitutionIds) &&
-    !event.eligibleInstitutionIds.includes("ALL");
+    Array.isArray(event.eligibleInstitutionIds) && !event.eligibleInstitutionIds.includes("ALL");
 
   const startDate = new Date(event.startDate);
   const endDate = new Date(event.endDate);
@@ -244,11 +239,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
       {/* Event Banner */}
       <div className="relative aspect-[21/9] md:aspect-[3/1] w-full overflow-hidden bg-muted/40">
         {event.bannerUrl ? (
-          <img
-            src={event.bannerUrl}
-            alt={event.title}
-            className="h-full w-full object-cover"
-          />
+          <img src={event.bannerUrl} alt={event.title} className="h-full w-full object-cover" />
         ) : (
           <div className="h-full w-full bg-linear-to-tr from-primary/20 via-primary/5 to-muted flex items-center justify-center">
             <Calendar className="size-16 text-primary/40" />
@@ -286,9 +277,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
             {event.title}
           </h1>
           {event.tagline && (
-            <p className="text-sm font-medium text-muted-foreground leading-relaxed">
-              {event.tagline}
-            </p>
+            <p className="text-sm font-medium text-muted-foreground leading-relaxed">{event.tagline}</p>
           )}
         </div>
 
@@ -387,9 +376,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
               <Calendar className="size-5" />
             </div>
             <div>
-              <h4 className="text-xs font-black text-foreground uppercase tracking-wide">
-                Date & Timing
-              </h4>
+              <h4 className="text-xs font-black text-foreground uppercase tracking-wide">Date & Timing</h4>
               <p className="text-xs font-bold text-foreground mt-0.5">{startFormatted}</p>
               <p className="text-xs text-muted-foreground font-medium">{timeFormatted}</p>
             </div>
@@ -400,12 +387,8 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
               <MapPin className="size-5" />
             </div>
             <div className="min-w-0">
-              <h4 className="text-xs font-black text-foreground uppercase tracking-wide">
-                Venue / Location
-              </h4>
-              <p className="text-xs font-bold text-foreground mt-0.5 truncate">
-                {event.venue || event.mode}
-              </p>
+              <h4 className="text-xs font-black text-foreground uppercase tracking-wide">Venue / Location</h4>
+              <p className="text-xs font-bold text-foreground mt-0.5 truncate">{event.venue || event.mode}</p>
               {event.meetingUrl && (
                 <a
                   href={event.meetingUrl}
@@ -451,8 +434,8 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                 {event.participationType === "BOTH"
                   ? "Solo or Teams"
                   : event.participationType === "TEAM"
-                  ? `Teams of ${event.minTeamSize}-${event.maxTeamSize}`
-                  : "Individual (Solo)"}
+                    ? `Teams of ${event.minTeamSize}-${event.maxTeamSize}`
+                    : "Individual (Solo)"}
               </p>
               <p className="text-xs text-muted-foreground font-medium">
                 {event.maxParticipants
@@ -496,9 +479,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
 
         {/* Full Description */}
         <div className="space-y-3">
-          <h3 className="text-sm font-black text-foreground uppercase tracking-wider">
-            About the Event
-          </h3>
+          <h3 className="text-sm font-black text-foreground uppercase tracking-wider">About the Event</h3>
           <div className="rounded-2xl border border-border/40 bg-card p-4 text-sm leading-relaxed text-foreground/90">
             <MarkdownContent content={event.description} />
           </div>
@@ -527,9 +508,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                         {r.profile?.displayName?.[0] || "S"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="font-bold text-foreground">
-                      @{r.profile?.username}
-                    </span>
+                    <span className="font-bold text-foreground">@{r.profile?.username}</span>
                   </Link>
                 );
               })}

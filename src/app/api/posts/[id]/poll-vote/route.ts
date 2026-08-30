@@ -1,9 +1,9 @@
+import { and, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { pollVotes,userProfiles } from "@/db/schema";
+import { pollVotes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { and,eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -37,10 +37,7 @@ export async function POST(req: Request, { params }: RouteParams) {
 
     // Check if user has already voted on this poll/post
     const existingVote = await db.query.pollVotes.findFirst({
-      where: and(
-        eq(pollVotes.postId, id),
-        eq(pollVotes.userId, profile.id)
-      )
+      where: and(eq(pollVotes.postId, id), eq(pollVotes.userId, profile.id)),
     });
 
     if (existingVote) {
@@ -48,11 +45,14 @@ export async function POST(req: Request, { params }: RouteParams) {
     }
 
     // Insert vote
-    const [newVote] = await db.insert(pollVotes).values({
-      postId: id,
-      optionId,
-      userId: profile.id,
-    }).returning();
+    const [newVote] = await db
+      .insert(pollVotes)
+      .values({
+        postId: id,
+        optionId,
+        userId: profile.id,
+      })
+      .returning();
 
     return NextResponse.json(newVote, { status: 201 });
   } catch (error) {

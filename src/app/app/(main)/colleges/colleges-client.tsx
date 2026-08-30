@@ -1,12 +1,12 @@
 "use client";
 
+import { Building2, Flame, Plus, School, Search, Trophy, X, Zap } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { AddCollegeModal } from "@/components/colleges/add-college-modal";
 import { CollegeHubRow, type CollegeItem } from "@/components/colleges/college-hub-row";
 import { fetcher } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { Building2, Flame, Plus, School, Search, Trophy, X, Zap } from "lucide-react";
-import { useEffect,useMemo,useState } from "react";
-import { toast } from "sonner";
 
 const CATEGORY_FILTERS = [
   { id: "ALL", label: "All", icon: School },
@@ -44,7 +44,8 @@ const TOP_LEADERBOARD_COLLEGES = [
     discussions: 17,
     nirf: 53,
     logoUrl: "https://upload.wikimedia.org/wikipedia/en/d/d2/Birla_Institute_of_Technology_Mesra.png",
-    bannerUrl: "https://bitmesra.ac.in/UploadedDocuments/user_pratyush_869/Header/Header4b13a61283f54f04a30eed41dfa3f4dd_1600x520px%20webbanner%20rankings.jpg",
+    bannerUrl:
+      "https://bitmesra.ac.in/UploadedDocuments/user_pratyush_869/Header/Header4b13a61283f54f04a30eed41dfa3f4dd_1600x520px%20webbanner%20rankings.jpg",
   },
   {
     rank: 2,
@@ -70,7 +71,8 @@ const TOP_LEADERBOARD_COLLEGES = [
     discussions: 12,
     nirf: 25,
     logoUrl: "https://upload.wikimedia.org/wikipedia/en/d/d3/BITS_Pilani-Logo.svg",
-    bannerUrl: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&auto=format&fit=crop&q=80",
+    bannerUrl:
+      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&auto=format&fit=crop&q=80",
   },
   {
     rank: 4,
@@ -210,7 +212,6 @@ export default function CollegesClient() {
     }
   }
 
-
   const tabs = [
     { id: "directory" as const, label: "Directory" },
     { id: "leaderboard" as const, label: "Leaderboard" },
@@ -223,9 +224,7 @@ export default function CollegesClient() {
         <div className="flex items-center justify-between gap-2 px-4 py-3.5">
           <div className="min-w-0">
             <h1 className="text-lg font-black tracking-tight text-foreground">Colleges</h1>
-            <p className="truncate text-[13px] text-muted-foreground">
-              Campus hubs across India
-            </p>
+            <p className="truncate text-[13px] text-muted-foreground">Campus hubs across India</p>
           </div>
 
           <button
@@ -357,9 +356,7 @@ export default function CollegesClient() {
             ) : filteredColleges.length > 0 ? (
               <>
                 <p className="px-4 py-2.5 text-[13px] text-muted-foreground">
-                  <strong className="font-black text-foreground">
-                    {filteredColleges.length}
-                  </strong>{" "}
+                  <strong className="font-black text-foreground">{filteredColleges.length}</strong>{" "}
                   {filteredColleges.length === 1 ? "campus" : "campuses"}
                   {selectedState !== "ALL" ? ` in ${selectedState}` : ""}
                 </p>
@@ -417,9 +414,7 @@ export default function CollegesClient() {
                   <span className="block text-[13px] font-black text-primary tabular-nums">
                     {col.points.toLocaleString("en-IN")} LP
                   </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    {col.students} enrolled
-                  </span>
+                  <span className="text-[11px] text-muted-foreground">{col.students} enrolled</span>
                 </>
               }
             />

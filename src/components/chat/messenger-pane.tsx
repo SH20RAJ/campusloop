@@ -1,28 +1,9 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
-import { GifPickerModal } from "@/components/ui/gif-picker-modal";
-import { PresenceDot } from "@/components/ui/presence-dot";
-import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
-import { UserProfile } from "@/db/schema";
-import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
-import {
-  CachedMessage,
-  getCachedMessages,
-  setCachedMessages,
-  updateCachedConversationLastMessage,
-} from "@/lib/chat-cache";
-import { extractYouTubeId } from "@/lib/embeds";
-import { haptics } from "@/lib/haptics";
-import { isOnline,presenceLabel } from "@/lib/presence";
-import { sounds } from "@/lib/sounds";
-import { uploadImageToImgBB } from "@/lib/upload";
-import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   CheckCheck,
   CornerDownRight,
-  ExternalLink,
   Heart,
   Info,
   Loader2,
@@ -39,9 +20,27 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect,useRef,useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { GifPickerModal } from "@/components/ui/gif-picker-modal";
+import { PresenceDot } from "@/components/ui/presence-dot";
+import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
+import type { UserProfile } from "@/db/schema";
+import { triggerBrowserNotification } from "@/hooks/use-push-notifications";
+import {
+  type CachedMessage,
+  getCachedMessages,
+  setCachedMessages,
+  updateCachedConversationLastMessage,
+} from "@/lib/chat-cache";
+import { extractYouTubeId } from "@/lib/embeds";
+import { haptics } from "@/lib/haptics";
+import { isOnline, presenceLabel } from "@/lib/presence";
+import { sounds } from "@/lib/sounds";
+import { uploadImageToImgBB } from "@/lib/upload";
+import { cn } from "@/lib/utils";
 import { ChatUserInfoDrawer } from "./chat-user-info-drawer";
 
 const fetcher = async <T,>(url: string): Promise<T> => {
@@ -182,7 +181,9 @@ export function MessengerPane({
       sounds.tap();
       haptics.light();
       setReplyingTo(msg);
-      toast.info(`Replying to ${msg.senderId === currentUserId ? "yourself" : otherParticipant?.displayName || "message"}`);
+      toast.info(
+        `Replying to ${msg.senderId === currentUserId ? "yourself" : otherParticipant?.displayName || "message"}`
+      );
     }
     setSwipedOffset({});
     touchStartXRef.current = null;
@@ -210,10 +211,9 @@ export function MessengerPane({
     }, false);
 
     try {
-      const res = await fetch(
-        `/api/chat/${conversationId}/messages/${msgId}?deleteFor=${deleteFor}`,
-        { method: "DELETE" }
-      );
+      const res = await fetch(`/api/chat/${conversationId}/messages/${msgId}?deleteFor=${deleteFor}`, {
+        method: "DELETE",
+      });
       if (!res.ok) throw new Error("Failed to delete message");
       toast.success(deleteFor === "everyone" ? "Message deleted for everyone" : "Message deleted for you");
       mutate();
@@ -230,32 +230,32 @@ export function MessengerPane({
     el.style.height = "auto";
     const newHeight = Math.min(Math.max(el.scrollHeight, 40), 140);
     el.style.height = `${newHeight}px`;
-  }, [msgText]);
+  }, []);
 
   // Fast Hard Cache: Initial fallback from in-memory / local storage cache for 0ms instant display
   const initialCache = conversationId ? getCachedMessages(conversationId) : null;
 
-  const { data: messages, isLoading, mutate } = useSWR<CachedMessage[]>(
-    conversationId ? `/api/chat/${conversationId}/messages` : null,
-    fetcher,
-    {
-      fallbackData: initialCache || undefined,
-      refreshInterval: 2000,
-      revalidateOnFocus: true,
-      onSuccess: (data) => {
-        if (conversationId && data) {
-          setCachedMessages(conversationId, data);
-        }
-      },
-    }
-  );
+  const {
+    data: messages,
+    isLoading,
+    mutate,
+  } = useSWR<CachedMessage[]>(conversationId ? `/api/chat/${conversationId}/messages` : null, fetcher, {
+    fallbackData: initialCache || undefined,
+    refreshInterval: 2000,
+    revalidateOnFocus: true,
+    onSuccess: (data) => {
+      if (conversationId && data) {
+        setCachedMessages(conversationId, data);
+      }
+    },
+  });
 
   // Auto scroll to bottom smoothly on message updates (unless user is searching)
   useEffect(() => {
     if (!chatSearchQuery.trim()) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, chatSearchQuery]);
+  }, [chatSearchQuery]);
 
   // Alert with native browser notification when new message arrives in background
   const lastKnownMsgIdRef = useRef<string | null>(null);
@@ -558,55 +558,55 @@ export function MessengerPane({
             </button>
 
             {/* Avatar with active presence dot */}
-          {/* Avatar & Online status (Clickable to open User Info & Media Drawer) */}
-          <div
-            onClick={() => setShowInfoDrawer(true)}
-            className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer group hover:opacity-90 transition-opacity"
-            title="View student info and shared media"
-          >
-            <div className="relative shrink-0">
-              <Avatar className="size-10 border border-border/40 shadow-xs transition-transform group-hover:scale-105">
-                <AvatarImage src={otherParticipant.avatarUrl || ""} />
-                <AvatarFallback className="text-xs font-black bg-primary/10 text-primary">
-                  {(otherParticipant.displayName?.[0] || "S").toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <PresenceDot lastSeenAt={otherParticipant.lastSeenAt} />
-            </div>
-
-            {/* Name & Branch / Presence status */}
-            <div className="min-w-0 space-y-0.5">
-              <div className="text-xs sm:text-sm font-black text-foreground group-hover:text-primary transition-colors truncate flex items-center gap-1.5 leading-tight">
-                <span>{otherParticipant.displayName}</span>
-                <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+            {/* Avatar & Online status (Clickable to open User Info & Media Drawer) */}
+            <div
+              onClick={() => setShowInfoDrawer(true)}
+              className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer group hover:opacity-90 transition-opacity"
+              title="View student info and shared media"
+            >
+              <div className="relative shrink-0">
+                <Avatar className="size-10 border border-border/40 shadow-xs transition-transform group-hover:scale-105">
+                  <AvatarImage src={otherParticipant.avatarUrl || ""} />
+                  <AvatarFallback className="text-xs font-black bg-primary/10 text-primary">
+                    {(otherParticipant.displayName?.[0] || "S").toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <PresenceDot lastSeenAt={otherParticipant.lastSeenAt} />
               </div>
-              <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1.5 font-medium">
-                <span
-                  className={cn(
-                    "font-bold flex items-center gap-1 shrink-0",
-                    viewerIsOnline ? "text-emerald-500" : "text-muted-foreground",
-                  )}
-                >
+
+              {/* Name & Branch / Presence status */}
+              <div className="min-w-0 space-y-0.5">
+                <div className="text-xs sm:text-sm font-black text-foreground group-hover:text-primary transition-colors truncate flex items-center gap-1.5 leading-tight">
+                  <span>{otherParticipant.displayName}</span>
+                  <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+                </div>
+                <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1.5 font-medium">
                   <span
                     className={cn(
-                      "size-1.5 rounded-full",
-                      viewerIsOnline ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/40",
+                      "font-bold flex items-center gap-1 shrink-0",
+                      viewerIsOnline ? "text-emerald-500" : "text-muted-foreground"
                     )}
-                  />
-                  {viewerIsOnline ? "Online" : presenceText || "Offline"}
-                </span>
-                <span>•</span>
-                <span>@{otherParticipant.username}</span>
-                {otherParticipant.branch && (
-                  <>
-                    <span className="hidden sm:inline">•</span>
-                    <span className="hidden sm:inline">{otherParticipant.branch}</span>
-                  </>
-                )}
-              </p>
+                  >
+                    <span
+                      className={cn(
+                        "size-1.5 rounded-full",
+                        viewerIsOnline ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/40"
+                      )}
+                    />
+                    {viewerIsOnline ? "Online" : presenceText || "Offline"}
+                  </span>
+                  <span>•</span>
+                  <span>@{otherParticipant.username}</span>
+                  {otherParticipant.branch && (
+                    <>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="hidden sm:inline">{otherParticipant.branch}</span>
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
           {/* Header Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
@@ -724,256 +724,250 @@ export function MessengerPane({
                 <Smile className="size-6" />
               </div>
               <p className="font-bold text-foreground">Say hello to {otherParticipant.displayName}!</p>
-              <p className="text-[11px] text-muted-foreground">Type a message, paste keyboard stickers, or share campus memories.</p>
+              <p className="text-[11px] text-muted-foreground">
+                Type a message, paste keyboard stickers, or share campus memories.
+              </p>
             </div>
           ) : (
             filteredMessages?.map((msg, idx) => {
-            const isMe = msg.senderId === currentUserId;
-            const isDirectMedia =
-              /^https?:\/\/.+\.(gif|jpeg|jpg|png|webp)(\?.*)?$/i.test(msg.body.trim()) ||
-              msg.body.trim().startsWith("https://media.giphy.com/") ||
-              msg.body.trim().startsWith("https://i.giphy.com/");
+              const isMe = msg.senderId === currentUserId;
+              const isDirectMedia =
+                /^https?:\/\/.+\.(gif|jpeg|jpg|png|webp)(\?.*)?$/i.test(msg.body.trim()) ||
+                msg.body.trim().startsWith("https://media.giphy.com/") ||
+                msg.body.trim().startsWith("https://i.giphy.com/");
 
-            const isVoiceMemo = msg.body.includes("🎙️ [Voice Memo");
+              const isVoiceMemo = msg.body.includes("🎙️ [Voice Memo");
 
-            const prevMsg = idx > 0 ? filteredMessages[idx - 1] : null;
-            const showDateSeparator =
-              !prevMsg ||
-              new Date(prevMsg.createdAt).toDateString() !== new Date(msg.createdAt).toDateString();
+              const prevMsg = idx > 0 ? filteredMessages[idx - 1] : null;
+              const showDateSeparator =
+                !prevMsg ||
+                new Date(prevMsg.createdAt).toDateString() !== new Date(msg.createdAt).toDateString();
 
-            const isHovered = hoveredMsgId === msg.id;
-            const isReactionMenuOpen = isHovered || activeReactionMsgId === msg.id;
-            const reactions = msg.reactions || [];
+              const isHovered = hoveredMsgId === msg.id;
+              const isReactionMenuOpen = isHovered || activeReactionMsgId === msg.id;
+              const reactions = msg.reactions || [];
 
-            // Check if Secret Crush Match greeting
-            const isSecretCrushMatch =
-              msg.body.includes("Secret Crush Match") ||
-              msg.body.includes("We both secretly liked each other");
+              // Check if Secret Crush Match greeting
+              const isSecretCrushMatch =
+                msg.body.includes("Secret Crush Match") ||
+                msg.body.includes("We both secretly liked each other");
 
-            // Check if message is a quoted reply
-            const isQuoted = msg.body.startsWith("> ");
-            let quotedText = "";
-            let messageBody = msg.body;
-            if (isQuoted) {
-              const lines = msg.body.split("\n\n");
-              quotedText = lines[0].replace(/^> /, "");
-              messageBody = lines.slice(1).join("\n\n") || lines[0];
-            }
+              // Check if message is a quoted reply
+              const isQuoted = msg.body.startsWith("> ");
+              let quotedText = "";
+              let messageBody = msg.body;
+              if (isQuoted) {
+                const lines = msg.body.split("\n\n");
+                quotedText = lines[0].replace(/^> /, "");
+                messageBody = lines.slice(1).join("\n\n") || lines[0];
+              }
 
-            // Detect YouTube Video URL
-            const ytVideoId = getYouTubeVideoId(messageBody);
+              // Detect YouTube Video URL
+              const ytVideoId = getYouTubeVideoId(messageBody);
 
-            // If Secret Crush Match System card: render centered in chat
-            if (isSecretCrushMatch) {
+              // If Secret Crush Match System card: render centered in chat
+              if (isSecretCrushMatch) {
+                return (
+                  <div key={msg.id} className="space-y-1 my-4">
+                    {showDateSeparator && (
+                      <div className="flex items-center justify-center my-3">
+                        <span className="text-[10px] font-bold px-3 py-0.5 rounded-full bg-card/90 text-muted-foreground border border-border/40 shadow-2xs tracking-wider">
+                          {formatDateSeparator(msg.createdAt)}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="w-full max-w-md mx-auto p-4 sm:p-5 rounded-3xl bg-linear-to-tr from-rose-500/15 via-pink-500/10 to-purple-500/15 border border-rose-500/30 text-center space-y-3 shadow-lg backdrop-blur-md animate-in zoom-in-95">
+                      <div className="size-12 rounded-2xl bg-rose-500 text-white flex items-center justify-center mx-auto shadow-md shadow-rose-500/30 animate-pulse">
+                        <Heart className="size-6 fill-white stroke-white" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-sm sm:text-base font-black text-rose-500 tracking-tight">
+                          💕 It&apos;s a Secret Crush Match!
+                        </h4>
+                        <p className="text-xs font-bold text-foreground">
+                          We both secretly liked each other.
+                        </p>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          Your identities have been revealed to each other. Break the ice and say hello!
+                        </p>
+                      </div>
+                      <div className="text-[10px] font-bold text-rose-500/70 pt-1">
+                        {formatTime(msg.createdAt)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              const currentSwipe = swipedOffset[msg.id] || 0;
+
               return (
-                <div key={msg.id} className="space-y-1 my-4">
+                <div key={msg.id} className="space-y-1 relative">
+                  {/* Date Header Pill */}
                   {showDateSeparator && (
-                    <div className="flex items-center justify-center my-3">
+                    <div className="flex items-center justify-center my-3.5">
                       <span className="text-[10px] font-bold px-3 py-0.5 rounded-full bg-card/90 text-muted-foreground border border-border/40 shadow-2xs tracking-wider">
                         {formatDateSeparator(msg.createdAt)}
                       </span>
                     </div>
                   )}
 
-                  <div className="w-full max-w-md mx-auto p-4 sm:p-5 rounded-3xl bg-linear-to-tr from-rose-500/15 via-pink-500/10 to-purple-500/15 border border-rose-500/30 text-center space-y-3 shadow-lg backdrop-blur-md animate-in zoom-in-95">
-                    <div className="size-12 rounded-2xl bg-rose-500 text-white flex items-center justify-center mx-auto shadow-md shadow-rose-500/30 animate-pulse">
-                      <Heart className="size-6 fill-white stroke-white" />
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="text-sm sm:text-base font-black text-rose-500 tracking-tight">
-                        💕 It&apos;s a Secret Crush Match!
-                      </h4>
-                      <p className="text-xs font-bold text-foreground">
-                        We both secretly liked each other.
-                      </p>
-                      <p className="text-[11px] text-muted-foreground leading-relaxed">
-                        Your identities have been revealed to each other. Break the ice and say hello!
-                      </p>
-                    </div>
-                    <div className="text-[10px] font-bold text-rose-500/70 pt-1">
-                      {formatTime(msg.createdAt)}
-                    </div>
-                  </div>
-                </div>
-              );
-            }
-
-            const currentSwipe = swipedOffset[msg.id] || 0;
-
-            return (
-              <div key={msg.id} className="space-y-1 relative">
-                {/* Date Header Pill */}
-                {showDateSeparator && (
-                  <div className="flex items-center justify-center my-3.5">
-                    <span className="text-[10px] font-bold px-3 py-0.5 rounded-full bg-card/90 text-muted-foreground border border-border/40 shadow-2xs tracking-wider">
-                      {formatDateSeparator(msg.createdAt)}
-                    </span>
-                  </div>
-                )}
-
-                {/* Message Row Wrapper with Hover, Swipe, & Safe Bridge */}
-                <div
-                  className={cn(
-                    "flex items-end gap-1.5 relative group/row transition-transform duration-75",
-                    isMe ? "justify-end flex-row" : "justify-start flex-row"
-                  )}
-                  style={{
-                    transform: currentSwipe ? `translateX(${currentSwipe}px)` : undefined,
-                  }}
-                  onTouchStart={(e) => handleTouchStart(e, msg.id)}
-                  onTouchMove={(e) => handleTouchMove(e, msg)}
-                  onTouchEnd={() => handleTouchEnd(msg)}
-                  onMouseEnter={() => handleMsgMouseEnter(msg.id)}
-                  onMouseLeave={handleMsgMouseLeave}
-                  onDoubleClick={() => toggleReaction(msg.id, "❤️")}
-                >
-                  {/* Action trigger buttons (visible on hover or tap) */}
+                  {/* Message Row Wrapper with Hover, Swipe, & Safe Bridge */}
                   <div
                     className={cn(
-                      "flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100 transition-opacity shrink-0 mb-1 z-10",
-                      isReactionMenuOpen && "opacity-100",
-                      isMe ? "order-first" : "order-last"
+                      "flex items-end gap-1.5 relative group/row transition-transform duration-75",
+                      isMe ? "justify-end flex-row" : "justify-start flex-row"
                     )}
+                    style={{
+                      transform: currentSwipe ? `translateX(${currentSwipe}px)` : undefined,
+                    }}
+                    onTouchStart={(e) => handleTouchStart(e, msg.id)}
+                    onTouchMove={(e) => handleTouchMove(e, msg)}
+                    onTouchEnd={() => handleTouchEnd(msg)}
+                    onMouseEnter={() => handleMsgMouseEnter(msg.id)}
+                    onMouseLeave={handleMsgMouseLeave}
+                    onDoubleClick={() => toggleReaction(msg.id, "❤️")}
                   >
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveReactionMsgId((prev) => (prev === msg.id ? null : msg.id));
-                      }}
-                      className="size-6 rounded-full bg-card border border-border/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-2xs"
-                      title="React to message"
-                    >
-                      <Smile className="size-3.5" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setReplyingTo(msg)}
-                      className="size-6 rounded-full bg-card border border-border/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-2xs"
-                      title="Reply"
-                    >
-                      <CornerDownRight className="size-3" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setDeleteModalMsg(msg)}
-                      className="size-6 rounded-full bg-card border border-border/50 hover:bg-rose-500/10 hover:text-rose-500 flex items-center justify-center text-muted-foreground transition-all cursor-pointer shadow-2xs"
-                      title="Delete message"
-                    >
-                      <Trash2 className="size-3" />
-                    </button>
-                  </div>
-
-                  {/* ─── Floating WhatsApp-Style Reaction Bar (With Safe Hover Bridge) ─── */}
-                  {isReactionMenuOpen && (
+                    {/* Action trigger buttons (visible on hover or tap) */}
                     <div
-                      onClick={(e) => e.stopPropagation()}
-                      onMouseEnter={() => {
-                        if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-                      }}
                       className={cn(
-                        "absolute -top-9 z-30 flex items-center gap-1 bg-card/95 dark:bg-[#1f2c34]/95 backdrop-blur-md px-2.5 py-1 rounded-full border border-border/60 shadow-lg animate-in fade-in zoom-in-95 duration-150 before:absolute before:-bottom-3 before:inset-x-0 before:h-3 before:content-['']",
-                        isMe ? "right-2" : "left-2"
+                        "flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100 transition-opacity shrink-0 mb-1 z-10",
+                        isReactionMenuOpen && "opacity-100",
+                        isMe ? "order-first" : "order-last"
                       )}
                     >
-                      {QUICK_REACTION_EMOJIS.map((emoji) => (
-                        <button
-                          key={emoji}
-                          type="button"
-                          onClick={() => toggleReaction(msg.id, emoji)}
-                          className="text-sm hover:scale-125 transition-transform active:scale-95 p-1 cursor-pointer"
-                          title={emoji}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveReactionMsgId((prev) => (prev === msg.id ? null : msg.id));
+                        }}
+                        className="size-6 rounded-full bg-card border border-border/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-2xs"
+                        title="React to message"
+                      >
+                        <Smile className="size-3.5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setReplyingTo(msg)}
+                        className="size-6 rounded-full bg-card border border-border/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-2xs"
+                        title="Reply"
+                      >
+                        <CornerDownRight className="size-3" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setDeleteModalMsg(msg)}
+                        className="size-6 rounded-full bg-card border border-border/50 hover:bg-rose-500/10 hover:text-rose-500 flex items-center justify-center text-muted-foreground transition-all cursor-pointer shadow-2xs"
+                        title="Delete message"
+                      >
+                        <Trash2 className="size-3" />
+                      </button>
                     </div>
-                  )}
 
-                  {/* ─── Message Bubble ─── */}
-                  <div
-                    className={cn(
-                      "max-w-[85%] sm:max-w-[70%] space-y-1 relative",
-                      isMe ? "items-end text-right" : "items-start text-left"
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "relative text-[14px] leading-relaxed transition-all shadow-xs",
-                        isDirectMedia
-                          ? "p-0 bg-transparent border-0"
-                          : isMe
-                          ? "bg-[#1d9bf0] text-white rounded-2xl rounded-br-xs px-4 py-2.5"
-                          : "bg-[#202327] dark:bg-[#202327] bg-neutral-100 text-foreground rounded-2xl rounded-bl-xs px-4 py-2.5 border border-border/20"
-                      )}
-                    >
-                      {/* Quoted Message Preview Bar */}
-                      {isQuoted && (
-                        <div
-                          className={cn(
-                            "mb-1.5 p-1.5 px-2.5 rounded-lg border-l-3 text-[11px] font-medium leading-tight truncate text-left",
-                            isMe
-                              ? "bg-black/15 border-white/80 text-primary-foreground/90"
-                              : "bg-muted/70 border-primary text-muted-foreground"
-                          )}
-                        >
-                          <p className="font-bold text-[10px] opacity-80">Quoted</p>
-                          <p className="truncate">{quotedText}</p>
-                        </div>
-                      )}
-
-                      {/* Content: Direct Image, Voice Memo, or Plain Text */}
-                      {isDirectMedia ? (
-                        <div className="relative overflow-hidden rounded-2xl border border-border/40 shadow-xs">
-                          <img
-                            src={msg.body.trim()}
-                            alt="Shared Media"
-                            className="max-h-72 max-w-full rounded-2xl object-cover"
-                            loading="lazy"
-                          />
-                          <div className="absolute bottom-1.5 right-2 bg-black/60 backdrop-blur-xs text-[9px] font-bold text-white px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span>{formatTime(msg.createdAt)}</span>
-                            {isMe && (
-                              <span title={msg.readAt ? "Seen" : "Delivered"}>
-                                <CheckCheck
-                                  className={cn(
-                                    "size-3",
-                                    msg.readAt ? "text-sky-300" : "text-white/80"
-                                  )}
-                                />
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ) : isVoiceMemo ? (
-                        /* WhatsApp Voice Memo Player Mockup */
-                        <div className="flex items-center gap-3 py-1 pr-1 min-w-[200px]">
+                    {/* ─── Floating WhatsApp-Style Reaction Bar (With Safe Hover Bridge) ─── */}
+                    {isReactionMenuOpen && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        onMouseEnter={() => {
+                          if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+                        }}
+                        className={cn(
+                          "absolute -top-9 z-30 flex items-center gap-1 bg-card/95 dark:bg-[#1f2c34]/95 backdrop-blur-md px-2.5 py-1 rounded-full border border-border/60 shadow-lg animate-in fade-in zoom-in-95 duration-150 before:absolute before:-bottom-3 before:inset-x-0 before:h-3 before:content-['']",
+                          isMe ? "right-2" : "left-2"
+                        )}
+                      >
+                        {QUICK_REACTION_EMOJIS.map((emoji) => (
                           <button
+                            key={emoji}
                             type="button"
-                            onClick={() =>
-                              setPlayingVoiceId((prev) => (prev === msg.id ? null : msg.id))
-                            }
+                            onClick={() => toggleReaction(msg.id, emoji)}
+                            className="text-sm hover:scale-125 transition-transform active:scale-95 p-1 cursor-pointer"
+                            title={emoji}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* ─── Message Bubble ─── */}
+                    <div
+                      className={cn(
+                        "max-w-[85%] sm:max-w-[70%] space-y-1 relative",
+                        isMe ? "items-end text-right" : "items-start text-left"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "relative text-[14px] leading-relaxed transition-all shadow-xs",
+                          isDirectMedia
+                            ? "p-0 bg-transparent border-0"
+                            : isMe
+                              ? "bg-[#1d9bf0] text-white rounded-2xl rounded-br-xs px-4 py-2.5"
+                              : "bg-[#202327] dark:bg-[#202327] bg-neutral-100 text-foreground rounded-2xl rounded-bl-xs px-4 py-2.5 border border-border/20"
+                        )}
+                      >
+                        {/* Quoted Message Preview Bar */}
+                        {isQuoted && (
+                          <div
                             className={cn(
-                              "size-9 rounded-full flex items-center justify-center shrink-0 cursor-pointer shadow-xs transition-transform active:scale-95",
+                              "mb-1.5 p-1.5 px-2.5 rounded-lg border-l-3 text-[11px] font-medium leading-tight truncate text-left",
                               isMe
-                                ? "bg-white text-primary"
-                                : "bg-primary text-primary-foreground"
+                                ? "bg-black/15 border-white/80 text-primary-foreground/90"
+                                : "bg-muted/70 border-primary text-muted-foreground"
                             )}
                           >
-                            {playingVoiceId === msg.id ? (
-                              <Volume2 className="size-4 animate-pulse" />
-                            ) : (
-                              <Play className="size-4 fill-current ml-0.5" />
-                            )}
-                          </button>
+                            <p className="font-bold text-[10px] opacity-80">Quoted</p>
+                            <p className="truncate">{quotedText}</p>
+                          </div>
+                        )}
 
-                          <div className="flex-1 space-y-1">
-                            {/* Waveform graphic */}
-                            <div className="flex items-center gap-0.5 h-4">
-                              {[3, 8, 14, 9, 12, 16, 8, 11, 15, 7, 10, 14, 6, 12, 8, 4].map(
-                                (h, i) => (
+                        {/* Content: Direct Image, Voice Memo, or Plain Text */}
+                        {isDirectMedia ? (
+                          <div className="relative overflow-hidden rounded-2xl border border-border/40 shadow-xs">
+                            <img
+                              src={msg.body.trim()}
+                              alt="Shared Media"
+                              className="max-h-72 max-w-full rounded-2xl object-cover"
+                              loading="lazy"
+                            />
+                            <div className="absolute bottom-1.5 right-2 bg-black/60 backdrop-blur-xs text-[9px] font-bold text-white px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <span>{formatTime(msg.createdAt)}</span>
+                              {isMe && (
+                                <span title={msg.readAt ? "Seen" : "Delivered"}>
+                                  <CheckCheck
+                                    className={cn("size-3", msg.readAt ? "text-sky-300" : "text-white/80")}
+                                  />
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ) : isVoiceMemo ? (
+                          /* WhatsApp Voice Memo Player Mockup */
+                          <div className="flex items-center gap-3 py-1 pr-1 min-w-[200px]">
+                            <button
+                              type="button"
+                              onClick={() => setPlayingVoiceId((prev) => (prev === msg.id ? null : msg.id))}
+                              className={cn(
+                                "size-9 rounded-full flex items-center justify-center shrink-0 cursor-pointer shadow-xs transition-transform active:scale-95",
+                                isMe ? "bg-white text-primary" : "bg-primary text-primary-foreground"
+                              )}
+                            >
+                              {playingVoiceId === msg.id ? (
+                                <Volume2 className="size-4 animate-pulse" />
+                              ) : (
+                                <Play className="size-4 fill-current ml-0.5" />
+                              )}
+                            </button>
+
+                            <div className="flex-1 space-y-1">
+                              {/* Waveform graphic */}
+                              <div className="flex items-center gap-0.5 h-4">
+                                {[3, 8, 14, 9, 12, 16, 8, 11, 15, 7, 10, 14, 6, 12, 8, 4].map((h, i) => (
                                   <span
                                     key={i}
                                     style={{ height: `${h}px` }}
@@ -982,91 +976,91 @@ export function MessengerPane({
                                       playingVoiceId === msg.id && i % 3 === 0
                                         ? "bg-amber-300 animate-pulse"
                                         : isMe
-                                        ? "bg-white/70"
-                                        : "bg-primary/70"
+                                          ? "bg-white/70"
+                                          : "bg-primary/70"
                                     )}
                                   />
-                                )
-                              )}
-                            </div>
-                            <div className="flex items-center justify-between text-[10px] opacity-80 font-medium">
-                              <span>0:14</span>
-                              <span>{formatTime(msg.createdAt)}</span>
+                                ))}
+                              </div>
+                              <div className="flex items-center justify-between text-[10px] opacity-80 font-medium">
+                                <span>0:14</span>
+                                <span>{formatTime(msg.createdAt)}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-1">
-                          <p className="whitespace-pre-wrap break-words pr-12 text-[13px]">
-                            {renderMessageWithMentions(messageBody)}
-                          </p>
+                        ) : (
+                          <div className="space-y-1">
+                            <p className="whitespace-pre-wrap break-words pr-12 text-[13px]">
+                              {renderMessageWithMentions(messageBody)}
+                            </p>
 
-                          {/* YouTube Video Embed Player */}
-                          {ytVideoId && (
-                            <div className="mt-2 overflow-hidden rounded-xl aspect-video w-full max-w-sm border border-border/40 shadow-sm">
-                              <iframe
-                                src={`https://www.youtube-nocookie.com/embed/${ytVideoId}`}
-                                title="YouTube video player"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                className="w-full h-full border-0"
-                              />
+                            {/* YouTube Video Embed Player */}
+                            {ytVideoId && (
+                              <div className="mt-2 overflow-hidden rounded-xl aspect-video w-full max-w-sm border border-border/40 shadow-sm">
+                                <iframe
+                                  src={`https://www.youtube-nocookie.com/embed/${ytVideoId}`}
+                                  title="YouTube video player"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="w-full h-full border-0"
+                                />
+                              </div>
+                            )}
+
+                            {/* WhatsApp-Style Bottom Right Timestamp & Seen Double Ticks */}
+                            <div
+                              className={cn(
+                                "flex items-center justify-end gap-1 text-[9px] font-medium select-none -mt-1 float-right ml-2 pt-0.5",
+                                isMe ? "text-primary-foreground/75" : "text-muted-foreground"
+                              )}
+                            >
+                              <span>{formatTime(msg.createdAt)}</span>
+                              {isMe &&
+                                (msg.optimistic ? (
+                                  <Loader2 className="size-2.5 animate-spin text-primary-foreground/70" />
+                                ) : msg.readAt ? (
+                                  <span title="Seen">
+                                    <CheckCheck className="size-3.5 text-sky-300 font-bold" />
+                                  </span>
+                                ) : (
+                                  <span title="Delivered">
+                                    <CheckCheck className="size-3.5 text-primary-foreground/70" />
+                                  </span>
+                                ))}
                             </div>
-                          )}
+                          </div>
+                        )}
 
-                          {/* WhatsApp-Style Bottom Right Timestamp & Seen Double Ticks */}
+                        {/* ─── Reaction Badges Pill (Bottom Corner of Bubble) ─── */}
+                        {reactions.length > 0 && (
                           <div
                             className={cn(
-                              "flex items-center justify-end gap-1 text-[9px] font-medium select-none -mt-1 float-right ml-2 pt-0.5",
-                              isMe ? "text-primary-foreground/75" : "text-muted-foreground"
+                              "absolute -bottom-2.5 flex items-center gap-0.5 bg-card dark:bg-[#1e293b] border border-border/60 rounded-full px-2 py-0.5 shadow-xs text-[11px] cursor-pointer hover:scale-105 transition-transform",
+                              isMe ? "right-2" : "left-2"
                             )}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleReaction(msg.id, reactions[0].emoji);
+                            }}
+                            title="Click to toggle reaction"
                           >
-                            <span>{formatTime(msg.createdAt)}</span>
-                            {isMe &&
-                              (msg.optimistic ? (
-                                <Loader2 className="size-2.5 animate-spin text-primary-foreground/70" />
-                              ) : msg.readAt ? (
-                                <span title="Seen">
-                                  <CheckCheck className="size-3.5 text-sky-300 font-bold" />
-                                </span>
-                              ) : (
-                                <span title="Delivered">
-                                  <CheckCheck className="size-3.5 text-primary-foreground/70" />
-                                </span>
-                              ))}
+                            {Array.from(new Set(reactions.map((r) => r.emoji))).map((e) => (
+                              <span key={e}>{e}</span>
+                            ))}
+                            {reactions.length > 1 && (
+                              <span className="text-[9px] font-black text-muted-foreground ml-0.5">
+                                {reactions.length}
+                              </span>
+                            )}
                           </div>
-                        </div>
-                      )}
-
-                      {/* ─── Reaction Badges Pill (Bottom Corner of Bubble) ─── */}
-                      {reactions.length > 0 && (
-                        <div
-                          className={cn(
-                            "absolute -bottom-2.5 flex items-center gap-0.5 bg-card dark:bg-[#1e293b] border border-border/60 rounded-full px-2 py-0.5 shadow-xs text-[11px] cursor-pointer hover:scale-105 transition-transform",
-                            isMe ? "right-2" : "left-2"
-                          )}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleReaction(msg.id, reactions[0].emoji);
-                          }}
-                          title="Click to toggle reaction"
-                        >
-                          {Array.from(new Set(reactions.map((r) => r.emoji))).map((e) => (
-                            <span key={e}>{e}</span>
-                          ))}
-                          {reactions.length > 1 && (
-                            <span className="text-[9px] font-black text-muted-foreground ml-0.5">
-                              {reactions.length}
-                            </span>
-                          )}
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          }))}
+              );
+            })
+          )}
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -1078,9 +1072,7 @@ export function MessengerPane({
             <div className="border-l-3 border-primary pl-2.5 min-w-0">
               <p className="text-[10px] font-black text-primary">
                 Replying to{" "}
-                {replyingTo.senderId === currentUserId
-                  ? "yourself"
-                  : otherParticipant.displayName}
+                {replyingTo.senderId === currentUserId ? "yourself" : otherParticipant.displayName}
               </p>
               <p className="text-xs text-muted-foreground truncate">{replyingTo.body}</p>
             </div>
@@ -1112,9 +1104,7 @@ export function MessengerPane({
                 >
                   <Avatar className="size-5">
                     <AvatarImage src={u.avatarUrl || ""} />
-                    <AvatarFallback className="text-[9px]">
-                      {u.displayName?.[0] || "U"}
-                    </AvatarFallback>
+                    <AvatarFallback className="text-[9px]">{u.displayName?.[0] || "U"}</AvatarFallback>
                   </Avatar>
                   <span>@{u.username}</span>
                   <span className="text-[10px] opacity-75 font-normal">({u.displayName})</span>
@@ -1225,9 +1215,7 @@ export function MessengerPane({
                 <X className="size-4" />
               </button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Are you sure you want to delete this message?
-            </p>
+            <p className="text-xs text-muted-foreground">Are you sure you want to delete this message?</p>
             <div className="space-y-2 pt-2">
               {deleteModalMsg.senderId === currentUserId && (
                 <button

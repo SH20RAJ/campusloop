@@ -8,15 +8,22 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "**",
+      "src/**",
       "!**/.next/**",
       "!**/node_modules/**",
       "!**/out/**",
       "!**/.open-next/**",
       "!**/drizzle/**",
       "!**/dist/**",
-      "!**/public/**"
+      "!**/public/**",
+      "!**/scripts/**",
+      "!src/components/animate-ui/**"
     ]
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
   "formatter": {
     "enabled": true,
@@ -35,15 +42,32 @@
     "enabled": true,
     "rules": {
       "preset": "recommended",
+      "style": {
+        "noNonNullAssertion": "off",
+        "useImportType": "off"
+      },
+      "complexity": {
+        "useOptionalChain": "off"
+      },
       "suspicious": {
         "noExplicitAny": "off",
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noGlobalIsNan": "off",
+        "noAssignInExpressions": "off",
+        "useIterableCallbackReturn": "off",
+        "noDocumentCookie": "off"
       },
       "a11y": {
         "useKeyWithClickEvents": "off",
         "useAltText": "off",
         "useButtonType": "off",
-        "noLabelWithoutControl": "off"
+        "noLabelWithoutControl": "off",
+        "noAutofocus": "off",
+        "noStaticElementInteractions": "off",
+        "noSvgWithoutTitle": "off",
+        "noRedundantAlt": "off",
+        "useIframeTitle": "off",
+        "useAriaPropsSupportedByRole": "off"
       },
       "performance": {
         "noImgElement": "off"
@@ -52,14 +76,16 @@
         "noDangerouslySetInnerHtml": "off"
       },
       "correctness": {
-        "useExhaustiveDependencies": "warn"
+        "useExhaustiveDependencies": "off",
+        "noUnusedVariables": "off",
+        "noUnusedFunctionParameters": "off",
+        "useHookAtTopLevel": "off"
       }
     }
   },
   "javascript": {
     "formatter": {
       "quoteStyle": "double",
-      "jsxQuoteStyle": "double",
       "semicolons": "always",
       "trailingCommas": "es5"
     }

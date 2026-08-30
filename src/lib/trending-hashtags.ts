@@ -1,6 +1,6 @@
+import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { posts } from "@/db/schema";
-import { desc,eq } from "drizzle-orm";
 
 export interface TrendingHashtag {
   tag: string;
@@ -49,7 +49,9 @@ const CACHE_TTL_MS = 45 * 1000; // 45 seconds
 /**
  * Fetch and aggregate active hashtags from real database posts
  */
-async function getAggregatedDbHashtags(): Promise<Map<string, { count: number; category: string; campusId?: string | null }>> {
+async function getAggregatedDbHashtags(): Promise<
+  Map<string, { count: number; category: string; campusId?: string | null }>
+> {
   const now = Date.now();
   if (cachedDbTags && now - cachedDbTags.timestamp < CACHE_TTL_MS) {
     return cachedDbTags.data;
@@ -94,7 +96,6 @@ async function getAggregatedDbHashtags(): Promise<Map<string, { count: number; c
   cachedDbTags = { timestamp: now, data: tagMap };
   return tagMap;
 }
-
 
 export interface GetTrendingHashtagsOptions {
   query?: string;

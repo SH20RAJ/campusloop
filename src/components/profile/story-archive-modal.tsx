@@ -1,17 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import {
-Bookmark,
-Check,
-Heart,
-Loader2,
-Plus,
-X
-} from "lucide-react";
+import { Bookmark, Check, Heart, Loader2, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { cn } from "@/lib/utils";
 
 interface ArchivedStory {
   id: string;
@@ -36,11 +29,7 @@ interface StoryArchiveModalProps {
   onHighlightCreated: () => void;
 }
 
-export function StoryArchiveModal({
-  isOpen,
-  onClose,
-  onHighlightCreated,
-}: StoryArchiveModalProps) {
+export function StoryArchiveModal({ isOpen, onClose, onHighlightCreated }: StoryArchiveModalProps) {
   const [selectedStoryIds, setSelectedStoryIds] = useState<string[]>([]);
   const [highlightTitle, setHighlightTitle] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -54,9 +43,7 @@ export function StoryArchiveModal({
   if (!isOpen) return null;
 
   function toggleSelect(id: string) {
-    setSelectedStoryIds((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    );
+    setSelectedStoryIds((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
   }
 
   async function handleCreateHighlight(e: React.FormEvent) {
@@ -65,9 +52,7 @@ export function StoryArchiveModal({
 
     setIsCreating(true);
     try {
-      const selectedStories = archiveStories?.filter((s) =>
-        selectedStoryIds.includes(s.id)
-      );
+      const selectedStories = archiveStories?.filter((s) => selectedStoryIds.includes(s.id));
       const coverUrl = selectedStories?.find((s) => s.mediaUrl)?.mediaUrl || null;
 
       const res = await fetch("/api/highlights", {

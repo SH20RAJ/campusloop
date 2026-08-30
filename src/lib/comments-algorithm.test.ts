@@ -1,5 +1,5 @@
-import { describe,expect,it } from "vitest";
-import { calculateCommentScore,rankAndThreadComments } from "./comments-algorithm";
+import { describe, expect, it } from "vitest";
+import { calculateCommentScore, rankAndThreadComments } from "./comments-algorithm";
 
 describe("comments-algorithm", () => {
   it("boosts OP comments above regular comments", () => {

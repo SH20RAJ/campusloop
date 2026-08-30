@@ -1,7 +1,7 @@
+import { type NextRequest, NextResponse } from "next/server";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { sendEmail } from "@/lib/email";
-import { buildNotificationEmail,buildWelcomeEmail } from "@/lib/email-templates";
-import { NextRequest,NextResponse } from "next/server";
+import { buildNotificationEmail, buildWelcomeEmail } from "@/lib/email-templates";
 
 export const dynamic = "force-dynamic";
 

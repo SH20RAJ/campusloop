@@ -1,5 +1,5 @@
-import { index,integer,jsonb,pgEnum,pgTable,text,uniqueIndex } from "drizzle-orm/pg-core";
-import { createdAt,id,updatedAt } from "./common";
+import { index, integer, jsonb, pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "./common";
 
 export const institutionDomainTypeEnum = pgEnum("institution_domain_type", [
   "WEBSITE",
@@ -58,7 +58,7 @@ export const institutions = pgTable(
     uniqueIndex("institutions_aishe_code_idx").on(table.aisheCode),
     uniqueIndex("institutions_slug_idx").on(table.slug),
     index("institutions_search_idx").on(table.name, table.state, table.district, table.websiteDomain),
-  ],
+  ]
 );
 
 export const institutionDomains = pgTable(
@@ -77,7 +77,7 @@ export const institutionDomains = pgTable(
   (table) => [
     uniqueIndex("institution_domains_domain_idx").on(table.domain),
     uniqueIndex("institution_domains_institution_domain_idx").on(table.institutionId, table.domain),
-  ],
+  ]
 );
 
 export const institutionRequests = pgTable(
@@ -92,7 +92,7 @@ export const institutionRequests = pgTable(
     status: institutionRequestStatusEnum("status").default("PENDING").notNull(),
     createdAt,
   },
-  (table) => [index("institution_requests_status_created_idx").on(table.status, table.createdAt)],
+  (table) => [index("institution_requests_status_created_idx").on(table.status, table.createdAt)]
 );
 
 export type Institution = typeof institutions.$inferSelect;

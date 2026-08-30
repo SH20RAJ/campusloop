@@ -1,9 +1,8 @@
+import { desc, ilike, sql } from "drizzle-orm";
+import type { Metadata } from "next";
 import { comments } from "@/db/schema";
-import { desc,ilike,sql } from "drizzle-orm";
-import { Metadata } from "next";
-import { CommentsTable } from "./comments-table";
-
 import { resolveAdminSession } from "../_lib/guard";
+import { CommentsTable } from "./comments-table";
 
 export const metadata: Metadata = {
   title: "Admin Comments | CampusLoop",
@@ -16,22 +15,17 @@ interface PageProps {
 export default async function AdminCommentsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const { db } = await resolveAdminSession();
-  
+
   const q = params.q || "";
   const page = Number(params.page) || 1;
   const limit = 10;
   const offset = (page - 1) * limit;
 
   // Search filtering clause
-  const whereClause = q 
-    ? ilike(comments.body, `%${q}%`)
-    : undefined;
+  const whereClause = q ? ilike(comments.body, `%${q}%`) : undefined;
 
   // Get total count
-  const countResult = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(comments)
-    .where(whereClause);
+  const countResult = await db.select({ count: sql<number>`count(*)` }).from(comments).where(whereClause);
 
   const totalCount = countResult[0]?.count || 0;
   const totalPages = Math.ceil(totalCount / limit);
@@ -45,7 +39,7 @@ export default async function AdminCommentsPage({ searchParams }: PageProps) {
     with: {
       author: true,
       post: true,
-    }
+    },
   });
 
   return (
@@ -55,11 +49,7 @@ export default async function AdminCommentsPage({ searchParams }: PageProps) {
         <p className="text-muted-foreground text-sm">Review and delete comments across all campuses.</p>
       </div>
 
-      <CommentsTable 
-        initialComments={list} 
-        page={page} 
-        totalPages={totalPages} 
-      />
+      <CommentsTable initialComments={list} page={page} totalPages={totalPages} />
     </div>
   );
 }

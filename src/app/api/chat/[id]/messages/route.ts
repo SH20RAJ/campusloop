@@ -1,10 +1,10 @@
+import { and, asc, eq, isNull, ne } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { conversations,messages,userProfiles } from "@/db/schema";
+import { conversations, messages, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { recordHeartbeat } from "@/lib/presence-server";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { and,asc,eq,isNull,ne } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -36,11 +36,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       .update(messages)
       .set({ readAt: new Date() })
       .where(
-        and(
-          eq(messages.conversationId, id),
-          ne(messages.senderId, profile.id),
-          isNull(messages.readAt)
-        )
+        and(eq(messages.conversationId, id), ne(messages.senderId, profile.id), isNull(messages.readAt))
       );
 
     const chatMessages = await db.query.messages.findMany({
@@ -48,7 +44,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       orderBy: [asc(messages.createdAt)],
       with: {
         sender: true,
-      }
+      },
     });
 
     return NextResponse.json(chatMessages);
@@ -57,7 +53,6 @@ export async function GET(req: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
-
 
 export async function POST(req: Request, { params }: RouteParams) {
   try {
@@ -88,17 +83,17 @@ export async function POST(req: Request, { params }: RouteParams) {
     }
 
     // Insert message
-    const [newMessage] = await db.insert(messages).values({
-      conversationId: id,
-      senderId: profile.id,
-      body,
-    }).returning();
+    const [newMessage] = await db
+      .insert(messages)
+      .values({
+        conversationId: id,
+        senderId: profile.id,
+        body,
+      })
+      .returning();
 
     // Update conversation updatedAt to trigger re-sorting in conversation list
-    await db
-      .update(conversations)
-      .set({ updatedAt: new Date() })
-      .where(eq(conversations.id, id));
+    await db.update(conversations).set({ updatedAt: new Date() }).where(eq(conversations.id, id));
 
     // Return message populated with sender
     const populatedMessage = {

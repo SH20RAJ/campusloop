@@ -22,7 +22,7 @@ export function PresenceDot({
       aria-label="Online now"
       className={cn(
         "absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 ring-2 ring-card shadow-xs",
-        className,
+        className
       )}
     />
   );

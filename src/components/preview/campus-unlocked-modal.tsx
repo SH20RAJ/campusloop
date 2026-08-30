@@ -1,18 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { sounds } from "@/lib/sounds";
-import {
-  ArrowRight,
-  CheckCircle2,
-  GraduationCap,
-  Mail,
-  School,
-  X,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2, GraduationCap, Mail, School, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { sounds } from "@/lib/sounds";
 
 interface CampusUnlockedModalProps {
   isOpen: boolean;
@@ -25,11 +18,7 @@ interface JourneyStats {
   collegeName: string;
 }
 
-export function CampusUnlockedModal({
-  isOpen,
-  onClose,
-  onSuccess,
-}: CampusUnlockedModalProps) {
+export function CampusUnlockedModal({ isOpen, onClose, onSuccess }: CampusUnlockedModalProps) {
   const router = useRouter();
   const [collegeEmail, setCollegeEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -148,9 +137,7 @@ export function CampusUnlockedModal({
               <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
                 CAMPUS UNLOCKED
               </h2>
-              <p className="text-sm font-extrabold text-primary">
-                {journeyStats.collegeName}
-              </p>
+              <p className="text-sm font-extrabold text-primary">{journeyStats.collegeName}</p>
             </div>
 
             {/* Journey Narrative Card */}
@@ -160,12 +147,11 @@ export function CampusUnlockedModal({
               </p>
               {journeyStats.savedPostsCount > 0 && (
                 <p className="text-xs font-bold text-foreground">
-                  You saved {journeyStats.savedPostsCount} {journeyStats.savedPostsCount === 1 ? "post" : "posts"} in your vault.
+                  You saved {journeyStats.savedPostsCount}{" "}
+                  {journeyStats.savedPostsCount === 1 ? "post" : "posts"} in your vault.
                 </p>
               )}
-              <p className="text-sm font-black text-foreground pt-1">
-                Today, you&apos;re officially inside.
-              </p>
+              <p className="text-sm font-black text-foreground pt-1">Today, you&apos;re officially inside.</p>
             </div>
 
             {/* What's Unlocked Grid */}
@@ -214,9 +200,8 @@ export function CampusUnlockedModal({
             <div className="space-y-1.5">
               <h2 className="text-xl font-black tracking-tight text-foreground">Check your inbox</h2>
               <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                We sent a verification link to{" "}
-                <strong className="text-foreground">{pendingEmail}</strong>. Open it, then come back
-                here to finish unlocking your campus.
+                We sent a verification link to <strong className="text-foreground">{pendingEmail}</strong>.
+                Open it, then come back here to finish unlocking your campus.
               </p>
             </div>
 
@@ -270,15 +255,14 @@ export function CampusUnlockedModal({
                 Unlock Your Campus
               </h2>
               <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                Connect your accredited university email (@bitmesra.ac.in, @iitb.ac.in, etc.) to participate in discussions and matchmaking.
+                Connect your accredited university email (@bitmesra.ac.in, @iitb.ac.in, etc.) to participate
+                in discussions and matchmaking.
               </p>
             </div>
 
             <form onSubmit={handleRequestVerification} className="space-y-4 text-left">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-foreground">
-                  Official College Email
-                </label>
+                <label className="text-xs font-bold text-foreground">Official College Email</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <input
@@ -291,12 +275,10 @@ export function CampusUnlockedModal({
                   />
                 </div>
                 <p className="text-[10px] text-muted-foreground">
-                  We&apos;ll email a link to confirm you can read this inbox. Your saved posts,
-                  profile and points stay on this same account.
+                  We&apos;ll email a link to confirm you can read this inbox. Your saved posts, profile and
+                  points stay on this same account.
                 </p>
-                {error && (
-                  <p className="text-[11px] font-semibold text-destructive">{error}</p>
-                )}
+                {error && <p className="text-[11px] font-semibold text-destructive">{error}</p>}
               </div>
 
               <div className="space-y-2 pt-2">

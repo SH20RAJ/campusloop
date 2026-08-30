@@ -1,20 +1,28 @@
 "use client";
 
+import { Bookmark, Compass, Search } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import useSWR from "swr";
 import { FeedCard } from "@/components/ui/feed-card";
 import { FeedSkeleton } from "@/components/ui/skeleton-card";
 import type { FeedPost } from "@/hooks/use-feed";
 import { fetcher } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { Bookmark, Compass, Lock, Search } from "lucide-react";
-import Link from "next/link";
-import { useMemo, useState } from "react";
-import useSWR from "swr";
 
 const CATEGORIES = [
   { id: "ALL", label: "All Saved" },
   { id: "HOSTEL", label: "Hostel & Food", keywords: ["hostel", "mess", "food", "room", "canteen"] },
-  { id: "PLACEMENTS", label: "Placements", keywords: ["placement", "intern", "package", "ctc", "interview", "salary"] },
-  { id: "ACADEMICS", label: "Academics", keywords: ["exam", "professor", "cgpa", "assignment", "attendance", "notes"] },
+  {
+    id: "PLACEMENTS",
+    label: "Placements",
+    keywords: ["placement", "intern", "package", "ctc", "interview", "salary"],
+  },
+  {
+    id: "ACADEMICS",
+    label: "Academics",
+    keywords: ["exam", "professor", "cgpa", "assignment", "attendance", "notes"],
+  },
   { id: "CONFESSIONS", label: "Confessions", keywords: ["confession", "crush", "secret", "anonymous"] },
 ] as const;
 
@@ -29,11 +37,9 @@ export function SavedClient() {
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, isLoading, mutate } = useSWR<SavedApiResponse>(
-    "/api/posts/saved",
-    fetcher,
-    { revalidateOnFocus: true }
-  );
+  const { data, isLoading, mutate } = useSWR<SavedApiResponse>("/api/posts/saved", fetcher, {
+    revalidateOnFocus: true,
+  });
 
   const posts = data?.posts || [];
 
@@ -124,9 +130,7 @@ export function SavedClient() {
         {isLoading ? (
           <FeedSkeleton />
         ) : filteredPosts.length > 0 ? (
-          filteredPosts.map((post) => (
-            <FeedCard key={post.id} post={{ ...post, isSaved: true }} />
-          ))
+          filteredPosts.map((post) => <FeedCard key={post.id} post={{ ...post, isSaved: true }} />)
         ) : (
           <div className="py-20 text-center space-y-4 max-w-sm mx-auto">
             <div className="size-16 rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 mx-auto">

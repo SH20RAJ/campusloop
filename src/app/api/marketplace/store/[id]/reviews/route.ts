@@ -1,9 +1,9 @@
+import { and, desc, eq, sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { marketplaceReviews, merchants, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { and, desc, eq, sql } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -121,7 +121,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       ),
     });
 
-    let savedReview;
+    let savedReview: typeof existingReview | null = null;
     if (existingReview) {
       // Update existing review
       const [updated] = await db

@@ -1,10 +1,10 @@
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { resolveGenderPreference } from "@/lib/dating";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -68,15 +68,16 @@ export async function PATCH(req: Request) {
     const current = { ...DEFAULTS, ...(profile.datingPreferences ?? {}) };
 
     const next: DatingPreferences = {
-      gender: GENDERS.includes(body.gender as never) ? (body.gender as DatingPreferences["gender"]) : current.gender,
-      scope: SCOPES.includes(body.scope as never) ? (body.scope as DatingPreferences["scope"]) : current.scope,
+      gender: GENDERS.includes(body.gender as never)
+        ? (body.gender as DatingPreferences["gender"])
+        : current.gender,
+      scope: SCOPES.includes(body.scope as never)
+        ? (body.scope as DatingPreferences["scope"])
+        : current.scope,
       sort: SORTS.includes(body.sort as never) ? (body.sort as DatingPreferences["sort"]) : current.sort,
     };
 
-    await db
-      .update(userProfiles)
-      .set({ datingPreferences: next })
-      .where(eq(userProfiles.id, profile.id));
+    await db.update(userProfiles).set({ datingPreferences: next }).where(eq(userProfiles.id, profile.id));
 
     return NextResponse.json({ preferences: next });
   } catch (error) {

@@ -1,13 +1,10 @@
+import { describe, expect, it } from "vitest";
+import { getSecretCrushSlotLimit, getSecretCrushSlotProgress } from "@/constants/gamification";
 import {
-getSecretCrushSlotLimit,
-getSecretCrushSlotProgress,
-} from "@/constants/gamification";
-import { describe,expect,it } from "vitest";
-import {
-computeCompatibility,
-resolveGenderPreference,
-sharedInterestsBetween,
-type CompatibilityProfile,
+  type CompatibilityProfile,
+  computeCompatibility,
+  resolveGenderPreference,
+  sharedInterestsBetween,
 } from "./dating";
 
 function profile(overrides: Partial<CompatibilityProfile> = {}): CompatibilityProfile {
@@ -112,7 +109,9 @@ describe("computeCompatibility", () => {
     const r2 = computeCompatibility(me, cand, { likedMe: true });
     expect(r1.score).toBe(r2.score);
     expect(r1.score).toBeLessThanOrEqual(99);
-    expect(computeCompatibility(me, profile({ id: "cand-min", institutionId: "z", institution: {} })).score).toBeGreaterThanOrEqual(35);
+    expect(
+      computeCompatibility(me, profile({ id: "cand-min", institutionId: "z", institution: {} })).score
+    ).toBeGreaterThanOrEqual(35);
   });
 });
 

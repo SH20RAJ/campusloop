@@ -1,7 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useEffect,useState } from "react";
 
 /**
  * Document primitives for the legal / policy pages.
@@ -35,7 +35,7 @@ export function DocToc({ sections }: { sections: DocSectionRef[] }) {
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
         if (visible[0]) setActiveId(visible[0].target.id);
       },
-      { rootMargin: "-96px 0px -70% 0px", threshold: 0 },
+      { rootMargin: "-96px 0px -70% 0px", threshold: 0 }
     );
 
     headings.forEach((el) => observer.observe(el));
@@ -55,7 +55,7 @@ export function DocToc({ sections }: { sections: DocSectionRef[] }) {
             "block border-l py-1.5 pl-3.5 text-[13px] leading-snug transition-colors",
             activeId === section.id
               ? "border-foreground font-medium text-foreground"
-              : "border-border/60 text-muted-foreground hover:border-foreground/40 hover:text-foreground",
+              : "border-border/60 text-muted-foreground hover:border-foreground/40 hover:text-foreground"
           )}
         >
           {section.label}
@@ -147,11 +147,7 @@ export function DocList({ items }: { items: React.ReactNode[] }) {
 }
 
 /** Label/value rows — used for helplines, contact desks, data categories. */
-export function DocTable({
-  rows,
-}: {
-  rows: { label: string; value: React.ReactNode; note?: string }[];
-}) {
+export function DocTable({ rows }: { rows: { label: string; value: React.ReactNode; note?: string }[] }) {
   return (
     <dl className="divide-y divide-border/50 border-y border-border/50">
       {rows.map((row) => (
@@ -167,13 +163,7 @@ export function DocTable({
   );
 }
 
-export function DocLayout({
-  sections,
-  children,
-}: {
-  sections: DocSectionRef[];
-  children: React.ReactNode;
-}) {
+export function DocLayout({ sections, children }: { sections: DocSectionRef[]; children: React.ReactNode }) {
   return (
     <div className="mx-auto grid w-full max-w-5xl gap-x-16 px-5 sm:px-8 lg:grid-cols-[13rem_minmax(0,1fr)]">
       <aside className="hidden lg:block">

@@ -1,15 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import {
-DocLayout,
-DocSection,
-DocTable,
-LegalDocHeader,
-type DocSectionRef,
+  DocLayout,
+  DocSection,
+  type DocSectionRef,
+  DocTable,
+  LegalDocHeader,
 } from "@/components/marketing/legal-doc";
 import { LegalNav } from "@/components/marketing/legal-nav";
-import { MarketingFooter,MarketingHeader } from "@/components/marketing/system";
-import Link from "next/link";
+import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
 
 const SECTIONS: DocSectionRef[] = [
   { id: "desks", label: "Where to write" },
@@ -78,36 +78,36 @@ export function ContactClient() {
 
           <DocSection id="urgent" number={2} title="Something urgent">
             <p>
-              If a student is in immediate danger, contact emergency services before you contact us.
-              The national helplines are listed on the{" "}
+              If a student is in immediate danger, contact emergency services before you contact us. The
+              national helplines are listed on the{" "}
               <Link href="/safety" className="text-primary underline-offset-4 hover:underline">
                 safety page
               </Link>
               , and they are free and staffed around the clock.
             </p>
             <p>
-              To report a specific post or account, use the report control on the post itself — that
-              routes into the moderation queue with the context already attached, which is faster
-              than describing it over email.
+              To report a specific post or account, use the report control on the post itself — that routes
+              into the moderation queue with the context already attached, which is faster than describing it
+              over email.
             </p>
           </DocSection>
 
           <DocSection id="college" number={3} title="Add your college">
             <p>
-              If your institution&apos;s email domain is not recognised during sign-up, you can
-              request it directly from the{" "}
+              If your institution&apos;s email domain is not recognised during sign-up, you can request it
+              directly from the{" "}
               <Link href="/colleges" className="text-primary underline-offset-4 hover:underline">
                 college directory
               </Link>{" "}
-              — that form goes straight into the verification queue. Write to the partnerships desk
-              if your college wants an official hub with administrator access.
+              — that form goes straight into the verification queue. Write to the partnerships desk if your
+              college wants an official hub with administrator access.
             </p>
           </DocSection>
 
           <DocSection id="statutory" number={4} title="Statutory contacts">
             <p>
-              Published under Rule 3(2) of the IT (Intermediary Guidelines and Digital Media Ethics
-              Code) Rules, 2021 and the DPDP Act, 2023.
+              Published under Rule 3(2) of the IT (Intermediary Guidelines and Digital Media Ethics Code)
+              Rules, 2021 and the DPDP Act, 2023.
             </p>
             <DocTable
               rows={[

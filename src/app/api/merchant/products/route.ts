@@ -1,8 +1,8 @@
+import { and, asc, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { products } from "@/db/schema";
 import { resolveMerchantSession } from "@/lib/merchant-session";
-import { and, asc, eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -71,7 +71,9 @@ export async function POST(req: Request) {
         price: Math.max(0, price),
         originalPrice: typeof originalPrice === "number" ? originalPrice : null,
         categoryName: categoryName?.trim() || "Popular Items",
-        imageUrl: imageUrl?.trim() || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop",
+        imageUrl:
+          imageUrl?.trim() ||
+          "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop",
         preparationTime,
         options: mergedOptions,
         addons,
@@ -149,9 +151,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
     }
 
-    await db
-      .delete(products)
-      .where(and(eq(products.id, productId), eq(products.merchantId, merchant.id)));
+    await db.delete(products).where(and(eq(products.id, productId), eq(products.merchantId, merchant.id)));
 
     return NextResponse.json({ success: true });
   } catch (error) {

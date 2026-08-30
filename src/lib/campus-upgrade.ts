@@ -1,8 +1,8 @@
+import { and, eq, ne, sql } from "drizzle-orm";
 import { getDb } from "@/db";
+import type { Institution, UserProfile } from "@/db/schema";
 import { institutionDomains, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import type { Institution, UserProfile } from "@/db/schema";
-import { and, eq, ne, sql } from "drizzle-orm";
 
 /**
  * Campus upgrade: turning a Campus Preview account into a verified student.
@@ -89,10 +89,7 @@ export async function checkCampusUpgradeEligibility(rawEmail: string): Promise<U
 
   // Nobody may claim an address that already belongs to another profile.
   const takenByProfile = await db.query.userProfiles.findFirst({
-    where: and(
-      sql`lower(${userProfiles.email}) = ${email}`,
-      ne(userProfiles.id, profile.id)
-    ),
+    where: and(sql`lower(${userProfiles.email}) = ${email}`, ne(userProfiles.id, profile.id)),
     columns: { id: true },
   });
 
@@ -124,10 +121,7 @@ export async function checkCampusUpgradeEligibility(rawEmail: string): Promise<U
  * `currentUserId`. The directory search is free-text, so every candidate is
  * confirmed by comparing its channel values exactly.
  */
-export async function isEmailOnAnotherAuthAccount(
-  email: string,
-  currentUserId: string
-): Promise<boolean> {
+export async function isEmailOnAnotherAuthAccount(email: string, currentUserId: string): Promise<boolean> {
   try {
     const candidates = await hexclaveServerApp.listUsers({ query: email, limit: 20 });
 

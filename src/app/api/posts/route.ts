@@ -1,14 +1,13 @@
+import { randomUUID } from "node:crypto";
+import { eq, sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { anonIdentityVault,pollOptions,posts,userProfiles } from "@/db/schema";
+import { anonIdentityVault, pollOptions, posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { deriveAnonHandle,sealIdentity } from "@/lib/anonymity";
+import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
 import { runSafetyCheck } from "@/lib/moderation/rules";
 import { notifyMentions } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { eq,sql } from "drizzle-orm";
-
-import { NextResponse } from "next/server";
-import { randomUUID } from "node:crypto";
 
 export async function POST(req: Request) {
   try {
@@ -49,7 +48,7 @@ export async function POST(req: Request) {
     if (safety.blocked) {
       return NextResponse.json(
         { error: safety.messages.join(" "), messages: safety.messages, riskScore: safety.riskScore },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -99,7 +98,8 @@ export async function POST(req: Request) {
       .returning();
 
     // Award +5 points
-    await db.update(userProfiles)
+    await db
+      .update(userProfiles)
       .set({ points: sql`${userProfiles.points} + 5` })
       .where(eq(userProfiles.id, profile.id));
 
@@ -115,7 +115,6 @@ export async function POST(req: Request) {
     }).catch((err) => console.warn("Mention notification error:", err));
 
     return NextResponse.json(newPost, { status: 201 });
-
   } catch (error) {
     console.error("Error creating post:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

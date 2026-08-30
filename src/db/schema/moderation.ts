@@ -1,5 +1,5 @@
-import { index,pgTable,text } from "drizzle-orm/pg-core";
-import { createdAt,id,reportStatusEnum,reportTargetTypeEnum,updatedAt } from "./common";
+import { index, pgTable, text } from "drizzle-orm/pg-core";
+import { createdAt, id, reportStatusEnum, reportTargetTypeEnum, updatedAt } from "./common";
 import { userProfiles } from "./users";
 
 export const reports = pgTable(
@@ -20,7 +20,7 @@ export const reports = pgTable(
   (table) => [
     index("reports_status_created_idx").on(table.status, table.createdAt),
     index("reports_target_idx").on(table.targetType, table.targetId),
-  ],
+  ]
 );
 
 export const moderationActions = pgTable(
@@ -36,7 +36,7 @@ export const moderationActions = pgTable(
     reason: text("reason"),
     createdAt,
   },
-  (table) => [index("moderation_actions_target_idx").on(table.targetType, table.targetId)],
+  (table) => [index("moderation_actions_target_idx").on(table.targetType, table.targetId)]
 );
 
 export type Report = typeof reports.$inferSelect;

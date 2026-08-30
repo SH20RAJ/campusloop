@@ -1,12 +1,11 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import confetti from "canvas-confetti";
-import { Cake,Heart,MessageCircle,Zap } from "lucide-react";
-
+import { Cake, Heart, MessageCircle, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface BirthdayCardProps {
   student: {
@@ -26,10 +25,7 @@ interface BirthdayCardProps {
   isToday?: boolean;
 }
 
-const MONTH_NAMES = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-];
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
   const [wished, setWished] = useState(false);
@@ -53,11 +49,12 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
     }
   }
 
-  const birthDateFormatted = student.birthMonth && student.birthDay
-    ? `${MONTH_NAMES[student.birthMonth - 1]} ${student.birthDay}`
-    : student.dob
-      ? `${MONTH_NAMES[parseInt(student.dob.split("-")[1], 10) - 1]} ${parseInt(student.dob.split("-")[2], 10)}`
-      : "";
+  const birthDateFormatted =
+    student.birthMonth && student.birthDay
+      ? `${MONTH_NAMES[student.birthMonth - 1]} ${student.birthDay}`
+      : student.dob
+        ? `${MONTH_NAMES[parseInt(student.dob.split("-")[1], 10) - 1]} ${parseInt(student.dob.split("-")[2], 10)}`
+        : "";
 
   return (
     <div
@@ -87,7 +84,9 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
             <h4 className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">
               {student.displayName}
             </h4>
-            <span className="text-blue-500 text-[10px] font-black" title="Verified Student">✓</span>
+            <span className="text-blue-500 text-[10px] font-black" title="Verified Student">
+              ✓
+            </span>
           </div>
 
           <p className="text-[11px] text-muted-foreground truncate">
@@ -138,8 +137,8 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
                 {student.daysUntil === 0
                   ? "Today! 🎉"
                   : student.daysUntil === 1
-                  ? "Tomorrow"
-                  : `In ${student.daysUntil} days`}
+                    ? "Tomorrow"
+                    : `In ${student.daysUntil} days`}
               </p>
             )}
           </div>

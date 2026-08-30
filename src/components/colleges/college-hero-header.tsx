@@ -1,14 +1,6 @@
 "use client";
 
-import {
-ArrowLeft,
-Check,
-Globe,
-MapPin,
-MessageSquarePlus,
-School,
-Share2
-} from "lucide-react";
+import { ArrowLeft, Check, Globe, MapPin, MessageSquarePlus, School, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -153,11 +145,7 @@ export function CollegeHeroHeader({
 
               {college.website && (
                 <a
-                  href={
-                    college.website.startsWith("http")
-                      ? college.website
-                      : `https://${college.website}`
-                  }
+                  href={college.website.startsWith("http") ? college.website : `https://${college.website}`}
                   target="_blank"
                   rel="noreferrer"
                   className="h-9 px-4 rounded-full border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
@@ -198,9 +186,7 @@ export function CollegeHeroHeader({
 
           {/* Description if present */}
           {college.description && (
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {college.description}
-            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{college.description}</p>
           )}
 
           {/* Horizontal Stats Row */}
@@ -214,7 +200,8 @@ export function CollegeHeroHeader({
             </span>
             <span>•</span>
             <span className="text-foreground">
-              <strong className="text-foreground font-black">{collectivePoints.toLocaleString()}</strong> LP Clout
+              <strong className="text-foreground font-black">{collectivePoints.toLocaleString()}</strong> LP
+              Clout
             </span>
           </div>
         </div>

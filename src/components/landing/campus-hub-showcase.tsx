@@ -1,22 +1,22 @@
 "use client";
 
-import { Card,CardContent } from "@/components/ui/card";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
 import {
-ArrowRight,
-BookOpen,
-Car,
-Copy,
-Gamepad2,
-Home,
-MessageCircle,
-PackageSearch,
-ShoppingBag,
+  ArrowRight,
+  BookOpen,
+  Car,
+  Copy,
+  Gamepad2,
+  Home,
+  MessageCircle,
+  PackageSearch,
+  ShoppingBag,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 import { Reveal } from "./reveal";
 
 interface HubItemData {
@@ -140,7 +140,8 @@ export function CampusHubShowcase() {
             Everything your campus needs, under one roof.
           </h2>
           <p className="text-base leading-relaxed text-muted-foreground">
-            No more messy WhatsApp groups or unverified Telegram channels. Each college gets its own isolated, verified student-to-student service hubs.
+            No more messy WhatsApp groups or unverified Telegram channels. Each college gets its own isolated,
+            verified student-to-student service hubs.
           </p>
         </Reveal>
 
@@ -186,12 +187,8 @@ export function CampusHubShowcase() {
             >
               {activeHub.badge}
             </span>
-            <h3 className="text-2xl font-bold text-foreground">
-              {activeHub.title}
-            </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {activeHub.subtitle}
-            </p>
+            <h3 className="text-2xl font-bold text-foreground">{activeHub.title}</h3>
+            <p className="text-sm leading-relaxed text-muted-foreground">{activeHub.subtitle}</p>
             <div className="pt-2">
               <span className="text-xs font-bold text-primary flex items-center gap-1">
                 <span>Try clicking buttons on the demo card</span>
@@ -209,20 +206,14 @@ export function CampusHubShowcase() {
                       <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-500 border border-rose-500/30">
                         {demo.type} ITEM
                       </span>
-                      <span className="text-xs text-muted-foreground">
-                        {demo.college}
-                      </span>
+                      <span className="text-xs text-muted-foreground">{demo.college}</span>
                     </div>
-                    <h4 className="text-base font-bold text-foreground">
-                      {demo.itemTitle}
-                    </h4>
+                    <h4 className="text-base font-bold text-foreground">{demo.itemTitle}</h4>
                     <p className="text-xs text-muted-foreground">
                       Last seen at {demo.location} · {demo.date}
                     </p>
                     <div className="flex items-center justify-between pt-2 border-t border-border/30">
-                      <span className="text-xs font-bold text-amber-500">
-                        Reward: {demo.reward}
-                      </span>
+                      <span className="text-xs font-bold text-amber-500">Reward: {demo.reward}</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -241,26 +232,18 @@ export function CampusHubShowcase() {
                 {activeKey === "marketplace" && (
                   <div className="space-y-3">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-xl font-black text-foreground">
-                        {demo.price}
-                      </span>
-                      <span className="text-xs text-muted-foreground line-through">
-                        {demo.originalPrice}
-                      </span>
+                      <span className="text-xl font-black text-foreground">{demo.price}</span>
+                      <span className="text-xs text-muted-foreground line-through">{demo.originalPrice}</span>
                       <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/15 px-2 py-0.5 rounded-md">
                         {demo.condition}
                       </span>
                     </div>
-                    <h4 className="text-base font-bold text-foreground">
-                      {demo.itemTitle}
-                    </h4>
+                    <h4 className="text-base font-bold text-foreground">{demo.itemTitle}</h4>
                     <p className="text-xs text-muted-foreground">
                       Pickup location: {demo.location} · Seller: @{demo.seller}
                     </p>
                     <div className="flex items-center justify-between pt-2 border-t border-border/30">
-                      <span className="text-xs text-muted-foreground">
-                        Hostel Room Delivery Available
-                      </span>
+                      <span className="text-xs text-muted-foreground">Hostel Room Delivery Available</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -283,13 +266,9 @@ export function CampusHubShowcase() {
                       <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-500 border border-rose-500/30">
                         {demo.game} · {demo.mode}
                       </span>
-                      <span className="text-xs font-bold text-foreground">
-                        {demo.time}
-                      </span>
+                      <span className="text-xs font-bold text-foreground">{demo.time}</span>
                     </div>
-                    <h4 className="text-base font-bold text-foreground">
-                      {demo.title}
-                    </h4>
+                    <h4 className="text-base font-bold text-foreground">{demo.title}</h4>
                     <div className="space-y-1.5 p-3 rounded-xl bg-muted/40 border border-border/40">
                       <div className="flex justify-between text-xs font-bold">
                         <span className="text-muted-foreground">Lobby Squad</span>
@@ -334,20 +313,14 @@ export function CampusHubShowcase() {
                       <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-500 border border-sky-500/30">
                         {demo.vehicle}
                       </span>
-                      <span className="text-sm font-black text-sky-500">
-                        {demo.fare}
-                      </span>
+                      <span className="text-sm font-black text-sky-500">{demo.fare}</span>
                     </div>
-                    <h4 className="text-base font-bold text-foreground">
-                      {demo.route}
-                    </h4>
+                    <h4 className="text-base font-bold text-foreground">{demo.route}</h4>
                     <p className="text-xs text-muted-foreground">
                       Departure: {demo.departure} · Coordinated by {demo.creator}
                     </p>
                     <div className="flex items-center justify-between pt-2 border-t border-border/30">
-                      <span className="text-xs font-bold text-emerald-500">
-                        {demo.seats}
-                      </span>
+                      <span className="text-xs font-bold text-emerald-500">{demo.seats}</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -366,22 +339,17 @@ export function CampusHubShowcase() {
                 {activeKey === "housing" && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-black text-amber-500">
-                        {demo.rent}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {demo.occupancy}
-                      </span>
+                      <span className="text-lg font-black text-amber-500">{demo.rent}</span>
+                      <span className="text-xs text-muted-foreground">{demo.occupancy}</span>
                     </div>
-                    <h4 className="text-base font-bold text-foreground">
-                      {demo.title}
-                    </h4>
-                    <p className="text-xs text-muted-foreground">
-                      {demo.distance}
-                    </p>
+                    <h4 className="text-base font-bold text-foreground">{demo.title}</h4>
+                    <p className="text-xs text-muted-foreground">{demo.distance}</p>
                     <div className="flex flex-wrap gap-1 pt-1">
                       {(demo.amenities || []).map((am: string) => (
-                        <span key={am} className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
+                        <span
+                          key={am}
+                          className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground"
+                        >
                           {am}
                         </span>
                       ))}
@@ -405,23 +373,15 @@ export function CampusHubShowcase() {
                 {activeKey === "academics" && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-indigo-500">
-                        {demo.subject}
-                      </span>
+                      <span className="text-xs font-bold text-indigo-500">{demo.subject}</span>
                       <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md">
                         Verified Notes
                       </span>
                     </div>
-                    <h4 className="text-base font-bold text-foreground">
-                      {demo.title}
-                    </h4>
-                    <p className="text-xs text-muted-foreground">
-                      {demo.branch}
-                    </p>
+                    <h4 className="text-base font-bold text-foreground">{demo.title}</h4>
+                    <p className="text-xs text-muted-foreground">{demo.branch}</p>
                     <div className="flex items-center justify-between pt-2 border-t border-border/30">
-                      <span className="text-xs font-black text-foreground">
-                        {demo.upvotes}
-                      </span>
+                      <span className="text-xs font-black text-foreground">{demo.upvotes}</span>
                       <button
                         type="button"
                         onClick={() => {

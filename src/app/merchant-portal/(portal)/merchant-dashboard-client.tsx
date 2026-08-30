@@ -1,20 +1,15 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
-import { cn,formatTimeAgo } from "@/lib/utils";
-import {
-Bell,
-Check,
-Loader2,
-Power
-} from "lucide-react";
+import { Bell, Check, Loader2, Power } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetcher } from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
+import { cn, formatTimeAgo } from "@/lib/utils";
 
 export function MerchantDashboardClient() {
   const [updatingStoreOpen, setUpdatingStoreOpen] = useState(false);
@@ -133,18 +128,29 @@ export function MerchantDashboardClient() {
       {/* ─── Quick Stats Grid ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-2xl bg-card border border-border/40 space-y-1">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Today's Revenue</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Today's Revenue
+          </p>
           <p className="text-xl font-black text-foreground">₹{stats.todayRevenue.toLocaleString("en-IN")}</p>
         </div>
 
         <div className="p-4 rounded-2xl bg-card border border-border/40 space-y-1">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Today's Orders</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Today's Orders
+          </p>
           <p className="text-xl font-black text-foreground">{stats.todayOrdersCount}</p>
         </div>
 
         <div className="p-4 rounded-2xl bg-card border border-border/40 space-y-1">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Pending Action</p>
-          <p className={cn("text-xl font-black", stats.pendingCount > 0 ? "text-amber-500 animate-pulse" : "text-foreground")}>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Pending Action
+          </p>
+          <p
+            className={cn(
+              "text-xl font-black",
+              stats.pendingCount > 0 ? "text-amber-500 animate-pulse" : "text-foreground"
+            )}
+          >
             {stats.pendingCount}
           </p>
         </div>
@@ -206,9 +212,7 @@ export function MerchantDashboardClient() {
                         <span>
                           {item.quantity} × {item.productNameSnapshot}
                         </span>
-                        <span className="text-muted-foreground font-bold">
-                          ₹{item.subtotal}
-                        </span>
+                        <span className="text-muted-foreground font-bold">₹{item.subtotal}</span>
                       </div>
                     ))}
                   </div>
@@ -219,15 +223,12 @@ export function MerchantDashboardClient() {
                   <div className="p-3 rounded-2xl bg-muted/40 text-xs text-muted-foreground space-y-1">
                     {order.deliveryAddress.hostelName && (
                       <p className="font-bold text-foreground">
-                        📍 Deliver to: {order.deliveryAddress.hostelName}, Room {order.deliveryAddress.roomNumber}
+                        📍 Deliver to: {order.deliveryAddress.hostelName}, Room{" "}
+                        {order.deliveryAddress.roomNumber}
                       </p>
                     )}
-                    {order.deliveryAddress.phone && (
-                      <p>📞 Phone: {order.deliveryAddress.phone}</p>
-                    )}
-                    {order.customerNote && (
-                      <p className="italic">Note: "{order.customerNote}"</p>
-                    )}
+                    {order.deliveryAddress.phone && <p>📞 Phone: {order.deliveryAddress.phone}</p>}
+                    {order.customerNote && <p className="italic">Note: "{order.customerNote}"</p>}
                   </div>
                 )}
 
@@ -280,10 +281,7 @@ export function MerchantDashboardClient() {
           <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
             Recent Orders ({recentOrders.length})
           </h2>
-          <Link
-            href="/merchant-portal/orders"
-            className="text-xs font-bold text-primary hover:underline"
-          >
+          <Link href="/merchant-portal/orders" className="text-xs font-bold text-primary hover:underline">
             Manage Order Pipeline →
           </Link>
         </div>
@@ -300,24 +298,20 @@ export function MerchantDashboardClient() {
                   <span className="text-muted-foreground">· {formatTimeAgo(order.createdAt)}</span>
                 </div>
                 <p className="text-muted-foreground truncate mt-0.5">
-                  {(order.items || [])
-                    .map((i: any) => `${i.quantity}× ${i.productNameSnapshot}`)
-                    .join(", ")}
+                  {(order.items || []).map((i: any) => `${i.quantity}× ${i.productNameSnapshot}`).join(", ")}
                 </p>
               </div>
 
               <div className="flex items-center gap-3 shrink-0">
-                <span className="font-black text-foreground">
-                  ₹{order.total.toLocaleString("en-IN")}
-                </span>
+                <span className="font-black text-foreground">₹{order.total.toLocaleString("en-IN")}</span>
                 <span
                   className={cn(
                     "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border",
                     order.status === "DELIVERED"
                       ? "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
                       : order.status === "REJECTED"
-                      ? "bg-rose-500/15 text-rose-500 border-rose-500/30"
-                      : "bg-amber-500/15 text-amber-500 border-amber-500/30"
+                        ? "bg-rose-500/15 text-rose-500 border-rose-500/30"
+                        : "bg-amber-500/15 text-amber-500 border-amber-500/30"
                   )}
                 >
                   {order.status.replace("_", " ")}

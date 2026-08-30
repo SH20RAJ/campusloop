@@ -1,11 +1,11 @@
 "use client";
 
+import { Check, Loader2, Plus } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { Check,Loader2,Plus } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 import { joinCommunity } from "./actions";
 
 interface JoinButtonProps {
@@ -65,7 +65,7 @@ export function JoinCommunityButton({
         isMember
           ? "border border-border/60 bg-transparent text-foreground hover:border-destructive/50 hover:text-destructive hover:bg-destructive/5"
           : "bg-foreground text-background hover:opacity-90 shadow-2xs",
-        className,
+        className
       )}
     >
       {isPending ? (

@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { OverviewClient } from "./overview-client";
 
 export const metadata: Metadata = {
@@ -38,15 +38,13 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 export default function OverviewPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: "CampusLoop Platform Overview",
     url: "https://campusloop.space/overview",
-    description:
-      "Comprehensive architectural and strategic brief of CampusLoop social network.",
+    description: "Comprehensive architectural and strategic brief of CampusLoop social network.",
     publisher: {
       "@type": "Organization",
       name: "CampusLoop Inc.",
@@ -57,10 +55,7 @@ export default function OverviewPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <OverviewClient />
     </>
   );

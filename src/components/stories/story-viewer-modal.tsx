@@ -62,7 +62,7 @@ export function StoryViewerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-3 sm:p-4 animate-in fade-in select-none">
-      <div className="relative w-full max-w-[360px] aspect-[9/16] rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between p-5 text-white border border-white/15 bg-black">
+      <div className="relative w-full max-w-[360px] aspect-9/16 rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between p-5 text-white border border-white/15 bg-black">
         {/* Story Background: Either Photo or Gradient */}
         {currentStory.mediaUrl ? (
           <>

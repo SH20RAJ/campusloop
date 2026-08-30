@@ -102,7 +102,7 @@ export function EventEmbed({ eventId }: EventEmbedProps) {
       className="mt-3 block overflow-hidden rounded-2xl border border-border/40 bg-card hover:bg-muted/20 transition-all shadow-xs group"
     >
       {event.bannerUrl && (
-        <div className="relative aspect-[2.4/1] w-full overflow-hidden bg-muted/30">
+        <div className="relative aspect-24/10 w-full overflow-hidden bg-muted/30">
           <img
             src={event.bannerUrl}
             alt={event.title}

@@ -183,7 +183,7 @@ export function StoryArchiveModal({ isOpen, onClose, onHighlightCreated }: Story
                       }
                     }}
                     className={cn(
-                      "relative aspect-[9/16] rounded-2xl overflow-hidden border transition-all cursor-pointer group shadow-2xs",
+                      "relative aspect-9/16 rounded-2xl overflow-hidden border transition-all cursor-pointer group shadow-2xs",
                       isSelected
                         ? "border-primary ring-2 ring-primary ring-offset-1"
                         : "border-border/40 hover:border-border"

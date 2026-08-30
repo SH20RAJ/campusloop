@@ -309,7 +309,7 @@ export function ImageCropModal({ isOpen, onClose, imageUrl, mode, onCropComplete
             className={cn(
               "relative touch-none overflow-hidden border-2 border-primary/60 shadow-lg",
               isDragging ? "cursor-grabbing" : "cursor-grab",
-              mode === "avatar" ? "size-64 rounded-full sm:size-72" : "aspect-[3/1] w-full rounded-2xl"
+              mode === "avatar" ? "size-64 rounded-full sm:size-72" : "aspect-3/1 w-full rounded-2xl"
             )}
           >
             <img

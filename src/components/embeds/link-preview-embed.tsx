@@ -55,7 +55,7 @@ export function LinkPreviewEmbed({ url }: LinkPreviewEmbedProps) {
       className="mt-3 block overflow-hidden rounded-2xl border border-border/40 bg-card hover:bg-muted/20 transition-all shadow-xs group"
     >
       {data.image && (
-        <div className="relative aspect-[1.91/1] max-h-52 w-full overflow-hidden bg-muted/30">
+        <div className="relative aspect-1.91/1 max-h-52 w-full overflow-hidden bg-muted/30">
           <img
             src={data.image}
             alt={data.title || "Link Preview"}

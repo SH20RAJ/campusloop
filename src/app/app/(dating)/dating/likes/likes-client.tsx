@@ -90,7 +90,7 @@ export function LikesClient() {
                 <img
                   src={admirer.photo ?? getAvatarUrl(admirer.avatarUrl, admirer.username)}
                   alt={admirer.displayName}
-                  className="aspect-[3/4] w-full object-cover"
+                  className="aspect-3/4 w-full object-cover"
                 />
                 <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/95 via-black/20 to-transparent" />
 

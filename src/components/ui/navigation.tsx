@@ -104,7 +104,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
 
                   {/* Clean, minimal menu indicator badge on avatar corner */}
                   <span className="absolute -bottom-0.5 -right-0.5 flex size-3.5 items-center justify-center rounded-full bg-card border border-border/80 shadow-xs text-muted-foreground group-hover:text-foreground">
-                    <Menu className="size-2 stroke-[2.5]" />
+                    <Menu className="size-2" strokeWidth={2.5} />
                   </span>
                 </div>
               </button>
@@ -350,7 +350,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/25 active:scale-90 transition-transform cursor-pointer shrink-0 mx-1"
                     aria-label="Create post or confession"
                   >
-                    <Plus className="size-5.5 stroke-[2.5]" />
+                    <Plus className="size-5.5" strokeWidth={2.5} />
                   </Link>
                 );
               }
@@ -370,10 +370,8 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 >
                   <div className="relative">
                     <Icon
-                      className={cn(
-                        "size-5.5 transition-colors",
-                        isActive ? "stroke-[2.2] text-foreground" : "stroke-2"
-                      )}
+                      strokeWidth={isActive ? 2.5 : 2}
+                      className={cn("size-5.5 transition-colors", isActive ? "text-foreground" : "")}
                     />
                     {item.href === "/app/marketplace" && !marketplaceSeen && (
                       <span className="absolute -top-1 -right-1 size-2 rounded-full bg-emerald-500" />

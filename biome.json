@@ -9,15 +9,15 @@
     "ignoreUnknown": true,
     "includes": [
       "src/**",
-      "!**/.next/**",
-      "!**/node_modules/**",
-      "!**/out/**",
-      "!**/.open-next/**",
-      "!**/drizzle/**",
-      "!**/dist/**",
-      "!**/public/**",
-      "!**/scripts/**",
-      "!src/components/animate-ui/**"
+      "!**/.next",
+      "!**/node_modules",
+      "!**/out",
+      "!**/.open-next",
+      "!**/drizzle",
+      "!**/dist",
+      "!**/public",
+      "!**/scripts",
+      "!src/components/animate-ui"
     ]
   },
   "css": {

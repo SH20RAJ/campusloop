@@ -90,7 +90,7 @@ export function ArticleDashboardClient({
           href="/app/articles/new"
           className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 shadow-md shadow-primary/20 transition-all cursor-pointer active:scale-95"
         >
-          <Plus className="size-3.5 stroke-[3]" />
+          <Plus className="size-3.5" strokeWidth={3} />
           <span>New Article</span>
         </Link>
       </header>

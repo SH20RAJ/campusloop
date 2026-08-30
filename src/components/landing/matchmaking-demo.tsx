@@ -113,7 +113,7 @@ export function MatchmakingShowcase() {
         <div className="mx-auto grid max-w-4xl items-center gap-10 lg:grid-cols-2">
           {/* Interactive Swipe Widget */}
           <div className="relative mx-auto w-full max-w-sm">
-            <div className="relative aspect-[3/4] w-full">
+            <div className="relative aspect-3/4 w-full">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentProfile.id}

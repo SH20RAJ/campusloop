@@ -486,7 +486,7 @@ export function NewEventClient() {
             </div>
 
             {bannerUrl && (
-              <div className="mt-2 aspect-[21/9] w-full overflow-hidden rounded-xl border border-border/40 bg-muted/40">
+              <div className="mt-2 aspect-21/9 w-full overflow-hidden rounded-xl border border-border/40 bg-muted/40">
                 <img
                   src={bannerUrl}
                   alt="Banner preview"

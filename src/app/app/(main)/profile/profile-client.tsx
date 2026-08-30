@@ -541,7 +541,7 @@ export function ProfileClientView({
               <p className="text-xs sm:text-sm text-muted-foreground font-medium">@{profile.username}</p>
 
               {/* Bio */}
-              <p className="text-xs sm:text-sm font-normal text-foreground leading-relaxed pt-1 whitespace-pre-wrap break-words">
+              <p className="text-xs sm:text-sm font-normal text-foreground leading-relaxed pt-1 whitespace-pre-wrap wrap-break-word">
                 {profile.bio ||
                   profile.headline ||
                   `Student @ ${campusShort}. Exploring campus vibes and connecting with fellow peers.`}

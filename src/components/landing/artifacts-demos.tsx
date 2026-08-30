@@ -388,7 +388,7 @@ function MemeDemo() {
 
       {/* Meme Body */}
       <div className="overflow-hidden rounded-lg border border-border bg-muted/20">
-        <div className="flex aspect-[16/9] items-center justify-center bg-linear-to-br from-pink-500/10 via-rose-500/5 to-purple-500/10">
+        <div className="flex aspect-16/9 items-center justify-center bg-linear-to-br from-pink-500/10 via-rose-500/5 to-purple-500/10">
           <div className="flex flex-col items-center gap-2 text-center">
             <Zap className="size-8 text-pink-400/60" />
             <div className="space-y-1">
@@ -734,7 +734,7 @@ function StoryDemo() {
             </div>
 
             {/* Content */}
-            <div className="flex aspect-[3/1] items-center justify-center bg-linear-to-br from-gray-900 via-primary/20 to-gray-900 px-4">
+            <div className="flex aspect-3/1 items-center justify-center bg-linear-to-br from-gray-900 via-primary/20 to-gray-900 px-4">
               <div className="text-center">
                 <p className="text-sm font-semibold text-white/90">Morning library grind 🫠</p>
                 <p className="mt-1 text-xs text-white/50">

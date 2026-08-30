@@ -328,7 +328,7 @@ export function CollegesSkeleton() {
 export function DatingSkeleton() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[75vh] p-4 select-none">
-      <div className="w-full max-w-sm aspect-[3/4] rounded-3xl border border-border/40 bg-card p-5 flex flex-col justify-between shadow-md relative overflow-hidden">
+      <div className="w-full max-w-sm aspect-3/4 rounded-3xl border border-border/40 bg-card p-5 flex flex-col justify-between shadow-md relative overflow-hidden">
         <Skeleton className="absolute inset-0 w-full h-full rounded-3xl" />
         <div className="relative z-10 flex items-center justify-between">
           <Skeleton className="h-6 w-24 rounded-full" />

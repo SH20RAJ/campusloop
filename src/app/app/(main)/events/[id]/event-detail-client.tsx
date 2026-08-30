@@ -237,7 +237,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
       </div>
 
       {/* Event Banner */}
-      <div className="relative aspect-[21/9] md:aspect-[3/1] w-full overflow-hidden bg-muted/40">
+      <div className="relative aspect-21/9 md:aspect-3/1 w-full overflow-hidden bg-muted/40">
         {event.bannerUrl ? (
           <img src={event.bannerUrl} alt={event.title} className="h-full w-full object-cover" />
         ) : (

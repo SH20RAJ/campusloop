@@ -420,7 +420,7 @@ export function ArticleEditorClient({ initialArticle, isEditing = false }: Artic
                 />
               </div>
               {coverImageUrl && (
-                <div className="aspect-[21/9] w-full overflow-hidden rounded-xl bg-muted/40 border border-border/40 mt-2">
+                <div className="aspect-21/9 w-full overflow-hidden rounded-xl bg-muted/40 border border-border/40 mt-2">
                   <img
                     src={coverImageUrl}
                     alt="Cover Preview"
@@ -673,7 +673,7 @@ export function ArticleEditorClient({ initialArticle, isEditing = false }: Artic
           /* ─── Preview Mode ─── */
           <div className="space-y-6">
             {coverImageUrl && (
-              <div className="aspect-[21/9] w-full overflow-hidden rounded-3xl bg-muted/40 border border-border/40 shadow-sm">
+              <div className="aspect-21/9 w-full overflow-hidden rounded-3xl bg-muted/40 border border-border/40 shadow-sm">
                 <img src={coverImageUrl} alt={title} className="h-full w-full object-cover" />
               </div>
             )}

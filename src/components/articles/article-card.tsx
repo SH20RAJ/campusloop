@@ -82,7 +82,7 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
           href={`/app/articles/${article.slug}`}
           className={cn(
             "relative block overflow-hidden bg-muted/40",
-            featured ? "md:col-span-6 aspect-[16/10] md:aspect-auto md:h-full" : "aspect-[16/9] w-full"
+            featured ? "md:col-span-6 aspect-16/10 md:aspect-auto md:h-full" : "aspect-16/9 w-full"
           )}
         >
           {article.coverImageUrl ? (

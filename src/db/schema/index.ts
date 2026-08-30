@@ -4,6 +4,7 @@ export * from "./commercial-marketplace";
 export * from "./common";
 export * from "./communities";
 export * from "./dating";
+export * from "./events";
 export * from "./gaming";
 export * from "./housing";
 export * from "./institutions";

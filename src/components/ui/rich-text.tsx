@@ -1,16 +1,16 @@
-"use client";
-
-import { ExternalLink,X,ZoomIn } from "lucide-react";
+import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
+import { ExternalLink, X, ZoomIn } from "lucide-react";
 import Link from "next/link";
-import React,{ useState } from "react";
+import React, { useState } from "react";
 
 interface RichTextProps {
   content: string;
   className?: string;
+  disableEmbeds?: boolean;
   onImageClick?: (url: string) => void;
 }
 
-export function RichText({ content, className = "" }: RichTextProps) {
+export function RichText({ content, className = "", disableEmbeds = false }: RichTextProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   if (!content) return null;
@@ -175,6 +175,9 @@ export function RichText({ content, className = "" }: RichTextProps) {
           ))}
         </div>
       )}
+
+      {/* Rich Embeds (YouTube, Spotify, User Profiles, Communities, Events, Web Previews) */}
+      {!disableEmbeds && <PostEmbedRenderer content={content} />}
 
       {/* Fullscreen Lightbox Modal */}
       {selectedImage && (

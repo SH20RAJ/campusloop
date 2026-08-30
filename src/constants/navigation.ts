@@ -3,6 +3,7 @@ import {
   Bell,
   Bookmark,
   Cake,
+  Calendar,
   Compass,
   Flame,
   Heart,
@@ -41,6 +42,13 @@ export interface NavGroup {
 export const DESKTOP_NAV_ITEMS: NavItem[] = [
   { icon: Home, href: "/app", label: "Home" },
   { icon: Compass, href: "/app/discover", label: "Explore" },
+  {
+    icon: Calendar,
+    href: "/app/events",
+    label: "Events",
+    badge: "NEW",
+    badgeColor: "bg-primary/15 text-primary border border-primary/30",
+  },
   { icon: Bookmark, href: "/app/saved", label: "Saved" },
   {
     icon: ShoppingBag,
@@ -96,6 +104,14 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
   {
     group: "Campus Directories & Life",
     items: [
+      {
+        icon: Calendar,
+        href: "/app/events",
+        label: "Events & Fests",
+        desc: "Hackathons, fests, workshops & competitions",
+        badge: "NEW",
+        badgeColor: "bg-primary/10 text-primary border-primary/20",
+      },
       {
         icon: School,
         href: "/app/colleges",

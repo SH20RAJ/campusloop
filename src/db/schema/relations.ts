@@ -20,6 +20,7 @@ savedMarketplaceItems
 } from "./commercial-marketplace";
 import { communities,communityMembers } from "./communities";
 import { secretCrushes,swipes } from "./dating";
+import { eventRegistrations, events } from "./events";
 import { gamingLobbies } from "./gaming";
 import { housingListings } from "./housing";
 import { institutionDomains,institutions } from "./institutions";
@@ -534,6 +535,30 @@ export const bikeBookingStatusHistoryRelations = relations(bikeBookingStatusHist
     references: [bikeBookings.id],
   }),
 }));
+
+export const eventsRelations = relations(events, ({ one, many }) => ({
+  organizer: one(userProfiles, {
+    fields: [events.organizerProfileId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [events.institutionId],
+    references: [institutions.id],
+  }),
+  registrations: many(eventRegistrations),
+}));
+
+export const eventRegistrationsRelations = relations(eventRegistrations, ({ one }) => ({
+  event: one(events, {
+    fields: [eventRegistrations.eventId],
+    references: [events.id],
+  }),
+  profile: one(userProfiles, {
+    fields: [eventRegistrations.profileId],
+    references: [userProfiles.id],
+  }),
+}));
+
 
 
 

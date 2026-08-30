@@ -1,6 +1,6 @@
 import { getDb } from "@/db";
 import { posts } from "@/db/schema";
-import { desc,eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,10 @@ export async function GET() {
       columns: {
         id: true,
       },
-      where: eq(posts.status, "PUBLISHED"),
+      // Anonymous posts (confessions) are never submitted for indexing: they
+      // are already hidden from public profiles, and handing them to Google
+      // would undo that.
+      where: and(eq(posts.status, "PUBLISHED"), eq(posts.isAnonymous, false)),
       orderBy: [desc(posts.createdAt)],
       limit: 2000,
     });

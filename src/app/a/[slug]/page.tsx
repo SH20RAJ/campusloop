@@ -19,7 +19,8 @@ export async function generateMetadata({ params }: ArticleShortLinkProps): Promi
     return { title: "Article | CampusLoop" };
   }
 
-  const title = `${article.title} | CampusLoop`;
+  // The root layout's title template already appends " | CampusLoop".
+  const title = article.title;
   const description = article.excerpt || article.subtitle || "Read student articles on CampusLoop.";
   const url = `https://campusloop.space/a/${slug}`;
 

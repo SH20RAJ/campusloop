@@ -1,6 +1,7 @@
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
-import { desc } from "drizzle-orm";
+import { desc, ne } from "drizzle-orm";
+import { VIEWER_INSTITUTION_SLUG } from "@/lib/viewer";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +14,9 @@ export async function GET() {
         id: true,
         slug: true,
       },
+      // The reserved Viewer Hub is internal plumbing for personal-email
+      // accounts, not a real campus — it must never be handed to Google.
+      where: ne(institutions.slug, VIEWER_INSTITUTION_SLUG),
       orderBy: [desc(institutions.createdAt)],
       limit: 1500,
     });

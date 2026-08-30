@@ -2,7 +2,7 @@ import { getDb } from "@/db";
 import { articleComments, articleCommentVotes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { and, eq, sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/navigation";
+import { NextRequest, NextResponse } from "next/server";
 
 interface RouteProps {
   params: Promise<{ slug: string; commentId: string }>;

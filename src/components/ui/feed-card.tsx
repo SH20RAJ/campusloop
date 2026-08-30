@@ -219,12 +219,9 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
             onShare={handleSharePost}
           />
 
-          {/* Minimal clean divider before post content */}
-          <hr className="border-t border-border/25 my-1.5" />
-
           {/* Content Body */}
           <div
-            className="text-[15px] leading-normal text-foreground font-normal break-words pt-0.5"
+            className="text-[15px] leading-relaxed text-foreground font-normal break-words pt-1"
             onClick={handleCardClick}
             onDoubleClick={handleDoubleTap}
           >

@@ -332,16 +332,16 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 (item.href !== "/app" && pathname.startsWith(item.href));
               const Icon = item.icon;
 
-              if (item.label === "") {
+              if (item.href === "/app/post/new") {
                 if (isViewer) return null;
                 return (
                   <Link
                     key="create"
                     href="/app/post/new"
-                    className="flex size-10 items-center justify-center rounded-full bg-foreground text-background shadow-xs active:scale-95 transition-transform cursor-pointer"
-                    aria-label="Create post"
+                    className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/25 active:scale-90 transition-transform cursor-pointer shrink-0 mx-1"
+                    aria-label="Create post or confession"
                   >
-                    <Plus className="size-5 stroke-2" />
+                    <Plus className="size-5.5 stroke-[2.5]" />
                   </Link>
                 );
               }
@@ -352,18 +352,23 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   href={item.href}
                   className={cn(
                     "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
-                    isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
+                    isActive ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <Icon
-                    className={cn(
-                      "size-5.5 transition-colors",
-                      isActive ? "stroke-2" : "stroke-2"
+                  <div className="relative">
+                    <Icon
+                      className={cn(
+                        "size-5.5 transition-colors",
+                        isActive ? "stroke-[2.2] text-foreground" : "stroke-2"
+                      )}
+                    />
+                    {item.href === "/app/notifications" && unreadNotificationsCount > 0 && (
+                      <span className="absolute -top-1 -right-1 size-2 rounded-full bg-primary" />
                     )}
-                  />
+                  </div>
                   <span className="mt-0.5 text-[9px] font-semibold">{item.label}</span>
                   {isActive && (
-                    <div className="absolute bottom-1 size-1 rounded-full bg-foreground" />
+                    <div className="absolute bottom-1 size-1 rounded-full bg-primary" />
                   )}
                 </Link>
               );

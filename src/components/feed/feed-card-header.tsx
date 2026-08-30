@@ -54,16 +54,24 @@ export function FeedCardHeader({
     }
   }
 
-  const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
-  const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
+  const authorName = post.isAnonymous
+    ? (post.pseudonym ? `🫣 @${post.pseudonym}` : "🫣 Anonymous")
+    : post.author?.displayName || "Student";
+  const authorHandle = post.isAnonymous ? null : `@${post.author?.username || "student"}`;
   const isVerified = Boolean(!post.isAnonymous && ((post.author?.points || 0) >= 150 || post.author?.role === "ADMIN"));
+
+  const institutionDisplayName =
+    post.institution?.shortName ||
+    post.institution?.name?.split(",")?.[0]?.replace(/^(Birla Institute of Technology)/i, "BIT") ||
+    post.institution?.name?.slice(0, 20) ||
+    null;
 
   return (
     <div className="flex items-center justify-between gap-2 min-w-0 select-none">
       <div className="flex items-center gap-1.5 flex-wrap text-[15px] leading-tight min-w-0">
         {!post.isAnonymous ? (
           <Link
-            href={`/@${authorHandle}`}
+            href={`/@${post.author?.username || "student"}`}
             onClick={(e) => e.stopPropagation()}
             className="font-bold text-foreground hover:underline truncate"
           >
@@ -77,9 +85,11 @@ export function FeedCardHeader({
           <ShieldCheck className="size-4 text-[#1d9bf0] shrink-0" />
         )}
 
-        <span className="text-muted-foreground text-[14px] truncate">
-          @{authorHandle}
-        </span>
+        {authorHandle && (
+          <span className="text-muted-foreground text-[14px] truncate">
+            {authorHandle}
+          </span>
+        )}
 
         <span className="text-muted-foreground/60 text-xs">·</span>
 
@@ -87,17 +97,17 @@ export function FeedCardHeader({
           {formatTimeAgo(post.createdAt)}
         </span>
 
-        {post.institution?.name && (
+        {institutionDisplayName && (
           <>
             <span className="text-muted-foreground/40 text-xs">·</span>
             <Link
               href={`/app/college/${post.institution?.slug || post.institutionId}`}
               onClick={(e) => e.stopPropagation()}
-              className="text-primary hover:underline truncate max-w-[110px] sm:max-w-[170px] text-xs font-semibold inline-flex items-center gap-1 transition-colors"
-              title={post.institution.name}
+              className="text-muted-foreground hover:text-foreground truncate max-w-[120px] sm:max-w-[180px] text-xs font-semibold inline-flex items-center gap-1 transition-colors"
+              title={post.institution?.name || ""}
             >
-              <School className="size-3 shrink-0 text-primary/70" />
-              <span className="truncate">{post.institution.name.split(",")[0]}</span>
+              <School className="size-3 shrink-0 text-muted-foreground/70" />
+              <span className="truncate">{institutionDisplayName}</span>
             </Link>
           </>
         )}

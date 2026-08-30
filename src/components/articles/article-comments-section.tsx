@@ -74,8 +74,8 @@ export function ArticleCommentsSection({
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed to post comment");
+        const errPayload = (await res.json()) as { error?: string };
+        throw new Error(errPayload.error || "Failed to post comment");
       }
 
       toast.success(parentId ? "Reply posted! 💬" : "Comment added! 💬");
@@ -86,8 +86,9 @@ export function ArticleCommentsSection({
         setCommentText("");
       }
       mutate();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to post comment");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to post comment";
+      toast.error(msg);
       haptics.error();
     } finally {
       setIsSubmitting(false);

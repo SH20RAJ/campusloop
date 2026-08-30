@@ -71,9 +71,9 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
 export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
   { icon: Home, href: "/app", label: "Home" },
   { icon: Compass, href: "/app/discover", label: "Explore" },
-  { icon: Plus, href: "/app/post/new", label: "" },
-  { icon: MessageSquare, href: "/app/chat", label: "Chat" },
-  { icon: MoreHorizontal, href: "/app/more", label: "More" },
+  { icon: Plus, href: "/app/post/new", label: "Post" },
+  { icon: Bell, href: "/app/notifications", label: "Notifications" },
+  { icon: UserCircle, href: "/app/profile", label: "Profile" },
 ];
 
 /**

@@ -3,6 +3,7 @@ import { Navigation } from "@/components/ui/navigation";
 import { RightSidebar } from "@/components/ui/right-sidebar";
 import { getBranchIcon } from "@/constants";
 
+import { ShareQrButton } from "@/components/common/share-qr-button";
 import { PublicFollowButton } from "@/components/profile/public-follow-button";
 import { getDb } from "@/db";
 import { institutions,posts,userProfiles } from "@/db/schema";
@@ -259,12 +260,22 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                 )}
               </div>
 
-              <PublicFollowButton
-                username={profile.username}
-                displayName={profile.displayName}
-                profileId={profile.id}
-                isSignedIn={false}
-              />
+              <div className="flex items-center gap-2">
+                <ShareQrButton
+                  title={profile.displayName}
+                  subtitle={`@${profile.username} • ${profile.institution?.name || "Verified Student"}`}
+                  badgeText="Verified Student Network"
+                  shortUrl={`https://campusloop.space/@${profile.username}`}
+                  avatarUrl={profile.avatarUrl}
+                  category="profile"
+                />
+                <PublicFollowButton
+                  username={profile.username}
+                  displayName={profile.displayName}
+                  profileId={profile.id}
+                  isSignedIn={false}
+                />
+              </div>
             </div>
 
             <div className="space-y-1">

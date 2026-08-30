@@ -17,12 +17,23 @@ export const metadata: Metadata = {
   description: "Share a confession, start a poll, or ask your campus on CampusLoop.",
 };
 
-export default async function NewPostPage() {
+const POST_TYPES = ["NORMAL", "CONFESSION", "POLL", "QUESTION"] as const;
+type PostTypeParam = (typeof POST_TYPES)[number];
+
+interface NewPostPageProps {
+  searchParams: Promise<{ type?: string }>;
+}
+
+export default async function NewPostPage({ searchParams }: NewPostPageProps) {
   const user = await hexclaveServerApp.getUser();
   if (!user) {
     redirect("/handler/sign-in");
   }
 
+
+  const { type } = await searchParams;
+  const requested = (type || "").toUpperCase() as PostTypeParam;
+  const initialType = POST_TYPES.includes(requested) ? requested : "NORMAL";
 
   const profile = await getDb().query.userProfiles.findFirst({
     where: eq(userProfiles.userId, user.id),
@@ -60,7 +71,7 @@ export default async function NewPostPage() {
 
       {/* Composer Container */}
       <div className="px-4 pt-4">
-        <PostComposer />
+        <PostComposer initialType={initialType} />
       </div>
     </main>
   );

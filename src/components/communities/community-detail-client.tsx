@@ -2,6 +2,7 @@
 
 import { recordCommunityInviteShare } from "@/app/app/(main)/communities/actions";
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
+import { ShareQrButton } from "@/components/common/share-qr-button";
 import { PostComposer } from "@/app/app/(main)/post/new/post-composer";
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
@@ -338,10 +339,20 @@ export function CommunityDetailClient({
             type="button"
             onClick={handleShareInvite}
             className="flex size-8 items-center justify-center rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
-            title="Share Community"
+            title="Copy invite link"
           >
             {copied ? <Check className="size-3.5 text-primary" /> : <Share2 className="size-3.5" />}
           </button>
+
+          <ShareQrButton
+            title={`c/${community.name}`}
+            subtitle={community.description || "Campus sub-hub on CampusLoop"}
+            badgeText="Campus Sub-Hub"
+            shortUrl={`https://campusloop.space/c/${community.slug || community.id}`}
+            avatarUrl={community.avatarUrl}
+            category="community"
+            className="size-8 border-border/60 bg-transparent text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+          />
         </div>
       </header>
 

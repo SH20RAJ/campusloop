@@ -62,6 +62,11 @@ interface PostComposerProps {
   communityId?: string;
   /** "page" is the full /app/post/new screen; "modal" embeds it in a dialog. */
   variant?: "page" | "modal";
+  /**
+   * Preselects the composer type, so the "Confess" button on /app/confessions
+   * lands on a confession rather than a blank post.
+   */
+  initialType?: PostType;
   /** Community name to lock the composer to, hiding the audience picker. */
   lockedCommunityName?: string;
   onPublished?: (post: FeedPost) => void;
@@ -76,6 +81,7 @@ interface PostComposerProps {
 export function PostComposer({
   communityId: initialCommunityId,
   variant = "page",
+  initialType,
   lockedCommunityName,
   onPublished,
   onPublishConfirmed,
@@ -90,7 +96,7 @@ export function PostComposer({
   const [showStickerPicker, setShowStickerPicker] = useState(false);
   const [showFormatting, setShowFormatting] = useState(false);
 
-  const [postType, setPostType] = useState<PostType>("NORMAL");
+  const [postType, setPostType] = useState<PostType>(initialType ?? "NORMAL");
   const [scope, setScope] = useState<"CAMPUS" | "GLOBAL">("GLOBAL");
   const [showAudienceMenu, setShowAudienceMenu] = useState(false);
   const [selectedCommunityId, setSelectedCommunityId] = useState<string>(initialCommunityId || "NONE");

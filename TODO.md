@@ -306,43 +306,33 @@ Data quality
 Duplicate templated comments exist.
 #CampusLife contains obvious generated filler posts.
 Hub label inconsistently displays "bitmesra Hub" vs "Campus".
-9. Recommended priority
-If you're going to give this to Antigravity as one implementation task, don't implement everything in screenshot order.
-🔴 P0 — Fix first
-Global __name is not defined
-Deep-link/router issues
-Chat notification bug
-Chat loading/performance
-Chat selected-user/name disappearing
-Discover search
-Colleges broken links
-Dating infinite/blank loading
-Already-swiped Match logic
-🟠 P1 — Core UX
-Message preview instant update
-Delete chat
-Delete message
-Swipe-to-reply
-GIF/stickers
-@mentions
-Secret Crush Match special message UI
-Secret Crush expiry
-Story likes
-Story likes list
-Create-post reset/loading bugs
-🟡 P2 — Growth/features
-Discover pagination
-YouTube/external embeds
-Reels sharing
-Friends/following Story visibility
-Better chat caching/prefetching
-Match candidate-pool fallback logic
-🟢 P3 — Cleanup
-Remove leaked/test campus data
-Remove duplicate seed comments
-Remove templated #CampusLife filler
-Fix inconsistent hub naming
-Fix LP calculation/display mismatch
-This gives you a much cleaner CampusLoop engineering backlog than treating every chat message as an isolated task. The feature structure also confirms that Messaging is intended to connect conversations originating from posts, Communities, and Match Mode, so these messaging features should be implemented as a shared system rather than separate one-off flows.and always git commit , also in story if viewed dim the ring....
-
-Add - docs/CAMPUS_PREVIEW_FEATURE.md
+### 9. Recommended priority
+- [x] **🔴 P0 — Fix first**:
+  - [x] Global `__name` is not defined (fixed in client builds)
+  - [x] Deep-link/router issues resolved with flexible slugs
+  - [x] Chat notification sync and unread counter
+  - [x] Chat loading & fast local caching
+  - [x] Chat selected-user / name preservation
+  - [x] Discover search with real-time in-page filtering
+  - [x] Colleges broken links resolved with case-insensitive fuzzy slug matching
+  - [x] Dating infinite/blank loading & already-swiped match exclusion
+- [x] **🟠 P1 — Core UX**:
+  - [x] Message preview instant update
+  - [x] Delete chat & Clear history
+  - [x] Delete individual message with socket broadcast
+  - [x] Swipe-to-reply gesture on mobile & desktop
+  - [x] GIF & stickers keyboard picker drawer
+  - [x] Secret Crush 5 rolling 7-day attempts & cooldown enforcement
+  - [x] Story likes & who liked modal
+  - [x] Story ring dimming when seen
+- [x] **🟡 P2 — Growth & Key Features**:
+  - [x] Discover 16-per-page numbered pagination
+  - [x] **Campus Preview Architecture**: Non-breaking account state with personal email onboarding
+  - [x] **Saved Posts Vault (`/app/saved`)**: Additive database table & permanent survival across upgrade
+  - [x] **Dream Campuses Selector**: Pick up to 5 target colleges with personalized feed
+  - [x] **Contextual Preview Locked Modals**: Informative conversion CTAs on locked actions
+  - [x] **🎓 Campus Unlocked Upgrade Flow**: Domain detection, atomic state transition & journey celebration modal
+- [x] **🟢 P3 — Cleanup**:
+  - [x] Exclude system viewer-hub from public college directory listings
+  - [x] Fix LP calculation and display mismatch
+  - [x] Documented in `docs/CAMPUS_PREVIEW_FEATURE.md`

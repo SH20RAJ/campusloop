@@ -1,31 +1,23 @@
 import { getDb } from "@/db";
-import { bikeBookings,bikes,merchants,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,ne,sql } from "drizzle-orm";
+import { bikeBookings, bikes, merchants } from "@/db/schema";
+import { resolveMerchantSession } from "@/lib/merchant-session";
+import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    let merchant = await resolveMerchantSession();
     const db = getDb();
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
 
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
+    if (!merchant || merchant.categorySlug !== "rentals") {
+      // Fallback to first rental merchant
+      const rentalMerchant = await db.query.merchants.findFirst({
+        where: eq(merchants.categorySlug, "rentals"),
+      });
+      if (rentalMerchant) merchant = rentalMerchant;
     }
-
-    // Find merchant owned or associated with user
-    const merchant = await db.query.merchants.findFirst({
-      where: eq(merchants.categorySlug, "rentals"),
-    });
 
     if (!merchant) {
       return NextResponse.json({ error: "No rental merchant found" }, { status: 404 });
@@ -59,9 +51,10 @@ export async function GET() {
         student: {
           columns: {
             id: true,
-            displayName: true,
             username: true,
+            displayName: true,
             avatarUrl: true,
+            email: true,
           },
         },
       },
@@ -69,17 +62,18 @@ export async function GET() {
 
     return NextResponse.json({
       merchant,
-      stats: {
-        totalBikes: fleetBikes.length,
+      fleetSummary: {
+        totalVehicles: fleetBikes.length,
         availableCount,
         rentedCount,
         maintenanceCount,
         bookedCount,
       },
+      fleetBikes,
       todaysBookings,
     });
   } catch (error) {
-    console.error("Error fetching merchant bike dashboard:", error);
+    console.error("Error in merchant bikes GET:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

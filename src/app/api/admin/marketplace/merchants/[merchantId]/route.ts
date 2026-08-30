@@ -68,6 +68,8 @@ export async function PATCH(req: Request, { params }: RouteParams) {
       estimatedPrepTime,
       status,
       isOpen,
+      loginUsername,
+      loginPassword,
     } = body;
 
     const updateData: Record<string, any> = {
@@ -89,6 +91,8 @@ export async function PATCH(req: Request, { params }: RouteParams) {
     if (estimatedPrepTime !== undefined) updateData.estimatedPrepTime = estimatedPrepTime?.trim() || null;
     if (status !== undefined) updateData.status = status;
     if (isOpen !== undefined) updateData.isOpen = Boolean(isOpen);
+    if (loginUsername !== undefined) updateData.loginUsername = loginUsername?.trim().toLowerCase() || null;
+    if (loginPassword !== undefined) updateData.loginPassword = loginPassword?.trim() || null;
 
     const [updated] = await db
       .update(merchants)

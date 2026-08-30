@@ -4,25 +4,35 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
+import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 import {
-ArrowLeft,
-Edit2,
-ExternalLink,
-Loader2,
-Package,
-Plus,
-QrCode,
-Save,
-Search,
-ShoppingBag,
-Store,
-Trash2,
-X
+  ArrowLeft,
+  Copy,
+  Edit2,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Image as ImageIcon,
+  KeyRound,
+  Loader2,
+  Lock,
+  Package,
+  Plus,
+  QrCode,
+  RefreshCw,
+  Save,
+  Search,
+  ShieldCheck,
+  ShoppingBag,
+  Star,
+  Store,
+  Trash2,
+  User,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo,useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
@@ -30,15 +40,24 @@ interface AdminMerchantEditClientProps {
   merchantId: string;
 }
 
+type TabType = "profile" | "credentials" | "products" | "orders" | "reviews" | "qr";
+
 export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"profile" | "products" | "orders" | "qr">("profile");
+  const [activeTab, setActiveTab] = useState<TabType>("profile");
 
   const { data, isLoading, mutate } = useSWR<{ merchant: any }>(
     `/api/admin/marketplace/merchants/${merchantId}`,
     fetcher,
     { dedupingInterval: 6000 }
   );
+
+  const { data: reviewsData, mutate: mutateReviews } = useSWR<{
+    reviews: any[];
+    totalCount: number;
+    averageRating: string;
+    distribution: Record<number, number>;
+  }>(`/api/marketplace/store/${merchantId}/reviews`, fetcher);
 
   const merchant = data?.merchant;
 
@@ -60,6 +79,12 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
   const [status, setStatus] = useState("ACTIVE");
   const [isSaving, setIsSaving] = useState(false);
 
+  // Credentials states
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSavingCredentials, setIsSavingCredentials] = useState(false);
+
   // Initialize form when data loads
   const [formInitialized, setFormInitialized] = useState(false);
   if (merchant && !formInitialized) {
@@ -71,13 +96,15 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
     setPhone(merchant.phone || "");
     setEmail(merchant.email || "");
     setUpiId(merchant.upiId || "");
-    setLogoUrl(merchant.logoUrl || "");
-    setCoverUrl(merchant.coverUrl || "");
+    setLogoUrl(merchant.logoUrl || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=300&fit=crop");
+    setCoverUrl(merchant.coverUrl || "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop");
     setDeliveryFee(String(merchant.deliveryFee ?? 20));
     setMinOrderValue(String(merchant.minOrderValue ?? 80));
     setEstimatedPrepTime(merchant.estimatedPrepTime || "15–20 min");
     setIsOpen(Boolean(merchant.isOpen));
     setStatus(merchant.status || "ACTIVE");
+    setLoginUsername(merchant.loginUsername || merchant.slug || "");
+    setLoginPassword(merchant.loginPassword || "momo@CampusLoop2026");
     setFormInitialized(true);
   }
 
@@ -102,6 +129,59 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
     const q = productSearch.toLowerCase();
     return prods.filter((p: any) => p.name?.toLowerCase().includes(q) || p.categoryName?.toLowerCase().includes(q));
   }, [merchant?.products, productSearch]);
+
+  function handleGeneratePassword() {
+    sounds.pop();
+    haptics.light();
+    const chars = "abcdefghjkmnpqrstuvwxyz23456789";
+    let rand = "";
+    for (let i = 0; i < 8; i++) {
+      rand += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setLoginPassword(`cl_${rand}!`);
+    toast.success("Generated new password! Click 'Save Credentials' to apply.");
+  }
+
+  function handleCopyCredentials() {
+    sounds.tap();
+    const text = `CampusLoop Merchant Portal Credentials\nStore: ${name}\nLogin URL: https://campusloop.space/merchant-portal/login\nUsername: ${loginUsername}\nPassword: ${loginPassword}`;
+    navigator.clipboard.writeText(text);
+    toast.success("Credentials copied to clipboard! 📋");
+  }
+
+  async function handleSaveCredentials(e: React.FormEvent) {
+    e.preventDefault();
+    if (!loginUsername.trim() || !loginPassword.trim()) {
+      toast.error("Username and password cannot be empty");
+      return;
+    }
+
+    setIsSavingCredentials(true);
+    sounds.tap();
+    haptics.medium();
+
+    try {
+      const res = await fetch(`/api/admin/marketplace/merchants/${merchantId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          loginUsername: loginUsername.trim().toLowerCase(),
+          loginPassword: loginPassword.trim(),
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update credentials");
+
+      sounds.ting();
+      haptics.success();
+      toast.success("Merchant login credentials updated successfully! 🔑");
+      mutate();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update credentials");
+    } finally {
+      setIsSavingCredentials(false);
+    }
+  }
 
   async function handleSaveMerchant(e: React.FormEvent) {
     e.preventDefault();
@@ -161,9 +241,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
   function handleOpenEditProduct(p: any) {
     sounds.tap();
     setEditingProduct(p);
-    setProdName(p.name);
+    setProdName(p.name || "");
     setProdDesc(p.description || "");
-    setProdPrice(String(p.price));
+    setProdPrice(String(p.price ?? ""));
     setProdOriginalPrice(p.originalPrice ? String(p.originalPrice) : "");
     setProdCategory(p.categoryName || "General");
     setProdImageUrl(p.imageUrl || "");
@@ -183,7 +263,6 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
 
     try {
       if (editingProduct) {
-        // PATCH
         const res = await fetch("/api/admin/marketplace/products", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -202,7 +281,6 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
         if (!res.ok) throw new Error("Failed to update product");
         toast.success("Product updated!");
       } else {
-        // POST
         const res = await fetch("/api/admin/marketplace/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -249,54 +327,54 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
   }
 
   async function handleDeleteProduct(p: any) {
-    if (!confirm(`Are you sure you want to delete "${p.name}"?`)) return;
-    sounds.tap();
+    if (!confirm(`Delete "${p.name}" from menu?`)) return;
+    sounds.pop();
+    haptics.warning();
     try {
-      const res = await fetch(`/api/admin/marketplace/products?id=${p.id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to delete product");
-      toast.success("Product deleted");
+      await fetch(`/api/merchant/products?id=${p.id}`, { method: "DELETE" });
+      toast.success("Product removed from menu");
       mutate();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to delete");
+    } catch {
+      toast.error("Failed to delete product");
     }
   }
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-10 w-48 rounded-xl" />
-        <Skeleton className="h-40 w-full rounded-2xl" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
+      <div className="max-w-4xl mx-auto space-y-6 animate-pulse">
+        <div className="h-10 w-48 bg-muted rounded-xl" />
+        <div className="h-64 w-full bg-muted rounded-3xl" />
       </div>
     );
   }
 
   if (!merchant) {
     return (
-      <div className="text-center py-24 space-y-3">
-        <p className="text-sm font-bold text-muted-foreground">Merchant not found</p>
-        <Link href="/admin/marketplace" className="text-xs font-bold text-primary hover:underline">
-          Return to Marketplace Console
+      <div className="max-w-md mx-auto text-center py-20 space-y-4">
+        <p className="text-sm font-bold text-foreground">Merchant not found</p>
+        <Link
+          href="/admin/marketplace"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-bold"
+        >
+          Back to Marketplace
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto select-none pb-20">
-      {/* ─── Header ─── */}
+    <div className="max-w-4xl mx-auto space-y-6 pb-20 select-none">
+      {/* ─── Top Store Header Bar ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/marketplace"
-            className="flex size-9 shrink-0 items-center justify-center rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            className="size-9 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
           >
             <ArrowLeft className="size-4.5" />
           </Link>
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="size-10 rounded-xl overflow-hidden bg-muted border border-border shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="size-12 rounded-2xl border border-border bg-muted overflow-hidden shrink-0">
               <img src={merchant.logoUrl} alt={merchant.name} className="size-full object-cover" />
             </div>
             <div className="min-w-0">
@@ -314,7 +392,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                 </span>
               </div>
               <p className="text-xs text-muted-foreground font-medium truncate">
-                {merchant.institution?.name?.split(",")[0] || "BIT Mesra"} · {merchant.categorySlug}
+                {merchant.institution?.name?.split(",")[0] || "BIT Mesra"} · {merchant.categorySlug} · ⭐ {merchant.rating} ({merchant.reviewCount} reviews)
               </p>
             </div>
           </div>
@@ -331,11 +409,12 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
           </Link>
 
           <Link
-            href={`/merchant-portal/store/qr`}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+            href="/merchant-portal/login"
+            target="_blank"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-xs font-bold hover:bg-emerald-500/20 transition-colors"
           >
-            <QrCode className="size-3.5" />
-            <span>Table QR</span>
+            <KeyRound className="size-3.5" />
+            <span>Login as Merchant</span>
           </Link>
         </div>
       </div>
@@ -344,8 +423,10 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
       <div className="flex items-center gap-2 border-b border-border pb-1 overflow-x-auto no-scrollbar">
         {[
           { id: "profile", label: "Store Profile", icon: Store },
+          { id: "credentials", label: "Credentials & Auth", icon: KeyRound },
           { id: "products", label: `Catalog (${merchant.products?.length || 0})`, icon: Package },
           { id: "orders", label: `Orders (${merchant.orders?.length || 0})`, icon: ShoppingBag },
+          { id: "reviews", label: `Reviews (${reviewsData?.totalCount || merchant.reviewCount || 0})`, icon: Star },
           { id: "qr", label: "Table Poster QR", icon: QrCode },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -359,7 +440,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                 setActiveTab(tab.id as any);
               }}
               className={cn(
-                "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer",
+                "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0",
                 isActive
                   ? "bg-foreground text-background font-black shadow-xs"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -372,9 +453,61 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
         })}
       </div>
 
-      {/* ─── TAB 1: Profile & Details ─── */}
+      {/* ─── TAB 1: Profile & Details (pfp, bg pic, address, info) ─── */}
       {activeTab === "profile" && (
         <form onSubmit={handleSaveMerchant} className="space-y-4">
+          {/* Visual Assets Preview Card */}
+          <div className="p-5 rounded-2xl bg-card border border-border space-y-4 shadow-xs">
+            <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <ImageIcon className="size-3.5 text-primary" />
+              <span>Visual Branding (Profile Picture &amp; Cover Banner)</span>
+            </h2>
+
+            {/* Live Visual Preview */}
+            <div className="relative rounded-2xl border border-border overflow-hidden bg-muted/40 h-36 sm:h-44 flex items-end p-4">
+              {coverUrl ? (
+                <img src={coverUrl} alt="Cover Preview" className="absolute inset-0 size-full object-cover" />
+              ) : null}
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
+
+              <div className="relative z-10 flex items-center gap-3">
+                <div className="size-16 rounded-2xl border-2 border-background bg-card overflow-hidden shrink-0 shadow-lg">
+                  <img src={logoUrl} alt="Logo Preview" className="size-full object-cover" />
+                </div>
+                <div className="text-white">
+                  <h3 className="text-base font-black leading-tight drop-shadow-sm">{name || "Store Name"}</h3>
+                  <p className="text-xs text-white/80 font-medium drop-shadow-sm">
+                    {categorySlug} · {address || "Campus Location"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold text-muted-foreground">Logo / Profile Picture URL</span>
+                <input
+                  type="url"
+                  value={logoUrl}
+                  onChange={(e) => setLogoUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-medium text-foreground outline-none focus:border-foreground"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold text-muted-foreground">Cover / Background Banner URL</span>
+                <input
+                  type="url"
+                  value={coverUrl}
+                  onChange={(e) => setCoverUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-medium text-foreground outline-none focus:border-foreground"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="p-5 rounded-2xl bg-card border border-border space-y-4 shadow-xs">
             <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
               General Store Details
@@ -388,32 +521,33 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none focus:border-foreground"
+                  className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none focus:border-foreground"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Category</span>
+                <span className="text-[11px] font-bold text-muted-foreground">Category *</span>
                 <select
                   value={categorySlug}
                   onChange={(e) => setCategorySlug(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
                 >
                   <option value="food">Food &amp; Canteens</option>
                   <option value="essentials">Essentials &amp; Groceries</option>
-                  <option value="services">Services &amp; Repairs</option>
-                  <option value="rentals">Bike &amp; Gear Rentals</option>
+                  <option value="services">Local Services (Laundry, Repairs)</option>
+                  <option value="rentals">Vehicle &amp; Bike Rentals</option>
+                  <option value="activities">Activities &amp; Outings</option>
                 </select>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">Store Description</span>
+              <span className="text-[11px] font-bold text-muted-foreground">Description</span>
               <textarea
                 rows={2}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full p-3 rounded-xl bg-muted/40 border border-border text-xs font-medium text-foreground outline-none focus:border-foreground resize-none"
+                className="w-full rounded-xl bg-muted/40 border border-border p-3 text-xs font-medium text-foreground outline-none resize-none"
               />
             </div>
 
@@ -425,7 +559,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   required
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
                 />
               </div>
 
@@ -435,26 +569,19 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   type="text"
                   value={locationPin}
                   onChange={(e) => setLocationPin(e.target.value)}
-                  placeholder="Near ICICI ATM / Main Gate"
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
                 />
               </div>
             </div>
-          </div>
 
-          <div className="p-5 rounded-2xl bg-card border border-border space-y-4 shadow-xs">
-            <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-              Contact &amp; Financials
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Phone Number</span>
+                <span className="text-[11px] font-bold text-muted-foreground">Phone</span>
                 <input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-medium text-foreground outline-none"
                 />
               </div>
 
@@ -464,7 +591,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-medium text-foreground outline-none"
                 />
               </div>
 
@@ -474,20 +601,21 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   type="text"
                   value={upiId}
                   onChange={(e) => setUpiId(e.target.value)}
-                  placeholder="merchant@okhdfcbank"
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  placeholder="paytm@upi"
+                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-mono font-medium text-foreground outline-none"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <span className="text-[11px] font-bold text-muted-foreground">Delivery Fee (₹)</span>
                 <input
                   type="number"
+                  min="0"
                   value={deliveryFee}
                   onChange={(e) => setDeliveryFee(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-black text-foreground outline-none"
                 />
               </div>
 
@@ -495,260 +623,401 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                 <span className="text-[11px] font-bold text-muted-foreground">Min Order Value (₹)</span>
                 <input
                   type="number"
+                  min="0"
                   value={minOrderValue}
                   onChange={(e) => setMinOrderValue(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-black text-foreground outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Prep Time</span>
+                <span className="text-[11px] font-bold text-muted-foreground">Est. Prep Time</span>
                 <input
                   type="text"
                   value={estimatedPrepTime}
                   onChange={(e) => setEstimatedPrepTime(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-medium text-foreground outline-none"
                 />
               </div>
             </div>
-          </div>
 
-          <div className="p-5 rounded-2xl bg-card border border-border space-y-4 shadow-xs">
-            <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-              Store Status &amp; Storefront Media
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Store Status</span>
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border">
+                <span className="text-xs font-bold text-foreground">Operational Status</span>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+                  className="rounded-lg bg-card border border-border px-2 py-1 text-xs font-black uppercase"
                 >
-                  <option value="ACTIVE">🟢 Active</option>
-                  <option value="SUSPENDED">🔴 Suspended</option>
-                  <option value="PENDING">🟡 Pending Verification</option>
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="PAUSED">PAUSED</option>
+                  <option value="CLOSED">CLOSED</option>
+                  <option value="SUSPENDED">SUSPENDED</option>
                 </select>
               </div>
 
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Operational Status</span>
-                <select
-                  value={isOpen ? "open" : "closed"}
-                  onChange={(e) => setIsOpen(e.target.value === "open")}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
+              <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border">
+                <span className="text-xs font-bold text-foreground">Store Open Toggle</span>
+                <button
+                  type="button"
+                  onClick={() => setIsOpen((prev) => !prev)}
+                  className={cn(
+                    "px-3 py-1 rounded-lg text-xs font-black uppercase transition-colors cursor-pointer",
+                    isOpen
+                      ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/30"
+                      : "bg-rose-500/20 text-rose-500 border border-rose-500/30"
+                  )}
                 >
-                  <option value="open">🟢 Accepting Orders (Open)</option>
-                  <option value="closed">🔴 Closed for the day</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Logo URL</span>
-                <input
-                  type="url"
-                  value={logoUrl}
-                  onChange={(e) => setLogoUrl(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground">Cover Banner URL</span>
-                <input
-                  type="url"
-                  value={coverUrl}
-                  onChange={(e) => setCoverUrl(e.target.value)}
-                  className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
-                />
+                  {isOpen ? "OPEN NOW" : "CLOSED"}
+                </button>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-foreground text-background font-black text-xs hover:opacity-90 transition-all cursor-pointer shadow-xs disabled:opacity-50"
-            >
-              {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
-              <span>Save Merchant Changes</span>
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="w-full h-12 rounded-xl bg-foreground text-background font-black text-sm hover:opacity-90 active:scale-98 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                <span>Saving Changes...</span>
+              </>
+            ) : (
+              <>
+                <Save className="size-4" />
+                <span>Save Store Profile</span>
+              </>
+            )}
+          </button>
         </form>
       )}
 
-      {/* ─── TAB 2: Products & Menu Catalog ─── */}
+      {/* ─── TAB 2: Credentials & Portal Login (Username + Password) ─── */}
+      {activeTab === "credentials" && (
+        <div className="space-y-5">
+          <div className="p-5 rounded-2xl bg-card border border-emerald-500/30 space-y-4 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="size-4 text-emerald-500" />
+                <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
+                  Direct Merchant Portal Credentials
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyCredentials}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted hover:bg-muted/80 text-xs font-bold text-foreground cursor-pointer transition-colors"
+              >
+                <Copy className="size-3.5" />
+                <span>Copy Credentials</span>
+              </button>
+            </div>
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Give these credentials to the merchant stall owner/staff so they can log in at{" "}
+              <code className="text-foreground font-mono bg-muted px-1.5 py-0.5 rounded">
+                https://campusloop.space/merchant-portal/login
+              </code>{" "}
+              to update their menu inventory and manage orders.
+            </p>
+
+            <form onSubmit={handleSaveCredentials} className="space-y-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <span className="text-[11px] font-bold text-muted-foreground flex items-center gap-1">
+                    <User className="size-3" />
+                    <span>Merchant Login Username</span>
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    value={loginUsername}
+                    onChange={(e) => setLoginUsername(e.target.value)}
+                    className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-mono font-bold text-foreground outline-none focus:border-foreground"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-muted-foreground flex items-center gap-1">
+                      <Lock className="size-3" />
+                      <span>Login Password</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleGeneratePassword}
+                      className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <RefreshCw className="size-2.5" />
+                      <span>Generate Strong Password</span>
+                    </button>
+                  </div>
+                  <div className="relative flex items-center">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 pr-20 text-xs font-mono font-bold text-foreground outline-none focus:border-foreground"
+                    />
+                    <div className="absolute right-2 flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((p) => !p)}
+                        className="size-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <Link
+                  href="/merchant-portal/login"
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline"
+                >
+                  <span>Open Merchant Login Page</span>
+                  <ExternalLink className="size-3" />
+                </Link>
+
+                <button
+                  type="submit"
+                  disabled={isSavingCredentials}
+                  className="px-5 py-2.5 rounded-xl bg-foreground text-background font-black text-xs hover:opacity-90 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
+                >
+                  {isSavingCredentials ? <Loader2 className="size-3.5 animate-spin" /> : <KeyRound className="size-3.5" />}
+                  <span>Save Credentials</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── TAB 3: Products Catalog CRUD ─── */}
       {activeTab === "products" && (
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="relative flex-1 max-w-xs">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <input
                 type="text"
                 value={productSearch}
                 onChange={(e) => setProductSearch(e.target.value)}
                 placeholder="Search menu items..."
-                className="w-full h-9 rounded-xl bg-card border border-border pl-8.5 pr-3 text-xs font-medium text-foreground outline-none"
+                className="w-full h-10 rounded-xl bg-card border border-border pl-9 pr-3 text-xs font-bold text-foreground outline-none focus:border-foreground"
               />
             </div>
 
             <button
               type="button"
               onClick={handleOpenAddProduct}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-xs"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer shrink-0"
             >
-              <Plus className="size-3.5 stroke-3" />
+              <Plus className="size-3.5 stroke-2" />
               <span>Add Menu Item</span>
             </button>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-muted/40 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
-                <tr>
-                  <th className="p-3">Product Name</th>
-                  <th className="p-3">Category</th>
-                  <th className="p-3">Price</th>
-                  <th className="p-3">Diet</th>
-                  <th className="p-3">Stock Status</th>
-                  <th className="p-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {productsList.length > 0 ? (
-                  productsList.map((p: any) => (
-                    <tr key={p.id} className="hover:bg-muted/20 transition-colors">
-                      <td className="p-3 font-bold text-foreground">
-                        <div className="flex items-center gap-2.5">
-                          <div className="size-8 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
-                            <img src={p.imageUrl} alt={p.name} className="size-full object-cover" />
-                          </div>
-                          <div>
-                            <p className="truncate max-w-[180px]">{p.name}</p>
-                            {p.description && (
-                              <p className="text-[10px] text-muted-foreground line-clamp-1">
-                                {p.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-3 text-muted-foreground font-medium">{p.categoryName || "General"}</td>
-                      <td className="p-3 font-black text-foreground">
-                        ₹{p.price}
-                        {p.originalPrice && p.originalPrice > p.price && (
-                          <span className="text-[10px] text-muted-foreground line-through ml-1.5">
-                            ₹{p.originalPrice}
-                          </span>
-                        )}
-                      </td>
-                      <td className="p-3">
-                        <span
-                          className={cn(
-                            "px-2 py-0.5 rounded-full text-[10px] font-black uppercase",
-                            p.isVeg
-                              ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
-                              : "bg-rose-500/15 text-rose-500 border border-rose-500/30"
-                          )}
-                        >
-                          {p.isVeg ? "Veg" : "Non-Veg"}
+          <div className="rounded-2xl bg-card border border-border overflow-hidden divide-y divide-border/30">
+            {productsList.length === 0 ? (
+              <div className="text-center py-12 space-y-2">
+                <Package className="size-8 mx-auto text-muted-foreground" />
+                <p className="text-xs font-bold text-foreground">No menu items found</p>
+                <p className="text-[11px] text-muted-foreground">Add products to make them available to students.</p>
+              </div>
+            ) : (
+              productsList.map((p: any) => (
+                <div key={p.id} className="p-4 flex items-center justify-between gap-3 hover:bg-muted/10 transition-colors">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="size-12 rounded-xl bg-muted overflow-hidden shrink-0 border border-border">
+                      {p.imageUrl ? (
+                        <img src={p.imageUrl} alt={p.name} className="size-full object-cover" />
+                      ) : (
+                        <div className="size-full flex items-center justify-center text-xs">🍽️</div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-foreground truncate">{p.name}</span>
+                        <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                          {p.categoryName}
                         </span>
-                      </td>
-                      <td className="p-3">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleStock(p)}
-                          className={cn(
-                            "px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer",
-                            p.isAvailable
-                              ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
-                              : "bg-muted text-muted-foreground border border-border"
-                          )}
-                        >
-                          {p.isAvailable ? "🟢 In Stock" : "🔴 Out of Stock"}
-                        </button>
-                      </td>
-                      <td className="p-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEditProduct(p)}
-                            className="size-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
-                            title="Edit Product"
-                          >
-                            <Edit2 className="size-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteProduct(p)}
-                            className="size-7 rounded-lg hover:bg-rose-500/10 flex items-center justify-center text-muted-foreground hover:text-rose-500 cursor-pointer transition-colors"
-                            title="Delete Product"
-                          >
-                            <Trash2 className="size-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="p-8 text-center text-xs text-muted-foreground">
-                      No products found. Click "Add Menu Item" to add items to this store.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* ─── TAB 3: Orders Stream ─── */}
-      {activeTab === "orders" && (
-        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
-          <div className="p-4 border-b border-border flex items-center justify-between">
-            <h2 className="text-sm font-black text-foreground">Recent Orders</h2>
-            <span className="text-xs text-muted-foreground font-semibold">
-              {merchant.orders?.length || 0} total
-            </span>
-          </div>
-
-          <div className="divide-y divide-border">
-            {merchant.orders?.length > 0 ? (
-              merchant.orders.map((o: any) => (
-                <div key={o.id} className="p-4 flex items-center justify-between gap-4 hover:bg-muted/10 transition-colors">
-                  <div>
-                    <p className="text-xs font-black text-foreground">Order #{o.id.slice(0, 8)}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      Total ₹{o.total} · {o.paymentMode || "UPI"} · {o.deliveryType || "HOSTEL_DELIVERY"}
-                    </p>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                        <span className="font-black text-foreground">₹{p.price}</span>
+                        {p.originalPrice && <span className="line-through text-[11px]">₹{p.originalPrice}</span>}
+                        <span>· {p.isAvailable ? "🟢 In Stock" : "🔴 Out of Stock"}</span>
+                      </div>
+                    </div>
                   </div>
-                  <span
-                    className={cn(
-                      "px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider",
-                      o.status === "DELIVERED" || o.status === "COMPLETED"
-                        ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
-                        : "bg-amber-500/15 text-amber-500 border border-amber-500/30"
-                    )}
-                  >
-                    {o.status}
-                  </span>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStock(p)}
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer",
+                        p.isAvailable
+                          ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/30 hover:bg-emerald-500/20"
+                          : "bg-rose-500/10 text-rose-500 border-rose-500/30 hover:bg-rose-500/20"
+                      )}
+                    >
+                      {p.isAvailable ? "In Stock" : "Out of Stock"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditProduct(p)}
+                      className="size-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center cursor-pointer"
+                      title="Edit Item"
+                    >
+                      <Edit2 className="size-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteProduct(p)}
+                      className="size-8 rounded-lg hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 flex items-center justify-center cursor-pointer"
+                      title="Delete Item"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))
-            ) : (
-              <div className="p-8 text-center text-xs text-muted-foreground">
-                No orders placed yet for this store.
-              </div>
             )}
           </div>
         </div>
       )}
 
-      {/* ─── TAB 4: Table QR Stand ─── */}
+      {/* ─── TAB 4: Live Orders ─── */}
+      {activeTab === "orders" && (
+        <div className="rounded-2xl bg-card border border-border overflow-hidden divide-y divide-border/30">
+          {(merchant.orders || []).length === 0 ? (
+            <div className="text-center py-12 space-y-2">
+              <ShoppingBag className="size-8 mx-auto text-muted-foreground" />
+              <p className="text-xs font-bold text-foreground">No orders recorded yet</p>
+            </div>
+          ) : (
+            merchant.orders.map((o: any) => (
+              <div key={o.id} className="p-4 flex items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-foreground">#{o.orderNumber || o.id.slice(0, 8)}</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-primary/10 text-primary border border-primary/20">
+                      {o.status}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    ₹{o.total} · {o.paymentMethod || "COD"} · {formatTimeAgo(o.createdAt)}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* ─── TAB 5: Ratings & Student Reviews ─── */}
+      {activeTab === "reviews" && (
+        <div className="space-y-5">
+          {/* Summary Card */}
+          <div className="p-5 rounded-2xl bg-card border border-border shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="size-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex flex-col items-center justify-center text-amber-500">
+                <span className="text-2xl font-black">{reviewsData?.averageRating || merchant.rating}</span>
+                <span className="text-[10px] font-bold">/ 5.0</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-foreground">Student Store Rating</h3>
+                <p className="text-xs text-muted-foreground">
+                  Based on {reviewsData?.totalCount || merchant.reviewCount || 0} verified student reviews
+                </p>
+                <div className="flex items-center gap-1 mt-1 text-amber-500">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star
+                      key={s}
+                      className={cn(
+                        "size-3.5",
+                        s <= Math.round(Number(reviewsData?.averageRating || merchant.rating))
+                          ? "fill-amber-500 stroke-amber-500"
+                          : "fill-transparent stroke-muted-foreground/40"
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <Link
+              href={`/app/marketplace/store/${merchant.id}`}
+              target="_blank"
+              className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+            >
+              <span>View Reviews on Public Storefront</span>
+              <ExternalLink className="size-3" />
+            </Link>
+          </div>
+
+          {/* Reviews List */}
+          <div className="rounded-2xl bg-card border border-border overflow-hidden divide-y divide-border/30">
+            {(reviewsData?.reviews || []).length === 0 ? (
+              <div className="text-center py-12 space-y-2">
+                <Star className="size-8 mx-auto text-muted-foreground" />
+                <p className="text-xs font-bold text-foreground">No student reviews yet</p>
+                <p className="text-[11px] text-muted-foreground">Students can review this store from the store page.</p>
+              </div>
+            ) : (
+              reviewsData?.reviews.map((r: any) => (
+                <div key={r.id} className="p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="size-7 rounded-full bg-muted overflow-hidden border border-border">
+                        <img
+                          src={getAvatarUrl(r.student?.avatarUrl, r.student?.username ?? "student")}
+                          alt={r.student?.displayName || "Student"}
+                          className="size-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-foreground">{r.student?.displayName || "Student"}</span>
+                          <span className="text-[10px] text-muted-foreground">@{r.student?.username || "student"}</span>
+                        </div>
+                        <div className="flex items-center gap-0.5 text-amber-500">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star
+                              key={s}
+                              className={cn(
+                                "size-2.5",
+                                s <= r.rating ? "fill-amber-500 stroke-amber-500" : "fill-transparent stroke-muted-foreground/30"
+                              )}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground">{formatTimeAgo(r.createdAt)}</span>
+                  </div>
+
+                  {r.comment && (
+                    <p className="text-xs text-foreground/90 leading-relaxed font-medium pl-9">
+                      {r.comment}
+                    </p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ─── TAB 6: Table QR Stand ─── */}
       {activeTab === "qr" && (
         <div className="p-8 rounded-2xl bg-card border border-border text-center space-y-4 max-w-sm mx-auto shadow-xs">
           <div className="size-48 mx-auto bg-white p-4 rounded-2xl border border-border flex items-center justify-center">

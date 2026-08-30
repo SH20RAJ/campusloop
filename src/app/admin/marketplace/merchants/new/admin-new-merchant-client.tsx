@@ -2,7 +2,15 @@
 
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { ArrowLeft,Loader2,Send } from "lucide-react";
+import {
+  ArrowLeft,
+  Copy,
+  KeyRound,
+  Loader2,
+  RefreshCw,
+  Send,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -22,7 +30,41 @@ export function AdminNewMerchantClient() {
   const [minOrderValue, setMinOrderValue] = useState("80");
   const [estimatedPrepTime, setEstimatedPrepTime] = useState("15–20 min");
   const [institutionId, setInstitutionId] = useState("inst_35df75700bb23dd30311ef5f"); // BIT Mesra default
+  const [logoUrl, setLogoUrl] = useState("https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=300&fit=crop");
+  const [coverUrl, setCoverUrl] = useState("https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop");
+
+  // Portal Credentials
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function handleNameChange(newName: string) {
+    setName(newName);
+    if (!loginUsername) {
+      const suggested = newName.toLowerCase().replace(/[^a-z0-9]/g, "");
+      setLoginUsername(suggested);
+    }
+  }
+
+  function handleGeneratePassword() {
+    sounds.pop();
+    haptics.light();
+    const chars = "abcdefghjkmnpqrstuvwxyz23456789";
+    let rand = "";
+    for (let i = 0; i < 8; i++) {
+      rand += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const generated = `cl_${rand}!`;
+    setLoginPassword(generated);
+    toast.success("Generated strong merchant password!");
+  }
+
+  function handleCopyCredentials() {
+    sounds.tap();
+    const text = `CampusLoop Merchant Portal Credentials\nStore: ${name}\nURL: https://campusloop.space/merchant-portal/login\nUsername: ${loginUsername}\nPassword: ${loginPassword}`;
+    navigator.clipboard.writeText(text);
+    toast.success("Copied credentials to clipboard! 📋");
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,6 +94,10 @@ export function AdminNewMerchantClient() {
           minOrderValue: parseInt(minOrderValue, 10) || 0,
           estimatedPrepTime: estimatedPrepTime.trim(),
           institutionId,
+          logoUrl: logoUrl.trim(),
+          coverUrl: coverUrl.trim(),
+          loginUsername: loginUsername.trim() || undefined,
+          loginPassword: loginPassword.trim() || undefined,
         }),
       });
 
@@ -80,12 +126,13 @@ export function AdminNewMerchantClient() {
             Onboard New Campus Merchant
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Register a verified local business to sell on the student marketplace
+            Register a verified local business and generate direct portal login credentials
           </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Section 1: Business Information */}
         <div className="p-5 rounded-2xl bg-card border border-border space-y-3.5 shadow-xs">
           <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
             1. Business Information
@@ -97,8 +144,8 @@ export function AdminNewMerchantClient() {
               type="text"
               required
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Canteen Corner / Chai Point / SpeedWheel Rentals"
+              onChange={(e) => handleNameChange(e.target.value)}
+              placeholder="e.g. Momo House / Sharma Ji Canteen / Campus Wheel Rentals"
               className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground focus:border-foreground outline-none"
             />
           </div>
@@ -114,7 +161,7 @@ export function AdminNewMerchantClient() {
                 <option value="food">Food &amp; Canteens</option>
                 <option value="essentials">Essentials &amp; Groceries</option>
                 <option value="services">Local Services (Laundry, Repairs)</option>
-                <option value="rentals">Vehicle &amp; Gear Rentals</option>
+                <option value="rentals">Vehicle &amp; Bike Rentals</option>
                 <option value="activities">Activities &amp; Outings</option>
               </select>
             </div>
@@ -141,9 +188,33 @@ export function AdminNewMerchantClient() {
               className="w-full rounded-xl bg-muted/40 border border-border p-3 text-xs font-medium text-foreground outline-none resize-none"
             />
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold text-muted-foreground">Logo / Profile Picture URL</span>
+              <input
+                type="url"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                placeholder="https://..."
+                className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-medium text-foreground outline-none"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold text-muted-foreground">Cover / Background Banner URL</span>
+              <input
+                type="url"
+                value={coverUrl}
+                onChange={(e) => setCoverUrl(e.target.value)}
+                placeholder="https://..."
+                className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-medium text-foreground outline-none"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Location & Fulfillment */}
+        {/* Section 2: Location & Fulfillment */}
         <div className="p-5 rounded-2xl bg-card border border-border space-y-3.5 shadow-xs">
           <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
             2. Campus Location &amp; Fulfillment
@@ -182,6 +253,78 @@ export function AdminNewMerchantClient() {
                 onChange={(e) => setDeliveryFee(e.target.value)}
                 className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-black text-foreground outline-none"
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3: Portal Login Credentials */}
+        <div className="p-5 rounded-2xl bg-card border border-emerald-500/30 space-y-3.5 shadow-xs">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="size-4 text-emerald-500" />
+              <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
+                3. Merchant Portal Credentials
+              </h2>
+            </div>
+            {loginUsername && loginPassword && (
+              <button
+                type="button"
+                onClick={handleCopyCredentials}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-muted hover:bg-muted/80 text-[11px] font-bold text-foreground cursor-pointer transition-colors"
+              >
+                <Copy className="size-3" />
+                <span>Copy Credentials</span>
+              </button>
+            )}
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            The merchant will log in at <code className="text-foreground font-mono bg-muted px-1.5 py-0.5 rounded">/merchant-portal/login</code> with these credentials to manage their menu and live orders.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold text-muted-foreground">Login Username</span>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={loginUsername}
+                  onChange={(e) => setLoginUsername(e.target.value)}
+                  placeholder="e.g. momohouse"
+                  className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-mono font-bold text-foreground outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-muted-foreground">Password</span>
+                <button
+                  type="button"
+                  onClick={handleGeneratePassword}
+                  className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <RefreshCw className="size-2.5" />
+                  <span>Generate Password</span>
+                </button>
+              </div>
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="e.g. cl_momo982!"
+                  className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 pr-9 text-xs font-mono font-bold text-foreground outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleGeneratePassword}
+                  className="absolute right-2.5 text-muted-foreground hover:text-foreground"
+                  title="Generate Password"
+                >
+                  <KeyRound className="size-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

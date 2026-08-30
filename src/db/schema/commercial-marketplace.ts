@@ -50,6 +50,10 @@ export const merchants = pgTable("merchants", {
   status: text("status").default("ACTIVE").notNull(),
   isOpen: boolean("is_open").default(true).notNull(), // Merchant toggle (Open/Busy/Closed)
   
+  // Direct Portal Credentials
+  loginUsername: text("login_username"),
+  loginPassword: text("login_password"),
+  
   // Banking / Settlement
   upiId: text("upi_id"),
   bankAccountDetails: jsonb("bank_account_details"),

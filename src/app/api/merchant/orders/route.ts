@@ -1,45 +1,19 @@
 import { getDb } from "@/db";
-import { marketplaceOrders,merchants,merchantUsers,userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,inArray } from "drizzle-orm";
+import { marketplaceOrders } from "@/db/schema";
+import { resolveMerchantSession } from "@/lib/merchant-session";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const db = getDb();
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
-
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
-    }
-
-    // Find merchant
-    let merchantUser = await db.query.merchantUsers.findFirst({
-      where: eq(merchantUsers.userId, profile.id),
-      with: { merchant: true },
-    });
-
-    let merchant = merchantUser?.merchant;
-    if (!merchant) {
-      const firstMerchant = await db.query.merchants.findFirst({
-        where: eq(merchants.institutionId, profile.institutionId),
-      });
-      merchant = firstMerchant || (await db.query.merchants.findFirst());
-    }
-
-    if (!merchant) {
-      return NextResponse.json({ error: "No merchant found" }, { status: 404 });
-    }
-
     const { searchParams } = new URL(req.url);
     const statusTab = searchParams.get("status"); // "new", "preparing", "ready", "delivery", "completed", "all"
 
@@ -70,7 +44,7 @@ export async function GET(req: Request) {
       },
     });
 
-    return NextResponse.json({ orders });
+    return NextResponse.json({ orders, merchant });
   } catch (error) {
     console.error("Error fetching merchant orders:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

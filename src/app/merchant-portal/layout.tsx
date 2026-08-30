@@ -1,4 +1,5 @@
-import { getCachedAuthUser,getCachedUserProfile } from "@/lib/server-cache";
+import { getAuthenticatedMerchant } from "@/lib/merchant-auth";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { MerchantLayoutClient } from "./merchant-layout-client";
@@ -14,11 +15,32 @@ export default async function MerchantPortalLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // 1. Try direct merchant session cookie
+  const directMerchant = await getAuthenticatedMerchant();
+  if (directMerchant) {
+    return (
+      <MerchantLayoutClient
+        merchant={directMerchant}
+        profile={{
+          displayName: directMerchant.name,
+          username: directMerchant.loginUsername || directMerchant.slug,
+          avatarUrl: directMerchant.logoUrl,
+        }}
+      >
+        {children}
+      </MerchantLayoutClient>
+    );
+  }
+
+  // 2. Fallback to Hexclave user session
   const user = await getCachedAuthUser();
-  if (!user) redirect("/handler/sign-in");
+  if (user) {
+    const profile = await getCachedUserProfile(user.id);
+    if (profile) {
+      return <MerchantLayoutClient profile={profile}>{children}</MerchantLayoutClient>;
+    }
+  }
 
-  const profile = await getCachedUserProfile(user.id);
-  if (!profile) redirect("/app/onboarding");
-
-  return <MerchantLayoutClient profile={profile}>{children}</MerchantLayoutClient>;
+  // 3. Not logged in -> Redirect to dedicated merchant login page
+  redirect("/merchant-portal/login");
 }

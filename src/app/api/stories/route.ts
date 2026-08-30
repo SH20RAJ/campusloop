@@ -1,8 +1,9 @@
 import { getDb } from "@/db";
-import { stories,userProfiles,type Story,type UserProfile } from "@/db/schema";
+import { follows, stories, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { rankAndFilterStories } from "@/lib/stories-ranker";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { eq,gt } from "drizzle-orm";
+import { eq, gt } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -15,8 +16,17 @@ export async function GET() {
     }
 
     const db = getDb();
+    const profile = await db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, user.id),
+    });
+
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
+    }
+
     const now = new Date();
 
+    // 1. Fetch active stories within 24h
     const activeStories = await db.query.stories.findMany({
       where: gt(stories.expiresAt, now),
       with: {
@@ -24,35 +34,23 @@ export async function GET() {
       },
     });
 
-    // Group stories by user profile
-    type StoryPayload = Pick<
-      Story,
-      "id" | "mediaUrl" | "text" | "backgroundColor" | "createdAt" | "expiresAt"
-    >;
-    const userStoriesMap = new Map<string, { user: UserProfile; stories: StoryPayload[] }>();
-    for (const story of activeStories) {
-      if (!story.user) continue; // Skip orphaned stories whose author no longer exists
-      if (!userStoriesMap.has(story.userId)) {
-        userStoriesMap.set(story.userId, {
-          user: story.user,
-          stories: [],
-        });
-      }
-      const userStories = userStoriesMap.get(story.userId);
-      if (userStories) {
-        userStories.stories.push({
-          id: story.id,
-          mediaUrl: story.mediaUrl,
-          text: story.text,
-          backgroundColor: story.backgroundColor,
-          createdAt: story.createdAt,
-          expiresAt: story.expiresAt,
-        });
-      }
-    }
+    // 2. Fetch users followed by viewer
+    const userFollows = await db.query.follows.findMany({
+      where: eq(follows.followerId, profile.id),
+    });
 
-    const result = Array.from(userStoriesMap.values());
-    return NextResponse.json(result);
+    const followingIds = userFollows.map((f) => f.followingId);
+    const friendIds = userFollows.filter((f) => f.isMutual).map((f) => f.followingId);
+
+    // 3. Rank and filter: Friends prioritized first, then general followings, only show followings + self
+    const rankedResult = rankAndFilterStories({
+      viewerProfileId: profile.id,
+      activeStories,
+      followingIds,
+      friendIds,
+    });
+
+    return NextResponse.json(rankedResult);
   } catch (error) {
     console.error("Error fetching stories:", error);
     return NextResponse.json({ error: "Failed to fetch stories" }, { status: 500 });
@@ -92,13 +90,16 @@ export async function POST(req: Request) {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
-    const [newStory] = await db.insert(stories).values({
-      userId: profile.id,
-      text: text || null,
-      backgroundColor: backgroundColor || "from-violet-600 to-indigo-600",
-      mediaUrl: mediaUrl || null,
-      expiresAt,
-    }).returning();
+    const [newStory] = await db
+      .insert(stories)
+      .values({
+        userId: profile.id,
+        text: text || null,
+        backgroundColor: backgroundColor || "from-violet-600 to-indigo-600",
+        mediaUrl: mediaUrl || null,
+        expiresAt,
+      })
+      .returning();
 
     return NextResponse.json(newStory, { status: 201 });
   } catch (error) {

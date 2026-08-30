@@ -1,52 +1,19 @@
 import { getDb } from "@/db";
-import {
-marketplaceOrders,
-merchants,
-merchantUsers,
-products,
-userProfiles,
-} from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { desc,eq } from "drizzle-orm";
+import { marketplaceOrders, products } from "@/db/schema";
+import { resolveMerchantSession } from "@/lib/merchant-session";
+import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const db = getDb();
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
-
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
-    }
-
-    // Find merchant linked to this user, or first active merchant for fallback
-    let merchantUser = await db.query.merchantUsers.findFirst({
-      where: eq(merchantUsers.userId, profile.id),
-      with: { merchant: true },
-    });
-
-    let merchant = merchantUser?.merchant;
-
-    // If user is not yet explicitly mapped to a merchant, fallback to first active merchant in their campus
-    if (!merchant) {
-      const firstMerchant = await db.query.merchants.findFirst({
-        where: eq(merchants.institutionId, profile.institutionId),
-      });
-      merchant = firstMerchant || (await db.query.merchants.findFirst());
-    }
-
-    if (!merchant) {
-      return NextResponse.json({ error: "No merchant found" }, { status: 404 });
-    }
 
     // Fetch all orders for this merchant
     const allMerchantOrders = await db.query.marketplaceOrders.findMany({
@@ -60,54 +27,37 @@ export async function GET(req: Request) {
       },
     });
 
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    const todayOrders = allMerchantOrders.filter(
-      (o) => new Date(o.createdAt) >= todayStart
-    );
-
-    const todayRevenue = todayOrders
-      .filter((o) => o.status !== "REJECTED" && o.status !== "CANCELLED")
-      .reduce((sum, o) => sum + o.total, 0);
-
-    const pendingOrders = allMerchantOrders.filter(
-      (o) => o.status === "PLACED"
-    );
-
-    const activeOrders = allMerchantOrders.filter((o) =>
-      [
-        "PLACED",
-        "ACCEPTED",
-        "PREPARING",
-        "READY",
-        "OUT_FOR_DELIVERY",
-        "READY_FOR_PICKUP",
-      ].includes(o.status)
-    );
-
-    const avgOrderValue =
-      todayOrders.length > 0 ? Math.round(todayRevenue / todayOrders.length) : 180;
-
-    const totalProducts = await db.query.products.findMany({
+    // Fetch active products count
+    const merchantProducts = await db.query.products.findMany({
       where: eq(products.merchantId, merchant.id),
     });
 
+    // Calculate metrics
+    const totalOrders = allMerchantOrders.length;
+    const activeOrders = allMerchantOrders.filter(
+      (o) => !["DELIVERED", "REJECTED", "CANCELLED", "PICKED_UP", "RETURNED"].includes(o.status)
+    );
+    const completedOrders = allMerchantOrders.filter((o) =>
+      ["DELIVERED", "PICKED_UP", "RETURNED"].includes(o.status)
+    );
+    const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+
     return NextResponse.json({
       merchant,
-      stats: {
-        todayRevenue,
-        todayOrdersCount: todayOrders.length,
-        pendingCount: pendingOrders.length,
-        activeCount: activeOrders.length,
-        avgOrderValue,
-        totalProductsCount: totalProducts.length,
+      metrics: {
+        totalOrders,
+        activeOrdersCount: activeOrders.length,
+        completedOrdersCount: completedOrders.length,
+        totalRevenue,
+        totalProducts: merchantProducts.length,
+        rating: merchant.rating,
+        reviewCount: merchant.reviewCount,
       },
-      incomingOrders: pendingOrders,
-      recentOrders: allMerchantOrders.slice(0, 8),
+      activeOrders,
+      recentOrders: allMerchantOrders.slice(0, 15),
     });
   } catch (error) {
-    console.error("Error fetching merchant dashboard:", error);
+    console.error("Error in merchant dashboard GET:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

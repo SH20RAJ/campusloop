@@ -1,33 +1,37 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import {
-ArrowLeft,
-Bike,
-CalendarCheck2,
-Clock,
-DollarSign,
-Gauge,
-LayoutDashboard,
-Menu,
-Package,
-QrCode,
-Settings,
-Star,
-Store,
-Tag,
-UtensilsCrossed
+  ArrowLeft,
+  Bike,
+  CalendarCheck2,
+  Clock,
+  DollarSign,
+  Gauge,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Package,
+  QrCode,
+  Settings,
+  Star,
+  Store,
+  Tag,
+  UtensilsCrossed,
+  X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface MerchantLayoutClientProps {
   children: React.ReactNode;
   profile: any;
+  merchant?: any;
 }
 
 const MERCHANT_NAV_ITEMS = [
@@ -49,17 +53,25 @@ const BIKE_RENTAL_NAV_ITEMS = [
   { href: "/merchant-portal/bikes/settings", label: "Rental Rules", icon: Settings },
 ];
 
-const MOBILE_MERCHANT_TABS = [
-  { href: "/merchant-portal", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/merchant-portal/orders", label: "Orders", icon: Package },
-  { href: "/merchant-portal/bikes", label: "Bikes", icon: Bike },
-  { href: "/merchant-portal/products", label: "Menu", icon: UtensilsCrossed },
-  { href: "/merchant-portal/store", label: "Store", icon: Store },
-];
-
-export function MerchantLayoutClient({ children, profile }: MerchantLayoutClientProps) {
+export function MerchantLayoutClient({ children, profile, merchant }: MerchantLayoutClientProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isRentalStore = merchant?.categorySlug === "rentals" || pathname.startsWith("/merchant-portal/bikes");
+
+  async function handleLogout() {
+    sounds.tap();
+    haptics.medium();
+    try {
+      await fetch("/api/merchant/auth/logout", { method: "POST" });
+      toast.success("Logged out from merchant portal");
+      router.push("/merchant-portal/login");
+      router.refresh();
+    } catch {
+      router.push("/merchant-portal/login");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col md:flex-row select-none">
@@ -69,7 +81,7 @@ export function MerchantLayoutClient({ children, profile }: MerchantLayoutClient
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
-            className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-foreground"
+            className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-foreground cursor-pointer"
           >
             <Menu className="size-5" />
           </button>
@@ -78,13 +90,23 @@ export function MerchantLayoutClient({ children, profile }: MerchantLayoutClient
           </span>
         </div>
 
-        <Link
-          href="/app/marketplace"
-          className="text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1"
-        >
-          <ArrowLeft className="size-3.5" />
-          <span>Student App</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/app/marketplace"
+            className="text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1"
+          >
+            <ArrowLeft className="size-3.5" />
+            <span>Store</span>
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-rose-500 transition-colors"
+            title="Log Out"
+          >
+            <LogOut className="size-4" />
+          </button>
+        </div>
       </header>
 
       {/* ─── Desktop Dedicated Sidebar ─── */}
@@ -182,58 +204,112 @@ export function MerchantLayoutClient({ children, profile }: MerchantLayoutClient
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
           >
             <ArrowLeft className="size-3.5" />
-            <span>Switch to Student App</span>
+            <span>Student App</span>
           </Link>
 
-          <div className="flex items-center gap-2.5 px-3 py-1 text-xs text-muted-foreground">
-            <Avatar className="size-7 rounded-full border border-border/40">
-              <AvatarImage src={profile.avatarUrl} />
-              <AvatarFallback className="text-[10px] font-bold">
-                {profile.displayName?.[0] || "M"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <p className="font-bold text-foreground truncate leading-none">
-                {profile.displayName}
-              </p>
-              <p className="text-[10px] text-muted-foreground truncate mt-0.5">
-                @{profile.username}
-              </p>
+          <div className="flex items-center justify-between px-3 py-1 text-xs">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <Avatar className="size-7 rounded-full border border-border/40 shrink-0">
+                <AvatarImage src={profile.avatarUrl} />
+                <AvatarFallback className="text-[10px] font-bold">
+                  {profile.displayName?.[0] || "M"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-foreground truncate leading-none">
+                  {profile.displayName}
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate mt-0.5">
+                  @{profile.username}
+                </p>
+              </div>
             </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="size-7 rounded-lg hover:bg-muted/60 flex items-center justify-center text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer"
+              title="Sign Out of Merchant Console"
+            >
+              <LogOut className="size-3.5" />
+            </button>
           </div>
         </div>
       </aside>
 
-      {/* ─── Main Content Canvas ─── */}
-      <div className="flex-1 md:pl-64 min-h-screen pb-20 md:pb-6">{children}</div>
+      {/* ─── Mobile Slide-out Drawer Menu ─── */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex md:hidden">
+          <div className="w-4/5 max-w-xs h-full bg-card border-r border-border p-4 flex flex-col justify-between overflow-y-auto">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-border">
+                <span className="text-sm font-black">
+                  Campus<span className="text-emerald-500">Merchant</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
 
-      {/* ─── Mobile Bottom Navigation ─── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 flex h-14 items-center justify-around border-t border-border/30 bg-background/90 px-2 backdrop-blur-xl md:hidden">
-        {MOBILE_MERCHANT_TABS.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/merchant-portal" && pathname.startsWith(item.href));
-          const Icon = item.icon;
+              <nav className="space-y-1">
+                <p className="px-2 text-[10px] font-black uppercase text-muted-foreground">General Store</p>
+                {MERCHANT_NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold",
+                      pathname === item.href ? "bg-foreground text-background font-black" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <item.icon className="size-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </nav>
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => {
-                sounds.tap();
-                haptics.light();
-              }}
-              className={cn(
-                "flex flex-col items-center gap-0.5 text-[10px] font-bold py-1 px-3 rounded-xl transition-colors cursor-pointer",
-                isActive ? "text-emerald-500 font-black" : "text-muted-foreground"
-              )}
-            >
-              <Icon className="size-4.5" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+              <nav className="space-y-1 pt-2 border-t border-border">
+                <p className="px-2 text-[10px] font-black uppercase text-emerald-500">Bike Rentals</p>
+                {BIKE_RENTAL_NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold",
+                      pathname === item.href ? "bg-emerald-500 text-black font-black" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <item.icon className="size-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            <div className="pt-3 border-t border-border space-y-2">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-rose-500/10 text-rose-500 text-xs font-bold hover:bg-rose-500/20 transition-colors"
+              >
+                <LogOut className="size-3.5" />
+                <span>Log Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Main Content Body ─── */}
+      <main className="flex-1 md:ml-64 p-4 sm:p-6 pb-20 md:pb-8 max-w-5xl mx-auto w-full">
+        {children}
+      </main>
     </div>
   );
 }

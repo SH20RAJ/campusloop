@@ -54,6 +54,8 @@ export async function POST(req: Request) {
       deliveryFee,
       minOrderValue,
       estimatedPrepTime,
+      loginUsername,
+      loginPassword,
     } = body;
 
     if (!name || !institutionId || !address) {
@@ -66,6 +68,14 @@ export async function POST(req: Request) {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
+
+    const cleanLoginUsername =
+      loginUsername?.trim().toLowerCase() ||
+      cleanSlug.replace(/[^a-z0-9]/g, "");
+
+    const cleanLoginPassword =
+      loginPassword?.trim() ||
+      `store@${Math.random().toString(36).slice(-6)}`;
 
     const [newMerchant] = await db
       .insert(merchants)
@@ -88,6 +98,8 @@ export async function POST(req: Request) {
         deliveryFee: typeof deliveryFee === "number" ? deliveryFee : 20,
         minOrderValue: typeof minOrderValue === "number" ? minOrderValue : 80,
         estimatedPrepTime: estimatedPrepTime || "15–20 min",
+        loginUsername: cleanLoginUsername,
+        loginPassword: cleanLoginPassword,
         status: "ACTIVE",
         isOpen: true,
       })

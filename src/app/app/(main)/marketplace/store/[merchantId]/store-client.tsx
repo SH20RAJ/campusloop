@@ -11,6 +11,7 @@ ArrowLeft,
 Check,
 ChevronRight,
 Clock,
+Loader2,
 MapPin,
 Minus,
 Percent,
@@ -56,6 +57,19 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
     fetcher,
     { dedupingInterval: 15000 }
   );
+
+  const { data: reviewsData, mutate: mutateReviews } = useSWR<{
+    reviews: any[];
+    totalCount: number;
+    averageRating: string;
+    distribution: Record<number, number>;
+    userReview: any;
+  }>(`/api/marketplace/store/${merchantId}/reviews`, fetcher);
+
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const store = data?.store;
   const products = store?.products || [];
@@ -186,6 +200,39 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
     } else {
       navigator.clipboard.writeText(shareUrl);
       toast.success("Store link copied to clipboard! 📋");
+    }
+  }
+
+  async function handleSubmitReview(e: React.FormEvent) {
+    e.preventDefault();
+    if (!store?.id) return;
+    setIsSubmittingReview(true);
+    sounds.send();
+    haptics.success();
+
+    try {
+      const res = await fetch(`/api/marketplace/store/${store.id}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rating: reviewRating,
+          comment: reviewComment.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to submit review");
+      }
+
+      toast.success("Thank you for your review! ⭐");
+      mutateReviews();
+      setIsReviewModalOpen(false);
+      setReviewComment("");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit review");
+    } finally {
+      setIsSubmittingReview(false);
     }
   }
 
@@ -631,31 +678,103 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
         </section>
       )}
 
-      {/* ─── TAB 3: REVIEWS ─── */}
+      {/* ─── TAB 3: REVIEWS & STUDENT RATINGS ─── */}
       {activeTab === "reviews" && (
-        <section className="divide-y divide-border/20">
-          {reviews.length > 0 ? (
-            reviews.map((rev: any) => (
-              <div key={rev.id} className="p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-foreground">{rev.studentName || "Verified Student"}</span>
-                    <span className="text-[10px] text-muted-foreground">· {formatTimeAgo(rev.createdAt)}</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-amber-500 text-xs font-bold">
-                    <Star className="size-3 fill-amber-500" />
-                    <span>{rev.rating}</span>
+        <section className="p-4 space-y-4">
+          {/* Rating Summary & Write Review Button */}
+          <div className="p-5 rounded-3xl border border-border/40 bg-card space-y-4 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="size-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex flex-col items-center justify-center text-amber-500 shrink-0">
+                  <span className="text-2xl font-black">{reviewsData?.averageRating || store.rating || "4.8"}</span>
+                  <span className="text-[10px] font-bold">/ 5.0</span>
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-foreground">Verified Student Rating</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Based on {reviewsData?.totalCount || store.reviewCount || 0} student orders
+                  </p>
+                  <div className="flex items-center gap-1 mt-1 text-amber-500">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star
+                        key={s}
+                        className={cn(
+                          "size-3.5",
+                          s <= Math.round(Number(reviewsData?.averageRating || store.rating || 5))
+                            ? "fill-amber-500 stroke-amber-500"
+                            : "fill-transparent stroke-muted-foreground/30"
+                        )}
+                      />
+                    ))}
                   </div>
                 </div>
-                <p className="text-xs text-foreground/90 leading-relaxed font-normal">{rev.comment}</p>
               </div>
-            ))
-          ) : (
-            <div className="py-16 text-center space-y-2">
-              <Star className="size-8 text-muted-foreground/40 mx-auto" />
-              <p className="text-xs font-bold text-muted-foreground">No reviews yet. Be the first to order and review!</p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setIsReviewModalOpen(true);
+                }}
+                className="px-4 py-2.5 rounded-2xl bg-foreground text-background text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Star className="size-3.5 fill-current" />
+                <span>{reviewsData?.userReview ? "Update Your Review" : "Rate & Review"}</span>
+              </button>
             </div>
-          )}
+          </div>
+
+          {/* Student Reviews Stream */}
+          <div className="rounded-3xl border border-border/40 bg-card overflow-hidden divide-y divide-border/20 shadow-xs">
+            {(reviewsData?.reviews || reviews || []).length > 0 ? (
+              (reviewsData?.reviews || reviews || []).map((rev: any) => {
+                const sName = rev.student?.displayName || rev.studentName || "Verified Student";
+                const sHandle = rev.student?.username || "student";
+                const sAvatar = getAvatarUrl(rev.student?.avatarUrl, sHandle);
+
+                return (
+                  <div key={rev.id} className="p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="size-8 rounded-full bg-muted overflow-hidden border border-border/40">
+                          <img src={sAvatar} alt={sName} className="size-full object-cover" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-foreground">{sName}</span>
+                            <span className="text-[10px] text-muted-foreground">@{sHandle}</span>
+                          </div>
+                          <div className="flex items-center gap-0.5 text-amber-500">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <Star
+                                key={s}
+                                className={cn(
+                                  "size-2.5",
+                                  s <= rev.rating ? "fill-amber-500 stroke-amber-500" : "fill-transparent stroke-muted-foreground/30"
+                                )}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground">{formatTimeAgo(rev.createdAt)}</span>
+                    </div>
+                    {rev.comment && (
+                      <p className="text-xs text-foreground/90 leading-relaxed font-normal pl-10.5">
+                        {rev.comment}
+                      </p>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="py-16 text-center space-y-2">
+                <Star className="size-8 text-muted-foreground/40 mx-auto" />
+                <p className="text-xs font-bold text-muted-foreground">No reviews yet. Be the first to order and review!</p>
+              </div>
+            )}
+          </div>
         </section>
       )}
 
@@ -830,6 +949,96 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
               <span>Add to Cart</span>
               <span>₹{modalItemTotal.toLocaleString("en-IN")}</span>
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Rate & Review Store Modal ─── */}
+      {isReviewModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-card border border-border rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div>
+                <h3 className="text-sm font-black text-foreground">
+                  {reviewsData?.userReview ? "Update Review" : `Review ${store.name}`}
+                </h3>
+                <p className="text-[11px] text-muted-foreground">Share your dining or delivery experience</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsReviewModalOpen(false)}
+                className="size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitReview} className="space-y-4">
+              <div className="space-y-2 text-center py-2 bg-muted/20 rounded-2xl border border-border/40">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Select Rating
+                </span>
+                <div className="flex items-center justify-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => {
+                        sounds.tap();
+                        haptics.light();
+                        setReviewRating(star);
+                      }}
+                      className="p-1 hover:scale-125 active:scale-95 transition-transform cursor-pointer"
+                    >
+                      <Star
+                        className={cn(
+                          "size-7 transition-colors",
+                          star <= reviewRating
+                            ? "fill-amber-500 stroke-amber-500"
+                            : "fill-transparent stroke-muted-foreground/40"
+                        )}
+                      />
+                    </button>
+                  ))}
+                </div>
+                <span className="text-xs font-black text-amber-500">
+                  {reviewRating === 5 && "Outstanding! ⭐⭐⭐⭐⭐"}
+                  {reviewRating === 4 && "Great Experience! ⭐⭐⭐⭐"}
+                  {reviewRating === 3 && "Average ⭐⭐⭐"}
+                  {reviewRating === 2 && "Needs Improvement ⭐⭐"}
+                  {reviewRating === 1 && "Poor Experience ⭐"}
+                </span>
+              </div>
+
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold text-muted-foreground">Your Review (Optional)</span>
+                <textarea
+                  rows={3}
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="How was the food quality, packaging, delivery speed, and portion size?"
+                  className="w-full p-3 rounded-2xl bg-muted/40 border border-border text-xs font-medium text-foreground outline-none resize-none focus:border-foreground transition-colors"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setIsReviewModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingReview}
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  {isSubmittingReview && <Loader2 className="size-3.5 animate-spin" />}
+                  <span>{reviewsData?.userReview ? "Update Review" : "Submit Review"}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

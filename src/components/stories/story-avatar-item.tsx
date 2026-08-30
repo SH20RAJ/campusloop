@@ -1,12 +1,13 @@
 "use client";
 
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 interface StoryAvatarItemProps {
   displayName: string;
   avatarUrl: string | null;
   hasUnseen?: boolean;
+  isFriend?: boolean;
   onClick: () => void;
 }
 
@@ -14,6 +15,7 @@ export function StoryAvatarItem({
   displayName,
   avatarUrl,
   hasUnseen = true,
+  isFriend = false,
   onClick,
 }: StoryAvatarItemProps) {
   const fallback = displayName ? displayName[0].toUpperCase() : "S";
@@ -27,7 +29,9 @@ export function StoryAvatarItem({
         className={cn(
           "p-0.5 rounded-full transition-all duration-300 group-hover:scale-105",
           hasUnseen
-            ? "bg-linear-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2px]"
+            ? isFriend
+              ? "bg-linear-to-tr from-emerald-500 via-teal-500 to-green-400 p-[2px]"
+              : "bg-linear-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2px]"
             : "bg-muted"
         )}
       >

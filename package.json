@@ -23,7 +23,6 @@
 		"clean:imports": "bun run scripts/remove-unused-imports.ts",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
 	},
-
 	"dependencies": {
 		"@base-ui/react": "^1.6.0",
 		"@hexclave/next": "^1.0.36",
@@ -67,7 +66,7 @@
 	"devDependencies": {
 		"@next/eslint-plugin-next": "16.2.6",
 		"@tailwindcss/postcss": "^4",
-		"@types/node": "^25.9.1",
+		"@types/node": "^26.4.0",
 		"@types/react": "^19.1.7",
 		"@types/react-dom": "^19.1.7",
 		"@typescript-eslint/eslint-plugin": "^8.60.1",

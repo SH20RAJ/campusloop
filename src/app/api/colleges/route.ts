@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { and,desc,eq,ilike,or } from "drizzle-orm";
+import { and,desc,eq,ilike,ne,or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     const limit = Number(searchParams.get("limit")) || 12;
     const offset = (page - 1) * limit;
 
-    const conditions = [];
+    const conditions = [ne(institutions.slug, "viewer-hub")];
 
     if (q.trim()) {
       const searchPattern = `%${q.trim()}%`;

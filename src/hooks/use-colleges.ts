@@ -34,8 +34,8 @@ export function useColleges(limit = 100, page = 1) {
 
   const colleges = useMemo(() => {
     if (!data) return [];
-    if (Array.isArray(data)) return data;
-    return data.colleges || [];
+    const raw = Array.isArray(data) ? data : data.colleges || [];
+    return raw.filter((c) => c.slug !== "viewer-hub");
   }, [data]);
 
   const hasMore = useMemo(() => {

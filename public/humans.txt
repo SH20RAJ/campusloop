@@ -1,0 +1,12 @@
+/* TEAM */
+  Founder & Lead Engineer: Shaswat Raj (@SH20RAJ)
+  Contact: mail@campusloop.space
+  Location: India
+
+/* SITE */
+  Site Name: CampusLoop
+  Site URL: https://campusloop.space
+  Standards: HTML5, CSS3, ES2026, Schema.org, OpenGraph, WebAssembly
+  Stack: Next.js 16, React 19, TypeScript, Cloudflare Workers, Neon PostgreSQL, Drizzle ORM, Qdrant Vector DB, Tailwind CSS, Hexclave Auth
+  Language: English (en_IN)
+  Coverage: 1,350+ Verified Indian College Campuses

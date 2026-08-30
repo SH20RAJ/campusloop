@@ -6,6 +6,15 @@ A log of significant product updates, UI decisions, and architectural commits.
 
 ### Recent Updates
 
+- **Hero Carousel Dots Repositioning, Landing 120fps GPU Optimization, `llms.txt` & GEO SEO**:
+  - Repositioned the interactive feature navigation dots in [`src/components/landing/hero-preview.tsx`](campusloop/src/components/landing/hero-preview.tsx) to sit cleanly below floating micro-cards with dedicated clearances (`mt-14 sm:mt-16 pt-3 relative z-30`), eliminating visual overlap on all viewport sizes.
+  - Redesigned switcher dots with tactile pills (active `w-8 bg-primary`, inactive `w-2.5 bg-muted-foreground/25`) and accessible touch hit-boxes.
+  - Converted [`src/components/landing/interactive-bento-card.tsx`](campusloop/src/components/landing/interactive-bento-card.tsx) cursor radial spotlight tracking to pure GPU CSS variables (`--mouse-x`, `--mouse-y`), removing all React component re-renders on mousemove for 120fps scrolling and hover performance.
+  - Enhanced [`src/components/landing/reveal.tsx`](campusloop/src/components/landing/reveal.tsx) viewport triggers (`amount: 0.15`) with `will-change-transform` GPU layers.
+  - Created standardized AI & LLM ingestion files [`public/llms.txt`](campusloop/public/llms.txt) and [`public/llms-full.txt`](campusloop/public/llms-full.txt) following the official `llmstxt.org` specification.
+  - Created [`public/humans.txt`](campusloop/public/humans.txt), [`public/security.txt`](campusloop/public/security.txt), and [`public/.well-known/security.txt`](campusloop/public/.well-known/security.txt) (RFC 9116).
+  - Added India GEO search metadata (`geo.region`, `geo.placename`, `geo.position`, `ICBM`) and enhanced Schema.org `GeoCoordinates` / `EducationalAudience` JSON-LD in [`src/app/layout.tsx`](campusloop/src/app/layout.tsx) and [`src/app/page.tsx`](campusloop/src/app/page.tsx).
+
 - **In-Feed Vibe-Matching Student Profile Recommendations**:
   - Implemented semantic user recommendation engine ([`src/lib/recommendations/recommended-users.ts`](campusloop/src/lib/recommendations/recommended-users.ts)) combining Qdrant Cloud vector embeddings, mutual interests, shared college hubs, and academic branch matching.
   - Multi-tier fallback pipeline: 1st Qdrant Vector Semantic Vibe match -> 2nd Shared Interests/Department -> 3rd Same Campus -> 4th Active Verified Loopers.

@@ -1,0 +1,41 @@
+# CampusLoop — Full Comprehensive LLM Reference & Context
+> Standard: llms-full.txt | Canonical URL: https://campusloop.space/llms-full.txt
+
+## Platform Overview
+CampusLoop is India's dedicated collegiate social network connecting students across 1,350+ universities and institutes of higher education. The platform eliminates noise, outside recruiters, advertising spam, and impersonation by requiring verified university email (.ac.in, .edu.in) credentials for write/interact access.
+
+## Key Architectural Principles & Security Design
+1. **Cryptographic Identity Vault (AES-GCM Sealed)**:
+   - Anonymous confessions and secret comments are secured using AES-GCM encryption with unique initialization vectors (IVs).
+   - Real student profiles remain completely unlinked from anonymous handles in the front-facing UI and standard database queries, guaranteeing safety against harassment and retaliation.
+2. **Two-Sided Matching & Discovery Engine**:
+   - Matches dating and campus connections using Thompson Sampling and Reciprocal Recommender Systems.
+   - Boosts candidates with reciprocal affinity (+18 points) and interleaves 65% high-affinity candidates with 35% exploratory discovery to prevent stale profiles.
+3. **Qdrant Vector Database Integration with Resilient Fallback**:
+   - Embeddings are generated as 384-dimensional dense vectors using normalized character n-gram cosine projections.
+   - Vector database queries have a strict 600ms circuit breaker timeout.
+   - Graceful 100% fallback to PostgreSQL relational queries ensures zero application downtime if vector search is temporarily unreachable.
+4. **Anonymity Mode Filter (Anon Mode)**:
+   - Users can toggle between "All Posts & Anon" and "Public Only (No Anon)" for a distraction-free, academic-focused feed.
+
+## Public Sitemap & Routes
+- Landing Page: `https://campusloop.space/`
+- App Home Feed: `https://campusloop.space/app`
+- College Directory: `https://campusloop.space/app/colleges`
+- Campus Radius Discovery: `https://campusloop.space/app/discover`
+- Student Communities: `https://campusloop.space/app/communities`
+- Campus Match / Dating: `https://campusloop.space/app/dating`
+- Peer Marketplace: `https://campusloop.space/app/marketplace`
+- Time Capsules: `https://campusloop.space/app/capsule`
+- About CampusLoop: `https://campusloop.space/about`
+- Safety Center: `https://campusloop.space/safety`
+- Privacy Policy: `https://campusloop.space/privacy`
+- Terms & Conduct: `https://campusloop.space/terms`
+- Overview & Specs: `https://campusloop.space/overview`
+- Investor & Product Pitch: `https://campusloop.space/pitch`
+
+## Social Media & Community Channels
+1. Instagram: https://www.instagram.com/campusloop.space/ (@campusloop.space)
+2. LinkedIn: https://www.linkedin.com/company/mycampusloop/ (CampusLoop)
+3. Twitter / X: https://x.com/mycampusloop (@mycampusloop)
+4. Contact & Support: mail@campusloop.space

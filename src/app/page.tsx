@@ -187,10 +187,25 @@ export default async function LandingPage() {
             "@context": "https://schema.org",
             "@type": "WebApplication",
             name: "CampusLoop",
-            applicationCategory: "SocialNetworking",
-            operatingSystem: "Web",
+            url: "https://campusloop.space",
+            applicationCategory: "SocialNetworkingApplication",
+            operatingSystem: "Web, iOS, Android (PWA)",
+            inLanguage: "en-IN",
             description:
-              "Verified student-only campus social network. Share confessions, drop polls, trade on student hubs, and swipe to match across 1,350+ Indian colleges. Gatekept by college email.",
+              "Verified student-only campus social network for 1,350+ Indian colleges. Share anonymous confessions, drop canteen polls, trade on student marketplace, and match safely.",
+            spatialCoverage: {
+              "@type": "Country",
+              name: "India",
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: "20.5937",
+                longitude: "78.9629",
+              },
+            },
+            audience: {
+              "@type": "EducationalAudience",
+              educationalRole: "student",
+            },
             offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
           }),
         }}

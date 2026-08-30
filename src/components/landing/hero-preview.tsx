@@ -109,7 +109,7 @@ export function HeroPreview() {
 
   return (
     <div
-      className="relative mx-auto w-full max-w-md pb-12 select-none"
+      className="relative mx-auto w-full max-w-md pb-6 select-none"
       style={{ perspective: 1000 }}
       onMouseMove={handleTilt}
       onMouseLeave={() => {
@@ -120,7 +120,7 @@ export function HeroPreview() {
     >
       <motion.div style={reduce ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}>
         {/* ─── Main Interactive Card Deck with AnimatePresence ─── */}
-        <div className="relative min-h-[285px]">
+        <div className="relative min-h-[310px] sm:min-h-[320px]">
           <AnimatePresence mode="wait">
             {/* ────── SLIDE 0: Canteen Poll & Confession ────── */}
             {activeSlide === 0 && (
@@ -401,7 +401,7 @@ export function HeroPreview() {
         </div>
 
         {/* ─── Overlapping Floating Micro-Card (Cycles with Active Slide) ─── */}
-        <div className="absolute -bottom-4 right-0 z-20 w-64 rotate-2 sm:-right-6">
+        <div className="absolute -bottom-3 right-0 z-20 w-60 sm:w-64 rotate-1.5 sm:-right-4 pointer-events-auto filter drop-shadow-xl">
           <AnimatePresence mode="wait">
             {/* Float 0: Confession */}
             {activeSlide === 0 && (
@@ -571,8 +571,8 @@ export function HeroPreview() {
           </AnimatePresence>
         </div>
 
-        {/* ─── Interactive Feature Navigation Pills ─── */}
-        <div className="mt-7 flex items-center justify-center gap-1.5 pt-2">
+        {/* ─── Interactive Feature Navigation Pills (Positioned Clearly Below Floating Artifacts) ─── */}
+        <div className="mt-14 sm:mt-16 flex items-center justify-center gap-2 pt-3 relative z-30">
           {PREVIEW_SLIDES.map((slide, idx) => {
             const isActive = activeSlide === idx;
             return (
@@ -580,13 +580,19 @@ export function HeroPreview() {
                 key={slide.id}
                 type="button"
                 onClick={() => setActiveSlide(idx)}
-                className={cn(
-                  "relative h-1.5 rounded-full transition-all duration-300 cursor-pointer",
-                  isActive ? "w-7 bg-primary" : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                )}
+                className="group relative p-1.5 -m-1.5 cursor-pointer focus:outline-hidden"
                 aria-label={`Preview ${slide.label}`}
                 title={slide.label}
-              />
+              >
+                <div
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300 ease-out",
+                    isActive
+                      ? "w-8 bg-primary shadow-xs shadow-primary/50"
+                      : "w-2.5 bg-muted-foreground/25 group-hover:bg-muted-foreground/50"
+                  )}
+                />
+              </button>
             );
           })}
         </div>

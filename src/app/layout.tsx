@@ -108,6 +108,12 @@ export const metadata: Metadata = {
   },
   category: "social networking",
   classification: "Student Community Platform",
+  other: {
+    "geo.region": "IN",
+    "geo.placename": "India",
+    "geo.position": "20.5937;78.9629",
+    ICBM: "20.5937, 78.9629",
+  },
 };
 
 export default function RootLayout({
@@ -126,9 +132,15 @@ export default function RootLayout({
         />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="author" href="/humans.txt" />
+        <link rel="help" href="/llms.txt" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="geo.region" content="IN" />
+        <meta name="geo.placename" content="India" />
+        <meta name="geo.position" content="20.5937;78.9629" />
+        <meta name="ICBM" content="20.5937, 78.9629" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -137,7 +149,8 @@ export default function RootLayout({
               "@type": "WebSite",
               name: "CampusLoop",
               url: "https://campusloop.space",
-              description: "The verified student-only social network for Indian colleges.",
+              description: "The verified student-only social network for 1,350+ Indian colleges.",
+              inLanguage: "en-IN",
               potentialAction: {
                 "@type": "SearchAction",
                 target: {
@@ -158,6 +171,10 @@ export default function RootLayout({
               name: "CampusLoop",
               url: "https://campusloop.space",
               logo: "https://campusloop.space/logo.png",
+              areaServed: {
+                "@type": "Country",
+                name: "India",
+              },
               sameAs: [
                 "https://www.instagram.com/campusloop.space/",
                 "https://www.linkedin.com/company/mycampusloop/?viewAsMember=true",

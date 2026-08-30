@@ -1,0 +1,45 @@
+# CampusLoop
+> The verified student-only campus social network for 1,350+ Indian colleges.
+
+CampusLoop (https://campusloop.space) is an exclusive campus social platform engineered specifically for college students across India. Access is gated by official university email (.ac.in / collegiate domains) to establish authentic, recruiter-free, faculty-free campus communities.
+
+## Core Capabilities & Features
+- **Campus Feed (/app)**: Dynamic feed supporting anonymous confessions, canteen polls, campus debates, question threads, hashtags, and Twitter/X-style reposts and quote notes.
+- **Anonymous Confessions**: High-entropy salted HMAC sealed identity vault allowing students to share honest thoughts and campus tea while cryptographically safeguarding their real identities.
+- **Campus Match & Dating (/app/dating)**: Two-sided reciprocal match engine with dynamic Thompson Sampling and Qdrant Cloud semantic vector embeddings for compatible peer connections and Secret Crush lists.
+- **Campus Radius & Discovery (/app/discover)**: Seamless switching between hyper-local campus timeline and global inter-collegiate discussions across Indian universities.
+- **24-Hour Stories & Vibes (/app/stories/new)**: Ephemeral photo/video vibe stories with real-time reactions and friend highlights.
+- **College Directory (/app/colleges)**: 1,350+ indexed Indian college hubs covering IITs, NITs, BITS, IIITs, Delhi University, state universities, and private institutions.
+- **Communities & Sub-Hubs (/app/communities)**: Student-run clubs, hostel groups, academic branches, placement prep circles, and hobby spaces.
+- **Loop Points (LP) & Gamification**: Clout tiering rewarding peer helpfulness, academic notes sharing, community answers, and verified student status.
+- **Student Marketplace (/app/marketplace)**: Peer-to-peer textbook trading, hostel cycle rentals, dorm essentials, and student-run micro-stores.
+- **Batch Time Capsules (/app/capsule)**: Cryptographically locked digital capsules buried until graduation day.
+
+## Verification & Onboarding
+- **Student Verification**: Single-step OTP authentication via official university email address (.ac.in, .edu.in, or whitelisted college domain).
+- **Aspirant / Viewer Mode**: Prospective students (JEE, NEET, CUET aspirants) can explore public campus hub discussions in read-only mode using any standard email address.
+
+## Technology Stack
+- **Frontend & App Framework**: Next.js 16 App Router, React 19, Tailwind CSS, Lucide Icons, Framer Motion.
+- **Backend & Compute**: Cloudflare Workers (OpenNext), Serverless edge execution.
+- **Database**: Neon Serverless PostgreSQL with Drizzle ORM.
+- **Vector Search & Recommendation**: Qdrant Cloud Vector Database for 384-dimensional dense semantic matching.
+- **Authentication & Security**: Hexclave Auth SDK with AES-GCM sealed identity vault.
+
+## Key Links & Resources
+- Web App: https://campusloop.space/app
+- About & Mission: https://campusloop.space/about
+- Safety & Content Moderation: https://campusloop.space/safety
+- Privacy Policy: https://campusloop.space/privacy
+- Terms of Service: https://campusloop.space/terms
+- Overview & Architecture: https://campusloop.space/overview
+- Investor & Product Pitch: https://campusloop.space/pitch
+- Instagram: https://www.instagram.com/campusloop.space/
+- LinkedIn: https://www.linkedin.com/company/mycampusloop/
+- Twitter / X: https://x.com/mycampusloop
+- Official Contact: mail@campusloop.space
+
+## Geographic Coverage
+- Country: India (IN)
+- Regions: Pan-India (Delhi NCR, Maharashtra, Karnataka, Tamil Nadu, Telangana, Jharkhand, West Bengal, Rajasthan, Uttar Pradesh, Punjab, Kerala, Gujarat, and all union territories)
+- Supported Institutions: 1,350+ colleges including IIT Bombay, IIT Delhi, IIT Kharagpur, BITS Pilani, NIT Trichy, BIT Mesra, VIT Vellore, SRM, Delhi University, Christ University, and more.

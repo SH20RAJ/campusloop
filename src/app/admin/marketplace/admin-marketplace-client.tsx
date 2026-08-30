@@ -221,7 +221,7 @@ export function AdminMarketplaceClient() {
                             className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-foreground text-background text-xs font-black hover:opacity-90 transition-opacity"
                           >
                             <Edit2 className="size-3" />
-                            <span>Manage Menu</span>
+                            <span>Manage</span>
                           </Link>
 
                           <Link

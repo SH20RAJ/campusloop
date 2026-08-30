@@ -7,7 +7,6 @@ import {
   Download,
   QrCode,
   Share2,
-  ShieldCheck,
   X,
 } from "lucide-react";
 import QRCode from "qrcode";
@@ -98,7 +97,7 @@ export function BrandedQrModal({
   }
 
   /**
-   * Generates a pixel-perfect 1200 x 1440 image matching the template
+   * Generates a pixel-perfect 1200 x 1440 image matching the template using /logo.png
    */
   async function handleDownloadCard() {
     if (!qrDataUrl) return;
@@ -158,30 +157,31 @@ export function BrandedQrModal({
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // 3. Header: CampusLoop Violet Logo + Brand Name
+      // 3. Header: CampusLoop /logo.png + Brand Name
       ctx.save();
       const brandY = cardY + 115;
       const brandLogoX = cardX + cardW / 2 - 170;
 
-      // Draw Gradient Crescent Moon Logo Circle
-      const logoGrad = ctx.createLinearGradient(brandLogoX - 32, brandY - 32, brandLogoX + 32, brandY + 32);
-      logoGrad.addColorStop(0, "#7c3aed");
-      logoGrad.addColorStop(1, "#3b82f6");
-
-      ctx.fillStyle = logoGrad;
-      ctx.beginPath();
-      ctx.arc(brandLogoX, brandY, 36, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Inner white cutout crescent
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.arc(brandLogoX + 10, brandY, 22, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = logoGrad;
-      ctx.beginPath();
-      ctx.arc(brandLogoX + 16, brandY, 20, 0, Math.PI * 2);
-      ctx.fill();
+      // Load and draw official /logo.png
+      try {
+        const logoImg = new Image();
+        logoImg.crossOrigin = "anonymous";
+        logoImg.src = "/logo.png";
+        await new Promise((resolve) => {
+          logoImg.onload = resolve;
+          logoImg.onerror = resolve;
+        });
+        ctx.drawImage(logoImg, brandLogoX - 36, brandY - 36, 72, 72);
+      } catch {
+        // Fallback
+        const logoGrad = ctx.createLinearGradient(brandLogoX - 32, brandY - 32, brandLogoX + 32, brandY + 32);
+        logoGrad.addColorStop(0, "#7c3aed");
+        logoGrad.addColorStop(1, "#3b82f6");
+        ctx.fillStyle = logoGrad;
+        ctx.beginPath();
+        ctx.arc(brandLogoX, brandY, 36, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // Brand Text
       ctx.fillStyle = "#0f172a";
@@ -318,6 +318,32 @@ export function BrandedQrModal({
 
       ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
+      // Draw Center Logo on QR Code
+      try {
+        const centerLogo = new Image();
+        centerLogo.crossOrigin = "anonymous";
+        centerLogo.src = "/logo.png";
+        await new Promise((resolve) => {
+          centerLogo.onload = resolve;
+          centerLogo.onerror = resolve;
+        });
+        const centerLogoSize = 80;
+        const centerLogoX = qrX + (qrSize - centerLogoSize) / 2;
+        const centerLogoY = qrY + (qrSize - centerLogoSize) / 2;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, centerLogoSize / 2 + 6, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.drawImage(centerLogo, centerLogoX, centerLogoY, centerLogoSize, centerLogoSize);
+      } catch {}
+
       // 8. Short Link Banner Pill
       ctx.save();
       const linkY = qrY + qrSize + 54;
@@ -369,7 +395,7 @@ export function BrandedQrModal({
       <DialogContent className="sm:max-w-md p-0 overflow-hidden border-border/40 bg-background/95 backdrop-blur-2xl shadow-2xl rounded-3xl">
         <DialogTitle className="sr-only">{title} QR Code</DialogTitle>
 
-        {/* Modal Header */}
+        {/* Modal Top Nav */}
         <div className="flex items-center justify-between px-5 pt-4 pb-2 border-b border-border/30">
           <div className="flex items-center gap-2">
             <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -388,90 +414,95 @@ export function BrandedQrModal({
           </button>
         </div>
 
-        {/* Branded Visual Card Preview */}
-        <div className="p-5 pt-3">
-          <div
-            className="relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-purple-500/10 via-background to-blue-500/10 p-5 text-center shadow-lg"
-          >
-            {/* Top Branding Banner */}
-            <div className="flex items-center justify-between pb-3">
-              <div className="flex items-center gap-2">
-                <div className="flex size-7 items-center justify-center rounded-full bg-linear-to-br from-violet-600 to-blue-600 text-white font-black text-xs shadow-sm">
-                  C
-                </div>
-                <span className="text-sm font-black tracking-tight text-foreground">
-                  Campus<span className="text-primary">Loop</span>
+        {/* Visual Card Preview matching the pastel light card template */}
+        <div className="p-4 sm:p-5">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#ece5ff] via-[#e9e3fe] to-[#ddf1ff] p-4 sm:p-5 shadow-lg select-none">
+            {/* Inner White Card */}
+            <div className="relative rounded-2xl bg-white p-5 text-center shadow-xl border border-black/5 space-y-3">
+              {/* Brand Header with /logo.png */}
+              <div className="flex items-center justify-center gap-2.5">
+                <img
+                  src="/logo.png"
+                  alt="CampusLoop"
+                  className="size-8 object-contain shrink-0"
+                />
+                <span className="text-xl font-black tracking-tight text-[#0f172a]">
+                  Campus<span className="text-[#2563eb]">Loop</span>
                 </span>
               </div>
 
-              <div className="flex items-center gap-1 text-[10px] font-black text-blue-600 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
-                <ShieldCheck className="size-3" />
-                <span>{badgeText}</span>
+              {/* Badge Pill */}
+              <div>
+                <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-black text-[#2563eb] bg-[#eff6ff] border border-[#bfdbfe]">
+                  ✓ {badgeText.toUpperCase()}
+                </span>
               </div>
-            </div>
 
-            {/* Optional Avatar */}
-            {avatarUrl && (
-              <div className="flex justify-center pt-2">
-                <img
-                  src={avatarUrl}
-                  alt={title}
-                  className="size-16 rounded-full border-2 border-blue-500 object-cover shadow-md"
-                />
-              </div>
-            )}
-
-            {/* Title & Subtitle */}
-            <div className="pt-3 pb-2">
-              <h3 className="text-base font-black text-foreground tracking-tight line-clamp-1">
-                {title}
-              </h3>
-              {subtitle && (
-                <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5 font-medium">
-                  {subtitle}
-                </p>
-              )}
-            </div>
-
-            {/* QR Code Graphic Frame */}
-            <div className="my-2 flex justify-center">
-              <div className="relative rounded-2xl bg-white p-3 shadow-sm border border-slate-200">
-                {qrDataUrl ? (
+              {/* Avatar */}
+              {avatarUrl && (
+                <div className="flex justify-center pt-1">
                   <img
-                    src={qrDataUrl}
-                    alt={`${title} QR Code`}
-                    className="size-44 rounded-lg object-contain"
+                    src={avatarUrl}
+                    alt={title}
+                    className="size-18 rounded-full border-3 border-[#3b82f6] object-cover shadow-md"
                   />
-                ) : (
-                  <div className="size-44 animate-pulse rounded-lg bg-slate-100 flex items-center justify-center text-xs text-muted-foreground font-bold">
-                    Generating QR...
-                  </div>
+                </div>
+              )}
+
+              {/* Title & Subtitle */}
+              <div className="space-y-0.5 pt-1">
+                <h3 className="text-base sm:text-lg font-black text-[#0f172a] tracking-tight line-clamp-1">
+                  {title}
+                </h3>
+                {subtitle && (
+                  <p className="text-[11px] font-semibold text-[#64748b] line-clamp-1">
+                    {subtitle}
+                  </p>
                 )}
-                <div className="absolute inset-0 m-auto flex size-8 items-center justify-center rounded-full bg-linear-to-br from-violet-600 to-blue-600 shadow-md border-2 border-white pointer-events-none">
-                  <span className="text-white font-black text-[10px]">C</span>
+              </div>
+
+              {/* QR Code Graphic Frame with /logo.png Center Watermark */}
+              <div className="my-2 flex justify-center">
+                <div className="relative rounded-2xl bg-white p-2.5 shadow-sm border border-slate-200">
+                  {qrDataUrl ? (
+                    <img
+                      src={qrDataUrl}
+                      alt={`${title} QR Code`}
+                      className="size-40 sm:size-44 rounded-lg object-contain"
+                    />
+                  ) : (
+                    <div className="size-40 sm:size-44 animate-pulse rounded-lg bg-slate-100 flex items-center justify-center text-xs text-muted-foreground font-bold">
+                      Generating QR...
+                    </div>
+                  )}
+
+                  {/* Center /logo.png badge */}
+                  <div className="absolute inset-0 m-auto flex size-8 items-center justify-center rounded-full bg-white shadow-md border border-slate-200 pointer-events-none p-0.5">
+                    <img src="/logo.png" alt="" className="size-full object-contain" />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Short Link Display Pill */}
-            <div className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-blue-50/90 dark:bg-blue-950/40 px-3 py-2 border border-blue-200 dark:border-blue-800">
-              <span className="text-xs font-black text-blue-600 dark:text-blue-400 font-mono truncate max-w-[240px]">
-                {shortUrl.replace(/^https?:\/\//, "")}
-              </span>
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                className="text-blue-600 dark:text-blue-400 hover:opacity-80 transition-opacity cursor-pointer"
-                title="Copy short link"
-              >
-                {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
-              </button>
-            </div>
+              {/* Short Link Display Pill */}
+              <div className="mt-2 flex items-center justify-between rounded-xl bg-[#eff6ff] px-3.5 py-2 border border-[#dbeafe]">
+                <span className="text-xs font-bold text-[#2563eb] font-mono truncate max-w-[240px]">
+                  {shortUrl.replace(/^https?:\/\//, "")}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="text-[#2563eb] hover:opacity-80 transition-opacity cursor-pointer ml-2"
+                  title="Copy short link"
+                >
+                  {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+                </button>
+              </div>
 
-            {/* Card Footer Microcopy */}
-            <p className="mt-2 text-[10px] text-muted-foreground/80 font-medium">
-              📷 Scan with any camera app • campusloop.space
-            </p>
+              {/* Card Footer Microcopy */}
+              <p className="text-[10px] text-[#94a3b8] font-bold">
+                📷 Scan with any camera app • campusloop.space
+              </p>
+            </div>
           </div>
 
           {/* Action Buttons Toolbar */}

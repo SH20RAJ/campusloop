@@ -43,6 +43,7 @@
   "exclude": [
     "node_modules",
     ".open-next",
-    ".next/dev"
+    ".next/dev",
+    "**/*.test.ts"
   ]
 }

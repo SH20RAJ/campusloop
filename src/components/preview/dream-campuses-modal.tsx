@@ -8,13 +8,17 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
+import { fetcher } from "@/lib/api";
+
 interface DreamCampusesModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+interface DreamCampusesApiResponse {
+  dreamCampuses: College[];
+}
 
 export function DreamCampusesModal({ isOpen, onClose, onSuccess }: DreamCampusesModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,13 +26,13 @@ export function DreamCampusesModal({ isOpen, onClose, onSuccess }: DreamCampuses
   const [isSaving, setIsSaving] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const { data: initialData, mutate } = useSWR<{ dreamCampuses: College[] }>(
+  const { data: initialData, mutate } = useSWR<DreamCampusesApiResponse>(
     isOpen ? "/api/profile/dream-campuses" : null,
     fetcher,
     {
-      onSuccess: (data) => {
-        if (!isInitialized && data.dreamCampuses) {
-          setSelectedIds(data.dreamCampuses.map((c) => c.id));
+      onSuccess: (data: DreamCampusesApiResponse) => {
+        if (!isInitialized && data?.dreamCampuses) {
+          setSelectedIds(data.dreamCampuses.map((c: College) => c.id));
           setIsInitialized(true);
         }
       },

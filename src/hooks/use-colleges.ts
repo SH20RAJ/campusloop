@@ -11,6 +11,8 @@ export interface College {
   website: string | null;
   yearOfEstablishment: number | null;
   aisheCode?: string;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
   postCount?: number;
 }
 

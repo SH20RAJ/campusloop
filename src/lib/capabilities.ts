@@ -67,18 +67,26 @@ const CAPABILITY_MESSAGES: Record<UserCapability, { title: string; desc: string 
   },
 };
 
+export interface CapabilitySubject {
+  institutionId: string | null;
+  role?: string | null;
+}
+
 /**
  * Check if a profile possesses a given capability.
  */
 export async function hasCapability(
-  profile: Pick<UserProfile, "institutionId" | "role"> | null | undefined,
+  profile: CapabilitySubject | null | undefined,
   capability: UserCapability
 ): Promise<boolean> {
   if (!profile) {
     return capability === "READ_PUBLIC_CONTENT";
   }
 
-  const isViewer = await isViewerProfile({ institutionId: profile.institutionId });
+  const isViewer = await isViewerProfile({
+    institutionId: profile.institutionId,
+    role: profile.role,
+  });
   if (isViewer || profile.role === "VIEWER") {
     return VIEWER_ALLOWED_CAPABILITIES.has(capability);
   }
@@ -90,7 +98,7 @@ export async function hasCapability(
  * API Guard: Returns a 403 Response with structured error metadata if capability is lacking.
  */
 export async function rejectIfLacksCapability(
-  profile: Pick<UserProfile, "institutionId" | "role"> | null | undefined,
+  profile: CapabilitySubject | null | undefined,
   capability: UserCapability
 ): Promise<NextResponse | null> {
   const allowed = await hasCapability(profile, capability);

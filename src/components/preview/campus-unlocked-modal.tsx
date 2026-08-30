@@ -49,13 +49,15 @@ export function CampusUnlockedModal({
         body: JSON.stringify({ collegeEmail }),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as { error?: string; journeyStats?: JourneyStats };
       if (!res.ok) {
         throw new Error(data.error || "Failed to verify college email");
       }
 
       sounds.pop();
-      setJourneyStats(data.journeyStats);
+      if (data.journeyStats) {
+        setJourneyStats(data.journeyStats);
+      }
       onSuccess?.();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Verification failed");

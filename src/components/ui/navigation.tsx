@@ -5,8 +5,6 @@ import {
   Bell,
   GraduationCap,
   HelpCircle,
-  Instagram,
-  Linkedin,
   Menu,
   MessageSquare,
   MoreHorizontal,
@@ -27,6 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@/components/ui/sign-out-button";
+import { InstagramIcon, LinkedinIcon, XIcon } from "@/components/ui/social-icons";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { DESKTOP_NAV_ITEMS, MOBILE_BOTTOM_ITEMS } from "@/constants/navigation";
 import { SOCIAL_LINKS } from "@/constants/socials";
@@ -539,7 +538,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     aria-label="Instagram"
                     title="Instagram @campusloop.space"
                   >
-                    <Instagram className="size-3.5" />
+                    <InstagramIcon className="size-3.5" />
                   </a>
                   <a
                     href={SOCIAL_LINKS.linkedin.url}
@@ -549,7 +548,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     aria-label="LinkedIn"
                     title="LinkedIn @mycampusloop"
                   >
-                    <Linkedin className="size-3.5" />
+                    <LinkedinIcon className="size-3.5" />
                   </a>
                   <a
                     href={SOCIAL_LINKS.x.url}
@@ -559,9 +558,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     aria-label="X (Twitter)"
                     title="X @mycampusloop"
                   >
-                    <svg className="size-3 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
+                    <XIcon className="size-3" />
                     <span className="sr-only">X (Twitter)</span>
                   </a>
                 </div>

@@ -1,7 +1,8 @@
-import { ArrowRight, Instagram, Linkedin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { buttonVariants } from "@/components/ui/button";
+import { InstagramIcon, LinkedinIcon, XIcon } from "@/components/ui/social-icons";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SOCIAL_LINKS } from "@/constants/socials";
 import { cn } from "@/lib/utils";
@@ -112,7 +113,7 @@ export function MarketingFooter() {
               aria-label="CampusLoop on Instagram"
               title="Instagram @campusloop.space"
             >
-              <Instagram className="size-4" />
+              <InstagramIcon className="size-4" />
             </a>
 
             <a
@@ -123,7 +124,7 @@ export function MarketingFooter() {
               aria-label="CampusLoop on LinkedIn"
               title="LinkedIn @mycampusloop"
             >
-              <Linkedin className="size-4" />
+              <LinkedinIcon className="size-4" />
             </a>
 
             <a
@@ -134,9 +135,7 @@ export function MarketingFooter() {
               aria-label="CampusLoop on X"
               title="X (Twitter) @mycampusloop"
             >
-              <svg className="size-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
+              <XIcon className="size-3.5" />
               <span className="sr-only">X (Twitter)</span>
             </a>
           </div>

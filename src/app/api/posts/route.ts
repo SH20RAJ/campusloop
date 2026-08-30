@@ -7,6 +7,7 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
 import { runSafetyCheck } from "@/lib/moderation/rules";
 import { notifyMentions } from "@/lib/notifications";
+import { indexPostVector } from "@/lib/qdrant/indexer";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 export async function POST(req: Request) {
@@ -113,6 +114,18 @@ export async function POST(req: Request) {
       actorId: profile.id,
       referenceId: newPost.id,
     }).catch((err) => console.warn("Mention notification error:", err));
+
+    // Asynchronously index post vector in Qdrant (fire-and-forget)
+    indexPostVector({
+      id: newPost.id,
+      title: title || null,
+      body,
+      type: type || "NORMAL",
+      scope: scope || "GLOBAL",
+      isAnonymous: anonymous,
+      institutionId: profile.institutionId,
+      authorId: anonymous ? null : profile.id,
+    }).catch(() => {});
 
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {

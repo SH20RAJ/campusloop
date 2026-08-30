@@ -2,6 +2,7 @@ import { ArrowLeft, Lock } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { RelatedPostsWidget } from "@/components/post/related-posts-widget";
 import { FeedCard } from "@/components/ui/feed-card";
 import type { FeedPost } from "@/hooks/use-feed";
 import { sanitizeAnonRow } from "@/lib/anonymity";
@@ -250,6 +251,11 @@ export default async function PostDetailPage({ params }: PostPageProps) {
             </div>
           </div>
         )}
+
+        {/* ─── AI Vector & Semantic Related Campus Threads ─── */}
+        <div className="px-4 py-6 border-t border-border/30">
+          <RelatedPostsWidget postId={id} currentUserId={profile?.id} />
+        </div>
       </div>
     </main>
   );

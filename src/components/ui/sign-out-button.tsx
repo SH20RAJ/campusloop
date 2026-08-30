@@ -38,7 +38,7 @@ export function SignOutButton({
         onClick={handleSignOut}
         disabled={isSigningOut}
         className={cn(
-          "flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:text-destructive transition-colors cursor-pointer disabled:opacity-50",
+          "flex size-7 items-center justify-center rounded-full text-muted-foreground hover:text-destructive transition-colors cursor-pointer disabled:opacity-50",
           className
         )}
         title="Sign Out"
@@ -72,7 +72,7 @@ export function SignOutButton({
       onClick={handleSignOut}
       disabled={isSigningOut}
       className={cn(
-        "flex items-center gap-1.5 rounded-xl border border-border/60 bg-muted/20 px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all cursor-pointer disabled:opacity-50",
+        "flex items-center gap-1.5 rounded-full border border-border/60 bg-transparent px-3.5 py-1.5 text-xs font-bold text-muted-foreground hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive transition-all cursor-pointer active:scale-95 disabled:opacity-50",
         className
       )}
     >

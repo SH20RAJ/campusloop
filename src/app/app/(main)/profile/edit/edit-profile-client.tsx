@@ -3,6 +3,8 @@
 import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
 import { useProfile } from "@/hooks/use-profile";
+import { useUsernameAvailability } from "@/hooks/use-username-availability";
+import { isUsernameBlocking, UsernameStatusHint } from "@/components/ui/username-status";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { getAvatarUrl } from "@/lib/utils";
 import { validateDisplayName,validateUsername } from "@/lib/validation";
@@ -79,6 +81,7 @@ export function EditProfileClient() {
 
   const nameVal = displayName ? validateDisplayName(displayName) : null;
   const userVal = username ? validateUsername(username) : null;
+  const usernameStatus = useUsernameAvailability(username);
 
   useEffect(() => {
     if (profile) {
@@ -493,18 +496,9 @@ export function EditProfileClient() {
           </div>
 
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <label className="text-xs font-semibold text-muted-foreground">Campus Username (@handle)</label>
-              {userVal && !userVal.isValid && (
-                <span className="text-[10px] text-destructive font-semibold flex items-center gap-1">
-                  <AlertCircle className="size-3" /> {userVal.error}
-                </span>
-              )}
-              {userVal && userVal.isValid && (
-                <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
-                  <Check className="size-3" /> Valid handle
-                </span>
-              )}
+              <UsernameStatusHint status={usernameStatus} />
             </div>
             <div className="relative">
               <span className="absolute left-3.5 top-2 text-xs font-bold text-muted-foreground">@</span>
@@ -515,8 +509,10 @@ export function EditProfileClient() {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="username"
                 className={`w-full pl-8 pr-3.5 py-2 rounded-xl border bg-muted/20 text-xs font-semibold text-foreground outline-none transition-all ${
-                  userVal && !userVal.isValid
+                  usernameStatus.state === "taken" || usernameStatus.state === "invalid"
                     ? "border-destructive focus:border-destructive"
+                    : usernameStatus.state === "available"
+                    ? "border-emerald-500/60 focus:bg-background"
                     : "border-border/60 focus:border-primary focus:bg-background"
                 }`}
               />
@@ -767,7 +763,13 @@ export function EditProfileClient() {
         {/* Action Button */}
         <button
           type="submit"
-          disabled={isSaving || Boolean(nameVal && !nameVal.isValid) || Boolean(userVal && !userVal.isValid) || isUploadingDatingPhoto}
+          disabled={
+            isSaving ||
+            Boolean(nameVal && !nameVal.isValid) ||
+            Boolean(userVal && !userVal.isValid) ||
+            isUsernameBlocking(usernameStatus) ||
+            isUploadingDatingPhoto
+          }
           className="w-full py-3 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
         >
           <Save className="size-4" />

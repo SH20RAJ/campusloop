@@ -2,6 +2,7 @@ import { getDb } from "@/db";
 import { institutionDomains,userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { eq } from "drizzle-orm";
+import { SignOutButton } from "@/components/ui/sign-out-button";
 import { Lock } from "lucide-react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -63,13 +64,31 @@ export default async function OnboardingPage() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-xl px-4 pb-4 sm:px-6">
         {/* ─── Header ─── */}
-        <header className="flex items-center gap-2.5 border-b border-border/40 py-5">
-          <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black">
-            <img src="/logo.png" alt="" className="h-full w-full scale-110 object-cover" />
+        <header className="flex items-center justify-between gap-3 border-b border-border/40 py-5">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black">
+              <img src="/logo.png" alt="" className="h-full w-full scale-110 object-cover" />
+            </div>
+            <span className="text-sm font-black tracking-tight text-foreground">
+              Campus<span className="text-primary">Loop</span>
+            </span>
           </div>
-          <span className="text-sm font-black tracking-tight text-foreground">
-            Campus<span className="text-primary">Loop</span>
-          </span>
+
+          {/*
+            Signing in with the wrong address is the usual reason to leave this
+            page, so show which account this is and offer a way out of it.
+          */}
+          <div className="flex min-w-0 items-center gap-2">
+            {email && (
+              <span
+                className="hidden max-w-[14rem] truncate text-[13px] text-muted-foreground sm:inline"
+                title={email}
+              >
+                {email}
+              </span>
+            )}
+            <SignOutButton className="shrink-0" />
+          </div>
         </header>
 
         <div className="pt-7">
@@ -93,6 +112,10 @@ export default async function OnboardingPage() {
               Browse feeds, confessions, polls and campus hubs across 1,350+ colleges, and save
               anything worth keeping. Posting, voting, chat and matching unlock when you verify an
               official college email on this same account — nothing you save is lost.
+            </p>
+            <p className="mt-2.5 text-[13px] text-muted-foreground">
+              Signed in with the wrong address? Sign out above and come back with your college
+              email.
             </p>
           </div>
         )}

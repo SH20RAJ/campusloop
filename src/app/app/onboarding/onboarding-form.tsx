@@ -3,6 +3,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DEGREE_CATEGORIES, getBranchesForDegree } from "@/constants";
 import { useColleges } from "@/hooks/use-colleges";
+import { useUsernameAvailability } from "@/hooks/use-username-availability";
+import { isUsernameBlocking, UsernameStatusHint } from "@/components/ui/username-status";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
@@ -157,6 +159,7 @@ export function OnboardingForm({
 
   const nameVal = displayName ? validateDisplayName(displayName) : null;
   const userVal = username ? validateUsername(username) : null;
+  const usernameStatus = useUsernameAvailability(username);
   const currentDegreeBranches = getBranchesForDegree(course);
 
   const { colleges } = useColleges(120);
@@ -262,6 +265,7 @@ export function OnboardingForm({
     isLoading ||
     Boolean(nameVal && !nameVal.isValid) ||
     Boolean(userVal && !userVal.isValid) ||
+    isUsernameBlocking(usernameStatus) ||
     isUploadingPfp;
 
   return (
@@ -344,13 +348,7 @@ export function OnboardingForm({
           <FieldLabel
             htmlFor="username"
             required
-            hint={
-              userVal && !userVal.isValid ? (
-                <span className="text-[11px] font-semibold text-destructive">{userVal.error}</span>
-              ) : userVal?.isValid ? (
-                <Check className="size-3.5 text-emerald-500" />
-              ) : null
-            }
+            hint={<UsernameStatusHint status={usernameStatus} />}
           >
             Username
           </FieldLabel>
@@ -368,7 +366,9 @@ export function OnboardingForm({
               className={cn(
                 inputClass,
                 "pl-8",
-                userVal && !userVal.isValid && "border-destructive"
+                usernameStatus.state === "taken" || usernameStatus.state === "invalid"
+                  ? "border-destructive"
+                  : usernameStatus.state === "available" && "border-emerald-500/60"
               )}
             />
           </div>

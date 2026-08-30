@@ -92,6 +92,8 @@ export async function GET(req: Request) {
       },
     });
 
+    const sort = searchParams.get("sort") || "trending"; // 'trending' | 'upcoming' | 'latest'
+
     const enriched = list.map((ev) => {
       const isRegistered = currentProfile
         ? ev.registrations.some((r) => r.profileId === currentProfile.id)
@@ -131,8 +133,41 @@ export async function GET(req: Request) {
         attendeeCount: ev.registrations.length,
         isRegistered,
         reminderSet: userReg?.reminderSet ?? false,
+        createdAt: ev.createdAt,
       };
     });
+
+    const now = Date.now();
+    if (sort === "trending") {
+      enriched.sort((a, b) => {
+        const regScoreA = Math.log10(1 + (a.attendeeCount || 0)) * 4.0;
+        const regScoreB = Math.log10(1 + (b.attendeeCount || 0)) * 4.0;
+
+        const startDiffDaysA = Math.max(0, (new Date(a.startDate).getTime() - now) / (1000 * 60 * 60 * 24));
+        const startDiffDaysB = Math.max(0, (new Date(b.startDate).getTime() - now) / (1000 * 60 * 60 * 24));
+
+        const urgencyA = startDiffDaysA <= 14 ? ((14 - startDiffDaysA) / 14) * 3.0 : 0;
+        const urgencyB = startDiffDaysB <= 14 ? ((14 - startDiffDaysB) / 14) * 3.0 : 0;
+
+        const affinityA =
+          currentProfile?.institutionId && (a.institution as any)?.id === currentProfile.institutionId
+            ? 2.5
+            : 0;
+        const affinityB =
+          currentProfile?.institutionId && (b.institution as any)?.id === currentProfile.institutionId
+            ? 2.5
+            : 0;
+
+        const scoreA = regScoreA + urgencyA + affinityA;
+        const scoreB = regScoreB + urgencyB + affinityB;
+
+        return scoreB - scoreA;
+      });
+    } else if (sort === "upcoming") {
+      enriched.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+    } else if (sort === "latest") {
+      enriched.sort((a, b) => new Date(b.createdAt || b.startDate).getTime() - new Date(a.createdAt || a.startDate).getTime());
+    }
 
     return NextResponse.json({ events: enriched });
   } catch (error) {

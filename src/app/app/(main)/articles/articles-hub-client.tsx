@@ -160,43 +160,7 @@ export function ArticlesHubClient() {
         </div>
       </header>
 
-      <div className="p-4 md:p-6 space-y-6">
-        {/* ─── Hero Spotlight Banner ─── */}
-        <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/15 via-purple-500/10 to-transparent p-6 md:p-8">
-          <div className="relative z-10 max-w-xl space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/20 text-primary text-[11px] font-black border border-primary/30">
-              <Sparkles className="size-3.5" />
-              <span>Verified Student Editorial Hub</span>
-            </div>
-            <h2 className="text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight">
-              Placement secrets, tech deep dives &amp; campus journalism.
-            </h2>
-            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed font-medium">
-              Read long-form insights written by verified seniors and batchmates across 1,350+ campuses in India.
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-3">
-              <Link
-                href="/app/articles/new"
-                className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-foreground text-background text-xs font-black hover:opacity-90 transition-all shadow-md active:scale-95 cursor-pointer"
-              >
-                <PenTool className="size-4" />
-                <span>Write an Article (+15 LP)</span>
-              </Link>
-
-              <Link
-                href="/app/articles/dashboard"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-2xl border border-border/80 bg-background/80 hover:bg-muted text-xs font-bold text-foreground transition-all cursor-pointer"
-              >
-                <FileText className="size-4" />
-                <span>Drafts &amp; Stats</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="absolute right-[-40px] bottom-[-40px] size-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
-        </div>
-
+      <div className="p-4 md:p-6 space-y-4">
         {/* ─── Search Bar ─── */}
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />

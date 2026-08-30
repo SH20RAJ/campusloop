@@ -3,84 +3,143 @@
 import { EventCard, EventItem } from "@/components/events/event-card";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { Calendar, Code, GraduationCap, Music, Plus, Search, Trophy, X } from "lucide-react";
+import {
+  Calendar,
+  Code,
+  Flame,
+  Globe,
+  GraduationCap,
+  Music,
+  Plus,
+  School,
+  Search,
+  Sparkles,
+  Trophy,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
 
-const SCOPES = [
-  { id: "ALL" as const, label: "All campuses" },
-  { id: "MY_CAMPUS" as const, label: "My campus" },
-];
+const EVENT_TABS = [
+  { id: "trending", label: "Trending 🔥" },
+  { id: "upcoming", label: "Upcoming 📅" },
+  { id: "latest", label: "Latest ✨" },
+] as const;
 
 const CATEGORIES = [
-  { id: "ALL", label: "All", icon: Calendar },
-  { id: "hackathons", label: "Hackathons", icon: Code },
-  { id: "competitions", label: "Competitions", icon: Trophy },
-  { id: "fests", label: "Fests", icon: Music },
-  { id: "workshops", label: "Workshops", icon: GraduationCap },
+  { id: "ALL", label: "All" },
+  { id: "hackathons", label: "Hackathons 💻" },
+  { id: "fests", label: "Fests 🎪" },
+  { id: "competitions", label: "Competitions 🏆" },
+  { id: "workshops", label: "Workshops 🎓" },
 ];
 
 export function EventsClient() {
+  const [activeTab, setActiveTab] = useState<"trending" | "upcoming" | "latest">("trending");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [scope, setScope] = useState<"ALL" | "MY_CAMPUS">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const endpoint = `/api/events?category=${activeCategory}&scope=${scope}&q=${encodeURIComponent(searchQuery)}`;
+  const endpoint = `/api/events?category=${activeCategory}&scope=${scope}&sort=${activeTab}&q=${encodeURIComponent(
+    searchQuery
+  )}`;
   const { data, isLoading } = useSWR<{ events: EventItem[] }>(
     endpoint,
     fetcher,
-    { dedupingInterval: 15000 }
+    { dedupingInterval: 15000, revalidateOnFocus: true }
   );
 
   const events = data?.events || [];
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl select-none flex-col border-x border-border/20 pb-28">
-      {/* ─── Sticky Header ─── */}
-      <header className="sticky top-0 z-40 border-b border-border/30 bg-background/90 backdrop-blur-xl">
-        <div className="flex items-center justify-between gap-2 px-4 py-3.5">
-          <div className="min-w-0">
-            <h1 className="text-lg font-black tracking-tight text-foreground">Events</h1>
-            <p className="truncate text-[13px] text-muted-foreground">
-              Hackathons, fests and workshops
-            </p>
+    <main className="mx-auto flex min-h-screen w-full max-w-2xl select-none flex-col border-x border-border/30 bg-background pb-28">
+      {/* ─── Sticky Header (Twitter / X Minimal) ─── */}
+      <header className="sticky top-0 z-40 border-b border-border/30 bg-background/85 backdrop-blur-xl">
+        <div className="flex h-13 items-center justify-between gap-2 px-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <h1 className="text-base font-black tracking-tight text-foreground flex items-center gap-1.5">
+              <span>Campus Events</span>
+              <Calendar className="size-4 text-primary shrink-0" />
+            </h1>
+
+            {/* Scope Pill Toggle */}
+            <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setScope("ALL");
+                }}
+                className={cn(
+                  "px-2.5 py-0.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                  scope === "ALL"
+                    ? "bg-foreground text-background shadow-xs font-black"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Globe className="size-3" />
+                <span>India</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setScope("MY_CAMPUS");
+                }}
+                className={cn(
+                  "px-2.5 py-0.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                  scope === "MY_CAMPUS"
+                    ? "bg-foreground text-background shadow-xs font-black"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <School className="size-3" />
+                <span>Campus</span>
+              </button>
+            </div>
           </div>
 
           <Link
             href="/app/events/new"
-            onClick={() => haptics.light()}
-            className="flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-black text-primary-foreground transition-opacity hover:opacity-90 active:scale-95"
+            onClick={() => {
+              sounds.tap();
+              haptics.light();
+            }}
+            className="flex h-8 shrink-0 cursor-pointer items-center gap-1 rounded-full bg-primary px-3.5 text-xs font-black text-primary-foreground transition-all hover:opacity-90 active:scale-95 shadow-sm"
           >
             <Plus className="size-3.5" />
-            <span className="hidden sm:inline">Host event</span>
-            <span className="sm:hidden">Host</span>
+            <span>Host (+25 LP)</span>
           </Link>
         </div>
 
-        {/* Scope tabs, matching the feed */}
-        <div className="flex items-center">
-          {SCOPES.map((s) => {
-            const isActive = scope === s.id;
+        {/* ─── Flat Twitter Tabs ─── */}
+        <div className="grid grid-cols-3 border-t border-border/20 text-center font-bold text-xs sm:text-sm">
+          {EVENT_TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
             return (
               <button
-                key={s.id}
+                key={tab.id}
                 type="button"
                 onClick={() => {
+                  sounds.tap();
                   haptics.light();
-                  setScope(s.id);
+                  setActiveTab(tab.id);
                 }}
                 className={cn(
-                  "relative flex-1 cursor-pointer py-3 text-[14px] font-bold transition-colors",
+                  "py-3 transition-colors relative cursor-pointer flex items-center justify-center gap-1",
                   isActive
-                    ? "font-black text-foreground"
-                    : "text-muted-foreground hover:bg-muted/30 hover:text-foreground"
+                    ? "text-foreground font-black"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
                 )}
               >
-                <span>{s.label}</span>
+                <span>{tab.label}</span>
                 {isActive && (
-                  <span className="absolute bottom-0 left-1/2 h-1 w-10 -translate-x-1/2 rounded-full bg-primary" />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-primary" />
                 )}
               </button>
             );
@@ -88,16 +147,16 @@ export function EventsClient() {
         </div>
       </header>
 
-      {/* ─── Search ─── */}
-      <div className="border-b border-border/30 px-4 py-3">
+      {/* ─── Search & Category Strip (Zero Clutter) ─── */}
+      <div className="space-y-2.5 px-4 pt-3 pb-2 border-b border-border/30">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search events, clubs or workshops"
+            placeholder="Search hackathons, fests, workshops or clubs..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-10 w-full rounded-full border border-border/60 bg-muted/30 pl-10 pr-9 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background"
+            className="h-10 w-full rounded-2xl border border-border/40 bg-muted/40 pl-10 pr-9 text-xs sm:text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background"
           />
           {searchQuery && (
             <button
@@ -110,30 +169,27 @@ export function EventsClient() {
             </button>
           )}
         </div>
-      </div>
 
-      {/* ─── Category pills ─── */}
-      <div className="border-b border-border/30 px-4 py-3">
-        <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto">
+        {/* Category filter pills */}
+        <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto py-0.5">
           {CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
             const isActive = activeCategory === cat.id;
             return (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => {
+                  sounds.tap();
                   haptics.light();
                   setActiveCategory(cat.id);
                 }}
                 className={cn(
-                  "flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold transition-all",
+                  "flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0",
                   isActive
-                    ? "bg-foreground font-black text-background"
-                    : "border border-border/40 bg-muted/40 text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                    ? "bg-foreground text-background shadow-xs font-black"
+                    : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/40"
                 )}
               >
-                <Icon className="size-3.5" />
                 <span>{cat.label}</span>
               </button>
             );
@@ -141,39 +197,34 @@ export function EventsClient() {
         </div>
       </div>
 
-      {/* ─── Results ─── */}
-      <div className="divide-y divide-border/30">
+      {/* ─── Stream of Event Cards (Immediate, Content-First) ─── */}
+      <div className="flex flex-col p-4 gap-4">
         {isLoading ? (
-          Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex animate-pulse gap-3.5 px-4 py-4">
-              <div className="size-24 shrink-0 rounded-xl bg-muted/60 sm:size-28" />
-              <div className="flex-1 space-y-2 py-1">
-                <div className="h-2.5 w-1/3 rounded bg-muted/50" />
-                <div className="h-3.5 w-3/4 rounded bg-muted/60" />
-                <div className="h-2.5 w-1/2 rounded bg-muted/40" />
-              </div>
+          <div className="space-y-4">
+            <div className="h-44 rounded-2xl bg-muted/40 animate-pulse" />
+            <div className="h-44 rounded-2xl bg-muted/40 animate-pulse" />
+          </div>
+        ) : events.length > 0 ? (
+          events.map((ev) => <EventCard key={ev.id} event={ev} />)
+        ) : (
+          <div className="py-20 text-center space-y-3">
+            <div className="flex size-12 items-center justify-center rounded-full bg-muted/60 text-muted-foreground mx-auto">
+              <Calendar className="size-6" />
             </div>
-          ))
-        ) : events.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 px-8 py-16 text-center">
-            <Calendar className="size-8 text-muted-foreground" />
-            <div className="space-y-1">
-              <h3 className="text-[15px] font-bold text-foreground">No events yet</h3>
-              <p className="text-[13px] text-muted-foreground">
-                {searchQuery
-                  ? `Nothing matches "${searchQuery}".`
-                  : "Be the first club to host one on your campus."}
-              </p>
-            </div>
+            <p className="text-sm font-bold text-foreground">No events found</p>
+            <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+              {searchQuery
+                ? "Try searching for a different keyword or category."
+                : "Be the pioneer organizer to host the next big hackathon or workshop on your campus."}
+            </p>
             <Link
               href="/app/events/new"
-              className="mt-1 cursor-pointer rounded-full bg-primary px-4 py-2 text-xs font-black text-primary-foreground transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer"
             >
-              Host an event
+              <Plus className="size-3.5" />
+              <span>Host First Event (+25 LP)</span>
             </Link>
           </div>
-        ) : (
-          events.map((event) => <EventCard key={event.id} event={event} />)
         )}
       </div>
     </main>

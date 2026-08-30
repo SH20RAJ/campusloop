@@ -13,9 +13,7 @@ import {
   Globe,
   RotateCw,
   School,
-  SlidersHorizontal,
 } from "lucide-react";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 

@@ -4,6 +4,7 @@ import { ArrowLeft, Check, Globe, MapPin, MessageSquarePlus, Share2 } from "luci
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ShareQrButton } from "@/components/common/share-qr-button";
 
 interface CollegeHeroHeaderProps {
   college: {
@@ -169,6 +170,16 @@ export function CollegeHeroHeader({
                   <span>Website</span>
                 </a>
               )}
+
+              <ShareQrButton
+                title={college.name}
+                subtitle={`${college.district ? `${college.district}, ` : ""}${college.state || "India"} • CampusLoop Official Hub`}
+                badgeText="Campus Hub"
+                shortUrl={`https://campusloop.space/college/${college.slug || college.id}`}
+                category="community"
+                avatarUrl={college.logoUrl || null}
+                variant="icon"
+              />
             </div>
           </div>
 

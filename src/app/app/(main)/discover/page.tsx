@@ -4,7 +4,7 @@ import { DiscoverFeed } from "./discover-feed";
 import DiscoverLoading from "./loading";
 
 export const metadata: Metadata = {
-  title: "Discover Campuses Across India | CampusLoop",
+  title: "Discover Campuses Across India",
   description:
     "Explore trending posts, confessions, and questions from verified students across every college on CampusLoop — switch between your campus loop and all of India.",
   keywords: [
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/app/discover" },
   openGraph: {
-    title: "Discover Campuses Across India | CampusLoop",
+    title: "Discover Campuses Across India",
     description: "Explore trending posts, confessions, and student vibes from colleges across India.",
     url: "https://campusloop.space/app/discover",
     siteName: "CampusLoop",
@@ -26,13 +26,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Discover Campuses Across India | CampusLoop",
+        alt: "Discover Campuses Across India",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Discover Campuses Across India | CampusLoop",
+    title: "Discover Campuses Across India",
     description: "Explore trending posts, confessions, and student vibes from colleges across India.",
     images: ["https://campusloop.space/og-image.png"],
   },

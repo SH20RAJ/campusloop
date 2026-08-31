@@ -9,7 +9,7 @@ import { getFollowCounts } from "@/lib/follows";
 import { ProfileClientView } from "./profile-client";
 
 export const metadata: Metadata = {
-  title: "Profile | CampusLoop",
+  title: "Profile",
 };
 
 export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {

@@ -9,7 +9,7 @@ import { SettingsClient } from "./settings-client";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Account Settings | CampusLoop",
+  title: "Account Settings",
   description: "Manage your campus profile, avatar, preferences, and privacy.",
 };
 

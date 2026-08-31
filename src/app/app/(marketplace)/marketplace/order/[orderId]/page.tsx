@@ -8,7 +8,7 @@ interface OrderTrackingPageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Track Campus Order | CampusLoop Marketplace",
+  title: "Track Campus Order",
   description: "Live real-time order tracking and store timeline.",
   robots: { index: false, follow: false },
 };

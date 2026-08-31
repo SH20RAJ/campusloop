@@ -11,7 +11,7 @@ interface ArticleEditPageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Edit Article | CampusLoop",
+  title: "Edit Article",
 };
 
 export default async function ArticleEditPage({ params }: ArticleEditPageProps) {

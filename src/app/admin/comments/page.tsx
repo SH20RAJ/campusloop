@@ -5,7 +5,7 @@ import { resolveAdminSession } from "../_lib/guard";
 import { CommentsTable } from "./comments-table";
 
 export const metadata: Metadata = {
-  title: "Admin Comments | CampusLoop",
+  title: "Admin Comments",
 };
 
 interface PageProps {

@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!comm) {
     return {
-      title: "Community Sub-Hub | CampusLoop",
+      title: "Community Sub-Hub",
     };
   }
 

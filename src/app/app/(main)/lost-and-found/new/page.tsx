@@ -4,7 +4,7 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { HubCreateClient } from "../../hub/new/hub-create-client";
 
 export const metadata: Metadata = {
-  title: "Report Lost or Found Item | CampusLoop",
+  title: "Report Lost or Found Item",
   description:
     "Report lost IDs, keys, headphones, or report found items to verified students across your college.",
   alternates: { canonical: "https://campusloop.space/app/lost-and-found/new" },

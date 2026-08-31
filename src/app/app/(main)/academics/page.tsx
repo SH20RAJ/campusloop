@@ -4,7 +4,7 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { AcademicsClient } from "./academics-client";
 
 export const metadata: Metadata = {
-  title: "Academic Notes, PYQs & Cheat Sheets | CampusLoop",
+  title: "Academic Notes, PYQs & Cheat Sheets",
   description:
     "Free semester exam question papers, verified professor notes, formula cheat sheets, and lab manuals shared by college students.",
   keywords: [
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/app/academics" },
   openGraph: {
-    title: "Academic Notes, PYQs & Cheat Sheets | CampusLoop",
+    title: "Academic Notes, PYQs & Cheat Sheets",
     description:
       "Free semester exam question papers, verified professor notes, and formula cheat sheets shared by verified college students.",
     url: "https://campusloop.space/app/academics",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Academic Notes, PYQs & Cheat Sheets | CampusLoop",
+    title: "Academic Notes, PYQs & Cheat Sheets",
     description:
       "Free semester exam question papers, verified professor notes, and formula cheat sheets shared by verified college students.",
   },

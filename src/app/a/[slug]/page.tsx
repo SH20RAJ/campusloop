@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: ArticleShortLinkProps): Promi
   });
 
   if (!article) {
-    return { title: "Article | CampusLoop" };
+    return { title: "Article" };
   }
 
   // The root layout's title template already appends " | CampusLoop".

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AdminLoginForm } from "./login-form";
 
 export const metadata: Metadata = {
-  title: "Admin Passkey | CampusLoop",
+  title: "Admin Passkey",
 };
 
 export default function AdminLoginPage() {

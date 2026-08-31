@@ -5,7 +5,7 @@ import { resolveAdminSession } from "../_lib/guard";
 import { UsersTable } from "./users-table";
 
 export const metadata: Metadata = {
-  title: "Admin Users & Student Analytics | CampusLoop",
+  title: "Admin Users & Student Analytics",
 };
 
 type RoleFilter = "ALL" | "STUDENT" | "MODERATOR" | "ADMIN";

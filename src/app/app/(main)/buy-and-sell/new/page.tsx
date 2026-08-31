@@ -4,12 +4,12 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { CreateListingClient } from "./create-listing-client";
 
 export const metadata: Metadata = {
-  title: "Sell Campus Gear & Books | Buy & Sell Hub | CampusLoop",
+  title: "Sell Campus Gear & Books | Buy & Sell Hub",
   description:
     "List textbooks, cycles, coolers, mattresses, and hostel gear for verified peer-to-peer campus trades.",
   alternates: { canonical: "https://campusloop.space/app/buy-and-sell/new" },
   openGraph: {
-    title: "Sell Campus Gear & Books | Buy & Sell Hub | CampusLoop",
+    title: "Sell Campus Gear & Books | Buy & Sell Hub",
     description: "List textbooks, cycles, coolers, mattresses, and hostel gear for verified campus trades.",
     url: "https://campusloop.space/app/buy-and-sell/new",
     siteName: "CampusLoop",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sell Campus Gear & Books | Buy & Sell Hub | CampusLoop",
+    title: "Sell Campus Gear & Books | Buy & Sell Hub",
     description: "List textbooks, cycles, coolers, mattresses, and hostel gear for verified campus trades.",
   },
   robots: { index: true, follow: true },

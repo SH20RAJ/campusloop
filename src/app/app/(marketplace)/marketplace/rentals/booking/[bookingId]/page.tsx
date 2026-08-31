@@ -8,7 +8,7 @@ interface BikeBookingPageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Track Bike Reservation | CampusLoop Marketplace",
+  title: "Track Bike Reservation",
   description: "Live real-time reservation status, pickup instructions, and deposit refund tracking.",
   robots: { index: false, follow: false },
 };

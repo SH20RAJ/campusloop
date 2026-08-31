@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AboutClient } from "@/components/about-client";
 
 export const metadata: Metadata = {
-  title: "About Us | CampusLoop",
+  title: "About Us",
   description:
     "Learn more about CampusLoop — the verified student-only campus social network built for 1,350+ Indian universities and colleges.",
   keywords: [
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/about" },
   openGraph: {
-    title: "About Us | CampusLoop",
+    title: "About Us",
     description: "Learn more about CampusLoop — the verified student-only campus social network.",
     url: "https://campusloop.space/about",
     siteName: "CampusLoop",
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "About Us | CampusLoop",
+        alt: "About Us",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "About Us | CampusLoop",
+    title: "About Us",
     description: "Learn more about CampusLoop — the verified student-only campus social network.",
     images: ["https://campusloop.space/og-image.png"],
   },

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SavedClient } from "./saved-client";
 
 export const metadata: Metadata = {
-  title: "Saved Posts & Bookmarks Vault | CampusLoop",
+  title: "Saved Posts & Bookmarks Vault",
   description:
     "Your private archive of saved campus posts, hostel insights, placement discussions, and student guides on CampusLoop.",
   keywords: [
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/app/saved" },
   openGraph: {
-    title: "Saved Posts & Bookmarks Vault | CampusLoop",
+    title: "Saved Posts & Bookmarks Vault",
     description: "Your private archive of saved campus posts, hostel insights, and placement realities.",
     url: "https://campusloop.space/app/saved",
     siteName: "CampusLoop",
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Saved Posts & Bookmarks Vault | CampusLoop",
+        alt: "Saved Posts & Bookmarks Vault",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Saved Posts & Bookmarks Vault | CampusLoop",
+    title: "Saved Posts & Bookmarks Vault",
     description: "Your private archive of saved campus posts, hostel insights, and placement realities.",
     images: ["https://campusloop.space/og-image.png"],
   },

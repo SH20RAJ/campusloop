@@ -10,7 +10,7 @@ import { getPendingReviewPosts } from "../_lib/queries";
 import { approvePendingPost, rejectPendingPost } from "../posts/actions";
 
 export const metadata: Metadata = {
-  title: "Review Queue | CampusLoop Admin",
+  title: "Review Queue",
 };
 
 function riskTone(score: number) {

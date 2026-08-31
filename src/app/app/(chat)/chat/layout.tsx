@@ -4,10 +4,10 @@ import { Navigation } from "@/components/ui/navigation";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
-  title: "Messages | CampusLoop",
+  title: "Messages",
   description: "Chat privately with verified students across your campus loop.",
   openGraph: {
-    title: "Messages | CampusLoop",
+    title: "Messages",
     description: "Chat privately with verified students across your campus loop.",
     url: "https://campusloop.space/app/chat",
     siteName: "CampusLoop",
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Messages | CampusLoop",
+        alt: "Messages",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Messages | CampusLoop",
+    title: "Messages",
     description: "Chat privately with verified students across your campus loop.",
     images: ["https://campusloop.space/og-image.png"],
   },

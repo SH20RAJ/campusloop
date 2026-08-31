@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     "Meet someone unexpected. Real-time anonymous conversations with verified college students across campus.",
   openGraph: {
-    title: "Random Loop | CampusLoop",
+    title: "Random Loop",
     description: "You don't know who you'll meet. You know they're part of the Loop.",
     url: "https://campusloop.space/app/random",
   },

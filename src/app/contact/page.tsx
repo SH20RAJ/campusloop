@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ContactClient } from "./contact-client";
 
 export const metadata: Metadata = {
-  title: "Contact Support & Grievance Redressal | CampusLoop",
+  title: "Contact Support & Grievance Redressal",
   description:
     "Get in touch with CampusLoop support, campus partnership desk, safety compliance, or the designated Grievance Officer under IT Rules 2021.",
   keywords: [
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/contact" },
   openGraph: {
-    title: "Contact Support & Grievance Redressal | CampusLoop",
+    title: "Contact Support & Grievance Redressal",
     description: "Get in touch with CampusLoop support, safety compliance, and partnerships.",
     url: "https://campusloop.space/contact",
     siteName: "CampusLoop",
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Contact Support & Grievance Redressal | CampusLoop",
+        alt: "Contact Support & Grievance Redressal",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Contact Support & Grievance Redressal | CampusLoop",
+    title: "Contact Support & Grievance Redressal",
     description: "Get in touch with CampusLoop support, safety compliance, and partnerships.",
     images: ["https://campusloop.space/og-image.png"],
   },

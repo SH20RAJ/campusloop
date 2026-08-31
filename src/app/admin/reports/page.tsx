@@ -5,7 +5,7 @@ import { resolveAdminSession } from "../_lib/guard";
 import { ReportsTable } from "./reports-table";
 
 export const metadata: Metadata = {
-  title: "Admin Reports | CampusLoop",
+  title: "Admin Reports",
 };
 
 export default async function AdminReportsPage() {

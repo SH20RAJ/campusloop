@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { OverviewClient } from "./overview-client";
 
 export const metadata: Metadata = {
-  title: "Platform Overview & Strategic Architecture | CampusLoop",
+  title: "Platform Overview & Strategic Architecture",
   description:
     "Comprehensive overview of CampusLoop's verified campus architecture, market sizing, network density moats, and product layers.",
   keywords: [
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/overview" },
   openGraph: {
-    title: "Platform Overview | CampusLoop",
+    title: "Platform Overview",
     description: "Comprehensive overview of CampusLoop's verified campus architecture.",
     url: "https://campusloop.space/overview",
     siteName: "CampusLoop",
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Platform Overview | CampusLoop",
+        alt: "Platform Overview",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Platform Overview | CampusLoop",
+    title: "Platform Overview",
     description: "Comprehensive overview of CampusLoop's verified campus architecture.",
     images: ["https://campusloop.space/og-image.png"],
   },

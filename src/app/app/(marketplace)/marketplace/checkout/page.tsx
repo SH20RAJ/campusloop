@@ -4,7 +4,7 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { CheckoutClient } from "./checkout-client";
 
 export const metadata: Metadata = {
-  title: "Checkout | Campus Marketplace | CampusLoop",
+  title: "Checkout | Campus Marketplace",
   description: "Complete your campus order with verified hostel delivery or pickup.",
   robots: { index: false, follow: false },
 };

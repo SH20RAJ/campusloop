@@ -6,7 +6,7 @@ interface MerchantBikeBookingDetailPageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Process Reservation & Inspection | Merchant Portal | CampusLoop",
+  title: "Process Reservation & Inspection | Merchant Portal",
   description: "Verify customer credentials, perform vehicle handover, and complete returns.",
   robots: { index: false, follow: false },
 };

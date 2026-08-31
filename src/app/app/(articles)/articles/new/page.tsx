@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { ArticleEditorClient } from "./article-editor-client";
 
 export const metadata: Metadata = {
-  title: "Write Article | CampusLoop Editorial",
+  title: "Write Article",
   description: "Write and publish long-form student articles, placement guides, and stories on CampusLoop.",
 };
 

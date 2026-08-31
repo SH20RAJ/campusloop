@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PitchClient } from "./pitch-client";
 
 export const metadata: Metadata = {
-  title: "Investor Pitch Deck | CampusLoop",
+  title: "Investor Pitch Deck",
   description:
     "Explore CampusLoop's market size, problem statements, unit economics, engagement loops, and interactive valuation model.",
   keywords: [
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/pitch" },
   openGraph: {
-    title: "Investor Pitch Deck | CampusLoop",
+    title: "Investor Pitch Deck",
     description: "Explore CampusLoop's market size, unit economics, and business model.",
     url: "https://campusloop.space/pitch",
     siteName: "CampusLoop",
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Investor Pitch Deck | CampusLoop",
+        alt: "Investor Pitch Deck",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Investor Pitch Deck | CampusLoop",
+    title: "Investor Pitch Deck",
     description: "Explore CampusLoop's market size, unit economics, and business model.",
     images: ["https://campusloop.space/og-image.png"],
   },

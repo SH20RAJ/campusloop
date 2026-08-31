@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { ArticlesHubClient } from "./articles-hub-client";
 
 export const metadata: Metadata = {
-  title: "Campus Articles & Student Long Reads | CampusLoop",
+  title: "Campus Articles & Student Long Reads",
   description:
     "Read, write, and explore in-depth student articles, placement roadmaps, engineering guides, research, and campus stories from 1,350+ Indian colleges.",
   keywords: [
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     canonical: "https://campusloop.space/app/articles",
   },
   openGraph: {
-    title: "Campus Articles & Student Long Reads | CampusLoop",
+    title: "Campus Articles & Student Long Reads",
     description: "In-depth student articles, placement guides, and campus insights.",
     url: "https://campusloop.space/app/articles",
     siteName: "CampusLoop",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Campus Articles & Student Long Reads | CampusLoop",
+    title: "Campus Articles & Student Long Reads",
     description: "In-depth student articles, placement guides, and campus insights.",
     images: ["https://campusloop.space/og-image.png"],
   },

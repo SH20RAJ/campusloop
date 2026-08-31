@@ -12,7 +12,7 @@ import { LegalNav } from "@/components/marketing/legal-nav";
 import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | CampusLoop",
+  title: "Privacy Policy",
   description:
     "Learn how CampusLoop protects student data, cryptographic anonymity, and complies with the Digital Personal Data Protection Act (DPDP Act 2023) and IT Act 2000.",
   keywords: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/privacy" },
   openGraph: {
-    title: "Privacy Policy | CampusLoop",
+    title: "Privacy Policy",
     description: "Learn how CampusLoop protects student data and cryptographic anonymity.",
     url: "https://campusloop.space/privacy",
     siteName: "CampusLoop",
@@ -37,13 +37,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Privacy Policy | CampusLoop",
+        alt: "Privacy Policy",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Privacy Policy | CampusLoop",
+    title: "Privacy Policy",
     description: "Learn how CampusLoop protects student data and cryptographic anonymity.",
     images: ["https://campusloop.space/og-image.png"],
   },

@@ -7,7 +7,7 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { ArticleDashboardClient } from "./article-dashboard-client";
 
 export const metadata: Metadata = {
-  title: "My Articles & Drafts Dashboard | CampusLoop",
+  title: "My Articles & Drafts Dashboard",
   description: "Manage your published student articles, drafts, and readership stats on CampusLoop.",
 };
 

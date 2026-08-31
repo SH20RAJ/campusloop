@@ -4,7 +4,7 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { HubCreateClient } from "./hub-create-client";
 
 export const metadata: Metadata = {
-  title: "New Hub Listing | CampusLoop",
+  title: "New Hub Listing",
   description:
     "Create and publish listings for Lost & Found, Buy & Sell, Gaming Lobbies, Ride Sharing, Housing, and Notes.",
   alternates: { canonical: "https://campusloop.space/app/hub/new" },

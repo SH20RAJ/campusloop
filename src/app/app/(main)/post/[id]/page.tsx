@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 
   if (!post) {
     return {
-      title: "Post Details | CampusLoop",
+      title: "Post Details",
       description: "Explore student yaps, confessions, and campus discussions on CampusLoop.",
     };
   }

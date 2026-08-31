@@ -4,8 +4,8 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { HubCreateClient } from "../../hub/new/hub-create-client";
 
 export const metadata: Metadata = {
-  title: "Host Gaming Lobby | CampusLoop Arena",
-  description: "Find teammates for Valorant, BGMI, CS2, Dota 2, and campus esports tournaments.",
+  title: "Host Gaming Lobby",
+  description: "Create a match lobby, recruit teammates, or challenge rivals on campus.",
   alternates: { canonical: "https://campusloop.space/app/gaming/new" },
 };
 

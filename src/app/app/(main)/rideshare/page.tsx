@@ -4,7 +4,7 @@ import { DedicatedHubClient } from "@/components/communities/dedicated-hub-clien
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
-  title: "Ride Share | Station & Airport Cab Pool | CampusLoop",
+  title: "Ride Share | Station & Airport Cab Pool",
   description: "Split station and airport cab fares with verified college batchmates.",
   alternates: { canonical: "https://campusloop.space/app/rideshare" },
 };

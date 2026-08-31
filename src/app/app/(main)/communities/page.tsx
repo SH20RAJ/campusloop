@@ -11,12 +11,12 @@ import type { FeedPost } from "@/hooks/use-feed";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
-  title: "Student Communities & Sub-Hubs | CampusLoop",
+  title: "Student Communities & Sub-Hubs",
   description: "Browse interest groups, technical societies, and student-created communities on CampusLoop.",
   keywords: ["Student Communities", "College Sub-Hubs", "Campus Clubs", "Student Groups India"],
   alternates: { canonical: "https://campusloop.space/app/communities" },
   openGraph: {
-    title: "Student Communities & Sub-Hubs | CampusLoop",
+    title: "Student Communities & Sub-Hubs",
     description: "Browse interest groups and student communities on CampusLoop.",
     url: "https://campusloop.space/app/communities",
     siteName: "CampusLoop",
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Student Communities & Sub-Hubs | CampusLoop",
+        alt: "Student Communities & Sub-Hubs",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Student Communities & Sub-Hubs | CampusLoop",
+    title: "Student Communities & Sub-Hubs",
     description: "Browse interest groups and student communities on CampusLoop.",
     images: ["https://campusloop.space/og-image.png"],
   },

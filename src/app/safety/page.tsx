@@ -12,7 +12,7 @@ import { LegalNav } from "@/components/marketing/legal-nav";
 import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
 
 export const metadata: Metadata = {
-  title: "Safety & Community Standards | CampusLoop",
+  title: "Safety & Community Standards",
   description:
     "Community safety guidelines, zero-tolerance anti-ragging protocols under UGC regulations, automated doxxing filters, and student reporting mechanisms.",
   keywords: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/safety" },
   openGraph: {
-    title: "Safety & Community Standards | CampusLoop",
+    title: "Safety & Community Standards",
     description:
       "Learn how CampusLoop protects students with zero-tolerance anti-ragging and AI safety shields.",
     url: "https://campusloop.space/safety",
@@ -38,13 +38,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Safety & Community Standards | CampusLoop",
+        alt: "Safety & Community Standards",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Safety & Community Standards | CampusLoop",
+    title: "Safety & Community Standards",
     description:
       "Learn how CampusLoop protects students with zero-tolerance anti-ragging and AI safety shields.",
     images: ["https://campusloop.space/og-image.png"],

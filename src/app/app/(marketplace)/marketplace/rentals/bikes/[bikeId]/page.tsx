@@ -8,7 +8,7 @@ interface BikeDetailPageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Book Campus Bike Rental | CampusLoop Marketplace",
+  title: "Book Campus Bike Rental",
   description: "Rent verified scooters, motorcycles, and EV bikes on campus with instant pickup.",
   robots: { index: true, follow: true },
 };

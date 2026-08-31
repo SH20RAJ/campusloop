@@ -4,7 +4,7 @@ import { DedicatedHubClient } from "@/components/communities/dedicated-hub-clien
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
-  title: "Gaming Arena | Campus Esports | CampusLoop",
+  title: "Gaming Arena | Campus Esports",
   description: "Find college teammates, scrim lobbies, and host Valorant, BGMI, and Chess duels.",
   alternates: { canonical: "https://campusloop.space/app/gaming" },
 };

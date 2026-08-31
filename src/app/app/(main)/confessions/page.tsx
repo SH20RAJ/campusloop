@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { ConfessionsFeed } from "./confessions-feed";
 
 export const metadata: Metadata = {
-  title: "Campus Confessions — 100% Anonymous | CampusLoop",
+  title: "Campus Confessions — 100% Anonymous",
   description:
     "Read and share anonymous confessions from your college. Identity-sealed with cryptographic pseudonyms — anonymous to peers, safe for the community.",
   keywords: [
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/app/confessions" },
   openGraph: {
-    title: "Campus Confessions — 100% Anonymous | CampusLoop",
+    title: "Campus Confessions — 100% Anonymous",
     description: "Read and share anonymous confessions from your college safely.",
     url: "https://campusloop.space/app/confessions",
     siteName: "CampusLoop",
@@ -26,13 +26,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Campus Confessions — 100% Anonymous | CampusLoop",
+        alt: "Campus Confessions — 100% Anonymous",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Campus Confessions — 100% Anonymous | CampusLoop",
+    title: "Campus Confessions — 100% Anonymous",
     description: "Read and share anonymous confessions from your college safely.",
     images: ["https://campusloop.space/og-image.png"],
   },

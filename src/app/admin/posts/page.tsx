@@ -7,7 +7,7 @@ import { resolveAdminSession } from "../_lib/guard";
 import { PostsTable } from "./posts-table";
 
 export const metadata: Metadata = {
-  title: "Admin Posts | CampusLoop",
+  title: "Admin Posts",
 };
 
 type PostStatusFilter = "ALL" | "PUBLISHED" | "PENDING_REVIEW" | "HIDDEN" | "DELETED";

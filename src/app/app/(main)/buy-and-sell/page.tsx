@@ -4,7 +4,7 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { BuyAndSellClient } from "./buy-and-sell-client";
 
 export const metadata: Metadata = {
-  title: "Buy & Sell | Verified Campus Marketplace | CampusLoop",
+  title: "Buy & Sell | Verified Campus Marketplace",
   description:
     "Buy and sell second-hand bicycles, coolers, mattresses, textbooks, drafters, and calculators safely with verified college batchmates.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/app/buy-and-sell" },
   openGraph: {
-    title: "Buy & Sell | Verified Campus Marketplace | CampusLoop",
+    title: "Buy & Sell | Verified Campus Marketplace",
     description:
       "Buy and sell second-hand bicycles, coolers, mattresses, textbooks, and hostel essentials with verified students.",
     url: "https://campusloop.space/app/buy-and-sell",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Buy & Sell | Verified Campus Marketplace | CampusLoop",
+    title: "Buy & Sell | Verified Campus Marketplace",
     description:
       "Buy and sell second-hand bicycles, coolers, mattresses, textbooks, and hostel essentials with verified students.",
   },

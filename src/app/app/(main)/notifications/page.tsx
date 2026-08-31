@@ -9,7 +9,7 @@ import { NotificationsClient } from "./notifications-client";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Notifications | CampusLoop",
+  title: "Notifications",
   description: "Stay updated with campus replies, upvotes, mentions, and secret crushes.",
 };
 

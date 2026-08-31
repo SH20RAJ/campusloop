@@ -8,7 +8,7 @@ import { isViewerProfile } from "@/lib/viewer";
 import { StoryCreator } from "./story-creator";
 
 export const metadata: Metadata = {
-  title: "Create Story | CampusLoop",
+  title: "Create Story",
 };
 
 export default async function CreateStoryPage() {

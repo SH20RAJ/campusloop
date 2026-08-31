@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DatingAppClient } from "./dating-app-client";
 
 export const metadata: Metadata = {
-  title: "Campus Match & Dating | CampusLoop",
+  title: "Campus Match & Dating",
   description:
     "Swipe to connect with verified college students. Filter by college, department, and shared passions in a safe, student-only environment.",
   keywords: [
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/app/dating" },
   openGraph: {
-    title: "Campus Match & Dating | CampusLoop",
+    title: "Campus Match & Dating",
     description: "Connect with verified college students in a safe, student-only environment.",
     url: "https://campusloop.space/app/dating",
     siteName: "CampusLoop",
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Campus Match & Dating | CampusLoop",
+        alt: "Campus Match & Dating",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Campus Match & Dating | CampusLoop",
+    title: "Campus Match & Dating",
     description: "Connect with verified college students in a safe, student-only environment.",
     images: ["https://campusloop.space/og-image.png"],
   },

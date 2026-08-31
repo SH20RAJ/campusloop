@@ -6,7 +6,7 @@ import { resolveAdminSession } from "../_lib/guard";
 import { getAuditPage } from "../_lib/queries";
 
 export const metadata: Metadata = {
-  title: "Audit Log | CampusLoop Admin",
+  title: "Audit Log",
 };
 
 interface PageProps {

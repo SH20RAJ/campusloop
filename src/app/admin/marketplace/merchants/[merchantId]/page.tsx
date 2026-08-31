@@ -6,7 +6,7 @@ interface AdminMerchantEditPageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Merchant Management & Menu Editor | CampusLoop Admin",
+  title: "Merchant Management & Menu Editor",
   description: "Manage store details, catalog items, and view live order stream.",
   robots: { index: false, follow: false },
 };

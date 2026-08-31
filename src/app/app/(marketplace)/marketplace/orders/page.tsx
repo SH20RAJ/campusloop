@@ -4,7 +4,7 @@ import { getCachedAuthUser } from "@/lib/server-cache";
 import { OrdersClient } from "./orders-client";
 
 export const metadata: Metadata = {
-  title: "My Campus Orders | CampusLoop Marketplace",
+  title: "My Campus Orders",
   description: "View and track all your active and previous campus marketplace orders.",
   robots: { index: false, follow: false },
 };

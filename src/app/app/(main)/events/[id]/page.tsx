@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
   });
 
   if (!event) {
-    return { title: "Event Not Found | CampusLoop" };
+    return { title: "Event Not Found" };
   }
 
   const key = event.slug || event.id;

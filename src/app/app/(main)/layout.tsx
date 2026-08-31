@@ -7,10 +7,7 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { isViewerProfile } from "@/lib/viewer";
 
 export const metadata: Metadata = {
-  title: {
-    default: "CampusLoop | Student Social Network",
-    template: "%s | CampusLoop",
-  },
+  title: "Student Social Network",
   description:
     "Connect with verified students across Indian colleges. Share confessions, polls, and discussions.",
   openGraph: {

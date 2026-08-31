@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   });
 
   if (!article) {
-    return { title: "Article Not Found | CampusLoop" };
+    return { title: "Article Not Found" };
   }
 
   const title = `${article.title} — By @${article.author?.username || "student"} | CampusLoop`;

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import CollegesClient from "./colleges-client";
 
 export const metadata: Metadata = {
-  title: "Campus Directory & Colleges | CampusLoop",
+  title: "Campus Directory & Colleges",
   description:
     "Browse, search, and explore 1,350+ verified college hubs and student communities across Indian universities.",
   keywords: [
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/colleges" },
   openGraph: {
-    title: "Campus Directory & Colleges | CampusLoop",
+    title: "Campus Directory & Colleges",
     description: "Browse and search over 1,350+ verified colleges in India on CampusLoop.",
     url: "https://campusloop.space/colleges",
     siteName: "CampusLoop",
@@ -26,13 +26,13 @@ export const metadata: Metadata = {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Campus Directory & Colleges | CampusLoop",
+        alt: "Campus Directory & Colleges",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Campus Directory & Colleges | CampusLoop",
+    title: "Campus Directory & Colleges",
     description: "Browse and search over 1,350+ verified colleges in India on CampusLoop.",
     images: ["https://campusloop.space/og-image.png"],
   },

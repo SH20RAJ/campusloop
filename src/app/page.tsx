@@ -34,10 +34,7 @@ import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://campusloop.space"),
-  title: {
-    default: "CampusLoop | Your Campus, Verified & Unfiltered",
-    template: "%s | CampusLoop",
-  },
+  title: "CampusLoop | Your Campus, Verified & Unfiltered",
   description:
     "CampusLoop is the verified student-only campus network for 1,350+ Indian colleges. Gatekept by college email address to share anonymous confessions, settle canteen polls, trade on student marketplace, match safely, and lock batch time capsules.",
   applicationName: "CampusLoop",

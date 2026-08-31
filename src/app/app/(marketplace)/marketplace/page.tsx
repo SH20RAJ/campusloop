@@ -4,7 +4,7 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { MarketplaceClient } from "./marketplace-client";
 
 export const metadata: Metadata = {
-  title: "Campus Marketplace | Food, Essentials, Rentals & Services | CampusLoop",
+  title: "Campus Marketplace | Food, Essentials, Rentals & Services",
   description:
     "Discover local canteens, momos, campus essentials, vehicle rentals, and laundry services from verified businesses near your college.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://campusloop.space/app/marketplace" },
   openGraph: {
-    title: "Campus Marketplace | CampusLoop",
+    title: "Campus Marketplace",
     description: "Shop from verified local businesses, canteens, and services around your college campus.",
     url: "https://campusloop.space/app/marketplace",
     siteName: "CampusLoop",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Campus Marketplace | CampusLoop",
+    title: "Campus Marketplace",
     description: "Shop from verified local businesses, canteens, and services around your college campus.",
   },
   robots: { index: true, follow: true },

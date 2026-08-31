@@ -5,7 +5,7 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { MerchantLayoutClient } from "../merchant-layout-client";
 
 export const metadata: Metadata = {
-  title: "Merchant Portal | CampusLoop",
+  title: "Merchant Portal",
   description: "Manage orders, menu items, business hours, and delivery settings for your campus store.",
   robots: { index: false, follow: false },
 };

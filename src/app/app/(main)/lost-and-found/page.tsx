@@ -4,7 +4,7 @@ import { DedicatedHubClient } from "@/components/communities/dedicated-hub-clien
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
-  title: "Lost & Found | CampusLoop",
+  title: "Lost & Found",
   description:
     "Report lost student IDs, keys, earphones, and reclaim found items safely on your college campus.",
   alternates: { canonical: "https://campusloop.space/app/lost-and-found" },

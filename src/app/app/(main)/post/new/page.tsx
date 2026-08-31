@@ -8,7 +8,7 @@ import { isViewerProfile } from "@/lib/viewer";
 import { PostComposer } from "./post-composer";
 
 export const metadata: Metadata = {
-  title: "New Post | CampusLoop",
+  title: "New Post",
   description: "Share a confession, start a poll, or ask your campus on CampusLoop.",
 };
 

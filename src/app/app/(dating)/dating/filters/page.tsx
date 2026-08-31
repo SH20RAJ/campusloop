@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { FiltersClient } from "./filters-client";
 
 export const metadata: Metadata = {
-  title: "Match Preferences | CampusLoop",
+  title: "Match Preferences",
   robots: { index: false, follow: false },
 };
 

@@ -5,7 +5,7 @@ import { LogoutClient } from "./logout-client";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Log Out | CampusLoop",
+  title: "Log Out",
   description: "Logging out securely from your verified campus account.",
   robots: { index: false, follow: false },
 };

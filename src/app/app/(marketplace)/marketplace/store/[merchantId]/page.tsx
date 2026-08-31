@@ -8,7 +8,7 @@ interface StorePageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Campus Store Menu & Orders | CampusLoop Marketplace",
+  title: "Campus Store Menu & Orders",
   description: "Browse menu, configure add-ons, and place orders with verified campus stores.",
   robots: { index: true, follow: true },
 };

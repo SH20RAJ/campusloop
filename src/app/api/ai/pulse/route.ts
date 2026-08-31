@@ -101,7 +101,7 @@ export async function GET(req: Request) {
       institution: {
         id: institution?.id,
         name: institution?.name || "Campus",
-        shortName: institution?.shortName || institution?.name || "Campus",
+        shortName: institution?.slug || institution?.name || "Campus",
       },
       updatedAt: new Date().toISOString(),
       trendingTopics: trendingTags,

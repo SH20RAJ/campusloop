@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit3, Globe, PlusIcon, School, Search, Trash2Icon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit3, Globe, PlusIcon, School, Search, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -34,6 +34,9 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
   const [deleteCollegeData, setDeleteCollegeData] = useState<{ id: string; name: string } | null>(null);
   const [removeDomainId, setRemoveDomainId] = useState<string | null>(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 25;
+
   const filteredColleges = useMemo(() => {
     if (!searchQuery.trim()) return initialColleges;
     const q = searchQuery.toLowerCase();
@@ -45,6 +48,13 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
         c.district?.toLowerCase().includes(q)
     );
   }, [initialColleges, searchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredColleges.length / PAGE_SIZE));
+  const validCurrentPage = Math.min(currentPage, totalPages);
+  const paginatedColleges = useMemo(() => {
+    const start = (validCurrentPage - 1) * PAGE_SIZE;
+    return filteredColleges.slice(start, start + PAGE_SIZE);
+  }, [filteredColleges, validCurrentPage]);
 
   async function confirmDeleteCollege() {
     if (!deleteCollegeData) return;
@@ -117,7 +127,7 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filteredColleges.map((college) => (
+            {paginatedColleges.map((college) => (
               <tr key={college.id} className="hover:bg-muted/30 transition-colors">
                 <td className="px-6 py-3.5">
                   <div className="flex items-center gap-3">
@@ -266,6 +276,46 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Footer */}
+      {filteredColleges.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 py-1 text-xs text-muted-foreground">
+          <div>
+            Showing{" "}
+            <span className="font-bold text-foreground">{(validCurrentPage - 1) * PAGE_SIZE + 1}</span> to{" "}
+            <span className="font-bold text-foreground">
+              {Math.min(validCurrentPage * PAGE_SIZE, filteredColleges.length)}
+            </span>{" "}
+            of <span className="font-bold text-foreground">{filteredColleges.length}</span> colleges
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={validCurrentPage <= 1}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-card text-foreground font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted cursor-pointer transition-colors"
+            >
+              <ChevronLeft className="size-3.5" />
+              <span>Previous</span>
+            </button>
+
+            <span className="px-2 font-bold text-foreground">
+              Page {validCurrentPage} of {totalPages}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={validCurrentPage >= totalPages}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border bg-card text-foreground font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted cursor-pointer transition-colors"
+            >
+              <span>Next</span>
+              <ChevronRight className="size-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Edit College Media & Details Modal */}
       {editingCollege && (

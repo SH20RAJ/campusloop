@@ -82,8 +82,8 @@ export async function GET(_req: Request, { params }: RouteParams) {
       institution: {
         id: institution.id,
         name: institution.name,
-        shortName: institution.shortName || institution.name,
-        city: institution.city,
+        shortName: institution.slug || institution.name,
+        district: institution.district,
         state: institution.state,
       },
       stats: {

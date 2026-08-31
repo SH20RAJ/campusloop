@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ChevronRight, ExternalLink, Shield, Sparkles, Zap } from "lucide-react";
+import { ArrowLeft, ChevronRight, ExternalLink, Shield, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InstagramIcon, LinkedinIcon, XIcon } from "@/components/ui/social-icons";
@@ -39,103 +39,100 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
         </div>
       </div>
 
-      {/* ─── ⚡ RANDOM LOOP HERO CARD (Spec Section 3 & 52) ─── */}
+      {/* ─── ⚡ RANDOM LOOP HERO CARD (Clean Minimal Twitter/X Style) ─── */}
       <Link
         href="/app/random"
-        className="block p-5 rounded-3xl border-2 border-amber-500/40 bg-linear-to-r from-amber-500/15 via-orange-500/10 to-amber-500/5 hover:border-amber-500 transition-all shadow-md group cursor-pointer"
+        className="block p-4 sm:p-5 rounded-2xl border border-border/70 bg-card hover:bg-muted/40 hover:border-border transition-all group cursor-pointer"
       >
-        <div className="flex items-center justify-between">
-          <div className="space-y-1.5 min-w-0 pr-2">
-            <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-500">
-              <Zap className="size-4 fill-amber-500" />
-              <span>RANDOM LOOP</span>
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-1 min-w-0">
+            <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+              <Zap className="size-3.5 text-foreground" />
+              <span>Random Loop</span>
             </div>
-            <h3 className="text-base sm:text-lg font-black text-foreground group-hover:text-amber-500 transition-colors">
+            <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
               Meet someone unexpected.
             </h3>
             <p className="text-xs text-muted-foreground line-clamp-2">
               Serendipitous anonymous conversations with verified college peers. Choose campus or talk with
               anyone across India.
             </p>
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                🎲 Random
+            <div className="flex items-center gap-2 pt-1.5">
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/50">
+                Random
               </span>
-              <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                🛡️ Verified Student
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-foreground border border-border/50">
+                Verified Student
               </span>
             </div>
           </div>
 
-          <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-amber-500 text-black font-black shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform shrink-0">
-            <Zap className="size-6 sm:size-7 fill-black" />
+          <div className="flex size-10 sm:size-11 items-center justify-center rounded-xl bg-foreground text-background font-bold shrink-0 group-hover:scale-105 transition-transform">
+            <Zap className="size-5 fill-background" />
           </div>
         </div>
       </Link>
 
-      {/* ─── Highlighted Official Social Channels ─── */}
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Sparkles className="size-3 text-pink-500" /> Official Social Channels
+      {/* ─── Official Social Channels (Minimal Monochrome Cards) ─── */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-0.5">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            Official Channels
           </h2>
-          <span className="text-[10px] font-bold text-pink-500 bg-pink-500/10 px-2 py-0.5 rounded-full border border-pink-500/20">
-            Priority: Insta → LinkedIn → X
-          </span>
         </div>
 
-        <div className="space-y-2.5">
-          {/* Highlighted Instagram Card */}
+        <div className="space-y-2">
+          {/* Instagram Card */}
           <a
             href={SOCIAL_LINKS.instagram.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block p-4 rounded-3xl border-2 border-pink-500/40 bg-linear-to-r from-pink-500/15 via-rose-500/10 to-amber-500/10 hover:border-pink-500 transition-all shadow-md group cursor-pointer"
+            className="block p-3.5 rounded-2xl border border-border/70 bg-card hover:bg-muted/40 hover:border-border transition-all group cursor-pointer"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-linear-to-tr from-pink-500 via-rose-500 to-amber-500 text-white shadow-md shadow-pink-500/25 group-hover:scale-105 transition-transform shrink-0">
-                  <InstagramIcon className="size-6" />
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex size-9 items-center justify-center rounded-xl bg-muted text-foreground shrink-0 group-hover:scale-105 transition-transform">
+                  <InstagramIcon className="size-4.5" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-black text-foreground group-hover:text-pink-500 transition-colors">
+                    <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
                       Instagram
                     </p>
-                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-pink-500 text-white shadow-xs">
-                      🔥 Official Hub
+                    <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-muted text-muted-foreground border border-border/50">
+                      @campusloop.space
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground truncate font-medium">
-                    {SOCIAL_LINKS.instagram.handle} · Campus drops, confessions &amp; reels
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    Campus drops, confessions &amp; updates
                   </p>
                 </div>
               </div>
-              <ExternalLink className="size-4 text-pink-500 group-hover:translate-x-0.5 transition-transform shrink-0 ml-2" />
+              <ExternalLink className="size-3.5 text-muted-foreground/60 group-hover:text-foreground transition-colors shrink-0 ml-2" />
             </div>
           </a>
 
           {/* Secondary Social Channels: LinkedIn & X */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* LinkedIn */}
             <a
               href={SOCIAL_LINKS.linkedin.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3.5 rounded-2xl border border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10 hover:border-blue-500/50 transition-all shadow-2xs group flex items-center justify-between cursor-pointer"
+              className="p-3 rounded-2xl border border-border/70 bg-card hover:bg-muted/40 hover:border-border transition-all group flex items-center justify-between cursor-pointer"
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex size-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform shrink-0">
-                  <LinkedinIcon className="size-4.5" />
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-muted text-foreground shrink-0 group-hover:scale-105 transition-transform">
+                  <LinkedinIcon className="size-4" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-black text-foreground group-hover:text-blue-500 transition-colors truncate">
+                  <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
                     LinkedIn
                   </p>
-                  <p className="text-[11px] text-muted-foreground truncate">Startup news &amp; hiring</p>
+                  <p className="text-[11px] text-muted-foreground truncate">CampusLoop</p>
                 </div>
               </div>
-              <ExternalLink className="size-3.5 text-muted-foreground group-hover:text-blue-500 transition-colors shrink-0" />
+              <ExternalLink className="size-3 text-muted-foreground/60 group-hover:text-foreground transition-colors shrink-0" />
             </a>
 
             {/* X (Twitter) */}
@@ -143,20 +140,20 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
               href={SOCIAL_LINKS.x.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3.5 rounded-2xl border border-border/60 bg-card hover:bg-muted/40 hover:border-border transition-all shadow-2xs group flex items-center justify-between cursor-pointer"
+              className="p-3 rounded-2xl border border-border/70 bg-card hover:bg-muted/40 hover:border-border transition-all group flex items-center justify-between cursor-pointer"
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex size-9 items-center justify-center rounded-xl bg-muted/60 text-foreground group-hover:scale-105 transition-transform shrink-0">
-                  <XIcon className="size-4" />
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-muted text-foreground shrink-0 group-hover:scale-105 transition-transform">
+                  <XIcon className="size-3.5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-black text-foreground group-hover:text-primary transition-colors truncate">
+                  <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
                     X (Twitter)
                   </p>
                   <p className="text-[11px] text-muted-foreground truncate">{SOCIAL_LINKS.x.handle}</p>
                 </div>
               </div>
-              <ExternalLink className="size-3.5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+              <ExternalLink className="size-3 text-muted-foreground/60 group-hover:text-foreground transition-colors shrink-0" />
             </a>
           </div>
         </div>

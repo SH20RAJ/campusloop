@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, inArray, or, type SQL, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { comments, institutions, posts, reports, userProfiles, votes } from "@/db/schema";
+import { comments, follows, institutions, posts, reports, userProfiles, votes } from "@/db/schema";
 
 export type FeedPost = {
   id: string;
@@ -227,6 +227,25 @@ function getForYouScoreSql(
     ? sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 35.0 else 0.0 end)`
     : sql<number>`0.0`;
 
+  // 🤝 Friends & Following Algorithmic Affinity Boost:
+  // When a student follows someone or is mutual friends with them, their posts must strongly surface higher in the feed!
+  const followingBonusSql = viewerProfileId
+    ? sql<number>`(case 
+        when exists(
+          select 1 from ${follows} 
+          where ${follows.followerId} = ${viewerProfileId} 
+            and ${follows.followingId} = ${posts.authorId} 
+            and ${follows.isMutual} = true
+        ) then 120.0
+        when exists(
+          select 1 from ${follows} 
+          where ${follows.followerId} = ${viewerProfileId} 
+            and ${follows.followingId} = ${posts.authorId}
+        ) then 80.0
+        else 0.0 
+      end)`
+    : sql<number>`0.0`;
+
   const seenPenaltySql =
     seenIds && seenIds.length > 0
       ? sql<number>`(case when ${posts.id} in (${sql.raw(
@@ -251,6 +270,7 @@ function getForYouScoreSql(
 
   return sql<number>`(
 		${ownCollegeBonus}
+		+ ${followingBonusSql}
 		+ ${seenPenaltySql}
 		+ ${alreadyVotedPenaltySql}
 		+ ${alreadyCommentedPenaltySql}
@@ -514,13 +534,33 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
 
 export function sortFeedPosts<
   T extends {
+    id: string;
+    authorId?: string | null;
     createdAt: Date | string;
     votesCount: number;
     commentsCount: number;
     institutionId: string;
   },
->(items: T[], sort: string | null, userInstitutionId?: string): T[] {
+>(
+  items: T[],
+  sort: string | null,
+  userInstitutionId?: string,
+  options?: {
+    followingIds?: string[] | Set<string>;
+    friendIds?: string[] | Set<string>;
+  }
+): T[] {
   const sorted = [...items];
+  const followingSet = options?.followingIds
+    ? options.followingIds instanceof Set
+      ? options.followingIds
+      : new Set(options.followingIds)
+    : null;
+  const friendSet = options?.friendIds
+    ? options.friendIds instanceof Set
+      ? options.friendIds
+      : new Set(options.friendIds)
+    : null;
 
   switch (sort) {
     case "latest":
@@ -554,8 +594,23 @@ export function sortFeedPosts<
         const decayB = 45 / (hoursB + 1.2) ** 0.75;
         const campusBonusA = userInstitutionId && a.institutionId === userInstitutionId ? 500 : 0;
         const campusBonusB = userInstitutionId && b.institutionId === userInstitutionId ? 500 : 0;
-        const scoreA = campusBonusA + decayA + a.votesCount * 3.5 + a.commentsCount * 2.5;
-        const scoreB = campusBonusB + decayB + b.votesCount * 3.5 + b.commentsCount * 2.5;
+
+        // Follow & Friends boosts (1200 for mutual friends, 800 for following)
+        const followBonusA =
+          a.authorId && friendSet?.has(a.authorId)
+            ? 1200
+            : a.authorId && followingSet?.has(a.authorId)
+              ? 800
+              : 0;
+        const followBonusB =
+          b.authorId && friendSet?.has(b.authorId)
+            ? 1200
+            : b.authorId && followingSet?.has(b.authorId)
+              ? 800
+              : 0;
+
+        const scoreA = campusBonusA + followBonusA + decayA + a.votesCount * 3.5 + a.commentsCount * 2.5;
+        const scoreB = campusBonusB + followBonusB + decayB + b.votesCount * 3.5 + b.commentsCount * 2.5;
 
         if (scoreB !== scoreA) return scoreB - scoreA;
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();

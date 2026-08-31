@@ -76,6 +76,22 @@ describe("sortFeedPosts", () => {
     expect(sorted[0].id).toBe("campus");
   });
 
+  it("boosts posts from followed students and mutual friends under for_you", () => {
+    const strangerPost = post({ id: "stranger", authorId: "user_stranger", votesCount: 20 });
+    const friendPost = post({ id: "friend", authorId: "user_friend", votesCount: 0 });
+    const followingPost = post({ id: "following", authorId: "user_following", votesCount: 0 });
+
+    const sorted = sortFeedPosts([strangerPost, friendPost, followingPost], "for_you", undefined, {
+      followingIds: ["user_following"],
+      friendIds: ["user_friend"],
+    });
+
+    // Mutual friend is highest, followed by following, then stranger
+    expect(sorted[0].id).toBe("friend");
+    expect(sorted[1].id).toBe("following");
+    expect(sorted[2].id).toBe("stranger");
+  });
+
   it("falls back to for_you for unknown sorts", () => {
     const sortedUnknown = sortFeedPosts([A, B, C], "mystery");
     const sortedDefault = sortFeedPosts([A, B, C], null);

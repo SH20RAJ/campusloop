@@ -131,7 +131,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
         }),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (data.status === "MATCHED" && data.sessionId) {
         sounds.ting();
         haptics.success();
@@ -151,7 +151,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
       interval = setInterval(async () => {
         try {
           const res = await fetch("/api/random/queue");
-          const data = await res.json();
+          const data = (await res.json()) as any;
           if (data.status === "MATCHED" && data.sessionId) {
             sounds.ting();
             haptics.success();
@@ -191,7 +191,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
         body: JSON.stringify({ text: inputText }),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as any;
 
       if (!res.ok) {
         if (data.piiDetected) {
@@ -260,7 +260,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
       const res = await fetch(`/api/random/session/${activeSessionId}/reveal`, {
         method: "POST",
       });
-      const data = await res.json();
+      const data = (await res.json()) as any;
       mutateSession();
       if (data.isBothRevealed) {
         sounds.ting();
@@ -284,7 +284,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
       const res = await fetch(`/api/random/session/${activeSessionId}/continue`, {
         method: "POST",
       });
-      const data = await res.json();
+      const data = (await res.json()) as any;
       mutateSession();
 
       if (data.bothContinued && data.conversationId) {

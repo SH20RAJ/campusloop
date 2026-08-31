@@ -4,7 +4,7 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { LaundryMarketplaceClient } from "./laundry-client";
 
 export const metadata: Metadata = {
-  title: "Hostel Laundry & Dry Cleaning | CampusLoop",
+  title: "Hostel Laundry & Dry Cleaning ",
   description:
     "Order doorstep hostel laundry pickup, wash & fold, steam pressing, and winter jacket dry cleaning inside your campus.",
   alternates: { canonical: "https://campusloop.space/app/marketplace/laundry" },

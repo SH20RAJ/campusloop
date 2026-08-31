@@ -141,6 +141,8 @@ export function MessengerView({
   }, []);
 
   const handleSelectConversation = useCallback((convId: string) => {
+    sounds.tap();
+    haptics.light();
     setActiveConversationId(convId);
     if (typeof window !== "undefined") {
       window.history.pushState(null, "", `/app/chat/${convId}`);
@@ -269,7 +271,7 @@ export function MessengerView({
         {/* Top Header */}
         <div className="p-3.5 sm:p-4 border-b border-border/30 space-y-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <Link
                 href="/app"
                 className="size-8 rounded-xl bg-muted/60 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
@@ -277,23 +279,25 @@ export function MessengerView({
               >
                 <img src="/logo.png" alt="CampusLoop" className="size-5 object-contain" />
               </Link>
-              <div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-2xs">
-                <MessageSquare className="size-4.5" />
-              </div>
-              <h1 className="text-base font-black tracking-tight text-foreground">Chats</h1>
+              <h1 className="text-base sm:text-lg font-black tracking-tight text-foreground">Chats</h1>
+              {conversations && conversations.length > 0 && (
+                <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                  {conversations.length}
+                </span>
+              )}
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <Link
                 href="/app/random"
                 onClick={() => {
                   sounds.pop();
                   haptics.medium();
                 }}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 hover:bg-amber-500/20 text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-95"
                 title="Meet someone unexpected in Random Loop"
               >
-                <Zap className="size-3.5 fill-amber-500" />
+                <Zap className="size-3.5 fill-amber-500 text-amber-500" />
                 <span>Random</span>
               </Link>
 
@@ -304,16 +308,12 @@ export function MessengerView({
                   haptics.light();
                   setShowCreateGroupModal(true);
                 }}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-2xs active:scale-95"
                 title="Create campus group or study pod"
               >
                 <Users2 className="size-3.5" />
                 <span>+ Group</span>
               </button>
-
-              <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                {conversations?.length || 0}
-              </span>
             </div>
           </div>
 
@@ -322,11 +322,23 @@ export function MessengerView({
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search students to message..."
+              placeholder="Search students or groups..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full h-9 pl-9 pr-4 rounded-full border border-border/50 bg-muted/30 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary transition-all"
+              className="w-full h-9 pl-9 pr-8 rounded-xl border border-border/50 bg-muted/40 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary transition-all"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSearchResults([]);
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
           </div>
 
           {/* WhatsApp-Style Filter Pills */}
@@ -335,7 +347,7 @@ export function MessengerView({
               type="button"
               onClick={() => setActiveFilter("ALL")}
               className={cn(
-                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
+                "px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer",
                 activeFilter === "ALL"
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -347,7 +359,7 @@ export function MessengerView({
               type="button"
               onClick={() => setActiveFilter("UNREAD")}
               className={cn(
-                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                "px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
                 activeFilter === "UNREAD"
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -363,7 +375,7 @@ export function MessengerView({
               type="button"
               onClick={() => setActiveFilter("GROUPS")}
               className={cn(
-                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                "px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
                 activeFilter === "GROUPS"
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -376,7 +388,7 @@ export function MessengerView({
               type="button"
               onClick={() => setActiveFilter("CAMPUS")}
               className={cn(
-                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
+                "px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer",
                 activeFilter === "CAMPUS"
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -388,7 +400,7 @@ export function MessengerView({
               type="button"
               onClick={() => setActiveFilter("ARCHIVED")}
               className={cn(
-                "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
+                "px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1",
                 activeFilter === "ARCHIVED"
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -657,8 +669,16 @@ export function MessengerView({
         isOpen={showCreateGroupModal}
         onClose={() => setShowCreateGroupModal(false)}
         currentUserId={currentUserId}
-        onGroupCreated={(newConvId) => {
-          mutateConvs();
+        onGroupCreated={(newConvId, createdConv) => {
+          if (createdConv) {
+            mutateConvs((prev) => {
+              if (!prev) return [createdConv];
+              const filtered = prev.filter((c) => c.id !== newConvId);
+              return [createdConv, ...filtered];
+            }, false);
+          } else {
+            mutateConvs();
+          }
           handleSelectConversation(newConvId);
         }}
       />

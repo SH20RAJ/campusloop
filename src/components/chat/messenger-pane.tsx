@@ -201,7 +201,7 @@ export function MessengerPane({
       haptics.light();
       setReplyingTo(msg);
       toast.info(
-        `Replying to ${msg.senderId === currentUserId ? "yourself" : otherParticipant?.displayName || "message"}`
+        `Replying to ${msg.senderId === currentUserId ? "yourself" : effectiveParticipant?.displayName || "message"}`
       );
     }
     setSwipedOffset({});
@@ -279,7 +279,7 @@ export function MessengerPane({
   }, [currentUserId, activeCall]);
 
   async function handleStartCall(type: "audio" | "video") {
-    if (!conversationId || !otherParticipant || otherParticipant.isGroup) return;
+    if (!conversationId || !effectiveParticipant || effectiveParticipant.isGroup) return;
 
     sounds.tap();
     haptics.medium();
@@ -289,7 +289,7 @@ export function MessengerPane({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          receiverId: otherParticipant.id,
+          receiverId: effectiveParticipant.id,
           conversationId,
           type,
           context: "chat",
@@ -432,14 +432,14 @@ export function MessengerPane({
       sounds.pop();
       haptics.light();
       if (typeof document !== "undefined" && document.visibilityState === "hidden") {
-        triggerBrowserNotification(`CampusLoop: ${otherParticipant?.displayName || "New Message"}`, {
+        triggerBrowserNotification(`CampusLoop: ${effectiveParticipant?.displayName || "New Message"}`, {
           body: last.body,
           url: `/app/chat/${conversationId}`,
         });
       }
     }
     lastKnownMsgIdRef.current = last.id;
-  }, [messages, currentUserId, otherParticipant, conversationId]);
+  }, [messages, currentUserId, effectiveParticipant, conversationId]);
 
   // Click outside to dismiss active locked reaction bar
   useEffect(() => {
@@ -713,20 +713,51 @@ export function MessengerPane({
     }
   }
 
-  // Presence is derived from the peer's heartbeat, not assumed
-  const presenceText = presenceLabel(otherParticipant?.lastSeenAt);
-  const viewerIsOnline = isOnline(otherParticipant?.lastSeenAt);
+  // Auto-fetch conversation metadata if otherParticipant not passed or on fresh load
+  const { data: convData, isLoading: isLoadingConvData } = useSWR<{
+    id: string;
+    otherParticipant: any;
+    title?: string;
+    isGroup?: boolean;
+    isCommunity?: boolean;
+  }>(conversationId && !otherParticipant ? `/api/chat/${conversationId}` : null, fetcher, {
+    dedupingInterval: 8000,
+  });
 
-  if (!conversationId || !otherParticipant) {
+  const effectiveParticipant = otherParticipant || convData?.otherParticipant || null;
+
+  // Presence is derived from the peer's heartbeat, not assumed
+  const presenceText = presenceLabel(effectiveParticipant?.lastSeenAt);
+  const viewerIsOnline = isOnline(effectiveParticipant?.lastSeenAt);
+
+  if (!conversationId) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-muted-foreground p-6 text-center select-none bg-background">
         <div className="size-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-3.5 shadow-xs text-primary">
           <User className="size-7" />
         </div>
-        <h2 className="text-sm font-black text-foreground">CampusLoop Messenger</h2>
+        <h2 className="text-base font-black text-foreground">CampusLoop Messenger</h2>
         <p className="text-xs text-muted-foreground max-w-sm mt-1 leading-relaxed">
-          Select a verified student from your inbox or search above to chat.
+          Select a verified student, study pod, or campus group to start chatting.
         </p>
+      </div>
+    );
+  }
+
+  if (!effectiveParticipant) {
+    return (
+      <div className="flex h-full w-full flex-col bg-background select-none">
+        <div className="flex items-center gap-3 p-3.5 border-b border-border/40 bg-card">
+          <div className="size-10 rounded-full bg-muted animate-pulse shrink-0" />
+          <div className="space-y-1.5 flex-1 min-w-0">
+            <div className="h-4 w-32 bg-muted rounded-md animate-pulse" />
+            <div className="h-3 w-20 bg-muted/60 rounded-md animate-pulse" />
+          </div>
+        </div>
+        <div className="flex-1 p-4 space-y-3">
+          <div className="h-10 w-48 bg-muted/30 rounded-2xl animate-pulse" />
+          <div className="h-12 w-64 bg-primary/10 rounded-2xl ml-auto animate-pulse" />
+        </div>
       </div>
     );
   }
@@ -747,8 +778,8 @@ export function MessengerPane({
         onChange={handleImageUpload}
       />
 
-      {/* ─── WhatsApp-Style Header ─── */}
-      <header className="border-b border-border/40 bg-card/95 backdrop-blur-md px-3 sm:px-4 py-2.5 pt-[max(0.6rem,env(safe-area-inset-top))] shrink-0 z-30 shadow-2xs">
+      {/* ─── Clean Modern Chat Header ─── */}
+      <header className="border-b border-border/40 bg-card/95 backdrop-blur-md px-3.5 sm:px-5 py-2.5 pt-[max(0.6rem,env(safe-area-inset-top))] shrink-0 z-30 shadow-2xs">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             {/* Back Button (visible on mobile to return to chat inbox) */}
@@ -764,77 +795,74 @@ export function MessengerPane({
             {/* Avatar & Online status / Group Info (Clickable to open User/Group Info Drawer) */}
             <div
               onClick={() => setShowInfoDrawer(true)}
-              className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer group hover:opacity-90 transition-opacity"
-              title="View student or group info and shared media"
+              className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer group hover:opacity-90 transition-opacity"
+              title="View info and shared media"
             >
               <div className="relative shrink-0">
                 <Avatar className="size-10 border border-border/40 shadow-xs transition-transform group-hover:scale-105">
-                  <AvatarImage src={otherParticipant.avatarUrl || ""} />
+                  <AvatarImage src={effectiveParticipant.avatarUrl || ""} />
                   <AvatarFallback className="text-xs font-black bg-primary/10 text-primary">
-                    {(otherParticipant.displayName?.[0] || "S").toUpperCase()}
+                    {(effectiveParticipant.displayName?.[0] || "S").toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                {!otherParticipant.isGroup && <PresenceDot lastSeenAt={otherParticipant.lastSeenAt} />}
+                {!effectiveParticipant.isGroup && <PresenceDot lastSeenAt={effectiveParticipant.lastSeenAt} />}
               </div>
 
               {/* Name & Branch / Presence status / Group Member Count */}
               <div className="min-w-0 space-y-0.5">
-                <div className="text-xs sm:text-sm font-black text-foreground group-hover:text-primary transition-colors truncate flex items-center gap-1.5 leading-tight">
-                  <span>{otherParticipant.displayName}</span>
-                  {otherParticipant.isGroup ? (
-                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-md bg-primary/15 text-primary border border-primary/20 shrink-0">
-                      GROUP
+                <div className="text-sm font-black text-foreground group-hover:text-primary transition-colors truncate flex items-center gap-1.5 leading-tight">
+                  <span>{effectiveParticipant.displayName}</span>
+                  {effectiveParticipant.isGroup ? (
+                    <span className="text-[9px] font-black px-1.5 py-0.2 rounded-md bg-primary/15 text-primary border border-primary/20 shrink-0 uppercase">
+                      Group
                     </span>
                   ) : (
                     <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
                   )}
                 </div>
-                <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1.5 font-medium">
-                  {otherParticipant.isGroup ? (
+
+                <div className="text-xs text-muted-foreground truncate flex items-center gap-1.5 font-medium leading-none">
+                  {effectiveParticipant.isGroup ? (
                     <>
                       <span className="font-bold text-primary flex items-center gap-1 shrink-0">
                         <Users2 className="size-3" />
                         <span>
-                          {otherParticipant.membersCount || otherParticipant.participants?.length || 2}{" "}
+                          {effectiveParticipant.membersCount || effectiveParticipant.participants?.length || 2}{" "}
                           members
                         </span>
                       </span>
-                      {otherParticipant.category && (
+                      {effectiveParticipant.category && (
                         <>
                           <span>•</span>
                           <span className="capitalize">
-                            {otherParticipant.category.toLowerCase().replace(/_/g, " ")}
+                            {effectiveParticipant.category.toLowerCase().replace(/_/g, " ")}
                           </span>
                         </>
                       )}
                     </>
                   ) : (
                     <>
-                      <span
-                        className={cn(
-                          "font-bold flex items-center gap-1 shrink-0",
-                          viewerIsOnline ? "text-emerald-500" : "text-muted-foreground"
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "size-1.5 rounded-full",
-                            viewerIsOnline ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/40"
-                          )}
-                        />
-                        {viewerIsOnline ? "Online" : presenceText || "Offline"}
-                      </span>
+                      {viewerIsOnline ? (
+                        <span className="font-bold text-emerald-500 flex items-center gap-1 shrink-0">
+                          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>Online</span>
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {presenceText || "Offline"}
+                        </span>
+                      )}
                       <span>•</span>
-                      <span>@{otherParticipant.username}</span>
-                      {otherParticipant.branch && (
+                      <span className="text-muted-foreground font-medium">@{effectiveParticipant.username}</span>
+                      {effectiveParticipant.branch && (
                         <>
                           <span className="hidden sm:inline">•</span>
-                          <span className="hidden sm:inline">{otherParticipant.branch}</span>
+                          <span className="hidden sm:inline text-muted-foreground/80">{effectiveParticipant.branch}</span>
                         </>
                       )}
                     </>
                   )}
-                </p>
+                </div>
               </div>
             </div>
           </div>
@@ -895,7 +923,7 @@ export function MessengerPane({
                     onClick={() => setShowChatHeaderMenu(false)}
                   />
                   <div className="absolute right-0 top-10 z-50 w-52 rounded-2xl border border-border/60 bg-card/95 backdrop-blur-xl p-1.5 shadow-xl space-y-0.5 animate-in fade-in zoom-in-95">
-                    {!otherParticipant.isGroup && (
+                    {!effectiveParticipant.isGroup && (
                       <>
                         <button
                           type="button"
@@ -944,28 +972,23 @@ export function MessengerPane({
                       className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
                     >
                       <Info className="size-3.5 text-muted-foreground" />
-                      <span>Contact Info &amp; Media</span>
+                      <span>{effectiveParticipant.isGroup ? "Group Details & Media" : "Contact Info & Media"}</span>
                     </button>
 
-                    <Link
-                      href={`/@${otherParticipant.username || "student"}`}
-                      onClick={() => setShowChatHeaderMenu(false)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
-                    >
-                      <User className="size-3.5 text-muted-foreground" />
-                      <span>View Profile</span>
-                    </Link>
+                    {!effectiveParticipant.isGroup && effectiveParticipant.username && (
+                      <Link
+                        href={`/app/profile/${effectiveParticipant.username}`}
+                        onClick={() => setShowChatHeaderMenu(false)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors"
+                      >
+                        <User className="size-3.5 text-muted-foreground" />
+                        <span>View Profile</span>
+                      </Link>
+                    )}
                   </div>
                 </>
               )}
             </div>
-
-            <Link
-              href={`/@${otherParticipant.username || "student"}`}
-              className="text-[11px] font-bold text-foreground hover:text-primary px-3 py-1.5 rounded-full bg-muted/60 hover:bg-muted transition-all cursor-pointer shadow-2xs"
-            >
-              Profile
-            </Link>
           </div>
         </div>
       </header>
@@ -1056,7 +1079,7 @@ export function MessengerPane({
               <div className="size-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-2xs">
                 <Smile className="size-6" />
               </div>
-              <p className="font-bold text-foreground">Say hello to {otherParticipant.displayName}!</p>
+              <p className="font-bold text-foreground">Say hello to {effectiveParticipant.displayName}!</p>
               <p className="text-[11px] text-muted-foreground">
                 Type a message, paste keyboard stickers, or share campus memories.
               </p>
@@ -1258,7 +1281,7 @@ export function MessengerPane({
                         )}
                       >
                         {/* Group Sender Name */}
-                        {!isMe && (otherParticipant.isGroup || otherParticipant.isCommunity) && (
+                        {!isMe && (effectiveParticipant.isGroup || effectiveParticipant.isCommunity) && (
                           <div className="flex items-center gap-1 mb-1.5 leading-none">
                             <span className="text-[11px] font-black text-primary">
                               {msg.sender?.displayName || "Member"}
@@ -1417,7 +1440,7 @@ export function MessengerPane({
             <div className="border-l-3 border-primary pl-2.5 min-w-0">
               <p className="text-[10px] font-black text-primary">
                 Replying to{" "}
-                {replyingTo.senderId === currentUserId ? "yourself" : otherParticipant.displayName}
+                {replyingTo.senderId === currentUserId ? "yourself" : effectiveParticipant.displayName}
               </p>
               <p className="text-xs text-muted-foreground truncate">{replyingTo.body}</p>
             </div>
@@ -1601,7 +1624,7 @@ export function MessengerPane({
       <ChatUserInfoDrawer
         isOpen={showInfoDrawer}
         onClose={() => setShowInfoDrawer(false)}
-        otherParticipant={otherParticipant}
+        otherParticipant={effectiveParticipant}
         conversationId={conversationId}
         messages={messages || []}
         currentUserId={currentUserId}
@@ -1716,16 +1739,16 @@ export function MessengerPane({
       )}
 
       {/* Active Audio / Video Call Overlay */}
-      {activeCall && otherParticipant && (
+      {activeCall && effectiveParticipant && (
         <ActiveCallOverlay
           callId={activeCall.callId}
           isCaller={activeCall.isCaller}
           type={activeCall.type}
           partner={{
-            id: otherParticipant.id,
-            displayName: otherParticipant.displayName || "Student",
-            avatarUrl: otherParticipant.avatarUrl,
-            username: otherParticipant.username || undefined,
+            id: effectiveParticipant.id,
+            displayName: effectiveParticipant.displayName || "Student",
+            avatarUrl: effectiveParticipant.avatarUrl,
+            username: effectiveParticipant.username || undefined,
           }}
           remotePeerId={activeCall.remotePeerId}
           onCallEnded={() => setActiveCall(null)}

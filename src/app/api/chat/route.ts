@@ -228,13 +228,52 @@ export async function POST(req: Request) {
       const initialGreeting =
         messageContent?.trim() || `🎉 Welcome to "${title}"! Created by @${profile.username || "student"}.`;
 
-      await db.insert(messages).values({
-        conversationId: newConv.id,
-        senderId: profile.id,
-        body: initialGreeting,
-      });
+      const [initMsg] = await db
+        .insert(messages)
+        .values({
+          conversationId: newConv.id,
+          senderId: profile.id,
+          body: initialGreeting,
+        })
+        .returning();
 
-      return NextResponse.json({ id: newConv.id, isGroup: true }, { status: 200 });
+      return NextResponse.json(
+        {
+          id: newConv.id,
+          type: newConv.type,
+          isCommunity: false,
+          isGroup: true,
+          title: newConv.title,
+          createdAt: newConv.createdAt,
+          updatedAt: newConv.updatedAt,
+          unreadCount: 0,
+          isArchived: false,
+          isMuted: false,
+          isPinned: false,
+          lastClearedAt: null,
+          otherParticipant: {
+            id: newConv.id,
+            userId: newConv.id,
+            displayName: newConv.title || "Campus Group",
+            username: `grp_${newConv.id.slice(0, 8)}`,
+            avatarUrl: newConv.avatarUrl || null,
+            bio: `${validUsers.length} campus members`,
+            points: 0,
+            isGroup: true,
+            category: newConv.type,
+            membersCount: validUsers.length,
+            participants: validUsers,
+          },
+          lastMessage: {
+            id: initMsg.id,
+            body: initMsg.body,
+            senderId: initMsg.senderId,
+            readAt: null,
+            createdAt: initMsg.createdAt,
+          },
+        },
+        { status: 201 }
+      );
     }
 
     // ── Direct 1-on-1 Chat Flow ──

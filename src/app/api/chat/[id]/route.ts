@@ -10,6 +10,104 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
+export async function GET(req: NextRequest, { params }: RouteParams) {
+  try {
+    const user = await hexclaveServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const resolved = await params;
+    const conversationId = resolved.id;
+
+    const db = getDb();
+    const profile = await db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, user.id),
+    });
+
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
+    }
+
+    // Verify participation
+    const participation = await db.query.conversationParticipants.findFirst({
+      where: and(
+        eq(conversationParticipants.conversationId, conversationId),
+        eq(conversationParticipants.userId, profile.id)
+      ),
+    });
+
+    if (!participation) {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
+
+    const conv = await db.query.conversations.findFirst({
+      where: eq(conversations.id, conversationId),
+      with: {
+        community: true,
+        participants: {
+          with: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!conv) {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
+
+    const isCommunity = conv.type === "COMMUNITY";
+    const isGroup = conv.type !== "DIRECT" && !isCommunity;
+    const otherUser = conv.participants.find((p) => p.userId !== profile.id)?.user;
+    const comm = conv.community;
+
+    const otherParticipant = isCommunity
+      ? {
+          id: conv.communityId || conv.id,
+          userId: conv.communityId || conv.id,
+          displayName: conv.title || (comm ? `c/${comm.name}` : "Community Group"),
+          username: comm?.slug || comm?.id || "community",
+          avatarUrl: conv.avatarUrl || comm?.avatarUrl || null,
+          bio: comm?.description || "Official Community Group Chat",
+          points: comm?.points || 0,
+          isCommunity: true,
+          isGroup: true,
+          membersCount: conv.participants.length,
+        }
+      : isGroup
+        ? {
+            id: conv.id,
+            userId: conv.id,
+            displayName: conv.title || "Campus Group",
+            username: `grp_${conv.id.slice(0, 8)}`,
+            avatarUrl: conv.avatarUrl || null,
+            bio: `${conv.participants.length} campus members`,
+            points: 0,
+            isGroup: true,
+            category: conv.type,
+            membersCount: conv.participants.length,
+            participants: conv.participants.map((p) => p.user).filter(Boolean),
+          }
+        : otherUser;
+
+    return NextResponse.json({
+      id: conv.id,
+      type: conv.type,
+      title: conv.title,
+      isGroup,
+      isCommunity,
+      otherParticipant,
+      isArchived: Boolean(participation.isArchived),
+      isMuted: Boolean(participation.isMuted),
+      isPinned: Boolean(participation.isPinned),
+    });
+  } catch (error) {
+    console.error("GET /api/chat/[id] error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
   try {
     const user = await hexclaveServerApp.getUser();

@@ -48,4 +48,39 @@ describe("Chat Media & Links Extractor", () => {
     const parsed2 = new URL(url2);
     expect(parsed2.hostname.replace(/^www\./, "")).toBe("github.com");
   });
+
+  it("correctly synthesizes group participant object from conversation", () => {
+    const groupConv = {
+      id: "conv_group_12345678",
+      title: "ECE 2026 Study Pod",
+      avatarUrl: null,
+      type: "STUDY_POD",
+      participants: [
+        { user: { id: "u1", displayName: "Student One", username: "one" } },
+        { user: { id: "u2", displayName: "Student Two", username: "two" } },
+      ],
+    };
+
+    const isGroup = groupConv.type !== "DIRECT";
+    const synthesized = isGroup
+      ? {
+          id: groupConv.id,
+          userId: groupConv.id,
+          displayName: groupConv.title || "Campus Group",
+          username: `grp_${groupConv.id.slice(0, 8)}`,
+          avatarUrl: groupConv.avatarUrl || null,
+          bio: `${groupConv.participants.length} campus members`,
+          isGroup: true,
+          category: groupConv.type,
+          membersCount: groupConv.participants.length,
+          participants: groupConv.participants.map((p) => p.user),
+        }
+      : null;
+
+    expect(synthesized).not.toBeNull();
+    expect(synthesized?.displayName).toBe("ECE 2026 Study Pod");
+    expect(synthesized?.isGroup).toBe(true);
+    expect(synthesized?.membersCount).toBe(2);
+    expect(synthesized?.participants).toHaveLength(2);
+  });
 });

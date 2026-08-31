@@ -200,7 +200,7 @@ export function CreateGroupModal({ isOpen, onClose, currentUserId, onGroupCreate
       const data = (await res.json()) as { id: string };
       toast.success("Group created successfully! 🚀", { id: toastId });
       onClose();
-      onGroupCreated(data.id);
+      onGroupCreated(data.id, data);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create group", { id: toastId });
     } finally {

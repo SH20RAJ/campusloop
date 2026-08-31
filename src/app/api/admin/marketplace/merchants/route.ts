@@ -73,6 +73,16 @@ export async function POST(req: Request) {
 
     const cleanLoginPassword = loginPassword?.trim() || `store@${Math.random().toString(36).slice(-6)}`;
 
+    const verticalTypeMap: Record<string, string> = {
+      food: "FOOD",
+      rentals: "RENTALS",
+      barber: "BARBER",
+      laundry: "LAUNDRY",
+      water: "WATER",
+      essentials: "MART",
+    };
+    const resolvedVerticalType = verticalTypeMap[categorySlug?.toLowerCase() || "food"] || "FOOD";
+
     const [newMerchant] = await db
       .insert(merchants)
       .values({
@@ -80,6 +90,7 @@ export async function POST(req: Request) {
         slug: cleanSlug,
         institutionId,
         categorySlug: categorySlug || "food",
+        verticalType: resolvedVerticalType,
         description: description?.trim() || null,
         address: address.trim(),
         locationPin: locationPin?.trim() || null,

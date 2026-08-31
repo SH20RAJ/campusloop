@@ -1,10 +1,11 @@
 "use client";
 
-import { Bell, Check, Loader2, Power } from "lucide-react";
+import { Bell, Check, Loader2, Power, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { MerchantPWAInstallBanner } from "@/components/merchant/merchant-pwa-banner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
@@ -14,6 +15,8 @@ import { cn, formatTimeAgo } from "@/lib/utils";
 export function MerchantDashboardClient() {
   const [updatingStoreOpen, setUpdatingStoreOpen] = useState(false);
   const [actioningOrderId, setActioningOrderId] = useState<string | null>(null);
+  const [audioAlertsEnabled, setAudioAlertsEnabled] = useState(true);
+  const prevIncomingCountRef = useRef<number>(0);
 
   const { data, isLoading, mutate } = useSWR<{
     merchant: any;
@@ -21,7 +24,7 @@ export function MerchantDashboardClient() {
     incomingOrders: any[];
     recentOrders: any[];
   }>("/api/merchant/dashboard", fetcher, {
-    refreshInterval: 6000, // Poll every 6s for real-time incoming orders
+    refreshInterval: 5000, // Poll every 5s for real-time incoming orders
   });
 
   const merchant = data?.merchant;
@@ -35,6 +38,19 @@ export function MerchantDashboardClient() {
   };
   const incomingOrders = data?.incomingOrders || [];
   const recentOrders = data?.recentOrders || [];
+
+  // Play audio alert on new incoming order
+  useEffect(() => {
+    if (incomingOrders.length > prevIncomingCountRef.current && audioAlertsEnabled) {
+      try {
+        sounds.ring();
+        haptics.success();
+      } catch {
+        // Audio playback restricted
+      }
+    }
+    prevIncomingCountRef.current = incomingOrders.length;
+  }, [incomingOrders.length, audioAlertsEnabled]);
 
   async function handleToggleStoreOpen() {
     if (!merchant || updatingStoreOpen) return;
@@ -98,6 +114,8 @@ export function MerchantDashboardClient() {
 
   return (
     <main className="max-w-4xl mx-auto p-4 space-y-6">
+      <MerchantPWAInstallBanner />
+
       {/* ─── Top Header & Store Open/Closed Toggle ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card border border-border/40 p-5 rounded-3xl shadow-xs">
         <div>
@@ -109,20 +127,46 @@ export function MerchantDashboardClient() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={handleToggleStoreOpen}
-          disabled={updatingStoreOpen}
-          className={cn(
-            "flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer shadow-xs active:scale-95",
-            merchant?.isOpen
-              ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 hover:bg-emerald-500/25"
-              : "bg-rose-500/15 text-rose-500 border border-rose-500/30 hover:bg-rose-500/25"
-          )}
-        >
-          <Power className="size-3.5" />
-          <span>{merchant?.isOpen ? "🟢 Store Open (Accepting)" : "🔴 Store Closed"}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setAudioAlertsEnabled(!audioAlertsEnabled);
+              toast.info(
+                !audioAlertsEnabled ? "🔊 Order sound alerts enabled" : "🔇 Order sound alerts muted"
+              );
+            }}
+            className={cn(
+              "flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border",
+              audioAlertsEnabled
+                ? "bg-muted border-border/60 text-foreground"
+                : "bg-muted/40 border-dashed border-border/40 text-muted-foreground"
+            )}
+            title={audioAlertsEnabled ? "Mute order sound alerts" : "Unmute order sound alerts"}
+          >
+            {audioAlertsEnabled ? (
+              <Volume2 className="size-3.5 text-primary" />
+            ) : (
+              <VolumeX className="size-3.5" />
+            )}
+            <span className="hidden sm:inline">{audioAlertsEnabled ? "Sound ON" : "Muted"}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleToggleStoreOpen}
+            disabled={updatingStoreOpen}
+            className={cn(
+              "flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer shadow-xs active:scale-95",
+              merchant?.isOpen
+                ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 hover:bg-emerald-500/25"
+                : "bg-rose-500/15 text-rose-500 border border-rose-500/30 hover:bg-rose-500/25"
+            )}
+          >
+            <Power className="size-3.5" />
+            <span>{merchant?.isOpen ? "🟢 Store Open" : "🔴 Store Closed"}</span>
+          </button>
+        </div>
       </div>
 
       {/* ─── Quick Stats Grid ─── */}

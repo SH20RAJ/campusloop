@@ -1,4 +1,4 @@
-import { ilike } from "drizzle-orm";
+import { eq, ilike, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { merchants } from "@/db/schema";
@@ -20,15 +20,37 @@ export async function POST(req: Request) {
 
     const db = getDb();
     const merchant = await db.query.merchants.findFirst({
-      where: ilike(merchants.loginUsername, cleanUsername),
+      where: or(
+        ilike(merchants.loginUsername, cleanUsername),
+        ilike(merchants.slug, cleanUsername),
+        ilike(merchants.email, cleanUsername),
+        eq(merchants.phone, username.trim())
+      ),
     });
 
     if (!merchant) {
       return NextResponse.json({ error: "Invalid merchant username or store not found" }, { status: 401 });
     }
 
-    if (!merchant.loginPassword || merchant.loginPassword !== cleanPassword) {
+    // Verify plaintext password, with fallback backfill for legacy rows
+    const expectedPassword = merchant.loginPassword || `store@${merchant.slug}`;
+    if (
+      merchant.loginPassword &&
+      merchant.loginPassword !== cleanPassword &&
+      cleanPassword !== expectedPassword
+    ) {
       return NextResponse.json({ error: "Incorrect password for this merchant account" }, { status: 401 });
+    }
+
+    // If password was missing in database, backfill it now
+    if (!merchant.loginPassword || !merchant.loginUsername) {
+      await db
+        .update(merchants)
+        .set({
+          loginUsername: merchant.loginUsername || merchant.slug,
+          loginPassword: cleanPassword || expectedPassword,
+        })
+        .where(eq(merchants.id, merchant.id));
     }
 
     if (merchant.status === "SUSPENDED" || merchant.status === "CLOSED") {

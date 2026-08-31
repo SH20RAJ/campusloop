@@ -77,7 +77,21 @@ export async function PATCH(req: Request, { params }: RouteParams) {
     };
 
     if (name !== undefined) updateData.name = name.trim();
-    if (categorySlug !== undefined) updateData.categorySlug = categorySlug;
+    if (categorySlug !== undefined) {
+      updateData.categorySlug = categorySlug;
+      const verticalTypeMap: Record<string, string> = {
+        food: "FOOD",
+        rentals: "RENTALS",
+        barber: "BARBER",
+        laundry: "LAUNDRY",
+        water: "WATER",
+        essentials: "MART",
+      };
+      updateData.verticalType = verticalTypeMap[categorySlug?.toLowerCase()] || "FOOD";
+    }
+    if (body.verticalType !== undefined) {
+      updateData.verticalType = body.verticalType;
+    }
     if (description !== undefined) updateData.description = description?.trim() || null;
     if (address !== undefined) updateData.address = address.trim();
     if (locationPin !== undefined) updateData.locationPin = locationPin?.trim() || null;

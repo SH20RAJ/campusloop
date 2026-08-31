@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Hash, TrendingUp } from "lucide-react";
+import { ArrowLeft, Hash } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -41,38 +41,35 @@ export default function HashtagFeed() {
   }, [loadMoreRef, isReachingEnd, isLoadingMore, setSize]);
 
   return (
-    <main className="min-h-screen bg-background text-foreground pb-24 mx-auto max-w-2xl select-none">
-      {/* Top Sticky Header */}
-      <div className="sticky top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/60 px-4 py-3.5 flex items-center justify-between shadow-xs">
-        <div className="flex items-center gap-3 min-w-0">
+    <main className="min-h-screen bg-background text-foreground pb-28 mx-auto max-w-2xl select-none border-x border-border/20">
+      {/* Twitter/X Style Minimal Sticky Header */}
+      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/30 px-4 py-2.5 flex items-center justify-between">
+        <div className="flex items-center gap-3.5 min-w-0">
           <Link
             href="/app"
-            className="flex size-8 items-center justify-center rounded-xl border border-border/80 bg-card hover:bg-muted transition-colors cursor-pointer shrink-0 shadow-xs"
+            className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer shrink-0"
             aria-label="Back to feed"
           >
-            <ArrowLeft className="size-4" />
+            <ArrowLeft className="size-4.5" />
           </Link>
           <div className="min-w-0">
-            <h1 className="text-base font-black text-foreground flex items-center gap-1.5 truncate">
-              <span className="text-primary">#</span>
-              {tag}
+            <h1 className="text-base font-black tracking-tight text-foreground truncate flex items-center gap-0.5">
+              <span>#{tag}</span>
             </h1>
-            <p className="text-[10px] text-muted-foreground font-semibold flex items-center gap-1">
-              <TrendingUp className="size-3 text-rose-500" /> Campus Discussion Topic
-            </p>
+            <p className="text-[11px] text-muted-foreground font-medium truncate">Campus Topic</p>
           </div>
         </div>
 
         <Link
           href={`/app/post/new?tag=${encodeURIComponent(tag)}`}
-          className="py-1.5 px-3 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 transition-all cursor-pointer shrink-0"
+          className="h-8 px-3.5 rounded-full bg-foreground text-background hover:opacity-90 font-black text-xs transition-all flex items-center justify-center cursor-pointer shrink-0 shadow-2xs"
         >
-          Post with #{tag}
+          Post
         </Link>
-      </div>
+      </header>
 
       {/* Feed List Container */}
-      <div className="flex flex-col px-4 pt-4 gap-4">
+      <div className="flex flex-col divide-y divide-border/20">
         {feedLoading && size === 1 ? (
           <FeedSkeleton />
         ) : feed && feed.length > 0 ? (

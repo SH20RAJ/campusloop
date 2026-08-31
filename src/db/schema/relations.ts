@@ -3,12 +3,16 @@ import { academicResources } from "./academic-resources";
 import { articleComments, articleCommentVotes, articles, articleVotes } from "./articles";
 import { conversationParticipants, conversations, messages } from "./chat";
 import {
+  barberAppointments,
+  barberServices,
   bikeAvailabilityBlocks,
   bikeBookingDocuments,
   bikeBookingStatusHistory,
   bikeBookings,
   bikeInspections,
   bikes,
+  laundryOrders,
+  laundryServices,
   marketplaceOffers,
   marketplaceOrderItems,
   marketplaceOrders,
@@ -18,6 +22,9 @@ import {
   merchantUsers,
   products,
   savedMarketplaceItems,
+  waterOrders,
+  waterProducts,
+  waterSubscriptions,
 } from "./commercial-marketplace";
 import { communities, communityMembers } from "./communities";
 import { secretCrushes, swipes } from "./dating";
@@ -535,6 +542,97 @@ export const bikeBookingStatusHistoryRelations = relations(bikeBookingStatusHist
   booking: one(bikeBookings, {
     fields: [bikeBookingStatusHistory.bookingId],
     references: [bikeBookings.id],
+  }),
+}));
+
+export const barberServicesRelations = relations(barberServices, ({ one, many }) => ({
+  merchant: one(merchants, {
+    fields: [barberServices.merchantId],
+    references: [merchants.id],
+  }),
+  appointments: many(barberAppointments),
+}));
+
+export const barberAppointmentsRelations = relations(barberAppointments, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [barberAppointments.merchantId],
+    references: [merchants.id],
+  }),
+  student: one(userProfiles, {
+    fields: [barberAppointments.studentId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [barberAppointments.institutionId],
+    references: [institutions.id],
+  }),
+  service: one(barberServices, {
+    fields: [barberAppointments.serviceId],
+    references: [barberServices.id],
+  }),
+}));
+
+export const laundryServicesRelations = relations(laundryServices, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [laundryServices.merchantId],
+    references: [merchants.id],
+  }),
+}));
+
+export const laundryOrdersRelations = relations(laundryOrders, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [laundryOrders.merchantId],
+    references: [merchants.id],
+  }),
+  student: one(userProfiles, {
+    fields: [laundryOrders.studentId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [laundryOrders.institutionId],
+    references: [institutions.id],
+  }),
+}));
+
+export const waterProductsRelations = relations(waterProducts, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [waterProducts.merchantId],
+    references: [merchants.id],
+  }),
+}));
+
+export const waterSubscriptionsRelations = relations(waterSubscriptions, ({ one, many }) => ({
+  merchant: one(merchants, {
+    fields: [waterSubscriptions.merchantId],
+    references: [merchants.id],
+  }),
+  student: one(userProfiles, {
+    fields: [waterSubscriptions.studentId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [waterSubscriptions.institutionId],
+    references: [institutions.id],
+  }),
+  orders: many(waterOrders),
+}));
+
+export const waterOrdersRelations = relations(waterOrders, ({ one }) => ({
+  merchant: one(merchants, {
+    fields: [waterOrders.merchantId],
+    references: [merchants.id],
+  }),
+  student: one(userProfiles, {
+    fields: [waterOrders.studentId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [waterOrders.institutionId],
+    references: [institutions.id],
+  }),
+  subscription: one(waterSubscriptions, {
+    fields: [waterOrders.subscriptionId],
+    references: [waterSubscriptions.id],
   }),
 }));
 

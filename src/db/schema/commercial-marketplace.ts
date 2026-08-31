@@ -51,6 +51,7 @@ export const merchants = pgTable("merchants", {
   // Status: DRAFT, PENDING_REVIEW, ACTIVE, PAUSED, SUSPENDED, CLOSED
   status: text("status").default("ACTIVE").notNull(),
   isOpen: boolean("is_open").default(true).notNull(), // Merchant toggle (Open/Busy/Closed)
+  verticalType: text("vertical_type").default("FOOD").notNull(), // "FOOD", "RENTALS", "BARBER", "LAUNDRY", "WATER", "MART"
 
   // Direct Portal Credentials
   loginUsername: text("login_username"),
@@ -106,6 +107,14 @@ export const products = pgTable("products", {
   preparationTime: text("preparation_time").default("15 min"),
   isAvailable: boolean("is_available").default(true).notNull(),
   status: text("status").default("ACTIVE").notNull(), // "ACTIVE", "DRAFT", "OUT_OF_STOCK", "HIDDEN", "ARCHIVED"
+
+  // Vertical-specific attributes (Food & Grocery)
+  isVeg: boolean("is_veg").default(true).notNull(),
+  isNonVeg: boolean("is_non_veg").default(false).notNull(),
+  spicyLevel: text("spicy_level"), // "MILD", "MEDIUM", "HOT"
+  stockQuantity: integer("stock_quantity"), // For Mart / Essentials
+  sku: text("sku"),
+  isSubscriptionEligible: boolean("is_subscription_eligible").default(false).notNull(),
 
   // Customization Options (e.g. Spice level, Size) and Add-ons (e.g. Extra Chutney, Cheese)
   options: jsonb("options")
@@ -383,6 +392,203 @@ export const bikeBookingStatusHistory = pgTable("bike_booking_status_history", {
   createdAt,
 });
 
+// ─── 17. Barber & Salon: Services Catalog ───
+export const barberServices = pgTable("barber_services", {
+  id: id(),
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  name: text("name").notNull(), // e.g. "Classic Fade & Haircut", "Beard Trim & Shape", "Head Massage"
+  category: text("category").default("Hair").notNull(), // "Hair", "Beard", "Face", "Combo", "Spa"
+  durationMinutes: integer("duration_minutes").default(25).notNull(),
+  price: integer("price").notNull(), // in Rupees
+  originalPrice: integer("original_price"),
+  description: text("description"),
+  genderTarget: text("gender_target").default("UNISEX").notNull(), // "MEN", "WOMEN", "UNISEX"
+  isAvailable: boolean("is_available").default(true).notNull(),
+  displayOrder: integer("display_order").default(0).notNull(),
+  createdAt,
+  updatedAt,
+});
+
+// ─── 18. Barber & Salon: Appointments & Live Queue ───
+export const barberAppointments = pgTable("barber_appointments", {
+  id: id(),
+  appointmentNumber: text("appointment_number").notNull().unique(), // e.g. "BAR-108"
+  tokenNumber: integer("token_number").default(1).notNull(), // e.g. #1, #2 for the day
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  studentId: text("student_id")
+    .notNull()
+    .references(() => userProfiles.id, { onDelete: "cascade" }),
+  institutionId: text("institution_id")
+    .notNull()
+    .references(() => institutions.id, { onDelete: "cascade" }),
+  serviceId: text("service_id")
+    .notNull()
+    .references(() => barberServices.id, { onDelete: "cascade" }),
+
+  appointmentDate: text("appointment_date").notNull(), // "YYYY-MM-DD"
+  timeSlot: text("time_slot").notNull(), // "11:00 AM", "04:30 PM"
+  serviceNameSnapshot: text("service_name_snapshot").notNull(),
+  servicePriceSnapshot: integer("service_price_snapshot").notNull(),
+  durationMinutes: integer("duration_minutes").default(25).notNull(),
+
+  // Status: "BOOKED" -> "WAITING" -> "IN_CHAIR" -> "COMPLETED" | "CANCELLED" | "NO_SHOW"
+  status: text("status").default("BOOKED").notNull(),
+  paymentStatus: text("payment_status").default("PENDING").notNull(), // "PENDING", "PAID", "COD"
+  paymentMethod: text("payment_method").default("COD").notNull(),
+
+  customerName: text("customer_name").notNull(),
+  customerPhone: text("customer_phone").notNull(),
+  notes: text("notes"),
+
+  createdAt,
+  updatedAt,
+});
+
+// ─── 19. Laundry Services Catalog ───
+export const laundryServices = pgTable("laundry_services", {
+  id: id(),
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  name: text("name").notNull(), // e.g. "Wash & Fold (Per Kg)", "Wash & Steam Iron (Per Kg)", "Blazer Dry Clean (Per Piece)"
+  pricingType: text("pricing_type").default("PER_KG").notNull(), // "PER_KG", "PER_PIECE"
+  price: integer("price").notNull(), // in Rupees
+  minWeightKg: integer("min_weight_kg").default(3),
+  turnaroundHours: integer("turnaround_hours").default(24).notNull(),
+  description: text("description"),
+  isAvailable: boolean("is_available").default(true).notNull(),
+  displayOrder: integer("display_order").default(0).notNull(),
+  createdAt,
+  updatedAt,
+});
+
+// ─── 20. Laundry Orders & Bag Tracking ───
+export const laundryOrders = pgTable("laundry_orders", {
+  id: id(),
+  orderNumber: text("order_number").notNull().unique(), // e.g. "LND-2041"
+  bagTagNumber: text("bag_tag_number"), // e.g. "#TAG-48"
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  studentId: text("student_id")
+    .notNull()
+    .references(() => userProfiles.id, { onDelete: "cascade" }),
+  institutionId: text("institution_id")
+    .notNull()
+    .references(() => institutions.id, { onDelete: "cascade" }),
+
+  washType: text("wash_type").default("Wash & Fold").notNull(),
+  estimatedWeightKg: text("estimated_weight_kg").default("4").notNull(),
+  actualWeightKg: text("actual_weight_kg"),
+  pieceCount: integer("piece_count"),
+
+  pickupDate: text("pickup_date").notNull(),
+  pickupSlot: text("pickup_slot").notNull(), // e.g. "05:00 PM - 07:00 PM"
+  deliveryDate: text("delivery_date"),
+  deliverySlot: text("delivery_slot"),
+
+  hostelBlock: text("hostel_block").notNull(), // e.g. "Hostel 11"
+  roomNumber: text("room_number").notNull(), // e.g. "Room 304"
+  customerPhone: text("customer_phone").notNull(),
+  specialInstructions: text("special_instructions"),
+
+  // Washing Pipeline Status:
+  // "PICKUP_REQUESTED" -> "BAG_COLLECTED" -> "WASHING" -> "DRYING" -> "IRONING" -> "READY_FOR_DELIVERY" -> "DELIVERED"
+  status: text("status").default("PICKUP_REQUESTED").notNull(),
+  totalAmount: integer("total_amount").default(120).notNull(),
+  paymentStatus: text("payment_status").default("PENDING").notNull(),
+  paymentMethod: text("payment_method").default("COD").notNull(),
+
+  createdAt,
+  updatedAt,
+});
+
+// ─── 21. Water Delivery: Products & Cans ───
+export const waterProducts = pgTable("water_products", {
+  id: id(),
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  name: text("name").notNull(), // e.g. "20L Purified RO Can Refill", "Bisleri 20L Sealed Can", "Dispenser Tap Add-on"
+  sizeLiters: integer("size_liters").default(20).notNull(),
+  price: integer("price").notNull(), // in Rupees (e.g. ₹35)
+  depositAmount: integer("deposit_amount").default(150).notNull(), // Security deposit for empty can
+  imageUrl: text("image_url"),
+  isSubscriptionEligible: boolean("is_subscription_eligible").default(true).notNull(),
+  isAvailable: boolean("is_available").default(true).notNull(),
+  createdAt,
+  updatedAt,
+});
+
+// ─── 22. Water Delivery: Monthly Passes & Subscriptions ───
+export const waterSubscriptions = pgTable("water_subscriptions", {
+  id: id(),
+  subscriptionNumber: text("subscription_number").notNull().unique(), // e.g. "WP-5021"
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  studentId: text("student_id")
+    .notNull()
+    .references(() => userProfiles.id, { onDelete: "cascade" }),
+  institutionId: text("institution_id")
+    .notNull()
+    .references(() => institutions.id, { onDelete: "cascade" }),
+
+  planName: text("plan_name").default("Monthly 15 Cans Pass").notNull(),
+  totalCans: integer("total_cans").default(15).notNull(),
+  cansDelivered: integer("cans_delivered").default(0).notNull(),
+  cansRemaining: integer("cans_remaining").default(15).notNull(),
+  pricePaid: integer("price_paid").notNull(),
+
+  hostelBlock: text("hostel_block").notNull(),
+  roomNumber: text("room_number").notNull(),
+  customerPhone: text("customer_phone").notNull(),
+
+  // Status: "ACTIVE", "EXPIRED", "PAUSED"
+  status: text("status").default("ACTIVE").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true, mode: "date" }).notNull(),
+  createdAt,
+  updatedAt,
+});
+
+// ─── 23. Water Delivery: Orders & Dispatch ───
+export const waterOrders = pgTable("water_orders", {
+  id: id(),
+  orderNumber: text("order_number").notNull().unique(), // e.g. "WTR-3012"
+  merchantId: text("merchant_id")
+    .notNull()
+    .references(() => merchants.id, { onDelete: "cascade" }),
+  studentId: text("student_id")
+    .notNull()
+    .references(() => userProfiles.id, { onDelete: "cascade" }),
+  institutionId: text("institution_id")
+    .notNull()
+    .references(() => institutions.id, { onDelete: "cascade" }),
+
+  canCount: integer("can_count").default(1).notNull(),
+  emptyCanReturnedCount: integer("empty_can_returned_count").default(1).notNull(),
+  deliveryType: text("delivery_type").default("INSTANT").notNull(), // "INSTANT", "SUBSCRIPTION_CALL"
+  subscriptionId: text("subscription_id"),
+
+  hostelBlock: text("hostel_block").notNull(),
+  roomNumber: text("room_number").notNull(),
+  floorNumber: text("floor_number"),
+  customerPhone: text("customer_phone").notNull(),
+
+  // Status: "PLACED" -> "DISPATCHED" -> "DELIVERED" | "CANCELLED"
+  status: text("status").default("PLACED").notNull(),
+  totalAmount: integer("total_amount").default(35).notNull(),
+  paymentStatus: text("payment_status").default("PENDING").notNull(),
+  paymentMethod: text("payment_method").default("COD").notNull(),
+
+  createdAt,
+  updatedAt,
+});
+
 export type MarketplaceCategory = typeof marketplaceCategories.$inferSelect;
 export type Merchant = typeof merchants.$inferSelect;
 export type NewMerchant = typeof merchants.$inferInsert;
@@ -401,3 +607,10 @@ export type NewBikeBooking = typeof bikeBookings.$inferInsert;
 export type BikeAvailabilityBlock = typeof bikeAvailabilityBlocks.$inferSelect;
 export type BikeInspection = typeof bikeInspections.$inferSelect;
 export type BikeBookingDocument = typeof bikeBookingDocuments.$inferSelect;
+export type BarberService = typeof barberServices.$inferSelect;
+export type BarberAppointment = typeof barberAppointments.$inferSelect;
+export type LaundryService = typeof laundryServices.$inferSelect;
+export type LaundryOrder = typeof laundryOrders.$inferSelect;
+export type WaterProduct = typeof waterProducts.$inferSelect;
+export type WaterSubscription = typeof waterSubscriptions.$inferSelect;
+export type WaterOrder = typeof waterOrders.$inferSelect;

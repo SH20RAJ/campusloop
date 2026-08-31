@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, Globe, MapPin, MessageSquarePlus, School, Share2 } from "lucide-react";
+import { ArrowLeft, Check, Globe, MapPin, MessageSquarePlus, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -39,6 +39,16 @@ export function CollegeHeroHeader({
   onAskSeniorClick,
 }: CollegeHeroHeaderProps) {
   const [copied, setCopied] = useState(false);
+  const [logoError, setLogoError] = useState(false);
+  const [bannerError, setBannerError] = useState(false);
+
+  const initials =
+    college.name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase())
+      .join("") || "CL";
 
   function handleShareCollege() {
     const shareUrl =
@@ -84,16 +94,20 @@ export function CollegeHeroHeader({
       <div className="relative overflow-hidden rounded-3xl bg-card shadow-2xs">
         {/* Banner Area */}
         <div className="relative h-36 sm:h-48 w-full bg-muted/30 overflow-hidden">
-          {college.bannerUrl ? (
+          {college.bannerUrl && !bannerError ? (
             <img
               src={college.bannerUrl}
               alt={`${college.name} Banner`}
               referrerPolicy="no-referrer"
-              crossOrigin="anonymous"
+              onError={() => setBannerError(true)}
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-linear-to-r from-primary/15 via-violet-500/10 to-indigo-500/15" />
+            <div className="w-full h-full bg-linear-to-r from-primary/20 via-violet-500/15 to-indigo-500/20 flex items-center justify-center">
+              <span className="text-primary/30 font-black text-2xl tracking-widest uppercase">
+                {college.state || "Campus Hub"}
+              </span>
+            </div>
           )}
 
           {/* Top-Right Badges */}
@@ -117,17 +131,17 @@ export function CollegeHeroHeader({
           <div className="flex items-end justify-between -mt-12 sm:-mt-14 gap-3">
             {/* College Logo / Crest */}
             <div className="size-20 sm:size-24 rounded-2xl bg-card border-4 border-card shadow-xl p-1.5 shrink-0 flex items-center justify-center overflow-hidden z-10">
-              {college.logoUrl ? (
+              {college.logoUrl && !logoError ? (
                 <img
                   src={college.logoUrl}
                   alt={college.name}
                   referrerPolicy="no-referrer"
-                  crossOrigin="anonymous"
+                  onError={() => setLogoError(true)}
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <div className="w-full h-full rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                  <School className="size-8" />
+                <div className="w-full h-full rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-xl">
+                  {initials}
                 </div>
               )}
             </div>

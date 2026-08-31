@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Store, User } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2, Lock, ShieldCheck, Store, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -178,31 +178,6 @@ export function MerchantLoginClient() {
               )}
             </button>
           </form>
-
-          {/* Quick Demo Credentials */}
-          <div className="pt-3 border-t border-border/40 space-y-2">
-            <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
-              Quick Demo Store Accounts:
-            </span>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => handleFillDemo("momohouse", "momo@CampusLoop2026")}
-                className="px-2.5 py-1 rounded-xl bg-muted/50 hover:bg-muted border border-border text-[11px] font-bold text-foreground flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <KeyRound className="size-3 text-primary" />
-                <span>@momohouse (Food)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFillDemo("campusbikes", "bikes@CampusLoop2026")}
-                className="px-2.5 py-1 rounded-xl bg-muted/50 hover:bg-muted border border-border text-[11px] font-bold text-foreground flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <KeyRound className="size-3 text-emerald-500" />
-                <span>@campusbikes (Rentals)</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Security Footer Notice */}

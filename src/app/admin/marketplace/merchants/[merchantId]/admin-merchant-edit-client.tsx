@@ -549,11 +549,12 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   onChange={(e) => setCategorySlug(e.target.value)}
                   className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
                 >
-                  <option value="food">Food &amp; Canteens</option>
-                  <option value="essentials">Essentials &amp; Groceries</option>
-                  <option value="services">Local Services (Laundry, Repairs)</option>
-                  <option value="rentals">Vehicle &amp; Bike Rentals</option>
-                  <option value="activities">Activities &amp; Outings</option>
+                  <option value="food">🍔 Food &amp; Canteens</option>
+                  <option value="rentals">🚲 Bike &amp; Vehicle Rentals</option>
+                  <option value="barber">✂️ Barber &amp; Salon</option>
+                  <option value="laundry">🧺 Laundry &amp; Wash</option>
+                  <option value="water">💧 20L Water Delivery</option>
+                  <option value="essentials">🛒 Supermarket &amp; Mart</option>
                 </select>
               </div>
             </div>

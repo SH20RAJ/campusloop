@@ -220,6 +220,35 @@ class SoundEngine {
     osc.start(now);
     osc.stop(now + 0.1);
   }
+
+  /**
+   * Attention Chime / Bell (For Incoming Orders & Delivery Alerts)
+   */
+  public ring() {
+    if (!this.enabled) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const notes = [880, 1174.66, 1760]; // A5, D6, A6 bell triad
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const noteTime = now + idx * 0.1;
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      gain.gain.setValueAtTime(0.28, noteTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.4);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(noteTime);
+      osc.stop(noteTime + 0.4);
+    });
+  }
 }
 
 export const sounds = new SoundEngine();

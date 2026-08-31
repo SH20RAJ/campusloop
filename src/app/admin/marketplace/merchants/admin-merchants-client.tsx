@@ -3,6 +3,7 @@
 import { ExternalLink, Plus, Search, Store } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
@@ -81,9 +82,11 @@ export function AdminMerchantsClient() {
         >
           <option value="all">All Categories</option>
           <option value="food">🍔 Food &amp; Canteens</option>
-          <option value="rentals">🚲 Bike &amp; Scooters</option>
-          <option value="services">🛠️ Services &amp; Repairs</option>
-          <option value="essentials">📦 Daily Essentials</option>
+          <option value="rentals">🚲 Bike &amp; Vehicle Rentals</option>
+          <option value="barber">✂️ Barber &amp; Salon</option>
+          <option value="laundry">🧺 Laundry &amp; Wash</option>
+          <option value="water">💧 20L Water Delivery</option>
+          <option value="essentials">🛒 Supermarket &amp; Mart</option>
         </select>
       </div>
 
@@ -109,51 +112,80 @@ export function AdminMerchantsClient() {
                   <th className="p-3">Store Name</th>
                   <th className="p-3">Campus Hub</th>
                   <th className="p-3">Category</th>
-                  <th className="p-3">Products</th>
+                  <th className="p-3">Credentials</th>
                   <th className="p-3">Contact</th>
                   <th className="p-3">Rating</th>
                   <th className="p-3">Status</th>
-                  <th className="p-3 text-right">Storefront</th>
+                  <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredMerchants.map((m) => (
-                  <tr key={m.id} className="hover:bg-muted/20 transition-colors">
-                    <td className="p-3 font-black text-foreground">
-                      <div className="flex items-center gap-2.5">
-                        <div className="size-9 rounded-xl overflow-hidden bg-muted shrink-0 border border-border">
-                          <img src={m.logoUrl} alt={m.name} className="size-full object-cover" />
-                        </div>
-                        <div>
-                          <p>{m.name}</p>
-                          <p className="text-[10px] text-muted-foreground font-normal">{m.address}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-3 text-muted-foreground font-medium">
-                      {m.institution?.name?.split(",")[0] || "BIT Mesra"}
-                    </td>
-                    <td className="p-3 font-bold uppercase text-[10px] text-primary">{m.categorySlug}</td>
-                    <td className="p-3 font-bold">{m.products?.length || 0} items</td>
-                    <td className="p-3 text-muted-foreground">{m.phone || "—"}</td>
-                    <td className="p-3 font-bold text-amber-500">⭐ {m.rating}</td>
-                    <td className="p-3">
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 font-bold text-[10px]">
-                        {m.status}
-                      </span>
-                    </td>
-                    <td className="p-3 text-right">
-                      <Link
-                        href={`/app/marketplace/store/${m.id}`}
-                        target="_blank"
-                        className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
-                      >
-                        <span>View Store</span>
-                        <ExternalLink className="size-3" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                {filteredMerchants.map((m) => {
+                  const pass = m.loginPassword || `store@${m.slug}`;
+                  const user = m.loginUsername || m.slug;
+                  return (
+                    <tr key={m.id} className="hover:bg-muted/20 transition-colors">
+                      <td className="p-3 font-black text-foreground">
+                        <Link
+                          href={`/admin/marketplace/merchants/${m.id}`}
+                          className="flex items-center gap-2.5 group hover:underline"
+                        >
+                          <div className="size-9 rounded-xl overflow-hidden bg-muted shrink-0 border border-border">
+                            <img src={m.logoUrl} alt={m.name} className="size-full object-cover" />
+                          </div>
+                          <div>
+                            <p className="group-hover:text-primary transition-colors">{m.name}</p>
+                            <p className="text-[10px] text-muted-foreground font-normal">{m.address}</p>
+                          </div>
+                        </Link>
+                      </td>
+                      <td className="p-3 text-muted-foreground font-medium">
+                        {m.institution?.name?.split(",")[0] || "BIT Mesra"}
+                      </td>
+                      <td className="p-3 font-bold uppercase text-[10px] text-primary">{m.categorySlug}</td>
+                      <td className="p-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            sounds.tap();
+                            haptics.light();
+                            const creds = `🏪 ${m.name}\n👤 User: ${user}\n🔑 Pass: ${pass}\n🌐 https://campusloop.space/merchant-portal/login`;
+                            navigator.clipboard.writeText(creds);
+                            toast.success(`Copied credentials for ${m.name}! 📋`);
+                          }}
+                          className="px-2 py-1 rounded-lg bg-muted/60 hover:bg-muted border border-border font-mono text-[10px] font-bold text-foreground flex items-center gap-1 cursor-pointer"
+                          title="Click to copy full WhatsApp message"
+                        >
+                          <span>@{user}</span>
+                          <span className="text-muted-foreground font-normal">({pass})</span>
+                        </button>
+                      </td>
+                      <td className="p-3 text-muted-foreground">{m.phone || "—"}</td>
+                      <td className="p-3 font-bold text-amber-500">⭐ {m.rating}</td>
+                      <td className="p-3">
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 font-bold text-[10px]">
+                          {m.status}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right space-x-2">
+                        <Link
+                          href={`/admin/marketplace/merchants/${m.id}`}
+                          className="text-xs font-bold text-muted-foreground hover:text-foreground hover:underline"
+                        >
+                          Manage
+                        </Link>
+                        <Link
+                          href={`/app/marketplace/store/${m.id}`}
+                          target="_blank"
+                          className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-0.5"
+                        >
+                          <span>View</span>
+                          <ExternalLink className="size-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

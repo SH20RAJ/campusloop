@@ -1,7 +1,8 @@
 "use client";
 
-import { MapPin, School, Trophy } from "lucide-react";
+import { MapPin, Trophy } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export interface CollegeItem {
@@ -35,7 +36,17 @@ export function CollegeHubRow({
   rank?: number;
   trailing?: React.ReactNode;
 }) {
+  const [imgError, setImgError] = useState(false);
   const location = [college.district, college.state].filter(Boolean).join(", ") || "India";
+
+  // Compute initials for fallback
+  const initials =
+    college.name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase())
+      .join("") || "CL";
 
   return (
     <Link
@@ -54,17 +65,19 @@ export function CollegeHubRow({
       )}
 
       {/* Crest */}
-      <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/50 bg-card p-1.5">
-        {college.logoUrl ? (
+      <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/50 bg-muted/20 p-1 shadow-2xs">
+        {college.logoUrl && !imgError ? (
           <img
             src={college.logoUrl}
             alt=""
             referrerPolicy="no-referrer"
-            crossOrigin="anonymous"
+            onError={() => setImgError(true)}
             className="h-full w-full object-contain"
           />
         ) : (
-          <School className="size-5 text-muted-foreground" />
+          <div className="flex size-full items-center justify-center rounded-full bg-linear-to-br from-primary/20 via-violet-500/15 to-primary/10">
+            <span className="text-xs font-black text-primary tracking-tight">{initials}</span>
+          </div>
         )}
       </div>
 

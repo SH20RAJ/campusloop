@@ -1,0 +1,71 @@
+{
+  "name": "CampusLoop Merchant Console",
+  "short_name": "Merchant App",
+  "description": "Accept student orders, manage menu & services, update inventory, and manage campus deliveries.",
+  "id": "/merchant-portal",
+  "start_url": "/merchant-portal",
+  "scope": "/merchant-portal",
+  "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "prefer_related_applications": false,
+  "categories": ["business", "productivity", "shopping"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live Orders",
+      "short_name": "Orders",
+      "description": "View and manage incoming customer orders",
+      "url": "/merchant-portal/orders",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Menu & Catalog",
+      "short_name": "Catalog",
+      "description": "Manage products, services, and prices",
+      "url": "/merchant-portal/products",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Earnings & Payouts",
+      "short_name": "Earnings",
+      "description": "Track daily sales and settlements",
+      "url": "/merchant-portal/earnings",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Store Settings",
+      "short_name": "Settings",
+      "description": "Update store hours and delivery settings",
+      "url": "/merchant-portal/store",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -49,7 +49,7 @@ export async function GET(req: Request) {
       conditions.push(eq(merchants.institutionId, targetInstitutionId));
     }
 
-    const stores = await db.query.merchants.findMany({
+    let stores = await db.query.merchants.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
       orderBy: [desc(merchants.rating), desc(merchants.createdAt)],
       with: {
@@ -65,6 +65,24 @@ export async function GET(req: Request) {
         },
       },
     });
+
+    // Fallback: If no stores in this specific campus yet, return partner campus stores
+    if (stores.length === 0 && targetInstitutionId) {
+      const fallbackConditions = [eq(merchants.status, "ACTIVE")];
+      if (categorySlug && categorySlug !== "all" && categorySlug !== "deals") {
+        fallbackConditions.push(eq(merchants.categorySlug, categorySlug));
+      }
+      stores = await db.query.merchants.findMany({
+        where: fallbackConditions.length > 0 ? and(...fallbackConditions) : undefined,
+        orderBy: [desc(merchants.rating), desc(merchants.createdAt)],
+        limit: 12,
+        with: {
+          offers: { where: eq(marketplaceOffers.isActive, true), limit: 2 },
+          products: { limit: 4 },
+          institution: { columns: { id: true, name: true, slug: true } },
+        },
+      });
+    }
 
     return NextResponse.json({ stores });
   } catch (error) {

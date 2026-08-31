@@ -1,10 +1,12 @@
 "use client";
 
-import { ArrowLeft, Copy, KeyRound, Loader2, RefreshCw, Send, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Copy, KeyRound, Loader2, RefreshCw, Send, ShieldCheck, Store } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import useSWR from "swr";
+import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 
@@ -34,6 +36,16 @@ export function AdminNewMerchantClient() {
   const [loginPassword, setLoginPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Load institutions list
+  const { data: collegesData } = useSWR<{ institutions: any[] }>("/api/colleges?limit=200", fetcher);
+  const institutions = collegesData?.institutions || [];
+
+  useEffect(() => {
+    if (!loginPassword) {
+      handleGeneratePassword();
+    }
+  }, []);
+
   function handleNameChange(newName: string) {
     setName(newName);
     if (!loginUsername) {
@@ -47,19 +59,19 @@ export function AdminNewMerchantClient() {
     haptics.light();
     const chars = "abcdefghjkmnpqrstuvwxyz23456789";
     let rand = "";
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 6; i++) {
       rand += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    const generated = `cl_${rand}!`;
+    const generated = `store@${rand}`;
     setLoginPassword(generated);
-    toast.success("Generated strong merchant password!");
   }
 
   function handleCopyCredentials() {
     sounds.tap();
-    const text = `CampusLoop Merchant Portal Credentials\nStore: ${name}\nURL: https://campusloop.space/merchant-portal/login\nUsername: ${loginUsername}\nPassword: ${loginPassword}`;
+    haptics.medium();
+    const text = `🏪 CampusLoop Merchant Portal Access\nStore: ${name || "Your Store"}\n🌐 Portal Login: https://campusloop.space/merchant-portal/login\n👤 Username: ${loginUsername}\n🔑 Password: ${loginPassword}\n\nInstall on your phone or open in browser to manage your store!`;
     navigator.clipboard.writeText(text);
-    toast.success("Copied credentials to clipboard! 📋");
+    toast.success("Copied credentials to clipboard! 📋 Ready to share via WhatsApp/SMS.");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -128,8 +140,9 @@ export function AdminNewMerchantClient() {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Section 1: Business Information */}
         <div className="p-5 rounded-2xl bg-card border border-border space-y-3.5 shadow-xs">
-          <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-            1. Business Information
+          <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <Store className="size-4 text-emerald-500" />
+            <span>1. Business Information &amp; Vertical</span>
           </h2>
 
           <div className="space-y-1.5">
@@ -139,35 +152,46 @@ export function AdminNewMerchantClient() {
               required
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="e.g. Momo House / Sharma Ji Canteen / Campus Wheel Rentals"
+              placeholder="e.g. Momo House / Campus Wheel Rentals / Classic Cut Barber / Campus Dhobi"
               className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground focus:border-foreground outline-none"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">Business Category *</span>
+              <span className="text-[11px] font-bold text-muted-foreground">
+                Business Vertical Category *
+              </span>
               <select
                 value={categorySlug}
                 onChange={(e) => setCategorySlug(e.target.value)}
                 className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
               >
-                <option value="food">Food &amp; Canteens</option>
-                <option value="essentials">Essentials &amp; Groceries</option>
-                <option value="services">Local Services (Laundry, Repairs)</option>
-                <option value="rentals">Vehicle &amp; Bike Rentals</option>
-                <option value="activities">Activities &amp; Outings</option>
+                <option value="food">🍔 Food &amp; Canteens (Zomato style)</option>
+                <option value="rentals">🚲 Bike &amp; Vehicle Rentals (Bounce style)</option>
+                <option value="barber">✂️ Barber &amp; Salon Grooming (Urban Company style)</option>
+                <option value="laundry">🧺 Laundry &amp; Dhobi Services (Per-Kg Wash)</option>
+                <option value="water">💧 20L Water Can Delivery (Instant &amp; Pass)</option>
+                <option value="essentials">🛒 Supermarket &amp; Campus Mart (Blinkit style)</option>
               </select>
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">Target Campus *</span>
+              <span className="text-[11px] font-bold text-muted-foreground">Target College Campus *</span>
               <select
                 value={institutionId}
                 onChange={(e) => setInstitutionId(e.target.value)}
                 className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
               >
-                <option value="inst_35df75700bb23dd30311ef5f">Birla Institute of Technology, Mesra</option>
+                {institutions.length > 0 ? (
+                  institutions.map((inst) => (
+                    <option key={inst.id} value={inst.id}>
+                      {inst.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="inst_35df75700bb23dd30311ef5f">Birla Institute of Technology, Mesra</option>
+                )}
               </select>
             </div>
           </div>
@@ -178,14 +202,14 @@ export function AdminNewMerchantClient() {
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Specialties, cuisine type, or rental equipment..."
+              placeholder="Specialties, services offered, pricing overview, or operating hours..."
               className="w-full rounded-xl bg-muted/40 border border-border p-3 text-xs font-medium text-foreground outline-none resize-none"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">Logo / Profile Picture URL</span>
+              <span className="text-[11px] font-bold text-muted-foreground">Logo / DP URL</span>
               <input
                 type="url"
                 value={logoUrl}
@@ -196,9 +220,7 @@ export function AdminNewMerchantClient() {
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">
-                Cover / Background Banner URL
-              </span>
+              <span className="text-[11px] font-bold text-muted-foreground">Cover / Banner URL</span>
               <input
                 type="url"
                 value={coverUrl}
@@ -210,104 +232,124 @@ export function AdminNewMerchantClient() {
           </div>
         </div>
 
-        {/* Section 2: Location & Fulfillment */}
+        {/* Section 2: Contact & Fulfillment */}
         <div className="p-5 rounded-2xl bg-card border border-border space-y-3.5 shadow-xs">
           <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-            2. Campus Location &amp; Fulfillment
+            2. Campus Location &amp; Contact
           </h2>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold text-muted-foreground">Phone Number (WhatsApp)</span>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="e.g. +91 98765 43210"
+                className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-medium text-foreground outline-none"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold text-muted-foreground">Email Address</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="store@domain.com"
+                className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-medium text-foreground outline-none"
+              />
+            </div>
+          </div>
+
           <div className="space-y-1.5">
-            <span className="text-[11px] font-bold text-muted-foreground">Campus Address *</span>
+            <span className="text-[11px] font-bold text-muted-foreground">Physical Campus Address *</span>
             <input
               type="text"
               required
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="e.g. Main Gate Market Complex, Shop No. 4"
+              placeholder="e.g. Near Hostel 10 Gate / Student Activity Centre"
               className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">
-                Location Pin (e.g. 200m from Gate)
-              </span>
+              <span className="text-[11px] font-bold text-muted-foreground">Delivery Fee (₹)</span>
               <input
-                type="text"
-                value={locationPin}
-                onChange={(e) => setLocationPin(e.target.value)}
-                placeholder="e.g. 200m from Inner Circle"
+                type="number"
+                value={deliveryFee}
+                onChange={(e) => setDeliveryFee(e.target.value)}
                 className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
               />
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-muted-foreground">Delivery Fee (₹)</span>
+              <span className="text-[11px] font-bold text-muted-foreground">Min Order (₹)</span>
               <input
                 type="number"
-                min="0"
-                value={deliveryFee}
-                onChange={(e) => setDeliveryFee(e.target.value)}
-                className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-black text-foreground outline-none"
+                value={minOrderValue}
+                onChange={(e) => setMinOrderValue(e.target.value)}
+                className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold text-muted-foreground">Prep / Turnaround</span>
+              <input
+                type="text"
+                value={estimatedPrepTime}
+                onChange={(e) => setEstimatedPrepTime(e.target.value)}
+                className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
               />
             </div>
           </div>
         </div>
 
-        {/* Section 3: Portal Login Credentials */}
-        <div className="p-5 rounded-2xl bg-card border border-emerald-500/30 space-y-3.5 shadow-xs">
+        {/* Section 3: Direct Plaintext Credentials Generator */}
+        <div className="p-5 rounded-2xl bg-card border border-primary/30 space-y-3.5 shadow-xs relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="size-4 text-emerald-500" />
-              <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
-                3. Merchant Portal Credentials
-              </h2>
-            </div>
-            {loginUsername && loginPassword && (
-              <button
-                type="button"
-                onClick={handleCopyCredentials}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-muted hover:bg-muted/80 text-[11px] font-bold text-foreground cursor-pointer transition-colors"
-              >
-                <Copy className="size-3" />
-                <span>Copy Credentials</span>
-              </button>
-            )}
+            <h2 className="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
+              <ShieldCheck className="size-4" />
+              <span>3. Direct Portal Login Credentials</span>
+            </h2>
+            <button
+              type="button"
+              onClick={handleCopyCredentials}
+              className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20"
+            >
+              <Copy className="size-3" />
+              <span>Copy for WhatsApp</span>
+            </button>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            The merchant will log in at{" "}
-            <code className="text-foreground font-mono bg-muted px-1.5 py-0.5 rounded">
-              /merchant-portal/login
-            </code>{" "}
-            with these credentials to manage their menu and live orders.
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Stored directly as plaintext so you can copy and share them instantly with local shopkeepers.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div className="space-y-1.5">
               <span className="text-[11px] font-bold text-muted-foreground">Login Username</span>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={loginUsername}
-                  onChange={(e) => setLoginUsername(e.target.value)}
-                  placeholder="e.g. momohouse"
-                  className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-mono font-bold text-foreground outline-none"
-                />
-              </div>
+              <input
+                type="text"
+                value={loginUsername}
+                onChange={(e) => setLoginUsername(e.target.value)}
+                placeholder="e.g. momohouse"
+                className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-mono font-bold text-foreground outline-none"
+              />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-muted-foreground">Password</span>
+                <span className="text-[11px] font-bold text-muted-foreground">Plaintext Password</span>
                 <button
                   type="button"
                   onClick={handleGeneratePassword}
                   className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <RefreshCw className="size-2.5" />
-                  <span>Generate Password</span>
+                  <span>Regenerate</span>
                 </button>
               </div>
               <div className="relative flex items-center">
@@ -315,13 +357,13 @@ export function AdminNewMerchantClient() {
                   type="text"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="e.g. cl_momo982!"
+                  placeholder="e.g. store@k8f2a"
                   className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 pr-9 text-xs font-mono font-bold text-foreground outline-none"
                 />
                 <button
                   type="button"
                   onClick={handleGeneratePassword}
-                  className="absolute right-2.5 text-muted-foreground hover:text-foreground"
+                  className="absolute right-2.5 text-muted-foreground hover:text-foreground cursor-pointer"
                   title="Generate Password"
                 >
                   <KeyRound className="size-4" />

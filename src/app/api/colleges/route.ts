@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, ne, or, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, ilike, ne, or, type SQL, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { institutions } from "@/db/schema";
@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q") || "";
     const state = searchParams.get("state");
+    const category = searchParams.get("category");
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 12;
     const offset = (page - 1) * limit;
@@ -33,8 +34,41 @@ export async function GET(request: Request) {
       conditions.push(eq(institutions.state, state));
     }
 
+    if (category && category !== "ALL") {
+      if (category === "IIT_NIT") {
+        conditions.push(
+          or(
+            ilike(institutions.name, "%indian institute of technology%"),
+            ilike(institutions.name, "%national institute of technology%"),
+            ilike(institutions.name, "%iit %"),
+            ilike(institutions.name, "%nit %")
+          )
+        );
+      } else if (category === "NIRF") {
+        conditions.push(sql`${institutions.nirfRank} is not null`);
+      } else if (category === "CENTRAL") {
+        conditions.push(
+          or(ilike(institutions.name, "%university%"), ilike(institutions.name, "%institute of technology%"))
+        );
+      } else if (category === "TRENDING") {
+        conditions.push(
+          or(
+            eq(institutions.slug, "bitmesra"),
+            ilike(institutions.name, "%indian institute of technology%"),
+            ilike(institutions.name, "%national institute of technology%"),
+            ilike(institutions.name, "%birla institute of technology%"),
+            sql`${institutions.nirfRank} is not null`
+          )
+        );
+      }
+    }
+
     const validConditions = conditions.filter((c): c is SQL => Boolean(c));
     const whereClause = validConditions.length > 0 ? and(...validConditions) : undefined;
+
+    // Get total matching institutions count for accurate pagination
+    const [countResult] = await db.select({ total: count() }).from(institutions).where(whereClause);
+    const total = Number(countResult?.total ?? 0);
 
     const list = await db.query.institutions.findMany({
       where: whereClause,
@@ -59,11 +93,15 @@ export async function GET(request: Request) {
       postCount: 0,
     }));
 
+    const totalPages = Math.ceil(total / limit) || 1;
+
     return NextResponse.json({
       colleges: enriched,
       page,
       limit,
-      hasMore: enriched.length === limit,
+      total,
+      totalPages,
+      hasMore: offset + enriched.length < total,
     });
   } catch (error) {
     console.error("Failed to fetch colleges:", error);

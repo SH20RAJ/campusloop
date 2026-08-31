@@ -1,16 +1,17 @@
 "use client";
 
 import {
-  Car,
+  Bike,
   ChevronRight,
+  Droplet,
+  Scissors,
   ShieldCheck,
+  Shirt,
   ShoppingBag,
   Star,
   Store,
   Tag,
-  Ticket,
   UtensilsCrossed,
-  Wrench,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -37,13 +38,13 @@ interface MarketplaceClientProps {
 }
 
 const CATEGORIES = [
-  { id: "all", label: "All", icon: Store },
-  { id: "food", label: "Food", icon: UtensilsCrossed },
-  { id: "essentials", label: "Essentials", icon: ShoppingBag },
-  { id: "services", label: "Services", icon: Wrench },
-  { id: "rentals", label: "Rentals", icon: Car },
-  { id: "activities", label: "Activities", icon: Ticket },
-  { id: "deals", label: "Deals", icon: Tag },
+  { id: "all", label: "All Services", icon: Store },
+  { id: "food", label: "🍔 Food & Canteens", icon: UtensilsCrossed },
+  { id: "rentals", label: "🚲 Bike Rentals", icon: Bike },
+  { id: "barber", label: "✂️ Barber & Salon", icon: Scissors },
+  { id: "laundry", label: "🧺 Laundry & Wash", icon: Shirt },
+  { id: "water", label: "💧 Water Delivery", icon: Droplet },
+  { id: "essentials", label: "🛒 Supermarket & Mart", icon: ShoppingBag },
 ] as const;
 
 const CATEGORY_PILLS = CATEGORIES.map((c) => ({ id: c.id, label: c.label, icon: c.icon }));

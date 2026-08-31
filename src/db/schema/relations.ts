@@ -36,6 +36,7 @@ import { lostAndFoundItems } from "./lost-and-found";
 import { marketplaceItems } from "./marketplace";
 import { notifications } from "./notifications";
 import { comments, pollOptions, pollVotes, posts, votes } from "./posts";
+import { randomMessages, randomQueue, randomReports, randomSessions } from "./random-loop";
 import { ridesharePools } from "./rideshare";
 import { savedPosts } from "./saved-posts";
 import { stories, storyHighlights, storyLikes } from "./stories";
@@ -710,6 +711,62 @@ export const articleCommentVotesRelations = relations(articleCommentVotes, ({ on
   }),
   profile: one(userProfiles, {
     fields: [articleCommentVotes.profileId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const randomQueueRelations = relations(randomQueue, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [randomQueue.userId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [randomQueue.institutionId],
+    references: [institutions.id],
+  }),
+}));
+
+export const randomSessionsRelations = relations(randomSessions, ({ one, many }) => ({
+  userA: one(userProfiles, {
+    fields: [randomSessions.userAId],
+    references: [userProfiles.id],
+    relationName: "random_session_user_a",
+  }),
+  userB: one(userProfiles, {
+    fields: [randomSessions.userBId],
+    references: [userProfiles.id],
+    relationName: "random_session_user_b",
+  }),
+  institution: one(institutions, {
+    fields: [randomSessions.institutionId],
+    references: [institutions.id],
+  }),
+  messages: many(randomMessages),
+  reports: many(randomReports),
+}));
+
+export const randomMessagesRelations = relations(randomMessages, ({ one }) => ({
+  session: one(randomSessions, {
+    fields: [randomMessages.sessionId],
+    references: [randomSessions.id],
+  }),
+  sender: one(userProfiles, {
+    fields: [randomMessages.senderId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const randomReportsRelations = relations(randomReports, ({ one }) => ({
+  session: one(randomSessions, {
+    fields: [randomReports.sessionId],
+    references: [randomSessions.id],
+  }),
+  reporter: one(userProfiles, {
+    fields: [randomReports.reporterId],
+    references: [userProfiles.id],
+  }),
+  reportedUser: one(userProfiles, {
+    fields: [randomReports.reportedUserId],
     references: [userProfiles.id],
   }),
 }));

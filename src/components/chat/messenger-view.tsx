@@ -12,6 +12,7 @@ import {
   Search,
   ShieldCheck,
   Users2,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -282,7 +283,20 @@ export function MessengerView({
               <h1 className="text-base font-black tracking-tight text-foreground">Chats</h1>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <Link
+                href="/app/random"
+                onClick={() => {
+                  sounds.pop();
+                  haptics.medium();
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 hover:bg-amber-500/20 text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-95"
+                title="Meet someone unexpected in Random Loop"
+              >
+                <Zap className="size-3.5 fill-amber-500" />
+                <span>Random</span>
+              </Link>
+
               <button
                 type="button"
                 onClick={() => {
@@ -290,7 +304,7 @@ export function MessengerView({
                   haptics.light();
                   setShowCreateGroupModal(true);
                 }}
-                className="flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-95"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-95"
                 title="Create campus group or study pod"
               >
                 <Users2 className="size-3.5" />

@@ -21,6 +21,7 @@ import {
   Sliders,
   UserCircle,
   Users,
+  Zap,
 } from "lucide-react";
 
 export interface NavItem {
@@ -81,8 +82,16 @@ export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
  */
 export const MORE_HUB_SECTIONS: NavGroup[] = [
   {
-    group: "Connections & Dating",
+    group: "Connections & Social Discovery",
     items: [
+      {
+        icon: Zap,
+        href: "/app/random",
+        label: "Random Loop",
+        desc: "Meet someone unexpected. Real-time serendipitous chat with verified peers",
+        badge: "HOT",
+        badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+      },
       {
         icon: Lock,
         href: "/app/crush",

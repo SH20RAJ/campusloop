@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ChevronRight, ExternalLink, Shield, Sparkles } from "lucide-react";
+import { ArrowLeft, ChevronRight, ExternalLink, Shield, Sparkles, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InstagramIcon, LinkedinIcon, XIcon } from "@/components/ui/social-icons";
@@ -38,6 +38,40 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
           </div>
         </div>
       </div>
+
+      {/* ─── ⚡ RANDOM LOOP HERO CARD (Spec Section 3 & 52) ─── */}
+      <Link
+        href="/app/random"
+        className="block p-5 rounded-3xl border-2 border-amber-500/40 bg-linear-to-r from-amber-500/15 via-orange-500/10 to-amber-500/5 hover:border-amber-500 transition-all shadow-md group cursor-pointer"
+      >
+        <div className="flex items-center justify-between">
+          <div className="space-y-1.5 min-w-0 pr-2">
+            <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-500">
+              <Zap className="size-4 fill-amber-500" />
+              <span>RANDOM LOOP</span>
+            </div>
+            <h3 className="text-base sm:text-lg font-black text-foreground group-hover:text-amber-500 transition-colors">
+              Meet someone unexpected.
+            </h3>
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              Serendipitous anonymous conversations with verified college peers. Choose campus or talk with
+              anyone across India.
+            </p>
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                🎲 Random
+              </span>
+              <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                🛡️ Verified Student
+              </span>
+            </div>
+          </div>
+
+          <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-amber-500 text-black font-black shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform shrink-0">
+            <Zap className="size-6 sm:size-7 fill-black" />
+          </div>
+        </div>
+      </Link>
 
       {/* ─── Highlighted Official Social Channels ─── */}
       <div className="space-y-2.5">

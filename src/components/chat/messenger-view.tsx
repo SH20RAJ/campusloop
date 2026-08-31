@@ -12,6 +12,7 @@ import {
   Search,
   ShieldCheck,
   Users2,
+  X,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -669,7 +670,7 @@ export function MessengerView({
         isOpen={showCreateGroupModal}
         onClose={() => setShowCreateGroupModal(false)}
         currentUserId={currentUserId}
-        onGroupCreated={(newConvId, createdConv) => {
+        onGroupCreated={(newConvId: string, createdConv?: any) => {
           if (createdConv) {
             mutateConvs((prev) => {
               if (!prev) return [createdConv];

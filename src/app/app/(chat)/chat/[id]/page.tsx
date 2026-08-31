@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { MessengerView } from "@/components/chat/messenger-view";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
+
+export const metadata: Metadata = {
+  title: "Chat Conversation",
+  description: "Direct student conversation on CampusLoop.",
+  robots: { index: false, follow: false },
+};
 
 interface DirectChatPageProps {
   params: Promise<{

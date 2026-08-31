@@ -108,6 +108,23 @@ export function MessengerPane({
   } | null>(null);
   const [incomingCall, setIncomingCall] = useState<any | null>(null);
 
+  // Auto-fetch conversation metadata if otherParticipant not passed or on fresh load
+  const { data: convData, isLoading: isLoadingConvData } = useSWR<{
+    id: string;
+    otherParticipant: any;
+    title?: string;
+    isGroup?: boolean;
+    isCommunity?: boolean;
+  }>(conversationId && !otherParticipant ? `/api/chat/${conversationId}` : null, fetcher, {
+    dedupingInterval: 8000,
+  });
+
+  const effectiveParticipant = otherParticipant || convData?.otherParticipant || null;
+
+  // Presence is derived from the peer's heartbeat, not assumed
+  const presenceText = presenceLabel(effectiveParticipant?.lastSeenAt);
+  const viewerIsOnline = isOnline(effectiveParticipant?.lastSeenAt);
+
   // Swipe & Long-press hold gesture tracking
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
@@ -713,22 +730,6 @@ export function MessengerPane({
     }
   }
 
-  // Auto-fetch conversation metadata if otherParticipant not passed or on fresh load
-  const { data: convData, isLoading: isLoadingConvData } = useSWR<{
-    id: string;
-    otherParticipant: any;
-    title?: string;
-    isGroup?: boolean;
-    isCommunity?: boolean;
-  }>(conversationId && !otherParticipant ? `/api/chat/${conversationId}` : null, fetcher, {
-    dedupingInterval: 8000,
-  });
-
-  const effectiveParticipant = otherParticipant || convData?.otherParticipant || null;
-
-  // Presence is derived from the peer's heartbeat, not assumed
-  const presenceText = presenceLabel(effectiveParticipant?.lastSeenAt);
-  const viewerIsOnline = isOnline(effectiveParticipant?.lastSeenAt);
 
   if (!conversationId) {
     return (

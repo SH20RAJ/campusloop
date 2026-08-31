@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import { InstagramIcon, LinkedinIcon, XIcon } from "@/components/ui/social-icons";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { DESKTOP_NAV_ITEMS, MOBILE_BOTTOM_ITEMS } from "@/constants/navigation";
+import { DESKTOP_NAV_ITEMS, MOBILE_BOTTOM_ITEMS, type NavItem } from "@/constants/navigation";
 import { SOCIAL_LINKS } from "@/constants/socials";
 import type { UserProfile } from "@/db/schema";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
@@ -164,13 +164,11 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
 
   const isBitMesra = Boolean(
     profile?.institutionId === "bitmesra" ||
-      profile?.institution?.slug === "bit-mesra" ||
-      profile?.institution?.slug === "bitmesra" ||
-      profile?.institution?.id === "bitmesra" ||
+      profile?.institutionId?.toLowerCase().includes("bitmesra") ||
       (collegeName && collegeName.toLowerCase().includes("bit mesra"))
   );
 
-  const mobileBottomItems = useMemo(() => {
+  const mobileBottomItems: NavItem[] = useMemo(() => {
     return MOBILE_BOTTOM_ITEMS.map((item) => {
       if (item.href === "/app/marketplace" && !isBitMesra) {
         return {

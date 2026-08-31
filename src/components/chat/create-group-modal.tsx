@@ -31,7 +31,7 @@ interface CreateGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentUserId: string;
-  onGroupCreated: (newConversationId: string) => void;
+  onGroupCreated: (newConversationId: string, createdConv?: any) => void;
 }
 
 const GROUP_CATEGORIES = [

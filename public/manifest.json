@@ -78,10 +78,10 @@
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Campus Matches",
-      "short_name": "Dating",
-      "description": "Swipe verified students in your campus radius",
-      "url": "/app/dating",
+      "name": "Campus Match",
+      "short_name": "Match",
+      "description": "Connect with verified students in your campus radius",
+      "url": "/app/matching",
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     },
     {

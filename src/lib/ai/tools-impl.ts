@@ -103,9 +103,6 @@ export async function executeSearchCommunities(
   const q = args.query.trim();
 
   const conditions = [ilike(communities.name, `%${q}%`)];
-  if (context.institutionId) {
-    conditions.push(eq(communities.institutionId, context.institutionId));
-  }
 
   const results = await db.query.communities.findMany({
     where: and(...conditions),
@@ -126,7 +123,7 @@ export async function executeSearchCommunities(
       name: c.name,
       slug: c.slug,
       description: c.description,
-      isPrivate: c.isPrivate,
+      privacy: c.privacy,
     })),
     sources,
   };
@@ -250,7 +247,7 @@ export async function executeSearchAcademicResources(
     conditions.push(eq(academicResources.institutionId, context.institutionId));
   }
   if (args.subject) {
-    conditions.push(ilike(academicResources.subject, `%${args.subject}%`));
+    conditions.push(ilike(academicResources.subjectName, `%${args.subject}%`));
   }
 
   const results = await db.query.academicResources.findMany({
@@ -263,14 +260,14 @@ export async function executeSearchAcademicResources(
     type: "academic",
     id: a.id,
     title: a.title,
-    excerpt: `${a.subject} · Semester ${a.semester || "All"}`,
+    excerpt: `${a.subjectName} · Semester ${a.semester || "All"}`,
   }));
 
   return {
     data: results.map((a) => ({
       id: a.id,
       title: a.title,
-      subject: a.subject,
+      subject: a.subjectName,
       semester: a.semester,
       resourceType: a.resourceType,
       fileUrl: a.fileUrl,
@@ -331,7 +328,7 @@ export async function executeSearchHousing(
   const db = getDb();
   const limit = Math.min(Math.max(1, args.limit || 5), 10);
 
-  const conditions = [eq(housingListings.status, "ACTIVE")];
+  const conditions = [eq(housingListings.status, "AVAILABLE")];
   if (context.institutionId) {
     conditions.push(eq(housingListings.institutionId, context.institutionId));
   }
@@ -349,17 +346,16 @@ export async function executeSearchHousing(
     type: "housing",
     id: h.id,
     title: h.title,
-    excerpt: `₹${h.rent}/mo · ${h.propertyType} (${h.location || "Near Campus"})`,
+    excerpt: `₹${h.rentPerMonth}/mo · ${h.occupancyType} (${h.location || "Near Campus"})`,
   }));
 
   return {
     data: results.map((h) => ({
       id: h.id,
       title: h.title,
-      rent: h.rent,
-      propertyType: h.propertyType,
+      rent: h.rentPerMonth,
+      occupancyType: h.occupancyType,
       location: h.location,
-      occupancy: h.occupancy,
     })),
     sources,
   };
@@ -375,7 +371,7 @@ export async function executeSearchRides(
   const db = getDb();
   const limit = Math.min(Math.max(1, args.limit || 5), 10);
 
-  const conditions = [eq(ridesharePools.status, "OPEN")];
+  const conditions = [eq(ridesharePools.status, "ACTIVE")];
   if (context.institutionId) {
     conditions.push(eq(ridesharePools.institutionId, context.institutionId));
   }
@@ -383,14 +379,14 @@ export async function executeSearchRides(
   const results = await db.query.ridesharePools.findMany({
     where: and(...conditions),
     limit,
-    orderBy: [desc(ridesharePools.departureTime)],
+    orderBy: [desc(ridesharePools.createdAt)],
   });
 
   const sources: AiSource[] = results.map((r) => ({
     type: "ride",
     id: r.id,
     title: `${r.origin} ➔ ${r.destination}`,
-    excerpt: `Leaves ${new Date(r.departureTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · ${r.seatsAvailable} seats`,
+    excerpt: `Departure: ${r.departureTime} · ${r.availableSeats} seats available`,
   }));
 
   return {
@@ -399,8 +395,8 @@ export async function executeSearchRides(
       origin: r.origin,
       destination: r.destination,
       departureTime: r.departureTime,
-      seatsAvailable: r.seatsAvailable,
-      farePerSeat: r.farePerSeat,
+      availableSeats: r.availableSeats,
+      pricePerSeat: r.pricePerSeat,
     })),
     sources,
   };
@@ -417,7 +413,7 @@ export async function executeGetMySavedPosts(
   const limit = Math.min(Math.max(1, args.limit || 5), 10);
 
   const saved = await db.query.savedPosts.findMany({
-    where: eq(savedPosts.userId, context.userId),
+    where: eq(savedPosts.profileId, context.userId),
     limit,
     orderBy: [desc(savedPosts.createdAt)],
     with: {

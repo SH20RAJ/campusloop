@@ -5,12 +5,12 @@ import {
   conversationParticipants,
   conversations,
   messages,
-  notifications,
   secretCrushAttempts,
   secretCrushes,
   userProfiles,
 } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { createNotification } from "@/lib/notifications";
 
 const MAX_ACTIVE_SLOTS = 5;
 const MAX_ATTEMPTS_7_DAYS = 5;
@@ -263,23 +263,28 @@ export async function POST(req: NextRequest) {
         body: "💕 It's a Secret Crush Match! We both secretly liked each other.",
       });
 
-      // 4. Send match notifications to both users
+      // 4. Send match notifications to both users, through the shared pipeline
+      //    so both phones are actually woken (a raw insert skipped push).
       if (conversationId) {
-        await db.insert(notifications).values([
-          {
+        const crushBlurb = "💕 It's a Secret Crush Match! We both secretly liked each other.";
+
+        await Promise.all([
+          createNotification({
             userId: targetId,
             actorId: profile.id,
             type: "MATCH",
             referenceId: conversationId,
-            previewText: "💕 It's a Secret Crush Match! We both secretly liked each other.",
-          },
-          {
+            previewText: crushBlurb,
+          }),
+          // This student is looking at the reveal right now.
+          createNotification({
             userId: profile.id,
             actorId: targetId,
             type: "MATCH",
             referenceId: conversationId,
-            previewText: "💕 It's a Secret Crush Match! We both secretly liked each other.",
-          },
+            previewText: crushBlurb,
+            silent: true,
+          }),
         ]);
       }
 
@@ -298,11 +303,18 @@ export async function POST(req: NextRequest) {
     }
 
     // If not mutual yet: Send anonymous alert to target (intent strictly hidden!)
-    await db.insert(notifications).values({
+    //
+    // The actor id is stored so mutes and the eventual mutual reveal work, but
+    // every read path anonymizes it — /api/notifications and
+    // /api/notifications/latest both replace the actor with "Anonymous Student"
+    // for CRUSH_ALERT before anything leaves the server.
+    await createNotification({
       userId: targetId,
       actorId: profile.id,
       type: "CRUSH_ALERT",
-      referenceId: "/app/crush",
+      // buildUrl() maps CRUSH_ALERT to /app/crush on its own; storing a path
+      // here would be a reference id that references nothing.
+      referenceId: null,
       previewText:
         "Someone from your campus added you to their Secret Crush vault! 🔒 Add your crushes to see if it's mutual.",
     });

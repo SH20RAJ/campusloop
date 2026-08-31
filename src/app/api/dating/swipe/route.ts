@@ -1,15 +1,9 @@
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import {
-  conversationParticipants,
-  conversations,
-  messages,
-  notifications,
-  swipes,
-  userProfiles,
-} from "@/db/schema";
+import { conversationParticipants, conversations, messages, swipes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { createNotification } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 export async function POST(req: Request) {
@@ -78,22 +72,30 @@ export async function POST(req: Request) {
           { conversationId: newConv.id, userId: targetId },
         ]);
 
-        // Insert notifications
-        await db.insert(notifications).values([
-          {
+        // Notify both sides through the shared pipeline so the match actually
+        // reaches a phone. A raw insert here used to skip pushToUser entirely,
+        // which meant the highest-urgency notification in the app was the one
+        // nobody was woken for.
+        const matchBlurb = "You matched with each other on Campus Match! 🎉 Say hello in chat.";
+
+        await Promise.all([
+          // The swiper is looking at the match modal right now — the row belongs
+          // in their list, the buzz does not.
+          createNotification({
             userId: profile.id,
-            type: "MATCH",
             actorId: targetId,
-            referenceId: newConv.id,
-            previewText: "You matched with each other on Campus Match! 🎉 Say hello in chat.",
-          },
-          {
-            userId: targetId,
             type: "MATCH",
-            actorId: profile.id,
             referenceId: newConv.id,
-            previewText: "You matched with each other on Campus Match! 🎉 Say hello in chat.",
-          },
+            previewText: matchBlurb,
+            silent: true,
+          }),
+          createNotification({
+            userId: targetId,
+            actorId: profile.id,
+            type: "MATCH",
+            referenceId: newConv.id,
+            previewText: matchBlurb,
+          }),
         ]);
 
         // Send match greeting

@@ -30,7 +30,8 @@ export interface NotificationItem {
     | "FOLLOW"
     | "FRIEND"
     | "MESSAGE"
-    | "NEW_POST";
+    | "NEW_POST"
+    | "EVENT_REGISTRATION";
   actorId: string;
   referenceId: string | null;
   previewText: string | null;

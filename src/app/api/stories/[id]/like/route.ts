@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { stories, storyLikes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { createNotification } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
@@ -53,6 +54,17 @@ export async function POST(req: Request, { params }: RouteParams) {
         userId: profile.id,
       });
       liked = true;
+
+      // The notifications tab has always rendered STORY_LIKE, but nothing ever
+      // created one — liking a vibe was silent. Only on the like, never the
+      // unlike, so toggling a heart cannot be used to spam someone.
+      createNotification({
+        userId: targetStory.userId,
+        actorId: profile.id,
+        type: "STORY_LIKE",
+        referenceId: targetStory.id,
+        previewText: `${profile.displayName} liked your campus vibe`,
+      }).catch(() => {});
     }
 
     const allLikes = await db.query.storyLikes.findMany({

@@ -14,6 +14,7 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
+  Ticket,
   Trash2,
   Trophy,
   UserPlus,
@@ -172,6 +173,14 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
           actionText: "posted something new",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
           actionLabel: "View post",
+        };
+      case "EVENT_REGISTRATION":
+        return {
+          icon: <Ticket className="size-3.5 text-cyan-500 stroke-2" />,
+          badgeBg: "bg-cyan-500/15 border-cyan-500/30 text-cyan-500",
+          actionText: "— your spot is confirmed 🎟️",
+          href: n.referenceId ? `/app/events/${n.referenceId}` : "/app/events",
+          actionLabel: "View event",
         };
       default:
         return {

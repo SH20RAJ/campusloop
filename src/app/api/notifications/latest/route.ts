@@ -85,6 +85,8 @@ function buildTitle(type: string, actorName: string): string {
       return actorName;
     case "NEW_POST":
       return `${actorName} posted`;
+    case "EVENT_REGISTRATION":
+      return "You're registered 🎟️";
     default:
       return `${actorName} on CampusLoop`;
   }
@@ -117,12 +119,18 @@ function defaultBody(type: string, actorName: string): string {
       return "Sent you a message";
     case "NEW_POST":
       return `${actorName} shared something new on your campus`;
+    case "EVENT_REGISTRATION":
+      return "Your spot is confirmed — see you there";
     default:
       return "Open CampusLoop to see what's new";
   }
 }
 
 function buildUrl(type: string, referenceId: string | null): string {
+  // Resolved before the null guard: CRUSH_ALERT deliberately stores no
+  // reference id (naming the crush would defeat the point), but it still has a
+  // fixed destination.
+  if (type === "CRUSH_ALERT") return "/app/crush";
   if (!referenceId) return "/app/notifications";
   switch (type) {
     case "LIKE":
@@ -138,8 +146,8 @@ function buildUrl(type: string, referenceId: string | null): string {
     case "MESSAGE":
     case "MATCH":
       return `/app/chat/${referenceId}`;
-    case "CRUSH_ALERT":
-      return "/app/crush";
+    case "EVENT_REGISTRATION":
+      return `/app/events/${referenceId}`;
     case "FOLLOW":
     case "FRIEND":
       return `/@${referenceId}`;

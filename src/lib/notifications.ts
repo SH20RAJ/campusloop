@@ -23,7 +23,8 @@ export type NotificationType =
   | "STORY_LIKE"
   | "STORY_REPLY"
   | "MESSAGE"
-  | "NEW_POST";
+  | "NEW_POST"
+  | "EVENT_REGISTRATION";
 
 export interface CreateNotificationParams {
   userId: string;
@@ -31,6 +32,14 @@ export interface CreateNotificationParams {
   type: NotificationType;
   referenceId?: string | null;
   previewText?: string | null;
+  /**
+   * Write the row but do not wake the recipient's devices.
+   *
+   * For notifications the recipient themselves just caused — the match they
+   * swiped into, the event they registered for — the entry belongs in their
+   * list, but buzzing the phone they are holding is pure noise.
+   */
+  silent?: boolean;
 }
 
 /** Types that should buzz a phone immediately rather than ride the normal queue. */
@@ -96,7 +105,9 @@ export async function createNotification(params: CreateNotificationParams): Prom
     });
 
     // Wake the recipient's devices; failures here never fail the write above.
-    await pushToUser(params.userId, HIGH_URGENCY_TYPES.has(params.type) ? "high" : "normal");
+    if (!params.silent) {
+      await pushToUser(params.userId, HIGH_URGENCY_TYPES.has(params.type) ? "high" : "normal");
+    }
 
     // Dispatch transactional email via Cloudflare Email Sending
     dispatchNotificationEmail(params).catch(() => {});

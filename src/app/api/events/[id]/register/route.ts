@@ -2,9 +2,10 @@ import { and, eq, or, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { eventRegistrations, events, notifications, userProfiles } from "@/db/schema";
+import { eventRegistrations, events, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectIfLacksCapability } from "@/lib/capabilities";
+import { createNotification } from "@/lib/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -79,7 +80,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
     if (event.participationType === "TEAM" && registrationType === "SOLO") {
       return NextResponse.json(
-        { error: `This event requires a team registration (${event.minTeamSize || 2} to ${event.maxTeamSize || 4} members).` },
+        {
+          error: `This event requires a team registration (${event.minTeamSize || 2} to ${event.maxTeamSize || 4} members).`,
+        },
         { status: 400 }
       );
     }
@@ -133,18 +136,19 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       // Non-blocking
     }
 
-    // Create confirmation notification
-    try {
-      await db.insert(notifications).values({
-        userId: profile.id,
-        actorId: event.organizerProfileId,
-        type: "EVENT_REGISTRATION",
-        referenceId: event.id,
-        previewText: `You are officially registered for ${event.title} organized by ${event.clubName}!`,
-      });
-    } catch {
-      // Non-blocking
-    }
+    // Create confirmation notification. Silent: the student just tapped
+    // Register and is reading the success state — the row is a receipt for
+    // later, not something worth buzzing their phone about.
+    await createNotification({
+      userId: profile.id,
+      actorId: event.organizerProfileId,
+      type: "EVENT_REGISTRATION",
+      referenceId: event.id,
+      previewText: `You are officially registered for ${event.title} organized by ${event.clubName}!`,
+      silent: true,
+    }).catch(() => {
+      // Non-blocking: a missing receipt must not fail a real registration.
+    });
 
     return NextResponse.json({
       success: true,

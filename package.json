@@ -7,6 +7,7 @@
 		"build": "NODE_OPTIONS='--max-old-space-size=5120' next build --webpack",
 		"start": "next start",
 		"lint": "eslint .",
+		"typecheck": "NODE_OPTIONS='--max-old-space-size=5120' tsc --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"db:generate": "drizzle-kit generate",

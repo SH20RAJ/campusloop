@@ -139,10 +139,19 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
 
   const displayedPosts: FeedPost[] = useMemo(() => {
     if (!feed) return [];
-    if (visibility === "public") {
-      return feed.filter((post) => !post.isAnonymous && post.type !== "CONFESSION");
+    const seen = new Set<string>();
+    const uniquePosts: FeedPost[] = [];
+
+    for (const post of feed) {
+      if (!post?.id || seen.has(post.id)) continue;
+      if (visibility === "public" && (post.isAnonymous || post.type === "CONFESSION")) {
+        continue;
+      }
+      seen.add(post.id);
+      uniquePosts.push(post);
     }
-    return feed;
+
+    return uniquePosts;
   }, [feed, visibility]);
 
   const { stories, mutate: mutateStories, isLoading: storiesLoading } = useStories();

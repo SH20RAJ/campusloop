@@ -314,14 +314,7 @@ export function getFeedOrderBy(
 ) {
   const orderClauses: (SQL | ReturnType<typeof desc> | ReturnType<typeof asc>)[] = [];
 
-  if (seenIds && seenIds.length > 0) {
-    const escaped = seenIds
-      .slice(0, 100)
-      .map((id) => `'${id.replace(/'/g, "''")}'`)
-      .join(",");
-    orderClauses.push(desc(sql<number>`(case when ${posts.id} in (${sql.raw(escaped)}) then 0 else 1 end)`));
-  }
-
+  // Keep sorting deterministic and stable across pagination
   if (userInstitutionId && sort === "for_you") {
     orderClauses.push(
       desc(sql<number>`(case when ${posts.institutionId} = ${userInstitutionId} then 1 else 0 end)`)

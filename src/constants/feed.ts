@@ -24,17 +24,5 @@ export const FEED_SCOPE_OPTIONS = [
   { id: "GLOBAL", label: "All Colleges" },
 ] as const;
 
-export const TRENDING_CAMPUS_TAGS = [
-  "#LateNightTea",
-  "#Confessions",
-  "#CanteenGossip",
-  "#ExamStress",
-  "#LibraryVibes",
-  "#HostelLife",
-  "#PlacementSeason",
-  "#FestVibes",
-  "#Hackathon2026",
-] as const;
-
 export const MAX_POST_CHARS = 2000;
 export const DEFAULT_FEED_PAGE_LIMIT = 20;

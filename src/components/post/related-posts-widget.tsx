@@ -48,34 +48,34 @@ export function RelatedPostsWidget({ postId, currentUserId, initialItems }: Rela
   }
 
   return (
-    <section className="rounded-3xl border border-border/50 bg-card p-4 space-y-3 shadow-xs">
+    <section className="rounded-2xl border border-border/40 bg-card/60 p-4 space-y-3 shadow-xs">
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
           <Sparkles className="size-3.5 text-primary" />
-          <span>Similar Campus Discussions</span>
+          <span>More like this</span>
         </h3>
-        <span className="text-[10px] font-bold text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full border border-border/40">
-          AI Vector Matched
+        <span className="text-[11px] font-medium text-muted-foreground/70">
+          From other campuses
         </span>
       </div>
 
-      <div className="divide-y divide-border/30">
-        {items.map(({ post, matchScore, matchReason }) => {
+      <div className="divide-y divide-border/20">
+        {items.map(({ post }) => {
           const isAnon = post.isAnonymous;
           const authorName = isAnon
             ? post.pseudonym || "Anonymous Student"
             : post.author?.displayName || "Student";
-          const snippet = post.body.length > 120 ? `${post.body.slice(0, 118)}...` : post.body;
+          const snippet = post.body.length > 110 ? `${post.body.slice(0, 108)}...` : post.body;
 
           return (
             <Link
               key={post.id}
               href={`/app/post/${post.id}`}
-              className="block py-3 first:pt-1 last:pb-1 group hover:bg-muted/20 -mx-2 px-2 rounded-2xl transition-colors cursor-pointer"
+              className="block py-2.5 first:pt-1 last:pb-1 group hover:bg-muted/30 -mx-2 px-2 rounded-xl transition-colors cursor-pointer"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                  <Avatar className="size-6 rounded-full border border-border/40 shrink-0 mt-0.5">
+                  <Avatar className="size-7 rounded-full border border-border/40 shrink-0 mt-0.5">
                     <AvatarImage src={isAnon ? "" : post.author?.avatarUrl || ""} />
                     <AvatarFallback className="text-[10px] font-bold bg-muted text-foreground">
                       {authorName[0]}
@@ -83,12 +83,12 @@ export function RelatedPostsWidget({ postId, currentUserId, initialItems }: Rela
                   </Avatar>
 
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs font-black text-foreground truncate group-hover:text-primary transition-colors">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">
                         {authorName}
                       </p>
                       {post.institution?.name && (
-                        <span className="text-[10px] text-muted-foreground truncate hidden sm:inline">
+                        <span className="text-[10px] text-muted-foreground/80 truncate">
                           · {post.institution.name.split(",")[0]}
                         </span>
                       )}
@@ -98,7 +98,7 @@ export function RelatedPostsWidget({ postId, currentUserId, initialItems }: Rela
                       {snippet}
                     </p>
 
-                    <div className="flex items-center gap-3 mt-2 text-[10px] font-semibold text-muted-foreground">
+                    <div className="flex items-center gap-3.5 mt-2 text-[10px] font-semibold text-muted-foreground/80">
                       <span className="flex items-center gap-1">
                         <ThumbsUp className="size-3" /> {post.votesCount || 0}
                       </span>
@@ -108,19 +108,6 @@ export function RelatedPostsWidget({ postId, currentUserId, initialItems }: Rela
                     </div>
                   </div>
                 </div>
-
-                {matchScore && matchScore > 0 && (
-                  <span
-                    className={cn(
-                      "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0",
-                      matchReason === "semantic"
-                        ? "bg-primary/10 text-primary border-primary/20"
-                        : "bg-muted text-muted-foreground border-border/50"
-                    )}
-                  >
-                    {matchReason === "semantic" ? `${matchScore}% Vibe` : "Campus"}
-                  </span>
-                )}
               </div>
             </Link>
           );

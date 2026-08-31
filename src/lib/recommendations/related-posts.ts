@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, ne } from "drizzle-orm";
+import { and, desc, eq, inArray, ne, notInArray, or, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { posts } from "@/db/schema";
 import type { FeedPost } from "@/hooks/use-feed";
@@ -45,18 +45,31 @@ export async function getRelatedPosts(
     const vector = await generateEmbedding(textToEmbed);
 
     const hits = await qdrant.search<PostVectorPayload>(COLLECTIONS.POSTS, vector, {
-      limit: limit + 2, // Fetch slightly more to filter out target post
+      limit: limit + 10, // Fetch more to allow author and self filtering
       scoreThreshold: 0.1,
     });
 
-    const matchingHits = hits.filter((h) => String(h.id) !== targetPostId).slice(0, limit);
+    // Exclude target post AND exclude posts by the same author (so we find other people's discussions)
+    const matchingHits = hits
+      .filter((h) => {
+        if (String(h.id) === targetPostId) return false;
+        if (basePost.authorId && h.payload?.authorId && h.payload.authorId === basePost.authorId) {
+          return false;
+        }
+        return true;
+      })
+      .slice(0, limit);
 
     if (matchingHits.length > 0) {
       const pointIds = matchingHits.map((h) => String(h.id));
       const scoreMap = new Map(matchingHits.map((h) => [String(h.id), h.score]));
 
       const hydratedRows = await db.query.posts.findMany({
-        where: and(inArray(posts.id, pointIds), eq(posts.status, "PUBLISHED")),
+        where: and(
+          inArray(posts.id, pointIds),
+          eq(posts.status, "PUBLISHED"),
+          basePost.authorId ? ne(posts.authorId, basePost.authorId) : undefined
+        ),
         with: {
           author: true,
           institution: true,
@@ -97,29 +110,114 @@ export async function getRelatedPosts(
     }
   }
 
-  // 3. Resilient Fallback: Query Postgres for same campus or recent active threads
+  // 3. Resilient Fallback: Query Postgres for content similarity across other authors and campuses
   try {
-    const fallbackRows = await db.query.posts.findMany({
-      where: and(
-        ne(posts.id, targetPostId),
-        eq(posts.status, "PUBLISHED"),
-        basePost.institutionId ? eq(posts.institutionId, basePost.institutionId) : undefined
-      ),
-      orderBy: [desc(posts.createdAt)],
-      limit,
-      with: {
-        author: true,
-        institution: true,
-        community: true,
-        votes: true,
-        comments: {
-          with: {
-            author: true,
+    // Extract key content terms (hashtags or significant words > 4 chars)
+    const hashtags = (basePost.body.match(/#[a-zA-Z0-9_]+/g) || []).map((t) => t.replace(/^#/, "").toLowerCase());
+    const words = basePost.body
+      .replace(/[^a-zA-Z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length >= 5)
+      .slice(0, 4);
+
+    const matchConditions: any[] = [];
+    if (hashtags.length > 0) {
+      for (const tag of hashtags.slice(0, 3)) {
+        matchConditions.push(sql`${posts.body} ILIKE ${`%#${tag}%`}`);
+      }
+    }
+    for (const word of words) {
+      matchConditions.push(sql`${posts.body} ILIKE ${`%${word}%`}`);
+    }
+
+    // Always exclude current post and exclude current author
+    const baseConditions = [
+      ne(posts.id, targetPostId),
+      eq(posts.status, "PUBLISHED"),
+      basePost.authorId ? ne(posts.authorId, basePost.authorId) : undefined,
+    ].filter(Boolean);
+
+    let fallbackRows: any[] = [];
+    if (matchConditions.length > 0) {
+      fallbackRows = await db.query.posts.findMany({
+        where: and(...baseConditions, or(...matchConditions)),
+        orderBy: [desc(posts.createdAt)],
+        limit,
+        with: {
+          author: true,
+          institution: true,
+          community: true,
+          votes: true,
+          comments: {
+            with: {
+              author: true,
+            },
           },
+          pollOptions: { with: { votes: true } },
         },
-        pollOptions: { with: { votes: true } },
-      },
-    });
+      });
+    }
+
+    // If keyword match didn't yield enough, fill with other authors' discussions in same category or campus
+    if (fallbackRows.length < limit) {
+      const remainingLimit = limit - fallbackRows.length;
+      const existingIds = new Set(fallbackRows.map((r) => r.id));
+      existingIds.add(targetPostId);
+
+      const secondaryRows = await db.query.posts.findMany({
+        where: and(
+          ...baseConditions,
+          eq(posts.type, basePost.type),
+          notInArray(posts.id, Array.from(existingIds))
+        ),
+        orderBy: [desc(posts.createdAt)],
+        limit: remainingLimit,
+        with: {
+          author: true,
+          institution: true,
+          community: true,
+          votes: true,
+          comments: {
+            with: {
+              author: true,
+            },
+          },
+          pollOptions: { with: { votes: true } },
+        },
+      });
+
+      fallbackRows.push(...secondaryRows);
+    }
+
+    // If still need more, fetch any top active discussions from other authors
+    if (fallbackRows.length < limit) {
+      const remainingLimit = limit - fallbackRows.length;
+      const existingIds = new Set(fallbackRows.map((r) => r.id));
+      existingIds.add(targetPostId);
+
+      const generalRows = await db.query.posts.findMany({
+        where: and(
+          ...baseConditions,
+          notInArray(posts.id, Array.from(existingIds))
+        ),
+        orderBy: [desc(posts.createdAt)],
+        limit: remainingLimit,
+        with: {
+          author: true,
+          institution: true,
+          community: true,
+          votes: true,
+          comments: {
+            with: {
+              author: true,
+            },
+          },
+          pollOptions: { with: { votes: true } },
+        },
+      });
+
+      fallbackRows.push(...generalRows);
+    }
 
     const fallbackPosts = (await formatApiFeedPosts(
       fallbackRows as any,
@@ -128,7 +226,7 @@ export async function getRelatedPosts(
 
     return fallbackPosts.map((post) => ({
       post,
-      matchScore: 75,
+      matchScore: 80,
       matchReason: post.institution?.id === basePost.institutionId ? "campus" : "hashtag",
     }));
   } catch {

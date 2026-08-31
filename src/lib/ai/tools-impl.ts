@@ -37,7 +37,7 @@ export async function executeSearchCampusPosts(
   // Try Qdrant semantic vector candidate retrieval
   try {
     const vector = await generateEmbedding(q);
-    const hits = await qdrantClient.searchPoints(COLLECTIONS.POSTS, vector, limit * 2);
+    const hits = await qdrantClient.search(COLLECTIONS.POSTS, vector, { limit: limit * 2 });
     candidateIds = hits.map((h) => String(h.id));
   } catch {
     // Graceful circuit fallback

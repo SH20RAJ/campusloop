@@ -81,6 +81,10 @@ function buildTitle(type: string, actorName: string): string {
       return `${actorName} started following you`;
     case "MILESTONE":
       return "New clout milestone 🏆";
+    case "MESSAGE":
+      return actorName;
+    case "NEW_POST":
+      return `${actorName} posted`;
     default:
       return `${actorName} on CampusLoop`;
   }
@@ -109,6 +113,10 @@ function defaultBody(type: string, actorName: string): string {
       return "You're campus friends now";
     case "FOLLOW":
       return "Tap to view their profile";
+    case "MESSAGE":
+      return "Sent you a message";
+    case "NEW_POST":
+      return `${actorName} shared something new on your campus`;
     default:
       return "Open CampusLoop to see what's new";
   }
@@ -122,10 +130,12 @@ function buildUrl(type: string, referenceId: string | null): string {
     case "REPLY":
     case "MENTION":
     case "REPOST":
+    case "NEW_POST":
       return `/app/post/${referenceId}`;
     case "STORY_LIKE":
     case "STORY_REPLY":
       return `/app/story/${referenceId}`;
+    case "MESSAGE":
     case "MATCH":
       return `/app/chat/${referenceId}`;
     case "CRUSH_ALERT":

@@ -17,6 +17,7 @@
    - [5.4 Communities & Campus Utility Hubs](#54-communities--campus-utility-hubs)
    - [5.5 Chat & Instant Messaging](#55-chat--instant-messaging)
    - [5.6 Campus Time Capsule & Batch Legacy Vault](#56-campus-time-capsule--batch-legacy-vault)
+   - [5.10 Notification & Push Delivery Engine](#510-notification--push-delivery-engine)
 6. [Gamification & Loop Points (LP) Engine](#6-gamification--loop-points-lp-engine)
 7. [Zero-Latency Audio & Physical Haptics Engine](#7-zero-latency-audio--physical-haptics-engine)
 8. [Trust, Safety, Moderation & Legal Compliance](#8-trust-safety-moderation--legal-compliance)
@@ -119,7 +120,9 @@ sequenceDiagram
 
 ## 4. Database Architecture & Schema Topology
 
-The database is built on **Neon Serverless PostgreSQL** and managed through **Drizzle ORM** in [`src/db/schema.ts`](campusloop/src/db/schema.ts).
+The database is built on **Neon Serverless PostgreSQL** and managed through **Drizzle ORM**. The schema is split by domain across [`src/db/schema/`](campusloop/src/db/schema/) (26 modules — `posts`, `users`, `chat`, `notifications`, `dating`, `commercial-marketplace`, …), with every table and relation re-exported through [`src/db/schema.ts`](campusloop/src/db/schema.ts) so application code has one import site.
+
+> **Schema changes reach the database through `bun run db:push`.** The generated `drizzle/` migration chain is stale — its newest snapshot predates most of the current schema, so `drizzle-kit generate` emits a full recreate of every table rather than a delta. Explicit, idempotent DDL for hand-applying against a production Neon branch lives in [`drizzle/manual/`](campusloop/drizzle/manual/).
 
 ```mermaid
 erDiagram
@@ -203,11 +206,18 @@ Located in [`src/lib/feed.ts`](campusloop/src/lib/feed.ts) and [`src/app/api/fee
   - `CAMPUS`: Filtered strictly by `userProfiles.institutionId = profile.institutionId`.
   - `GLOBAL`: Surfaces posts across all 1,350+ Indian colleges.
 - **Sorting Algorithms**:
-  - `for_you`: Decaying time-weighted score + campus locality boost + engagement velocity.
-  - `latest`: Strictly chronological order (`createdAt DESC`).
-  - `trending`: Weighted by comment interaction volume, reposts, and active participant velocity.
+  - `for_you`: Decaying time-weighted score + campus locality boost + engagement velocity + social affinity.
+  - `latest`: Strictly chronological order (`createdAt DESC`) — deliberately **not** affinity-weighted, so "Latest" always means latest.
+  - `trending`: HackerNews/Reddit gravity decay over recent votes and comments, scaled by social affinity.
+  - `viral`: Multi-armed-bandit heavy ranker — velocity derivative + log-scaled engagement floor + stochastic exploration, scaled by social affinity.
+  - `spicy`: Confession-weighted controversy and discussion velocity.
   - `top_voted`: Ranked by net upvotes (`upvotes - downvotes`).
-  - `discussed`: Ranked by total comment count.
+  - `most_discussed`: Ranked by total comment count.
+- **Social Affinity Weighting** (`followAffinityMultiplierSql`):
+  - Posts by a **mutual friend** are multiplied by **1.75×**; posts by someone the viewer **follows one-way** by **1.4×**; everyone else by **1.0×**.
+  - Expressed as a *multiplier*, not a flat bonus, so it composes with any ranking scale — the gravity-decayed trending score and the log-scaled viral score differ by an order of magnitude, and a constant tuned for one would either vanish or dominate in the other.
+  - `for_you` additionally carries the older flat bonuses (+120 friend / +80 follow) alongside its campus-locality and seen-post terms.
+  - Anonymous posts carry no `author_id`, so the affinity term can never boost — or deanonymize — a confession.
 - **Cryptographic Anonymity**:
   - Pseudonymized handles generated via HMAC-SHA256 with institutional salt (`deriveAnonHandle`).
   - Strict isolation prevents moderators or users from linking anonymous confessions to real student profiles.
@@ -267,6 +277,53 @@ Located in [`src/components/landing/time-capsule-showcase.tsx`](campusloop/src/c
 - **Cryptographic Batch Lock**: Sealed letters, predictions, and confessions locked until graduation day.
 - **Live Countdown Timer**: Real-time ticker counting down days, hours, and minutes to convocation.
 - **Unlocked Museum Wall**: Public batch archive rendered after timer expiry.
+
+### 5.10 Notification & Push Delivery Engine
+Located in [`src/lib/notifications.ts`](campusloop/src/lib/notifications.ts), [`src/lib/notification-preferences.ts`](campusloop/src/lib/notification-preferences.ts), [`src/lib/web-push.ts`](campusloop/src/lib/web-push.ts) and [`src/app/api/notifications/`](campusloop/src/app/api/notifications/):
+
+**Payload-free push ("tickles").** Pushes are VAPID-authenticated wake-ups carrying *no* encrypted body. The service worker ([`public/sw.js`](campusloop/public/sw.js)) wakes, calls `/api/notifications/latest` over the student's **own session**, and renders from that. Notification content therefore never passes through Google's, Apple's or Mozilla's push infrastructure — and there is no hand-rolled RFC 8291 payload encryption to get wrong. `src/lib/web-push.ts` signs the VAPID JWT with Web Crypto, so it runs on workerd where the Node-`crypto`-based `web-push` package cannot.
+
+```mermaid
+sequenceDiagram
+    participant A as Actor (student)
+    participant API as Edge API Route
+    participant DB as Neon Postgres
+    participant PS as Push Service (FCM/APNs)
+    participant SW as Service Worker
+
+    A->>API: send DM / publish post / like
+    API->>DB: write the primary row (message, post, vote)
+    API-->>API: fire-and-forget notify()
+    API->>DB: check prefs + per-actor mutes
+    DB-->>API: allowed recipients only
+    API->>DB: INSERT notifications (batched)
+    API->>PS: VAPID tickle, no payload
+    PS->>SW: push event
+    SW->>API: GET /api/notifications/latest (own session)
+    API-->>SW: title, body, deep link, unread badge count
+    SW->>SW: showNotification + setAppBadge
+```
+
+**Notification types.** `LIKE`, `COMMENT`, `REPLY`, `MENTION`, `REPOST`, `MATCH`, `CRUSH_ALERT`, `MILESTONE`, `FOLLOW`, `FRIEND`, `STORY_LIKE`, `STORY_REPLY`, `MESSAGE`, `NEW_POST`. `MATCH` and `MESSAGE` are sent at `high` urgency; the rest ride normal urgency.
+
+**Two silencers, deliberately separate:**
+
+| | Scope | Storage | Where the student sets it |
+| :--- | :--- | :--- | :--- |
+| **Preference** | A whole category — "never ping me about likes" | `notification_preferences` (one row per student, all-on default) | Settings → Platform Preferences |
+| **Mute** | One person, one channel — "his posts, not his DMs" | `notification_mutes` `(user_id, muted_user_id, channel)` | The bell on that person's profile |
+
+`channel` is one of `POST`, `MESSAGE`, `LIKE`, `COMMENT`, `MENTION`, `REPOST`, `FOLLOW`, `STORY`, `MATCH`, or the wildcard `ALL`. Absence of a row means *notify* — a mute is an explicit opt-out, which keeps the hot path a single indexed lookup and makes the default correct for a student who never opens settings.
+
+**Muting is notification-only.** A muted person keeps their place in the feed and keeps the follow-affinity ranking boost, and is never told. Silencing an alert is not unfollowing, and conflating the two is how students end up quietly cut off from their own campus.
+
+**Fan-out economics.** `createNotificationsForMany` is deliberately not a loop over `createNotification`: the mute/preference filter is batched into two `IN` queries and the rows land in one multi-value insert, so a post reaching a thousand followers costs a bounded number of round trips rather than a thousand. Pushes go out in waves of 25 so one worker invocation never opens hundreds of simultaneous sockets, and the audience is capped at **500** recipients — mutual friends are ordered first, so when a popular account exceeds the cap the people who lose the push are one-way followers, not actual friends.
+
+**Message notifications** ([`src/lib/chat-notifications.ts`](campusloop/src/lib/chat-notifications.ts)) additionally respect the per-conversation `conversation_participants.is_muted` flag, and **collapse**: any still-unread `MESSAGE` row for the same thread is cleared before the newest one is written, so a rapid back-and-forth leaves one entry per conversation instead of a wall. Read rows are left alone — they are history, not a backlog.
+
+**Followed-post notifications** ([`src/lib/post-notifications.ts`](campusloop/src/lib/post-notifications.ts)) are the one place anonymity and notifications collide. **Anonymous posts never fan out.** A confession carries no author id and must not carry an actor id either — a "your friend just posted" ping sitting beside an anonymous post would deanonymize it by correlation. The guard lives inside the helper rather than at the call site, so it cannot be forgotten.
+
+**Failure posture.** Every notification path is fire-and-forget and swallows its own errors: a failed push must never fail the message, post or like that triggered it. The preference/mute lookups **fail open** — if the check itself errors the notification is still delivered, on the grounds that a dropped alert is worse than an extra one.
 
 ### 5.7 Semantic Vector Search & Qdrant Cloud Engine
 Located in [`src/lib/qdrant/`](campusloop/src/lib/qdrant/) and [`src/lib/recommendations/`](campusloop/src/lib/recommendations/):
@@ -351,15 +408,47 @@ Located in [`src/lib/moderation/`](campusloop/src/lib/moderation/) and policy ro
 # 1. Type check (Strict: 0 errors allowed)
 bunx tsc --noEmit
 
-# 2. Run unit test suite (56+ tests)
-bun test
+# 2. Lint & format
+bunx biome check --write ./src
 
-# 3. Development server
+# 3. Run unit test suite (110 tests across 19 files)
+bun run test
+
+# 4. Push schema changes to Neon (NOT drizzle-kit generate — see §4)
+bun run db:push
+
+# 5. Development server
 bun run dev
 
-# 4. Deploy to Cloudflare Workers Edge
+# 6. Deploy to Cloudflare Workers Edge
 bun run deploy
 ```
+
+### Build Memory Budget
+
+The production build compiles ~700 source files and ~115k lines through webpack.
+On a 16 GB machine this is unremarkable; on **8 GB it used to be SIGKILLed by the
+macOS memory manager** partway through `Creating an optimized production build`,
+surfacing as an opaque `signal: 'SIGKILL'` from OpenNext rather than an
+out-of-memory message.
+
+Four settings hold peak resident memory down — three in
+[`next.config.ts`](campusloop/next.config.ts), one in the build script:
+
+| Setting | What it does |
+| :--- | :--- |
+| `experimental.webpackMemoryOptimizations` | Frees webpack's cached module sources between compilations |
+| `experimental.webpackBuildWorker` | Runs each compilation in its own short-lived worker, so its heap is reclaimed on exit |
+| `experimental.memoryBasedWorkersCount` | Sizes the static-generation worker pool from *free memory* rather than CPU count |
+| `NODE_OPTIONS='--max-old-space-size=5120'` | Raises the V8 heap ceiling from the 2.2 GB default without inviting an OS-level kill |
+
+**Operational note**: a `next dev` server left running in another project holds
+~700 MB–1 GB. On an 8 GB machine, stop other dev servers before building — the
+config above buys headroom, it does not create RAM.
+
+The build is expected to log `Error resolving merchant session: … couldn't be
+rendered statically because it used cookies` for the `/merchant-portal/*` routes.
+These are Next.js marking those routes dynamic, not failures, and the build exits 0.
 
 ### Git & Deployment Policy:
 - Every step is committed atomically with conventional commit prefixes (`feat:`, `fix:`, `refactor:`).

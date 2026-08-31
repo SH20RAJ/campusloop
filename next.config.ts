@@ -11,6 +11,16 @@ const nextConfig: NextConfig = {
       dynamic: 180,
       static: 600,
     },
+    // ── Build memory budget ──
+    // This is a ~690-file app and the webpack production build used to be
+    // SIGKILLed by the OS on 8 GB machines. These three settings cut peak RSS:
+    // the first frees webpack's cached module sources between compilations,
+    // the second moves each compilation into its own short-lived worker so its
+    // heap is reclaimed on exit, and the third sizes the static-generation
+    // worker pool from free memory instead of the CPU count.
+    webpackMemoryOptimizations: true,
+    webpackBuildWorker: true,
+    memoryBasedWorkersCount: true,
     optimizePackageImports: [
 
       "lucide-react",

@@ -192,8 +192,42 @@ const totalVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int 
 const totalCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)`;
 const hoursSinceSql = sql<number>`(extract(epoch from (now() - ${posts.createdAt})) / 3600.0)`;
 
-// HackerNews + Reddit gravity trending
-const trendingScoreSql = sql<number>`((${recentVoteScoreSql} * 3.5 + ${recentCommentCountSql} * 2.5 + 1.0) / power(${hoursSinceSql} + 2.0, 0.75))`;
+/**
+ * Social affinity between the viewer and a post's author.
+ *
+ * Expressed as a multiplier rather than a flat bonus so it composes with any
+ * ranking scale: the gravity-decayed trending score and the log-scaled viral
+ * score differ by an order of magnitude, and an additive constant tuned for one
+ * would either vanish or dominate in the other. A multiplier keeps "friends
+ * rank above strangers, all else equal" true in both.
+ *
+ * Anonymous posts have no author id, so they are naturally unaffected — a
+ * confession can never be boosted by who wrote it.
+ */
+function followAffinityMultiplierSql(viewerProfileId?: string | null) {
+  if (!viewerProfileId) return sql<number>`1.0`;
+  return sql<number>`(case
+		when exists(
+			select 1 from ${follows}
+			where ${follows.followerId} = ${viewerProfileId}
+				and ${follows.followingId} = ${posts.authorId}
+				and ${follows.isMutual} = true
+		) then 1.75
+		when exists(
+			select 1 from ${follows}
+			where ${follows.followerId} = ${viewerProfileId}
+				and ${follows.followingId} = ${posts.authorId}
+		) then 1.4
+		else 1.0
+	end)`;
+}
+
+// HackerNews + Reddit gravity trending, scaled by who the viewer follows
+const baseTrendingScoreSql = sql<number>`((${recentVoteScoreSql} * 3.5 + ${recentCommentCountSql} * 2.5 + 1.0) / power(${hoursSinceSql} + 2.0, 0.75))`;
+
+function getTrendingScoreSql(viewerProfileId?: string | null) {
+  return sql<number>`(${baseTrendingScoreSql} * ${followAffinityMultiplierSql(viewerProfileId)})`;
+}
 
 // 🌶️ State-of-the-art Confessions Spicy Algorithm:
 // High weight on discussion velocity, controversy delta, and fresh secret exploration
@@ -206,7 +240,7 @@ const spicyScoreSql = sql<number>`(
 
 // 🚀 Multi-Armed Bandit / Epsilon-Greedy Viral Algorithm (TikTok / Twitter Heavy Ranker inspired):
 // Logarithmic engagement magnitude + velocity derivative + stochastic exploration injection
-const viralScoreSql = sql<number>`(
+const baseViralScoreSql = sql<number>`(
 	-- Velocity Derivative (First derivative of campus interactions over age)
 	((${recentVoteScoreSql} * 4.2 + ${recentCommentCountSql} * 5.8 + 2.0) / power(${hoursSinceSql} + 0.65, 1.28))
 	-- Log-scale engagement floor
@@ -218,6 +252,10 @@ const viralScoreSql = sql<number>`(
 	-- Interactive / poll / confession bonus
 	+ (case when ${posts.type} in ('POLL', 'QUESTION', 'CONFESSION', 'MEME') then 6.0 else 0.0 end)
 )`;
+
+function getViralScoreSql(viewerProfileId?: string | null) {
+  return sql<number>`(${baseViralScoreSql} * ${followAffinityMultiplierSql(viewerProfileId)})`;
+}
 
 function getForYouScoreSql(
   userInstitutionId?: string | null,
@@ -329,13 +367,13 @@ export function getFeedOrderBy(
       orderClauses.push(desc(commentCountSql));
       break;
     case "trending":
-      orderClauses.push(desc(trendingScoreSql));
+      orderClauses.push(desc(getTrendingScoreSql(viewerProfileId)));
       break;
     case "spicy":
       orderClauses.push(desc(spicyScoreSql));
       break;
     case "viral":
-      orderClauses.push(desc(viralScoreSql));
+      orderClauses.push(desc(getViralScoreSql(viewerProfileId)));
       break;
     case "random":
       orderClauses.push(sql`random()`);

@@ -39,16 +39,16 @@ Student life is fragmented across loose WhatsApp groups, Instagram pages, Discor
 ## 🌟 The Core Product Layers
 
 ```
-                               ┌─────────────────────────────────────────┐
-                               │     🎓 CAMPUSLOOP PRODUCT ARCHITECTURE  │
-                               └────────────────────┬────────────────────┘
-                                                    │
-     ┌───────────────────┬──────────────────┬───────┴──────────┬──────────────────┐
-     ▼                   ▼                  ▼                  ▼                  ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│  1. IDENTITY │  │  2. SOCIAL   │  │3. CONNECTION │  │  4. UTILITY  │  │  5. CLOUT    │
-│  GATEKEEPING │  │   & FEEDS    │  │  & MATCHING  │  │ & SUB-HUBS   │  │ GAMIFICATION │
-└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
+                    ┌─────────────────────────────────────────┐
+                    │   🎓 CAMPUSLOOP PRODUCT ARCHITECTURE     │
+                    └────────────────────┬────────────────────┘
+                                         │
+      ┌─────────────┬─────────────┬──────┴──────┬─────────────┬─────────────┐
+      ▼             ▼             ▼             ▼             ▼             ▼
+┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐
+│1. IDENTITY │ │ 2. SOCIAL  │ │3. ATTENTION│ │4. CONNECT  │ │ 5. UTILITY │ │  6. CLOUT  │
+│GATEKEEPING │ │  & FEEDS   │ │& NOTIFYING │ │ & MATCHING │ │ & SUB-HUBS │ │GAMIFICATION│
+└────────────┘ └────────────┘ └────────────┘ └────────────┘ └────────────┘ └────────────┘
 ```
 
 ### 1. 🛡️ Identity & Gatekeeping Layer
@@ -94,14 +94,23 @@ type** — which is what makes the upgrade painless years later.
 - **Mutual Video Opt-In**: Transition from anonymous text to live video only when both students consent.
 - **Mutual Identity Reveal & Social Follow**: Reveal real college identities or tap "Become Friends" to instantly connect on CampusLoop's social graph.
 
-### 4. 💖 Connection & Matchmaking Layer (`/app/dating`)
+### 4. 🔔 Notifications & Attention Layer (`/app/notifications`)
+- **Instant Phone Pings**: Web Push wakes your phone the moment a classmate DMs you, likes your post, replies, mentions you, or follows you — including from an installed PWA on Android and iOS.
+- **Posts From People You Follow**: When a friend or someone you follow publishes, you hear about it — and their post is ranked higher in your feed rather than buried under strangers.
+- **Per-Person Mute, Not Unfollow**: Tap the bell on anyone's profile to silence *their posts*, *their messages*, or *everything* — without unfollowing them, without them ever being told, and without them leaving your feed.
+- **Per-Category Switches**: Turn off a whole class of alert (likes, reposts, mentions, matches) from Settings, or narrow post alerts to mutual friends only.
+- **Inbox, Not a Log**: A rapid chat back-and-forth collapses to one entry per conversation instead of a wall of rows.
+- **Confessions Stay Confessions**: Anonymous posts never trigger a follower notification — a "your friend just posted" ping beside an anonymous post would deanonymize it by correlation.
+- **Privacy by Construction**: Pushes carry *no payload*. Your phone receives an empty authenticated wake-up, then fetches the content over your own session — notification text never passes through Google's or Apple's push servers.
+
+### 5. 💖 Connection & Matchmaking Layer (`/app/dating`)
 - **Campus Match Swipe Deck**: Draggable Framer Motion cards with velocity-based release detection (`velocity.x > 400 || offset.x > 80`).
 - **Curated Unsplash Student Portraits**: Verified college portrait sets replacing cartoon Dicebear avatars.
 - **Circular PFP Previews**: Sleek circular avatar rendered directly before candidate names.
 - **Zero-Lag Preloader**: Instant image preloading in browser memory for smooth swipe transitions.
 - **Secret Crush & Mutual Match**: Cryptographic crush escrow revealing identity only when feelings are mutual.
 
-### 5. 🏫 Campus Utility & Dedicated Sub-Hubs (`/app/communities`)
+### 6. 🏫 Campus Utility & Dedicated Sub-Hubs (`/app/communities`)
 - **Reddit-Style Sub-Hubs**: Authentic student interest communities (`c/coding`, `c/music-band`, `c/anime`) with custom sorting (*Hot, New, Top, Rising, Discussed*).
 - **6 Dedicated Campus Portals**:
   - 🔎 [**/app/lost-and-found**](https://campusloop.space/app/lost-and-found) — Lost calculators, ID cards, keys & cycle locks.
@@ -111,12 +120,12 @@ type** — which is what makes the upgrade painless years later.
   - 🏠 [**/app/housing**](https://campusloop.space/app/housing) — Flat hunting and roommate matching.
   - 📚 [**/app/academics**](https://campusloop.space/app/academics) — Exam-night handwritten notes & solved PYQs.
 
-### 5. ⏳ Campus Time Capsule & Batch Legacy Vault (`/app/capsule`)
+### 7. ⏳ Campus Time Capsule & Batch Legacy Vault (`/app/capsule`)
 - **Cryptographically Sealed Vaults**: Contribute batch predictions, hostel confessions, and convocation letters.
 - **Graduation Day Countdown**: Real-time ticker counting down days, hours, and minutes until convocation.
 - **Unlocked Museum Wall**: Automatically transforms into a public alumni celebration wall upon timer expiry.
 
-### 6. ⚡ Clout, Reputation & Virality (Loop Points - LP)
+### 8. ⚡ Clout, Reputation & Virality (Loop Points - LP)
 - **Micro-Incentives**: Earn **Loop Points (LP)** for participation:
   - **+20 LP**: Per successful verified student referral.
   - **+5 LP**: Per post created.
@@ -148,13 +157,16 @@ The value of CampusLoop is **not** in total user headcount across India — it i
 
 ## 🛠️ Tech Stack & Architecture
 
-- **Framework**: Next.js 16 (App Router + Turbopack)
+- **Framework**: Next.js 16.2.6 (App Router; production builds use the **webpack** compiler — `next build --webpack` — which is what OpenNext consumes)
 - **Runtime & Edge Deployment**: Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`)
 - **Database**: Neon Serverless Postgres via Drizzle ORM
 - **Authentication**: Hexclave Auth (`hexclaveServerApp.getUser()`)
 - **Zero-Latency Audio**: Synthesized Web Audio API (`src/lib/sounds.ts`)
 - **Haptics**: Native vibration engine (`src/lib/haptics.ts`)
 - **Styling & UI**: Vanilla CSS + TailwindCSS + Framer Motion + Lucide Icons + Sonner Toasts
+- **Push Notifications**: Web Push over VAPID, signed with Web Crypto so it runs on workerd (`src/lib/web-push.ts`) + a payload-free service worker (`public/sw.js`)
+- **Semantic Search**: Qdrant Cloud vectors as a strictly optional layer behind a 600 ms timeout and circuit breaker, falling back to Postgres
+- **Caching & Presence**: Upstash Redis
 - **Package Manager**: Bun (`bun run dev`, `bun run deploy`)
 
 ---
@@ -186,12 +198,17 @@ campusloop/
 │   │   ├── communities/       # Sub-hubs & dedicated utility portal clients
 │   │   ├── stories/           # Fullscreen story viewer & creator components
 │   │   ├── chat/              # Responsive messenger pane & sticker paste
+│   │   ├── notifications/     # Push opt-in, per-category switches, per-person mute
 │   │   ├── marketing/         # Minimal document layout & legal navigation
 │   │   └── ui/                # Shared UI primitives
-│   ├── db/                    # Drizzle ORM schema & Neon database client
+│   ├── db/
+│   │   ├── schema/            # 26 domain schema modules (posts, users, chat, …)
+│   │   ├── schema.ts          # Single re-export barrel for all tables & relations
+│   │   └── index.ts           # Neon serverless client
 │   ├── hexclave/              # Hexclave SDK config
 │   ├── hooks/                 # Custom React hooks (useFeed, useProfile, usePostActions)
-│   └── lib/                   # API client, sounds, haptics, moderation & LP utilities
+│   └── lib/                   # API client, feed ranking, notifications, push, sounds,
+│                              # haptics, Qdrant vectors, moderation & LP utilities
 └── .agents/
     └── skills/
         └── campusloop-guide/  # Comprehensive AI agent handbook
@@ -201,15 +218,16 @@ campusloop/
 
 ## 📈 Codebase Size & Architecture Metrics
 
-> 🕒 **Last Updated**: August 31, 2026, 09:52 AM IST
+> 🕒 **Last Updated**: August 31, 2026
 
 ### High-Level Summary
 
 | Metric | Measurement |
 | :--- | :--- |
-| **Total Source Files** *(excl. `node_modules`, `.next`, `.git`)* | **756 files** |
-| **Total Lines of Code (TS/TSX/JS/CSS/SQL/Config)** | **~128,000+ lines** |
-| **Core Source Code (`src/`)** | **~4.88 MB** (642 files, **111,720 lines**) |
+| **Total Source Files** *(excl. `node_modules`, `.next`, `.git`)* | **~815 files** |
+| **Total Lines of Code (TS/TSX/JS/CSS/SQL/Config)** | **~131,000+ lines** |
+| **Core Source Code (`src/`)** | **~6.9 MB** (700 files, **114,640 lines**) |
+| **Unit Tests** | **110 tests** across **19 files** (`bun run test`) |
 | **Scripts & Migrations (`scripts/`, `drizzle/`)** | **~418 KB** (48 files, **13,161 lines**) |
 | **Documentation (`docs/`, Markdown files)** | **~286 KB** (25 files, **8,473 lines**) |
 | **Public Assets (`public/`)** | **~17.0 MB** *(images, icons, manifest, llms.txt)* |
@@ -219,16 +237,16 @@ campusloop/
 
 ```
 src/
-├── app/                  # 373 files  │  63,033 lines  │  Next.js App Router (Pages, Layouts & APIs)
-│   ├── app/              # 129 files  │  24,352 lines  │  Main App Shell (Feed, Dating, Stories, Chat, etc.)
-│   ├── api/              # 116 files  │  12,522 lines  │  Edge REST APIs & Qdrant semantic indexing
-│   ├── admin/            #  43 files  │   7,177 lines  │  Moderation, user verification, & audit console
-│   └── merchant-portal/  #  37 files  │   4,901 lines  │  Merchant listings, student deals & marketplace
-├── components/           # 147 files  │  34,993 lines  │  Feature subcomponents & Radix/Shadcn primitives
-├── lib/                  #  67 files  │   8,320 lines  │  Qdrant vector search, recommendations & utils
-├── db/                   #  26 files  │   2,789 lines  │  Drizzle ORM schema definitions & Neon client
-├── hooks/                #  14 files  │   1,254 lines  │  Custom React hooks (useFeed, useProfile, etc.)
-├── constants/            #  12 files  │   1,244 lines  │  Static configs, navigational layouts, and metadata
+├── app/                  # 407 files  │  60,013 lines  │  Next.js App Router (Pages, Layouts & APIs)
+│   ├── app/              # 150 files  │  27,771 lines  │  Main App Shell (Feed, Dating, Stories, Chat, etc.)
+│   ├── api/              # 128 files  │  14,237 lines  │  Edge REST APIs & Qdrant semantic indexing
+│   ├── admin/            #  43 files  │   7,716 lines  │  Moderation, user verification, & audit console
+│   └── merchant-portal/  #  39 files  │   5,316 lines  │  Merchant listings, student deals & marketplace
+├── components/           # 157 files  │  39,328 lines  │  Feature subcomponents & Radix/Shadcn primitives
+├── lib/                  #  78 files  │   9,386 lines  │  Feed ranking, notifications & push, Qdrant, utils
+├── db/                   #  28 files  │   3,111 lines  │  Drizzle ORM schema modules & Neon client
+├── hooks/                #  15 files  │   1,392 lines  │  Custom React hooks (useFeed, useProfile, etc.)
+├── constants/            #  12 files  │   1,323 lines  │  Static configs, navigational layouts, and metadata
 └── hexclave/             #   2 files  │      24 lines  │  Hexclave Auth server and client integrations
 ```
 
@@ -244,30 +262,55 @@ bun install
 ```
 
 ### 2. Environment Variables
-Create a `.env.local` file:
+Create a `.env.local` file (see [`.env.example`](.env.example) for the full list):
 ```env
 DB_URL="postgresql://neondb_owner:..."
 NEXT_PUBLIC_HEXCLAVE_API_URL="https://api.stack-auth.com"
 NEXT_PUBLIC_HEXCLAVE_PROJECT_ID="e40e0f..."
 HEXCLAVE_SECRET_SERVER_KEY="ssk_..."
+
+# Web Push (optional — without these, in-app and browser notifications still
+# work; only background push to a closed tab or installed PWA is disabled)
+NEXT_PUBLIC_VAPID_PUBLIC_KEY="B..."   # uncompressed P-256 point, 65 bytes
+VAPID_PRIVATE_KEY="..."
+VAPID_SUBJECT="mailto:hello@campusloop.space"
 ```
 
-### 3. Development & Type Check
+### 3. Database Schema
+Schema changes are applied with **`db:push`**, not `drizzle-kit generate` — the
+generated `drizzle/` migration chain is stale and would emit a full recreate of
+every table. Explicit idempotent DDL for hand-applying to production lives in
+[`drizzle/manual/`](drizzle/manual/).
+```bash
+bun run db:push
+```
+
+### 4. Development, Type Check & Tests
 ```bash
 # Type Check (Must compile cleanly with 0 errors)
 bunx tsc --noEmit
 
-# Run Unit Tests
-bun test
+# Lint & format
+bunx biome check --write ./src
+
+# Run Unit Tests (110 tests, 19 files)
+bun run test
 
 # Development Server
 bun run dev
 ```
 
-### 4. Cloudflare Edge Deployment
+### 5. Cloudflare Edge Deployment
 ```bash
 bun run deploy
 ```
+
+> 💾 **Building on 8 GB of RAM?** The production build compiles ~700 files and
+> the OS used to kill it mid-build (an opaque `signal: 'SIGKILL'`). `next.config.ts`
+> now enables `webpackMemoryOptimizations`, `webpackBuildWorker` and
+> `memoryBasedWorkersCount`, and the build script raises the V8 heap to 5 GB.
+> Still stop any other `next dev` servers first — each one holds ~1 GB.
+> See [ARCHITECTURE.md §10](ARCHITECTURE.md#10-build-test--deployment-workflow).
 
 ---
 

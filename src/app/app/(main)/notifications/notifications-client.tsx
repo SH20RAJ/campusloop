@@ -11,7 +11,9 @@ import {
   MessageCircle,
   MoreHorizontal,
   Repeat2,
+  Send,
   ShieldCheck,
+  Sparkles,
   Trash2,
   Trophy,
   UserPlus,
@@ -155,6 +157,22 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
           href: "/app/profile",
           actionLabel: "View clout",
         };
+      case "MESSAGE":
+        return {
+          icon: <Send className="size-3.5 text-sky-500 stroke-2" />,
+          badgeBg: "bg-sky-500/15 border-sky-500/30 text-sky-500",
+          actionText: "sent you a message",
+          href: n.referenceId ? `/app/chat/${n.referenceId}` : "/app/chat",
+          actionLabel: "Reply",
+        };
+      case "NEW_POST":
+        return {
+          icon: <Sparkles className="size-3.5 text-violet-500 stroke-2" />,
+          badgeBg: "bg-violet-500/15 border-violet-500/30 text-violet-500",
+          actionText: "posted something new",
+          href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
+          actionLabel: "View post",
+        };
       default:
         return {
           icon: <Zap className="size-3.5 text-primary" />,
@@ -202,6 +220,8 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
 
   const tabs: { id: NotificationTab; label: string }[] = [
     { id: "all", label: "All" },
+    { id: "messages", label: "Messages" },
+    { id: "posts", label: "From people you follow" },
     { id: "mentions", label: "Mentions" },
     { id: "replies", label: "Replies" },
     { id: "reactions", label: "Reactions" },

@@ -7,6 +7,7 @@ import { hexclaveServerApp } from "@/hexclave/server";
 import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
 import { runSafetyCheck } from "@/lib/moderation/rules";
 import { notifyMentions } from "@/lib/notifications";
+import { notifyFollowersOfNewPost } from "@/lib/post-notifications";
 import { indexPostVector } from "@/lib/qdrant/indexer";
 import { rejectViewerWrite } from "@/lib/viewer";
 
@@ -114,6 +115,17 @@ export async function POST(req: Request) {
       actorId: profile.id,
       referenceId: newPost.id,
     }).catch((err) => console.warn("Mention notification error:", err));
+
+    // Tell followers and friends there is something new. Anonymous posts are
+    // filtered out inside the helper — an author-attributed ping would undo the
+    // anonymity the post row is careful to preserve.
+    notifyFollowersOfNewPost({
+      postId: newPost.id,
+      authorId: anonymous ? null : profile.id,
+      isAnonymous: anonymous,
+      title: title || null,
+      body,
+    }).catch((err) => console.warn("New post notification error:", err));
 
     // Asynchronously index post vector in Qdrant (fire-and-forget)
     indexPostVector({

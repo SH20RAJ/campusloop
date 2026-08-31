@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { conversations, messages, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { notifyNewMessage } from "@/lib/chat-notifications";
 import { recordHeartbeat } from "@/lib/presence-server";
 import { rejectViewerWrite } from "@/lib/viewer";
 
@@ -111,6 +112,11 @@ export async function POST(req: Request, { params }: RouteParams) {
 
     // Update conversation updatedAt to trigger re-sorting in conversation list
     await db.update(conversations).set({ updatedAt: new Date() }).where(eq(conversations.id, id));
+
+    // Ping the other participants' devices. Fire-and-forget: the sender's
+    // request must not wait on push delivery, and a push failure must not
+    // fail a message that is already stored.
+    notifyNewMessage({ conversationId: id, senderId: profile.id, body }).catch(() => {});
 
     // Return message populated with sender
     const populatedMessage = {

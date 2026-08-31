@@ -36,6 +36,7 @@ import { archivePost, deletePost } from "@/app/app/(main)/post/actions";
 import { ArticleCard } from "@/components/articles/article-card";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
+import { MuteUserMenu } from "@/components/notifications/mute-user-menu";
 import { FollowButton } from "@/components/profile/follow-button";
 import { ProfileHighlights } from "@/components/profile/profile-highlights";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -504,6 +505,7 @@ export function ProfileClientView({
                       <MessageSquare className="size-3.5" />
                       <span className="hidden xs:inline">Message</span>
                     </Link>
+                    <MuteUserMenu userId={profile.id} displayName={profile.displayName} />
                     <FollowButton
                       username={profile.username}
                       displayName={profile.displayName}

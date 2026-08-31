@@ -36,7 +36,7 @@ import { housingListings } from "./housing";
 import { institutionDomains, institutions } from "./institutions";
 import { lostAndFoundItems } from "./lost-and-found";
 import { marketplaceItems } from "./marketplace";
-import { notifications } from "./notifications";
+import { notificationMutes, notificationPreferences, notifications } from "./notifications";
 import { comments, pollOptions, pollVotes, posts, votes } from "./posts";
 import { randomMessages, randomQueue, randomReports, randomSessions } from "./random-loop";
 import { ridesharePools } from "./rideshare";
@@ -249,6 +249,26 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   }),
   actor: one(userProfiles, {
     fields: [notifications.actorId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const notificationMutesRelations = relations(notificationMutes, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [notificationMutes.userId],
+    references: [userProfiles.id],
+    relationName: "notification_mute_owner",
+  }),
+  mutedUser: one(userProfiles, {
+    fields: [notificationMutes.mutedUserId],
+    references: [userProfiles.id],
+    relationName: "notification_mute_target",
+  }),
+}));
+
+export const notificationPreferencesRelations = relations(notificationPreferences, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [notificationPreferences.userId],
     references: [userProfiles.id],
   }),
 }));

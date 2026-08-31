@@ -3,7 +3,15 @@
 import useSWR from "swr";
 import { fetcher } from "@/lib/api";
 
-export type NotificationTab = "all" | "mentions" | "replies" | "reactions" | "crushes" | "verified";
+export type NotificationTab =
+  | "all"
+  | "messages"
+  | "posts"
+  | "mentions"
+  | "replies"
+  | "reactions"
+  | "crushes"
+  | "verified";
 
 export interface NotificationItem {
   id: string;
@@ -20,7 +28,9 @@ export interface NotificationItem {
     | "STORY_LIKE"
     | "STORY_REPLY"
     | "FOLLOW"
-    | "FRIEND";
+    | "FRIEND"
+    | "MESSAGE"
+    | "NEW_POST";
   actorId: string;
   referenceId: string | null;
   previewText: string | null;

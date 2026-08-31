@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { NotificationPreferencesPanel } from "@/components/notifications/notification-preferences-panel";
 import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SignOutButton } from "@/components/ui/sign-out-button";
@@ -249,6 +250,9 @@ export function SettingsClient({ profile }: SettingsClientProps) {
           <div className="space-y-4 pt-1">
             {/* Browser / PWA push opt-in */}
             <PushNotificationToggle />
+
+            {/* Per-category notification switches */}
+            <NotificationPreferencesPanel />
 
             {/* Feed Anonymity 2-Modes Toggler */}
             <div className="p-4 rounded-2xl border border-border/60 bg-muted/20 space-y-3">

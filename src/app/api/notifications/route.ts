@@ -36,6 +36,10 @@ export async function GET(req: NextRequest) {
       whereConditions.push(inArray(notifications.type, ["LIKE", "REPOST", "STORY_LIKE"]));
     } else if (tab === "crushes") {
       whereConditions.push(inArray(notifications.type, ["CRUSH_ALERT", "MATCH"]));
+    } else if (tab === "messages") {
+      whereConditions.push(eq(notifications.type, "MESSAGE"));
+    } else if (tab === "posts") {
+      whereConditions.push(eq(notifications.type, "NEW_POST"));
     }
 
     const rawNotifications = await db.query.notifications.findMany({
@@ -194,6 +198,10 @@ export async function DELETE(req: NextRequest) {
         conditions.push(inArray(notifications.type, ["LIKE", "REPOST", "STORY_LIKE"]));
       } else if (tab === "crushes") {
         conditions.push(inArray(notifications.type, ["CRUSH_ALERT", "MATCH"]));
+      } else if (tab === "messages") {
+        conditions.push(eq(notifications.type, "MESSAGE"));
+      } else if (tab === "posts") {
+        conditions.push(eq(notifications.type, "NEW_POST"));
       }
 
       await db.delete(notifications).where(and(...conditions));

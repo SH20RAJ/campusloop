@@ -26,6 +26,7 @@ export type EmbedType =
   | "internal_college"
   | "internal_event"
   | "internal_post"
+  | "internal_article"
   | "opengraph";
 
 export interface ParsedEmbed {
@@ -206,6 +207,17 @@ export function extractEmbedsFromText(text: string): ParsedEmbed[] {
           });
           continue;
         }
+
+        // Article: /app/articles/slug or /a/slug
+        const articleMatch = path.match(/^\/(?:app\/articles\/|a\/|articles\/)([a-zA-Z0-9_-]+)/);
+        if (articleMatch && articleMatch[1] !== "new" && articleMatch[1] !== "dashboard") {
+          embeds.push({
+            type: "internal_article",
+            rawUrl: cleanUrl,
+            slug: articleMatch[1],
+          });
+          continue;
+        }
       }
     } catch {
       // Ignore URL parse error
@@ -257,6 +269,24 @@ export function extractEmbedsFromText(text: string): ParsedEmbed[] {
         type: "internal_event",
         rawUrl: `/app/events/${id}`,
         id,
+      });
+    }
+  }
+
+  const internalArticleRegex =
+    /(?:^|\s)(?:https?:\/\/(?:campusloop\.space|localhost(?::\d+)?)\/)?(?:\/)?(?:app\/articles\/|a\/|articles\/)([a-zA-Z0-9_-]+)/g;
+  while ((match = internalArticleRegex.exec(text)) !== null) {
+    const slug = match[1];
+    if (
+      slug &&
+      slug !== "new" &&
+      slug !== "dashboard" &&
+      !embeds.some((e) => e.type === "internal_article" && e.slug === slug)
+    ) {
+      embeds.push({
+        type: "internal_article",
+        rawUrl: `/app/articles/${slug}`,
+        slug,
       });
     }
   }

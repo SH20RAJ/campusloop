@@ -40,12 +40,12 @@ import {
   setCachedMessages,
   updateCachedConversationLastMessage,
 } from "@/lib/chat-cache";
-import { extractYouTubeId } from "@/lib/embeds";
 import { haptics } from "@/lib/haptics";
 import { isOnline, presenceLabel } from "@/lib/presence";
 import { sounds } from "@/lib/sounds";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
+import { ChatMessageContent } from "./chat-message-content";
 import { ChatUserInfoDrawer } from "./chat-user-info-drawer";
 
 const fetcher = async <T,>(url: string): Promise<T> => {
@@ -70,34 +70,6 @@ interface MessengerPaneProps {
 }
 
 const QUICK_REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥"];
-
-/**
- * Chat reuses the shared feed parser so a link that embeds in a post embeds in
- * a DM too (Shorts, live streams and `m.`/`music.` links included).
- */
-function getYouTubeVideoId(text: string) {
-  return extractYouTubeId(text);
-}
-
-function renderMessageWithMentions(text: string) {
-  const parts = text.split(/(@[a-zA-Z0-9_]+)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("@") && part.length > 1) {
-      const username = part.slice(1);
-      return (
-        <Link
-          key={i}
-          href={`/@${username}`}
-          className="font-bold text-primary hover:underline inline-block px-1 py-0.5 rounded-md bg-primary/10 transition-colors"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {part}
-        </Link>
-      );
-    }
-    return part;
-  });
-}
 
 export function MessengerPane({
   conversationId,
@@ -1017,9 +989,6 @@ export function MessengerPane({
                 messageBody = lines.slice(1).join("\n\n") || lines[0];
               }
 
-              // Detect YouTube Video URL
-              const ytVideoId = getYouTubeVideoId(messageBody);
-
               // If Secret Crush Match System card: render centered in chat
               if (isSecretCrushMatch) {
                 return (
@@ -1152,23 +1121,23 @@ export function MessengerPane({
                     {/* ─── Message Bubble ─── */}
                     <div
                       className={cn(
-                        "max-w-[85%] sm:max-w-[70%] space-y-1 relative",
-                        isMe ? "items-end text-right" : "items-start text-left"
+                        "max-w-[88%] sm:max-w-[78%] md:max-w-[70%] space-y-1 relative text-left",
+                        isMe ? "items-end" : "items-start"
                       )}
                     >
                       <div
                         className={cn(
-                          "relative text-[14px] leading-relaxed transition-all shadow-xs",
+                          "relative text-[14px] leading-relaxed transition-all shadow-xs text-left",
                           isDirectMedia
                             ? "p-0 bg-transparent border-0"
                             : isMe
-                              ? "bg-[#1d9bf0] text-white rounded-2xl rounded-br-xs px-4 py-2.5"
-                              : "bg-[#202327] dark:bg-[#202327] bg-neutral-100 text-foreground rounded-2xl rounded-bl-xs px-4 py-2.5 border border-border/20"
+                              ? "bg-sky-600 dark:bg-sky-600/90 hover:bg-sky-600 text-white rounded-2xl rounded-br-xs px-4 py-2.5 shadow-sm"
+                              : "bg-neutral-100 dark:bg-[#1f2328] text-foreground rounded-2xl rounded-bl-xs px-4 py-2.5 border border-border/40 shadow-sm"
                         )}
                       >
                         {/* Group Sender Name */}
                         {!isMe && (otherParticipant.isGroup || otherParticipant.isCommunity) && (
-                          <div className="flex items-center gap-1 mb-1 leading-none">
+                          <div className="flex items-center gap-1 mb-1.5 leading-none">
                             <span className="text-[11px] font-black text-primary">
                               {msg.sender?.displayName || "Member"}
                             </span>
@@ -1184,10 +1153,10 @@ export function MessengerPane({
                         {isQuoted && (
                           <div
                             className={cn(
-                              "mb-1.5 p-1.5 px-2.5 rounded-lg border-l-3 text-[11px] font-medium leading-tight truncate text-left",
+                              "mb-2 p-1.5 px-2.5 rounded-lg border-l-3 text-[11px] font-medium leading-tight truncate text-left",
                               isMe
-                                ? "bg-black/15 border-white/80 text-primary-foreground/90"
-                                : "bg-muted/70 border-primary text-muted-foreground"
+                                ? "bg-black/20 border-white/90 text-white/90"
+                                : "bg-muted/80 border-primary text-muted-foreground"
                             )}
                           >
                             <p className="font-bold text-[10px] opacity-80">Quoted</p>
@@ -1195,7 +1164,7 @@ export function MessengerPane({
                           </div>
                         )}
 
-                        {/* Content: Direct Image, Voice Memo, or Plain Text */}
+                        {/* Content: Direct Image, Voice Memo, or Plain Text with Mentions & Embeds */}
                         {isDirectMedia ? (
                           <div className="relative overflow-hidden rounded-2xl border border-border/40 shadow-xs">
                             <img
@@ -1258,42 +1227,27 @@ export function MessengerPane({
                             </div>
                           </div>
                         ) : (
-                          <div className="space-y-1">
-                            <p className="whitespace-pre-wrap break-words pr-12 text-[13px]">
-                              {renderMessageWithMentions(messageBody)}
-                            </p>
-
-                            {/* YouTube Video Embed Player */}
-                            {ytVideoId && (
-                              <div className="mt-2 overflow-hidden rounded-xl aspect-video w-full max-w-sm border border-border/40 shadow-sm">
-                                <iframe
-                                  src={`https://www.youtube-nocookie.com/embed/${ytVideoId}`}
-                                  title="YouTube video player"
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                  allowFullScreen
-                                  className="w-full h-full border-0"
-                                />
-                              </div>
-                            )}
+                          <div className="space-y-1 text-left">
+                            <ChatMessageContent content={messageBody} isMe={isMe} />
 
                             {/* WhatsApp-Style Bottom Right Timestamp & Seen Double Ticks */}
                             <div
                               className={cn(
-                                "flex items-center justify-end gap-1 text-[9px] font-medium select-none -mt-1 float-right ml-2 pt-0.5",
-                                isMe ? "text-primary-foreground/75" : "text-muted-foreground"
+                                "flex items-center justify-end gap-1 text-[9.5px] font-medium select-none -mt-0.5 float-right ml-2 pt-0.5",
+                                isMe ? "text-white/80" : "text-muted-foreground"
                               )}
                             >
                               <span>{formatTime(msg.createdAt)}</span>
                               {isMe &&
                                 (msg.optimistic ? (
-                                  <Loader2 className="size-2.5 animate-spin text-primary-foreground/70" />
+                                  <Loader2 className="size-2.5 animate-spin text-white/70" />
                                 ) : msg.readAt ? (
                                   <span title="Seen">
-                                    <CheckCheck className="size-3.5 text-sky-300 font-bold" />
+                                    <CheckCheck className="size-3.5 text-sky-200 font-bold" />
                                   </span>
                                 ) : (
                                   <span title="Delivered">
-                                    <CheckCheck className="size-3.5 text-primary-foreground/70" />
+                                    <CheckCheck className="size-3.5 text-white/80" />
                                   </span>
                                 ))}
                             </div>

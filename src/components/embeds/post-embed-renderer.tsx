@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { extractEmbedsFromText } from "@/lib/embeds";
+import { ArticleEmbed } from "./article-embed";
 import { CommunityEmbed } from "./community-embed";
 import { EventEmbed } from "./event-embed";
 import { LinkPreviewEmbed } from "./link-preview-embed";
@@ -44,6 +45,9 @@ export function PostEmbedRenderer({ content }: PostEmbedRendererProps) {
 
           case "internal_event":
             return embed.id ? <EventEmbed key={key} eventId={embed.id} /> : null;
+
+          case "internal_article":
+            return embed.slug ? <ArticleEmbed key={key} slug={embed.slug} /> : null;
 
           case "opengraph":
             return <LinkPreviewEmbed key={key} url={embed.rawUrl} />;

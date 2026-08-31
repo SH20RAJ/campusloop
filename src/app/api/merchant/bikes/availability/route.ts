@@ -2,29 +2,25 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { bikeAvailabilityBlocks, bikeBookings, bikes, merchants, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
+import { resolveMerchantSession } from "@/lib/merchant-session";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // The caller's own store, not "whichever rentals merchant exists first" —
+    // that showed every rental store the same bookings, including other
+    // students' names, phone numbers and licence details.
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
     const bikeId = searchParams.get("bikeId");
 
     const db = getDb();
-    const merchant = await db.query.merchants.findFirst({
-      where: eq(merchants.categorySlug, "rentals"),
-    });
-
-    if (!merchant) {
-      return NextResponse.json({ error: "No rental merchant found" }, { status: 404 });
-    }
 
     const fleet = await db.query.bikes.findMany({
       where: eq(bikes.merchantId, merchant.id),
@@ -64,30 +60,15 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // The caller's own store, not "whichever rentals merchant exists first" —
+    // that showed every rental store the same bookings, including other
+    // students' names, phone numbers and licence details.
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const db = getDb();
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
-
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
-    }
-
-    const viewerBlocked = await rejectViewerWrite(profile);
-    if (viewerBlocked) return viewerBlocked;
-
-    const merchant = await db.query.merchants.findFirst({
-      where: eq(merchants.categorySlug, "rentals"),
-    });
-
-    if (!merchant) {
-      return NextResponse.json({ error: "No rental merchant found" }, { status: 404 });
-    }
 
     const body = (await req.json()) as Record<string, any>;
     const { bikeId, startAt: startAtStr, endAt: endAtStr, reason = "MAINTENANCE", notes } = body;
@@ -124,9 +105,12 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // The caller's own store, not "whichever rentals merchant exists first" —
+    // that showed every rental store the same bookings, including other
+    // students' names, phone numbers and licence details.
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);

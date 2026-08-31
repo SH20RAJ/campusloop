@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { bikeBookings, bikeInspections, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
+import { resolveMerchantSession } from "@/lib/merchant-session";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
@@ -14,22 +14,15 @@ interface RouteParams {
 export async function POST(req: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // The caller's own store, not "whichever rentals merchant exists first" —
+    // that showed every rental store the same bookings, including other
+    // students' names, phone numbers and licence details.
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const db = getDb();
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
-
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
-    }
-
-    const viewerBlocked = await rejectViewerWrite(profile);
-    if (viewerBlocked) return viewerBlocked;
 
     const booking = await db.query.bikeBookings.findFirst({
       where: eq(bikeBookings.id, id),

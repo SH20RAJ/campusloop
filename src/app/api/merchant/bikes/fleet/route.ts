@@ -1,27 +1,21 @@
 import { and, desc, eq, ne } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { bikes, merchants, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { rejectViewerWrite } from "@/lib/viewer";
+import { bikes } from "@/db/schema";
+import { resolveMerchantSession } from "@/lib/merchant-session";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Was "the first merchant with categorySlug = rentals", which showed every
+    // rental store the same fleet — the first one's.
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const db = getDb();
-    const merchant = await db.query.merchants.findFirst({
-      where: eq(merchants.categorySlug, "rentals"),
-    });
-
-    if (!merchant) {
-      return NextResponse.json({ error: "No rental merchant found" }, { status: 404 });
-    }
 
     const fleet = await db.query.bikes.findMany({
       where: and(eq(bikes.merchantId, merchant.id), ne(bikes.status, "INACTIVE")),
@@ -43,30 +37,12 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const db = getDb();
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
-
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
-    }
-
-    const viewerBlocked = await rejectViewerWrite(profile);
-    if (viewerBlocked) return viewerBlocked;
-
-    const merchant = await db.query.merchants.findFirst({
-      where: eq(merchants.categorySlug, "rentals"),
-    });
-
-    if (!merchant) {
-      return NextResponse.json({ error: "No rental merchant found" }, { status: 404 });
-    }
 
     const body = (await req.json()) as Record<string, any>;
     const {
@@ -118,22 +94,15 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Authenticated as the *store*, not as any signed-in student. This handler
+    // used to accept a plain student session and then update by bike id alone,
+    // so anyone with an account could reprice or retire another store's bikes.
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const db = getDb();
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
-
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
-    }
-
-    const viewerBlocked = await rejectViewerWrite(profile);
-    if (viewerBlocked) return viewerBlocked;
 
     const body = (await req.json()) as Record<string, any>;
     const { id, status, dailyPrice, hourlyPrice, securityDeposit, pickupLocation, specs, name } = body;
@@ -151,7 +120,15 @@ export async function PATCH(req: Request) {
     if (typeof name === "string") updatePayload.name = name.trim();
     if (specs) updatePayload.specs = specs;
 
-    const [updated] = await db.update(bikes).set(updatePayload).where(eq(bikes.id, id)).returning();
+    const [updated] = await db
+      .update(bikes)
+      .set(updatePayload)
+      .where(and(eq(bikes.id, id), eq(bikes.merchantId, merchant.id)))
+      .returning();
+
+    if (!updated) {
+      return NextResponse.json({ error: "Bike not found in your fleet" }, { status: 404 });
+    }
 
     return NextResponse.json({ success: true, bike: updated });
   } catch (error) {
@@ -162,9 +139,9 @@ export async function PATCH(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -175,8 +152,17 @@ export async function DELETE(req: Request) {
     }
 
     const db = getDb();
-    // Soft-delete to preserve booking history (PRD item 18)
-    await db.update(bikes).set({ status: "INACTIVE", updatedAt: new Date() }).where(eq(bikes.id, id));
+    // Soft-delete to preserve booking history (PRD item 18), scoped to the
+    // caller's own fleet.
+    const [retired] = await db
+      .update(bikes)
+      .set({ status: "INACTIVE", updatedAt: new Date() })
+      .where(and(eq(bikes.id, id), eq(bikes.merchantId, merchant.id)))
+      .returning({ id: bikes.id });
+
+    if (!retired) {
+      return NextResponse.json({ error: "Bike not found in your fleet" }, { status: 404 });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

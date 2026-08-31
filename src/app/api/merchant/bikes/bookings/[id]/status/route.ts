@@ -1,9 +1,8 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { bikeBookingStatusHistory, bikeBookings, bikes, userProfiles } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
-import { rejectViewerWrite } from "@/lib/viewer";
+import { bikeBookingStatusHistory, bikeBookings, bikes } from "@/db/schema";
+import { resolveMerchantSession } from "@/lib/merchant-session";
 
 export const dynamic = "force-dynamic";
 
@@ -14,28 +13,22 @@ interface RouteParams {
 export async function PATCH(req: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Authenticated as the store. This accepted any signed-in student and then
+    // looked the booking up by id alone, so anyone with an account could
+    // advance another store's bookings — marking a bike returned, or moving a
+    // security deposit toward refund.
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const db = getDb();
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    });
-
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 403 });
-    }
-
-    const viewerBlocked = await rejectViewerWrite(profile);
-    if (viewerBlocked) return viewerBlocked;
 
     const body = (await req.json()) as Record<string, any>;
     const { status: nextStatus, rejectionReason } = body;
 
     const booking = await db.query.bikeBookings.findFirst({
-      where: eq(bikeBookings.id, id),
+      where: and(eq(bikeBookings.id, id), eq(bikeBookings.merchantId, merchant.id)),
     });
 
     if (!booking) {

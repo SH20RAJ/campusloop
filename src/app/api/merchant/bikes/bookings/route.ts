@@ -2,28 +2,24 @@ import { and, desc, eq, inArray, type SQL } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { bikeBookings, merchants } from "@/db/schema";
-import { hexclaveServerApp } from "@/hexclave/server";
+import { resolveMerchantSession } from "@/lib/merchant-session";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // The caller's own store, not "whichever rentals merchant exists first" —
+    // that showed every rental store the same bookings, including other
+    // students' names, phone numbers and licence details.
+    const merchant = await resolveMerchantSession();
+    if (!merchant) {
+      return NextResponse.json({ error: "Unauthorized or merchant not found" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
     const filter = searchParams.get("filter") || "all";
 
     const db = getDb();
-    const merchant = await db.query.merchants.findFirst({
-      where: eq(merchants.categorySlug, "rentals"),
-    });
-
-    if (!merchant) {
-      return NextResponse.json({ error: "No rental merchant found" }, { status: 404 });
-    }
 
     let statusCondition: SQL | undefined;
     if (filter === "pending") {

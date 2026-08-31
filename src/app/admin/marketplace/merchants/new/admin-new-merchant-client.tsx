@@ -57,13 +57,13 @@ export function AdminNewMerchantClient() {
   function handleGeneratePassword() {
     sounds.pop();
     haptics.light();
+    // crypto.getRandomValues, not Math.random — this string is a credential,
+    // and Math.random is neither uniform nor unpredictable.
     const chars = "abcdefghjkmnpqrstuvwxyz23456789";
+    const bytes = crypto.getRandomValues(new Uint8Array(10));
     let rand = "";
-    for (let i = 0; i < 6; i++) {
-      rand += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    const generated = `store@${rand}`;
-    setLoginPassword(generated);
+    for (const byte of bytes) rand += chars[byte % chars.length];
+    setLoginPassword(`cl-${rand.slice(0, 5)}-${rand.slice(5)}`);
   }
 
   function handleCopyCredentials() {

@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { getDb } from "@/db";
 import { merchants } from "@/db/schema";
+import {
+  generateMerchantPassword,
+  hashMerchantPassword,
+  stripMerchantSecrets,
+} from "@/lib/marketplace/merchant-password";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +31,10 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({ merchants: allMerchants });
+    // Credentials never travel to the admin browser — only hashes are stored
+    // now, and shipping those would still be handing out offline-crackable
+    // material for no reason.
+    return NextResponse.json({ merchants: allMerchants.map(stripMerchantSecrets) });
   } catch (error) {
     console.error("Error in admin merchants GET:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -71,7 +79,11 @@ export async function POST(req: Request) {
 
     const cleanLoginUsername = loginUsername?.trim().toLowerCase() || cleanSlug.replace(/[^a-z0-9]/g, "");
 
-    const cleanLoginPassword = loginPassword?.trim() || `store@${Math.random().toString(36).slice(-6)}`;
+    // Generated when the admin does not supply one. Held in plaintext only
+    // for the length of this request: it is hashed before storage and returned
+    // once so the admin can pass it to the shopkeeper.
+    const issuedPassword: string = loginPassword?.trim() || generateMerchantPassword();
+    const hashedPassword = await hashMerchantPassword(issuedPassword);
 
     const verticalTypeMap: Record<string, string> = {
       food: "FOOD",
@@ -103,13 +115,19 @@ export async function POST(req: Request) {
         minOrderValue: typeof minOrderValue === "number" ? minOrderValue : 80,
         estimatedPrepTime: estimatedPrepTime || "15–20 min",
         loginUsername: cleanLoginUsername,
-        loginPassword: cleanLoginPassword,
+        loginPassword: hashedPassword,
         status: "ACTIVE",
         isOpen: true,
       })
       .returning();
 
-    return NextResponse.json({ success: true, merchant: newMerchant });
+    return NextResponse.json({
+      success: true,
+      merchant: stripMerchantSecrets(newMerchant),
+      // The only time this value is ever readable. Not stored in plaintext, so
+      // it cannot be shown again — only reset.
+      temporaryPassword: issuedPassword,
+    });
   } catch (error) {
     console.error("Error in admin merchant creation:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

@@ -43,12 +43,36 @@ import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
   { id: "all", label: "All Verticals", icon: Store, color: "text-primary", bg: "bg-primary/10" },
-  { id: "food", label: "Food & Canteens", icon: UtensilsCrossed, color: "text-rose-500", bg: "bg-rose-500/10" },
-  { id: "supermarket", label: "Supermarket & Mart", icon: ShoppingBag, color: "text-amber-500", bg: "bg-amber-500/10" },
-  { id: "rentals", label: "Bike & Vehicle Rentals", icon: Bike, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+  {
+    id: "food",
+    label: "Food & Canteens",
+    icon: UtensilsCrossed,
+    color: "text-rose-500",
+    bg: "bg-rose-500/10",
+  },
+  {
+    id: "supermarket",
+    label: "Supermarket & Mart",
+    icon: ShoppingBag,
+    color: "text-amber-500",
+    bg: "bg-amber-500/10",
+  },
+  {
+    id: "rentals",
+    label: "Bike & Vehicle Rentals",
+    icon: Bike,
+    color: "text-emerald-500",
+    bg: "bg-emerald-500/10",
+  },
   { id: "barber", label: "Barber & Salon", icon: Scissors, color: "text-blue-500", bg: "bg-blue-500/10" },
   { id: "laundry", label: "Laundry & Wash", icon: Shirt, color: "text-purple-500", bg: "bg-purple-500/10" },
-  { id: "water", label: "20L Water Can Delivery", icon: Droplet, color: "text-cyan-500", bg: "bg-cyan-500/10" },
+  {
+    id: "water",
+    label: "20L Water Can Delivery",
+    icon: Droplet,
+    color: "text-cyan-500",
+    bg: "bg-cyan-500/10",
+  },
 ] as const;
 
 export function AdminMarketplaceClient() {
@@ -59,6 +83,8 @@ export function AdminMarketplaceClient() {
   // Quick credentials modal state
   const [credentialModalStore, setCredentialModalStore] = useState<any | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  // Held in memory only, for the one render after a rotate. Never persisted.
+  const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
   const [isRotating, setIsRotating] = useState(false);
 
   // Quick product modal state
@@ -115,24 +141,26 @@ export function AdminMarketplaceClient() {
     sounds.tap();
     haptics.medium();
     setIsRotating(true);
-    const newPass = `store@${Math.random().toString(36).slice(-6)}`;
 
     try {
+      // The server generates and hashes it, then echoes the plaintext exactly
+      // once in the response.
       const res = await fetch(`/api/admin/marketplace/merchants/${merchantId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ loginPassword: newPass }),
+        body: JSON.stringify({ rotatePassword: true }),
       });
 
       if (!res.ok) throw new Error();
+      const data = (await res.json()) as { temporaryPassword?: string | null };
+      if (!data.temporaryPassword) throw new Error();
 
       sounds.ting();
       haptics.success();
-      toast.success("New password generated and saved! 🔑");
+      toast.success("New password issued — copy it now, it cannot be shown again. 🔑");
       mutate();
-      if (credentialModalStore && credentialModalStore.id === merchantId) {
-        setCredentialModalStore({ ...credentialModalStore, loginPassword: newPass });
-      }
+      setRevealedPassword(data.temporaryPassword);
+      setShowPassword(true);
     } catch {
       toast.error("Failed to rotate password");
     } finally {
@@ -140,11 +168,21 @@ export function AdminMarketplaceClient() {
     }
   }
 
-  // Copy WhatsApp Invitation text
+  // Copy WhatsApp Invitation text.
+  //
+  // Only ever includes a password that was issued a moment ago in this session.
+  // Stored passwords are hashed, so there is nothing to read back — if the
+  // admin has not just reset the account, they are told to reset it first.
   function handleCopyWhatsApp(merchant: any) {
     sounds.tap();
     haptics.medium();
-    const text = `*CampusLoop Merchant Portal Credentials*\n\nStore: ${merchant.name}\nCampus: ${merchant.institution?.name || "Campus Hub"}\n\nLogin URL: https://campusloop.space/merchant-portal/login\nUsername: ${merchant.loginUsername || merchant.slug}\nPassword: ${merchant.loginPassword || "store@" + merchant.slug}\n\nPlease login and manage your store menu, pricing, and live customer orders!`;
+
+    if (!revealedPassword) {
+      toast.info("Reset the password first — stored passwords are hashed and cannot be read back.");
+      return;
+    }
+
+    const text = `*CampusLoop Merchant Portal Credentials*\n\nStore: ${merchant.name}\nCampus: ${merchant.institution?.name || "Campus Hub"}\n\nLogin URL: https://campusloop.space/merchant-portal/login\nUsername: ${merchant.loginUsername || merchant.slug}\nPassword: ${revealedPassword}\n\nPlease login and manage your store menu, pricing, and live customer orders!`;
     navigator.clipboard.writeText(text);
     toast.success("Copied WhatsApp invitation message! 📲");
   }
@@ -249,11 +287,15 @@ export function AdminMarketplaceClient() {
       {/* ─── Top Metrics Strip ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Active Stores</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Active Stores
+          </p>
           <p className="text-2xl font-black text-foreground">{merchants.length}</p>
         </div>
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Catalog Items</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Catalog Items
+          </p>
           <p className="text-2xl font-black text-foreground">{totalProducts}</p>
         </div>
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
@@ -261,7 +303,9 @@ export function AdminMarketplaceClient() {
           <p className="text-2xl font-black text-foreground">{totalOrders}</p>
         </div>
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Est. Campus GMV</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Est. Campus GMV
+          </p>
           <p className="text-2xl font-black text-emerald-500">₹1,85,000</p>
         </div>
       </div>
@@ -326,17 +370,28 @@ export function AdminMarketplaceClient() {
             const CatIcon = categoryMeta.icon;
 
             return (
-              <div key={catSlug} className="rounded-3xl border border-border bg-card overflow-hidden shadow-xs">
+              <div
+                key={catSlug}
+                className="rounded-3xl border border-border bg-card overflow-hidden shadow-xs"
+              >
                 {/* ── Tier 1: Category Header ── */}
                 <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className={cn("size-8 rounded-xl flex items-center justify-center font-black", categoryMeta.bg, categoryMeta.color)}>
+                    <div
+                      className={cn(
+                        "size-8 rounded-xl flex items-center justify-center font-black",
+                        categoryMeta.bg,
+                        categoryMeta.color
+                      )}
+                    >
                       <CatIcon className="size-4.5" />
                     </div>
                     <div>
                       <h2 className="text-sm font-black text-foreground capitalize flex items-center gap-2">
                         <span>{categoryMeta.label}</span>
-                        <span className="text-[11px] font-bold text-muted-foreground">({storeList.length} stores)</span>
+                        <span className="text-[11px] font-bold text-muted-foreground">
+                          ({storeList.length} stores)
+                        </span>
                       </h2>
                     </div>
                   </div>
@@ -363,7 +418,11 @@ export function AdminMarketplaceClient() {
                           {/* Store Info */}
                           <div className="flex items-center gap-3">
                             <div className="size-12 rounded-2xl bg-muted border border-border overflow-hidden shrink-0">
-                              <img src={store.logoUrl || store.coverUrl} alt={store.name} className="size-full object-cover" />
+                              <img
+                                src={store.logoUrl || store.coverUrl}
+                                alt={store.name}
+                                className="size-full object-cover"
+                              />
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
@@ -401,6 +460,8 @@ export function AdminMarketplaceClient() {
                                 sounds.tap();
                                 haptics.light();
                                 setCredentialModalStore(store);
+                                setRevealedPassword(null);
+                                setShowPassword(false);
                               }}
                               className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-colors cursor-pointer"
                             >
@@ -437,7 +498,9 @@ export function AdminMarketplaceClient() {
                             >
                               <Package className="size-3.5" />
                               <span>Products ({storeProducts.length})</span>
-                              <ChevronDown className={cn("size-3.5 transition-transform", isExpanded && "rotate-180")} />
+                              <ChevronDown
+                                className={cn("size-3.5 transition-transform", isExpanded && "rotate-180")}
+                              />
                             </button>
                           </div>
                         </div>
@@ -480,7 +543,9 @@ export function AdminMarketplaceClient() {
                                       <p className="text-[11px] text-muted-foreground">
                                         <span className="font-black text-foreground">₹{p.price}</span>
                                         {p.originalPrice && (
-                                          <span className="line-through ml-1 text-[10px]">₹{p.originalPrice}</span>
+                                          <span className="line-through ml-1 text-[10px]">
+                                            ₹{p.originalPrice}
+                                          </span>
                                         )}{" "}
                                         · {p.categoryName || "General"}
                                       </p>
@@ -495,7 +560,9 @@ export function AdminMarketplaceClient() {
                                           setEditingProduct(p);
                                           setProdName(p.name);
                                           setProdPrice(String(p.price));
-                                          setProdOriginalPrice(p.originalPrice ? String(p.originalPrice) : "");
+                                          setProdOriginalPrice(
+                                            p.originalPrice ? String(p.originalPrice) : ""
+                                          );
                                           setProdCategory(p.categoryName || "General");
                                           setProdIsVeg(p.isVeg ?? true);
                                         }}
@@ -534,7 +601,8 @@ export function AdminMarketplaceClient() {
           <Store className="size-10 text-muted-foreground mx-auto" />
           <h3 className="text-sm font-bold text-foreground">No merchants found</h3>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-            No stores match &quot;{searchQuery}&quot;. Click &quot;Onboard Merchant&quot; above to add a new stall or canteens.
+            No stores match &quot;{searchQuery}&quot;. Click &quot;Onboard Merchant&quot; above to add a new
+            stall or canteens.
           </p>
         </div>
       )}
@@ -552,7 +620,11 @@ export function AdminMarketplaceClient() {
               </div>
               <button
                 type="button"
-                onClick={() => setCredentialModalStore(null)}
+                onClick={() => {
+                  setCredentialModalStore(null);
+                  setRevealedPassword(null);
+                  setShowPassword(false);
+                }}
                 className="size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 <X className="size-4" />
@@ -573,21 +645,27 @@ export function AdminMarketplaceClient() {
               </div>
 
               <div>
-                <p className="text-[10px] font-bold uppercase text-muted-foreground">Plaintext Password</p>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-mono font-black text-emerald-600 dark:text-emerald-400 select-all">
-                    {showPassword
-                      ? credentialModalStore.loginPassword || `store@${credentialModalStore.slug}`
-                      : "••••••••••••"}
+                <p className="text-[10px] font-bold uppercase text-muted-foreground">Password</p>
+                {revealedPassword ? (
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-mono font-black text-emerald-600 dark:text-emerald-400 select-all">
+                      {showPassword ? revealedPassword : "••••••••••••"}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((p) => !p)}
+                      className="size-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Stored as a hash and cannot be read back. Use{" "}
+                    <span className="font-bold text-foreground">Rotate password</span> to issue a new one — it
+                    is shown here once, then never again.
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((p) => !p)}
-                    className="size-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
-                  >
-                    {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-                  </button>
-                </div>
+                )}
               </div>
 
               <div>

@@ -1,27 +1,24 @@
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { marketplaceOrderItems, marketplaceOrders, merchants, products, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { withUniqueOrderNumber } from "@/lib/marketplace/order-number";
+import { type CartItemInput, type FulfillmentType, priceMerchantOrder } from "@/lib/marketplace/pricing";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
-interface CartItemPayload {
-  productId: string;
-  merchantId: string;
-  quantity: number;
-  selectedOptions?: Record<string, string>;
-  selectedAddons?: Array<{ name: string; price: number }>;
-}
+/** One request may not span more baskets than a person could plausibly have open. */
+const MAX_MERCHANT_ORDERS = 5;
 
 interface CheckoutPayload {
   merchantOrders: Array<{
     merchantId: string;
-    fulfillmentType: "DELIVERY" | "PICKUP" | "BOOKING";
+    fulfillmentType: FulfillmentType;
     customerNote?: string;
     paymentMethod?: "COD" | "UPI" | "CAMPUS_PAY";
-    items: CartItemPayload[];
+    items: CartItemInput[];
   }>;
   deliveryAddress: {
     hostelName?: string;
@@ -54,33 +51,28 @@ export async function POST(req: Request) {
     const viewerBlocked = await rejectViewerWrite(profile);
     if (viewerBlocked) return viewerBlocked;
 
-    const payload = (await req.json()) as CheckoutPayload;
-    if (!payload.merchantOrders || payload.merchantOrders.length === 0) {
+    const payload = (await req.json().catch(() => null)) as CheckoutPayload | null;
+    if (!payload?.merchantOrders?.length) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
+    if (payload.merchantOrders.length > MAX_MERCHANT_ORDERS) {
+      return NextResponse.json({ error: "Too many merchants in one order" }, { status: 400 });
+    }
 
-    const createdOrderIds: string[] = [];
-
-    for (const mo of payload.merchantOrders) {
-      if (!mo.items || mo.items.length === 0) continue;
-
-      const merchant = await db.query.merchants.findFirst({
-        where: eq(merchants.id, mo.merchantId),
-      });
-
-      if (!merchant) continue;
-
-      // Fetch all products in this merchant order
-      const productIds = mo.items.map((i) => i.productId);
-      const dbProducts = await db.query.products.findMany({
-        where: inArray(products.id, productIds),
-      });
-
-      const productMap = new Map(dbProducts.map((p) => [p.id, p]));
-
-      // Calculate subtotal
-      let subtotal = 0;
-      const orderItemsToInsert: Array<{
+    // ── Phase 1: price everything before writing anything ──
+    //
+    // The old flow interleaved validation and inserts and `continue`d past
+    // anything it disliked, so a partially-valid cart produced a partial order
+    // and still reported success. Pricing every basket up front means the
+    // student either gets the order they confirmed or a specific reason they
+    // cannot have it.
+    const validated: Array<{
+      merchantId: string;
+      categorySlug: string;
+      fulfillmentType: FulfillmentType;
+      paymentMethod: "COD" | "UPI" | "CAMPUS_PAY";
+      customerNote: string | null;
+      lines: Array<{
         productId: string;
         productNameSnapshot: string;
         unitPriceSnapshot: number;
@@ -88,87 +80,123 @@ export async function POST(req: Request) {
         selectedOptions: Record<string, string>;
         selectedAddons: Array<{ name: string; price: number }>;
         subtotal: number;
-      }> = [];
+      }>;
+      subtotal: number;
+      deliveryFee: number;
+      total: number;
+    }> = [];
 
-      for (const item of mo.items) {
-        const prod = productMap.get(item.productId);
-        if (!prod) continue;
+    for (const basket of payload.merchantOrders) {
+      const merchant = await db.query.merchants.findFirst({
+        where: eq(merchants.id, basket.merchantId),
+      });
 
-        const basePrice = prod.price;
-        const addonsTotal = (item.selectedAddons || []).reduce((sum, a) => sum + (a.price || 0), 0);
-        const itemUnitTotal = basePrice + addonsTotal;
-        const itemSubtotal = itemUnitTotal * Math.max(1, item.quantity);
-
-        subtotal += itemSubtotal;
-
-        orderItemsToInsert.push({
-          productId: prod.id,
-          productNameSnapshot: prod.name,
-          unitPriceSnapshot: itemUnitTotal,
-          quantity: Math.max(1, item.quantity),
-          selectedOptions: item.selectedOptions || {},
-          selectedAddons: item.selectedAddons || [],
-          subtotal: itemSubtotal,
-        });
+      if (!merchant) {
+        return NextResponse.json({ error: "That store is no longer available." }, { status: 400 });
       }
 
-      if (orderItemsToInsert.length === 0) continue;
-
-      // Calculate delivery fee
-      let deliveryFee = 0;
-      if (mo.fulfillmentType === "DELIVERY") {
-        if (!merchant.freeDeliveryAbove || subtotal < merchant.freeDeliveryAbove) {
-          deliveryFee = merchant.deliveryFee || 20;
-        }
+      // A student may only order from stores on their own campus.
+      if (merchant.institutionId !== profile.institutionId) {
+        return NextResponse.json({ error: `${merchant.name} does not serve your campus.` }, { status: 403 });
       }
 
-      const total = subtotal + deliveryFee;
-
-      // Generate random unique 4-digit order number (e.g. CL-1042)
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const orderNumber = `CL-${randomSuffix}`;
-
-      // Insert Order
-      const [newOrder] = await db
-        .insert(marketplaceOrders)
-        .values({
-          orderNumber,
-          studentId: profile.id,
-          merchantId: merchant.id,
-          institutionId: profile.institutionId,
-          categorySlug: merchant.categorySlug,
-          fulfillmentType: mo.fulfillmentType,
-          status: "PLACED",
-          subtotal,
-          deliveryFee,
-          discount: 0,
-          total,
-          paymentStatus: mo.paymentMethod === "COD" ? "COD" : "PENDING",
-          paymentMethod: mo.paymentMethod || "COD",
-          customerNote: mo.customerNote || null,
-          deliveryAddress: payload.deliveryAddress,
-        })
-        .returning();
-
-      // Insert Order Items
-      for (const oi of orderItemsToInsert) {
-        await db.insert(marketplaceOrderItems).values({
-          orderId: newOrder.id,
-          productId: oi.productId,
-          productNameSnapshot: oi.productNameSnapshot,
-          unitPriceSnapshot: oi.unitPriceSnapshot,
-          quantity: oi.quantity,
-          selectedOptions: oi.selectedOptions,
-          selectedAddons: oi.selectedAddons,
-          subtotal: oi.subtotal,
-        });
+      const productIds = Array.from(new Set((basket.items ?? []).map((item) => item.productId)));
+      if (productIds.length === 0) {
+        return NextResponse.json({ error: "This order has no items." }, { status: 400 });
       }
 
-      createdOrderIds.push(newOrder.id);
+      // Scoped to the merchant in SQL as well as in the pricer — defence in
+      // depth against a product id borrowed from another store.
+      const dbProducts = await db.query.products.findMany({
+        where: and(inArray(products.id, productIds), eq(products.merchantId, merchant.id)),
+      });
+
+      const result = priceMerchantOrder({
+        merchant,
+        products: dbProducts,
+        items: basket.items,
+        fulfillmentType: basket.fulfillmentType,
+      });
+
+      if (!result.ok) {
+        return NextResponse.json(
+          { error: result.message, code: result.code, merchantId: merchant.id },
+          { status: 409 }
+        );
+      }
+
+      validated.push({
+        merchantId: merchant.id,
+        categorySlug: merchant.categorySlug,
+        fulfillmentType: basket.fulfillmentType,
+        paymentMethod: basket.paymentMethod ?? "COD",
+        customerNote: basket.customerNote?.trim() || null,
+        ...result.order,
+      });
     }
 
-    if (createdOrderIds.length === 0) {
-      return NextResponse.json({ error: "Could not process orders" }, { status: 400 });
+    // ── Phase 2: write ──
+    const createdOrderIds: string[] = [];
+
+    for (const basket of validated) {
+      const newOrder = await withUniqueOrderNumber(async (orderNumber) => {
+        const [row] = await db
+          .insert(marketplaceOrders)
+          .values({
+            orderNumber,
+            studentId: profile.id,
+            merchantId: basket.merchantId,
+            institutionId: profile.institutionId,
+            categorySlug: basket.categorySlug,
+            fulfillmentType: basket.fulfillmentType,
+            status: "PLACED",
+            subtotal: basket.subtotal,
+            deliveryFee: basket.deliveryFee,
+            discount: 0,
+            total: basket.total,
+            paymentStatus: basket.paymentMethod === "COD" ? "COD" : "PENDING",
+            paymentMethod: basket.paymentMethod,
+            customerNote: basket.customerNote,
+            deliveryAddress: payload.deliveryAddress,
+          })
+          .returning();
+        return row;
+      });
+
+      // One multi-value insert rather than a statement per line.
+      await db.insert(marketplaceOrderItems).values(
+        basket.lines.map((line) => ({
+          orderId: newOrder.id,
+          productId: line.productId,
+          productNameSnapshot: line.productNameSnapshot,
+          unitPriceSnapshot: line.unitPriceSnapshot,
+          quantity: line.quantity,
+          selectedOptions: line.selectedOptions,
+          selectedAddons: line.selectedAddons,
+          subtotal: line.subtotal,
+        }))
+      );
+
+      // Decrement tracked stock. The guard in the UPDATE makes the decrement
+      // itself the concurrency check: two students racing for the last unit
+      // cannot both drive the column negative, because the second UPDATE
+      // matches no row.
+      await Promise.all(
+        basket.lines.map((line) =>
+          db
+            .update(products)
+            .set({ stockQuantity: sql`${products.stockQuantity} - ${line.quantity}` })
+            .where(
+              and(
+                eq(products.id, line.productId),
+                sql`${products.stockQuantity} IS NOT NULL`,
+                sql`${products.stockQuantity} >= ${line.quantity}`
+              )
+            )
+        )
+      );
+
+      createdOrderIds.push(newOrder.id);
     }
 
     return NextResponse.json({

@@ -108,7 +108,11 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
     setIsOpen(Boolean(merchant.isOpen));
     setStatus(merchant.status || "ACTIVE");
     setLoginUsername(merchant.loginUsername || merchant.slug || "");
-    setLoginPassword(merchant.loginPassword || "momo@CampusLoop2026");
+    // Left blank on purpose: stored passwords are hashed and never sent to the
+    // browser. Blank means "unchanged" — prefilling a placeholder here used to
+    // mean that merely opening this page and saving reset the store's password
+    // to a hardcoded string.
+    setLoginPassword("");
     setFormInitialized(true);
   }
 
@@ -150,15 +154,20 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
 
   function handleCopyCredentials() {
     sounds.tap();
-    const text = `CampusLoop Merchant Portal Credentials\nStore: ${name}\nLogin URL: https://campusloop.space/merchant-portal/login\nUsername: ${loginUsername}\nPassword: ${loginPassword}`;
+    // Only include a password if the admin has just typed one — there is
+    // nothing readable stored to fall back on.
+    const passwordLine = loginPassword.trim()
+      ? `\nPassword: ${loginPassword.trim()}`
+      : "\nPassword: (unchanged — set a new one above to share it)";
+    const text = `CampusLoop Merchant Portal Credentials\nStore: ${name}\nLogin URL: https://campusloop.space/merchant-portal/login\nUsername: ${loginUsername}${passwordLine}`;
     navigator.clipboard.writeText(text);
     toast.success("Credentials copied to clipboard! 📋");
   }
 
   async function handleSaveCredentials(e: React.FormEvent) {
     e.preventDefault();
-    if (!loginUsername.trim() || !loginPassword.trim()) {
-      toast.error("Username and password cannot be empty");
+    if (!loginUsername.trim()) {
+      toast.error("Username cannot be empty");
       return;
     }
 
@@ -172,7 +181,8 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           loginUsername: loginUsername.trim().toLowerCase(),
-          loginPassword: loginPassword.trim(),
+          // Omitted when blank, which the API reads as "leave it unchanged".
+          loginPassword: loginPassword.trim() || undefined,
         }),
       });
 
@@ -775,10 +785,11 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   <div className="relative flex items-center">
                     <input
                       type={showPassword ? "text" : "password"}
-                      required
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
-                      className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 pr-20 text-xs font-mono font-bold text-foreground outline-none focus:border-foreground"
+                      placeholder="Leave blank to keep the current password"
+                      autoComplete="new-password"
+                      className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 pr-20 text-xs font-mono font-bold text-foreground outline-none focus:border-foreground placeholder:font-sans placeholder:font-medium placeholder:text-muted-foreground"
                     />
                     <div className="absolute right-2 flex items-center gap-1">
                       <button

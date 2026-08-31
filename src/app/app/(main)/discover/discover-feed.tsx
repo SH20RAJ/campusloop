@@ -20,6 +20,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { FeaturedCampusCard } from "@/components/discover/featured-campus-card";
+import { FollowButton } from "@/components/profile/follow-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -498,18 +499,13 @@ export function DiscoverFeed() {
                           </div>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => handleFollowToggle(user.id, user.displayName)}
-                          className={cn(
-                            "px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer self-start sm:self-center shrink-0",
-                            isFollowed
-                              ? "border border-border/60 bg-muted text-foreground hover:bg-muted/80"
-                              : "bg-primary text-primary-foreground hover:opacity-90 active:scale-95 shadow-xs"
-                          )}
-                        >
-                          {isFollowed ? "Following" : "Follow"}
-                        </button>
+                        <FollowButton
+                          username={user.username}
+                          displayName={user.displayName}
+                          initialIsFollowing={isFollowed}
+                          size="sm"
+                          className="self-start sm:self-center shrink-0"
+                        />
                       </div>
                     );
                   })}
@@ -732,18 +728,12 @@ export function DiscoverFeed() {
                               <p className="text-xs text-muted-foreground truncate">@{peer.username}</p>
                             </div>
                           </Link>
-                          <button
-                            type="button"
-                            onClick={() => handleFollowToggle(peer.id, peer.displayName)}
-                            className={cn(
-                              "px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer shrink-0",
-                              isFollowed
-                                ? "border border-border/60 bg-muted text-foreground hover:bg-muted/80"
-                                : "bg-primary text-primary-foreground hover:opacity-90 active:scale-95 shadow-xs"
-                            )}
-                          >
-                            {isFollowed ? "Following" : "Follow"}
-                          </button>
+                          <FollowButton
+                            username={peer.username}
+                            displayName={peer.displayName}
+                            initialIsFollowing={isFollowed}
+                            size="sm"
+                          />
                         </div>
                       );
                     })}

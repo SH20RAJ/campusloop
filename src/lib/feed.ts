@@ -2,6 +2,13 @@ import { and, asc, desc, eq, inArray, or, type SQL, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { comments, follows, institutions, posts, reports, userProfiles, votes } from "@/db/schema";
+import {
+  type ActiveBoost,
+  applicableBoosts,
+  buildBoostMultiplierSql,
+  buildBoostTierSql,
+  loadActiveBoosts,
+} from "@/lib/feed-boosts";
 
 export type FeedPost = {
   id: string;
@@ -348,9 +355,27 @@ export function getFeedOrderBy(
   sort: ApiFeedSort,
   userInstitutionId?: string | null,
   seenIds?: string[],
-  viewerProfileId?: string | null
+  viewerProfileId?: string | null,
+  boosts: ActiveBoost[] = []
 ) {
   const orderClauses: (SQL | ReturnType<typeof desc> | ReturnType<typeof asc>)[] = [];
+
+  // ── Editorial tier ──
+  // Sorted ahead of every other clause, including the campus-locality
+  // tiebreak. This is what makes promotion real: ranking scores span four
+  // orders of magnitude, so multiplying a decayed score can never lift an old
+  // or quiet post to the top. A tier can.
+  //
+  // Applies to `latest` too — a pinned campus announcement belongs at the top
+  // of the chronological feed — but never to `random`, where a guaranteed
+  // first result would stop it being random.
+  //
+  // Costs nothing when only nudges are live: the expression is omitted
+  // entirely rather than evaluating to the same constant for every row.
+  const tierSql = sort === "random" ? null : buildBoostTierSql(boosts);
+  if (tierSql) {
+    orderClauses.push(desc(tierSql));
+  }
 
   // Keep sorting deterministic and stable across pagination
   if (userInstitutionId && sort === "for_you") {
@@ -359,28 +384,37 @@ export function getFeedOrderBy(
     );
   }
 
+  // ── Editorial weighting ──
+  // Multiplies whichever score the chosen sort produces, so one control works
+  // across for_you, trending, viral and spicy without per-sort tuning.
+  // `latest` and `random` are left alone: a curated "latest" is a lie, and a
+  // weighted "random" is not random.
+  const boostSql = buildBoostMultiplierSql(boosts);
+  const weighted = (score: SQL<number>): SQL<number> =>
+    boostSql ? (sql<number>`(${score} * ${boostSql})` as SQL<number>) : score;
+
   switch (sort) {
     case "top_voted":
-      orderClauses.push(desc(voteScoreSql));
+      orderClauses.push(desc(weighted(voteScoreSql)));
       break;
     case "most_discussed":
-      orderClauses.push(desc(commentCountSql));
+      orderClauses.push(desc(weighted(commentCountSql)));
       break;
     case "trending":
-      orderClauses.push(desc(getTrendingScoreSql(viewerProfileId)));
+      orderClauses.push(desc(weighted(getTrendingScoreSql(viewerProfileId))));
       break;
     case "spicy":
-      orderClauses.push(desc(spicyScoreSql));
+      orderClauses.push(desc(weighted(spicyScoreSql)));
       break;
     case "viral":
-      orderClauses.push(desc(getViralScoreSql(viewerProfileId)));
+      orderClauses.push(desc(weighted(getViralScoreSql(viewerProfileId))));
       break;
     case "random":
       orderClauses.push(sql`random()`);
       return orderClauses;
     case "for_you": {
       const forYouScore = getForYouScoreSql(userInstitutionId, seenIds, viewerProfileId);
-      orderClauses.push(desc(forYouScore));
+      orderClauses.push(desc(weighted(forYouScore)));
       break;
     }
     default:
@@ -406,15 +440,31 @@ export async function resolveFeedPage(options: {
   userInstitutionId?: string | null;
   seenIds?: string[];
   viewerProfileId?: string | null;
+  /** Viewer's campus, for narrowing INSTITUTION-scoped editorial boosts. */
+  viewerInstitutionId?: string | null;
 }) {
   const db = getDb();
+
+  // Redis-backed and request-memoized; adds no database round trip on the hot
+  // path, and degrades to an unboosted feed if the cache and table are both
+  // unreachable.
+  const boosts = applicableBoosts(
+    await loadActiveBoosts(),
+    options.viewerInstitutionId ?? options.userInstitutionId
+  );
 
   const idRows = await db
     .select({ id: posts.id })
     .from(posts)
     .where(and(...options.conditions))
     .orderBy(
-      ...getFeedOrderBy(options.sort, options.userInstitutionId, options.seenIds, options.viewerProfileId)
+      ...getFeedOrderBy(
+        options.sort,
+        options.userInstitutionId,
+        options.seenIds,
+        options.viewerProfileId,
+        boosts
+      )
     )
     .limit(options.limit)
     .offset(options.offset);

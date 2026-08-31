@@ -278,6 +278,42 @@ Located in [`src/components/landing/time-capsule-showcase.tsx`](campusloop/src/c
 - **Live Countdown Timer**: Real-time ticker counting down days, hours, and minutes to convocation.
 - **Unlocked Museum Wall**: Public batch archive rendered after timer expiry.
 
+### 5.9b Editorial Feed Curation (Boosts)
+Located in [`src/lib/feed-boosts.ts`](campusloop/src/lib/feed-boosts.ts), [`src/app/api/admin/feed-boosts/`](campusloop/src/app/api/admin/feed-boosts/) and the console at `/admin/feed`.
+
+Admins can promote or bury a **single post** or **every post by a student**, scoped globally or to one campus, for a fixed window or indefinitely.
+
+**Why tiers, not just a multiplier.** The obvious design — multiply the ranking score — does not work here, and measuring the live distribution is what proved it. On the trending sort the scores span four orders of magnitude:
+
+| max | p99 | median | min |
+| :--- | :--- | :--- | :--- |
+| 23.910 | 19.509 | 0.0168 | 0.00572 |
+
+Gravity decay crushes anything old or quiet, so 25× the median is still nowhere near the top. Measured against the live table, a 25× multiplier moved a stale post from rank #124 to… **rank #124**. The same post under a tier lands at **#1**. A purely multiplicative "make it viral" button would have silently done nothing — the worst kind of admin tool.
+
+So a boost carries a `mode`, and the tier sorts *ahead of* the organic score:
+
+| Mode | Tier | Behaviour |
+| :--- | :--- | :--- |
+| `PIN` | 3 | Above everything, including promoted posts |
+| `PROMOTE` | 2 | Above every organic result |
+| *(organic)* | 1 | Default |
+| `BURY` | 0 | Below everything, without deleting the post |
+
+`NUDGE` is the exception: purely multiplicative, blending into organic ranking, and the UI says so rather than promising a lift it cannot guarantee. The multiplier still orders rows *within* a tier, and `priority` is clamped below 1 so it can never push a row into the tier above.
+
+**Applies to** `for_you`, `trending`, `viral`, `spicy`, `top_voted`, `most_discussed`. **`latest`** keeps its chronological order but still honours the tier, so a pinned announcement reaches the top of it. **`random`** is exempt entirely — a guaranteed first result would stop it being random.
+
+**Anonymity.** `PROFILE` boosts key on `posts.author_id`, which is NULL for anonymous posts, so a profile boost can never surface — or expose — a confession. That falls out of the data model rather than being a rule anyone has to remember.
+
+**Cost: none when idle.** This is deliberately *not* a join or a correlated subquery, which would make every feed query pay for a feature that is usually inactive:
+
+1. the active set is read from **Upstash Redis** (~1 ms), or Postgres on a miss, and written back with a 60 s TTL;
+2. React `cache()` memoizes it per request, so a page rendering several feeds pays once;
+3. it is inlined into `ORDER BY` as a constant `CASE` expression, with every id **bound as a parameter** — composed through drizzle's `sql` rather than `sql.raw`, so there is no string-escaping step to get wrong.
+
+The result is O(1) per candidate row with **zero extra database round trips**, and when nothing is boosted the expression is omitted entirely — the generated `ORDER BY` is byte-identical to what it was before this feature existed. The active set is capped at 200 rows, which also bounds the generated SQL. If both Redis and Postgres are unreachable the loader returns an empty set: curation failing must never take the feed down with it.
+
 ### 5.10 Notification & Push Delivery Engine
 Located in [`src/lib/notifications.ts`](campusloop/src/lib/notifications.ts), [`src/lib/notification-preferences.ts`](campusloop/src/lib/notification-preferences.ts), [`src/lib/web-push.ts`](campusloop/src/lib/web-push.ts) and [`src/app/api/notifications/`](campusloop/src/app/api/notifications/):
 

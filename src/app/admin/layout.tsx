@@ -27,6 +27,7 @@ import {
   ShieldAlert,
   ShoppingBag,
   Store,
+  TrendingUp,
   Users,
   UtensilsCrossed,
 } from "lucide-react";
@@ -38,6 +39,7 @@ const primaryNav = [
 ];
 
 const contentNav = [
+  { href: "/admin/feed", label: "Feed Curation", icon: TrendingUp },
   { href: "/admin/posts", label: "Posts", icon: FileText },
   { href: "/admin/comments", label: "Comments", icon: MessageSquare },
   { href: "/admin/users", label: "Users", icon: Users },

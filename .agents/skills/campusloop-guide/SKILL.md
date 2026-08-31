@@ -170,6 +170,23 @@ src/
 
 ---
 
+## 📈 5b. Editorial Feed Curation
+
+`/admin/feed` lets an admin promote or bury a post, or a student's whole output. Engine: [`src/lib/feed-boosts.ts`](../../../src/lib/feed-boosts.ts).
+
+**A boost is a tier, not just a multiplier.** Ranking scores span four orders of magnitude (measured: max 23.9, median 0.017), so multiplying a decayed score cannot lift an old post — 25× moved a stale post from rank #124 to rank #124, while a tier put it at #1. Modes: `PIN` (3) > `PROMOTE` (2) > organic (1) > `BURY` (0). `NUDGE` is purely multiplicative and the UI says so.
+
+Rules when touching this code:
+- **Never turn this into a join or a subquery.** The set is Redis-cached (60 s TTL), request-memoized with `cache()`, and inlined into `ORDER BY` as a constant `CASE`. When nothing is boosted the expression is omitted entirely, so an unboosted feed costs exactly what it did before the feature existed. Any change that adds a per-row table access defeats the entire design.
+- **Compose ids with drizzle's `sql`, never `sql.raw`.** Every id is a bound parameter; there is no escaping step to get wrong.
+- **Invalidate the cache on every write** (`invalidateBoostCache`), or admins will not see their change.
+- `PROFILE` boosts key on `posts.authorId`, which is NULL for anonymous posts — that is the anonymity guarantee, and it must stay that way (see Rule 8).
+- `random` must never be tiered.
+
+**Postgres extensions**: `pg_trgm` is installed with GIN indexes on `posts.body`, `posts.title`, `user_profiles.username` and `user_profiles.display_name`. Several hot paths do `ILIKE '%needle%'` — the hashtag filter in `/api/feed`, global search, admin lookups — and a leading wildcard defeats a B-tree. The planner picks these up with no query changes.
+
+---
+
 ## 🔔 6. Notification & Push Subsystem
 
 ### Delivery model

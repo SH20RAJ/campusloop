@@ -118,6 +118,69 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
         placeholder="Search canteens, rentals or services"
       />
 
+      {/* ─── 3 Distinct Campus Vertical Entrance Cards ─── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 px-4 py-2">
+        <Link
+          href="/app/marketplace/food"
+          onClick={() => {
+            sounds.tap();
+            haptics.light();
+          }}
+          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-rose-600 to-amber-500 p-4 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
+        >
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+              Zomato Style
+            </span>
+            <h3 className="text-base font-black mt-1">Food &amp; Canteens</h3>
+          </div>
+          <p className="text-[11px] text-white/90 flex items-center justify-between font-bold">
+            <span>Momos, rolls &amp; thalis</span>
+            <ChevronRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
+          </p>
+        </Link>
+
+        <Link
+          href="/app/marketplace/supermarket"
+          onClick={() => {
+            sounds.tap();
+            haptics.light();
+          }}
+          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 p-4 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
+        >
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+              Flipkart Style
+            </span>
+            <h3 className="text-base font-black mt-1">Supermarket Mart</h3>
+          </div>
+          <p className="text-[11px] text-white/90 flex items-center justify-between font-bold">
+            <span>Snacks, stationery &amp; kit</span>
+            <ChevronRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
+          </p>
+        </Link>
+
+        <Link
+          href="/app/marketplace/rentals"
+          onClick={() => {
+            sounds.tap();
+            haptics.light();
+          }}
+          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-600 to-teal-600 p-4 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
+        >
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+              Fleet Mobility
+            </span>
+            <h3 className="text-base font-black mt-1">Bike &amp; EV Rentals</h3>
+          </div>
+          <p className="text-[11px] text-white/90 flex items-center justify-between font-bold">
+            <span>Gear cycles &amp; scooters</span>
+            <ChevronRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
+          </p>
+        </Link>
+      </div>
+
       <FilterPills pills={CATEGORY_PILLS} value={selectedCategory} onChange={handleCategorySelect} />
 
       {/* ─── Student deals ─── */}

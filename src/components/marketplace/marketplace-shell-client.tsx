@@ -172,15 +172,12 @@ export function MarketplaceShellClient({ children, profile, viewerMode }: Market
             <div className="space-y-1">
               {VERTICAL_NAV.map((v) => {
                 const Icon = v.icon;
-                const isActive =
-                  pathname === `/app/marketplace` &&
-                  new URLSearchParams(typeof window !== "undefined" ? window.location.search : "").get(
-                    "category"
-                  ) === v.slug;
+                const pathSlug = v.slug === "essentials" ? "supermarket" : v.slug;
+                const isActive = pathname.startsWith(`/app/marketplace/${pathSlug}`);
                 return (
                   <Link
                     key={v.slug}
-                    href={`/app/marketplace?category=${v.slug}`}
+                    href={`/app/marketplace/${pathSlug}`}
                     onClick={() => {
                       sounds.tap();
                       haptics.light();

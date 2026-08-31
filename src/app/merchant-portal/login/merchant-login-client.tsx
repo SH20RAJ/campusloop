@@ -46,9 +46,14 @@ export function MerchantLoginClient() {
       haptics.medium();
       toast.success(`Welcome back, ${data.merchant?.name || "Merchant"}!`);
 
-      // If rental merchant, redirect to /merchant-portal/bikes, else /merchant-portal
-      if (data.merchant?.categorySlug === "rentals") {
+      // Redirect according to vertical type
+      const cat = data.merchant?.categorySlug?.toLowerCase();
+      const vtype = data.merchant?.verticalType?.toUpperCase();
+
+      if (cat === "rentals" || vtype === "RENTALS") {
         router.push("/merchant-portal/bikes");
+      } else if (cat === "essentials" || vtype === "MART" || vtype === "SUPERMARKET") {
+        router.push("/merchant-portal/supermarket");
       } else {
         router.push("/merchant-portal");
       }

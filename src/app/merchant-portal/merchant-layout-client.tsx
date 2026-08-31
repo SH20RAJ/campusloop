@@ -13,6 +13,7 @@ import {
   Package,
   QrCode,
   Settings,
+  ShoppingBag,
   Star,
   Store,
   Tag,
@@ -53,12 +54,30 @@ const BIKE_RENTAL_NAV_ITEMS = [
   { href: "/merchant-portal/bikes/settings", label: "Rental Rules", icon: Settings },
 ];
 
+const SUPERMARKET_NAV_ITEMS = [
+  { href: "/merchant-portal/supermarket", label: "Mart Dashboard", icon: LayoutDashboard },
+  { href: "/merchant-portal/orders", label: "Packing Orders", icon: Package },
+  { href: "/merchant-portal/products", label: "Inventory & SKUs", icon: ShoppingBag },
+  { href: "/merchant-portal/store", label: "Mart Profile", icon: Store },
+  { href: "/merchant-portal/offers", label: "Flash Deals", icon: Tag },
+  { href: "/merchant-portal/earnings", label: "Revenue & Settlements", icon: DollarSign },
+];
+
 export function MerchantLayoutClient({ children, profile, merchant }: MerchantLayoutClientProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isRentalStore = merchant?.categorySlug === "rentals" || pathname.startsWith("/merchant-portal/bikes");
+  const isRentalStore =
+    merchant?.categorySlug === "rentals" ||
+    merchant?.verticalType === "RENTALS" ||
+    pathname.startsWith("/merchant-portal/bikes");
+
+  const isSupermarketStore =
+    merchant?.categorySlug === "essentials" ||
+    merchant?.verticalType === "MART" ||
+    merchant?.verticalType === "SUPERMARKET" ||
+    pathname.startsWith("/merchant-portal/supermarket");
 
   async function handleLogout() {
     sounds.tap();
@@ -127,71 +146,105 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
             </Link>
           </div>
 
-          {/* Navigation Links */}
+          {/* Dynamic Navigation according to Merchant Vertical */}
           <nav className="space-y-1">
-            <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-              General Store
-            </p>
-            {MERCHANT_NAV_ITEMS.map((item) => {
-              const isActive =
-                pathname === item.href ||
-                (item.href !== "/merchant-portal" && pathname.startsWith(item.href));
-              const Icon = item.icon;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => {
-                    sounds.tap();
-                    haptics.light();
-                  }}
-                  className={cn(
-                    "flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer",
-                    isActive
-                      ? "bg-foreground text-background font-black shadow-xs"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  )}
-                >
-                  <Icon className="size-4 shrink-0" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Dedicated Bike Rentals Section */}
-          <nav className="space-y-1 pt-2 border-t border-border/30">
-            <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center gap-1.5">
-              <Bike className="size-3.5" />
-              <span>Bike Fleet Rentals</span>
-            </p>
-            {BIKE_RENTAL_NAV_ITEMS.map((item) => {
-              const isActive =
-                pathname === item.href ||
-                (item.href !== "/merchant-portal/bikes" && pathname.startsWith(item.href));
-              const Icon = item.icon;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => {
-                    sounds.tap();
-                    haptics.light();
-                  }}
-                  className={cn(
-                    "flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer",
-                    isActive
-                      ? "bg-emerald-500 text-black font-black shadow-xs"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  )}
-                >
-                  <Icon className="size-4 shrink-0" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+            {isRentalStore ? (
+              <>
+                <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center gap-1.5">
+                  <Bike className="size-3.5" />
+                  <span>Bike Fleet Rentals</span>
+                </p>
+                {BIKE_RENTAL_NAV_ITEMS.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/merchant-portal/bikes" && pathname.startsWith(item.href));
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => {
+                        sounds.tap();
+                        haptics.light();
+                      }}
+                      className={cn(
+                        "flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer",
+                        isActive
+                          ? "bg-emerald-500 text-black font-black shadow-xs"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      <Icon className="size-4 shrink-0" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </>
+            ) : isSupermarketStore ? (
+              <>
+                <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-1.5">
+                  <ShoppingBag className="size-3.5" />
+                  <span>Supermarket Console</span>
+                </p>
+                {SUPERMARKET_NAV_ITEMS.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/merchant-portal/supermarket" && pathname.startsWith(item.href));
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => {
+                        sounds.tap();
+                        haptics.light();
+                      }}
+                      className={cn(
+                        "flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer",
+                        isActive
+                          ? "bg-amber-500 text-black font-black shadow-xs"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      <Icon className="size-4 shrink-0" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </>
+            ) : (
+              <>
+                <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-rose-500 flex items-center gap-1.5">
+                  <UtensilsCrossed className="size-3.5" />
+                  <span>Food &amp; Kitchen Console</span>
+                </p>
+                {MERCHANT_NAV_ITEMS.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/merchant-portal" && pathname.startsWith(item.href));
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => {
+                        sounds.tap();
+                        haptics.light();
+                      }}
+                      className={cn(
+                        "flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer",
+                        isActive
+                          ? "bg-foreground text-background font-black shadow-xs"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      <Icon className="size-4 shrink-0" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </>
+            )}
           </nav>
         </div>
 

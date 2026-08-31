@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
-import { GraduationCap, Heart, School, ShieldCheck, Sparkles, UserRound, X, Zap } from "lucide-react";
+import { GraduationCap, HeartHandshakeIcon, School, ShieldCheck, Sparkles, UserRound, X, Zap } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
@@ -362,7 +362,7 @@ export function SwipeActions({
         aria-label="Match"
         className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary/95 active:scale-90 cursor-pointer"
       >
-        <Sparkles className="size-7 fill-current" />
+        <HeartHandshakeIcon className="size-7 fill-current" />
       </button>
     </div>
   );

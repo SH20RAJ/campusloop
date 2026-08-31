@@ -199,7 +199,7 @@ export function DatingAppClient() {
 
         <div className="flex items-center gap-2">
           <div className="size-7 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-2xs">
-            <Sparkles className="size-3.5" />
+            <Heart className="size-3.5" />
           </div>
           <div>
             <h1 className="text-sm font-black tracking-tight text-foreground leading-tight">

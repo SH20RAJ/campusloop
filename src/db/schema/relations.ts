@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import { academicResources } from "./academic-resources";
+import { aiConversations, aiFeedback, aiMessages, aiUsageEvents } from "./ai";
 import { articleComments, articleCommentVotes, articles, articleVotes } from "./articles";
 import { callSessions, userBehaviorEvents } from "./calls-and-analytics";
 import { conversationParticipants, conversations, messages } from "./chat";
@@ -793,5 +794,39 @@ export const userBehaviorEventsRelations = relations(userBehaviorEvents, ({ one 
   user: one(userProfiles, {
     fields: [userBehaviorEvents.userId],
     references: [userProfiles.id],
+  }),
+}));
+
+export const aiConversationsRelations = relations(aiConversations, ({ one, many }) => ({
+  user: one(userProfiles, {
+    fields: [aiConversations.userId],
+    references: [userProfiles.id],
+  }),
+  messages: many(aiMessages),
+}));
+
+export const aiMessagesRelations = relations(aiMessages, ({ one, many }) => ({
+  conversation: one(aiConversations, {
+    fields: [aiMessages.conversationId],
+    references: [aiConversations.id],
+  }),
+  feedback: many(aiFeedback),
+}));
+
+export const aiUsageEventsRelations = relations(aiUsageEvents, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [aiUsageEvents.userId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const aiFeedbackRelations = relations(aiFeedback, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [aiFeedback.userId],
+    references: [userProfiles.id],
+  }),
+  message: one(aiMessages, {
+    fields: [aiFeedback.messageId],
+    references: [aiMessages.id],
   }),
 }));

@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull, ne } from "drizzle-orm";
+import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { conversations, messages, userProfiles } from "@/db/schema";
@@ -20,6 +20,10 @@ export async function GET(req: Request, { params }: RouteParams) {
     }
 
     const { id } = await params;
+    const { searchParams } = new URL(req.url);
+    const limit = Math.min(Math.max(1, Number(searchParams.get("limit")) || 35), 100);
+    const before = searchParams.get("before"); // ISO date string or timestamp cursor
+
     const db = getDb();
     const profile = await db.query.userProfiles.findFirst({
       where: eq(userProfiles.userId, user.id),
@@ -39,13 +43,26 @@ export async function GET(req: Request, { params }: RouteParams) {
         and(eq(messages.conversationId, id), ne(messages.senderId, profile.id), isNull(messages.readAt))
       );
 
-    const chatMessages = await db.query.messages.findMany({
-      where: eq(messages.conversationId, id),
-      orderBy: [asc(messages.createdAt)],
+    const conditions = [eq(messages.conversationId, id)];
+    if (before) {
+      const beforeDate = new Date(before);
+      if (!isNaN(beforeDate.getTime())) {
+        conditions.push(sql`${messages.createdAt} < ${beforeDate}`);
+      }
+    }
+
+    // Query messages in descending order to fetch the newest slice first
+    const rawSlice = await db.query.messages.findMany({
+      where: and(...conditions),
+      orderBy: [desc(messages.createdAt)],
+      limit,
       with: {
         sender: true,
       },
     });
+
+    // Reverse to return in chronological ascending order for normal chat display
+    const chatMessages = rawSlice.reverse();
 
     return NextResponse.json(chatMessages);
   } catch (error) {

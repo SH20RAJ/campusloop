@@ -91,6 +91,43 @@ export const CAMPUSLOOP_AI_TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: "search_housing",
+    description: "Find verified student flatmate openings, PG vacancies, and campus housing.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: { type: "string" },
+        limit: { type: "integer", minimum: 1, maximum: 10 },
+      },
+      required: [],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "search_rides",
+    description: "Find airport, railway station cab shares and campus rideshares.",
+    parameters: {
+      type: "object",
+      properties: {
+        limit: { type: "integer", minimum: 1, maximum: 10 },
+      },
+      required: [],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "get_my_saved_posts",
+    description: "Get the current user's personal saved posts and bookmarks.",
+    parameters: {
+      type: "object",
+      properties: {
+        limit: { type: "integer", minimum: 1, maximum: 10 },
+      },
+      required: [],
+      additionalProperties: false,
+    },
+  },
 ] as const;
 
 export type CampusLoopAiToolName = (typeof CAMPUSLOOP_AI_TOOL_DEFINITIONS)[number]["name"];
@@ -98,7 +135,7 @@ export type CampusLoopAiToolName = (typeof CAMPUSLOOP_AI_TOOL_DEFINITIONS)[numbe
 export type CampusLoopAiToolExecutor = (
   context: AiToolContext,
   args: Record<string, unknown>
-) => Promise<unknown>;
+) => Promise<{ data: unknown; sources: import("./types").AiSource[] }>;
 
 export function assertInstitutionScope(context: AiToolContext) {
   if (!context.userId) throw new Error("Unauthorized");

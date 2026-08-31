@@ -312,27 +312,100 @@ export function MessengerPane({
   // Fast Hard Cache: Initial fallback from in-memory / local storage cache for 0ms instant display
   const initialCache = conversationId ? getCachedMessages(conversationId) : null;
 
+  // Pagination state for loading older messages (WhatsApp/Instagram style)
+  const [isLoadingOlder, setIsLoadingOlder] = useState(false);
+  const [hasMoreOlder, setHasMoreOlder] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const isInitialScrollDoneRef = useRef(false);
+
   const {
     data: messages,
     isLoading,
     mutate,
-  } = useSWR<CachedMessage[]>(conversationId ? `/api/chat/${conversationId}/messages` : null, fetcher, {
-    fallbackData: initialCache || undefined,
-    refreshInterval: 2000,
-    revalidateOnFocus: true,
-    onSuccess: (data) => {
-      if (conversationId && data) {
-        setCachedMessages(conversationId, data);
-      }
-    },
-  });
+  } = useSWR<CachedMessage[]>(
+    conversationId ? `/api/chat/${conversationId}/messages?limit=35` : null,
+    fetcher,
+    {
+      fallbackData: initialCache || undefined,
+      refreshInterval: 2000,
+      revalidateOnFocus: true,
+      onSuccess: (data) => {
+        if (conversationId && data) {
+          setCachedMessages(conversationId, data);
+        }
+      },
+    }
+  );
 
-  // Auto scroll to bottom smoothly on message updates (unless user is searching)
+  // Load older messages when user scrolls to top
+  const handleLoadOlder = useCallback(async () => {
+    if (!conversationId || isLoadingOlder || !hasMoreOlder || !messages || messages.length === 0) return;
+    setIsLoadingOlder(true);
+
+    const oldestMessage = messages[0];
+    const oldestTimestamp = oldestMessage?.createdAt;
+    const container = scrollContainerRef.current;
+    const prevScrollHeight = container?.scrollHeight || 0;
+
+    try {
+      const res = await fetch(
+        `/api/chat/${conversationId}/messages?limit=35&before=${encodeURIComponent(new Date(oldestTimestamp).toISOString())}`
+      );
+      if (res.ok) {
+        const olderSlice = (await res.json()) as CachedMessage[];
+        if (olderSlice.length < 35) {
+          setHasMoreOlder(false);
+        }
+        if (olderSlice.length > 0) {
+          // Prepend older messages while avoiding duplicates
+          const olderIds = new Set(olderSlice.map((m) => m.id));
+          const filteredCurrent = messages.filter((m) => !olderIds.has(m.id));
+          const combined = [...olderSlice, ...filteredCurrent];
+
+          mutate(combined, false);
+
+          // Preserve exact scroll view position after prepend
+          requestAnimationFrame(() => {
+            if (container) {
+              const newScrollHeight = container.scrollHeight;
+              container.scrollTop = newScrollHeight - prevScrollHeight;
+            }
+          });
+        }
+      }
+    } catch {
+      // Fallback
+    } finally {
+      setIsLoadingOlder(false);
+    }
+  }, [conversationId, isLoadingOlder, hasMoreOlder, messages, mutate]);
+
+  // Handle scroll to detect when user reaches top of conversation
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    if (container.scrollTop < 60 && !isLoadingOlder && hasMoreOlder && messages && messages.length >= 35) {
+      void handleLoadOlder();
+    }
+  }, [handleLoadOlder, isLoadingOlder, hasMoreOlder, messages]);
+
+  // Auto scroll to bottom smoothly on message updates (unless user is searching or viewing older history)
   useEffect(() => {
     if (!chatSearchQuery.trim()) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      if (!isInitialScrollDoneRef.current) {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+        isInitialScrollDoneRef.current = true;
+      } else {
+        const container = scrollContainerRef.current;
+        const isNearBottom = container
+          ? container.scrollHeight - container.scrollTop - container.clientHeight < 180
+          : true;
+        if (isNearBottom) {
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+      }
     }
-  }, [chatSearchQuery]);
+  }, [messages, chatSearchQuery]);
 
   // Alert with native browser notification when new message arrives in background
   const lastKnownMsgIdRef = useRef<string | null>(null);
@@ -847,11 +920,22 @@ export function MessengerPane({
 
       {/* ─── Messages Feed Viewport ─── */}
       <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
         className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 space-y-3"
       >
         <div className="max-w-3xl mx-auto w-full space-y-3">
+          {isLoadingOlder && (
+            <div className="flex justify-center py-2">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/60 px-3 py-1 rounded-full animate-pulse">
+                <Loader2 className="size-3 animate-spin" />
+                <span>Loading older messages...</span>
+              </div>
+            </div>
+          )}
+
           {!messages || (messages.length === 0 && isLoading) ? (
             /* Animated Message Bubbles Skeleton */
             <div className="space-y-4 py-2">

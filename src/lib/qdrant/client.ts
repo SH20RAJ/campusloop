@@ -194,3 +194,4 @@ class QdrantResilientClient {
 }
 
 export const qdrant = new QdrantResilientClient();
+export const qdrantClient = qdrant;

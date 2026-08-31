@@ -27,3 +27,9 @@ export function getRedis(): Redis | null {
 
   return redisClient;
 }
+
+export const redis = {
+  get: async <T = unknown>(key: string) => getRedis()?.get<T>(key) ?? null,
+  set: async (key: string, value: unknown, options?: Parameters<Redis["set"]>[2]) =>
+    getRedis()?.set(key, value, options) ?? null,
+};

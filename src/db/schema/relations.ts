@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import { academicResources } from "./academic-resources";
 import { articleComments, articleCommentVotes, articles, articleVotes } from "./articles";
+import { callSessions, userBehaviorEvents } from "./calls-and-analytics";
 import { conversationParticipants, conversations, messages } from "./chat";
 import {
   barberAppointments,
@@ -767,6 +768,30 @@ export const randomReportsRelations = relations(randomReports, ({ one }) => ({
   }),
   reportedUser: one(userProfiles, {
     fields: [randomReports.reportedUserId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const callSessionsRelations = relations(callSessions, ({ one }) => ({
+  caller: one(userProfiles, {
+    fields: [callSessions.callerId],
+    references: [userProfiles.id],
+    relationName: "call_caller",
+  }),
+  receiver: one(userProfiles, {
+    fields: [callSessions.receiverId],
+    references: [userProfiles.id],
+    relationName: "call_receiver",
+  }),
+  conversation: one(conversations, {
+    fields: [callSessions.conversationId],
+    references: [conversations.id],
+  }),
+}));
+
+export const userBehaviorEventsRelations = relations(userBehaviorEvents, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [userBehaviorEvents.userId],
     references: [userProfiles.id],
   }),
 }));

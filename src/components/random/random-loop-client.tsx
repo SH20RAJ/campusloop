@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Sparkles,
   UserCheck,
+  Video,
   X,
   Zap,
 } from "lucide-react";
@@ -19,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { ActiveCallOverlay } from "@/components/calls/active-call-overlay";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
@@ -72,6 +74,10 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
   const [reportReason, setReportReason] = useState("HARASSMENT");
   const [ratedReaction, setRatedReaction] = useState<string | null>(null);
 
+  // Video calling state in Random Loop
+  const [isVideoActive, setIsVideoActive] = useState(false);
+  const [showVideoConsentModal, setShowVideoConsentModal] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // Poll active session details and message feed
@@ -96,8 +102,33 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
   useEffect(() => {
     if (session?.status && session.status !== "ACTIVE" && viewState === "ACTIVE") {
       setViewState("ENDED");
+      setIsVideoActive(false);
     }
   }, [session?.status, viewState]);
+
+  // Video session trigger effect: when both users accept, launch video
+  useEffect(() => {
+    if (session?.isBothVideoAccepted && !isVideoActive) {
+      sounds.ting();
+      toast.success("Mutual video accepted! Connecting camera... 📹");
+      setIsVideoActive(true);
+      setShowVideoConsentModal(false);
+    } else if (
+      session?.partnerVideoRequested &&
+      !session?.myVideoRequested &&
+      !showVideoConsentModal &&
+      !isVideoActive
+    ) {
+      sounds.pop();
+      setShowVideoConsentModal(true);
+    }
+  }, [
+    session?.isBothVideoAccepted,
+    session?.partnerVideoRequested,
+    session?.myVideoRequested,
+    showVideoConsentModal,
+    isVideoActive,
+  ]);
 
   function handleToggleInterest(id: string) {
     sounds.tap();
@@ -248,6 +279,34 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
     setActiveSessionId(null);
     setShowOptionsModal(false);
     setViewState("CONFIGURING");
+  }
+
+  // Action: Mutual Video Request
+  async function handleRequestVideo(peerId?: string) {
+    sounds.tap();
+    haptics.medium();
+    if (!activeSessionId) return;
+
+    try {
+      const res = await fetch(`/api/random/session/${activeSessionId}/video`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ peerId }),
+      });
+      const data = (await res.json()) as any;
+      mutateSession();
+
+      if (data.isBothVideoAccepted) {
+        sounds.ting();
+        haptics.success();
+        setIsVideoActive(true);
+        setShowVideoConsentModal(false);
+      } else {
+        toast.info("Video request sent! Waiting for consent 📹");
+      }
+    } catch {
+      toast.error("Could not request video");
+    }
   }
 
   // Action: Mutual Reveal
@@ -642,6 +701,24 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
           </button>
 
           <div className="flex items-center gap-2">
+            {/* Request Video Pill */}
+            {!session?.isBothVideoAccepted && (
+              <button
+                type="button"
+                onClick={() => handleRequestVideo()}
+                className={cn(
+                  "flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border",
+                  session?.myVideoRequested
+                    ? "bg-purple-500/15 text-purple-500 border-purple-500/30"
+                    : "bg-muted/40 hover:bg-muted border-border/40 text-muted-foreground hover:text-foreground"
+                )}
+                title="Switch conversation to video with mutual consent"
+              >
+                <Video className="size-3.5" />
+                <span>{session?.myVideoRequested ? "Video Sent" : "Video 📹"}</span>
+              </button>
+            )}
+
             {!session?.isBothRevealed && (
               <button
                 type="button"
@@ -822,6 +899,56 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Video Request Consent Modal */}
+      {showVideoConsentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-zinc-900 border border-white/15 max-w-sm w-full p-6 rounded-3xl space-y-4 text-center shadow-2xl">
+            <div className="size-14 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-400 flex items-center justify-center mx-auto">
+              <Video className="size-7" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-black text-white">Video Request 📹</h3>
+              <p className="text-xs text-zinc-400">
+                {partner?.displayName || "Anonymous Student"} wants to switch this conversation to video.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowVideoConsentModal(false)}
+                className="flex-1 h-11 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                Not Now
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRequestVideo()}
+                className="flex-1 h-11 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black transition-colors shadow-lg cursor-pointer"
+              >
+                Accept Video
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Active Random Loop Video Stream Overlay */}
+      {isVideoActive && partner && activeSessionId && (
+        <ActiveCallOverlay
+          callId={activeSessionId}
+          isCaller={session?.myVideoRequested || false}
+          type="video"
+          partner={{
+            id: partner.id,
+            displayName: partner.displayName,
+            avatarUrl: partner.avatarUrl,
+            username: partner.username,
+          }}
+          remotePeerId={session?.partnerPeerId}
+          onCallEnded={() => setIsVideoActive(false)}
+        />
       )}
     </div>
   );

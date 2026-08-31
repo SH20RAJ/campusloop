@@ -9,6 +9,7 @@ import {
   Loader2,
   Mic,
   Paperclip,
+  Phone,
   Play,
   Search,
   Send,
@@ -17,6 +18,7 @@ import {
   Trash2,
   User,
   Users2,
+  Video,
   Volume2,
   X,
 } from "lucide-react";
@@ -24,6 +26,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { ActiveCallOverlay } from "@/components/calls/active-call-overlay";
+import { IncomingCallModal } from "@/components/calls/incoming-call-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 import { PresenceDot } from "@/components/ui/presence-dot";
@@ -117,6 +121,15 @@ export function MessengerPane({
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionSuggestions, setMentionSuggestions] = useState<UserProfile[]>([]);
   const [isSearchingMentions, setIsSearchingMentions] = useState(false);
+
+  // Calling States
+  const [activeCall, setActiveCall] = useState<{
+    callId: string;
+    isCaller: boolean;
+    type: "audio" | "video";
+    remotePeerId?: string;
+  } | null>(null);
+  const [incomingCall, setIncomingCall] = useState<any | null>(null);
 
   // Swipe gesture tracking
   const touchStartXRef = useRef<number | null>(null);
@@ -229,6 +242,61 @@ export function MessengerPane({
     } catch (err: any) {
       toast.error(err.message || "Failed to delete message");
       mutate();
+    }
+  }
+
+  // Poll for incoming calls
+  useEffect(() => {
+    if (!currentUserId || activeCall) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("/api/calls");
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.incomingCall && data.incomingCall.status === "CALLING") {
+            setIncomingCall(data.incomingCall);
+          } else {
+            setIncomingCall(null);
+          }
+        }
+      } catch {}
+    }, 2800);
+
+    return () => clearInterval(interval);
+  }, [currentUserId, activeCall]);
+
+  async function handleStartCall(type: "audio" | "video") {
+    if (!conversationId || !otherParticipant || otherParticipant.isGroup) return;
+
+    sounds.tap();
+    haptics.medium();
+
+    try {
+      const res = await fetch("/api/calls", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          receiverId: otherParticipant.id,
+          conversationId,
+          type,
+          context: "chat",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.call) {
+        toast.error(data.error || "Failed to start call");
+        return;
+      }
+
+      setActiveCall({
+        callId: data.call.id,
+        isCaller: true,
+        type,
+      });
+    } catch (err: any) {
+      toast.error(`Call failed: ${err.message}`);
     }
   }
 
@@ -688,6 +756,31 @@ export function MessengerPane({
 
           {/* Header Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            {/* Audio & Video Calling Buttons (1-to-1 DMs only) */}
+            {!otherParticipant.isGroup && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleStartCall("audio")}
+                  className="size-8 sm:size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  title="Start audio call"
+                  aria-label="Start audio call"
+                >
+                  <Phone className="size-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleStartCall("video")}
+                  className="size-8 sm:size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  title="Start video call"
+                  aria-label="Start video call"
+                >
+                  <Video className="size-4.5" />
+                </button>
+              </>
+            )}
+
             <button
               type="button"
               onClick={() => setSearchInChat(!searchInChat)}
@@ -1356,6 +1449,49 @@ export function MessengerPane({
         onClearChat={() => mutate(undefined, true)}
         onDeleteChat={onBack}
       />
+
+      {/* Incoming Call Prompt Modal */}
+      {incomingCall && (
+        <IncomingCallModal
+          incomingCall={incomingCall}
+          onAccept={() => {
+            setActiveCall({
+              callId: incomingCall.callId,
+              isCaller: false,
+              type: incomingCall.type,
+              remotePeerId: incomingCall.callerPeerId,
+            });
+            setIncomingCall(null);
+          }}
+          onDecline={async () => {
+            try {
+              await fetch(`/api/calls/${incomingCall.callId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "DECLINE" }),
+              });
+            } catch {}
+            setIncomingCall(null);
+          }}
+        />
+      )}
+
+      {/* Active Audio / Video Call Overlay */}
+      {activeCall && otherParticipant && (
+        <ActiveCallOverlay
+          callId={activeCall.callId}
+          isCaller={activeCall.isCaller}
+          type={activeCall.type}
+          partner={{
+            id: otherParticipant.id,
+            displayName: otherParticipant.displayName || "Student",
+            avatarUrl: otherParticipant.avatarUrl,
+            username: otherParticipant.username || undefined,
+          }}
+          remotePeerId={activeCall.remotePeerId}
+          onCallEnded={() => setActiveCall(null)}
+        />
+      )}
     </div>
   );
 }

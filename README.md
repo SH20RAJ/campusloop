@@ -192,6 +192,41 @@ campusloop/
 
 ---
 
+## 📈 Codebase Size & Architecture Metrics
+
+> 🕒 **Last Updated**: August 31, 2026, 09:52 AM IST
+
+### High-Level Summary
+
+| Metric | Measurement |
+| :--- | :--- |
+| **Total Source Files** *(excl. `node_modules`, `.next`, `.git`)* | **756 files** |
+| **Total Lines of Code (TS/TSX/JS/CSS/SQL/Config)** | **~128,000+ lines** |
+| **Core Source Code (`src/`)** | **~4.88 MB** (642 files, **111,720 lines**) |
+| **Scripts & Migrations (`scripts/`, `drizzle/`)** | **~418 KB** (48 files, **13,161 lines**) |
+| **Documentation (`docs/`, Markdown files)** | **~286 KB** (25 files, **8,473 lines**) |
+| **Public Assets (`public/`)** | **~17.0 MB** *(images, icons, manifest, llms.txt)* |
+| **Dependencies & Build Cache** | `node_modules`: ~1.5 GB \| `.next`: ~2.1 GB \| `.git`: ~27 MB |
+
+### Source Breakdown by Subsystem (`src/`)
+
+```
+src/
+├── app/                  # 373 files  │  63,033 lines  │  Next.js App Router (Pages, Layouts & APIs)
+│   ├── app/              # 129 files  │  24,352 lines  │  Main App Shell (Feed, Dating, Stories, Chat, etc.)
+│   ├── api/              # 116 files  │  12,522 lines  │  Edge REST APIs & Qdrant semantic indexing
+│   ├── admin/            #  43 files  │   7,177 lines  │  Moderation, user verification, & audit console
+│   └── merchant-portal/  #  37 files  │   4,901 lines  │  Merchant listings, student deals & marketplace
+├── components/           # 147 files  │  34,993 lines  │  Feature subcomponents & Radix/Shadcn primitives
+├── lib/                  #  67 files  │   8,320 lines  │  Qdrant vector search, recommendations & utils
+├── db/                   #  26 files  │   2,789 lines  │  Drizzle ORM schema definitions & Neon client
+├── hooks/                #  14 files  │   1,254 lines  │  Custom React hooks (useFeed, useProfile, etc.)
+├── constants/            #  12 files  │   1,244 lines  │  Static configs, navigational layouts, and metadata
+└── hexclave/             #   2 files  │      24 lines  │  Hexclave Auth server and client integrations
+```
+
+---
+
 ## 🚀 Getting Started
 
 ### 1. Installation

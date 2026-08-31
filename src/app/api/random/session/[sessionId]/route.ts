@@ -75,6 +75,13 @@ export async function GET(req: Request, { params }: RouteParams) {
     const myContinue = isUserA ? session.userAContinued : session.userBContinued;
     const partnerContinue = isUserA ? session.userBContinued : session.userAContinued;
 
+    // Video request flags
+    const myVideoRequested = isUserA ? session.userAVideoRequested : session.userBVideoRequested;
+    const partnerVideoRequested = isUserA ? session.userBVideoRequested : session.userAVideoRequested;
+    const isBothVideoAccepted = session.userAVideoRequested && session.userBVideoRequested;
+    const myPeerId = isUserA ? session.userAPeerId : session.userBPeerId;
+    const partnerPeerId = isUserA ? session.userBPeerId : session.userAPeerId;
+
     // Sanitize partner information based on reveal state
     const partnerInfo = {
       id: partner.id,
@@ -96,6 +103,11 @@ export async function GET(req: Request, { params }: RouteParams) {
         myReveal,
         partnerReveal,
         isBothRevealed,
+        myVideoRequested,
+        partnerVideoRequested,
+        isBothVideoAccepted,
+        myPeerId,
+        partnerPeerId,
         myContinue,
         partnerContinue,
         conversationId: session.conversationId,

@@ -49,6 +49,12 @@ export const randomSessions = pgTable("random_sessions", {
   userARevealed: boolean("user_a_revealed").default(false).notNull(),
   userBRevealed: boolean("user_b_revealed").default(false).notNull(),
 
+  // Mutual Video Request Flow
+  userAVideoRequested: boolean("user_a_video_requested").default(false).notNull(),
+  userBVideoRequested: boolean("user_b_video_requested").default(false).notNull(),
+  userAPeerId: text("user_a_peer_id"),
+  userBPeerId: text("user_b_peer_id"),
+
   // Mutual Keep Talking / Continue to Messages Flow
   userAContinued: boolean("user_a_continued").default(false).notNull(),
   userBContinued: boolean("user_b_continued").default(false).notNull(),

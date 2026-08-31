@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
-import { GraduationCap, Heart, School, ShieldCheck, UserRound, X, Zap } from "lucide-react";
+import { GraduationCap, Heart, School, ShieldCheck, Sparkles, UserRound, X, Zap } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
@@ -140,33 +140,33 @@ function TopCard({
         </div>
       )}
 
-      {/* LIKE / NOPE stamps (Tinder signature) */}
+      {/* LIKE / NOPE stamps */}
       <motion.div
         style={{ opacity: likeOpacity }}
         className="pointer-events-none absolute left-5 top-10 z-30 -rotate-12 rounded-lg border-4 border-emerald-400 px-3 py-1 shadow-lg"
       >
-        <span className="text-3xl font-black tracking-widest text-emerald-400">LIKE</span>
+        <span className="text-3xl font-black tracking-widest text-emerald-400">MATCH</span>
       </motion.div>
       <motion.div
         style={{ opacity: nopeOpacity }}
-        className="pointer-events-none absolute right-5 top-10 z-30 rotate-12 rounded-lg border-4 border-rose-500 px-3 py-1 shadow-lg"
+        className="pointer-events-none absolute right-5 top-10 z-30 rotate-12 rounded-lg border-4 border-neutral-300 dark:border-neutral-500 px-3 py-1 shadow-lg"
       >
-        <span className="text-3xl font-black tracking-widest text-rose-500">NOPE</span>
+        <span className="text-3xl font-black tracking-widest text-neutral-300 dark:text-neutral-400">PASS</span>
       </motion.div>
 
       {/* Top badges */}
       <div className="absolute inset-x-3 top-7 z-20 flex items-center justify-between">
         <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-black text-white backdrop-blur-md border border-white/10">
-          <Zap className="size-3 text-rose-400" /> {candidate.compatibilityScore}% match
+          <Zap className="size-3 text-primary" /> {candidate.compatibilityScore}% vibe match
         </span>
         <div className="flex items-center gap-1.5">
           {candidate.likedYou && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/90 px-2.5 py-1 text-[10px] font-black text-white backdrop-blur-md shadow-sm">
-              <Heart className="size-2.5 fill-white" /> Likes you
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/90 px-2.5 py-1 text-[10px] font-black text-primary-foreground backdrop-blur-md shadow-sm">
+              <Sparkles className="size-2.5" /> Likes your vibe
             </span>
           )}
           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/25 px-2.5 py-1 text-[10px] font-extrabold text-emerald-300 backdrop-blur-md border border-emerald-500/30">
-            <ShieldCheck className="size-3" /> Verified
+            <ShieldCheck className="size-3" /> Verified Student
           </span>
         </div>
       </div>
@@ -211,15 +211,15 @@ function TopCard({
           </div>
         </div>
 
-        {/* Shared interests — the Hinge move */}
+        {/* Shared interests */}
         {candidate.sharedInterests.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {candidate.sharedInterests.slice(0, 4).map((interest) => (
               <span
                 key={interest}
-                className="inline-flex items-center gap-1 rounded-full border border-rose-400/50 bg-rose-500/25 px-2.5 py-1 text-[10px] font-bold text-rose-100 backdrop-blur-md"
+                className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-md"
               >
-                <Heart className="size-2.5 fill-rose-300 text-rose-300" /> You both like {interest}
+                <Sparkles className="size-2.5 text-primary" /> You both like {interest}
               </span>
             ))}
           </div>
@@ -236,7 +236,7 @@ function TopCard({
           onClick={(e) => e.stopPropagation()}
           className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70 transition-colors hover:text-white pt-0.5"
         >
-          <UserRound className="size-3" /> View full profile
+          <UserRound className="size-3" /> View profile
         </Link>
       </div>
     </motion.div>
@@ -331,7 +331,7 @@ export function SwipeActions({
         onClick={handleUndo}
         disabled={!canUndo}
         aria-label="Undo last swipe"
-        className="flex size-11 items-center justify-center rounded-full border border-amber-500/40 bg-card text-amber-500 shadow-xs transition-all hover:scale-105 hover:bg-amber-500/15 active:scale-90 cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
+        className="flex size-11 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground shadow-xs transition-all hover:scale-105 hover:bg-muted hover:text-foreground active:scale-90 cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
       >
         <svg
           viewBox="0 0 24 24"
@@ -351,7 +351,7 @@ export function SwipeActions({
         type="button"
         onClick={handlePass}
         aria-label="Pass"
-        className="flex size-14 items-center justify-center rounded-full border-2 border-rose-500/40 bg-card text-rose-500 shadow-md transition-all hover:scale-105 hover:bg-rose-500/15 hover:border-rose-500 active:scale-90 cursor-pointer"
+        className="flex size-14 items-center justify-center rounded-full border-2 border-border bg-card text-muted-foreground shadow-md transition-all hover:scale-105 hover:bg-muted hover:text-foreground active:scale-90 cursor-pointer"
       >
         <X className="size-7" strokeWidth={2.5} />
       </button>
@@ -359,10 +359,10 @@ export function SwipeActions({
       <button
         type="button"
         onClick={handleLike}
-        aria-label="Like"
-        className="flex size-14 items-center justify-center rounded-full bg-linear-to-tr from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/35 transition-all hover:scale-105 hover:opacity-95 active:scale-90 cursor-pointer"
+        aria-label="Match"
+        className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary/95 active:scale-90 cursor-pointer"
       >
-        <Heart className="size-7 fill-white" />
+        <Sparkles className="size-7 fill-current" />
       </button>
     </div>
   );

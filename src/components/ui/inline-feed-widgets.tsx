@@ -110,32 +110,32 @@ export function InlineCommunitiesWidget() {
   );
 }
 
-// ──────── 2. Campus Dating / Matchmaking Teaser Widget ────────
+// ──────── 2. Campus Matchmaking Teaser Widget ────────
 
 export function InlineDatingWidget() {
   return (
     <div className="py-3 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none">
       <div className="flex items-center gap-3 min-w-0">
-        <div className="size-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-500 shrink-0">
-          <Heart className="size-5 fill-pink-500 text-pink-500" />
+        <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+          <Sparkles className="size-5 text-primary" />
         </div>
 
         <div className="space-y-0.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="text-[14px] font-black text-foreground">Campus Match &amp; Dating</h4>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-600 dark:text-pink-400">
-              18+ Verified
+            <h4 className="text-[14px] font-black text-foreground">Campus Match</h4>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              Safe &amp; Verified
             </span>
           </div>
           <p className="text-xs text-muted-foreground leading-snug truncate">
-            Connect with fellow students from your campus. Intent-hidden matchmaking.
+            Connect with fellow students in a safe space. 100% mutual opt-in matching.
           </p>
         </div>
       </div>
 
       <Link
-        href="/app/dating"
-        className="shrink-0 self-start sm:self-center px-4 py-1.5 rounded-full bg-pink-500 hover:bg-pink-600 text-white font-black text-xs transition-all shadow-2xs active:scale-95"
+        href="/app/matching"
+        className="shrink-0 self-start sm:self-center px-4 py-1.5 rounded-full bg-primary hover:bg-primary/95 text-primary-foreground font-black text-xs transition-all shadow-2xs active:scale-95 cursor-pointer"
       >
         Explore Match
       </Link>

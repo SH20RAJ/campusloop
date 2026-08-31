@@ -1,11 +1,5 @@
-import type { Metadata } from "next";
-import { FiltersClient } from "./filters-client";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Match Preferences",
-  robots: { index: false, follow: false },
-};
-
-export default function DatingFiltersPage() {
-  return <FiltersClient />;
+export default function DatingFiltersRedirectPage() {
+  redirect("/app/matching/filters");
 }

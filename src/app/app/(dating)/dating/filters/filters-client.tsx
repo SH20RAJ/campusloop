@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, Loader2, RotateCcw } from "lucide-react";
+import { ArrowLeft, Check, Eye, EyeOff, Loader2, RotateCcw, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ type Prefs = {
   gender: "DEFAULT" | "MALE" | "FEMALE" | "ALL";
   scope: "GLOBAL" | "CAMPUS";
   sort: "COMPATIBILITY" | "RECENT" | "POPULAR";
+  isEnabled?: boolean;
 };
 
 type PrefsResponse = {
@@ -35,8 +36,8 @@ function Option({
       className={cn(
         "flex items-center justify-between rounded-2xl border px-4 py-3.5 text-sm font-bold transition-all cursor-pointer active:scale-[0.98]",
         selected
-          ? "border-rose-500/60 bg-rose-500/10 text-rose-400"
-          : "border-white/10 bg-white/5 text-white/60 hover:text-white"
+          ? "border-primary bg-primary/10 text-primary font-black shadow-2xs ring-1 ring-primary/30"
+          : "border-border/60 bg-card text-muted-foreground hover:text-foreground hover:bg-muted/40"
       )}
     >
       {children}
@@ -50,6 +51,7 @@ export function FiltersClient() {
   const [saving, setSaving] = useState(false);
 
   const prefs = data?.preferences;
+  const isEnabled = prefs?.isEnabled !== false;
   const recommended =
     data?.recommendedGender === "FEMALE" ? "Girls" : data?.recommendedGender === "MALE" ? "Guys" : "Everyone";
 
@@ -81,27 +83,70 @@ export function FiltersClient() {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 select-none">
-      <header className="flex items-center gap-3 py-3">
+    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 bg-background text-foreground select-none">
+      <header className="flex items-center gap-3 py-3 border-b border-border/30">
         <Link
-          href="/app/dating"
+          href="/app/matching"
           aria-label="Back"
-          className="flex size-10 items-center justify-center rounded-full bg-white/5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex size-9 items-center justify-center rounded-full bg-muted/60 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground border border-border/40 cursor-pointer"
         >
-          <ArrowLeft className="size-5" />
+          <ArrowLeft className="size-4.5" />
         </Link>
-        <h1 className="text-lg font-black tracking-tight">Preferences</h1>
-        {saving && <Loader2 className="ml-auto size-4 animate-spin text-white/40" />}
+        <div>
+          <h1 className="text-base font-black tracking-tight text-foreground">Matching Preferences</h1>
+          <p className="text-[10px] text-muted-foreground font-semibold flex items-center gap-1">
+            <ShieldCheck className="size-3 text-primary" /> Safe &amp; Mutual Opt-In
+          </p>
+        </div>
+        {saving && <Loader2 className="ml-auto size-4 animate-spin text-muted-foreground" />}
       </header>
 
       {isLoading || !prefs ? (
-        <div className="m-auto">
-          <Loader2 className="size-6 animate-spin text-rose-500" />
+        <div className="m-auto py-20">
+          <Loader2 className="size-6 animate-spin text-primary" />
         </div>
       ) : (
-        <main className="space-y-7 pb-10 pt-2">
+        <main className="space-y-6 pb-10 pt-4">
+          {/* Privacy & Opt-in Visibility Section */}
           <section className="space-y-2">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-white/40">Show me</p>
+            <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+              Privacy &amp; Deck Visibility
+            </p>
+            <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-3 shadow-2xs">
+              <div className="flex items-center justify-between gap-3">
+                <div className="space-y-0.5 min-w-0 flex-1">
+                  <p className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                    {isEnabled ? (
+                      <Eye className="size-4 text-emerald-500 shrink-0" />
+                    ) : (
+                      <EyeOff className="size-4 text-amber-500 shrink-0" />
+                    )}
+                    <span>Show profile in Campus Match</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {isEnabled
+                      ? "Active: Classmates can discover your card in the match deck."
+                      : "Paused & Hidden: Your card is 100% hidden from everyone's deck."}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => save({ isEnabled: !isEnabled })}
+                  className={cn(
+                    "w-12 h-6.5 rounded-full transition-colors flex items-center p-1 cursor-pointer shrink-0 border border-border/40",
+                    isEnabled ? "bg-primary justify-end" : "bg-muted justify-start"
+                  )}
+                  aria-label="Toggle profile visibility"
+                >
+                  <div className="size-4.5 rounded-full bg-white shadow-xs" />
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Gender Filter Section */}
+          <section className="space-y-2">
+            <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">Show me</p>
             <div className="grid gap-2">
               <Option selected={prefs.gender === "DEFAULT"} onClick={() => save({ gender: "DEFAULT" })}>
                 Recommended · {recommended}
@@ -118,26 +163,28 @@ export function FiltersClient() {
             </div>
           </section>
 
+          {/* Campus Scope Section */}
           <section className="space-y-2">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-white/40">Where</p>
+            <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">Where</p>
             <div className="grid grid-cols-2 gap-2">
               <Option selected={prefs.scope === "GLOBAL"} onClick={() => save({ scope: "GLOBAL" })}>
-                All India
+                All Campuses
               </Option>
               <Option selected={prefs.scope === "CAMPUS"} onClick={() => save({ scope: "CAMPUS" })}>
-                My campus
+                My Campus
               </Option>
             </div>
           </section>
 
+          {/* Ranking Sort Section */}
           <section className="space-y-2">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-white/40">Rank by</p>
+            <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">Rank by</p>
             <div className="grid grid-cols-3 gap-2">
               <Option
                 selected={prefs.sort === "COMPATIBILITY"}
                 onClick={() => save({ sort: "COMPATIBILITY" })}
               >
-                Match
+                Vibe Match
               </Option>
               <Option selected={prefs.sort === "RECENT"} onClick={() => save({ sort: "RECENT" })}>
                 New
@@ -151,9 +198,9 @@ export function FiltersClient() {
           <button
             type="button"
             onClick={resetSwipes}
-            className="flex w-full items-center justify-center gap-1.5 py-3 text-xs font-semibold text-white/35 transition-colors hover:text-rose-400 cursor-pointer"
+            className="flex w-full items-center justify-center gap-1.5 py-3 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground cursor-pointer rounded-xl hover:bg-muted/40"
           >
-            <RotateCcw className="size-3.5" /> Reset my swipes
+            <RotateCcw className="size-3.5" /> Reset my swipes &amp; start over
           </button>
         </main>
       )}

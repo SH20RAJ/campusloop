@@ -185,7 +185,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
 
   const desktopNavItems = [
     ...DESKTOP_NAV_ITEMS.filter((item) => {
-      if (isViewer && ["/app/chat", "/app/dating"].includes(item.href)) {
+      if (isViewer && ["/app/chat", "/app/dating", "/app/matching"].includes(item.href)) {
         return false;
       }
       return true;
@@ -206,6 +206,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
         !pathname.startsWith("/app/community/") &&
         !pathname.startsWith("/app/search") &&
         !pathname.startsWith("/app/dating") &&
+        !pathname.startsWith("/app/matching") &&
         !pathname.startsWith("/app/settings") &&
         !pathname.startsWith("/@") && (
           <header className="sticky top-0 z-40 flex h-13 w-full items-center justify-between border-b border-border/30 bg-background/85 px-4 backdrop-blur-xl md:hidden select-none">

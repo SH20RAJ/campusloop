@@ -287,54 +287,77 @@ export function PitchClient() {
           </Reveal>
         </div>
 
-        {/* ── Feature Highlight: Secret Crush (Match Mode 18+) ── */}
-        <div className="mt-10 overflow-hidden rounded-3xl border border-rose-500/30 bg-linear-to-br from-rose-500/10 via-pink-500/5 to-card p-6 sm:p-8 shadow-sm">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-3 max-w-xl">
-              <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-rose-500 bg-rose-500/15 px-3 py-1 rounded-full">
-                💘 Flagship Feature · Match Mode (18+)
-              </span>
+        {/* ── Feature Highlight: Secret Crush & Multipurpose Match Mode ── */}
+        <div className="mt-10 overflow-hidden rounded-3xl border border-primary/30 bg-linear-to-br from-primary/10 via-primary/5 to-card p-6 sm:p-8 shadow-sm">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="space-y-4 max-w-xl">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-primary bg-primary/15 px-3 py-1 rounded-full border border-primary/25">
+                  ✨ Flagship Feature · Match Mode
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                  <ShieldCheck className="size-3" /> Safe &amp; Verified
+                </span>
+              </div>
+
               <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
-                Secret Crush: Zero-Embarrassment Campus Matchmaking
+                Multipurpose Campus Match &amp; Secret Crush
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                College students dread public rejection. Secret Crush lets 18+ verified students express
-                romantic interest in up to 5 classmates with <strong>100% hidden intent</strong>. The
-                recipient sees nothing unless they secretly add them back — turning awkward campus crushes
-                into instant mutual matches.
+                Unlike shallow dating apps, Campus Match is designed as a versatile, comfortable connection space for verified college students — softly bridging romance, friendship, and peer collaborations without public pressure or awkwardness.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+
+              {/* Multipurpose Usage Dimensions */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
                 <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
-                  <p className="text-xs font-black text-foreground">1. Hidden Intent</p>
+                  <p className="text-xs font-black text-foreground">🎓 Campus Friends</p>
                   <p className="text-[11px] text-muted-foreground">
-                    Zero notification of who crushed on you.
+                    Batchmates, hostel buddies &amp; seniors.
                   </p>
                 </div>
                 <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
-                  <p className="text-xs font-black text-rose-500">2. Mutual Unlock</p>
+                  <p className="text-xs font-black text-primary">💘 Soft Dating</p>
                   <p className="text-[11px] text-muted-foreground">
-                    Match &amp; private chat open only if feeling is mutual.
+                    Zero-embarrassment natural campus vibes.
                   </p>
                 </div>
                 <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
-                  <p className="text-xs font-black text-foreground">3. Safety Escrow</p>
+                  <p className="text-xs font-black text-foreground">🤝 Peer Connects</p>
                   <p className="text-[11px] text-muted-foreground">
-                    18+ verified identity behind the scenes.
+                    Study groups, lab &amp; project partners.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
+                  <p className="text-xs font-black text-foreground">☕ Talk &amp; Chai</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Canteen banter &amp; evening conversations.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
+                  <p className="text-xs font-black text-foreground">🚀 Co-Founders</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Hackathons, builders &amp; creative minds.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
+                  <p className="text-xs font-black text-foreground">🔒 Intent-Hidden</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Mutual reveal only when both students match.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border/40 bg-card p-5 shadow-md max-w-sm w-full space-y-3 text-center">
-              <div className="size-12 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto">
-                <Heart className="size-6 fill-rose-500" />
+            <div className="rounded-2xl border border-border/40 bg-card p-5 shadow-md max-w-sm w-full space-y-3 text-center self-center lg:self-start">
+              <div className="size-12 rounded-2xl bg-primary/15 text-primary flex items-center justify-center mx-auto border border-primary/20">
+                <Heart className="size-6 fill-primary text-primary" />
               </div>
               <p className="text-xs font-black text-foreground">Rahul ➔ Secret Crush ➔ Priya</p>
               <p className="text-[11px] text-muted-foreground">
-                Priya sees nothing. Later, Priya adds Rahul...
+                Priya sees nothing. Later, Priya secretly adds Rahul...
               </p>
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
-                🎉 Mutual Match! Direct Chat Unlocked
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center gap-1.5">
+                <Sparkles className="size-3.5" /> Mutual Match! Direct Chat Unlocked
               </div>
             </div>
           </div>

@@ -56,7 +56,7 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
     badge: "NEW",
     badgeColor: "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30",
   },
-  { icon: Heart, href: "/app/dating", label: "Dating" },
+  { icon: Sparkles, href: "/app/matching", label: "Match" },
   { icon: Bell, href: "/app/notifications", label: "Notifications" },
   { icon: MessageSquare, href: "/app/chat", label: "Messages" },
   { icon: Users, href: "/app/communities", label: "Communities" },
@@ -69,7 +69,7 @@ export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
   { icon: Compass, href: "/app/discover", label: "Explore" },
   { icon: Plus, href: "/app/post/new", label: "Post" },
   { icon: ShoppingBag, href: "/app/marketplace", label: "Market" },
-  { icon: Heart, href: "/app/dating", label: "Dating" },
+  { icon: Sparkles, href: "/app/matching", label: "Match" },
 ];
 
 export const MORE_HUB_SECTIONS: NavGroup[] = [
@@ -106,12 +106,12 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-muted text-muted-foreground border-border/50",
       },
       {
-        icon: Heart,
-        href: "/app/dating",
+        icon: Sparkles,
+        href: "/app/matching",
         label: "Campus Match",
-        desc: "Swipe deck for 18+ verified students",
-        badge: "18+",
-        badgeColor: "bg-muted text-muted-foreground border-border/50",
+        desc: "Safe vibe matching & swipe deck for verified classmates",
+        badge: "Safe",
+        badgeColor: "bg-primary/15 text-primary border border-primary/30",
       },
     ],
   },

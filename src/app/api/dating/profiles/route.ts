@@ -1,4 +1,4 @@
-import { and, eq, ne, notInArray, type SQL } from "drizzle-orm";
+import { and, eq, ne, notInArray, sql, type SQL } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
 import { getDb } from "@/db";
@@ -31,13 +31,13 @@ export async function GET(req: Request) {
     const viewerBlocked = await rejectViewerWrite(profile);
     if (viewerBlocked) return viewerBlocked;
 
-    // Strict Gate: Must have gender set to access dating
+    // Strict Gate: Must have gender set to access matching
     const validGenders = ["MALE", "FEMALE", "OTHER"];
     if (!profile.gender || !validGenders.includes(profile.gender)) {
       return NextResponse.json(
         {
           error: "GENDER_REQUIRED",
-          message: "Gender is required to access Campus Dating and matching.",
+          message: "Gender is required to access Campus Match.",
         },
         { status: 403 }
       );
@@ -47,6 +47,7 @@ export async function GET(req: Request) {
     // Precedence: explicit query param > saved DB preference > smart default
     // (male sees women, female sees men, other sees everyone).
     const prefs = profile.datingPreferences ?? {};
+    const isMatchingEnabled = prefs.isEnabled !== false;
     const requestedGender = searchParams.get("gender") ?? prefs.gender ?? null;
     const genderFilter = resolveGenderPreference(
       profile.gender,
@@ -73,6 +74,7 @@ export async function GET(req: Request) {
       ne(userProfiles.id, profile.id), // Exclude self
       eq(userProfiles.status, "ACTIVE"), // Only active students
       ne(userProfiles.institutionId, viewerInstitutionId), // Never surface viewer accounts
+      sql`coalesce((${userProfiles.datingPreferences}->>'isEnabled')::boolean, true) = true`, // Only users who haven't paused/opted-out
       swipedIds.length > 0 ? notInArray(userProfiles.id, swipedIds) : undefined,
     ];
 
@@ -163,6 +165,7 @@ export async function GET(req: Request) {
       meta: {
         showingGender: genderFilter,
         likesYouCount: pendingLikes,
+        isMatchingEnabled,
       },
     });
   } catch (error) {

@@ -47,7 +47,7 @@ const CAPABILITY_MESSAGES: Record<UserCapability, { title: string; desc: string 
   },
   CAMPUS_MATCH: {
     title: "Campus Match Unlocks in Student Mode",
-    desc: "Connect and match with verified students on campus (18+).",
+    desc: "Connect and match with verified students in a safe, mutual opt-in campus space.",
   },
   SECRET_CRUSH: {
     title: "Secret Crush Unlocks in Student Mode",

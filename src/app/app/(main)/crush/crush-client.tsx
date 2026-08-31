@@ -177,8 +177,8 @@ export function CrushClient() {
           <div>
             <h1 className="text-base font-black text-foreground tracking-tight flex items-center gap-2">
               <span>Secret Crush Vault</span>
-              <span className="text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-500 px-2 py-0.5 rounded-full border border-rose-500/20">
-                18+
+              <span className="text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-full border border-primary/20">
+                Safe &amp; Mutual
               </span>
             </h1>
             <p className="text-[11px] text-muted-foreground font-medium">

@@ -36,10 +36,10 @@ export function FeedCaughtUpCard() {
             Campus Directory
           </Link>
           <Link
-            href="/app/dating"
-            className="px-3.5 py-1.5 rounded-xl border border-pink-500/30 bg-pink-500/10 text-pink-500 text-xs font-bold hover:bg-pink-500/20 transition-colors"
+            href="/app/matching"
+            className="px-3.5 py-1.5 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
           >
-            Dating Matches
+            Campus Match
           </Link>
         </div>
       </div>

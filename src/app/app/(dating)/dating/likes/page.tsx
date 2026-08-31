@@ -1,11 +1,5 @@
-import type { Metadata } from "next";
-import { LikesClient } from "./likes-client";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Likes You",
-  robots: { index: false, follow: false },
-};
-
-export default function DatingLikesPage() {
-  return <LikesClient />;
+export default function DatingLikesRedirectPage() {
+  redirect("/app/matching/likes");
 }

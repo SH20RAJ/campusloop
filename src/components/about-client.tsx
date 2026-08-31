@@ -198,7 +198,7 @@ export function AboutClient() {
     },
     {
       q: "How does CampusLoop align with the DPDP Act, 2023?",
-      a: "CampusLoop strictly enforces data minimization and purpose limitation under the Digital Personal Data Protection Act (DPDP), 2023. Student profile verification is used strictly for authentication. Furthermore, match discovery mode is strictly restricted to users aged 18+ to safeguard minors.",
+      a: "CampusLoop strictly enforces data minimization and purpose limitation under the Digital Personal Data Protection Act (DPDP), 2023. Student profile verification is used strictly for authentication. Furthermore, match discovery mode operates on a 100% mutual opt-in basis with complete privacy controls.",
     },
     {
       q: "I'm a JEE/NEET aspirant without a college email. Can I still join?",
@@ -451,8 +451,8 @@ export function AboutClient() {
             {/* Mode 3: Match Mode (Swipe Interface) */}
             <div className="md:col-span-7 rounded-[32px] border border-border/40 bg-card p-6 flex flex-col justify-between space-y-4 hover:border-primary/25 transition-all duration-300 shadow-sm relative overflow-hidden">
               <div className="space-y-2">
-                <span className="inline-block text-[10px] font-black uppercase tracking-wider text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full">
-                  Match Mode (18+ Gated)
+                <span className="inline-block text-[10px] font-black uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
+                  Match Mode (Verified &amp; Safe)
                 </span>
                 <h3 className="text-base font-extrabold">Peer-to-Peer Student Discovery</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">

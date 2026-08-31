@@ -208,12 +208,12 @@ export function OverviewClient() {
                     ],
                   },
                   {
-                    title: "3. Connection & Matchmaking Layer (18+)",
+                    title: "3. Connection & Matchmaking Layer",
                     icon: Heart,
-                    color: "text-rose-500",
+                    color: "text-primary",
                     points: [
                       "💘 Secret Crush: Intent-hidden matchmaking with 5-slot vault",
-                      "Swipe deck for 18+ verified student matches",
+                      "Swipe deck for verified student vibe matching",
                       "Gender & campus radius scope filters",
                       "Direct messaging (DMs) & automatic mutual reveal",
                     ],

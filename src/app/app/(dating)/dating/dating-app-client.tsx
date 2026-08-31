@@ -1,6 +1,17 @@
 "use client";
 
-import { ArrowLeft, Camera, Globe, Heart, Lock, RotateCcw, SlidersHorizontal } from "lucide-react";
+import {
+  ArrowLeft,
+  Camera,
+  EyeOff,
+  Globe,
+  Heart,
+  Lock,
+  RotateCcw,
+  ShieldCheck,
+  SlidersHorizontal,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -20,7 +31,11 @@ type MatchResult = {
 
 type ProfilesResponse = {
   candidates: Candidate[];
-  meta: { showingGender: "MALE" | "FEMALE" | "ALL"; likesYouCount: number };
+  meta: {
+    showingGender: "MALE" | "FEMALE" | "ALL";
+    likesYouCount: number;
+    isMatchingEnabled?: boolean;
+  };
 };
 
 export function DatingAppClient() {
@@ -44,6 +59,7 @@ export function DatingAppClient() {
   const candidates = useMemo(() => data?.candidates ?? [], [data]);
   const remaining = useMemo(() => candidates.slice(deckIndex), [candidates, deckIndex]);
   const likesYouCount = data?.meta?.likesYouCount ?? 0;
+  const isMatchingEnabled = data?.meta?.isMatchingEnabled !== false;
 
   const hasGenderSet = profile?.gender && ["MALE", "FEMALE", "OTHER"].includes(profile.gender);
   const genderGateRequired =
@@ -130,7 +146,7 @@ export function DatingAppClient() {
     return () => window.removeEventListener("keydown", onKey);
   }, [handleSwipe, handleUndo, matchResult]);
 
-  async function widenSearch(updates: { gender?: string; scope?: string }) {
+  async function widenSearch(updates: { gender?: string; scope?: string; isEnabled?: boolean }) {
     await fetch("/api/dating/preferences", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -181,40 +197,45 @@ export function DatingAppClient() {
           <ArrowLeft className="size-4.5" />
         </Link>
 
-        <div className="flex items-center gap-1.5">
-          <h1 className="bg-linear-to-r from-rose-500 via-pink-500 to-rose-600 bg-clip-text text-base font-black tracking-tight text-transparent">
-            Campus Match
-          </h1>
-          <span className="text-[9px] font-black uppercase tracking-wider bg-rose-500/15 text-rose-500 border border-rose-500/30 px-1.5 py-0.5 rounded-full">
-            18+
-          </span>
+        <div className="flex items-center gap-2">
+          <div className="size-7 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-2xs">
+            <Sparkles className="size-3.5" />
+          </div>
+          <div>
+            <h1 className="text-sm font-black tracking-tight text-foreground leading-tight">
+              Campus Match
+            </h1>
+            <p className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1">
+              <ShieldCheck className="size-3 text-primary" /> Safe Space
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-1.5">
           {/* Secret Crush Vault Link */}
           <Link
             href="/app/crush"
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs border border-rose-500/25"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs border border-primary/25"
             title="Manage Secret Crush Vault"
           >
-            <Lock className="size-3 text-rose-500" />
+            <Lock className="size-3" />
             <span className="hidden sm:inline">Crush Vault</span>
           </Link>
 
           <Link
-            href="/app/dating/likes"
+            href="/app/matching/likes"
             aria-label="Likes you"
-            className="relative flex size-9 items-center justify-center rounded-full bg-muted/60 text-rose-500 hover:bg-muted transition-colors border border-border/40 cursor-pointer"
+            className="relative flex size-9 items-center justify-center rounded-full bg-muted/60 text-primary hover:bg-muted transition-colors border border-border/40 cursor-pointer"
           >
-            <Heart className="size-4.5 fill-rose-500/30" />
+            <Heart className="size-4.5 fill-primary/20" />
             {likesYouCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-black text-white shadow-xs">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-black text-primary-foreground shadow-xs">
                 {likesYouCount > 9 ? "9+" : likesYouCount}
               </span>
             )}
           </Link>
           <Link
-            href="/app/dating/filters"
+            href="/app/matching/filters"
             aria-label="Preferences"
             className="flex size-9 items-center justify-center rounded-full bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border border-border/40 cursor-pointer"
           >
@@ -223,6 +244,23 @@ export function DatingAppClient() {
         </div>
       </header>
 
+      {/* Matching Paused Notice */}
+      {!isMatchingEnabled && (
+        <div className="mt-2 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold min-w-0">
+            <EyeOff className="size-4 shrink-0" />
+            <span className="truncate">Your match profile is paused &amp; hidden.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => widenSearch({ isEnabled: true })}
+            className="px-3 py-1 rounded-full bg-primary text-primary-foreground font-black text-xs shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+          >
+            Resume
+          </button>
+        </div>
+      )}
+
       {/* Secret Crush Modal */}
       <SecretCrushModal isOpen={showSecretCrushModal} onClose={() => setShowSecretCrushModal(false)} />
 
@@ -230,13 +268,13 @@ export function DatingAppClient() {
       <main className="flex min-h-0 flex-1 flex-col py-3 pb-[max(env(safe-area-inset-bottom),1rem)]">
         {genderGateRequired ? (
           <div className="m-auto w-full max-w-sm space-y-5 rounded-3xl border border-border/70 bg-card p-6 text-center shadow-lg">
-            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-500 border border-rose-500/30">
-              <Heart className="size-7 fill-rose-500/25" />
+            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20">
+              <Sparkles className="size-7" />
             </div>
             <div>
               <h2 className="text-lg font-black text-foreground">Select your gender</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Campus Dating connects you with verified students based on your preferences.
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Campus Match connects you with verified classmates in a safe, mutual opt-in space.
               </p>
             </div>
             <form onSubmit={handleSaveGenderGate} className="space-y-4">
@@ -248,7 +286,7 @@ export function DatingAppClient() {
                     onClick={() => setSelectedGenderGate(g)}
                     className={`cursor-pointer rounded-2xl border py-2.5 text-xs font-bold transition-all ${
                       selectedGenderGate === g
-                        ? "border-rose-500 bg-rose-500/15 text-rose-500 font-black shadow-xs ring-1 ring-rose-500"
+                        ? "border-primary bg-primary/15 text-primary font-black shadow-xs ring-1 ring-primary"
                         : "border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -259,9 +297,9 @@ export function DatingAppClient() {
               <button
                 type="submit"
                 disabled={isSavingGender}
-                className="w-full cursor-pointer rounded-2xl bg-linear-to-r from-rose-500 to-pink-500 py-3 text-xs font-black text-white shadow-md shadow-rose-500/25 transition-all hover:opacity-95 disabled:opacity-50"
+                className="w-full cursor-pointer rounded-2xl bg-primary py-3 text-xs font-black text-primary-foreground shadow-md shadow-primary/20 transition-all hover:opacity-95 disabled:opacity-50"
               >
-                {isSavingGender ? "Saving..." : "Start Swiping"}
+                {isSavingGender ? "Saving..." : "Start Matching"}
               </button>
             </form>
           </div>
@@ -283,8 +321,8 @@ export function DatingAppClient() {
           </>
         ) : (
           <div className="m-auto w-full max-w-sm space-y-4 rounded-3xl border border-dashed border-border/80 bg-card/60 p-8 text-center shadow-xs">
-            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-500 border border-rose-500/30">
-              <Heart className="size-7" />
+            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20">
+              <Sparkles className="size-7" />
             </div>
             <div>
               <h3 className="text-base font-black text-foreground">That&apos;s everyone for now</h3>
@@ -296,7 +334,7 @@ export function DatingAppClient() {
               <button
                 type="button"
                 onClick={() => widenSearch({ scope: "GLOBAL", gender: "ALL" })}
-                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl bg-linear-to-r from-rose-500 to-pink-500 py-2.5 text-xs font-black text-white shadow-md shadow-rose-500/25 transition-all hover:opacity-95"
+                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl bg-primary py-2.5 text-xs font-black text-primary-foreground shadow-md shadow-primary/20 transition-all hover:opacity-95"
               >
                 <Globe className="size-3.5" /> Widen my search (All Campuses)
               </button>

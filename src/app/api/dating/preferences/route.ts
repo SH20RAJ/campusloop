@@ -16,9 +16,10 @@ export type DatingPreferences = {
   gender: (typeof GENDERS)[number];
   scope: (typeof SCOPES)[number];
   sort: (typeof SORTS)[number];
+  isEnabled?: boolean;
 };
 
-const DEFAULTS: DatingPreferences = { gender: "DEFAULT", scope: "GLOBAL", sort: "COMPATIBILITY" };
+const DEFAULTS: DatingPreferences = { gender: "DEFAULT", scope: "GLOBAL", sort: "COMPATIBILITY", isEnabled: true };
 
 export async function GET() {
   try {
@@ -75,6 +76,7 @@ export async function PATCH(req: Request) {
         ? (body.scope as DatingPreferences["scope"])
         : current.scope,
       sort: SORTS.includes(body.sort as never) ? (body.sort as DatingPreferences["sort"]) : current.sort,
+      isEnabled: typeof body.isEnabled === "boolean" ? body.isEnabled : (current.isEnabled ?? true),
     };
 
     await db.update(userProfiles).set({ datingPreferences: next }).where(eq(userProfiles.id, profile.id));

@@ -34,8 +34,8 @@ const FEATURE_TITLES: Partial<Record<UserCapability, { title: string; desc: stri
   },
   CAMPUS_MATCH: {
     title: "Campus Match Unlocks in Student Mode",
-    desc: "Swipe deck and matching is reserved exclusively for verified college students (18+).",
-    iconBg: "from-pink-500/20 to-rose-500/20 text-pink-500 border-pink-500/30",
+    desc: "Swipe deck and matching is reserved exclusively for verified college students in a safe, mutual opt-in space.",
+    iconBg: "from-primary/20 to-primary/10 text-primary border-primary/30",
   },
   SECRET_CRUSH: {
     title: "Secret Crush Unlocks in Student Mode",

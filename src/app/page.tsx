@@ -227,7 +227,7 @@ export default async function LandingPage() {
             </h1>
             <p className="max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
               The verified collegiate network for India. Canteen polls, anonymous confessions, campus
-              marketplace, 18+ student matching, and batch time capsules — with zero recruiters, zero faculty,
+              marketplace, safe student vibe matching, and batch time capsules — with zero recruiters, zero faculty,
               and zero outsiders.
             </p>
             <div className="flex flex-wrap items-center gap-3">

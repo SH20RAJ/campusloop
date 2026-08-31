@@ -32,6 +32,7 @@ export class CallEngine {
   private peer: Peer | null = null;
   private currentCall: MediaConnection | null = null;
   private localStream: MediaStream | null = null;
+  private remoteStream: MediaStream | null = null;
   private callbacks: CallEngineCallbacks;
   private isAudioOnly = false;
   private currentFacingMode: "user" | "environment" = "user";
@@ -218,6 +219,10 @@ export class CallEngine {
     } catch {
       return false;
     }
+  }
+
+  getRemoteStream(): MediaStream | null {
+    return this.remoteStream;
   }
 
   endCall() {

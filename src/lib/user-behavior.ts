@@ -81,7 +81,7 @@ export async function getUserAffinityInterests(userId: string): Promise<string[]
     const redis = getRedis();
     if (!redis) return [];
     // Top 5 highest weighted interests
-    return await redis.zrevrange(`user:${userId}:interests`, 0, 4);
+    return await redis.zrange<string[]>(`user:${userId}:interests`, 0, 4, { rev: true });
   } catch {
     return [];
   }

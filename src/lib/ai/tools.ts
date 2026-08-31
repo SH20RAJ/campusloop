@@ -7,7 +7,8 @@ import type { AiToolContext } from "./types";
 export const CAMPUSLOOP_AI_TOOL_DEFINITIONS = [
   {
     name: "search_campus_posts",
-    description: "Search posts the current user is allowed to read within their institution and requested scope.",
+    description:
+      "Search posts the current user is allowed to read within their institution and requested scope.",
     parameters: {
       type: "object",
       properties: {

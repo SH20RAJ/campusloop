@@ -253,7 +253,7 @@ export function MessengerPane({
       try {
         const res = await fetch("/api/calls");
         if (res.ok) {
-          const data = await res.json();
+          const data = (await res.json()) as any;
           if (data?.incomingCall && data.incomingCall.status === "CALLING") {
             setIncomingCall(data.incomingCall);
           } else {
@@ -284,7 +284,7 @@ export function MessengerPane({
         }),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (!res.ok || !data.call) {
         toast.error(data.error || "Failed to start call");
         return;

@@ -94,7 +94,7 @@ export function ActiveCallOverlay({
           if (!targetPeerId) {
             const checkInterval = setInterval(async () => {
               const res = await fetch(`/api/calls/${callId}`);
-              const data = await res.json();
+              const data = (await res.json()) as any;
               if (data?.call?.status === "ACCEPTED" && data?.call?.receiverPeerId) {
                 clearInterval(checkInterval);
                 engine.callPeer(data.call.receiverPeerId, {

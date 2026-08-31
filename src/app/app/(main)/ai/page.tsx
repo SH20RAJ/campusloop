@@ -1,17 +1,42 @@
 "use client";
 
-import { ArrowUp, BookOpen, Flame, Search, Sparkles, ShoppingBag, WandSparkles } from "lucide-react";
+import { ArrowUp, BookOpen, Flame, Search, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { AiMode } from "@/lib/ai/types";
 
 const actions: Array<{ label: string; prompt: string; mode: AiMode; icon: typeof Sparkles }> = [
-  { label: "What's happening on my campus?", prompt: "What's happening on my campus today?", mode: "campus", icon: Flame },
-  { label: "What did I miss?", prompt: "Give me a useful recap of what I missed recently.", mode: "personal", icon: Sparkles },
-  { label: "Help me study", prompt: "Help me study based on what's useful for my campus.", mode: "study", icon: BookOpen },
+  {
+    label: "What's happening on my campus?",
+    prompt: "What's happening on my campus today?",
+    mode: "campus",
+    icon: Flame,
+  },
+  {
+    label: "What did I miss?",
+    prompt: "Give me a useful recap of what I missed recently.",
+    mode: "personal",
+    icon: Sparkles,
+  },
+  {
+    label: "Help me study",
+    prompt: "Help me study based on what's useful for my campus.",
+    mode: "study",
+    icon: BookOpen,
+  },
   { label: "Find something", prompt: "Help me find something on CampusLoop.", mode: "search", icon: Search },
-  { label: "Find something to buy", prompt: "Help me find something to buy on CampusLoop.", mode: "search", icon: ShoppingBag },
-  { label: "Make my post better", prompt: "Help me improve this post without changing its facts:", mode: "create", icon: WandSparkles },
+  {
+    label: "Find something to buy",
+    prompt: "Help me find something to buy on CampusLoop.",
+    mode: "search",
+    icon: ShoppingBag,
+  },
+  {
+    label: "Make my post better",
+    prompt: "Help me improve this post without changing its facts:",
+    mode: "create",
+    icon: WandSparkles,
+  },
 ];
 
 export default function CampusAiPage() {
@@ -30,7 +55,7 @@ export default function CampusAiPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: prompt, mode: selectedMode }),
       });
-      const data = await response.json();
+      const data = (await response.json()) as { answer?: string; error?: string };
       setAnswer(data.answer ?? data.error ?? "I couldn't answer that right now.");
     } catch {
       setAnswer("Campus AI is temporarily unavailable. Try again in a moment.");
@@ -46,7 +71,9 @@ export default function CampusAiPage() {
           <Sparkles className="size-4" /> Campus AI
         </div>
         <h1 className="text-3xl font-black tracking-tight">Ask your campus.</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Find, understand, create and navigate CampusLoop with AI.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Find, understand, create and navigate CampusLoop with AI.
+        </p>
       </div>
 
       {answer && (

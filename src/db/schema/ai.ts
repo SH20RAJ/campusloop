@@ -1,4 +1,4 @@
-import { integer, index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { index, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "./common";
 import { userProfiles } from "./users";
 
@@ -6,7 +6,9 @@ export const aiConversations = pgTable(
   "ai_conversations",
   {
     id: id(),
-    userId: text("user_id").notNull().references(() => userProfiles.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
     mode: text("mode").default("campus").notNull(),
     title: text("title"),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
@@ -14,9 +16,7 @@ export const aiConversations = pgTable(
     updatedAt,
     lastMessageAt: timestamp("last_message_at", { withTimezone: true }),
   },
-  (table) => [
-    index("ai_conversations_user_updated_idx").on(table.userId, table.updatedAt),
-  ]
+  (table) => [index("ai_conversations_user_updated_idx").on(table.userId, table.updatedAt)]
 );
 
 export const aiMessages = pgTable(
@@ -42,7 +42,9 @@ export const aiUsageEvents = pgTable(
   "ai_usage_events",
   {
     id: id(),
-    userId: text("user_id").notNull().references(() => userProfiles.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
     conversationId: text("conversation_id"),
     requestType: text("request_type").notNull(),
     model: text("model").notNull(),
@@ -59,8 +61,12 @@ export const aiFeedback = pgTable(
   "ai_feedback",
   {
     id: id(),
-    userId: text("user_id").notNull().references(() => userProfiles.id, { onDelete: "cascade" }),
-    messageId: text("message_id").notNull().references(() => aiMessages.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    messageId: text("message_id")
+      .notNull()
+      .references(() => aiMessages.id, { onDelete: "cascade" }),
     rating: text("rating").notNull(),
     reason: text("reason"),
     createdAt,

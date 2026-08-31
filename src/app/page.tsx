@@ -19,7 +19,7 @@ import { CampusHubShowcase } from "@/components/landing/campus-hub-showcase";
 import { ComparisonShowcase } from "@/components/landing/comparison-table";
 import { ConfessionDemo, MatchDemo, PointsDemo, VerifyDemo } from "@/components/landing/demos";
 import { FAQSection, SafetySection, StatsSection } from "@/components/landing/extra-sections";
-import { HeroPreview } from "@/components/landing/hero-preview";
+import { CreativeHero } from "@/components/landing/creative-hero";
 import { InteractiveBentoCard } from "@/components/landing/interactive-bento-card";
 import { LeaderboardShowcase } from "@/components/landing/leaderboard-demo";
 import { MatchmakingShowcase } from "@/components/landing/matchmaking-demo";
@@ -211,67 +211,8 @@ export default async function LandingPage() {
       <div className="flex min-h-screen flex-col bg-background text-foreground overflow-x-clip">
         <MarketingHeader isAuthenticated={isAuthenticated} />
 
-        {/* ─── Hero Section ─── */}
-        <section className="mx-auto grid w-full max-w-6xl items-center gap-12 px-6 pt-32 pb-20 lg:grid-cols-2 lg:gap-8 lg:pt-24 lg:pb-16">
-          <div className="space-y-6">
-            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              <ShieldCheck className="size-3.5" />
-              Verified students only · 1,350+ Indian Colleges
-            </p>
-            <h1 className="text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl">
-              Your campus,
-              <br />
-              <GradientText>
-                <em>unfiltered.</em>
-              </GradientText>
-            </h1>
-            <p className="max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
-              The verified collegiate network for India. Canteen polls, anonymous confessions, campus
-              marketplace, safe student vibe matching, and batch time capsules — with zero recruiters, zero faculty,
-              and zero outsiders.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              {isAuthenticated ? (
-                <Link href="/app" className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}>
-                  Open app
-                  <ArrowRight className="size-4" />
-                </Link>
-              ) : (
-                <Link href="/handler/sign-up" className={cn(buttonVariants({ size: "lg" }), "gap-1.5")}>
-                  Get verified with college email
-                  <ArrowRight className="size-4" />
-                </Link>
-              )}
-              <Link href="#inside" className={buttonVariants({ variant: "outline", size: "lg" })}>
-                See what&apos;s inside
-              </Link>
-            </div>
-
-            {!isAuthenticated && (
-              <p className="text-xs font-medium text-muted-foreground">
-                JEE/NEET aspirant or prospective student?{" "}
-                <Link href="/handler/sign-up" className="font-bold text-primary hover:underline">
-                  Browse in Viewer Mode
-                </Link>{" "}
-                with any email — read-only, no college ID required.
-              </p>
-            )}
-
-            <ul className="flex flex-wrap gap-x-5 gap-y-2 pt-1 text-xs font-semibold text-muted-foreground">
-              <li className="flex items-center gap-1.5">
-                <ShieldCheck className="size-3.5 text-primary" /> College-email gated (.ac.in)
-              </li>
-              <li className="flex items-center gap-1.5">
-                <School className="size-3.5 text-primary" /> 1,350+ colleges indexed
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Lock className="size-3.5 text-primary" /> Salted HMAC sealed identity
-              </li>
-            </ul>
-          </div>
-
-          <HeroPreview />
-        </section>
+        {/* ─── Creative Hero Section ─── */}
+        <CreativeHero isAuthenticated={isAuthenticated} />
 
         {/* ─── College Marquee ─── */}
         <section className="overflow-hidden border-y border-border/60 py-8 bg-muted/5">

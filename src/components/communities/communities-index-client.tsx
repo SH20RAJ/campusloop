@@ -16,7 +16,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useSWRInfinite from "swr/infinite";
 import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
-import { CampusHubStrip } from "@/components/communities/campus-hub-strip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import type { FeedPost } from "@/hooks/use-feed";
@@ -228,9 +227,6 @@ export function CommunitiesIndexClient({
           </button>
         </div>
       </header>
-
-      {/* ─── Campus Utility Template Hubs Strip (Always Available at Top) ─── */}
-      <CampusHubStrip />
 
       {/* ─── TAB 1: Explore Student Communities (Reddit-Style Sub-Hubs) ─── */}
       {activeTab === "explore" && (

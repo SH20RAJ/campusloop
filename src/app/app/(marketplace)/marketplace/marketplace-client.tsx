@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/app-shell";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { InstagramIcon } from "@/components/ui/social-icons";
+import { CommunityHubStrip } from "@/components/marketplace/community-hub-strip";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -267,6 +268,9 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
           </a>
         </div>
       </div>
+
+      {/* ─── Community-Maintained Campus Utility Hubs (6 Dedicated Services) ─── */}
+      <CommunityHubStrip />
 
       <FilterPills pills={CATEGORY_PILLS} value={selectedCategory} onChange={handleCategorySelect} />
 

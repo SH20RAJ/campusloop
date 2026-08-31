@@ -203,7 +203,7 @@ export async function executeGetUpcomingEvents(
   const db = getDb();
   const limit = Math.min(Math.max(1, args.limit || 5), 10);
 
-  const conditions = [eq(events.status, "UPCOMING")];
+  const conditions = [eq(events.status, "PUBLISHED")];
   if (context.institutionId) {
     conditions.push(eq(events.institutionId, context.institutionId));
   }
@@ -218,7 +218,7 @@ export async function executeGetUpcomingEvents(
     type: "event",
     id: e.id,
     title: e.title,
-    excerpt: `${e.location || "Campus"} · ${new Date(e.startDate).toLocaleDateString()}`,
+    excerpt: `${e.venue || "Campus"} · ${new Date(e.startDate).toLocaleDateString()}`,
   }));
 
   return {
@@ -226,9 +226,9 @@ export async function executeGetUpcomingEvents(
       id: e.id,
       title: e.title,
       description: e.description,
-      location: e.location,
+      venue: e.venue,
       startDate: e.startDate,
-      isOnline: e.isOnline,
+      mode: e.mode,
     })),
     sources,
   };

@@ -57,12 +57,12 @@ export async function GET(_req: Request, { params }: RouteParams) {
     });
 
     const upcomingEvents = await db.query.events.findMany({
-      where: and(eq(events.institutionId, institutionId), eq(events.status, "UPCOMING")),
+      where: and(eq(events.institutionId, institutionId)),
       limit: 3,
       columns: {
         id: true,
         title: true,
-        location: true,
+        venue: true,
         startDate: true,
       },
     });

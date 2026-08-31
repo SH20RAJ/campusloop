@@ -87,7 +87,7 @@ export async function GET(req: Request) {
 
     // Upcoming events count
     const upcomingEventsCount = await db.query.events.findMany({
-      where: and(eq(events.institutionId, institutionId), eq(events.status, "UPCOMING")),
+      where: and(eq(events.institutionId, institutionId), eq(events.status, "PUBLISHED")),
       limit: 5,
     });
 

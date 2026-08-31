@@ -290,7 +290,7 @@ export async function executeSearchMarketplace(
   const limit = Math.min(Math.max(1, args.limit || 5), 10);
   const q = args.query.trim();
 
-  const conditions = [eq(marketplaceItems.status, "ACTIVE"), ilike(marketplaceItems.title, `%${q}%`)];
+  const conditions = [eq(marketplaceItems.isSold, false), ilike(marketplaceItems.title, `%${q}%`)];
   if (context.institutionId) {
     conditions.push(eq(marketplaceItems.institutionId, context.institutionId));
   }

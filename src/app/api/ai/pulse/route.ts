@@ -93,7 +93,7 @@ export async function GET(req: Request) {
 
     // Recent marketplace count
     const activeMarketplace = await db.query.marketplaceItems.findMany({
-      where: and(eq(marketplaceItems.institutionId, institutionId), eq(marketplaceItems.status, "ACTIVE")),
+      where: and(eq(marketplaceItems.institutionId, institutionId), eq(marketplaceItems.isSold, false)),
       limit: 5,
     });
 

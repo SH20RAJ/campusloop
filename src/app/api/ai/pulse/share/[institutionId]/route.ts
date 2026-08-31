@@ -68,7 +68,7 @@ export async function GET(_req: Request, { params }: RouteParams) {
     });
 
     const activeListings = await db.query.marketplaceItems.findMany({
-      where: and(eq(marketplaceItems.institutionId, institutionId), eq(marketplaceItems.status, "ACTIVE")),
+      where: and(eq(marketplaceItems.institutionId, institutionId), eq(marketplaceItems.isSold, false)),
       limit: 5,
       columns: {
         id: true,

@@ -84,6 +84,13 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     setSortState(newSort);
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", newSort);
+    if (newSort === "memes") {
+      params.set("type", "MEME");
+      setTypeState("MEME");
+    } else if (type === "MEME") {
+      params.delete("type");
+      setTypeState("ALL");
+    }
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 

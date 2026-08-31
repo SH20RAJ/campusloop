@@ -69,6 +69,13 @@ const FEATURED_CAMPUSES = [
       time: "Today, 4:15 PM",
       status: "Safely kept at canteen counter",
     },
+    meme: {
+      tag: "Aura -5,000",
+      title: "Dropping chai on syllabus printout",
+      caption: "Popular senior tried to do a cool walk past R&D gate and spilled hot cutting chai directly on the only 5-year PYQ notes booklet 💀",
+      likes: 624,
+      category: "Aura Check",
+    },
   },
   {
     id: "iit-delhi",
@@ -109,6 +116,13 @@ const FEATURED_CAMPUSES = [
       location: "Central Library 2nd Floor Reading Room",
       time: "Today, 2:30 PM",
       status: "Handed over to Library Reception",
+    },
+    meme: {
+      tag: "Faculty Lore",
+      title: "Prof. Sharma's 8:01 AM gate lock",
+      caption: "When the professor said 'door closes at 8:00 AM sharp' and you made eye contact through the glass at 8:00:30 AM while holding your breakfast roll 🚶‍♂️🔒",
+      likes: 890,
+      category: "Professor Lore",
     },
   },
   {
@@ -151,6 +165,13 @@ const FEATURED_CAMPUSES = [
       time: "Today, 1:10 PM",
       status: "With security guard at LTC Gate",
     },
+    meme: {
+      tag: "Batch Tees",
+      title: "Official Fest Merch vs What We Got",
+      caption: "Design committee on Figma: Cyberpunk neon masterpiece. The vendor who delivered it 2 hours before the fest opening: Dark blue polyester rag 😭",
+      likes: 710,
+      category: "Viral Tees",
+    },
   },
   {
     id: "vit-vellore",
@@ -191,6 +212,13 @@ const FEATURED_CAMPUSES = [
       location: "SJT Footbridge towards Food Street",
       time: "Today, 6:45 PM",
       status: "Submitted at SJT Security Desk",
+    },
+    meme: {
+      tag: "Aura +10,000",
+      title: "Fingerprint scanner worked on 8:29:59 PM",
+      caption: "Biometric machine turned green with literally 1 second left before the late penalty siren. Entire hostel lobby gave a standing ovation 🏆",
+      likes: 1040,
+      category: "Aura Check",
     },
   },
   {
@@ -233,10 +261,17 @@ const FEATURED_CAMPUSES = [
       time: "Today, 5:20 PM",
       status: "Left at SAC Main Security",
     },
+    meme: {
+      tag: "Inside Joke",
+      title: "Hostel 12 vs 13 Chai Debate",
+      caption: "When a fresher asks which hostel has better midnight parathas and triggers a 45-minute philosophical dissertation between seniors 🥟",
+      likes: 670,
+      category: "Campus Lore",
+    },
   },
 ] as const;
 
-type ArtifactType = "confession" | "poll" | "match" | "market" | "lost_found";
+type ArtifactType = "memes" | "confession" | "poll" | "match" | "market" | "lost_found";
 
 const ARTIFACT_TABS: {
   id: ArtifactType;
@@ -244,6 +279,7 @@ const ARTIFACT_TABS: {
   shortLabel: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
+  { id: "memes", label: "Memes", shortLabel: "Memes", icon: Zap },
   { id: "confession", label: "Confession", shortLabel: "Confess", icon: Lock },
   { id: "poll", label: "Canteen Poll", shortLabel: "Poll", icon: Vote },
   { id: "match", label: "Peer Match", shortLabel: "Match", icon: Heart },
@@ -510,6 +546,47 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             {/* Artifact Canvas */}
             <div className="min-h-[220px] pt-1">
               <AnimatePresence mode="wait">
+                {/* 0. MEMES ARTIFACT */}
+                {activeTab === "memes" && (
+                  <motion.div
+                    key={`meme-${campus.id}`}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-3"
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <span className="rounded-md bg-amber-500/15 text-amber-500 font-bold px-2 py-0.5 text-[10px]">
+                          ⚡ {campus.meme.tag}
+                        </span>
+                        <span className="text-muted-foreground font-semibold text-[10px]">
+                          {campus.meme.category}
+                        </span>
+                      </div>
+                      <span className="text-amber-500 font-black text-[11px]">Inside Joke</span>
+                    </div>
+
+                    <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3.5 space-y-2">
+                      <h4 className="text-xs sm:text-sm font-black text-foreground">
+                        {campus.meme.title}
+                      </h4>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        {campus.meme.caption}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-amber-500">
+                        <Zap className="size-3.5 fill-amber-500" />
+                        <span>{campus.meme.likes} Campus Upvotes</span>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground">Verified Campus Only</span>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* 1. CONFESSION ARTIFACT */}
                 {activeTab === "confession" && (
                   <motion.div

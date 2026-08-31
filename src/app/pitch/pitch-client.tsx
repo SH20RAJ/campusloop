@@ -66,9 +66,9 @@ const PRODUCT_LAYERS = [
   },
   {
     icon: MessagesSquare,
-    title: "Social & Anonymous Feeds",
-    body: "Campus + national feeds: confessions with sealed identity escrow, canteen polls, questions, reposts, and 24h stories.",
-    color: "text-blue-500",
+    title: "Campus Feeds & Inside Joke Memes",
+    body: "Hyper-local memes, confessions with sealed identity escrow, canteen polls, aura points (+/-), and inside jokes only your campus gets — shared privately instead of leaked to global Instagram.",
+    color: "text-amber-500",
   },
   {
     icon: HeartHandshake,
@@ -360,6 +360,82 @@ export function PitchClient() {
               <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center gap-1.5">
                 <Sparkles className="size-3.5" /> Mutual Match! Direct Chat Unlocked
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Feature Highlight: Hyper-Local Campus Memes & Inside Jokes ── */}
+        <div className="mt-6 overflow-hidden rounded-3xl border border-amber-500/30 bg-linear-to-br from-amber-500/10 via-orange-500/5 to-card p-6 sm:p-8 shadow-sm">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="space-y-4 max-w-xl">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-500 bg-amber-500/15 px-3 py-1 rounded-full border border-amber-500/25">
+                  🔥 Viral Campus Culture · Inside Jokes &amp; Memes
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
+                  Campus-Only Privacy
+                </span>
+              </div>
+
+              <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
+                Stop Leaking Campus Lore to Global Instagram
+              </h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                College humor is hyper-local: the professor who gives 8:01 AM surprise quizzes, the boy doing aura -10,000 in front of the canteen, iconic batch tees, and 2 AM hostel wing lore. When posted to public social media, it gets zero context. On CampusLoop, it reaches the exact verified peer group that gets every single punchline.
+              </p>
+
+              {/* Meme Dimensions Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
+                <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
+                  <p className="text-xs font-black text-amber-500">✨ Aura Points (+/-)</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Tripping on canteen stairs or saving end-sem slides.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
+                  <p className="text-xs font-black text-foreground">👨‍🏫 Respectful Faculty Lore</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Catchphrases, surprise quiz alerts &amp; legendary assignments.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
+                  <p className="text-xs font-black text-foreground">👕 Viral Tees &amp; Merch</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Fest drip, department roasts &amp; hostel quotes.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
+                  <p className="text-xs font-black text-foreground">📸 Instagram Carousel</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Multi-photo photo dumps with swipe indicators.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
+                  <p className="text-xs font-black text-foreground">☕ Canteen &amp; Mess Banter</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Sunday feast queues vs everyday dinner struggles.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-card/80 p-3 border border-border/40 space-y-1">
+                  <p className="text-xs font-black text-foreground">🔒 Zero Outsider Judgment</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Family &amp; recruiters can never see or scrape campus memes.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-border/40 bg-card p-5 shadow-md max-w-sm w-full space-y-3 text-center self-center lg:self-start">
+              <div className="size-12 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto border border-amber-500/20 font-black text-lg">
+                ⚡
+              </div>
+              <p className="text-xs font-black text-foreground">&ldquo;Popular senior dropped iced tea on dean&apos;s scooter&rdquo;</p>
+              <div className="p-2.5 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-black">
+                Aura -50,000 · 842 Upvotes
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Trending #1 across the entire campus feed today
+              </p>
             </div>
           </div>
         </div>

@@ -104,11 +104,16 @@ export function FeedCardHeader({
           </span>
         </div>
 
-        {/* Right Actions: Confession Pill & More Menu */}
+        {/* Right Actions: Confession/Meme Pill & More Menu */}
         <div className="flex items-center gap-1 shrink-0">
           {post.type === "CONFESSION" && (
             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
               Confession
+            </span>
+          )}
+          {post.type === "MEME" && (
+            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 flex items-center gap-1">
+              <span>Meme</span>
             </span>
           )}
 

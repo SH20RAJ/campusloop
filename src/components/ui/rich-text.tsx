@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, X, ZoomIn } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, X, ZoomIn } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import { useEffect, useState } from "react";
@@ -182,38 +182,12 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
         <div className="whitespace-pre-wrap break-words">{parseText(textWithoutMdImages)}</div>
       )}
 
-      {/* Render Markdown Images */}
+      {/* Render Markdown Images / Instagram-Style Multi-Image Carousel */}
       {images.length > 0 && (
-        <div
-          className={`grid gap-2 pt-1 no-card-nav ${images.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}
-          data-no-nav="true"
-        >
-          {images.map((img, i) => (
-            <div
-              key={i}
-              className="relative group rounded-2xl overflow-hidden border border-border/80 bg-muted/20 shadow-xs max-w-lg cursor-pointer no-card-nav"
-              data-no-nav="true"
-              onClick={(e) => handleOpenImage(e, img.url)}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              <img
-                src={img.url}
-                alt={img.alt}
-                data-no-nav="true"
-                className="w-full max-h-80 object-cover group-hover:scale-[1.01] transition-transform duration-300"
-                loading="lazy"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = "none";
-                }}
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-                <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-md">
-                  <ZoomIn className="size-4" />
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ImageCarousel
+          images={images}
+          onOpenImage={handleOpenImage}
+        />
       )}
 
       {/* Rich Embeds (YouTube, Spotify, User Profiles, Communities, Events, Web Previews) */}
@@ -290,6 +264,142 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
           </div>,
           document.body
         )}
+    </div>
+  );
+}
+
+interface ImageCarouselProps {
+  images: { alt: string; url: string }[];
+  onOpenImage: (e: React.MouseEvent, url: string) => void;
+}
+
+function ImageCarousel({ images, onOpenImage }: ImageCarouselProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  if (images.length === 1) {
+    const single = images[0];
+    return (
+      <div
+        className="relative group rounded-2xl overflow-hidden border border-border/80 bg-muted/20 shadow-xs max-w-lg cursor-pointer no-card-nav"
+        data-no-nav="true"
+        onClick={(e) => onOpenImage(e, single.url)}
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <img
+          src={single.url}
+          alt={single.alt}
+          data-no-nav="true"
+          className="w-full max-h-96 object-cover group-hover:scale-[1.01] transition-transform duration-300"
+          loading="lazy"
+          onError={(e) => {
+            (e.target as HTMLElement).style.display = "none";
+          }}
+        />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+          <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-md">
+            <ZoomIn className="size-4" />
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  const prev = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentIndex((i) => (i > 0 ? i - 1 : images.length - 1));
+  };
+
+  const next = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentIndex((i) => (i < images.length - 1 ? i + 1 : 0));
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (diff > 40) {
+      setCurrentIndex((i) => (i < images.length - 1 ? i + 1 : 0));
+    } else if (diff < -40) {
+      setCurrentIndex((i) => (i > 0 ? i - 1 : images.length - 1));
+    }
+    setTouchStartX(null);
+  };
+
+  return (
+    <div
+      className="relative rounded-2xl overflow-hidden border border-border/80 bg-black/5 dark:bg-muted/10 shadow-xs max-w-lg select-none no-card-nav group"
+      data-no-nav="true"
+      onPointerDown={(e) => e.stopPropagation()}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Current Slide */}
+      <div
+        className="relative w-full aspect-4/3 sm:aspect-16/10 cursor-pointer overflow-hidden flex items-center justify-center bg-black/20"
+        onClick={(e) => onOpenImage(e, images[currentIndex].url)}
+      >
+        <img
+          src={images[currentIndex].url}
+          alt={images[currentIndex].alt}
+          data-no-nav="true"
+          className="w-full h-full object-contain transition-all duration-300"
+          loading="lazy"
+        />
+
+        {/* Zoom Hint */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+          <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-md">
+            <ZoomIn className="size-4" />
+          </span>
+        </div>
+      </div>
+
+      {/* Instagram-Style Counter Badge */}
+      <div className="absolute top-3 right-3 rounded-full bg-black/65 px-2.5 py-0.5 text-[11px] font-black text-white backdrop-blur-md shadow-xs pointer-events-none">
+        {currentIndex + 1}/{images.length}
+      </div>
+
+      {/* Previous Button */}
+      <button
+        type="button"
+        aria-label="Previous image"
+        onClick={prev}
+        className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 hover:bg-black/75 text-white p-1.5 backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 cursor-pointer"
+      >
+        <ChevronLeft className="size-4" />
+      </button>
+
+      {/* Next Button */}
+      <button
+        type="button"
+        aria-label="Next image"
+        onClick={next}
+        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 hover:bg-black/75 text-white p-1.5 backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 cursor-pointer"
+      >
+        <ChevronRight className="size-4" />
+      </button>
+
+      {/* Instagram-Style Dot Indicators */}
+      <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 p-1 rounded-full bg-black/40 backdrop-blur-xs pointer-events-none">
+        {images.map((_, idx) => (
+          <span
+            key={idx}
+            className={`transition-all rounded-full ${
+              idx === currentIndex
+                ? "size-1.5 bg-white scale-125"
+                : "size-1 bg-white/50"
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 }

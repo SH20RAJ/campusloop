@@ -57,7 +57,9 @@ export async function GET(req: Request) {
       }
     }
 
-    if (type && type !== "ALL" && type !== "all") {
+    if (sort === "memes" || (type && (type === "MEME" || type === "memes"))) {
+      conditions.push(eq(posts.type, "MEME"));
+    } else if (type && type !== "ALL" && type !== "all") {
       conditions.push(eq(posts.type, type as (typeof posts.type.enumValues)[number]));
     }
 

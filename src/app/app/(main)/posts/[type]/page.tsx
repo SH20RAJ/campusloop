@@ -10,7 +10,8 @@ export async function generateMetadata({ params }: PostsTypePageProps): Promise<
   const uppercaseType = type.toUpperCase();
 
   let label = "Posts";
-  if (uppercaseType === "POLL") label = "Campus Polls";
+  if (uppercaseType === "MEME") label = "Campus Memes";
+  else if (uppercaseType === "POLL") label = "Campus Polls";
   else if (uppercaseType === "CONFESSION") label = "Campus Confessions";
   else if (uppercaseType === "QUESTION") label = "Campus Q&A";
 

@@ -180,6 +180,7 @@ export type ApiFeedSort =
   | "latest"
   | "trending"
   | "viral"
+  | "memes"
   | "spicy"
   | "top_voted"
   | "most_discussed"
@@ -294,6 +295,7 @@ export function normalizeApiFeedSort(value?: string | null): ApiFeedSort {
     value === "latest" ||
     value === "trending" ||
     value === "viral" ||
+    value === "memes" ||
     value === "spicy" ||
     value === "top_voted" ||
     value === "most_discussed" ||

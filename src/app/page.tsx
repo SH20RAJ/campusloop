@@ -218,7 +218,7 @@ export default async function LandingPage() {
         <section className="overflow-hidden border-y border-border/60 py-8 bg-muted/5">
           <div className="pb-5 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 flex flex-col sm:flex-row items-center justify-center gap-x-2.5 gap-y-1 px-6">
             <span>
-              Colleges Enrolled*:{" "}
+              Colleges Allowed:{" "}
               <strong className="text-primary font-extrabold text-sm tracking-normal">1,350+</strong> and
               adding more
             </span>

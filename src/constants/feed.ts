@@ -1,6 +1,6 @@
 export const FEED_SORT_TABS = [
   { id: "for_you", label: "For you" },
-  { id: "viral", label: "Viral ⚡" },
+  { id: "memes", label: "Memes" },
   { id: "trending", label: "Trending" },
   { id: "latest", label: "Latest" },
   { id: "top_voted", label: "Top Voted" },
@@ -14,6 +14,7 @@ export const FEED_VISIBILITY_OPTIONS = [
 
 export const FEED_CATEGORY_OPTIONS = [
   { id: "ALL", label: "All" },
+  { id: "MEME", label: "Memes" },
   { id: "CONFESSION", label: "Confess" },
   { id: "POLL", label: "Polls" },
 ] as const;

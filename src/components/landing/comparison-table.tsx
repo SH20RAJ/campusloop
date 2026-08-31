@@ -53,6 +53,13 @@ const COMPARISONS = [
     instagram: false,
     datingApps: false,
   },
+  {
+    feature: "Private Inside Jokes, Aura & Memes (No Public Leaks)",
+    campusloop: true,
+    reddit: false,
+    instagram: false,
+    datingApps: false,
+  },
 ];
 
 export function ComparisonShowcase() {

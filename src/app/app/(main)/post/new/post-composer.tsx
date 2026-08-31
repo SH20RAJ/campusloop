@@ -48,12 +48,13 @@ import type { TrendingHashtag } from "@/lib/trending-hashtags";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 
-export type PostType = "NORMAL" | "CONFESSION" | "POLL" | "QUESTION";
+export type PostType = "NORMAL" | "MEME" | "CONFESSION" | "POLL" | "QUESTION";
 
 const MAX_CHARS = 2000;
 
 const POST_TYPES: { id: PostType; label: string; icon: React.ElementType; accent: string }[] = [
   { id: "NORMAL", label: "Post", icon: Type, accent: "text-primary" },
+  { id: "MEME", label: "Meme", icon: Zap, accent: "text-amber-500" },
   { id: "POLL", label: "Poll", icon: BarChart3, accent: "text-blue-500" },
   { id: "QUESTION", label: "Question", icon: HelpCircle, accent: "text-orange-500" },
   { id: "CONFESSION", label: "Confession", icon: Lock, accent: "text-pink-500" },
@@ -697,15 +698,46 @@ export function PostComposer({
             <span className="pointer-events-none absolute left-5 top-4 text-[17px] text-muted-foreground/45">
               {isConfession
                 ? "Confess it. Nobody will ever know it's you... 🤫"
-                : postType === "QUESTION"
-                  ? "Ask your campus anything..."
-                  : postType === "POLL"
-                    ? "What should the campus vote on?"
-                    : `What's on your mind${firstName ? `, ${firstName}` : ""}?`}
+                : postType === "MEME"
+                  ? "Drop inside campus joke, aura minus/plus moment, or viral lore... 😂"
+                  : postType === "QUESTION"
+                    ? "Ask your campus anything..."
+                    : postType === "POLL"
+                      ? "What should the campus vote on?"
+                      : `What's on your mind${firstName ? `, ${firstName}` : ""}?`}
             </span>
           )}
           <EditorContent editor={editor} />
         </div>
+
+        {/* ─── Suggested Meme Category / Aura tags when MEME is selected ─── */}
+        {postType === "MEME" && (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-5 pb-2.5">
+            <span className="text-[11px] font-black text-amber-500 shrink-0">Tags:</span>
+            {[
+              "#AuraMinus",
+              "#AuraPlus",
+              "#ProfLore",
+              "#CanteenSaga",
+              "#ViralTees",
+              "#8AMAttendance",
+              "#HostelChronicles",
+            ].map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => {
+                  if (editor) {
+                    editor.chain().focus().insertContent(` ${tag} `).run();
+                  }
+                }}
+                className="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-black text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-all cursor-pointer"
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* ─── Media grid (Instagram style) ─── */}
         {uploadedImages.length > 0 && (

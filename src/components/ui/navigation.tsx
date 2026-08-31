@@ -162,6 +162,27 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
     }
   }, [pathname]);
 
+  const isBitMesra = Boolean(
+    profile?.institutionId === "bitmesra" ||
+      profile?.institution?.slug === "bit-mesra" ||
+      profile?.institution?.slug === "bitmesra" ||
+      profile?.institution?.id === "bitmesra" ||
+      (collegeName && collegeName.toLowerCase().includes("bit mesra"))
+  );
+
+  const mobileBottomItems = useMemo(() => {
+    return MOBILE_BOTTOM_ITEMS.map((item) => {
+      if (item.href === "/app/marketplace" && !isBitMesra) {
+        return {
+          icon: MoreHorizontal,
+          href: "/app/more",
+          label: "More",
+        };
+      }
+      return item;
+    });
+  }, [isBitMesra]);
+
   const desktopNavItems = [
     ...DESKTOP_NAV_ITEMS.filter((item) => {
       if (isViewer && ["/app/chat", "/app/dating"].includes(item.href)) {
@@ -443,7 +464,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
         !pathname.startsWith("/app/story/") &&
         !pathname.startsWith("/app/post/new") && (
           <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/30 bg-background/90 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
-            {MOBILE_BOTTOM_ITEMS.map((item) => {
+            {mobileBottomItems.map((item) => {
               const isActive =
                 pathname === item.href || (item.href !== "/app" && pathname.startsWith(item.href));
               const Icon = item.icon;

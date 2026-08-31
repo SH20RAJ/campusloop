@@ -19,11 +19,14 @@ interface ChatMessageContentProps {
 
 /**
  * Splits text into tokens: @mentions, URLs, and regular text,
- * rendering links and mentions interactively.
+ * using industry-standard boundary detection (preventing credentials like mart@password123 from matching).
  */
 function renderFormattedMessage(text: string, isMe: boolean) {
-  // Regex matches URLs OR @mentions
-  const tokenRegex = /(https?:\/\/[^\s<>"']+|@[a-zA-Z0-9_]+)/gi;
+  // Industry-standard tokenizer regex:
+  // 1. Matches URLs: https?://...
+  // 2. Matches username mentions strictly when preceded by start-of-line, whitespace, or open punctuation
+  // 3. Negative lookbehind ensures credentials like 'mart@password123' or emails stay untouched
+  const tokenRegex = /(https?:\/\/[^\s<>"']+|(?<=^|[\s([{<,;:/])@[a-zA-Z0-9_]{2,32}\b)/gi;
   const parts = text.split(tokenRegex);
 
   return parts.map((part, index) => {
@@ -39,8 +42,8 @@ function renderFormattedMessage(text: string, isMe: boolean) {
           onClick={(e) => e.stopPropagation()}
           className={
             isMe
-              ? "inline-flex items-center font-bold px-1.5 py-0.5 mx-0.5 rounded-md bg-white/20 hover:bg-white/30 text-white transition-colors underline-offset-2 hover:underline"
-              : "inline-flex items-center font-bold px-1.5 py-0.5 mx-0.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-colors underline-offset-2 hover:underline"
+              ? "inline-flex items-center font-bold px-1.5 py-0.5 mx-0.5 rounded-md bg-white/20 hover:bg-white/30 text-white transition-colors underline-offset-2 hover:underline select-text"
+              : "inline-flex items-center font-bold px-1.5 py-0.5 mx-0.5 rounded-md bg-primary/15 hover:bg-primary/25 text-primary transition-colors underline-offset-2 hover:underline select-text"
           }
         >
           {part}
@@ -79,11 +82,12 @@ function renderFormattedMessage(text: string, isMe: boolean) {
               onClick={(e) => e.stopPropagation()}
               className={
                 isMe
-                  ? "font-semibold underline decoration-white/60 hover:decoration-white text-white break-all transition-colors"
-                  : "font-semibold underline decoration-primary/50 hover:decoration-primary text-primary break-all transition-colors"
+                  ? "inline-flex items-center gap-1 font-bold underline decoration-white/80 hover:decoration-white text-white break-all transition-colors bg-white/10 hover:bg-white/20 px-1.5 py-0.5 rounded-md"
+                  : "inline-flex items-center gap-1 font-bold underline decoration-primary/70 hover:decoration-primary text-primary break-all transition-colors bg-primary/10 hover:bg-primary/20 px-1.5 py-0.5 rounded-md"
               }
             >
-              {cleanUrl}
+              <span>{cleanUrl}</span>
+              <ExternalLink className="size-3 shrink-0 opacity-85" />
             </Link>
             {trailing}
           </React.Fragment>
@@ -99,12 +103,12 @@ function renderFormattedMessage(text: string, isMe: boolean) {
             onClick={(e) => e.stopPropagation()}
             className={
               isMe
-                ? "inline-flex items-center gap-0.5 font-medium underline decoration-white/60 hover:decoration-white text-white/95 break-all transition-colors"
-                : "inline-flex items-center gap-0.5 font-medium underline decoration-primary/50 hover:decoration-primary text-primary break-all transition-colors"
+                ? "inline-flex items-center gap-1 font-bold underline decoration-white/80 hover:decoration-white text-white break-all transition-colors bg-white/10 hover:bg-white/20 px-1.5 py-0.5 rounded-md"
+                : "inline-flex items-center gap-1 font-bold underline decoration-sky-500/70 hover:decoration-sky-500 text-sky-600 dark:text-sky-400 break-all transition-colors bg-sky-500/10 hover:bg-sky-500/20 px-1.5 py-0.5 rounded-md"
             }
           >
             <span>{cleanUrl}</span>
-            <ExternalLink className="size-3 shrink-0 opacity-75" />
+            <ExternalLink className="size-3 shrink-0 opacity-85" />
           </a>
           {trailing}
         </React.Fragment>

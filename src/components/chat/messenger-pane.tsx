@@ -3,11 +3,14 @@
 import {
   ArrowLeft,
   CheckCheck,
+  Copy,
   CornerDownRight,
   Heart,
   Info,
   Loader2,
   Mic,
+  MoreHorizontal,
+  MoreVertical,
   Paperclip,
   Phone,
   Play,
@@ -93,6 +96,8 @@ export function MessengerPane({
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionSuggestions, setMentionSuggestions] = useState<UserProfile[]>([]);
   const [isSearchingMentions, setIsSearchingMentions] = useState(false);
+  const [optionsMenuMsg, setOptionsMenuMsg] = useState<CachedMessage | null>(null);
+  const [showChatHeaderMenu, setShowChatHeaderMenu] = useState(false);
 
   // Calling States
   const [activeCall, setActiveCall] = useState<{
@@ -103,10 +108,11 @@ export function MessengerPane({
   } | null>(null);
   const [incomingCall, setIncomingCall] = useState<any | null>(null);
 
-  // Swipe gesture tracking
+  // Swipe & Long-press hold gesture tracking
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const activeSwipingMsgIdRef = useRef<string | null>(null);
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [swipedOffset, setSwipedOffset] = useState<Record<string, number>>({});
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -151,16 +157,31 @@ export function MessengerPane({
     textareaRef.current.focus();
   }
 
-  function handleTouchStart(e: React.TouchEvent, msgId: string) {
+  function handleTouchStart(e: React.TouchEvent, msg: CachedMessage) {
     touchStartXRef.current = e.touches[0].clientX;
     touchStartYRef.current = e.touches[0].clientY;
-    activeSwipingMsgIdRef.current = msgId;
+    activeSwipingMsgIdRef.current = msg.id;
+
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = setTimeout(() => {
+      sounds.pop();
+      haptics.medium();
+      setOptionsMenuMsg(msg);
+    }, 450);
   }
 
   function handleTouchMove(e: React.TouchEvent, msg: CachedMessage) {
     if (touchStartXRef.current === null || touchStartYRef.current === null) return;
     const diffX = e.touches[0].clientX - touchStartXRef.current;
     const diffY = e.touches[0].clientY - touchStartYRef.current;
+
+    // If movement > 10px, cancel long-press
+    if (Math.abs(diffX) > 10 || Math.abs(diffY) > 10) {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+    }
 
     // Only swipe horizontally if dominant
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
@@ -170,6 +191,10 @@ export function MessengerPane({
   }
 
   function handleTouchEnd(msg: CachedMessage) {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
     const currentOffset = swipedOffset[msg.id] || 0;
     if (Math.abs(currentOffset) >= 45) {
       sounds.tap();
@@ -183,6 +208,21 @@ export function MessengerPane({
     touchStartXRef.current = null;
     touchStartYRef.current = null;
     activeSwipingMsgIdRef.current = null;
+  }
+
+  function handleCopyMessageText(msg: CachedMessage) {
+    let text = msg.body;
+    if (text.startsWith("> ")) {
+      const lines = text.split("\n\n");
+      text = lines.slice(1).join("\n\n") || lines[0].replace(/^> /, "");
+    }
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      sounds.tap();
+      haptics.light();
+      toast.success("Message copied to clipboard! 📋");
+    }
+    setOptionsMenuMsg(null);
   }
 
   async function handleDeleteMessage(msgId: string, deleteFor: "everyone" | "me") {
@@ -801,31 +841,6 @@ export function MessengerPane({
 
           {/* Header Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-            {/* Audio & Video Calling Buttons (1-to-1 DMs only) */}
-            {!otherParticipant.isGroup && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => handleStartCall("audio")}
-                  className="size-8 sm:size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                  title="Start audio call"
-                  aria-label="Start audio call"
-                >
-                  <Phone className="size-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleStartCall("video")}
-                  className="size-8 sm:size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                  title="Start video call"
-                  aria-label="Start video call"
-                >
-                  <Video className="size-4.5" />
-                </button>
-              </>
-            )}
-
             <button
               type="button"
               onClick={() => setSearchInChat(!searchInChat)}
@@ -836,6 +851,7 @@ export function MessengerPane({
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
               title="Search in conversation"
+              aria-label="Search in conversation"
             >
               <Search className="size-4" />
             </button>
@@ -850,9 +866,99 @@ export function MessengerPane({
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
               title="Contact Info & Media"
+              aria-label="Contact Info & Media"
             >
               <Info className="size-4.5" />
             </button>
+
+            {/* Header 3-Dots Dropdown Menu */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowChatHeaderMenu((prev) => !prev)}
+                className={cn(
+                  "size-8 sm:size-9 rounded-full flex items-center justify-center transition-colors cursor-pointer",
+                  showChatHeaderMenu
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+                title="More options"
+                aria-label="More options"
+              >
+                <MoreVertical className="size-4.5" />
+              </button>
+
+              {showChatHeaderMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowChatHeaderMenu(false)}
+                  />
+                  <div className="absolute right-0 top-10 z-50 w-52 rounded-2xl border border-border/60 bg-card/95 backdrop-blur-xl p-1.5 shadow-xl space-y-0.5 animate-in fade-in zoom-in-95">
+                    {!otherParticipant.isGroup && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowChatHeaderMenu(false);
+                            handleStartCall("audio");
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
+                        >
+                          <Phone className="size-3.5 text-primary" />
+                          <span>Voice Call</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowChatHeaderMenu(false);
+                            handleStartCall("video");
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
+                        >
+                          <Video className="size-3.5 text-primary" />
+                          <span>Video Call</span>
+                        </button>
+                        <div className="my-1 border-t border-border/30" />
+                      </>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowChatHeaderMenu(false);
+                        setSearchInChat(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    >
+                      <Search className="size-3.5 text-muted-foreground" />
+                      <span>Search in Chat</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowChatHeaderMenu(false);
+                        setShowInfoDrawer(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    >
+                      <Info className="size-3.5 text-muted-foreground" />
+                      <span>Contact Info &amp; Media</span>
+                    </button>
+
+                    <Link
+                      href={`/@${otherParticipant.username || "student"}`}
+                      onClick={() => setShowChatHeaderMenu(false)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    >
+                      <User className="size-3.5 text-muted-foreground" />
+                      <span>View Profile</span>
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
 
             <Link
               href={`/@${otherParticipant.username || "student"}`}
@@ -1046,7 +1152,7 @@ export function MessengerPane({
                     style={{
                       transform: currentSwipe ? `translateX(${currentSwipe}px)` : undefined,
                     }}
-                    onTouchStart={(e) => handleTouchStart(e, msg.id)}
+                    onTouchStart={(e) => handleTouchStart(e, msg)}
                     onTouchMove={(e) => handleTouchMove(e, msg)}
                     onTouchEnd={() => handleTouchEnd(msg)}
                     onMouseEnter={() => handleMsgMouseEnter(msg.id)}
@@ -1069,6 +1175,7 @@ export function MessengerPane({
                         }}
                         className="size-6 rounded-full bg-card border border-border/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-2xs"
                         title="React to message"
+                        aria-label="React to message"
                       >
                         <Smile className="size-3.5" />
                       </button>
@@ -1078,8 +1185,22 @@ export function MessengerPane({
                         onClick={() => setReplyingTo(msg)}
                         className="size-6 rounded-full bg-card border border-border/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-2xs"
                         title="Reply"
+                        aria-label="Reply"
                       >
                         <CornerDownRight className="size-3" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOptionsMenuMsg(msg);
+                        }}
+                        className="size-6 rounded-full bg-card border border-border/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-2xs"
+                        title="Message options"
+                        aria-label="Message options"
+                      >
+                        <MoreHorizontal className="size-3.5" />
                       </button>
 
                       <button
@@ -1087,6 +1208,7 @@ export function MessengerPane({
                         onClick={() => setDeleteModalMsg(msg)}
                         className="size-6 rounded-full bg-card border border-border/50 hover:bg-rose-500/10 hover:text-rose-500 flex items-center justify-center text-muted-foreground transition-all cursor-pointer shadow-2xs"
                         title="Delete message"
+                        aria-label="Delete message"
                       >
                         <Trash2 className="size-3" />
                       </button>
@@ -1486,7 +1608,86 @@ export function MessengerPane({
         onSearchClick={() => setSearchInChat(true)}
         onClearChat={() => mutate(undefined, true)}
         onDeleteChat={onBack}
+        onStartCall={handleStartCall}
       />
+
+      {/* ─── Message Options Modal (Copy Text / Reply / React / Delete) ─── */}
+      {optionsMenuMsg && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in"
+          onClick={() => setOptionsMenuMsg(null)}
+        >
+          <div
+            className="w-full max-w-xs rounded-3xl border border-border/60 bg-card/95 backdrop-blur-xl p-4 shadow-2xl space-y-3 animate-in zoom-in-95"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Quick Emoji Bar */}
+            <div className="flex items-center justify-around py-1.5 px-2 rounded-2xl bg-muted/60 border border-border/30">
+              {QUICK_REACTION_EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => {
+                    toggleReaction(optionsMenuMsg.id, emoji);
+                    setOptionsMenuMsg(null);
+                  }}
+                  className="text-lg hover:scale-125 transition-transform active:scale-95 p-1 cursor-pointer"
+                  title={emoji}
+                  aria-label={`React ${emoji}`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => handleCopyMessageText(optionsMenuMsg)}
+                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-foreground hover:bg-muted transition-colors cursor-pointer"
+              >
+                <Copy className="size-4 text-primary" />
+                <span>Copy Message Text</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setReplyingTo(optionsMenuMsg);
+                  setOptionsMenuMsg(null);
+                }}
+                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-foreground hover:bg-muted transition-colors cursor-pointer"
+              >
+                <CornerDownRight className="size-4 text-primary" />
+                <span>Reply</span>
+              </button>
+
+              {optionsMenuMsg.senderId === currentUserId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = optionsMenuMsg;
+                    setOptionsMenuMsg(null);
+                    setDeleteModalMsg(target);
+                  }}
+                  className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                >
+                  <Trash2 className="size-4 text-rose-500" />
+                  <span>Delete Message</span>
+                </button>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setOptionsMenuMsg(null)}
+              className="w-full py-2 text-center text-xs font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Incoming Call Prompt Modal */}
       {incomingCall && (

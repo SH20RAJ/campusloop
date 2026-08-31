@@ -118,25 +118,25 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
         placeholder="Search canteens, rentals or services"
       />
 
-      {/* ─── 3 Distinct Campus Vertical Entrance Cards ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 px-4 py-2">
+      {/* ─── 6 Campus Marketplace Vertical Hub Cards ─── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 px-4 py-2">
         <Link
           href="/app/marketplace/food"
           onClick={() => {
             sounds.tap();
             haptics.light();
           }}
-          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-rose-600 to-amber-500 p-4 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
+          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-rose-600 to-amber-500 p-3.5 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
         >
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+            <span className="text-[9px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
               Zomato Style
             </span>
-            <h3 className="text-base font-black mt-1">Food &amp; Canteens</h3>
+            <h3 className="text-sm sm:text-base font-black mt-1">Food &amp; Canteens</h3>
           </div>
-          <p className="text-[11px] text-white/90 flex items-center justify-between font-bold">
-            <span>Momos, rolls &amp; thalis</span>
-            <ChevronRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
+          <p className="text-[10px] sm:text-[11px] text-white/90 flex items-center justify-between font-bold">
+            <span>Momos &amp; thalis</span>
+            <ChevronRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
           </p>
         </Link>
 
@@ -146,17 +146,17 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
             sounds.tap();
             haptics.light();
           }}
-          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 p-4 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
+          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 p-3.5 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
         >
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+            <span className="text-[9px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
               Flipkart Style
             </span>
-            <h3 className="text-base font-black mt-1">Supermarket Mart</h3>
+            <h3 className="text-sm sm:text-base font-black mt-1">Supermarket Mart</h3>
           </div>
-          <p className="text-[11px] text-white/90 flex items-center justify-between font-bold">
-            <span>Snacks, stationery &amp; kit</span>
-            <ChevronRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
+          <p className="text-[10px] sm:text-[11px] text-white/90 flex items-center justify-between font-bold">
+            <span>Snacks &amp; stationery</span>
+            <ChevronRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
           </p>
         </Link>
 
@@ -166,19 +166,105 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
             sounds.tap();
             haptics.light();
           }}
-          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-600 to-teal-600 p-4 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
+          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-600 to-teal-600 p-3.5 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
         >
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
-              Fleet Mobility
+            <span className="text-[9px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+              Multi-Depot
             </span>
-            <h3 className="text-base font-black mt-1">Bike &amp; EV Rentals</h3>
+            <h3 className="text-sm sm:text-base font-black mt-1">Bike &amp; EV Rentals</h3>
           </div>
-          <p className="text-[11px] text-white/90 flex items-center justify-between font-bold">
-            <span>Gear cycles &amp; scooters</span>
-            <ChevronRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
+          <p className="text-[10px] sm:text-[11px] text-white/90 flex items-center justify-between font-bold">
+            <span>Cycles &amp; scooters</span>
+            <ChevronRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
           </p>
         </Link>
+
+        <Link
+          href="/app/marketplace/barber"
+          onClick={() => {
+            sounds.tap();
+            haptics.light();
+          }}
+          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-orange-600 to-amber-700 p-3.5 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
+        >
+          <div>
+            <span className="text-[9px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+              Live Queue
+            </span>
+            <h3 className="text-sm sm:text-base font-black mt-1">Barber &amp; Salon</h3>
+          </div>
+          <p className="text-[10px] sm:text-[11px] text-white/90 flex items-center justify-between font-bold">
+            <span>Haircut &amp; beard</span>
+            <ChevronRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </p>
+        </Link>
+
+        <Link
+          href="/app/marketplace/laundry"
+          onClick={() => {
+            sounds.tap();
+            haptics.light();
+          }}
+          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-600 p-3.5 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
+        >
+          <div>
+            <span className="text-[9px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+              Doorstep Drop
+            </span>
+            <h3 className="text-sm sm:text-base font-black mt-1">Laundry &amp; Wash</h3>
+          </div>
+          <p className="text-[10px] sm:text-[11px] text-white/90 flex items-center justify-between font-bold">
+            <span>Wash, iron &amp; fold</span>
+            <ChevronRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </p>
+        </Link>
+
+        <Link
+          href="/app/marketplace/water"
+          onClick={() => {
+            sounds.tap();
+            haptics.light();
+          }}
+          className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-cyan-600 to-blue-600 p-3.5 text-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-28"
+        >
+          <div>
+            <span className="text-[9px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+              Room Delivery
+            </span>
+            <h3 className="text-sm sm:text-base font-black mt-1">RO Water Supply</h3>
+          </div>
+          <p className="text-[10px] sm:text-[11px] text-white/90 flex items-center justify-between font-bold">
+            <span>20L Chilled Cans</span>
+            <ChevronRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </p>
+        </Link>
+      </div>
+
+      {/* ─── Campus Expansion Banner (Instagram Highlighted) ─── */}
+      <div className="mx-4 my-2 rounded-2xl border border-pink-500/30 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-amber-500/10 p-4 relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
+          <div className="space-y-0.5">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-600 dark:text-pink-400 text-[9px] font-black uppercase tracking-wider">
+              <span>🚀 Want this at your campus?</span>
+            </div>
+            <h4 className="text-xs sm:text-sm font-black text-foreground">
+              Bring CampusLoop Marketplace to Your College
+            </h4>
+            <p className="text-[11px] text-muted-foreground max-w-md">
+              We partner directly with campus canteens, laundries, cycle rentals, and water suppliers. Contact us on Instagram to onboard your campus vendors!
+            </p>
+          </div>
+          <a
+            href="https://www.instagram.com/campusloop.space/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white text-xs font-black shadow-sm hover:opacity-95 transition-transform active:scale-95 shrink-0"
+          >
+            <InstagramIcon className="size-3" />
+            <span>DM @campusloop.space</span>
+          </a>
+        </div>
       </div>
 
       <FilterPills pills={CATEGORY_PILLS} value={selectedCategory} onChange={handleCategorySelect} />

@@ -9,6 +9,7 @@ import {
   GraduationCap,
   Image as ImageIcon,
   Link2,
+  Phone,
   School,
   Search,
   ShieldAlert,
@@ -16,6 +17,7 @@ import {
   Trash2,
   User,
   Users2,
+  Video,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -46,6 +48,7 @@ interface ChatUserInfoDrawerProps {
   onSearchClick?: () => void;
   onClearChat?: () => void;
   onDeleteChat?: () => void;
+  onStartCall?: (type: "audio" | "video") => void;
 }
 
 export function ChatUserInfoDrawer({
@@ -58,6 +61,7 @@ export function ChatUserInfoDrawer({
   onSearchClick,
   onClearChat,
   onDeleteChat,
+  onStartCall,
 }: ChatUserInfoDrawerProps) {
   const [activeTab, setActiveTab] = useState<"media" | "links">("media");
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
@@ -307,6 +311,38 @@ export function ChatUserInfoDrawer({
         <div className="grid grid-cols-4 gap-2 p-4 border-b border-border/30 text-center bg-card">
           {!otherParticipant.isGroup ? (
             <>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onStartCall) onStartCall("audio");
+                }}
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-muted/60 transition-colors group cursor-pointer"
+              >
+                <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shadow-2xs">
+                  <Phone className="size-4.5" />
+                </div>
+                <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground">
+                  Voice Call
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onStartCall) onStartCall("video");
+                }}
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-muted/60 transition-colors group cursor-pointer"
+              >
+                <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shadow-2xs">
+                  <Video className="size-4.5" />
+                </div>
+                <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground">
+                  Video Call
+                </span>
+              </button>
+
               <Link
                 href={`/@${otherParticipant.username}`}
                 className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-muted/60 transition-colors group cursor-pointer"
@@ -318,11 +354,6 @@ export function ChatUserInfoDrawer({
                   Profile
                 </span>
               </Link>
-
-              <div className="flex flex-col items-center gap-1.5 p-2">
-                <SecretCrushButton targetId={otherParticipant.id} targetName={otherParticipant.displayName} />
-                <span className="text-[10px] font-bold text-muted-foreground">Crush</span>
-              </div>
             </>
           ) : (
             <>

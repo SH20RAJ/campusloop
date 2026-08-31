@@ -234,11 +234,17 @@ export function extractEmbedsFromText(text: string): ParsedEmbed[] {
   }
 
   // 2. Look for standalone internal paths like `/@username`, `/c/coding`, `/app/events/123`, or `https://campusloop.space/@username`
+  // Ensure @username is preceded by start of line, whitespace or opening bracket, never letters (e.g. mart@password123)
   const internalPathRegex =
-    /(?:^|\s)(?:https?:\/\/(?:campusloop\.space|localhost(?::\d+)?)\/)?(?:\/)?(?:@|u\/|app\/profile\/)([a-zA-Z0-9_]+)/g;
+    /(?:^|[\s([{<])(?:https?:\/\/(?:campusloop\.space|localhost(?::\d+)?)\/)?(?:\/)?(?:@|u\/|app\/profile\/)([a-zA-Z0-9_]{3,30})\b/g;
   while ((match = internalPathRegex.exec(text)) !== null) {
     const username = match[1];
-    if (username && !embeds.some((e) => e.type === "internal_profile" && e.username === username)) {
+    if (
+      username &&
+      username !== "new" &&
+      username !== "password123" &&
+      !embeds.some((e) => e.type === "internal_profile" && e.username === username)
+    ) {
       embeds.push({
         type: "internal_profile",
         rawUrl: `/@${username}`,

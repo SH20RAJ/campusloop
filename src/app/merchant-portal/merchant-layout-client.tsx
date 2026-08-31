@@ -214,9 +214,25 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
               </>
             ) : (
               <>
-                <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-rose-500 flex items-center gap-1.5">
-                  <UtensilsCrossed className="size-3.5" />
-                  <span>Food &amp; Kitchen Console</span>
+                <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-1.5">
+                  {merchant?.verticalType === "BARBER" ? (
+                    <>
+                      <span>✂️ Barber &amp; Salon Console</span>
+                    </>
+                  ) : merchant?.verticalType === "LAUNDRY" ? (
+                    <>
+                      <span>🧺 Laundry &amp; Wash Console</span>
+                    </>
+                  ) : merchant?.verticalType === "WATER" ? (
+                    <>
+                      <span>💧 RO Water Supply Console</span>
+                    </>
+                  ) : (
+                    <>
+                      <UtensilsCrossed className="size-3.5" />
+                      <span>Food &amp; Kitchen Console</span>
+                    </>
+                  )}
                 </p>
                 {MERCHANT_NAV_ITEMS.map((item) => {
                   const isActive =

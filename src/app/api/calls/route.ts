@@ -155,15 +155,20 @@ export async function GET(req: Request) {
     }
 
     // Database fallback: find any recent calling session
-    const activeCall = await db.query.callSessions.findFirst({
-      where: and(eq(callSessions.receiverId, profile.id), eq(callSessions.status, "CALLING")),
-      with: {
-        caller: {
-          columns: { id: true, displayName: true, avatarUrl: true, username: true },
+    let activeCall: any = null;
+    try {
+      activeCall = await db.query.callSessions.findFirst({
+        where: and(eq(callSessions.receiverId, profile.id), eq(callSessions.status, "CALLING")),
+        with: {
+          caller: {
+            columns: { id: true, displayName: true, avatarUrl: true, username: true },
+          },
         },
-      },
-      orderBy: [desc(callSessions.createdAt)],
-    });
+        orderBy: [desc(callSessions.createdAt)],
+      });
+    } catch (dbErr) {
+      console.warn("DB call fallback lookup error:", dbErr);
+    }
 
     return NextResponse.json({
       incomingCall: activeCall
@@ -180,6 +185,6 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("GET /api/calls error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ incomingCall: null });
   }
 }

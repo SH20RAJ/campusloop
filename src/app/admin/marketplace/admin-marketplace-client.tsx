@@ -44,7 +44,7 @@ import { cn } from "@/lib/utils";
 const CATEGORIES = [
   { id: "all", label: "All Verticals", icon: Store, color: "text-primary", bg: "bg-primary/10" },
   { id: "food", label: "Food & Canteens", icon: UtensilsCrossed, color: "text-rose-500", bg: "bg-rose-500/10" },
-  { id: "essentials", label: "Supermarket & Mart", icon: ShoppingBag, color: "text-amber-500", bg: "bg-amber-500/10" },
+  { id: "supermarket", label: "Supermarket & Mart", icon: ShoppingBag, color: "text-amber-500", bg: "bg-amber-500/10" },
   { id: "rentals", label: "Bike & Vehicle Rentals", icon: Bike, color: "text-emerald-500", bg: "bg-emerald-500/10" },
   { id: "barber", label: "Barber & Salon", icon: Scissors, color: "text-blue-500", bg: "bg-blue-500/10" },
   { id: "laundry", label: "Laundry & Wash", icon: Shirt, color: "text-purple-500", bg: "bg-purple-500/10" },
@@ -83,7 +83,8 @@ export function AdminMarketplaceClient() {
 
   const filteredMerchants = useMemo(() => {
     return merchants.filter((m) => {
-      if (selectedCategory !== "all" && m.categorySlug !== selectedCategory) return false;
+      const cat = m.categorySlug === "essentials" ? "supermarket" : m.categorySlug || "food";
+      if (selectedCategory !== "all" && cat !== selectedCategory) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         return (
@@ -102,7 +103,7 @@ export function AdminMarketplaceClient() {
   const categorizedMerchants = useMemo(() => {
     const map: Record<string, any[]> = {};
     for (const m of filteredMerchants) {
-      const cat = m.categorySlug || "food";
+      const cat = m.categorySlug === "essentials" ? "supermarket" : m.categorySlug || "food";
       if (!map[cat]) map[cat] = [];
       map[cat].push(m);
     }

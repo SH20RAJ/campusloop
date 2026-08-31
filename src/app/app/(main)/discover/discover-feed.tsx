@@ -249,16 +249,16 @@ export function DiscoverFeed() {
     return () => observer.disconnect();
   }, [isReachingEnd, isLoadingMore, setSize, trimmedSearch]);
 
-  function handleFollowToggle(peerId: string, peerName: string) {
+  async function handleFollowToggle(peerId: string, peerName: string) {
     sounds.tap();
     haptics.light();
-    setFollowedIds((prev) => {
-      const nextState = !prev[peerId];
-      if (nextState) {
-        toast.success(`Connected with ${peerName}!`);
-      }
-      return { ...prev, [peerId]: nextState };
-    });
+    const nextState = !followedIds[peerId];
+    setFollowedIds((prev) => ({ ...prev, [peerId]: nextState }));
+    if (nextState) {
+      toast.success(`Following ${peerName}! ⚡`);
+    } else {
+      toast.info(`Unfollowed ${peerName}`);
+    }
   }
 
   const trends = trendsData?.trends || [];
@@ -508,7 +508,7 @@ export function DiscoverFeed() {
                               : "bg-primary text-primary-foreground hover:opacity-90 active:scale-95 shadow-xs"
                           )}
                         >
-                          {isFollowed ? "Connected" : "Connect"}
+                          {isFollowed ? "Following" : "Follow"}
                         </button>
                       </div>
                     );
@@ -742,7 +742,7 @@ export function DiscoverFeed() {
                                 : "bg-primary text-primary-foreground hover:opacity-90 active:scale-95 shadow-xs"
                             )}
                           >
-                            {isFollowed ? "Connected" : "Connect"}
+                            {isFollowed ? "Following" : "Follow"}
                           </button>
                         </div>
                       );

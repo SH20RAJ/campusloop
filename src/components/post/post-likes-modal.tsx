@@ -159,12 +159,12 @@ export function PostLikesModal({ postId, isOpen, onClose, currentUserId }: PostL
                       {isFollowed ? (
                         <>
                           <UserCheck className="size-3" />
-                          <span>Connected</span>
+                          <span>Following</span>
                         </>
                       ) : (
                         <>
                           <UserPlus className="size-3" />
-                          <span>Connect</span>
+                          <span>Follow</span>
                         </>
                       )}
                     </button>

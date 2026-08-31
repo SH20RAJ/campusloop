@@ -244,7 +244,25 @@ Located in [`src/components/chat/`](campusloop/src/components/chat/) and [`src/a
 - **Safe-Area Alignment**: Native touch padding with `pb-[max(0.75rem,env(safe-area-inset-bottom))]`.
 - **Skeleton Loaders**: Dedicated instant loading states preventing blank screens during thread transitions.
 
-### 5.6 Campus Time Capsule & Batch Legacy Vault
+### 5.6 1-to-1 Audio & Video Calling (PeerJS & WebRTC)
+Located in [`src/components/calls/`](campusloop/src/components/calls/), [`src/lib/calls/`](campusloop/src/lib/calls/), and [`src/app/api/calls/`](campusloop/src/app/api/calls/):
+- **Decoupled Control & Media Planes**: Control plane runs on Cloudflare Workers, Upstash Redis (sub-5ms signaling) and Neon PostgreSQL (`call_sessions` table). Media plane runs directly P2P between browsers via WebRTC (`peerjs`).
+- **Zero Media Relaying on Workers**: Audio (Opus) and video (VP8/H.264) never route through or cost worker bandwidth.
+- **Resilient Fallback**: Automatic camera permission degradation with seamless audio-only fallback without dropping calls.
+- **Mobile Camera Flipping**: Front/rear camera toggling with direct WebRTC video sender track replacement.
+
+### 5.7 Random Loop Video & Accountable Anonymity
+Located in [`src/components/random/`](campusloop/src/components/random/) and [`src/app/api/random/`](campusloop/src/app/api/random/):
+- **Opt-In Video Handshake**: Starts as a protected text chat; video initiates **only** upon mutual consent (`userAVideoRequested && userBVideoRequested`).
+- **Mutual Identity Reveal**: Identities remain shielded as "Anonymous Student" until both users explicitly tap **Reveal Me**.
+- **Instant Next Person**: Hardware camera and mic tracks are cleanly killed and connections destroyed immediately upon skipping.
+
+### 5.8 User Behavior Analytics & Collaborative Personalization
+Located in [`src/lib/user-behavior.ts`](campusloop/src/lib/user-behavior.ts) and [`src/app/api/behavior/`](campusloop/src/app/api/behavior/):
+- **Dual-Layer Ingestion**: Ultra-fast writes to Upstash Redis sorted sets (`user:<id>:recents:<type>` & `user:<id>:interests`) coupled with durable audit rows in `user_behavior_events`.
+- **Real-Time Feed & Discover Boosting**: Dynamic weighting of user dwell time, clicks, search queries, and friend interactions to supercharge For You feed recommendations.
+
+### 5.9 Campus Time Capsule & Batch Legacy Vault
 Located in [`src/components/landing/time-capsule-showcase.tsx`](campusloop/src/components/landing/time-capsule-showcase.tsx) and [`src/app/app/(main)/capsule/`](campusloop/src/app/app/(main)/capsule/):
 - **Cryptographic Batch Lock**: Sealed letters, predictions, and confessions locked until graduation day.
 - **Live Countdown Timer**: Real-time ticker counting down days, hours, and minutes to convocation.

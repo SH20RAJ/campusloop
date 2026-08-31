@@ -6,7 +6,27 @@ A log of significant product updates, UI decisions, and architectural commits.
 
 ### Recent Updates
 
-- **Hero Carousel Dots Repositioning, Landing 120fps GPU Optimization, `llms.txt` & GEO SEO**:
+- **PeerJS 1-to-1 WebRTC Video & Audio Calling (`/app/chat`)**:
+  - Direct P2P audio (Opus) and video (VP8/H.264) calling integrated into messenger header using `peerjs`.
+  - Strict separation of Control Plane (Cloudflare Workers, Upstash Redis sub-5ms signaling, PostgreSQL `call_sessions` table) and Media Plane (direct browser P2P without worker relay bandwidth).
+  - Built unified [`CallEngine`](campusloop/src/lib/calls/call-engine.ts) abstraction handling ICE lifecycle, track toggles, mobile front/back camera flipping, and resilient audio fallback.
+  - Implemented modern floating calling card on desktop and full-screen calling sheet on mobile with crystal-clear audio chimes and haptics.
+
+- **Omegle-Style Random Loop Video Discovery (`/app/random`)**:
+  - Added seamless transition from anonymous text chat to live video via mutual consent (`userAVideoRequested && userBVideoRequested`).
+  - Accountable Anonymity: real identity remains 100% masked as "Anonymous Student" until both users tap **Reveal Me**.
+  - One-tap "Become Friends" action connects both students on CampusLoop's relational follow graph and creates a persistent DM thread in `/app/chat`.
+  - Next Person action immediately destroys local camera/mic hardware tracks and re-queues.
+
+- **Upstash Redis User Behavior Analytics & Personalization Engine**:
+  - Integrated Upstash Redis REST client (`@upstash/redis` in [`src/lib/redis.ts`](campusloop/src/lib/redis.ts)) for sub-5ms user affinity ingestion.
+  - Built [`trackUserBehavior`](campusloop/src/lib/user-behavior.ts) and `/api/behavior/track` recording dwell times, clicks, searches, and calling completions to fuel real-time algorithmic boosts and recommendation scoring.
+  - Backed by durable audit event log in PostgreSQL `user_behavior_events` table.
+
+- **Follows & Mutual Friends Feed Algorithm Boost**:
+  - Enhanced `for_you` feed ranking in [`src/lib/feed.ts`](campusloop/src/lib/feed.ts) to significantly prioritize posts created by followed classmates (+80.0 score) and mutual friends (+120.0 score).
+  - Preserved accountable anonymity invariants (boosts do not expose identity on anonymous confessions).
+  - Added unit test suite in [`src/lib/feed.test.ts`](campusloop/src/lib/feed.test.ts) (105 total passing tests).
   - Repositioned the interactive feature navigation dots in [`src/components/landing/hero-preview.tsx`](campusloop/src/components/landing/hero-preview.tsx) to sit cleanly below floating micro-cards with dedicated clearances (`mt-14 sm:mt-16 pt-3 relative z-30`), eliminating visual overlap on all viewport sizes.
   - Redesigned switcher dots with tactile pills (active `w-8 bg-primary`, inactive `w-2.5 bg-muted-foreground/25`) and accessible touch hit-boxes.
   - Converted [`src/components/landing/interactive-bento-card.tsx`](campusloop/src/components/landing/interactive-bento-card.tsx) cursor radial spotlight tracking to pure GPU CSS variables (`--mouse-x`, `--mouse-y`), removing all React component re-renders on mousemove for 120fps scrolling and hover performance.

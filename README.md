@@ -87,14 +87,21 @@ type** — which is what makes the upgrade painless years later.
 - **1-Tap & Quoted Reposts**: Twitter-style reposts with embedded quote previews and crystalline Web Audio chimes.
 - **24-Hour Stories (Vibes)**: Fullscreen visual vibe sharing with pause-on-reply typing and permanent profile highlights.
 
-### 3. 💖 Connection & Matchmaking Layer (`/app/dating`)
+### 3. 💬 Realtime Communication & Video Calling (`/app/chat` & `/app/random`)
+- **1-to-1 WebRTC Video & Audio Calling**: Direct peer-to-peer audio and video calling inside `/app/chat` powered by PeerJS. Encrypted media flows directly between browsers with zero worker bandwidth costs.
+- **Incoming Call Ringing & Sheet UI**: Desktop floating cards and mobile full-screen incoming call sheets with instant accept/decline.
+- **Random Loop Discovery (`/app/random`)**: Omegle-style serendipitous student matching with accountable anonymity.
+- **Mutual Video Opt-In**: Transition from anonymous text to live video only when both students consent.
+- **Mutual Identity Reveal & Social Follow**: Reveal real college identities or tap "Become Friends" to instantly connect on CampusLoop's social graph.
+
+### 4. 💖 Connection & Matchmaking Layer (`/app/dating`)
 - **Campus Match Swipe Deck**: Draggable Framer Motion cards with velocity-based release detection (`velocity.x > 400 || offset.x > 80`).
 - **Curated Unsplash Student Portraits**: Verified college portrait sets replacing cartoon Dicebear avatars.
 - **Circular PFP Previews**: Sleek circular avatar rendered directly before candidate names.
 - **Zero-Lag Preloader**: Instant image preloading in browser memory for smooth swipe transitions.
 - **Secret Crush & Mutual Match**: Cryptographic crush escrow revealing identity only when feelings are mutual.
 
-### 4. 🏫 Campus Utility & Dedicated Sub-Hubs (`/app/communities`)
+### 5. 🏫 Campus Utility & Dedicated Sub-Hubs (`/app/communities`)
 - **Reddit-Style Sub-Hubs**: Authentic student interest communities (`c/coding`, `c/music-band`, `c/anime`) with custom sorting (*Hot, New, Top, Rising, Discussed*).
 - **6 Dedicated Campus Portals**:
   - 🔎 [**/app/lost-and-found**](https://campusloop.space/app/lost-and-found) — Lost calculators, ID cards, keys & cycle locks.

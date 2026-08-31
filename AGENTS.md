@@ -60,7 +60,17 @@ CampusLoop is designed to empower college students with a safe, engaging, and fe
 - **ALWAYS** prefer creating dedicated Next.js App Router full-page routes (`page.tsx`) with rich SEO metadata, Twitter/X-style full-width minimal UI/UX, and optimal secure backend + frontend, instead of modal popups for creation flows (e.g. Campus Hub posting, community creation, listing creation).
 - Popups/modals should only be reserved for micro-interactions (fast comment reply, repost quote, quick reaction). Dedicated pages ensure 100% mobile space utilization, avoid cramped modal scrolling, and enable deep linkability.
 
-### 8. Official Social Media Channels Priority
+### 8. PeerJS WebRTC Calling & Control vs. Media Plane Isolation
+- Control plane (authentication, authorization, session state, ringing timeouts, block verification) runs strictly through Cloudflare Workers and PostgreSQL (`call_sessions` table).
+- Media plane (PeerJS, getUserMedia, direct audio/video tracks) connects P2P directly between student browsers. **NEVER** route or relay raw WebRTC media streams through the worker.
+- Encapsulate all WebRTC and PeerJS event handling inside `src/lib/calls/call-engine.ts` instead of scattering across React components.
+
+### 9. Upstash Redis & User Behavior Personalization
+- Low-latency cache, signaling, and user behavior analytics ingestion are supported via Upstash Redis (`@upstash/redis` via `src/lib/redis.ts`).
+- High-frequency tracking (`trackUserBehavior`) updates real-time user affinity sets (`user:<id>:interests`) in Redis within 5ms, backed asynchronously by durable audit rows in `user_behavior_events`.
+- If Redis is unavailable or unconfigured, all endpoints must continue functioning seamlessly with zero disruption.
+
+### 10. Official Social Media Channels Priority
 - Always prioritize official social media links in the order:
   1. **Instagram (🔥 Highlighted)**: `https://www.instagram.com/campusloop.space/` (`@campusloop.space`)
   2. **LinkedIn**: `https://www.linkedin.com/company/mycampusloop/?viewAsMember=true` (`CampusLoop`)

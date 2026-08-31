@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 
 export interface NavItem {
-  icon: LucideIcon;
+  icon: LucideIcon | React.ComponentType<any>;
   href: string;
   label: string;
   desc?: string;

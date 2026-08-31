@@ -1,9 +1,18 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
-import { GraduationCap, HeartHandshakeIcon, School, ShieldCheck, Sparkles, UserRound, X, Zap } from "lucide-react";
+import {
+  GraduationCap,
+  HeartHandshakeIcon,
+  School,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AnimateX } from "@/components/ui/animated-icon";
 import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -151,7 +160,9 @@ function TopCard({
         style={{ opacity: nopeOpacity }}
         className="pointer-events-none absolute right-5 top-10 z-30 rotate-12 rounded-lg border-4 border-neutral-300 dark:border-neutral-500 px-3 py-1 shadow-lg"
       >
-        <span className="text-3xl font-black tracking-widest text-neutral-300 dark:text-neutral-400">PASS</span>
+        <span className="text-3xl font-black tracking-widest text-neutral-300 dark:text-neutral-400">
+          PASS
+        </span>
       </motion.div>
 
       {/* Top badges */}
@@ -353,7 +364,7 @@ export function SwipeActions({
         aria-label="Pass"
         className="flex size-14 items-center justify-center rounded-full border-2 border-border bg-card text-muted-foreground shadow-md transition-all hover:scale-105 hover:bg-muted hover:text-foreground active:scale-90 cursor-pointer"
       >
-        <X className="size-7" strokeWidth={2.5} />
+        <AnimateX size={26} />
       </button>
 
       <button

@@ -8,15 +8,12 @@ import {
   BarChart3,
   Check,
   ChevronDown,
-  Flame,
   Globe,
   HelpCircle,
-  Image as ImageIcon,
   Loader2,
   Lock,
   School,
   Smile,
-  Sparkles,
   Type,
   Users,
   VenetianMask,
@@ -29,6 +26,7 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { PollOptionsEditor } from "@/components/post/poll-options-editor";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
+import { AnimateImage, AnimateSparkles } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 import {
@@ -425,7 +423,7 @@ export function PostComposer({
     {
       id: "photo",
       label: "Photo",
-      icon: ImageIcon,
+      icon: AnimateImage,
       color: "text-emerald-500 hover:bg-emerald-500/10",
       onClick: openFilePicker,
       disabled: isUploadingImage,
@@ -434,7 +432,7 @@ export function PostComposer({
     {
       id: "gif",
       label: "GIF",
-      icon: Sparkles,
+      icon: AnimateSparkles,
       color: "text-primary hover:bg-primary/10",
       onClick: () => setShowGifPicker(true),
     },

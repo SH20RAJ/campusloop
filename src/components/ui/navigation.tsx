@@ -2,11 +2,9 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Bell,
   GraduationCap,
   HelpCircle,
   Menu,
-  MessageSquare,
   MoreHorizontal,
   Plus,
   School,
@@ -18,11 +16,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
 import { DreamCampusesModal } from "@/components/preview/dream-campuses-modal";
+import {
+  AnimateBellRing,
+  AnimatedIcon,
+  AnimateMessageSquare,
+  AnimatePlus,
+} from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { Button } from "@/components/ui/button";
@@ -232,7 +236,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Direct messages"
               >
-                <MessageSquare className="size-4.5" />
+                <AnimatedIcon icon={AnimateMessageSquare} animation="pop" size={18} />
               </Link>
 
               <Link
@@ -240,7 +244,14 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 className="relative flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Notifications"
               >
-                <Bell className="size-4.5" />
+                <AnimatedIcon
+                  icon={AnimateBellRing}
+                  animation="bell"
+                  size={18}
+                  // Rings again whenever a new notification lands, not just on
+                  // hover — the badge alone is easy to miss mid-scroll.
+                  playKey={unreadNotificationsCount}
+                />
                 {unreadNotificationsCount > 0 && (
                   <span className="absolute top-2 right-2 size-2 rounded-full bg-[#1d9bf0]" />
                 )}
@@ -466,7 +477,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/25 active:scale-90 transition-transform cursor-pointer shrink-0 mx-1"
                     aria-label="Create post or confession"
                   >
-                    <Plus className="size-5.5" strokeWidth={2.5} />
+                    <AnimatedIcon icon={AnimatePlus} animation="spin" size={22} strokeWidth={2.5} />
                   </Link>
                 );
               }
@@ -485,9 +496,16 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   )}
                 >
                   <div className="relative">
-                    <Icon
+                    <AnimatedIcon
+                      icon={Icon}
+                      animation="pop"
+                      size={22}
                       strokeWidth={isActive ? 2.5 : 2}
-                      className={cn("size-5.5 transition-colors", isActive ? "text-foreground" : "")}
+                      // Hover means nothing on a phone; the tab popping as it
+                      // becomes active is the feedback that matters here.
+                      animateOnHover={false}
+                      playKey={isActive}
+                      iconClassName={cn("transition-colors", isActive ? "text-foreground" : "")}
                     />
                     {item.href === "/app/marketplace" && !marketplaceSeen && (
                       <span className="absolute -top-1 -right-1 size-2 rounded-full bg-emerald-500" />

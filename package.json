@@ -26,6 +26,7 @@
 		"format": "biome format --write ./src"
 	},
 	"dependencies": {
+		"@animateicons/react": "^0.4.3",
 		"@base-ui/react": "^1.6.0",
 		"@hexclave/next": "^1.0.36",
 		"@neondatabase/serverless": "^1.1.0",

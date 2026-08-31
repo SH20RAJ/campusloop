@@ -8,20 +8,16 @@ import {
   Heart,
   Info,
   Loader2,
-  Mic,
   MoreHorizontal,
   MoreVertical,
   Paperclip,
-  Phone,
   Play,
   Search,
-  Send,
   ShieldCheck,
   Smile,
   Trash2,
   User,
   Users2,
-  Video,
   Volume2,
   X,
 } from "lucide-react";
@@ -31,6 +27,7 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { ActiveCallOverlay } from "@/components/calls/active-call-overlay";
 import { IncomingCallModal } from "@/components/calls/incoming-call-modal";
+import { AnimateMic, AnimatePhone, AnimateSend, AnimateVideo } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 import { PresenceDot } from "@/components/ui/presence-dot";
@@ -730,7 +727,6 @@ export function MessengerPane({
     }
   }
 
-
   if (!conversationId) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-muted-foreground p-6 text-center select-none bg-background">
@@ -806,7 +802,9 @@ export function MessengerPane({
                     {(effectiveParticipant.displayName?.[0] || "S").toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                {!effectiveParticipant.isGroup && <PresenceDot lastSeenAt={effectiveParticipant.lastSeenAt} />}
+                {!effectiveParticipant.isGroup && (
+                  <PresenceDot lastSeenAt={effectiveParticipant.lastSeenAt} />
+                )}
               </div>
 
               {/* Name & Branch / Presence status / Group Member Count */}
@@ -828,7 +826,9 @@ export function MessengerPane({
                       <span className="font-bold text-primary flex items-center gap-1 shrink-0">
                         <Users2 className="size-3" />
                         <span>
-                          {effectiveParticipant.membersCount || effectiveParticipant.participants?.length || 2}{" "}
+                          {effectiveParticipant.membersCount ||
+                            effectiveParticipant.participants?.length ||
+                            2}{" "}
                           members
                         </span>
                       </span>
@@ -849,16 +849,18 @@ export function MessengerPane({
                           <span>Online</span>
                         </span>
                       ) : (
-                        <span className="text-muted-foreground">
-                          {presenceText || "Offline"}
-                        </span>
+                        <span className="text-muted-foreground">{presenceText || "Offline"}</span>
                       )}
                       <span>•</span>
-                      <span className="text-muted-foreground font-medium">@{effectiveParticipant.username}</span>
+                      <span className="text-muted-foreground font-medium">
+                        @{effectiveParticipant.username}
+                      </span>
                       {effectiveParticipant.branch && (
                         <>
                           <span className="hidden sm:inline">•</span>
-                          <span className="hidden sm:inline text-muted-foreground/80">{effectiveParticipant.branch}</span>
+                          <span className="hidden sm:inline text-muted-foreground/80">
+                            {effectiveParticipant.branch}
+                          </span>
                         </>
                       )}
                     </>
@@ -919,10 +921,7 @@ export function MessengerPane({
 
               {showChatHeaderMenu && (
                 <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setShowChatHeaderMenu(false)}
-                  />
+                  <div className="fixed inset-0 z-40" onClick={() => setShowChatHeaderMenu(false)} />
                   <div className="absolute right-0 top-10 z-50 w-52 rounded-2xl border border-border/60 bg-card/95 backdrop-blur-xl p-1.5 shadow-xl space-y-0.5 animate-in fade-in zoom-in-95">
                     {!effectiveParticipant.isGroup && (
                       <>
@@ -934,7 +933,7 @@ export function MessengerPane({
                           }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
                         >
-                          <Phone className="size-3.5 text-primary" />
+                          <AnimatePhone size={14} className="text-primary" />
                           <span>Voice Call</span>
                         </button>
                         <button
@@ -945,7 +944,7 @@ export function MessengerPane({
                           }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
                         >
-                          <Video className="size-3.5 text-primary" />
+                          <AnimateVideo size={14} className="text-primary" />
                           <span>Video Call</span>
                         </button>
                         <div className="my-1 border-t border-border/30" />
@@ -973,7 +972,9 @@ export function MessengerPane({
                       className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-xl text-foreground hover:bg-muted transition-colors cursor-pointer"
                     >
                       <Info className="size-3.5 text-muted-foreground" />
-                      <span>{effectiveParticipant.isGroup ? "Group Details & Media" : "Contact Info & Media"}</span>
+                      <span>
+                        {effectiveParticipant.isGroup ? "Group Details & Media" : "Contact Info & Media"}
+                      </span>
                     </button>
 
                     {!effectiveParticipant.isGroup && effectiveParticipant.username && (
@@ -1551,7 +1552,7 @@ export function MessengerPane({
               aria-label="Send message"
               className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#1d9bf0] text-white hover:opacity-90 shadow-xs transition-transform active:scale-90 cursor-pointer mr-1"
             >
-              <Send className="size-4" />
+              <AnimateSend size={16} className="text-white" />
             </button>
           ) : (
             <button
@@ -1561,7 +1562,7 @@ export function MessengerPane({
               className="flex size-8 shrink-0 items-center justify-center rounded-full hover:bg-muted/70 text-muted-foreground hover:text-[#1d9bf0] transition-all cursor-pointer mr-1 active:scale-90"
               title="Click to send voice note"
             >
-              <Mic className="size-4" />
+              <AnimateMic size={16} />
             </button>
           )}
         </form>

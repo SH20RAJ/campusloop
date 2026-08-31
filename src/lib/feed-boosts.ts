@@ -133,11 +133,40 @@ async function loadActiveBoostsUncached(): Promise<ActiveBoost[]> {
   return rows;
 }
 
-/** Request-scoped memo on top of the Redis cache. */
-export const loadActiveBoosts = cache(loadActiveBoostsUncached);
+/**
+ * Isolate-level memo above Redis.
+ *
+ * Workers reuse an isolate across requests, so holding the answer in module
+ * scope for a few seconds removes the Redis round trip from the overwhelmingly
+ * common case: nothing is boosted, and the answer is an empty array. Without
+ * this, adding curation would have made every feed request pay a network hop
+ * to learn that there is no curation.
+ *
+ * Staleness is bounded to ISOLATE_TTL_MS on top of the 60 s Redis TTL, which is
+ * well inside the "live within a minute" the admin console promises.
+ */
+const ISOLATE_TTL_MS = 10_000;
+let isolateCache: { value: ActiveBoost[]; expiresAt: number } | null = null;
+
+async function loadActiveBoostsMemoized(): Promise<ActiveBoost[]> {
+  const now = Date.now();
+  if (isolateCache && isolateCache.expiresAt > now) {
+    return isolateCache.value;
+  }
+
+  const value = await loadActiveBoostsUncached();
+  isolateCache = { value, expiresAt: now + ISOLATE_TTL_MS };
+  return value;
+}
+
+/** Request-scoped memo on top of the isolate and Redis caches. */
+export const loadActiveBoosts = cache(loadActiveBoostsMemoized);
 
 /** Drop the cache so an admin's change is visible on the next request. */
 export async function invalidateBoostCache(): Promise<void> {
+  // Clears this isolate immediately; other isolates expire on their own within
+  // ISOLATE_TTL_MS, and Redis is dropped so they reload from Postgres.
+  isolateCache = null;
   try {
     await getRedis()?.del(CACHE_KEY);
   } catch (error) {

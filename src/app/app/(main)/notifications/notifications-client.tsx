@@ -1,31 +1,21 @@
 "use client";
 
-import {
-  AtSign,
-  Bell,
-  CheckCheck,
-  Compass,
-  Eraser,
-  Heart,
-  Lock,
-  MessageCircle,
-  MoreHorizontal,
-  Repeat2,
-  Send,
-  ShieldCheck,
-  Sparkles,
-  Ticket,
-  Trash2,
-  Trophy,
-  UserPlus,
-  Users,
-  Zap,
-} from "lucide-react";
+import { AtSign, Eraser, Lock, MoreHorizontal, Ticket, Trash2, Trophy, UserPlus, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
+import {
+  AnimateCheckCheck,
+  AnimatedIcon,
+  AnimateHeart,
+  AnimateMessageCircle,
+  AnimateRepeat2,
+  AnimateSend,
+  AnimateSparkles,
+  AnimateUsers,
+} from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { type NotificationItem, type NotificationTab, useNotifications } from "@/hooks/use-notifications";
@@ -71,7 +61,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
     switch (n.type) {
       case "LIKE":
         return {
-          icon: <Heart className="size-3.5 text-rose-500 fill-rose-500" />,
+          icon: <AnimateHeart size={14} className="text-rose-500 fill-rose-500" />,
           badgeBg: "bg-rose-500/15 border-rose-500/30 text-rose-500",
           actionText: "liked your post",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
@@ -79,7 +69,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
         };
       case "STORY_LIKE":
         return {
-          icon: <Heart className="size-3.5 text-pink-500 fill-pink-500" />,
+          icon: <AnimateHeart size={14} className="text-pink-500 fill-pink-500" />,
           badgeBg: "bg-pink-500/15 border-pink-500/30 text-pink-500",
           actionText: "liked your campus story vibe",
           href: n.referenceId ? `/app/story/${n.referenceId}` : "/app",
@@ -87,7 +77,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
         };
       case "COMMENT":
         return {
-          icon: <MessageCircle className="size-3.5 text-[#1d9bf0] fill-[#1d9bf0]" />,
+          icon: <AnimateMessageCircle size={14} className="text-[#1d9bf0]" />,
           badgeBg: "bg-[#1d9bf0]/15 border-[#1d9bf0]/30 text-[#1d9bf0]",
           actionText: "replied to your discussion",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
@@ -96,7 +86,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
       case "REPLY":
       case "STORY_REPLY":
         return {
-          icon: <MessageCircle className="size-3.5 text-[#1d9bf0] fill-[#1d9bf0]" />,
+          icon: <AnimateMessageCircle size={14} className="text-[#1d9bf0]" />,
           badgeBg: "bg-[#1d9bf0]/15 border-[#1d9bf0]/30 text-[#1d9bf0]",
           actionText: "replied to your comment",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
@@ -112,7 +102,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
         };
       case "REPOST":
         return {
-          icon: <Repeat2 className="size-3.5 text-emerald-500 stroke-2" />,
+          icon: <AnimateRepeat2 size={14} className="text-emerald-500" />,
           badgeBg: "bg-emerald-500/15 border-emerald-500/30 text-emerald-500",
           actionText: "reposted your post to the campus feed",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
@@ -144,7 +134,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
         };
       case "FRIEND":
         return {
-          icon: <Users className="size-3.5 text-emerald-500 stroke-2" />,
+          icon: <AnimateUsers size={14} className="text-emerald-500" />,
           badgeBg: "bg-emerald-500/15 border-emerald-500/30 text-emerald-500",
           actionText: "followed you back — you're campus friends now 🤝",
           href: n.referenceId ? `/@${n.referenceId}` : "/app",
@@ -160,7 +150,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
         };
       case "MESSAGE":
         return {
-          icon: <Send className="size-3.5 text-sky-500 stroke-2" />,
+          icon: <AnimateSend size={14} className="text-sky-500" />,
           badgeBg: "bg-sky-500/15 border-sky-500/30 text-sky-500",
           actionText: "sent you a message",
           href: n.referenceId ? `/app/chat/${n.referenceId}` : "/app/chat",
@@ -168,7 +158,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
         };
       case "NEW_POST":
         return {
-          icon: <Sparkles className="size-3.5 text-violet-500 stroke-2" />,
+          icon: <AnimateSparkles size={14} className="text-violet-500" />,
           badgeBg: "bg-violet-500/15 border-violet-500/30 text-violet-500",
           actionText: "posted something new",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
@@ -260,7 +250,12 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer shadow-2xs active:scale-95"
                 title="Mark all notifications as read"
               >
-                <CheckCheck className="size-3.5 text-primary" />
+                <AnimatedIcon
+                  icon={AnimateCheckCheck}
+                  animation="nudge-right"
+                  size={14}
+                  iconClassName="text-primary"
+                />
                 <span className="hidden sm:inline">Mark all as read</span>
               </button>
             )}

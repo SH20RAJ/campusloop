@@ -1,7 +1,8 @@
 "use client";
 
-import { Bell, BellOff, BellRing, Check, Loader2, Send } from "lucide-react";
+import { BellOff, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { AnimateBellRing, AnimateCheck, AnimatedIcon, AnimateSend } from "@/components/ui/animated-icon";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { cn } from "@/lib/utils";
 
@@ -27,12 +28,12 @@ export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | 
         <div className="mx-4 my-2.5 flex items-center justify-between gap-3 rounded-2xl border border-emerald-500/25 bg-emerald-500/5 px-4 py-2.5">
           <div className="flex min-w-0 items-center gap-2.5">
             <span className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-500">
-              <BellRing className="size-3.5" />
+              <AnimatedIcon icon={AnimateBellRing} animation="bell" size={14} />
             </span>
             <div className="min-w-0">
               <p className="text-xs font-black text-foreground flex items-center gap-1.5">
                 <span>Browser alerts active</span>
-                <Check className="size-3 text-emerald-500" />
+                <AnimateCheck size={14} className="text-emerald-500" />
               </p>
               <p className="text-[10px] text-muted-foreground truncate">
                 Instant pings for campus replies, crushes, and chats
@@ -42,10 +43,10 @@ export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | 
           <button
             type="button"
             onClick={sendTestNotification}
-            className="flex h-7 shrink-0 items-center gap-1 rounded-full border border-emerald-500/30 bg-background px-3 text-[11px] font-bold text-foreground hover:bg-muted transition-all active:scale-95 cursor-pointer shadow-2xs"
+            className="flex h-7 shrink-0 items-center gap-1.5 rounded-full border border-emerald-500/30 bg-background px-3 text-[11px] font-bold text-foreground hover:bg-muted transition-all active:scale-95 cursor-pointer shadow-2xs"
             title="Send test browser notification"
           >
-            <Send className="size-3 text-emerald-500" />
+            <AnimateSend size={12} className="text-emerald-500" />
             <span>Test Ping</span>
           </button>
         </div>
@@ -78,7 +79,7 @@ export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | 
       <div className="mx-4 my-3 flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 shadow-xs">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
-            <BellRing className="size-4.5" />
+            <AnimatedIcon icon={AnimateBellRing} animation="bell" size={18} />
           </div>
           <div className="min-w-0">
             <p className="text-xs font-black text-foreground">Turn on campus alerts</p>
@@ -93,7 +94,11 @@ export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | 
           disabled={isBusy}
           className="flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-black text-primary-foreground shadow-sm transition-all hover:bg-primary/95 active:scale-95 cursor-pointer disabled:opacity-60"
         >
-          {isBusy ? <Loader2 className="size-3.5 animate-spin" /> : <Bell className="size-3.5" />}
+          {isBusy ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <AnimatedIcon icon={AnimateBellRing} animation="bell" size={14} />
+          )}
           <span>Enable</span>
         </button>
       </div>
@@ -109,7 +114,11 @@ export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | 
             isSubscribed ? "bg-emerald-500/15 text-emerald-500" : "bg-muted text-muted-foreground"
           )}
         >
-          {isSubscribed ? <BellRing className="size-4.5" /> : <BellOff className="size-4.5" />}
+          {isSubscribed ? (
+            <AnimatedIcon icon={AnimateBellRing} animation="bell" size={18} />
+          ) : (
+            <BellOff className="size-4.5" />
+          )}
         </div>
         <div className="min-w-0">
           <p className="text-xs font-black text-foreground">Push &amp; Browser Notifications</p>
@@ -128,9 +137,9 @@ export function PushNotificationToggle({ variant = "row" }: { variant?: "row" | 
           <button
             type="button"
             onClick={sendTestNotification}
-            className="flex h-8 shrink-0 items-center gap-1 rounded-full border border-border bg-card px-3 text-xs font-bold text-foreground hover:bg-muted transition-all active:scale-95 cursor-pointer"
+            className="flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold text-foreground hover:bg-muted transition-all active:scale-95 cursor-pointer"
           >
-            <Send className="size-3 text-primary" />
+            <AnimateSend size={12} className="text-primary" />
             <span>Test</span>
           </button>
         )}

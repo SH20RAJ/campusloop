@@ -1,21 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowUp,
-  Heart,
-  Image as ImageIcon,
-  Loader2,
-  MessageCircle,
-  Reply,
-  Shield,
-  User,
-  X,
-} from "lucide-react";
+import { ArrowUp, Loader2, MessageCircle, Reply, Shield, User, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { AnimateHeart, AnimateImage } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   detectMentionTrigger,
@@ -457,10 +448,11 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                         )}
                         aria-label="Like comment"
                       >
-                        <Heart
+                        <AnimateHeart
+                          size={14}
                           className={cn(
-                            "size-3.5 transition-transform active:scale-125",
-                            isLiked && "fill-rose-500 stroke-rose-500"
+                            "transition-transform active:scale-125",
+                            isLiked && "fill-rose-500 text-rose-500"
                           )}
                         />
                       </button>
@@ -567,7 +559,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                     {isUploadingImage ? (
                       <Loader2 className="size-3.5 animate-spin text-primary" />
                     ) : (
-                      <ImageIcon className="size-3.5" />
+                      <AnimateImage size={14} />
                     )}
                   </button>
 

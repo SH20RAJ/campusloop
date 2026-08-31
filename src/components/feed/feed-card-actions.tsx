@@ -1,8 +1,16 @@
 "use client";
 
-import { Bookmark, Heart, MessageCircle, Repeat2, Share } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  AnimateBookmark,
+  AnimatedIcon,
+  AnimateHeart,
+  AnimateMessageCircle,
+  AnimateRepeat2,
+  AnimateShare,
+  useIconHandle,
+} from "@/components/ui/animated-icon";
 import type { FeedPost } from "@/hooks/use-feed";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -34,6 +42,14 @@ export function FeedCardActions({
   const [repostSpin, setRepostSpin] = useState(false);
   const [hasReposted, setHasReposted] = useState(false);
   const [isSaved, setIsSaved] = useState(Boolean(post.isSaved));
+
+  // Hovering the button, not just the glyph, is what feels responsive — the
+  // hit area is the whole pill.
+  const reply = useIconHandle();
+  const repost = useIconHandle();
+  const like = useIconHandle();
+  const save = useIconHandle();
+  const share = useIconHandle();
   const displayCommentsCount = commentsCount ?? post.commentsCount;
 
   function triggerRepostAnimation(e: React.MouseEvent) {
@@ -80,11 +96,18 @@ export function FeedCardActions({
       <button
         type="button"
         onClick={onOpenComments}
+        {...reply.handlers}
         className="flex items-center gap-1.5 text-xs hover:text-[#1d9bf0] transition-colors group cursor-pointer"
         aria-label="Reply"
       >
         <div className="size-8 rounded-full group-hover:bg-[#1d9bf0]/10 flex items-center justify-center transition-colors">
-          <MessageCircle className="size-4.5" />
+          <AnimatedIcon
+            ref={reply.ref}
+            icon={AnimateMessageCircle}
+            animation="pop"
+            size={18}
+            animateOnHover={false}
+          />
         </div>
         {displayCommentsCount > 0 && (
           <span className="tabular-nums text-xs font-medium">{displayCommentsCount}</span>
@@ -95,6 +118,7 @@ export function FeedCardActions({
       <button
         type="button"
         onClick={triggerRepostAnimation}
+        {...repost.handlers}
         aria-pressed={hasReposted}
         className={cn(
           "flex items-center gap-1.5 text-xs transition-colors group cursor-pointer",
@@ -103,12 +127,14 @@ export function FeedCardActions({
         aria-label={hasReposted ? "Reposted" : "Repost"}
       >
         <div className="size-8 rounded-full group-hover:bg-emerald-500/10 flex items-center justify-center transition-colors">
-          <Repeat2
-            className={cn(
-              "size-4.5 transition-transform duration-300 ease-out",
-              repostSpin && "rotate-180 scale-115",
-              hasReposted && "text-emerald-500"
-            )}
+          <AnimatedIcon
+            ref={repost.ref}
+            icon={AnimateRepeat2}
+            animation="nudge-right"
+            size={18}
+            animateOnHover={false}
+            className={cn("transition-transform duration-300 ease-out", repostSpin && "rotate-180 scale-115")}
+            iconClassName={cn(hasReposted && "text-emerald-500")}
           />
         </div>
       </button>
@@ -118,6 +144,7 @@ export function FeedCardActions({
         <button
           type="button"
           onClick={onVote}
+          {...like.handlers}
           className={cn(
             "size-8 rounded-full flex items-center justify-center transition-colors cursor-pointer group",
             userVote === 1
@@ -126,11 +153,15 @@ export function FeedCardActions({
           )}
           aria-label="Like"
         >
-          <Heart
-            className={cn(
-              "size-4.5 transition-transform group-hover:scale-110",
-              userVote === 1 && "fill-rose-500 text-rose-500"
-            )}
+          <AnimatedIcon
+            ref={like.ref}
+            icon={AnimateHeart}
+            animation="beat"
+            size={18}
+            animateOnHover={false}
+            // Beats again the moment it is liked, not only on hover.
+            playKey={userVote === 1}
+            iconClassName={cn(userVote === 1 && "fill-rose-500 text-rose-500")}
           />
         </button>
         {votesCount > 0 && (
@@ -155,6 +186,7 @@ export function FeedCardActions({
       <button
         type="button"
         onClick={handleToggleSave}
+        {...save.handlers}
         className={cn(
           "flex items-center gap-1.5 text-xs transition-colors group cursor-pointer",
           isSaved ? "text-amber-500" : "hover:text-amber-500"
@@ -162,11 +194,14 @@ export function FeedCardActions({
         aria-label={isSaved ? "Saved" : "Save post"}
       >
         <div className="size-8 rounded-full group-hover:bg-amber-500/10 flex items-center justify-center transition-colors">
-          <Bookmark
-            className={cn(
-              "size-4.5 transition-transform group-hover:scale-110",
-              isSaved && "fill-amber-500 text-amber-500"
-            )}
+          <AnimatedIcon
+            ref={save.ref}
+            icon={AnimateBookmark}
+            animation="dip"
+            size={18}
+            animateOnHover={false}
+            playKey={isSaved}
+            iconClassName={cn(isSaved && "fill-amber-500 text-amber-500")}
           />
         </div>
       </button>
@@ -175,11 +210,18 @@ export function FeedCardActions({
       <button
         type="button"
         onClick={onShare}
+        {...share.handlers}
         className="flex items-center gap-1.5 text-xs hover:text-[#1d9bf0] transition-colors group cursor-pointer"
         aria-label="Share"
       >
         <div className="size-8 rounded-full group-hover:bg-[#1d9bf0]/10 flex items-center justify-center transition-colors">
-          <Share className="size-4" />
+          <AnimatedIcon
+            ref={share.ref}
+            icon={AnimateShare}
+            animation="nudge-up"
+            size={16}
+            animateOnHover={false}
+          />
         </div>
       </button>
     </div>

@@ -12,6 +12,7 @@ import {
   QrCode,
   School,
   Share2,
+  Sparkles,
   Trophy,
   Users,
 } from "lucide-react";
@@ -45,11 +46,19 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
   const [showQrModal, setShowQrModal] = useState(false);
   const [regType, setRegType] = useState<"SOLO" | "TEAM">("SOLO");
   const [teamName, setTeamName] = useState("");
-  const [teamMember1, setTeamMember1] = useState("");
-  const [teamMember2, setTeamMember2] = useState("");
+  const [teammates, setTeammates] = useState<Array<{ name: string; emailOrRoll: string; role: string }>>([
+    { name: "", emailOrRoll: "", role: "Developer / Member" },
+  ]);
   const [contactPhone, setContactPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTogglingReminder, setIsTogglingReminder] = useState(false);
+
+  // Fetch related events
+  const { data: relatedData } = useSWR<{ related: any[] }>(
+    event ? `/api/events/${eventId}/related` : null,
+    fetcher
+  );
+  const relatedEvents = relatedData?.related || [];
 
   if (isLoading) {
     return (
@@ -161,19 +170,36 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
     e.preventDefault();
     if (isSubmitting) return;
 
+    if (regType === "TEAM") {
+      if (!teamName.trim()) {
+        toast.error("Please enter your team name");
+        return;
+      }
+      const validTeammates = teammates.filter((t) => t.name.trim());
+      const totalSize = 1 + validTeammates.length; // leader + teammates
+      const min = event.minTeamSize || 1;
+      const max = event.maxTeamSize || 4;
+
+      if (totalSize < min) {
+        toast.error(`Team must have at least ${min} members (including you as leader).`);
+        return;
+      }
+      if (totalSize > max) {
+        toast.error(`Team cannot exceed ${max} members.`);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     try {
-      const members = [];
-      if (teamMember1.trim()) members.push({ name: teamMember1.trim() });
-      if (teamMember2.trim()) members.push({ name: teamMember2.trim() });
-
+      const validTeammates = teammates.filter((t) => t.name.trim());
       const res = await fetch(`/api/events/${event.id}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           registrationType: regType,
-          teamName: regType === "TEAM" ? teamName : null,
-          teamMembers: members,
+          teamName: regType === "TEAM" ? teamName.trim() : null,
+          teamMembers: regType === "TEAM" ? validTeammates : [],
           contactPhone,
         }),
       });
@@ -515,6 +541,54 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
             </div>
           </div>
         )}
+
+        {/* ─── Related Events (Unstop / Devpost Inspired) ─── */}
+        {relatedEvents.length > 0 && (
+          <div className="space-y-3 pt-6 border-t border-border/40">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-black tracking-tight text-foreground flex items-center gap-1.5">
+                <Sparkles className="size-4 text-primary" />
+                <span>Similar Campus Events</span>
+              </h2>
+              <Link
+                href="/app/events"
+                className="text-xs font-bold text-primary hover:underline"
+              >
+                View all
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {relatedEvents.map((rel) => (
+                <Link
+                  key={rel.id}
+                  href={`/app/events/${rel.slug || rel.id}`}
+                  className="group block p-3 rounded-2xl border border-border/40 bg-card/60 hover:bg-muted/30 hover:border-primary/40 transition-all space-y-2"
+                >
+                  <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground font-semibold">
+                    <span className="truncate">{rel.clubName}</span>
+                    <span className="text-primary font-black uppercase">{rel.mode}</span>
+                  </div>
+
+                  <h3 className="text-xs font-black text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                    {rel.title}
+                  </h3>
+
+                  {rel.prizesDescription && (
+                    <p className="text-[11px] font-bold text-amber-500 line-clamp-1">
+                      🏆 {rel.prizesDescription}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between pt-1 border-t border-border/20 text-[11px] text-muted-foreground">
+                    <span>{new Date(rel.startDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}</span>
+                    <span className="font-bold text-foreground">{rel.entryFee || "Free"}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Registration Modal */}
@@ -556,40 +630,93 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
             )}
 
             {regType === "TEAM" && (
-              <div className="space-y-3">
+              <div className="space-y-3 rounded-2xl border border-border/40 bg-muted/20 p-3.5">
                 <div>
-                  <label className="text-xs font-bold text-muted-foreground">Team Name</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-foreground">Team Name *</label>
+                    <span className="text-[10px] text-muted-foreground">
+                      Size: {1 + teammates.filter((t) => t.name.trim()).length} / {event.maxTeamSize || 4} members
+                    </span>
+                  </div>
                   <Input
                     required
-                    placeholder="e.g. ByteForce Mesra"
+                    placeholder="e.g. CodeMonks Mesra"
                     value={teamName}
                     onChange={(e) => setTeamName(e.target.value)}
-                    className="mt-1 rounded-xl text-xs"
+                    className="mt-1 rounded-xl text-xs bg-background"
                   />
                 </div>
 
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground">
-                    Teammate 1 Name / Email (Optional)
-                  </label>
-                  <Input
-                    placeholder="e.g. Aryan Kumar"
-                    value={teamMember1}
-                    onChange={(e) => setTeamMember1(e.target.value)}
-                    className="mt-1 rounded-xl text-xs"
-                  />
-                </div>
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-foreground flex items-center gap-1">
+                      <Users className="size-3.5 text-primary" />
+                      Teammates ({teammates.length})
+                    </span>
+                    {teammates.length + 1 < (event.maxTeamSize || 4) && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setTeammates((prev) => [
+                            ...prev,
+                            { name: "", emailOrRoll: "", role: "Member" },
+                          ])
+                        }
+                        className="text-[11px] font-black text-primary hover:underline cursor-pointer"
+                      >
+                        + Add Member
+                      </button>
+                    )}
+                  </div>
 
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground">
-                    Teammate 2 Name / Email (Optional)
-                  </label>
-                  <Input
-                    placeholder="e.g. Priya Sharma"
-                    value={teamMember2}
-                    onChange={(e) => setTeamMember2(e.target.value)}
-                    className="mt-1 rounded-xl text-xs"
-                  />
+                  {teammates.map((tm, idx) => (
+                    <div
+                      key={idx}
+                      className="p-2.5 rounded-xl border border-border/30 bg-background/80 space-y-2 relative"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Member #{idx + 2}
+                        </span>
+                        {teammates.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setTeammates((prev) => prev.filter((_, i) => i !== idx))
+                            }
+                            className="text-red-500 hover:text-red-600 text-[10px] font-bold cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <Input
+                          placeholder="Full Name *"
+                          value={tm.name}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setTeammates((prev) =>
+                              prev.map((m, i) => (i === idx ? { ...m, name: val } : m))
+                            );
+                          }}
+                          className="h-8 rounded-lg text-xs"
+                        />
+                        <Input
+                          placeholder="College Email or Roll No"
+                          value={tm.emailOrRoll}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setTeammates((prev) =>
+                              prev.map((m, i) => (i === idx ? { ...m, emailOrRoll: val } : m))
+                            );
+                          }}
+                          className="h-8 rounded-lg text-xs"
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -613,7 +740,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                 disabled={isSubmitting}
                 className="w-full h-10 rounded-full font-black text-xs bg-primary text-primary-foreground hover:opacity-90 shadow-md cursor-pointer"
               >
-                {isSubmitting ? "Confirming..." : "Confirm Free Registration"}
+                {isSubmitting ? "Confirming..." : "Confirm Registration (+25 LP)"}
               </Button>
             </div>
           </form>

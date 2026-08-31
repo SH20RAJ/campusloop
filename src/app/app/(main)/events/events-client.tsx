@@ -185,6 +185,50 @@ export function EventsClient() {
           </div>
         </div>
 
+        {/* ─── Featured Spotlight Banner (Unstop / Devpost Style) ─── */}
+        {!isLoading && events.length > 0 && !searchQuery && activeCategory === "ALL" && (
+          <div className="p-4 pb-0">
+            {(() => {
+              const featured = events.find((e) => e.prizesDescription) || events[0];
+              return (
+                <Link
+                  href={`/app/events/${featured.slug || featured.id}`}
+                  className="group relative block overflow-hidden rounded-3xl border border-primary/30 bg-linear-to-br from-primary/15 via-background to-card p-5 shadow-sm transition-all hover:border-primary/60 hover:shadow-md"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-primary-foreground shadow-xs">
+                      🔥 Spotlight Event
+                    </span>
+                    {featured.prizesDescription && (
+                      <span className="text-xs font-black text-amber-500">
+                        🏆 {featured.prizesDescription}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-3 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                    <div className="space-y-1 min-w-0">
+                      <p className="text-xs font-bold text-muted-foreground">{featured.clubName}</p>
+                      <h2 className="text-lg font-black text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                        {featured.title}
+                      </h2>
+                      {featured.tagline && (
+                        <p className="text-xs text-muted-foreground line-clamp-1">{featured.tagline}</p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black group-hover:opacity-90 transition-opacity">
+                        View & Register →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })()}
+          </div>
+        )}
+
         {/* ─── Stream of Event Cards (Immediate, Content-First) ─── */}
         <div className="flex flex-col p-4 gap-4">
           {isLoading ? (

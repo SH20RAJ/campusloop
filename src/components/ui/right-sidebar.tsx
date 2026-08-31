@@ -1,8 +1,8 @@
 "use client";
 
-import { MoreHorizontal, RotateCw, Search, ShieldCheck } from "lucide-react";
+import { Calendar, Clock, MoreHorizontal, Plus, RotateCw, Search, ShieldCheck, Sparkles, Trophy, Users } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -28,6 +28,9 @@ interface TrendsResponse {
 
 export function RightSidebar() {
   const router = useRouter();
+  const pathname = usePathname() || "";
+  const isEventsPage = pathname.startsWith("/app/events");
+  const isCommunitiesPage = pathname.startsWith("/app/communities");
   const [searchQuery, setSearchQuery] = useState("");
   const [followedIds, setFollowedIds] = useState<Record<string, boolean>>({});
 
@@ -87,6 +90,16 @@ export function RightSidebar() {
   const trends = (trendsData?.trends || []).slice(0, 4);
   const peers = (suggestedPeers || []).slice(0, 4);
 
+  // Dynamic Events data for Events page right sidebar
+  const { data: eventsData } = useSWR<{ events: any[] }>(
+    isEventsPage ? "/api/events?sort=trending" : null,
+    fetcher
+  );
+  const topEvents = (eventsData?.events || []).slice(0, 3);
+  const urgentDeadlines = (eventsData?.events || [])
+    .filter((e) => e.registrationDeadline && new Date(e.registrationDeadline) > new Date())
+    .slice(0, 2);
+
   return (
     <aside className="sticky top-3 space-y-4 text-foreground w-full select-none">
       {/* ─── Search Bar ─── */}
@@ -94,19 +107,103 @@ export function RightSidebar() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <input
           type="text"
-          placeholder="Search"
+          placeholder={isEventsPage ? "Search hackathons & fests..." : "Search"}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full h-11 pl-11 pr-4 rounded-full bg-muted/60 border border-transparent focus:border-border/80 focus:bg-background text-[13px] font-normal placeholder:text-muted-foreground/70 outline-none transition-all"
         />
       </form>
 
-      {/* ─── COMPONENT 1: What's happening (Trending on Campus) ─── */}
-      {trends.length > 0 && (
-        <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-1">
-          <div className="px-1 pb-1">
-            <h3 className="text-[17px] font-black tracking-tight text-foreground">What&apos;s happening</h3>
+      {/* ─── CONTEXT 1: EVENTS RIGHTBAR (When user is on /app/events) ─── */}
+      {isEventsPage ? (
+        <>
+          {/* Host Event Action Card */}
+          <div className="rounded-2xl border border-primary/30 bg-linear-to-br from-primary/15 via-background to-card p-4 space-y-2.5">
+            <div className="flex items-center gap-2 text-primary font-black text-xs">
+              <Sparkles className="size-4" />
+              <span>Organising on Campus?</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              List your college fest, hackathon, workshop or club recruitment to students across India.
+            </p>
+            <Link
+              href="/app/events/new"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-black shadow-xs hover:opacity-90 active:scale-95 transition-all w-full justify-center"
+            >
+              <Plus className="size-3.5" />
+              <span>Host Event (+25 LP)</span>
+            </Link>
           </div>
+
+          {/* Urgent Registration Deadlines */}
+          {urgentDeadlines.length > 0 && (
+            <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-2">
+              <div className="px-1 flex items-center gap-1.5">
+                <Clock className="size-4 text-red-500" />
+                <h3 className="text-sm font-black tracking-tight text-foreground">Closing Soon</h3>
+              </div>
+              <div className="divide-y divide-border/20">
+                {urgentDeadlines.map((ev) => (
+                  <Link
+                    key={ev.id}
+                    href={`/app/events/${ev.slug || ev.id}`}
+                    className="block px-2 py-2 hover:bg-muted/30 rounded-xl transition-colors group"
+                  >
+                    <p className="text-[11px] text-muted-foreground truncate">{ev.clubName}</p>
+                    <p className="text-xs font-black text-foreground group-hover:underline truncate">
+                      {ev.title}
+                    </p>
+                    <p className="text-[10px] font-bold text-red-500 pt-0.5">
+                      Deadline: {new Date(ev.registrationDeadline).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Top Prize Hackathons & Competitions */}
+          {topEvents.length > 0 && (
+            <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-2">
+              <div className="px-1 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Trophy className="size-4 text-amber-500" />
+                  <h3 className="text-sm font-black tracking-tight text-foreground">Top Campus Events</h3>
+                </div>
+              </div>
+              <div className="divide-y divide-border/20">
+                {topEvents.map((ev) => (
+                  <Link
+                    key={ev.id}
+                    href={`/app/events/${ev.slug || ev.id}`}
+                    className="block px-2 py-2 hover:bg-muted/30 rounded-xl transition-colors group"
+                  >
+                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                      <span className="truncate">{ev.clubName}</span>
+                      <span className="font-bold text-primary">{ev.mode}</span>
+                    </div>
+                    <p className="text-xs font-black text-foreground group-hover:underline truncate">
+                      {ev.title}
+                    </p>
+                    {ev.prizesDescription && (
+                      <p className="text-[10px] font-black text-amber-500 truncate">
+                        🏆 {ev.prizesDescription}
+                      </p>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      ) : (
+        <>
+          {/* ─── COMPONENT 1: What's happening (Trending on Campus) ─── */}
+          {trends.length > 0 && (
+            <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-1">
+              <div className="px-1 pb-1">
+                <h3 className="text-[17px] font-black tracking-tight text-foreground">What&apos;s happening</h3>
+              </div>
 
           <div className="divide-y divide-border/20">
             {trends.map((trend) => (
@@ -210,6 +307,8 @@ export function RightSidebar() {
           </Link>
         </section>
       )}
+      </>
+    )}
 
       <hr className="border-border/30 my-3" />
 

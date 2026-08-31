@@ -117,6 +117,7 @@ export function NewEventClient() {
   const [perkInput, setPerkInput] = useState("");
   const [loopPointsReward, setLoopPointsReward] = useState("30");
   const [isAllColleges, setIsAllColleges] = useState(true);
+  const [visibility, setVisibility] = useState<"PUBLIC" | "UNLISTED" | "PRIVATE">("PUBLIC");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
@@ -307,6 +308,7 @@ export function NewEventClient() {
           perks,
           loopPointsReward: Number(loopPointsReward) || 30,
           status,
+          visibility,
         }),
       });
 
@@ -755,6 +757,45 @@ export function NewEventClient() {
                 {opt.label}
               </button>
             ))}
+          </div>
+
+          {/* Visibility Mode (Public / Unlisted / Private) */}
+          <div className="space-y-2 pt-2 border-t border-border/20">
+            <label className="text-xs font-bold text-foreground">Event Visibility</label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {[
+                {
+                  id: "PUBLIC" as const,
+                  title: "Public 🌐",
+                  desc: "Visible in feeds, search & campus directory",
+                },
+                {
+                  id: "UNLISTED" as const,
+                  title: "Unlisted 🔗",
+                  desc: "Hidden from feeds; joinable only via link/QR",
+                },
+                {
+                  id: "PRIVATE" as const,
+                  title: "Campus Only 🔒",
+                  desc: "Only students of your college can view/join",
+                },
+              ].map((item) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  onClick={() => setVisibility(item.id)}
+                  className={cn(
+                    "p-3 rounded-2xl border text-left cursor-pointer transition-all active:scale-98 flex flex-col gap-1",
+                    visibility === item.id
+                      ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
+                      : "border-border/40 bg-muted/20 text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <span className="text-xs font-black text-foreground">{item.title}</span>
+                  <span className="text-[10px] leading-tight opacity-80">{item.desc}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 

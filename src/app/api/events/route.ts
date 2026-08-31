@@ -60,6 +60,22 @@ export async function GET(req: Request) {
       );
     }
 
+    // Visibility filter:
+    // 1. Never show UNLISTED events in the general listing/search unless specifically invited
+    // 2. PRIVATE events only shown if user is from the same institution or is organizer
+    if (currentProfile?.institutionId) {
+      conditions.push(
+        or(
+          eq(events.visibility, "PUBLIC"),
+          and(eq(events.visibility, "PRIVATE"), eq(events.institutionId, currentProfile.institutionId)),
+          eq(events.organizerProfileId, currentProfile.id)
+        )
+      );
+    } else {
+      // Unauthenticated / guest only sees PUBLIC
+      conditions.push(eq(events.visibility, "PUBLIC"));
+    }
+
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
     const list = await db.query.events.findMany({
@@ -222,6 +238,7 @@ export async function POST(req: Request) {
       perks = ["Certificates", "Prizes", "Loop Points"],
       loopPointsReward = 30,
       status = "PUBLISHED",
+      visibility = "PUBLIC",
     } = body;
 
     if (!title || !description || !clubName || !startDate || !endDate) {
@@ -288,6 +305,7 @@ export async function POST(req: Request) {
       perks: Array.isArray(perks) ? perks : ["Certificates", "Prizes", "Loop Points"],
       loopPointsReward: Number(loopPointsReward) || 30,
       status: safeStatus,
+      visibility: ["PUBLIC", "UNLISTED", "PRIVATE"].includes(visibility) ? visibility : "PUBLIC",
     };
 
     await db.insert(events).values(newEvent);

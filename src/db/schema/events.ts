@@ -16,6 +16,7 @@ export const eventTypeEnum = [
 export const eventModeEnum = ["OFFLINE", "ONLINE", "HYBRID"] as const;
 export const participationTypeEnum = ["SOLO", "TEAM", "BOTH"] as const;
 export const eventStatusEnum = ["PUBLISHED", "DRAFT", "COMPLETED", "CANCELLED"] as const;
+export const eventVisibilityEnum = ["PUBLIC", "UNLISTED", "PRIVATE"] as const;
 export const registrationStatusEnum = ["CONFIRMED", "WAITLISTED", "ATTENDED", "CANCELLED"] as const;
 
 export const events = pgTable("events", {
@@ -50,6 +51,7 @@ export const events = pgTable("events", {
   perks: jsonb("perks").default(["Certificates", "Prizes", "Loop Points"]).notNull(),
   loopPointsReward: integer("loop_points_reward").default(25).notNull(),
   status: varchar("status", { length: 16 }).default("PUBLISHED").notNull(),
+  visibility: varchar("visibility", { length: 16 }).default("PUBLIC").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

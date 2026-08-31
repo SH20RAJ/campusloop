@@ -59,6 +59,19 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
+    // Check visibility authorization
+    if (event.visibility === "PRIVATE") {
+      const isOrganizer = currentProfile && event.organizerProfileId === currentProfile.id;
+      const isSameCampus = currentProfile && event.institutionId === currentProfile.institutionId;
+      const isAdmin = currentProfile?.role === "ADMIN";
+      if (!isOrganizer && !isSameCampus && !isAdmin) {
+        return NextResponse.json(
+          { error: "This event is private to the host campus community." },
+          { status: 403 }
+        );
+      }
+    }
+
     const isRegistered = currentProfile
       ? event.registrations.some((r) => r.profileId === currentProfile.id)
       : false;

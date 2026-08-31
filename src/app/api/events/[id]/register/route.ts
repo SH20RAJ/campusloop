@@ -71,7 +71,39 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     const body = ((await req.json().catch(() => ({}))) || {}) as Record<string, any>;
-    const { registrationType = "SOLO", teamName, teamMembers = [], contactPhone, notes } = body;
+    const { registrationType = "SOLO", teamName, teamMembers, contactPhone, notes } = body;
+
+    // Validate participation type
+    if (event.participationType === "SOLO" && registrationType === "TEAM") {
+      return NextResponse.json({ error: "This event only permits Solo registrations." }, { status: 400 });
+    }
+    if (event.participationType === "TEAM" && registrationType === "SOLO") {
+      return NextResponse.json(
+        { error: `This event requires a team registration (${event.minTeamSize || 2} to ${event.maxTeamSize || 4} members).` },
+        { status: 400 }
+      );
+    }
+
+    if (registrationType === "TEAM") {
+      if (!teamName || !teamName.trim()) {
+        return NextResponse.json({ error: "Please provide a team name." }, { status: 400 });
+      }
+      const totalMembers = 1 + (Array.isArray(teamMembers) ? teamMembers.length : 0);
+      const min = event.minTeamSize || 1;
+      const max = event.maxTeamSize || 4;
+      if (totalMembers < min) {
+        return NextResponse.json(
+          { error: `Team must have at least ${min} members (including leader). Current: ${totalMembers}` },
+          { status: 400 }
+        );
+      }
+      if (totalMembers > max) {
+        return NextResponse.json(
+          { error: `Team cannot exceed ${max} members. Current: ${totalMembers}` },
+          { status: 400 }
+        );
+      }
+    }
 
     const regId = `ereg_${nanoid(12)}`;
 

@@ -35,7 +35,7 @@ export default async function RandomLoopPage() {
         username: profile.username,
         avatarUrl: profile.avatarUrl,
         institutionId: profile.institutionId,
-        yearOfStudy: profile.yearOfStudy,
+        year: profile.year ? `${profile.year}` : null,
         branch: profile.branch,
       }}
     />

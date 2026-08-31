@@ -33,7 +33,7 @@ interface RandomLoopClientProps {
     username: string;
     avatarUrl: string | null;
     institutionId: string;
-    yearOfStudy: string | null;
+    year: string | null;
     branch: string | null;
   };
 }
@@ -126,7 +126,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
         body: JSON.stringify({
           mode: selectedMode,
           interests: selectedInterests,
-          year: currentProfile.yearOfStudy,
+          year: currentProfile.year,
           department: currentProfile.branch,
         }),
       });

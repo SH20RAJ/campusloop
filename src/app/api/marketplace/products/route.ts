@@ -54,7 +54,7 @@ export async function GET(req: Request) {
     // Query products with merchant info
     const rawProducts = await db.query.products.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
-      orderBy: [desc(products.isPopular), desc(products.createdAt)],
+      orderBy: [desc(products.displayOrder), desc(products.createdAt)],
       limit: limit + 1,
       offset,
       with: {
@@ -105,8 +105,8 @@ export async function GET(req: Request) {
       imageUrl: p.imageUrl,
       categoryName: p.categoryName,
       isVeg: p.isVeg,
-      isPopular: p.isPopular,
-      customizationOptions: p.customizationOptions,
+      isPopular: p.displayOrder > 0,
+      customizationOptions: p.options,
     }));
 
     return NextResponse.json({

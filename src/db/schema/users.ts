@@ -45,6 +45,7 @@ export const userProfiles = pgTable(
       gender?: "DEFAULT" | "MALE" | "FEMALE" | "ALL";
       scope?: "GLOBAL" | "CAMPUS";
       sort?: "COMPATIBILITY" | "RECENT" | "POPULAR";
+      isEnabled?: boolean;
     }>(),
     onboardingCompleted: boolean("onboarding_completed").default(false).notNull(),
     role: userRoleEnum("role").default("STUDENT").notNull(),

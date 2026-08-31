@@ -569,7 +569,6 @@ async function main() {
           categoryName: p.categoryName,
           imageUrl: p.imageUrl,
           isVeg: p.isVeg,
-          isPopular: p.isPopular,
           status: "ACTIVE",
           isAvailable: true,
         });

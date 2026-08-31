@@ -28,6 +28,7 @@ import {
   SearchField,
 } from "@/components/ui/app-shell";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
+import { InstagramIcon } from "@/components/ui/social-icons";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";

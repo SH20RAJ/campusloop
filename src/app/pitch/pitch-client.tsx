@@ -14,6 +14,7 @@ import {
   MessagesSquare,
   ShieldCheck,
   ShoppingBag,
+  Sparkles,
   Split,
   Store,
   Ticket,

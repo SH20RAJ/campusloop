@@ -249,6 +249,35 @@ class SoundEngine {
       osc.stop(noteTime + 0.4);
     });
   }
+
+  /**
+   * Ascending Success Chime (For Order Placed, Bookings, Completed Actions)
+   */
+  public success() {
+    if (!this.enabled) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const notes = [587.33, 880, 1174.66]; // D5, A5, D6
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const noteTime = now + idx * 0.08;
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      gain.gain.setValueAtTime(0.22, noteTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.3);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(noteTime);
+      osc.stop(noteTime + 0.3);
+    });
+  }
 }
 
 export const sounds = new SoundEngine();

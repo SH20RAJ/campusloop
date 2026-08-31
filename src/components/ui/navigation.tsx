@@ -162,24 +162,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
     }
   }, [pathname]);
 
-  const isBitMesra = Boolean(
-    profile?.institutionId === "bitmesra" ||
-      profile?.institutionId?.toLowerCase().includes("bitmesra") ||
-      (collegeName && collegeName.toLowerCase().includes("bit mesra"))
-  );
-
-  const mobileBottomItems: NavItem[] = useMemo(() => {
-    return MOBILE_BOTTOM_ITEMS.map((item) => {
-      if (item.href === "/app/marketplace" && !isBitMesra) {
-        return {
-          icon: MoreHorizontal,
-          href: "/app/more",
-          label: "More",
-        };
-      }
-      return item;
-    });
-  }, [isBitMesra]);
+  const mobileBottomItems: NavItem[] = MOBILE_BOTTOM_ITEMS;
 
   const desktopNavItems = [
     ...DESKTOP_NAV_ITEMS.filter((item) => {
@@ -273,12 +256,18 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
           <div className="px-3 py-1 flex items-center justify-between">
             <BrandLogo href="/app" size="md" />
             {collegeName && (
-              <span
-                className="text-[10px] font-bold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full truncate max-w-[95px]"
-                title={collegeName}
+              <Link
+                href="/app/colleges"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  sounds.tap();
+                  haptics.light();
+                }}
+                className="text-[10px] font-bold text-muted-foreground bg-muted/60 hover:bg-muted hover:text-foreground px-2 py-0.5 rounded-full truncate max-w-[95px] transition-colors cursor-pointer"
+                title={`College: ${collegeName} — Click to view College Hubs`}
               >
                 {collegeName.split(" ")[0]}
-              </span>
+              </Link>
             )}
           </div>
 

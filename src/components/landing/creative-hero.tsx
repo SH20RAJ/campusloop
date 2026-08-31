@@ -233,7 +233,7 @@ interface PollOption {
 const FEATURE_TABS: { id: FeatureTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "confession", label: "Confessions", icon: Lock },
   { id: "poll", label: "Canteen Polls", icon: Vote },
-  { id: "match", label: "Peer Match", icon: Sparkles },
+  { id: "match", label: "Peer Match", icon: Heart },
   { id: "market", label: "Dorm Market", icon: Bike },
 ];
 

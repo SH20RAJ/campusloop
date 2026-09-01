@@ -1,3 +1,5 @@
+"use client";
+
 import { Bell, Check, Copy, ExternalLink, Loader2, Power, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";

@@ -1,10 +1,16 @@
-"use client";
-
 export default function Loading() {
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
-      <div className="h-0.5 w-full bg-primary/20 overflow-hidden">
-        <div className="h-full bg-primary w-1/2 animate-pulse" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background select-none">
+      <div className="relative flex items-center justify-center">
+        {/* Subtle glowing ambient halo */}
+        <div className="absolute size-24 rounded-full bg-primary/20 blur-xl animate-pulse" />
+        
+        {/* Centered CampusLoop Logo with smooth breathing effect */}
+        <img
+          src="/logo.png"
+          alt="CampusLoop"
+          className="relative size-14 sm:size-16 object-contain animate-pulse duration-1000 drop-shadow-md"
+        />
       </div>
     </div>
   );

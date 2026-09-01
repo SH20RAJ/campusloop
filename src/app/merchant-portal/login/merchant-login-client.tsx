@@ -193,9 +193,14 @@ export function MerchantLoginClient() {
           </p>
           <p className="text-[10px] text-muted-foreground/80">
             Need credentials for your campus stall? Request access from the{" "}
-            <Link href="/contact" className="underline hover:text-foreground">
+            <a
+              href="https://www.instagram.com/campusloop.space/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground"
+            >
               CampusLoop Admin
-            </Link>
+            </a>
             .
           </p>
         </div>

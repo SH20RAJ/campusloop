@@ -255,6 +255,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
             <div className="flex items-center gap-1">
               <Link
                 href="/app/chat"
+                prefetch={true}
                 className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Direct messages"
               >
@@ -263,6 +264,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
 
               <Link
                 href="/app/notifications"
+                prefetch={true}
                 className="relative flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Notifications"
               >
@@ -316,6 +318,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={true}
                   className={cn(
                     "group relative flex items-center gap-4 rounded-full px-4 py-3 text-sm font-semibold transition-colors cursor-pointer",
                     isActive
@@ -496,6 +499,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   <Link
                     key="create"
                     href="/app/post/new"
+                    prefetch={true}
                     className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/25 active:scale-90 transition-transform cursor-pointer shrink-0 mx-1"
                     aria-label="Create post or confession"
                   >
@@ -508,6 +512,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={true}
                   onClick={() => {
                     sounds.tap();
                     haptics.light();
@@ -619,6 +624,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                       <Link
                         key={item.href}
                         href={item.href}
+                        prefetch={true}
                         onClick={() => setShowMobileMenu(false)}
                         className={cn(
                           "flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer",

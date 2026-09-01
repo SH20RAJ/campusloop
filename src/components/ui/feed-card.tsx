@@ -13,6 +13,7 @@ import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
 import { PostLikesModal } from "@/components/post/post-likes-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RichText } from "@/components/ui/rich-text";
+import { startRouteProgress } from "@/components/ui/route-progress";
 import type { FeedPost } from "@/hooks/use-feed";
 import { repostPost, voteOnPost } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
@@ -108,10 +109,12 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
       clickTimeoutRef.current = null;
       return;
     }
+    sounds.tap();
+    startRouteProgress();
     clickTimeoutRef.current = setTimeout(() => {
       clickTimeoutRef.current = null;
       router.push(`/app/post/${post.id}`);
-    }, 220);
+    }, 120);
   }
 
   function handleDoubleTap(e: React.MouseEvent) {
@@ -138,14 +141,10 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
       try {
         await navigator.share({
           title: `Post by ${authorName} on CampusLoop`,
-          text: post.body.slice(0, 100),
+          text: post.body?.slice(0, 100),
           url: postUrl,
         });
-      } catch {
-        // Fallback to copy
-        await navigator.clipboard.writeText(postUrl);
-        toast.success("Link copied to clipboard! 📋");
-      }
+      } catch {}
     } else {
       await navigator.clipboard.writeText(postUrl);
       toast.success("Link copied to clipboard! 📋");
@@ -175,7 +174,11 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   }
 
   return (
-    <article className="border-b border-border/30 hover:bg-muted/[0.12] transition-colors relative cursor-pointer select-none px-4 py-3.5">
+    <article
+      onMouseEnter={() => router.prefetch(`/app/post/${post.id}`)}
+      onTouchStart={() => router.prefetch(`/app/post/${post.id}`)}
+      className="border-b border-border/30 hover:bg-muted/[0.12] transition-colors relative cursor-pointer select-none px-4 py-3.5"
+    >
       {/* Double Tap Heart Pop Overlay */}
       <AnimatePresence>
         {showDoubleTapHeart && (

@@ -53,7 +53,62 @@ export async function POST(req: Request, { params }: RouteParams) {
         .where(eq(academicResources.id, id))
         .returning();
 
-      return NextResponse.json({ success: true, upvotesCount: updated?.upvotesCount || 0 });
+      return NextResponse.json({
+        success: true,
+        upvotesCount: updated?.upvotesCount || 0,
+        downvotesCount: updated?.downvotesCount || 0,
+      });
+    }
+
+    if (action === "DOWNVOTE") {
+      const [updated] = await db
+        .update(academicResources)
+        .set({
+          downvotesCount: sql`${academicResources.downvotesCount} + 1`,
+          updatedAt: new Date(),
+        })
+        .where(eq(academicResources.id, id))
+        .returning();
+
+      return NextResponse.json({
+        success: true,
+        upvotesCount: updated?.upvotesCount || 0,
+        downvotesCount: updated?.downvotesCount || 0,
+      });
+    }
+
+    if (action === "UNDO_UPVOTE") {
+      const [updated] = await db
+        .update(academicResources)
+        .set({
+          upvotesCount: sql`GREATEST(0, ${academicResources.upvotesCount} - 1)`,
+          updatedAt: new Date(),
+        })
+        .where(eq(academicResources.id, id))
+        .returning();
+
+      return NextResponse.json({
+        success: true,
+        upvotesCount: updated?.upvotesCount || 0,
+        downvotesCount: updated?.downvotesCount || 0,
+      });
+    }
+
+    if (action === "UNDO_DOWNVOTE") {
+      const [updated] = await db
+        .update(academicResources)
+        .set({
+          downvotesCount: sql`GREATEST(0, ${academicResources.downvotesCount} - 1)`,
+          updatedAt: new Date(),
+        })
+        .where(eq(academicResources.id, id))
+        .returning();
+
+      return NextResponse.json({
+        success: true,
+        upvotesCount: updated?.upvotesCount || 0,
+        downvotesCount: updated?.downvotesCount || 0,
+      });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });

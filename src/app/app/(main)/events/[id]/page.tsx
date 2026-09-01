@@ -9,53 +9,57 @@ interface EventPageProps {
 }
 
 export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
-  const { id } = await params;
-  const db = getDb();
+  try {
+    const { id } = await params;
+    const db = getDb();
 
-  const event = await db.query.events.findFirst({
-    where: or(eq(events.id, id), eq(events.slug, id)),
-    with: { institution: true },
-  });
+    const event = await db.query.events.findFirst({
+      where: or(eq(events.id, id), eq(events.slug, id)),
+      with: { institution: true },
+    });
 
-  if (!event) {
-    return { title: "Event Not Found" };
+    if (!event) {
+      return { title: "Event | CampusLoop" };
+    }
+
+    const key = event.slug || event.id;
+    const canonical = `https://campusloop.space/app/events/${key}`;
+    const title = `${event.title} | ${event.clubName} — CampusLoop Events`;
+    const description =
+      event.tagline || `${event.title} hosted by ${event.clubName}. Register solo or in teams on CampusLoop.`;
+    const images = event.bannerUrl
+      ? [{ url: event.bannerUrl }]
+      : [{ url: "https://campusloop.space/og-image.png" }];
+
+    return {
+      title,
+      description,
+      alternates: { canonical },
+      keywords: [
+        event.title,
+        event.clubName,
+        (event.eventType || "event").toLowerCase(),
+        "college event",
+        "campus hackathon",
+        event.institution?.name || "India",
+      ],
+      openGraph: {
+        type: "website",
+        title: event.title,
+        description: (event.description || description).slice(0, 160),
+        url: canonical,
+        images,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: event.title,
+        description: (event.description || description).slice(0, 160),
+        images: images.map((i) => i.url),
+      },
+    };
+  } catch {
+    return { title: "CampusLoop Events" };
   }
-
-  const key = event.slug || event.id;
-  const canonical = `https://campusloop.space/app/events/${key}`;
-  const title = `${event.title} | ${event.clubName} — CampusLoop Events`;
-  const description =
-    event.tagline || `${event.title} hosted by ${event.clubName}. Register solo or in teams on CampusLoop.`;
-  const images = event.bannerUrl
-    ? [{ url: event.bannerUrl }]
-    : [{ url: "https://campusloop.space/og-image.png" }];
-
-  return {
-    title,
-    description,
-    alternates: { canonical },
-    keywords: [
-      event.title,
-      event.clubName,
-      event.eventType.toLowerCase(),
-      "college event",
-      "campus hackathon",
-      event.institution?.name || "India",
-    ],
-    openGraph: {
-      type: "website",
-      title: event.title,
-      description: event.description.slice(0, 160),
-      url: canonical,
-      images,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: event.title,
-      description: event.description.slice(0, 160),
-      images: images.map((i) => i.url),
-    },
-  };
 }
 
 /** Maps our event mode onto the schema.org attendance vocabulary. */
@@ -67,25 +71,30 @@ function attendanceMode(mode: string) {
 
 export default async function EventPage({ params }: EventPageProps) {
   const { id } = await params;
-  const db = getDb();
+  let jsonLd = null;
 
-  const event = await db.query.events.findFirst({
-    where: or(eq(events.id, id), eq(events.slug, id)),
-    with: { institution: true },
-  });
+  try {
+    const db = getDb();
+    const event = await db.query.events.findFirst({
+      where: or(eq(events.id, id), eq(events.slug, id)),
+      with: { institution: true },
+    });
 
-  // The client component renders its own not-found state, so a missing event
-  // here only means we skip the structured data.
-  const jsonLd = event
-    ? {
+    if (event) {
+      const startDateIso = event.startDate
+        ? new Date(event.startDate).toISOString()
+        : new Date().toISOString();
+      const endDateIso = event.endDate ? new Date(event.endDate).toISOString() : startDateIso;
+
+      jsonLd = {
         "@context": "https://schema.org",
         "@type": "Event",
         name: event.title,
-        description: event.description.slice(0, 500),
+        description: (event.description || "").slice(0, 500),
         image: event.bannerUrl || "https://campusloop.space/og-image.png",
-        startDate: event.startDate.toISOString(),
-        endDate: event.endDate.toISOString(),
-        eventAttendanceMode: attendanceMode(event.mode),
+        startDate: startDateIso,
+        endDate: endDateIso,
+        eventAttendanceMode: attendanceMode(event.mode || "OFFLINE"),
         eventStatus:
           event.status === "CANCELLED"
             ? "https://schema.org/EventCancelled"
@@ -114,8 +123,9 @@ export default async function EventPage({ params }: EventPageProps) {
           availability: "https://schema.org/InStock",
           url: `https://campusloop.space/app/events/${event.slug || event.id}`,
         },
-      }
-    : null;
+      };
+    }
+  } catch {}
 
   return (
     <>

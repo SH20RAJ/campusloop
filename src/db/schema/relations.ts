@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { academicResources } from "./academic-resources";
+import { academicResourceComments, academicResources, academicResourceVotes } from "./academic-resources";
 import { aiConversations, aiFeedback, aiMessages, aiUsageEvents } from "./ai";
 import { articleComments, articleCommentVotes, articles, articleVotes } from "./articles";
 import { callSessions, userBehaviorEvents } from "./calls-and-analytics";
@@ -367,7 +367,7 @@ export const housingListingsRelations = relations(housingListings, ({ one }) => 
   }),
 }));
 
-export const academicResourcesRelations = relations(academicResources, ({ one }) => ({
+export const academicResourcesRelations = relations(academicResources, ({ one, many }) => ({
   uploader: one(userProfiles, {
     fields: [academicResources.uploaderId],
     references: [userProfiles.id],
@@ -375,6 +375,30 @@ export const academicResourcesRelations = relations(academicResources, ({ one })
   institution: one(institutions, {
     fields: [academicResources.institutionId],
     references: [institutions.id],
+  }),
+  comments: many(academicResourceComments),
+  votes: many(academicResourceVotes),
+}));
+
+export const academicResourceCommentsRelations = relations(academicResourceComments, ({ one }) => ({
+  resource: one(academicResources, {
+    fields: [academicResourceComments.resourceId],
+    references: [academicResources.id],
+  }),
+  author: one(userProfiles, {
+    fields: [academicResourceComments.authorId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const academicResourceVotesRelations = relations(academicResourceVotes, ({ one }) => ({
+  resource: one(academicResources, {
+    fields: [academicResourceVotes.resourceId],
+    references: [academicResources.id],
+  }),
+  profile: one(userProfiles, {
+    fields: [academicResourceVotes.profileId],
+    references: [userProfiles.id],
   }),
 }));
 

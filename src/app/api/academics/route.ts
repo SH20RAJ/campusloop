@@ -12,28 +12,36 @@ export async function GET(req: Request) {
   try {
     const user = await getCachedAuthUser();
     const profile = user ? await getCachedUserProfile(user.id) : null;
-    const institutionId = profile?.institutionId || "inst_35df75700bb23dd30311ef5f";
+    const userInstitutionId = profile?.institutionId || "inst_35df75700bb23dd30311ef5f";
 
     const { searchParams } = new URL(req.url);
     const branch = searchParams.get("branch");
     const resourceType = searchParams.get("resourceType");
     const semesterStr = searchParams.get("semester");
     const searchQuery = searchParams.get("q");
+    const scope = searchParams.get("scope") || "campus"; // 'campus' or 'global'
     const sort = searchParams.get("sort") || "latest";
-    const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 50);
+    const limit = Math.min(parseInt(searchParams.get("limit") || "30", 10), 60);
 
     const db = getDb();
-
     const conditions = [];
 
+    // Scope filter (Campus vs Global)
+    if (scope === "campus" && userInstitutionId) {
+      conditions.push(eq(academicResources.institutionId, userInstitutionId));
+    }
+
+    // Branch filter
     if (branch && branch !== "all" && branch !== "All") {
       conditions.push(or(eq(academicResources.branch, branch), eq(academicResources.branch, "All")));
     }
 
+    // Resource type filter
     if (resourceType && resourceType !== "all" && resourceType !== "ALL") {
       conditions.push(eq(academicResources.resourceType, resourceType.toUpperCase()));
     }
 
+    // Semester filter
     if (semesterStr && semesterStr !== "all") {
       const sem = parseInt(semesterStr, 10);
       if (!isNaN(sem) && sem >= 1 && sem <= 8) {
@@ -41,6 +49,7 @@ export async function GET(req: Request) {
       }
     }
 
+    // Search query
     if (searchQuery?.trim()) {
       const q = `%${searchQuery.trim()}%`;
       conditions.push(
@@ -48,6 +57,7 @@ export async function GET(req: Request) {
           ilike(academicResources.title, q),
           ilike(academicResources.subjectCode, q),
           ilike(academicResources.subjectName, q),
+          ilike(academicResources.moduleOrChapter, q),
           ilike(academicResources.description, q)
         )
       );
@@ -83,10 +93,20 @@ export async function GET(req: Request) {
             slug: true,
           },
         },
+        comments: {
+          columns: {
+            id: true,
+          },
+        },
       },
     });
 
-    return NextResponse.json({ items });
+    const enriched = items.map((item) => ({
+      ...item,
+      commentsCount: item.comments?.length || 0,
+    }));
+
+    return NextResponse.json({ items: enriched });
   } catch (error) {
     console.error("Error fetching academic resources:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -121,8 +141,10 @@ export async function POST(req: Request) {
       branch = "All",
       semester = 1,
       resourceType = "NOTES",
+      moduleOrChapter,
       driveUrl,
       fileUrl,
+      tags = [],
     } = body;
 
     if (!title?.trim() || !subjectCode?.trim() || !subjectName?.trim()) {
@@ -144,24 +166,39 @@ export async function POST(req: Request) {
         branch: branch || "All",
         semester: typeof semester === "number" ? semester : 1,
         resourceType: resourceType || "NOTES",
+        moduleOrChapter: moduleOrChapter?.trim() || null,
         driveUrl: driveUrl?.trim() || null,
         fileUrl: fileUrl?.trim() || null,
+        tags: Array.isArray(tags) ? tags : [],
         upvotesCount: 0,
+        downvotesCount: 0,
         downloadsCount: 0,
         viewsCount: 1,
         isVerified: true,
       })
       .returning();
 
-    // Reward uploader with Loop Points (LP) for campus contribution
+    // Reward uploader with Loop Points (LP) for verified academic contribution
     try {
       await db
         .update(userProfiles)
-        .set({ points: sql`${userProfiles.points} + 15` })
+        .set({ points: sql`${userProfiles.points} + 20` })
         .where(eq(userProfiles.id, profile.id));
     } catch {}
 
-    return NextResponse.json({ success: true, item: created });
+    return NextResponse.json({
+      success: true,
+      item: {
+        ...created,
+        uploader: {
+          id: profile.id,
+          username: profile.username,
+          displayName: profile.displayName,
+          avatarUrl: profile.avatarUrl,
+          points: profile.points,
+        },
+      },
+    });
   } catch (error) {
     console.error("Error creating academic resource:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

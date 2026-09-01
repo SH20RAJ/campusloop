@@ -383,7 +383,10 @@ export function ArticleReaderClient({
               : "hover:bg-muted text-muted-foreground hover:text-foreground"
           )}
         >
-          <Heart className={cn("size-4", userVote === 1 && "fill-rose-500 text-rose-500")} />
+          <Heart
+            className={cn("size-4", userVote === 1 && "fill-rose-500 text-rose-500")}
+            fill={userVote === 1 ? "currentColor" : "none"}
+          />
           <span>{upvotes}</span>
         </button>
 

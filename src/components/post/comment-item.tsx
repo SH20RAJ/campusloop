@@ -220,7 +220,10 @@ export function CommentItem({
               )}
             >
               <div className="size-7 rounded-full group-hover/like:bg-rose-500/10 flex items-center justify-center transition-colors">
-                <Heart className={cn("size-4", liked && "fill-rose-500 text-rose-500")} />
+                <Heart
+                  className={cn("size-4", liked && "fill-rose-500 text-rose-500")}
+                  fill={liked ? "currentColor" : "none"}
+                />
               </div>
               {likesCount > 0 && <span className="text-[11px] font-semibold">{likesCount}</span>}
             </button>

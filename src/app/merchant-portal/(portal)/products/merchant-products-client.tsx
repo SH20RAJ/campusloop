@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit2, Loader2, Plus, Search, Trash2, UtensilsCrossed, X } from "lucide-react";
+import { Edit2, Plus, Search, Trash2, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,15 +14,6 @@ import { cn } from "@/lib/utils";
 export function MerchantProductsClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-
-  // Edit Product Modal State
-  const [editingProduct, setEditingProduct] = useState<any | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editPrice, setEditPrice] = useState("");
-  const [editOriginalPrice, setEditOriginalPrice] = useState("");
-  const [editCategory, setEditCategory] = useState("");
-  const [editDescription, setEditDescription] = useState("");
-  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   const { data, isLoading, mutate } = useSWR<{ products: any[]; merchant: any }>(
     "/api/merchant/products",
@@ -57,50 +48,6 @@ export function MerchantProductsClient() {
       toast.error("Failed to update availability");
     } finally {
       setUpdatingId(null);
-    }
-  }
-
-  function openEditModal(p: any) {
-    sounds.tap();
-    haptics.light();
-    setEditingProduct(p);
-    setEditName(p.name || "");
-    setEditPrice(String(p.price || ""));
-    setEditOriginalPrice(p.originalPrice ? String(p.originalPrice) : "");
-    setEditCategory(p.categoryName || "Popular Items");
-    setEditDescription(p.description || "");
-  }
-
-  async function handleSaveEdit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!editingProduct || !editName.trim() || !editPrice.trim()) return;
-
-    setIsSavingEdit(true);
-    sounds.tap();
-    haptics.medium();
-
-    try {
-      const res = await fetch("/api/merchant/products", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: editingProduct.id,
-          name: editName.trim(),
-          price: parseInt(editPrice, 10) || 0,
-          originalPrice: editOriginalPrice ? parseInt(editOriginalPrice, 10) : null,
-          categoryName: editCategory.trim() || "Popular Items",
-          description: editDescription.trim() || null,
-        }),
-      });
-
-      if (!res.ok) throw new Error();
-      mutate();
-      toast.success("Product updated successfully! ✨");
-      setEditingProduct(null);
-    } catch {
-      toast.error("Failed to save product changes");
-    } finally {
-      setIsSavingEdit(false);
     }
   }
 
@@ -209,14 +156,17 @@ export function MerchantProductsClient() {
                   {p.isAvailable ? "In Stock" : "Out of Stock"}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => openEditModal(p)}
+                <Link
+                  href={`/merchant-portal/products/${p.id}/edit`}
+                  onClick={() => {
+                    sounds.tap();
+                    haptics.light();
+                  }}
                   className="size-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                   title="Edit product"
                 >
                   <Edit2 className="size-3.5" />
-                </button>
+                </Link>
 
                 <button
                   type="button"
@@ -235,104 +185,6 @@ export function MerchantProductsClient() {
           <UtensilsCrossed className="size-10 text-muted-foreground/40 mx-auto" />
           <p className="text-sm font-bold text-foreground">No products found</p>
           <p className="text-xs text-muted-foreground">Add your first menu item to start selling.</p>
-        </div>
-      )}
-
-      {/* ─── Edit Product Modal ─── */}
-      {editingProduct && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-3xl w-full max-w-md p-5 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-black text-foreground">Edit Product Details</h3>
-              <button
-                type="button"
-                onClick={() => setEditingProduct(null)}
-                className="size-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveEdit} className="space-y-3">
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground block mb-1">Product Name</label>
-                <input
-                  type="text"
-                  required
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className="w-full h-9 rounded-xl bg-background border border-border px-3 text-xs font-medium outline-none focus:border-primary"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="text-[11px] font-bold text-muted-foreground block mb-1">Price (₹)</label>
-                  <input
-                    type="number"
-                    required
-                    min={0}
-                    value={editPrice}
-                    onChange={(e) => setEditPrice(e.target.value)}
-                    className="w-full h-9 rounded-xl bg-background border border-border px-3 text-xs font-bold outline-none focus:border-primary"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-muted-foreground block mb-1">
-                    Original Price (₹)
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={editOriginalPrice}
-                    onChange={(e) => setEditOriginalPrice(e.target.value)}
-                    placeholder="e.g. 100"
-                    className="w-full h-9 rounded-xl bg-background border border-border px-3 text-xs font-bold outline-none focus:border-primary"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground block mb-1">
-                  Category / Section
-                </label>
-                <input
-                  type="text"
-                  value={editCategory}
-                  onChange={(e) => setEditCategory(e.target.value)}
-                  className="w-full h-9 rounded-xl bg-background border border-border px-3 text-xs font-medium outline-none focus:border-primary"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground block mb-1">Description</label>
-                <textarea
-                  rows={2}
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full rounded-xl bg-background border border-border p-2.5 text-xs font-medium outline-none focus:border-primary resize-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setEditingProduct(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSavingEdit}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
-                >
-                  {isSavingEdit && <Loader2 className="size-3 animate-spin" />}
-                  <span>Save Changes</span>
-                </button>
-              </div>
-            </form>
-          </div>
         </div>
       )}
     </main>

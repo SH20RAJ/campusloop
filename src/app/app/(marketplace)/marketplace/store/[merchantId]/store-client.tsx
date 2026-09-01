@@ -887,118 +887,135 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
       )}
 
       {/* ─── Item Customization Bottom Drawer / Modal ─── */}
-      {selectedProduct && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="w-full max-w-lg bg-card border border-border rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-3 border-b border-border/30 pb-3">
-              <div>
-                <h3 className="text-base font-black text-foreground">{selectedProduct.name}</h3>
-                <p className="text-xs font-black text-foreground mt-0.5">₹{selectedProduct.price}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedProduct(null)}
-                className="size-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
+      {selectedProduct &&
+        (() => {
+          const productAddons = (
+            Array.isArray(selectedProduct.addons) ? selectedProduct.addons : []
+          ) as Array<{
+            name: string;
+            price: number;
+          }>;
 
-            {/* Quantity Controller */}
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/40 border border-border/40">
-              <span className="text-xs font-bold text-muted-foreground">Quantity</span>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    sounds.tap();
-                    setQuantity((prev) => Math.max(1, prev - 1));
-                  }}
-                  className="size-7 rounded-full bg-card border border-border flex items-center justify-center text-foreground font-black hover:bg-muted"
-                >
-                  <Minus className="size-3" />
-                </button>
-                <span className="text-xs font-black tabular-nums">{quantity}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    sounds.tap();
-                    setQuantity((prev) => prev + 1);
-                  }}
-                  className="size-7 rounded-full bg-card border border-border flex items-center justify-center text-foreground font-black hover:bg-muted"
-                >
-                  <Plus className="size-3" />
-                </button>
-              </div>
-            </div>
+          return (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+              <div className="w-full max-w-lg bg-card border border-border rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] sm:max-h-[82vh]">
+                {/* Fixed Header */}
+                <div className="flex items-start justify-between gap-3 border-b border-border/40 p-4 sm:p-5 shrink-0 bg-card">
+                  <div>
+                    <h3 className="text-base font-black text-foreground">{selectedProduct.name}</h3>
+                    <p className="text-xs font-black text-foreground mt-0.5">₹{selectedProduct.price}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedProduct(null)}
+                    className="size-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
 
-            {/* Add-ons sample (if any) */}
-            <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Popular Add-ons
-              </span>
-              <div className="space-y-1.5">
-                {[
-                  { name: "Extra Schezwan Dip", price: 15 },
-                  { name: "Cheese Burst Topping", price: 30 },
-                  { name: "Spicy Mayo Drizzle", price: 15 },
-                ].map((addon) => {
-                  const isChecked = selectedAddons.some((a) => a.name === addon.name);
-                  return (
-                    <button
-                      key={addon.name}
-                      type="button"
-                      onClick={() => handleAddonToggle(addon)}
-                      className={cn(
-                        "w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-colors cursor-pointer",
-                        isChecked
-                          ? "bg-primary/10 border-primary text-foreground font-black"
-                          : "bg-muted/20 border-border/40 text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={cn(
-                            "size-4 rounded-md border flex items-center justify-center",
-                            isChecked ? "bg-primary border-primary text-primary-foreground" : "border-border"
-                          )}
-                        >
-                          {isChecked && <Check className="size-3 stroke-3" />}
-                        </div>
-                        <span>{addon.name}</span>
+                {/* Scrollable Body */}
+                <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
+                  {/* Quantity Controller */}
+                  <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/40 border border-border/40">
+                    <span className="text-xs font-bold text-muted-foreground">Quantity</span>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sounds.tap();
+                          setQuantity((prev) => Math.max(1, prev - 1));
+                        }}
+                        className="size-7 rounded-full bg-card border border-border flex items-center justify-center text-foreground font-black hover:bg-muted"
+                      >
+                        <Minus className="size-3" />
+                      </button>
+                      <span className="text-xs font-black tabular-nums">{quantity}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sounds.tap();
+                          setQuantity((prev) => prev + 1);
+                        }}
+                        className="size-7 rounded-full bg-card border border-border flex items-center justify-center text-foreground font-black hover:bg-muted"
+                      >
+                        <Plus className="size-3" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Dynamic Add-ons (Decided exclusively by Merchant / Admin) */}
+                  {productAddons.length > 0 && (
+                    <div className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        Popular Add-ons
+                      </span>
+                      <div className="space-y-1.5">
+                        {productAddons.map((addon) => {
+                          const isChecked = selectedAddons.some((a) => a.name === addon.name);
+                          return (
+                            <button
+                              key={addon.name}
+                              type="button"
+                              onClick={() => handleAddonToggle(addon)}
+                              className={cn(
+                                "w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-colors cursor-pointer",
+                                isChecked
+                                  ? "bg-primary/10 border-primary text-foreground font-black"
+                                  : "bg-muted/20 border-border/40 text-muted-foreground hover:text-foreground"
+                              )}
+                            >
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className={cn(
+                                    "size-4 rounded-md border flex items-center justify-center",
+                                    isChecked
+                                      ? "bg-primary border-primary text-primary-foreground"
+                                      : "border-border"
+                                  )}
+                                >
+                                  {isChecked && <Check className="size-3 stroke-3" />}
+                                </div>
+                                <span>{addon.name}</span>
+                              </div>
+                              <span>+₹{addon.price}</span>
+                            </button>
+                          );
+                        })}
                       </div>
-                      <span>+₹{addon.price}</span>
-                    </button>
-                  );
-                })}
+                    </div>
+                  )}
+
+                  {/* Special Instructions */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-bold text-muted-foreground">
+                      Cooking Note / Preferences
+                    </span>
+                    <input
+                      type="text"
+                      value={specialInstructions}
+                      onChange={(e) => setSpecialInstructions(e.target.value)}
+                      placeholder="e.g. Less spicy, pack extra tissue..."
+                      className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-medium text-foreground outline-none focus:border-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* Sticky Guaranteed-Visible Footer */}
+                <div className="p-4 sm:p-5 border-t border-border/40 bg-card/95 backdrop-blur-md shrink-0 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))]">
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="w-full py-3.5 rounded-2xl bg-foreground text-background font-black text-xs hover:opacity-90 transition-all cursor-pointer shadow-lg active:scale-98 flex items-center justify-between px-5"
+                  >
+                    <span>Add to Cart</span>
+                    <span>₹{modalItemTotal.toLocaleString("en-IN")}</span>
+                  </button>
+                </div>
               </div>
             </div>
-
-            {/* Special Instructions */}
-            <div className="space-y-1.5">
-              <span className="text-xs font-bold text-muted-foreground">Cooking Note / Preferences</span>
-              <input
-                type="text"
-                value={specialInstructions}
-                onChange={(e) => setSpecialInstructions(e.target.value)}
-                placeholder="e.g. Less spicy, pack extra tissue..."
-                className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-medium text-foreground outline-none"
-              />
-            </div>
-
-            {/* Add to Cart Submit */}
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              className="w-full py-3.5 rounded-2xl bg-foreground text-background font-black text-xs hover:opacity-90 transition-all cursor-pointer shadow-lg active:scale-98 flex items-center justify-between px-5"
-            >
-              <span>Add to Cart</span>
-              <span>₹{modalItemTotal.toLocaleString("en-IN")}</span>
-            </button>
-          </div>
-        </div>
-      )}
+          );
+        })()}
 
       {/* ─── Rate & Review Store Modal ─── */}
       {isReviewModalOpen && (

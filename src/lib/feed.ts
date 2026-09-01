@@ -454,7 +454,11 @@ export async function resolveFeedPage(options: {
   );
 
   const idRows = await db
-    .select({ id: posts.id })
+    .select({
+      id: posts.id,
+      commentCount: commentCountSql,
+      voteScore: voteScoreSql,
+    })
     .from(posts)
     .where(and(...options.conditions))
     .orderBy(
@@ -472,18 +476,53 @@ export async function resolveFeedPage(options: {
   const ids = idRows.map((row) => row.id);
   if (ids.length === 0) return [];
 
+  const countsMap = new Map(
+    idRows.map((r) => [r.id, { commentCount: r.commentCount, voteScore: r.voteScore }])
+  );
+
   const hydrated = await db.query.posts.findMany({
     where: inArray(posts.id, ids),
     with: {
-      author: true,
-      institution: true,
-      community: true,
+      author: {
+        columns: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true,
+          points: true,
+          role: true,
+        },
+      },
+      institution: {
+        columns: {
+          id: true,
+          name: true,
+          slug: true,
+          logoUrl: true,
+        },
+      },
+      community: {
+        columns: {
+          id: true,
+          name: true,
+          avatarUrl: true,
+        },
+      },
       votes: true,
       comments: {
         where: eq(comments.status, "PUBLISHED"),
         orderBy: [desc(comments.createdAt)],
+        limit: 2,
         with: {
-          author: true,
+          author: {
+            columns: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatarUrl: true,
+              points: true,
+            },
+          },
         },
       },
       pollOptions: {
@@ -492,7 +531,18 @@ export async function resolveFeedPage(options: {
     },
   });
 
-  const byId = new Map(hydrated.map((post) => [post.id, post]));
+  const byId = new Map(
+    hydrated.map((post) => [
+      post.id,
+      {
+        ...post,
+        _counts: countsMap.get(post.id) || {
+          commentCount: post.comments?.length || 0,
+          voteScore: post.votes?.reduce((acc, v) => acc + (v?.value || 0), 0) || 0,
+        },
+      },
+    ])
+  );
   return ids
     .map((postId) => byId.get(postId))
     .filter((post): post is NonNullable<typeof post> => Boolean(post));
@@ -530,8 +580,24 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
       const repostedPosts = await db.query.posts.findMany({
         where: inArray(posts.id, repostOfIds),
         with: {
-          author: true,
-          institution: true,
+          author: {
+            columns: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatarUrl: true,
+              points: true,
+              role: true,
+            },
+          },
+          institution: {
+            columns: {
+              id: true,
+              name: true,
+              slug: true,
+              logoUrl: true,
+            },
+          },
         },
       });
       for (const p of repostedPosts) {
@@ -545,8 +611,9 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
   return rawFeed.map((post) => {
     const votesList = post.votes || [];
     const commentsList = post.comments || [];
-    const votesCount = votesList.reduce((acc, vote) => acc + (vote?.value || 0), 0);
-    const commentsCount = commentsList.length;
+    const counts = (post as any)._counts;
+    const votesCount = counts?.voteScore ?? votesList.reduce((acc, vote) => acc + (vote?.value || 0), 0);
+    const commentsCount = counts?.commentCount ?? commentsList.length;
     const userVoteObj = votesList.find((v) => v?.userId === viewerProfileId);
     const userVote = userVoteObj ? userVoteObj.value : 0;
 

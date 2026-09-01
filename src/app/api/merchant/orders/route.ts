@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
     const db = getDb();
     const { searchParams } = new URL(req.url);
-    const statusTab = searchParams.get("status"); // "new", "preparing", "ready", "delivery", "completed", "all"
+    const statusTab = searchParams.get("status") || "all";
 
     const conditions: any[] = [eq(marketplaceOrders.merchantId, merchant.id)];
 
@@ -24,27 +24,44 @@ export async function GET(req: Request) {
     } else if (statusTab === "preparing") {
       conditions.push(inArray(marketplaceOrders.status, ["ACCEPTED", "PREPARING"]));
     } else if (statusTab === "ready") {
-      conditions.push(inArray(marketplaceOrders.status, ["READY", "READY_FOR_PICKUP"]));
-    } else if (statusTab === "delivery") {
-      conditions.push(eq(marketplaceOrders.status, "OUT_FOR_DELIVERY"));
+      conditions.push(inArray(marketplaceOrders.status, ["READY", "READY_FOR_PICKUP", "OUT_FOR_DELIVERY"]));
     } else if (statusTab === "completed") {
       conditions.push(inArray(marketplaceOrders.status, ["DELIVERED", "PICKED_UP"]));
     } else if (statusTab === "cancelled") {
       conditions.push(inArray(marketplaceOrders.status, ["REJECTED", "CANCELLED"]));
     }
 
-    const orders = await db.query.marketplaceOrders.findMany({
-      where: and(...conditions),
-      orderBy: [desc(marketplaceOrders.createdAt)],
-      with: {
-        student: {
-          columns: { id: true, username: true, displayName: true, avatarUrl: true },
+    const [orders, allMerchantOrders] = await Promise.all([
+      db.query.marketplaceOrders.findMany({
+        where: and(...conditions),
+        orderBy: [desc(marketplaceOrders.createdAt)],
+        with: {
+          student: {
+            columns: { id: true, username: true, displayName: true, avatarUrl: true },
+          },
+          items: true,
         },
-        items: true,
-      },
-    });
+      }),
+      db
+        .select({
+          status: marketplaceOrders.status,
+        })
+        .from(marketplaceOrders)
+        .where(eq(marketplaceOrders.merchantId, merchant.id)),
+    ]);
 
-    return NextResponse.json({ orders, merchant });
+    const counts = {
+      all: allMerchantOrders.length,
+      new: allMerchantOrders.filter((o) => o.status === "PLACED").length,
+      preparing: allMerchantOrders.filter((o) => ["ACCEPTED", "PREPARING"].includes(o.status)).length,
+      ready: allMerchantOrders.filter((o) =>
+        ["READY", "READY_FOR_PICKUP", "OUT_FOR_DELIVERY"].includes(o.status)
+      ).length,
+      completed: allMerchantOrders.filter((o) => ["DELIVERED", "PICKED_UP"].includes(o.status)).length,
+      cancelled: allMerchantOrders.filter((o) => ["REJECTED", "CANCELLED"].includes(o.status)).length,
+    };
+
+    return NextResponse.json({ orders, counts, merchant });
   } catch (error) {
     console.error("Error fetching merchant orders:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

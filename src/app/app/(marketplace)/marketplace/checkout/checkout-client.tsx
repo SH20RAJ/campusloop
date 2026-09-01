@@ -15,6 +15,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { haptics } from "@/lib/haptics";
+import { CAMPUS_DELIVERY_LOCATIONS } from "@/lib/marketplace/locations";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,7 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
 
   const [fulfillmentType, setFulfillmentType] = useState<"DELIVERY" | "PICKUP">("DELIVERY");
   const [hostelName, setHostelName] = useState("Hostel 11 (Boys)");
+  const [otherLocationDetail, setOtherLocationDetail] = useState("");
   const [roomNumber, setRoomNumber] = useState("");
   const [phone, setPhone] = useState("");
   const [customerNote, setCustomerNote] = useState("");
@@ -54,7 +56,12 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
     e.preventDefault();
 
     if (fulfillmentType === "DELIVERY" && !roomNumber.trim()) {
-      toast.error("Please enter your hostel room number for delivery");
+      toast.error("Please enter your room / spot number for delivery");
+      return;
+    }
+
+    if (fulfillmentType === "DELIVERY" && hostelName.includes("Other") && !otherLocationDetail.trim()) {
+      toast.error("Please specify your campus spot or landmark");
       return;
     }
 
@@ -74,6 +81,11 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
 
     try {
       toast.loading("Placing your campus order...", { id: "checkout" });
+
+      const finalHostelName =
+        hostelName.includes("Other") && otherLocationDetail.trim()
+          ? `Other: ${otherLocationDetail.trim()}`
+          : hostelName;
 
       const merchantOrders = merchantGroups.map((group) => ({
         merchantId: group.merchantId,
@@ -95,7 +107,7 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
         body: JSON.stringify({
           merchantOrders,
           deliveryAddress: {
-            hostelName: fulfillmentType === "DELIVERY" ? hostelName : undefined,
+            hostelName: fulfillmentType === "DELIVERY" ? finalHostelName : undefined,
             roomNumber: fulfillmentType === "DELIVERY" ? roomNumber.trim() : undefined,
             phone: phone.trim(),
             pickupInstructions: fulfillmentType === "PICKUP" ? "Pickup from main store counter" : undefined,
@@ -204,29 +216,52 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
                 <select
                   value={hostelName}
                   onChange={(e) => setHostelName(e.target.value)}
-                  className="w-full h-11 rounded-2xl bg-muted/40 border border-border/50 px-3.5 text-xs font-bold text-foreground focus:border-foreground outline-none"
+                  className="w-full h-11 rounded-2xl bg-muted/40 border border-border/50 px-3.5 text-xs font-bold text-foreground focus:border-foreground outline-none cursor-pointer"
                 >
-                  <option value="Hostel 11 (Boys)">Hostel 11 (Boys)</option>
-                  <option value="Hostel 10 (Boys)">Hostel 10 (Boys)</option>
-                  <option value="Hostel 7 (Boys)">Hostel 7 (Boys)</option>
-                  <option value="Hostel 6 (Boys)">Hostel 6 (Boys)</option>
-                  <option value="Hostel 4 (Boys)">Hostel 4 (Boys)</option>
-                  <option value="Hostel 3 (Girls)">Hostel 3 (Girls)</option>
-                  <option value="Hostel 2 (Girls)">Hostel 2 (Girls)</option>
-                  <option value="Day Scholar / Campus Gate 1">Day Scholar / Main Gate 1</option>
-                  <option value="Central Library Complex">Central Library Complex</option>
+                  {CAMPUS_DELIVERY_LOCATIONS.map((grp) => (
+                    <optgroup key={grp.groupName} label={grp.groupName}>
+                      {grp.locations.map((loc) => (
+                        <option key={loc.id} value={loc.label}>
+                          {loc.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </select>
               </div>
 
+              {hostelName.includes("Other") && (
+                <div className="space-y-1.5">
+                  <span className="text-[11px] font-bold text-muted-foreground">
+                    Specify Campus Spot / Landmark *
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    value={otherLocationDetail}
+                    onChange={(e) => setOtherLocationDetail(e.target.value)}
+                    placeholder="e.g. Sports Complex / Tech Park Bench / Gate 2"
+                    className="w-full h-11 rounded-2xl bg-muted/40 border border-border/50 px-3.5 text-xs font-bold text-foreground placeholder:text-muted-foreground/60 focus:border-foreground outline-none"
+                  />
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <span className="text-[11px] font-bold text-muted-foreground">Room / Flat Number *</span>
+                  <span className="text-[11px] font-bold text-muted-foreground">
+                    {hostelName.includes("Building") ||
+                    hostelName.includes("PMC") ||
+                    hostelName.includes("R&D") ||
+                    hostelName.includes("Library")
+                      ? "Floor / Lab / Room No. *"
+                      : "Room / Flat Number *"}
+                  </span>
                   <input
                     type="text"
                     required
                     value={roomNumber}
                     onChange={(e) => setRoomNumber(e.target.value)}
-                    placeholder="e.g. 204 / C-12"
+                    placeholder="e.g. 204 / 2nd Floor"
                     className="w-full h-11 rounded-2xl bg-muted/40 border border-border/50 px-3.5 text-xs font-bold text-foreground placeholder:text-muted-foreground/60 focus:border-foreground outline-none"
                   />
                 </div>

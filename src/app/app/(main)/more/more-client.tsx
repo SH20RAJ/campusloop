@@ -1,8 +1,14 @@
 "use client";
 
-import { ArrowLeft, ChevronRight, ExternalLink, Shield, Zap } from "lucide-react";
+import { ArrowLeft, ChevronRight, ExternalLink, Shield } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  AnimateBookOpen,
+  AnimatedIcon,
+  AnimateGraduationCap,
+  AnimateZap,
+} from "@/components/ui/animated-icon";
 import { InstagramIcon, LinkedinIcon, XIcon } from "@/components/ui/social-icons";
 import { MORE_HUB_SECTIONS } from "@/constants/navigation";
 import { SOCIAL_LINKS } from "@/constants/socials";
@@ -39,39 +45,71 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
         </div>
       </div>
 
-      {/* ─── ⚡ RANDOM LOOP HERO CARD (Clean Minimal Twitter/X Style) ─── */}
-      <Link
-        href="/app/random"
-        className="block p-4 sm:p-5 rounded-2xl border border-border/70 bg-card hover:bg-muted/40 hover:border-border transition-all group cursor-pointer"
-      >
-        <div className="flex items-center justify-between gap-4">
-          <div className="space-y-1 min-w-0">
-            <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-              <Zap className="size-3.5 text-foreground" />
-              <span>Random Loop</span>
+      {/* ─── ⚡ FEATURED HERO CARDS: RANDOM LOOP & ACADEMIC VAULT ─── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Random Loop Card */}
+        <Link
+          href="/app/random"
+          className="block p-4 sm:p-5 rounded-2xl border border-border/70 bg-card hover:bg-muted/40 hover:border-border transition-all group cursor-pointer"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1 min-w-0">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                <AnimatedIcon icon={AnimateZap} animation="twinkle" size={14} className="text-amber-500" />
+                <span>Random Loop</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                Meet someone unexpected
+              </h3>
+              <p className="text-xs text-muted-foreground line-clamp-2">
+                Serendipitous anonymous conversations with verified college peers across India.
+              </p>
+              <div className="flex items-center gap-2 pt-1.5">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-foreground border border-border/50">
+                  Verified Student
+                </span>
+              </div>
             </div>
-            <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
-              Meet someone unexpected.
-            </h3>
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              Serendipitous anonymous conversations with verified college peers. Choose campus or talk with
-              anyone across India.
-            </p>
-            <div className="flex items-center gap-2 pt-1.5">
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/50">
-                Random
-              </span>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-foreground border border-border/50">
-                Verified Student
-              </span>
-            </div>
-          </div>
 
-          <div className="flex size-10 sm:size-11 items-center justify-center rounded-xl bg-foreground text-background font-bold shrink-0 group-hover:scale-105 transition-transform">
-            <Zap className="size-5 fill-background" />
+            <div className="flex size-10 items-center justify-center rounded-xl bg-foreground text-background font-bold shrink-0 group-hover:scale-105 transition-transform">
+              <AnimatedIcon icon={AnimateZap} animation="pop" size={18} />
+            </div>
           </div>
-        </div>
-      </Link>
+        </Link>
+
+        {/* Academic Vault & Notes Card */}
+        <Link
+          href="/app/academics"
+          className="block p-4 sm:p-5 rounded-2xl border border-indigo-500/30 bg-linear-to-br from-indigo-500/10 via-card to-card hover:bg-muted/40 hover:border-indigo-500/50 transition-all group cursor-pointer shadow-xs"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1 min-w-0">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-400 uppercase tracking-wider">
+                <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={14} className="text-indigo-500" />
+                <span>Academic Vault</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground group-hover:text-indigo-400 transition-colors">
+                Notes, PPTs, Books &amp; PYQs
+              </h3>
+              <p className="text-xs text-muted-foreground line-clamp-2">
+                Share module notes, syllabus PPTs, full books, and verify reliability with peer reviews.
+              </p>
+              <div className="flex items-center gap-1.5 pt-1.5 flex-wrap">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+                  R2 Storage
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  +20 LP
+                </span>
+              </div>
+            </div>
+
+            <div className="flex size-10 items-center justify-center rounded-xl bg-indigo-600 text-white font-bold shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+              <AnimatedIcon icon={AnimateGraduationCap} animation="pop" size={18} />
+            </div>
+          </div>
+        </Link>
+      </div>
 
       {/* ─── Official Social Channels (Minimal Monochrome Cards) ─── */}
       <div className="space-y-2">

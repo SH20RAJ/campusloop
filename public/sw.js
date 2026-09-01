@@ -1,4 +1,4 @@
-const CACHE_NAME = "campusloop-shell-v4";
+const CACHE_NAME = "campusloop-shell-v6";
 const STATIC_SHELL = [
   "/",
   "/app",
@@ -7,7 +7,8 @@ const STATIC_SHELL = [
   "/app/colleges",
   "/app/communities",
   "/app/notifications",
-  "/app/dating",
+  "/app/matching",
+  "/app/marketplace",
   "/app/profile",
   "/manifest.json",
   "/favicon.svg",
@@ -28,22 +29,25 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// Activate: Clean up older cache versions
+// Activate: Clean up older cache versions and claim immediate control
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    }).then(() => clients.claim())
+    caches
+      .keys()
+      .then((keys) => {
+        return Promise.all(
+          keys.map((key) => {
+            if (key !== CACHE_NAME) {
+              return caches.delete(key);
+            }
+          })
+        );
+      })
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch: Optimized Strategy depending on request type
+// Fetch: High-Performance Caching Strategy
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -53,14 +57,18 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 1. Static Assets & Images: Cache-first with Network Fallback
+  // 1. Static Assets, Web Fonts & Next.js Bundles: Cache-first with Background Network Update
   if (
+    url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/icons/") ||
+    url.hostname === "fonts.googleapis.com" ||
+    url.hostname === "fonts.gstatic.com" ||
     url.pathname.endsWith(".png") ||
     url.pathname.endsWith(".svg") ||
     url.pathname.endsWith(".ico") ||
     url.pathname.endsWith(".woff2") ||
     url.pathname.endsWith(".webp") ||
+    url.pathname.endsWith(".avif") ||
     url.hostname.includes("giphy.com") ||
     url.hostname.includes("images.unsplash.com")
   ) {
@@ -84,6 +92,8 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/api/colleges") ||
     url.pathname.startsWith("/api/communities") ||
     url.pathname.startsWith("/api/feed") ||
+    url.pathname.startsWith("/api/marketplace/stores") ||
+    url.pathname.startsWith("/api/marketplace/categories") ||
     url.pathname.startsWith("/api/profile/") ||
     url.pathname.startsWith("/api/dating/profiles")
   ) {
@@ -99,8 +109,6 @@ self.addEventListener("fetch", (event) => {
         .catch(() => {
           return caches.match(request).then((cached) => {
             if (cached) return cached;
-            // 503, not 200: callers check `res.ok`, so a fake success here
-            // made offline look like an empty successful response.
             return new Response(JSON.stringify({ error: "Offline", offline: true }), {
               headers: { "Content-Type": "application/json", "Retry-After": "5" },
               status: 503,
@@ -135,15 +143,11 @@ self.addEventListener("fetch", (event) => {
 });
 
 // ─── Web Push: wake, fetch, notify ───
-// Pushes arrive without a payload (VAPID-authenticated tickles), so the
-// content is pulled here over the student's own session. Nothing sensitive
-// ever passes through the push service.
 self.addEventListener("push", (event) => {
   event.waitUntil(
     (async () => {
       let payload = null;
 
-      // Honour an inline payload if one is ever sent, otherwise go fetch.
       if (event.data) {
         try {
           payload = event.data.json();
@@ -175,7 +179,6 @@ self.addEventListener("push", (event) => {
         body,
         icon: payload?.icon || "/icons/icon-192x192.png",
         badge: "/icons/icon-192x192.png",
-        // Collapse repeats so a burst of activity is one entry, not a stack
         tag: payload?.type || "campusloop",
         renotify: true,
         data: { url },
@@ -192,16 +195,13 @@ self.addEventListener("notificationclick", (event) => {
     (async () => {
       const allClients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
 
-      // Reuse an open tab when there is one rather than piling up windows
       for (const client of allClients) {
         if (client.url.includes(self.location.origin)) {
           await client.focus();
           if ("navigate" in client) {
             try {
               await client.navigate(targetUrl);
-            } catch {
-              /* focused tab is enough */
-            }
+            } catch {}
           }
           return;
         }

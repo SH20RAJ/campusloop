@@ -1,7 +1,7 @@
 {
   "name": "CampusLoop — Verified Campus Network",
   "short_name": "CampusLoop",
-  "description": "Verified student-only campus social network. Feed, Matches, Confessions, and College Directory.",
+  "description": "Verified student-only campus social network & marketplace. Live Feed, Campus Stores, Matches, Confessions, and College Directory.",
   "id": "/app",
   "start_url": "/app",
   "scope": "/",
@@ -11,7 +11,20 @@
   "background_color": "#09090b",
   "theme_color": "#09090b",
   "prefer_related_applications": false,
-  "categories": ["social", "education", "lifestyle"],
+  "categories": ["social", "education", "lifestyle", "shopping"],
+  "launch_handler": {
+    "client_mode": ["focus-existing", "auto"]
+  },
+  "handle_links": "preferred",
+  "share_target": {
+    "action": "/app/post/new",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "icons": [
     {
       "src": "/icons/icon-96x96.png",
@@ -71,6 +84,13 @@
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     },
     {
+      "name": "Campus Marketplace",
+      "short_name": "Market",
+      "description": "Order food, essentials, and hostel delivery",
+      "url": "/app/marketplace",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
       "name": "Create Post",
       "short_name": "Post",
       "description": "Drop a confession, poll or campus thread",
@@ -87,15 +107,8 @@
     {
       "name": "Direct Messages",
       "short_name": "Chat",
-      "description": "Private student chats",
+      "description": "Private student chats and groups",
       "url": "/app/chat",
-      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Notifications",
-      "short_name": "Alerts",
-      "description": "View replies, mentions, and campus alerts",
-      "url": "/app/notifications",
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]

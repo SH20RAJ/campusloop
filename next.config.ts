@@ -12,17 +12,10 @@ const nextConfig: NextConfig = {
       static: 600,
     },
     // ── Build memory budget ──
-    // This is a ~690-file app and the webpack production build used to be
-    // SIGKILLed by the OS on 8 GB machines. These three settings cut peak RSS:
-    // the first frees webpack's cached module sources between compilations,
-    // the second moves each compilation into its own short-lived worker so its
-    // heap is reclaimed on exit, and the third sizes the static-generation
-    // worker pool from free memory instead of the CPU count.
     webpackMemoryOptimizations: true,
     webpackBuildWorker: true,
     memoryBasedWorkersCount: true,
     optimizePackageImports: [
-
       "lucide-react",
       "framer-motion",
       "motion",
@@ -32,6 +25,7 @@ const nextConfig: NextConfig = {
       "sonner",
       "swr",
       "@radix-ui/react-icons",
+      "@animateicons/react",
     ],
   },
   images: {
@@ -45,6 +39,67 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "api.dicebear.com" },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/icons/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=0, must-revalidate",
+          },
+          {
+            key: "Service-Worker-Allowed",
+            value: "/",
+          },
+        ],
+      },
+      {
+        source: "/manifest.json",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/manifest+json",
+          },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       {
@@ -55,6 +110,5 @@ const nextConfig: NextConfig = {
     ];
   },
 };
-
 
 export default nextConfig;

@@ -126,6 +126,10 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="https://skill.hexclave.com" />
+        <link rel="dns-prefetch" href="https://api.dicebear.com" />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
@@ -136,7 +140,10 @@ export default function RootLayout({
         <link rel="help" href="/llms.txt" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="CampusLoop" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
         <meta name="geo.region" content="IN" />
         <meta name="geo.placename" content="India" />
         <meta name="geo.position" content="20.5937;78.9629" />

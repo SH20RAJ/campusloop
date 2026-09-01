@@ -1,7 +1,7 @@
 import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { comments, communities, institutions, posts, userProfiles } from "@/db/schema";
+import { comments, communities, institutions, merchants, posts, userProfiles } from "@/db/schema";
 import { formatApiFeedPosts } from "@/lib/feed";
 
 export async function GET(request: Request) {
@@ -16,6 +16,7 @@ export async function GET(request: Request) {
         colleges: [],
         users: [],
         communities: [],
+        merchants: [],
       });
     }
 
@@ -77,11 +78,25 @@ export async function GET(request: Request) {
       limit: 10,
     });
 
+    // 5. Search Merchants & Stores
+    const foundMerchants = await db.query.merchants.findMany({
+      where: and(
+        eq(merchants.status, "ACTIVE"),
+        or(
+          ilike(merchants.name, searchPattern),
+          ilike(merchants.description, searchPattern),
+          ilike(merchants.address, searchPattern)
+        )
+      ),
+      limit: 10,
+    });
+
     return NextResponse.json({
       posts: formattedPosts,
       colleges: foundColleges,
       users: foundUsers,
       communities: foundCommunities,
+      merchants: foundMerchants,
     });
   } catch (error) {
     console.error("Global search error:", error);

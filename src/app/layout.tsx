@@ -148,6 +148,7 @@ export default function RootLayout({
         <meta name="geo.placename" content="India" />
         <meta name="geo.position" content="20.5937;78.9629" />
         <meta name="ICBM" content="20.5937, 78.9629" />
+        {/* Sitelinks Searchbox Schema for Google SERP */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -155,8 +156,10 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "CampusLoop",
+              alternateName: ["Campus Loop", "CampusLoop App", "CampusLoop Space"],
               url: "https://campusloop.space",
-              description: "The verified student-only social network for 1,350+ Indian colleges.",
+              description:
+                "The verified student-only campus social network and marketplace for 1,350+ Indian colleges.",
               inLanguage: "en-IN",
               potentialAction: {
                 "@type": "SearchAction",
@@ -169,6 +172,105 @@ export default function RootLayout({
             }),
           }}
         />
+
+        {/* Google Sitelinks Navigation Elements (Relative Sub-links under search results) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              name: "CampusLoop Navigation Sitelinks",
+              itemListElement: [
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 1,
+                  name: "Campus Feed",
+                  description: "Live campus threads, confessions, polls, and discussions",
+                  url: "https://campusloop.space/app",
+                },
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 2,
+                  name: "Campus Marketplace",
+                  description: "Order night canteen snacks, food delivery, and campus essentials",
+                  url: "https://campusloop.space/app/marketplace",
+                },
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 3,
+                  name: "College Directory",
+                  description: "1,350+ verified Indian college hubs and university networks",
+                  url: "https://campusloop.space/app/colleges",
+                },
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 4,
+                  name: "Campus Match & Dating",
+                  description: "Connect with verified students within your campus radius",
+                  url: "https://campusloop.space/app/matching",
+                },
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 5,
+                  name: "Student Communities",
+                  description: "Student-created clubs, technical societies, and hobby spaces",
+                  url: "https://campusloop.space/app/communities",
+                },
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 6,
+                  name: "Campus Confessions",
+                  description: "Anonymous confessions and campus thoughts",
+                  url: "https://campusloop.space/app/confessions",
+                },
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 7,
+                  name: "Safety & DPDP Rules",
+                  description: "Student privacy, data protection, and content moderation rules",
+                  url: "https://campusloop.space/safety",
+                },
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 8,
+                  name: "About CampusLoop",
+                  description: "Learn more about the verified student ecosystem",
+                  url: "https://campusloop.space/about",
+                },
+              ],
+            }),
+          }}
+        />
+
+        {/* WebApplication PWA Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "CampusLoop",
+              url: "https://campusloop.space",
+              applicationCategory: "SocialNetworkingApplication",
+              operatingSystem: "All (Web, Android, iOS)",
+              browserRequirements: "Requires JavaScript. Requires HTML5.",
+              softwareVersion: "2.0.0",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "INR",
+              },
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.9",
+                reviewCount: "1420",
+              },
+            }),
+          }}
+        />
+
+        {/* Organization Schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

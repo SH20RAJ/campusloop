@@ -21,9 +21,7 @@ export function FoodOrdersClient() {
     { refreshInterval: 6000 }
   );
 
-  const orders = (data?.orders || []).filter(
-    (o) => !o.categorySlug || o.categorySlug === "food"
-  );
+  const orders = (data?.orders || []).filter((o) => !o.categorySlug || o.categorySlug === "food");
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-4 pb-20 select-none">
@@ -101,7 +99,9 @@ export function FoodOrdersClient() {
                       <UtensilsCrossed className="size-5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-black text-foreground">{order.merchant?.name || "Canteen"}</h3>
+                      <h3 className="text-sm font-black text-foreground">
+                        {order.merchant?.name || "Canteen"}
+                      </h3>
                       <p className="text-[11px] text-muted-foreground">Order #{order.orderNumber}</p>
                     </div>
                   </div>
@@ -111,7 +111,8 @@ export function FoodOrdersClient() {
                       "px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider",
                       isCooking && "bg-amber-500/15 text-amber-500 border border-amber-500/30",
                       isReady && "bg-blue-500/15 text-blue-500 border border-blue-500/30",
-                      isDispatched && "bg-purple-500/15 text-purple-500 border border-purple-500/30 animate-pulse",
+                      isDispatched &&
+                        "bg-purple-500/15 text-purple-500 border border-purple-500/30 animate-pulse",
                       isDelivered && "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30",
                       order.status === "REJECTED" && "bg-rose-500/15 text-rose-500 border border-rose-500/30",
                       order.status === "PLACED" && "bg-muted text-foreground border border-border"

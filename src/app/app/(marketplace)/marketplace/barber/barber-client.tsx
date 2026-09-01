@@ -29,7 +29,10 @@ interface BarberMarketplaceClientProps {
   collegeName?: string;
 }
 
-export function BarberMarketplaceClient({ profileId, collegeName = "Campus Hub" }: BarberMarketplaceClientProps) {
+export function BarberMarketplaceClient({
+  profileId,
+  collegeName = "Campus Hub",
+}: BarberMarketplaceClientProps) {
   const [selectedService, setSelectedService] = useState<any | null>(null);
   const [activeToken, setActiveToken] = useState<string | null>(null);
   const [isBookingToken, setIsBookingToken] = useState(false);
@@ -63,7 +66,8 @@ export function BarberMarketplaceClient({ profileId, collegeName = "Campus Hub" 
             Haircut, Beard Trim &amp; Salon Grooming
           </h1>
           <p className="text-xs sm:text-sm text-white/90 font-medium">
-            Skip long hostel salon queues. Grab a live digital token, check waiting times, and get styled by verified campus barbers at {collegeName}.
+            Skip long hostel salon queues. Grab a live digital token, check waiting times, and get styled by
+            verified campus barbers at {collegeName}.
           </p>
         </div>
 
@@ -106,7 +110,9 @@ export function BarberMarketplaceClient({ profileId, collegeName = "Campus Hub" 
                 {activeToken ? `Your Live Token: #${activeToken}` : "Current Serving: Token #07"}
               </p>
               <p className="text-[11px] text-muted-foreground">
-                {activeToken ? "You are next in line! Head over to the salon." : "Estimated wait time: ~10–15 mins"}
+                {activeToken
+                  ? "You are next in line! Head over to the salon."
+                  : "Estimated wait time: ~10–15 mins"}
               </p>
             </div>
           </div>
@@ -220,7 +226,9 @@ export function BarberMarketplaceClient({ profileId, collegeName = "Campus Hub" 
                   Salon Reservation
                 </span>
                 <h3 className="text-base font-black text-foreground">{selectedService.name}</h3>
-                <p className="text-xs text-muted-foreground font-bold">₹{selectedService.price} · Pay at salon</p>
+                <p className="text-xs text-muted-foreground font-bold">
+                  ₹{selectedService.price} · Pay at salon
+                </p>
               </div>
               <div className="size-10 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center font-black">
                 <Scissors className="size-5" />
@@ -228,7 +236,8 @@ export function BarberMarketplaceClient({ profileId, collegeName = "Campus Hub" 
             </div>
 
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Your appointment slot will be confirmed with {primaryBarber?.name || "the campus barber"}. Estimated wait: ~10 mins.
+              Your appointment slot will be confirmed with {primaryBarber?.name || "the campus barber"}.
+              Estimated wait: ~10 mins.
             </p>
 
             <div className="flex items-center gap-2 pt-2">
@@ -246,7 +255,9 @@ export function BarberMarketplaceClient({ profileId, collegeName = "Campus Hub" 
                   haptics.medium();
                   setSelectedService(null);
                   setActiveToken("09");
-                  alert(`Slot booked for ${selectedService.name}! 🎉\nYour Live Token is #09. Please show this token at the salon counter.`);
+                  alert(
+                    `Slot booked for ${selectedService.name}! 🎉\nYour Live Token is #09. Please show this token at the salon counter.`
+                  );
                 }}
                 className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-black transition-all cursor-pointer shadow-xs"
               >
@@ -268,7 +279,8 @@ export function BarberMarketplaceClient({ profileId, collegeName = "Campus Hub" 
               Bring CampusLoop Salon Tokens to Your College
             </h4>
             <p className="text-[11px] text-muted-foreground max-w-md">
-              We onboard campus hair stylists, barber shops, and beauty salons with instant token queues. Contact us on Instagram!
+              We onboard campus hair stylists, barber shops, and beauty salons with instant token queues.
+              Contact us on Instagram!
             </p>
           </div>
           <a

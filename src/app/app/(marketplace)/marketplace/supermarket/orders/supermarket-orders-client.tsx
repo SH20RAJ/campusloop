@@ -101,7 +101,9 @@ export function SupermarketOrdersClient() {
                       <ShoppingBag className="size-5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-black text-foreground">{order.merchant?.name || "Campus Mart"}</h3>
+                      <h3 className="text-sm font-black text-foreground">
+                        {order.merchant?.name || "Campus Mart"}
+                      </h3>
                       <p className="text-[11px] text-muted-foreground">Order #{order.orderNumber}</p>
                     </div>
                   </div>
@@ -111,7 +113,8 @@ export function SupermarketOrdersClient() {
                       "px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider",
                       isPacking && "bg-amber-500/15 text-amber-500 border border-amber-500/30",
                       isPacked && "bg-blue-500/15 text-blue-500 border border-blue-500/30",
-                      isDispatched && "bg-purple-500/15 text-purple-500 border border-purple-500/30 animate-pulse",
+                      isDispatched &&
+                        "bg-purple-500/15 text-purple-500 border border-purple-500/30 animate-pulse",
                       isDelivered && "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30",
                       order.status === "REJECTED" && "bg-rose-500/15 text-rose-500 border border-rose-500/30",
                       order.status === "PLACED" && "bg-muted text-foreground border border-border"

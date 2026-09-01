@@ -94,7 +94,8 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
             Campus Bike, EV &amp; Cycle Rentals
           </h1>
           <p className="text-xs sm:text-sm text-white/90 font-medium">
-            Rent gear bicycles, electric Ather scooters, and motorbikes for hostel transit, lab commutes, and city trips with zero paperwork inside {collegeName}.
+            Rent gear bicycles, electric Ather scooters, and motorbikes for hostel transit, lab commutes, and
+            city trips with zero paperwork inside {collegeName}.
           </p>
         </div>
 
@@ -142,7 +143,10 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
                   <div className="flex items-start gap-3.5">
                     <div className="size-14 rounded-2xl overflow-hidden bg-muted shrink-0 border border-border/50">
                       <img
-                        src={store.logoUrl || "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=200&h=200&fit=crop"}
+                        src={
+                          store.logoUrl ||
+                          "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=200&h=200&fit=crop"
+                        }
                         alt={store.name}
                         className="size-full object-cover group-hover:scale-105 transition-transform"
                       />
@@ -268,7 +272,10 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
                     {/* Vehicle Image */}
                     <div className="relative h-44 w-full bg-muted overflow-hidden">
                       <img
-                        src={bike.imageUrl || "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=600&h=400&fit=crop"}
+                        src={
+                          bike.imageUrl ||
+                          "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=600&h=400&fit=crop"
+                        }
                         alt={bike.name}
                         className="size-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -286,7 +293,11 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
                         </span>
 
                         <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-bold flex items-center gap-1">
-                          {isEV ? <Zap className="size-2.5 text-yellow-400" /> : <Fuel className="size-2.5 text-amber-400" />}
+                          {isEV ? (
+                            <Zap className="size-2.5 text-yellow-400" />
+                          ) : (
+                            <Fuel className="size-2.5 text-amber-400" />
+                          )}
                           <span>{isEV ? "Electric" : "Petrol / Gear"}</span>
                         </span>
                       </div>
@@ -323,7 +334,9 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
                           <p className="text-sm font-black text-foreground">₹{bike.hourlyPrice}/hr</p>
                         </div>
                         <div className="border-l border-border/40">
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase">24-Hr Day Pack</p>
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase">
+                            24-Hr Day Pack
+                          </p>
                           <p className="text-sm font-black text-emerald-600 dark:text-emerald-400">
                             ₹{bike.dailyPrice}/day
                           </p>
@@ -416,8 +429,12 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
             {/* Fare Summary */}
             <div className="p-3.5 rounded-2xl bg-muted/60 border border-border/40 space-y-2 text-xs">
               <div className="flex items-center justify-between font-medium">
-                <span className="text-muted-foreground">Rental ({bookingDurationHours} hrs × ₹{bookingBike.hourlyPrice})</span>
-                <span className="font-bold text-foreground">₹{bookingDurationHours * bookingBike.hourlyPrice}</span>
+                <span className="text-muted-foreground">
+                  Rental ({bookingDurationHours} hrs × ₹{bookingBike.hourlyPrice})
+                </span>
+                <span className="font-bold text-foreground">
+                  ₹{bookingDurationHours * bookingBike.hourlyPrice}
+                </span>
               </div>
               <div className="flex items-center justify-between font-medium">
                 <span className="text-muted-foreground">Security Deposit</span>
@@ -450,7 +467,9 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
                   setTimeout(() => {
                     setIsSubmittingBooking(false);
                     setBookingBike(null);
-                    alert(`Booking Confirmed! 🎉\nShow your booking token at ${bookingBike.pickupLocation} to collect your keys & helmet.`);
+                    alert(
+                      `Booking Confirmed! 🎉\nShow your booking token at ${bookingBike.pickupLocation} to collect your keys & helmet.`
+                    );
                   }, 800);
                 }}
                 className="flex-1 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition-all cursor-pointer shadow-md"
@@ -473,7 +492,8 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
               Bring CampusLoop Bike &amp; EV Rentals to Your College
             </h4>
             <p className="text-[11px] text-muted-foreground max-w-md">
-              We partner with local vehicle rental owners and cycle fleet managers. Contact us on Instagram to onboard rental shops around your campus!
+              We partner with local vehicle rental owners and cycle fleet managers. Contact us on Instagram to
+              onboard rental shops around your campus!
             </p>
           </div>
           <a

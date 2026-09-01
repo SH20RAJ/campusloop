@@ -19,7 +19,6 @@ import { useMemo, useState } from "react";
 import useSWR from "swr";
 import { CommunityHubStrip } from "@/components/marketplace/community-hub-strip";
 import {
-  EmptyState,
   FilterPills,
   ListRow,
   PageHeader,
@@ -133,39 +132,71 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
         placeholder="Search canteens, rentals or services"
       />
 
-      {/* ─── Arman's Night Canteen Live Announcement Banner ─── */}
-      <div className="mx-4 my-2.5 rounded-3xl border border-amber-500/35 bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-orange-500/15 p-4 sm:p-5 relative overflow-hidden shadow-xs">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 relative z-10">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/25 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
-              </span>
-              <span>🔴 LIVE STARTING TODAY · NIGHT CANTEEN</span>
+      {/* ─── Dynamic Banner (BIT Mesra vs Other Campuses) ─── */}
+      {isBitMesraStudent ? (
+        <div className="mx-4 my-2.5 rounded-3xl border border-amber-500/35 bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-orange-500/15 p-4 sm:p-5 relative overflow-hidden shadow-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 relative z-10">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/25 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+                </span>
+                <span>🔴 LIVE STARTING TODAY · NIGHT CANTEEN</span>
+              </div>
+              <h3 className="text-sm sm:text-base font-black text-foreground flex items-center gap-1.5">
+                <span>🌙 Arman&apos;s Night Canteen is Officially LIVE!</span>
+              </h3>
+              <p className="text-xs text-muted-foreground max-w-lg font-medium">
+                Late night Maggi, hot chicken rolls, burgers, thick shakes &amp; combos delivered straight to
+                your hostel room till 4 AM. Use code{" "}
+                <span className="font-bold text-foreground">NIGHTOWL20</span> for 20% OFF!
+              </p>
             </div>
-            <h3 className="text-sm sm:text-base font-black text-foreground flex items-center gap-1.5">
-              <span>🌙 Arman&apos;s Night Canteen is Officially LIVE!</span>
-            </h3>
-            <p className="text-xs text-muted-foreground max-w-lg font-medium">
-              Late night Maggi, hot chicken rolls, burgers, thick shakes &amp; combos delivered straight to
-              your hostel room till 4 AM. Use code{" "}
-              <span className="font-bold text-foreground">NIGHTOWL20</span> for 20% OFF!
-            </p>
+            <Link
+              href="/app/marketplace/store/merch_armans_night_canteen"
+              onClick={() => {
+                sounds.tap();
+                haptics.success();
+              }}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-foreground text-background text-xs font-black shadow-md hover:opacity-90 transition-all active:scale-95 shrink-0 cursor-pointer"
+            >
+              <span>Order from Arman&apos;s</span>
+              <ChevronRight className="size-3.5" />
+            </Link>
           </div>
-          <Link
-            href="/app/marketplace/store/merch_armans_night_canteen"
-            onClick={() => {
-              sounds.tap();
-              haptics.success();
-            }}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-foreground text-background text-xs font-black shadow-md hover:opacity-90 transition-all active:scale-95 shrink-0 cursor-pointer"
-          >
-            <span>Order from Arman&apos;s</span>
-            <ChevronRight className="size-3.5" />
-          </Link>
         </div>
-      </div>
+      ) : (
+        <div className="mx-4 my-2.5 rounded-3xl border border-primary/30 bg-gradient-to-r from-primary/10 via-purple-500/10 to-pink-500/10 p-4 sm:p-5 relative overflow-hidden shadow-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 relative z-10">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-black uppercase tracking-wider">
+                <span>🚀 EXPANDING TO NEW COLLEGES</span>
+              </div>
+              <h3 className="text-sm sm:text-base font-black text-foreground">
+                Want Night Canteens &amp; Store Delivery at {collegeName}?
+              </h3>
+              <p className="text-xs text-muted-foreground max-w-lg font-medium">
+                CampusLoop Marketplace is currently live at BIT Mesra. DM us on Instagram to onboard your
+                campus canteens, stationery stores, and bike rentals!
+              </p>
+            </div>
+            <a
+              href="https://www.instagram.com/campusloop.space/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                sounds.tap();
+                haptics.success();
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-black shadow-md hover:opacity-90 transition-all active:scale-95 shrink-0 cursor-pointer"
+            >
+              <InstagramIcon className="size-4 fill-white" />
+              <span>Invite via Instagram DM</span>
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* ─── 6 Campus Marketplace Vertical Hub Cards ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 px-4 py-2">
@@ -465,13 +496,40 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
             ))}
           </>
         ) : (
-          <EmptyState
-            icon={Store}
-            title="No stores found"
-            description={
-              searchQuery ? `Nothing matches "${searchQuery}".` : "No businesses listed in this category yet."
-            }
-          />
+          <div className="mx-4 my-6 p-6 sm:p-8 rounded-3xl bg-card border border-border/60 text-center space-y-4 shadow-xs">
+            <div className="size-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto font-black text-lg">
+              <Store className="size-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-black text-foreground">
+                {isBitMesraStudent
+                  ? searchQuery
+                    ? `No stores matching "${searchQuery}"`
+                    : "No stores currently open"
+                  : `Campus Stores Coming Soon to ${collegeName}`}
+              </h3>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
+                {isBitMesraStudent
+                  ? "Check back shortly or browse upcoming listings in other categories."
+                  : `CampusLoop Marketplace is currently live at BIT Mesra and expanding across Indian colleges. Drop us a DM on Instagram to get your campus night canteen & local stalls listed first!`}
+              </p>
+            </div>
+            {!isBitMesraStudent && (
+              <a
+                href="https://www.instagram.com/campusloop.space/"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.success();
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all shadow-sm active:scale-95 cursor-pointer"
+              >
+                <InstagramIcon className="size-3.5 fill-current" />
+                <span>Invite Us via Instagram DM @campusloop.space</span>
+              </a>
+            )}
+          </div>
         )}
       </PageList>
 

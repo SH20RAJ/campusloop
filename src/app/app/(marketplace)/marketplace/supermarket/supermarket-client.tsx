@@ -40,7 +40,10 @@ const MART_AISLES = [
   { id: "dorm", label: "Hostel Essentials 🔌" },
 ] as const;
 
-export function SupermarketMarketplaceClient({ profileId, collegeName = "Campus Hub" }: SupermarketMarketplaceClientProps) {
+export function SupermarketMarketplaceClient({
+  profileId,
+  collegeName = "Campus Hub",
+}: SupermarketMarketplaceClientProps) {
   const [selectedAisle, setSelectedAisle] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -89,7 +92,8 @@ export function SupermarketMarketplaceClient({ profileId, collegeName = "Campus 
             Campus Supermarket &amp; Daily Mart
           </h1>
           <p className="text-xs sm:text-sm text-white/90 font-medium">
-            Exam notebooks, pens, midnight Maggi, chilled Amul Kool, laundry detergents &amp; personal care delivered to your door.
+            Exam notebooks, pens, midnight Maggi, chilled Amul Kool, laundry detergents &amp; personal care
+            delivered to your door.
           </p>
         </div>
 
@@ -228,7 +232,10 @@ export function SupermarketMarketplaceClient({ profileId, collegeName = "Campus 
                   {/* Product Image & Discount Tag */}
                   <div className="relative h-28 sm:h-32 w-full rounded-xl bg-muted/40 overflow-hidden flex items-center justify-center p-2 mb-2">
                     <img
-                      src={p.imageUrl || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=300&fit=crop"}
+                      src={
+                        p.imageUrl ||
+                        "https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=300&fit=crop"
+                      }
                       alt={p.name}
                       className="size-full object-contain group-hover:scale-105 transition-transform"
                     />
@@ -244,9 +251,7 @@ export function SupermarketMarketplaceClient({ profileId, collegeName = "Campus 
                     <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
                       {p.categoryName || "Essentials"}
                     </p>
-                    <h3 className="text-xs font-bold text-foreground line-clamp-2 leading-snug">
-                      {p.name}
-                    </h3>
+                    <h3 className="text-xs font-bold text-foreground line-clamp-2 leading-snug">{p.name}</h3>
                     <p className="text-[10px] text-muted-foreground line-clamp-1">{p.merchantName}</p>
                   </div>
 

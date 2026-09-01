@@ -11,13 +11,15 @@ import {
   Wallet,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { haptics } from "@/lib/haptics";
-import { CAMPUS_DELIVERY_LOCATIONS } from "@/lib/marketplace/locations";
+import { getCampusDeliveryLocations, isBitMesraCampus } from "@/lib/marketplace/locations";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
+
+const SAVED_ADDRESS_KEY = "campusloop_saved_delivery_address";
 
 interface CheckoutClientProps {
   profileId: string;
@@ -28,14 +30,47 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
   const router = useRouter();
   const { items, merchantGroups, overallSubtotal, clearCart } = useMarketplaceCart();
 
+  const isBitMesra = useMemo(() => isBitMesraCampus(collegeName), [collegeName]);
+  const locationGroups = useMemo(() => getCampusDeliveryLocations(collegeName), [collegeName]);
+  const defaultHostel = locationGroups[0]?.locations[0]?.label || "Hostel 11 (Boys)";
+
   const [fulfillmentType, setFulfillmentType] = useState<"DELIVERY" | "PICKUP">("DELIVERY");
-  const [hostelName, setHostelName] = useState("Hostel 11 (Boys)");
+  const [hostelName, setHostelName] = useState(defaultHostel);
   const [otherLocationDetail, setOtherLocationDetail] = useState("");
   const [roomNumber, setRoomNumber] = useState("");
   const [phone, setPhone] = useState("");
   const [customerNote, setCustomerNote] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "UPI">("COD");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Autofill delivery address and phone from previous checkout session
+  useEffect(() => {
+    try {
+      const savedRaw = localStorage.getItem(SAVED_ADDRESS_KEY);
+      if (savedRaw) {
+        const saved = JSON.parse(savedRaw);
+        if (saved.hostelName) setHostelName(saved.hostelName);
+        if (saved.roomNumber) setRoomNumber(saved.roomNumber);
+        if (saved.phone) setPhone(saved.phone);
+        if (saved.otherLocationDetail) setOtherLocationDetail(saved.otherLocationDetail);
+      }
+    } catch {}
+  }, []);
+
+  // Autosave delivery address & phone changes to localStorage for next time
+  function saveAddressToStorage(hName: string, rNum: string, pNum: string, oLoc: string) {
+    try {
+      localStorage.setItem(
+        SAVED_ADDRESS_KEY,
+        JSON.stringify({
+          hostelName: hName,
+          roomNumber: rNum,
+          phone: pNum,
+          otherLocationDetail: oLoc,
+        })
+      );
+    } catch {}
+  }
 
   // Rental specific fields if any rental item in cart
   const hasRentalItems = items.some(
@@ -215,10 +250,13 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
                 </span>
                 <select
                   value={hostelName}
-                  onChange={(e) => setHostelName(e.target.value)}
+                  onChange={(e) => {
+                    setHostelName(e.target.value);
+                    saveAddressToStorage(e.target.value, roomNumber, phone, otherLocationDetail);
+                  }}
                   className="w-full h-11 rounded-2xl bg-muted/40 border border-border/50 px-3.5 text-xs font-bold text-foreground focus:border-foreground outline-none cursor-pointer"
                 >
-                  {CAMPUS_DELIVERY_LOCATIONS.map((grp) => (
+                  {locationGroups.map((grp) => (
                     <optgroup key={grp.groupName} label={grp.groupName}>
                       {grp.locations.map((loc) => (
                         <option key={loc.id} value={loc.label}>
@@ -239,7 +277,10 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
                     type="text"
                     required
                     value={otherLocationDetail}
-                    onChange={(e) => setOtherLocationDetail(e.target.value)}
+                    onChange={(e) => {
+                      setOtherLocationDetail(e.target.value);
+                      saveAddressToStorage(hostelName, roomNumber, phone, e.target.value);
+                    }}
                     placeholder="e.g. Sports Complex / Tech Park Bench / Gate 2"
                     className="w-full h-11 rounded-2xl bg-muted/40 border border-border/50 px-3.5 text-xs font-bold text-foreground placeholder:text-muted-foreground/60 focus:border-foreground outline-none"
                   />
@@ -260,7 +301,10 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
                     type="text"
                     required
                     value={roomNumber}
-                    onChange={(e) => setRoomNumber(e.target.value)}
+                    onChange={(e) => {
+                      setRoomNumber(e.target.value);
+                      saveAddressToStorage(hostelName, e.target.value, phone, otherLocationDetail);
+                    }}
                     placeholder="e.g. 204 / 2nd Floor"
                     className="w-full h-11 rounded-2xl bg-muted/40 border border-border/50 px-3.5 text-xs font-bold text-foreground placeholder:text-muted-foreground/60 focus:border-foreground outline-none"
                   />
@@ -272,7 +316,10 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
                     type="tel"
                     required
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      saveAddressToStorage(hostelName, roomNumber, e.target.value, otherLocationDetail);
+                    }}
                     placeholder="e.g. 9876543210"
                     className="w-full h-11 rounded-2xl bg-muted/40 border border-border/50 px-3.5 text-xs font-bold text-foreground placeholder:text-muted-foreground/60 focus:border-foreground outline-none"
                   />

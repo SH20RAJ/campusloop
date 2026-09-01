@@ -7,7 +7,7 @@ export interface CampusLocationGroup {
   }>;
 }
 
-export const CAMPUS_DELIVERY_LOCATIONS: CampusLocationGroup[] = [
+export const BIT_MESRA_LOCATIONS: CampusLocationGroup[] = [
   {
     groupName: "Boys Hostels (H1 – H13)",
     locations: [
@@ -50,4 +50,46 @@ export const CAMPUS_DELIVERY_LOCATIONS: CampusLocationGroup[] = [
   },
 ];
 
-export const ALL_LOCATION_LABELS = CAMPUS_DELIVERY_LOCATIONS.flatMap((g) => g.locations.map((l) => l.label));
+export const GENERIC_COLLEGE_LOCATIONS: CampusLocationGroup[] = [
+  {
+    groupName: "Hostels & Residences",
+    locations: [
+      { id: "boys_hostel_generic", label: "Boys Hostel / Hall of Residence", type: "BOYS_HOSTEL" },
+      { id: "girls_hostel_generic", label: "Girls Hostel / Hall of Residence", type: "GIRLS_HOSTEL" },
+    ],
+  },
+  {
+    groupName: "Campus Buildings",
+    locations: [
+      { id: "academic_block", label: "Main Academic Building / Departments", type: "ACADEMIC" },
+      { id: "central_lib", label: "Central Library / Reading Complex", type: "ACADEMIC" },
+      { id: "food_court", label: "Campus Canteen / Food Court Plaza", type: "ACADEMIC" },
+      { id: "main_gate", label: "Campus Main Gate / Day Scholar Entry", type: "OTHER" },
+    ],
+  },
+  {
+    groupName: "Other Places",
+    locations: [{ id: "other_place", label: "Other Campus Spot (Specify Details)", type: "OTHER" }],
+  },
+];
+
+export function isBitMesraCampus(collegeNameOrSlug?: string): boolean {
+  if (!collegeNameOrSlug) return true; // default campus in current phase
+  const lower = collegeNameOrSlug.toLowerCase();
+  return (
+    lower.includes("bit mesra") ||
+    lower.includes("mesra") ||
+    lower.includes("birla institute of technology") ||
+    lower.includes("inst_35df75700bb23dd30311ef5f")
+  );
+}
+
+export function getCampusDeliveryLocations(collegeNameOrSlug?: string): CampusLocationGroup[] {
+  if (isBitMesraCampus(collegeNameOrSlug)) {
+    return BIT_MESRA_LOCATIONS;
+  }
+  return GENERIC_COLLEGE_LOCATIONS;
+}
+
+export const CAMPUS_DELIVERY_LOCATIONS = BIT_MESRA_LOCATIONS;
+export const ALL_LOCATION_LABELS = BIT_MESRA_LOCATIONS.flatMap((g) => g.locations.map((l) => l.label));

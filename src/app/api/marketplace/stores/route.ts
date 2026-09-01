@@ -1,8 +1,9 @@
 import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { marketplaceOffers, merchants, userProfiles } from "@/db/schema";
+import { institutions, marketplaceOffers, merchants, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { isBitMesraCampus } from "@/lib/marketplace/locations";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,15 @@ export async function GET(req: Request) {
       }
     }
 
-    const conditions: any[] = [eq(merchants.status, "ACTIVE")];
+    // Default to BIT Mesra if no institution assigned
+    if (!targetInstitutionId) {
+      targetInstitutionId = "inst_35df75700bb23dd30311ef5f";
+    }
+
+    const conditions: any[] = [
+      eq(merchants.status, "ACTIVE"),
+      eq(merchants.institutionId, targetInstitutionId),
+    ];
 
     if (categorySlug && categorySlug !== "all" && categorySlug !== "deals") {
       conditions.push(eq(merchants.categorySlug, categorySlug));
@@ -44,47 +53,39 @@ export async function GET(req: Request) {
       );
     }
 
-    // If campus scope is provided, filter by campus; if not, return active merchants
-    if (targetInstitutionId) {
-      conditions.push(eq(merchants.institutionId, targetInstitutionId));
-    }
-
-    let stores = await db.query.merchants.findMany({
-      where: conditions.length > 0 ? and(...conditions) : undefined,
-      orderBy: [desc(merchants.isOpen), desc(merchants.rating), desc(merchants.createdAt)],
-      with: {
-        offers: {
-          where: eq(marketplaceOffers.isActive, true),
-          limit: 2,
-        },
-        products: {
-          limit: 4,
-        },
-        institution: {
-          columns: { id: true, name: true, slug: true },
-        },
-      },
-    });
-
-    // Fallback: If no stores in this specific campus yet, return partner campus stores
-    if (stores.length === 0 && targetInstitutionId) {
-      const fallbackConditions = [eq(merchants.status, "ACTIVE")];
-      if (categorySlug && categorySlug !== "all" && categorySlug !== "deals") {
-        fallbackConditions.push(eq(merchants.categorySlug, categorySlug));
-      }
-      stores = await db.query.merchants.findMany({
-        where: fallbackConditions.length > 0 ? and(...fallbackConditions) : undefined,
+    const [stores, currentInstitution] = await Promise.all([
+      db.query.merchants.findMany({
+        where: and(...conditions),
         orderBy: [desc(merchants.isOpen), desc(merchants.rating), desc(merchants.createdAt)],
-        limit: 12,
         with: {
-          offers: { where: eq(marketplaceOffers.isActive, true), limit: 2 },
-          products: { limit: 4 },
-          institution: { columns: { id: true, name: true, slug: true } },
+          offers: {
+            where: eq(marketplaceOffers.isActive, true),
+            limit: 2,
+          },
+          products: {
+            limit: 4,
+          },
+          institution: {
+            columns: { id: true, name: true, slug: true },
+          },
         },
-      });
-    }
+      }),
+      db.query.institutions.findFirst({
+        where: eq(institutions.id, targetInstitutionId),
+        columns: { id: true, name: true, slug: true },
+      }),
+    ]);
 
-    return NextResponse.json({ stores });
+    const isBitMesra =
+      isBitMesraCampus(targetInstitutionId) ||
+      isBitMesraCampus(currentInstitution?.slug) ||
+      isBitMesraCampus(currentInstitution?.name);
+
+    return NextResponse.json({
+      stores,
+      institution: currentInstitution,
+      isBitMesra,
+    });
   } catch (error) {
     console.error("Error fetching marketplace stores:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

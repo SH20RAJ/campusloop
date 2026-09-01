@@ -30,7 +30,10 @@ interface WaterMarketplaceClientProps {
   collegeName?: string;
 }
 
-export function WaterMarketplaceClient({ profileId, collegeName = "Campus Hub" }: WaterMarketplaceClientProps) {
+export function WaterMarketplaceClient({
+  profileId,
+  collegeName = "Campus Hub",
+}: WaterMarketplaceClientProps) {
   const [selectedCan, setSelectedCan] = useState<any | null>(null);
   const [canCount, setCanCount] = useState(1);
   const [hostelName, setHostelName] = useState("Hostel 7");
@@ -67,7 +70,8 @@ export function WaterMarketplaceClient({ profileId, collegeName = "Campus Hub" }
             20L Water Can Delivery to Hostel Rooms
           </h1>
           <p className="text-xs sm:text-sm text-white/90 font-medium">
-            Never lug heavy 20-litre water jars up hostel stairs again. 1-tap room floor delivery in 20–25 mins across {collegeName}.
+            Never lug heavy 20-litre water jars up hostel stairs again. 1-tap room floor delivery in 20–25
+            mins across {collegeName}.
           </p>
         </div>
 
@@ -83,9 +87,7 @@ export function WaterMarketplaceClient({ profileId, collegeName = "Campus Hub" }
             <Droplet className="size-6" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-black text-foreground">
-              Express 20L Jar Delivery
-            </h3>
+            <h3 className="text-sm sm:text-base font-black text-foreground">Express 20L Jar Delivery</h3>
             <p className="text-xs text-muted-foreground">
               Delivered directly outside your room door on your hostel floor.
             </p>
@@ -193,7 +195,9 @@ export function WaterMarketplaceClient({ profileId, collegeName = "Campus Hub" }
                 <h3 className="text-base font-black text-foreground">
                   {selectedCan?.name || "20L Chilled RO Water Jar"}
                 </h3>
-                <p className="text-xs text-muted-foreground font-bold">₹{selectedCan?.price || 30} each · Cash/UPI on Delivery</p>
+                <p className="text-xs text-muted-foreground font-bold">
+                  ₹{selectedCan?.price || 30} each · Cash/UPI on Delivery
+                </p>
               </div>
               <div className="size-10 rounded-2xl bg-cyan-500/15 text-cyan-500 flex items-center justify-center font-black">
                 <Droplet className="size-5" />
@@ -253,7 +257,9 @@ export function WaterMarketplaceClient({ profileId, collegeName = "Campus Hub" }
             {/* Total Fare Calculation */}
             <div className="p-3 rounded-2xl bg-muted/60 border border-border/40 space-y-1 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Price ({canCount} × ₹{selectedCan?.price || 30})</span>
+                <span className="text-muted-foreground">
+                  Total Price ({canCount} × ₹{selectedCan?.price || 30})
+                </span>
                 <span className="font-black text-foreground">₹{canCount * (selectedCan?.price || 30)}</span>
               </div>
               <div className="flex items-center justify-between">
@@ -284,7 +290,9 @@ export function WaterMarketplaceClient({ profileId, collegeName = "Campus Hub" }
                   setTimeout(() => {
                     setIsSubmitting(false);
                     setShowOrderModal(false);
-                    alert(`Order Placed! 💧\n${canCount} Jar(s) arriving at ${hostelName}, ${roomNumber} in ~20 mins.`);
+                    alert(
+                      `Order Placed! 💧\n${canCount} Jar(s) arriving at ${hostelName}, ${roomNumber} in ~20 mins.`
+                    );
                   }, 700);
                 }}
                 className="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black transition-all cursor-pointer shadow-xs"
@@ -307,7 +315,8 @@ export function WaterMarketplaceClient({ profileId, collegeName = "Campus Hub" }
               Bring 20L Water Delivery to Your College Hostels
             </h4>
             <p className="text-[11px] text-muted-foreground max-w-md">
-              We connect campus water plants and delivery agents directly to hostel students. Contact us on Instagram!
+              We connect campus water plants and delivery agents directly to hostel students. Contact us on
+              Instagram!
             </p>
           </div>
           <a

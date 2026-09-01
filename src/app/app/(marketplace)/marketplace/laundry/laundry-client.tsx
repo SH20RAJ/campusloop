@@ -30,7 +30,10 @@ interface LaundryMarketplaceClientProps {
   collegeName?: string;
 }
 
-export function LaundryMarketplaceClient({ profileId, collegeName = "Campus Hub" }: LaundryMarketplaceClientProps) {
+export function LaundryMarketplaceClient({
+  profileId,
+  collegeName = "Campus Hub",
+}: LaundryMarketplaceClientProps) {
   const [showPickupModal, setShowPickupModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
   const [hostelName, setHostelName] = useState("Hostel 7");
@@ -67,7 +70,8 @@ export function LaundryMarketplaceClient({ profileId, collegeName = "Campus Hub"
             Hostel Laundry Express &amp; Steam Press
           </h1>
           <p className="text-xs sm:text-sm text-white/90 font-medium">
-            Tired of hand washing clothes? Get wash &amp; fold, steam pressing, and dry cleaning picked up directly from your hostel wing in {collegeName}.
+            Tired of hand washing clothes? Get wash &amp; fold, steam pressing, and dry cleaning picked up
+            directly from your hostel wing in {collegeName}.
           </p>
         </div>
 
@@ -277,7 +281,9 @@ export function LaundryMarketplaceClient({ profileId, collegeName = "Campus Hub"
                   setTimeout(() => {
                     setIsSubmitting(false);
                     setShowPickupModal(false);
-                    alert(`Pickup Scheduled! 🧺\nPickup from ${hostelName}, ${roomNumber}. Our laundry partner will arrive in ~25 mins.`);
+                    alert(
+                      `Pickup Scheduled! 🧺\nPickup from ${hostelName}, ${roomNumber}. Our laundry partner will arrive in ~25 mins.`
+                    );
                   }, 700);
                 }}
                 className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition-all cursor-pointer shadow-xs"
@@ -300,7 +306,8 @@ export function LaundryMarketplaceClient({ profileId, collegeName = "Campus Hub"
               Bring CampusLoop Laundry Express to Your College
             </h4>
             <p className="text-[11px] text-muted-foreground max-w-md">
-              We partner with local dhobis and industrial laundries for fast hostel pickups. Contact us on Instagram to onboard your campus laundry!
+              We partner with local dhobis and industrial laundries for fast hostel pickups. Contact us on
+              Instagram to onboard your campus laundry!
             </p>
           </div>
           <a

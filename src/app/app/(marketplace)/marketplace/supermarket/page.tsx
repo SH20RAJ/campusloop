@@ -10,7 +10,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://campusloop.space/app/marketplace/supermarket" },
   openGraph: {
     title: "Campus Supermarket & Daily Mart | CampusLoop",
-    description: "Instant groceries, exam stationery, beverages, and dorm essentials delivered to hostel rooms.",
+    description:
+      "Instant groceries, exam stationery, beverages, and dorm essentials delivered to hostel rooms.",
     url: "https://campusloop.space/app/marketplace/supermarket",
     siteName: "CampusLoop Mart",
   },

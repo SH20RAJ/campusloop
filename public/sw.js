@@ -1,4 +1,4 @@
-const CACHE_NAME = "campusloop-shell-v6";
+const CACHE_NAME = "campusloop-shell-v7";
 const STATIC_SHELL = [
   "/",
   "/app",
@@ -10,7 +10,13 @@ const STATIC_SHELL = [
   "/app/matching",
   "/app/marketplace",
   "/app/profile",
+  "/merchant-portal",
+  "/merchant-portal/orders",
+  "/merchant-portal/products",
+  "/merchant-portal/earnings",
+  "/merchant-portal/store",
   "/manifest.json",
+  "/manifest-merchant.json",
   "/favicon.svg",
   "/logo.png",
   "/icons/icon-192x192.png",
@@ -95,7 +101,8 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/api/marketplace/stores") ||
     url.pathname.startsWith("/api/marketplace/categories") ||
     url.pathname.startsWith("/api/profile/") ||
-    url.pathname.startsWith("/api/dating/profiles")
+    url.pathname.startsWith("/api/dating/profiles") ||
+    url.pathname.startsWith("/api/merchant/orders")
   ) {
     event.respondWith(
       fetch(request)
@@ -120,7 +127,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 3. Navigation / HTML Pages: Network-first with App-Shell Fallback
+  // 3. Navigation / HTML Pages: Network-first with Dedicated App-Shell Fallback
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -134,6 +141,14 @@ self.addEventListener("fetch", (event) => {
         .catch(async () => {
           const cached = await caches.match(request);
           if (cached) return cached;
+
+          // Merchant Portal isolated shell
+          if (url.pathname.startsWith("/merchant-portal")) {
+            const merchantShell = await caches.match("/merchant-portal");
+            if (merchantShell) return merchantShell;
+          }
+
+          // Main Student App isolated shell
           const appShell = await caches.match("/app");
           if (appShell) return appShell;
           return caches.match("/");

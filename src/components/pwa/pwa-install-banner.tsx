@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, PlusSquare, Share, X, Zap } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { haptics } from "@/lib/haptics";
@@ -13,6 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PWAInstallBanner() {
+  const pathname = usePathname();
   const unreadCount = useUnreadNotificationsCount();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
@@ -21,8 +23,12 @@ export function PWAInstallBanner() {
   const [showIOSModal, setShowIOSModal] = useState(false);
   const [, setInstalled] = useState(false);
 
+  // Merchant Portal & Admin have dedicated interfaces and MUST NOT show main student app install prompt
+  const isMerchantOrAdmin = pathname?.startsWith("/merchant-portal") || pathname?.startsWith("/admin");
+
   // ─── PWA Badging API ───
   useEffect(() => {
+    if (isMerchantOrAdmin) return;
     if (typeof navigator !== "undefined") {
       if ("setAppBadge" in navigator) {
         if (unreadCount > 0) {
@@ -32,10 +38,11 @@ export function PWAInstallBanner() {
         }
       }
     }
-  }, [unreadCount]);
+  }, [unreadCount, isMerchantOrAdmin]);
 
   // ─── PWA Audio & Haptic Network Cues ───
   useEffect(() => {
+    if (isMerchantOrAdmin) return;
     function handleOnline() {
       sounds.ting();
       haptics.success();
@@ -49,9 +56,10 @@ export function PWAInstallBanner() {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []);
+  }, [isMerchantOrAdmin]);
 
   useEffect(() => {
+    if (isMerchantOrAdmin) return;
     // Check if already running in standalone / PWA mode
     const isStandaloneMode =
       window.matchMedia("(display-mode: standalone)").matches ||
@@ -120,7 +128,7 @@ export function PWAInstallBanner() {
     localStorage.setItem("cl_pwa_dismissed", String(Date.now()));
   }
 
-  if (isStandalone || !showBanner) return null;
+  if (isMerchantOrAdmin || isStandalone || !showBanner) return null;
 
   return (
     <>

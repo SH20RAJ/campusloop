@@ -1,7 +1,7 @@
 {
   "name": "CampusLoop Merchant Console",
-  "short_name": "Merchant App",
-  "description": "Accept student orders, manage menu & services, update inventory, and manage campus deliveries.",
+  "short_name": "Merchant Console",
+  "description": "Accept student orders, manage menu & services, update inventory, and manage campus deliveries in real-time.",
   "id": "/merchant-portal",
   "start_url": "/merchant-portal",
   "scope": "/merchant-portal",
@@ -12,10 +12,38 @@
   "theme_color": "#09090b",
   "prefer_related_applications": false,
   "categories": ["business", "productivity", "shopping"],
+  "launch_handler": {
+    "client_mode": ["focus-existing", "auto"]
+  },
+  "handle_links": "preferred",
   "icons": [
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },

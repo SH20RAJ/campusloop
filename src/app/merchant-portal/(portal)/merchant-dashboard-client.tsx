@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { MerchantPWAInstallBanner } from "@/components/merchant/merchant-pwa-banner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
@@ -122,8 +121,6 @@ export function MerchantDashboardClient() {
 
   return (
     <main className="max-w-4xl mx-auto p-4 space-y-6">
-      <MerchantPWAInstallBanner />
-
       {/* ─── Top Header & Store Open/Closed Toggle ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card border border-border/40 p-5 rounded-3xl shadow-xs">
         <div>

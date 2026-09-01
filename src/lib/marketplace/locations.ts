@@ -75,7 +75,8 @@ export const GENERIC_COLLEGE_LOCATIONS: CampusLocationGroup[] = [
 
 export function isBitMesraCampus(collegeNameOrSlug?: string): boolean {
   if (!collegeNameOrSlug) return true; // default campus in current phase
-  const lower = collegeNameOrSlug.toLowerCase();
+  const lower = collegeNameOrSlug.toLowerCase().trim();
+  if (lower === "viewer mode" || lower === "your college") return false;
   return (
     lower.includes("bit mesra") ||
     lower.includes("mesra") ||

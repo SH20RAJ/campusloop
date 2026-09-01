@@ -2,13 +2,17 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Compass,
   GraduationCap,
+  Heart,
   HelpCircle,
+  Home,
   Menu,
   MoreHorizontal,
   Plus,
   School,
   ShieldCheck,
+  ShoppingBag,
   Sliders,
   UserCircle,
   VenetianMask,
@@ -38,6 +42,7 @@ import { SOCIAL_LINKS } from "@/constants/socials";
 import type { UserProfile } from "@/db/schema";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { haptics } from "@/lib/haptics";
+import { isBitMesraCampus } from "@/lib/marketplace/locations";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
@@ -166,7 +171,24 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
     }
   }, [pathname]);
 
-  const mobileBottomItems: NavItem[] = MOBILE_BOTTOM_ITEMS;
+  const institutionIdentifier =
+    (profile as any)?.institution?.name ||
+    (profile as any)?.institution?.slug ||
+    profile?.institutionId ||
+    collegeName ||
+    "";
+
+  const isBitStudent = !isViewer && isBitMesraCampus(institutionIdentifier);
+
+  const mobileBottomItems: NavItem[] = isBitStudent
+    ? [
+        { icon: Home, href: "/app", label: "Home" },
+        { icon: Compass, href: "/app/discover", label: "Explore" },
+        { icon: Plus, href: "/app/post/new", label: "Post" },
+        { icon: Heart, href: "/app/matching", label: "Match" },
+        { icon: ShoppingBag, href: "/app/marketplace", label: "Market" },
+      ]
+    : MOBILE_BOTTOM_ITEMS;
 
   const desktopNavItems = [
     ...DESKTOP_NAV_ITEMS.filter((item) => {

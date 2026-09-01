@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { CampusQrCode } from "@/components/common/campus-qr-code";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -1101,20 +1102,21 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
       {/* ─── TAB 6: Table QR Stand ─── */}
       {activeTab === "qr" && (
         <div className="p-8 rounded-2xl bg-card border border-border text-center space-y-4 max-w-sm mx-auto shadow-xs">
-          <div className="size-48 mx-auto bg-white p-4 rounded-2xl border border-border flex items-center justify-center">
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://campusloop.space/app/marketplace/store/${merchant.id}`}
-              alt={`${merchant.name} QR`}
-              className="size-full object-contain"
+          <div className="mx-auto flex items-center justify-center">
+            <CampusQrCode
+              value={`https://campusloop.space/app/marketplace/store/${merchant.id}`}
+              size={200}
+              logoUrl="/logo.png"
+              bordered={true}
             />
           </div>
           <div>
             <h3 className="text-base font-black text-foreground">{merchant.name}</h3>
-            <p className="text-xs text-muted-foreground">Table Ordering QR Code</p>
+            <p className="text-xs text-muted-foreground">Branded Table Ordering QR Stand</p>
           </div>
           <Link
             href="/merchant-portal/store/qr"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90 transition-opacity shadow-xs"
           >
             <span>Print Official A4 Table Stand</span>
           </Link>

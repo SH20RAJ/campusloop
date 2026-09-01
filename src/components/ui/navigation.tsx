@@ -397,7 +397,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 </Button>
               </Link>
               <FeedAnonymityQuickToggle initialMode={profile?.feedVisibility} />
-              <button
+              {/* <button
                 type="button"
                 onClick={() => {
                   sounds.tap();
@@ -408,7 +408,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
               >
                 <AnimatedIcon icon={AnimateZap} animation="twinkle" size={14} />
                 <span>Install CampusLoop App</span>
-              </button>
+              </button> */}
             </div>
           )}
         </div>

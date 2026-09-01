@@ -13,14 +13,27 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+let globalDeferredPrompt: BeforeInstallPromptEvent | null = null;
+
+/**
+ * Trigger PWA Install Prompt or Instructions Modal from anywhere in the app
+ */
+export function triggerPWAInstall() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("campusloop_trigger_pwa_install"));
+  }
+}
+
 export function PWAInstallBanner() {
   const pathname = usePathname();
   const unreadCount = useUnreadNotificationsCount();
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(globalDeferredPrompt);
   const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [showIOSModal, setShowIOSModal] = useState(false);
+  const [showAndroidModal, setShowAndroidModal] = useState(false);
   const [, setInstalled] = useState(false);
 
   // Merchant Portal & Admin have dedicated interfaces and MUST NOT show main student app install prompt
@@ -68,55 +81,87 @@ export function PWAInstallBanner() {
     setIsStandalone(Boolean(isStandaloneMode));
     if (isStandaloneMode) return;
 
-    // Detect iOS
+    // Detect device OS
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+    const isAndroidDevice = /android/.test(userAgent);
     setIsIOS(isIosDevice);
+    setIsAndroid(isAndroidDevice);
 
-    // Check if user dismissed banner recently (within 7 days)
+    // Check if user dismissed banner recently (within 24 hours)
     const dismissedAt = localStorage.getItem("cl_pwa_dismissed");
     if (dismissedAt) {
       const daysSinceDismissed = (Date.now() - Number(dismissedAt)) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissed < 7) return;
+      if (daysSinceDismissed < 1) return;
     }
 
     // Android/Desktop Chrome install event
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      const promptEvent = e as BeforeInstallPromptEvent;
+      globalDeferredPrompt = promptEvent;
+      setDeferredPrompt(promptEvent);
       setShowBanner(true);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-    // If iOS and not standalone, show after 3 seconds on first visit
+    // Global programmatic trigger
+    const handleCustomTrigger = () => {
+      if (globalDeferredPrompt) {
+        globalDeferredPrompt.prompt().then(async () => {
+          const choice = await globalDeferredPrompt?.userChoice;
+          if (choice?.outcome === "accepted") {
+            sounds.match();
+            haptics.match();
+            setInstalled(true);
+            setShowBanner(false);
+          }
+          globalDeferredPrompt = null;
+          setDeferredPrompt(null);
+        });
+      } else if (isIosDevice) {
+        setShowIOSModal(true);
+      } else {
+        setShowAndroidModal(true);
+      }
+    };
+
+    window.addEventListener("campusloop_trigger_pwa_install", handleCustomTrigger);
+
+    // If iOS and not standalone, show after 2.5s on visit
     if (isIosDevice && !isStandaloneMode) {
       const timer = setTimeout(() => {
         setShowBanner(true);
-      }, 3000);
+      }, 2500);
       return () => clearTimeout(timer);
     }
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("campusloop_trigger_pwa_install", handleCustomTrigger);
     };
-  }, []);
+  }, [isMerchantOrAdmin]);
 
   async function handleInstallClick() {
     sounds.tap();
     haptics.light();
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-      if (choice.outcome === "accepted") {
+    if (deferredPrompt || globalDeferredPrompt) {
+      const p = deferredPrompt || globalDeferredPrompt;
+      p?.prompt();
+      const choice = await p?.userChoice;
+      if (choice?.outcome === "accepted") {
         sounds.match();
         haptics.match();
         setInstalled(true);
         setShowBanner(false);
       }
+      globalDeferredPrompt = null;
       setDeferredPrompt(null);
     } else if (isIOS) {
       setShowIOSModal(true);
+    } else {
+      setShowAndroidModal(true);
     }
   }
 
@@ -125,10 +170,11 @@ export function PWAInstallBanner() {
     haptics.light();
     setShowBanner(false);
     setShowIOSModal(false);
+    setShowAndroidModal(false);
     localStorage.setItem("cl_pwa_dismissed", String(Date.now()));
   }
 
-  if (isMerchantOrAdmin || isStandalone || !showBanner) return null;
+  if (isMerchantOrAdmin || isStandalone) return null;
 
   return (
     <>
@@ -142,7 +188,7 @@ export function PWAInstallBanner() {
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed bottom-20 left-4 right-4 z-40 md:hidden max-w-sm mx-auto select-none"
           >
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-card/95 p-3.5 shadow-2xl backdrop-blur-2xl">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-primary/40 bg-card/95 p-3.5 shadow-2xl backdrop-blur-2xl">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="relative size-10 shrink-0 overflow-hidden rounded-xl border border-border shadow-xs">
                   <img src="/logo.png" alt="CampusLoop App" className="size-full object-cover" />
@@ -153,7 +199,7 @@ export function PWAInstallBanner() {
                     <Zap className="size-3 text-amber-500 shrink-0" />
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">
-                    Add to home screen for 2x faster app feel
+                    Native WebAPK with 0ms fullscreen & push alerts
                   </p>
                 </div>
               </div>
@@ -181,10 +227,82 @@ export function PWAInstallBanner() {
         )}
       </AnimatePresence>
 
+      {/* ─── Android Chrome Instructions Modal (Removes 'Tap to copy URL' bar) ─── */}
+      <AnimatePresence>
+        {showAndroidModal && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-md p-4 select-none animate-in fade-in">
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <img src="/logo.png" alt="CampusLoop" className="size-8 rounded-xl border border-border" />
+                  <div>
+                    <h3 className="text-sm font-black text-foreground">Install CampusLoop WebAPK</h3>
+                    <p className="text-[10px] text-muted-foreground">True native full-screen app</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAndroidModal(false)}
+                  className="rounded-full p-1.5 text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <div className="flex items-start gap-3 rounded-2xl border border-border/60 bg-muted/20 p-3">
+                  <div className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-xs">
+                    1
+                  </div>
+                  <p className="text-xs text-foreground font-medium leading-snug">
+                    Tap the <strong>three dots ⋮</strong> in the top-right corner of Google Chrome.
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-3 rounded-2xl border border-border/60 bg-muted/20 p-3">
+                  <div className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-xs">
+                    2
+                  </div>
+                  <p className="text-xs text-foreground font-medium leading-snug">
+                    Select <strong>Install app</strong> (or <strong>Add to Home screen</strong>).
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-3">
+                  <div className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-500 font-bold text-xs">
+                    ✓
+                  </div>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold leading-snug">
+                    Chrome installs CampusLoop as a standalone WebAPK, removing browser notifications and
+                    unlocking 0ms speeds!
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAndroidModal(false);
+                  setShowBanner(false);
+                }}
+                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/95 transition-all cursor-pointer"
+              >
+                Understood!
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* ─── iOS Safari Instructions Modal ─── */}
       <AnimatePresence>
         {showIOSModal && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-md p-4 select-none">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-md p-4 select-none animate-in fade-in">
             <motion.div
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}

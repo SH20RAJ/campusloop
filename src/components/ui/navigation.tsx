@@ -25,11 +25,16 @@ import { toast } from "sonner";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
 import { DreamCampusesModal } from "@/components/preview/dream-campuses-modal";
+import { triggerPWAInstall } from "@/components/pwa/pwa-install-banner";
 import {
   AnimateBellRing,
+  AnimateDownload,
   AnimatedIcon,
   AnimateMessageSquare,
   AnimatePlus,
+  AnimateShieldCheck,
+  AnimateSlidersHorizontal,
+  AnimateZap,
 } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BrandLogo } from "@/components/ui/brand-logo";
@@ -387,11 +392,23 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
             <div className="pt-2 px-1 space-y-2">
               <Link href="/app/post/new" className="block">
                 <Button className="w-full h-11 bg-foreground text-background hover:opacity-90 font-black rounded-full text-sm cursor-pointer border-none shadow-sm transition-all flex items-center justify-center gap-2">
-                  <Plus className="size-4.5 stroke-3" />
+                  <AnimatedIcon icon={AnimatePlus} animation="pop" size={18} strokeWidth={2.5} />
                   <span>Post</span>
                 </Button>
               </Link>
               <FeedAnonymityQuickToggle initialMode={profile?.feedVisibility} />
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  triggerPWAInstall();
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-colors cursor-pointer"
+              >
+                <AnimatedIcon icon={AnimateZap} animation="twinkle" size={14} />
+                <span>Install CampusLoop App</span>
+              </button>
             </div>
           )}
         </div>
@@ -655,8 +672,35 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   <FeedAnonymityQuickToggle initialMode={profile?.feedVisibility} />
                 </div>
 
+                {/* Direct PWA App Install Button */}
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sounds.tap();
+                      haptics.light();
+                      setShowMobileMenu(false);
+                      triggerPWAInstall();
+                    }}
+                    className="w-full flex items-center justify-between p-3 rounded-2xl border border-primary/40 bg-gradient-to-r from-primary/15 to-primary/5 hover:from-primary/25 hover:to-primary/10 text-primary transition-all cursor-pointer shadow-xs group select-none"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="size-7 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
+                        <AnimatedIcon icon={AnimateZap} animation="twinkle" size={14} />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-xs font-black text-foreground group-hover:text-primary transition-colors">
+                          Install Web App (PWA)
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">Fullscreen 0ms app experience</p>
+                      </div>
+                    </div>
+                    <AnimatedIcon icon={AnimateDownload} animation="nudge-up" size={16} />
+                  </button>
+                </div>
+
                 {/* Secondary Quick Links */}
-                <div className="pt-4 border-t border-border/30 space-y-1">
+                <div className="pt-3 border-t border-border/30 space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground px-3">
                     Support &amp; Safety
                   </span>
@@ -665,7 +709,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     onClick={() => setShowMobileMenu(false)}
                     className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
                   >
-                    <Sliders className="size-4" />
+                    <AnimatedIcon icon={AnimateSlidersHorizontal} animation="pop" size={16} />
                     <span>Settings</span>
                   </Link>
 
@@ -674,7 +718,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     onClick={() => setShowMobileMenu(false)}
                     className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
                   >
-                    <ShieldCheck className="size-4" />
+                    <AnimatedIcon icon={AnimateShieldCheck} animation="pop" size={16} />
                     <span>Safety &amp; Rules</span>
                   </Link>
 

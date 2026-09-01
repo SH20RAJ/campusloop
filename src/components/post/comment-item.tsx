@@ -1,8 +1,15 @@
 "use client";
 
-import { Heart, MessageCircle, MoreHorizontal, ShieldCheck } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import {
+  AnimatedIcon,
+  AnimateHeart,
+  AnimateMessageCircle,
+  AnimateShieldCheck,
+  useIconHandle,
+} from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   detectMentionTrigger,
@@ -63,6 +70,8 @@ export function CommentItem({
   const [likesCount, setLikesCount] = useState(0);
   const [replyMentionTrigger, setReplyMentionTrigger] = useState<TriggerContext | null>(null);
   const replyInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const reply = useIconHandle();
+  const like = useIconHandle();
 
   const isAnon = comment.isAnonymous;
   const displayName = isAnon ? "Anonymous Student" : comment.author?.displayName || "Student";
@@ -156,7 +165,14 @@ export function CommentItem({
                 <span className="font-bold text-foreground truncate">{displayName}</span>
               )}
 
-              {isVerified && <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />}
+              {isVerified && (
+                <AnimatedIcon
+                  icon={AnimateShieldCheck}
+                  animation="pop"
+                  size={14}
+                  className="text-[#1d9bf0] shrink-0"
+                />
+              )}
 
               {/* OP / Author Badge */}
               {isPostAuthor && (
@@ -188,7 +204,7 @@ export function CommentItem({
           </div>
 
           {/* Action Row */}
-          <div className="flex items-center gap-6 pt-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-6 pt-1 text-xs text-muted-foreground select-none">
             {/* Reply Button */}
             <button
               type="button"
@@ -202,10 +218,17 @@ export function CommentItem({
                   setReplyBody(`@${handle} `);
                 }
               }}
+              {...reply.handlers}
               className="flex items-center gap-1.5 hover:text-[#1d9bf0] transition-colors cursor-pointer group/reply"
             >
               <div className="size-7 rounded-full group-hover/reply:bg-[#1d9bf0]/10 flex items-center justify-center transition-colors">
-                <MessageCircle className="size-4" />
+                <AnimatedIcon
+                  ref={reply.ref}
+                  icon={AnimateMessageCircle}
+                  animation="pop"
+                  size={15}
+                  animateOnHover={false}
+                />
               </div>
               <span className="text-[11px] font-semibold">Reply</span>
             </button>
@@ -214,15 +237,26 @@ export function CommentItem({
             <button
               type="button"
               onClick={handleToggleLike}
+              {...like.handlers}
               className={cn(
                 "flex items-center gap-1.5 transition-colors cursor-pointer group/like",
                 liked ? "text-rose-500" : "hover:text-rose-500"
               )}
             >
               <div className="size-7 rounded-full group-hover/like:bg-rose-500/10 flex items-center justify-center transition-colors">
-                <Heart
-                  className={cn("size-4", liked && "fill-rose-500 text-rose-500")}
-                  fill={liked ? "currentColor" : "none"}
+                <AnimatedIcon
+                  ref={like.ref}
+                  icon={AnimateHeart}
+                  animation="beat"
+                  size={15}
+                  animateOnHover={false}
+                  playKey={liked}
+                  iconClassName={cn(
+                    "transition-colors",
+                    liked
+                      ? "fill-rose-500 text-rose-500"
+                      : "text-muted-foreground group-hover/like:text-rose-500"
+                  )}
                 />
               </div>
               {likesCount > 0 && <span className="text-[11px] font-semibold">{likesCount}</span>}

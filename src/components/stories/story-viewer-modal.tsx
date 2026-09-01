@@ -1,8 +1,9 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Heart, Send, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AnimatedIcon, AnimateHeart, AnimateSend, AnimateX } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -61,71 +62,68 @@ export function StoryViewerModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-3 sm:p-4 animate-in fade-in select-none">
-      <div className="relative w-full max-w-[360px] aspect-9/16 rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between p-5 text-white border border-white/15 bg-black">
-        {/* Story Background: Either Photo or Gradient */}
-        {currentStory.mediaUrl ? (
-          <>
-            <img
-              src={currentStory.mediaUrl}
-              alt="Story Background"
-              className="absolute inset-0 w-full h-full object-cover z-0"
-            />
-            <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/10 to-black/85 z-0 pointer-events-none" />
-          </>
-        ) : (
-          <div
-            className={cn(
-              "absolute inset-0 z-0 bg-linear-to-tr from-violet-600 to-indigo-600",
-              currentStory.backgroundColor?.split(" ")[0]
-            )}
-          />
-        )}
-
-        {/* Top Progress Bars */}
-        <div className="relative z-10 flex gap-1 pt-1">
-          {user.stories.map((s, idx) => (
-            <div key={s.id} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-white transition-all duration-100 ease-linear"
-                style={{
-                  width: idx < activeStoryIdx ? "100%" : idx === activeStoryIdx ? `${progress}%` : "0%",
-                }}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Header Info */}
-        <div className="relative z-10 flex items-center justify-between mt-2">
-          <div className="flex items-center gap-2.5">
-            <Avatar className="h-8 w-8 border border-white/40 shadow-xs">
-              <AvatarImage src={user.avatarUrl || ""} />
-              <AvatarFallback className="text-xs font-bold text-foreground">
-                {user.displayName[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-xs font-bold leading-none text-white drop-shadow-md">{user.displayName}</p>
-              <p className="text-[10px] text-white/80 drop-shadow-xs">@{user.username}</p>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-0 sm:p-4 select-none">
+      <div className="relative w-full max-w-sm h-full sm:h-[680px] bg-black sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between p-4">
+        {/* Top Header & Progress Bars */}
+        <div className="relative z-10 space-y-2">
+          {/* Progress Indicators */}
+          <div className="flex gap-1 items-center">
+            {user.stories.map((s, idx) => (
+              <div key={s.id} className="flex-1 h-1 rounded-full bg-white/30 overflow-hidden">
+                <div
+                  className="h-full bg-white transition-all duration-100 ease-linear"
+                  style={{
+                    width: idx < activeStoryIdx ? "100%" : idx === activeStoryIdx ? `${progress}%` : "0%",
+                  }}
+                />
+              </div>
+            ))}
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="size-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/60 transition-colors cursor-pointer"
-          >
-            <X className="size-4" />
-          </button>
+          {/* User Meta Row */}
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center gap-2">
+              <Avatar className="size-8 border border-white/40">
+                <AvatarImage src={user.avatarUrl || ""} />
+                <AvatarFallback className="text-[10px] bg-muted font-bold text-foreground">
+                  {user.displayName[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-xs font-bold text-white leading-tight">{user.displayName}</p>
+                <p className="text-[10px] text-white/70 leading-tight">@{user.username}</p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="size-8 rounded-full bg-black/40 hover:bg-black/70 flex items-center justify-center text-white transition-colors cursor-pointer"
+            >
+              <AnimatedIcon icon={AnimateX} animation="pop" size={18} />
+            </button>
+          </div>
         </div>
 
-        {/* Center Story Content */}
-        <div className="relative z-10 flex-1 flex items-center justify-center text-center p-3">
+        {/* Story Canvas Content */}
+        <div
+          className="absolute inset-0 flex items-center justify-center p-6 text-center"
+          style={{
+            backgroundColor: currentStory.backgroundColor || "#1e1b4b",
+          }}
+        >
+          {currentStory.mediaUrl && (
+            <img
+              src={currentStory.mediaUrl}
+              alt="Story"
+              className="absolute inset-0 size-full object-cover"
+            />
+          )}
+
           {currentStory.text && (
             <p
               className={cn(
-                "text-lg sm:text-xl font-extrabold tracking-tight leading-relaxed max-w-[260px] break-words whitespace-pre-wrap drop-shadow-2xl",
+                "relative z-10 text-white font-extrabold text-lg sm:text-xl drop-shadow-md max-w-xs break-words",
                 currentStory.mediaUrl
                   ? "bg-black/40 px-3.5 py-2 rounded-2xl backdrop-blur-xs border border-white/10"
                   : ""
@@ -161,13 +159,13 @@ export function StoryViewerModal({
               placeholder={`Reply to ${user.displayName}...`}
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
-              className="flex-1 h-9 rounded-full bg-black/50 border border-white/25 px-4 text-xs placeholder:text-white/70 focus:outline-none focus:border-white/60 backdrop-blur-md"
+              className="flex-1 h-9 rounded-full bg-black/50 border border-white/25 px-4 text-xs placeholder:text-white/70 focus:outline-none focus:border-white/60 backdrop-blur-md text-white"
             />
             <button
               type="submit"
               className="size-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition-transform shadow-xs"
             >
-              <Send className="size-3.5" />
+              <AnimatedIcon icon={AnimateSend} animation="pop" size={14} />
             </button>
           </form>
 
@@ -181,7 +179,13 @@ export function StoryViewerModal({
                 : "bg-black/40 text-white hover:bg-black/60"
             )}
           >
-            <Heart className={cn("size-4", liked && "fill-current")} />
+            <AnimatedIcon
+              icon={AnimateHeart}
+              animation="beat"
+              size={16}
+              playKey={liked}
+              iconClassName={cn(liked ? "fill-white text-white" : "text-white")}
+            />
           </button>
         </div>
       </div>

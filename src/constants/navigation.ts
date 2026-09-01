@@ -1,35 +1,36 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  Bell,
-  Bookmark,
-  BookOpen,
   Building2,
   Cake,
   Calendar,
   Car,
-  Compass,
-  Flame,
   Gamepad2,
-  GraduationCap,
-  Heart,
-  HeartHandshakeIcon,
   HelpCircle,
-  Home,
   Hourglass,
-  Lock,
-  MessageSquare,
   MoreHorizontal,
-  Plus,
   School,
-  Search,
-  ShieldCheck,
-  ShoppingBag,
   Sliders,
-  Sparkles,
-  UserCircle,
-  Users,
-  Zap,
 } from "lucide-react";
+import {
+  AnimateBellRing,
+  AnimateBookmark,
+  AnimateBookOpen,
+  AnimateCompass,
+  AnimateFlame,
+  AnimateGraduationCap,
+  AnimateHeart,
+  AnimateHouse,
+  AnimateLock,
+  AnimateMessageSquare,
+  AnimatePlus,
+  AnimateSearch,
+  AnimateShieldCheck,
+  AnimateShoppingBag,
+  AnimateSparkles,
+  AnimateUser,
+  AnimateUsers,
+  AnimateZap,
+} from "@/components/ui/animated-icon";
 
 export interface NavItem {
   icon: LucideIcon | React.ComponentType<any>;
@@ -46,8 +47,8 @@ export interface NavGroup {
 }
 
 export const DESKTOP_NAV_ITEMS: NavItem[] = [
-  { icon: Home, href: "/app", label: "Home" },
-  { icon: Compass, href: "/app/discover", label: "Explore" },
+  { icon: AnimateHouse, href: "/app", label: "Home" },
+  { icon: AnimateCompass, href: "/app/discover", label: "Explore" },
   {
     icon: Calendar,
     href: "/app/events",
@@ -56,25 +57,25 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
     badgeColor: "bg-primary/15 text-primary border border-primary/30",
   },
   {
-    icon: ShoppingBag,
+    icon: AnimateShoppingBag,
     href: "/app/marketplace",
     label: "Marketplace",
     badge: "NEW",
     badgeColor: "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30",
   },
-  { icon: HeartHandshakeIcon, href: "/app/matching", label: "Match" },
-  { icon: Bell, href: "/app/notifications", label: "Notifications" },
-  { icon: MessageSquare, href: "/app/chat", label: "Messages" },
-  { icon: Users, href: "/app/communities", label: "Communities" },
-  { icon: UserCircle, href: "/app/profile", label: "Profile" },
+  { icon: AnimateHeart, href: "/app/matching", label: "Match" },
+  { icon: AnimateBellRing, href: "/app/notifications", label: "Notifications" },
+  { icon: AnimateMessageSquare, href: "/app/chat", label: "Messages" },
+  { icon: AnimateUsers, href: "/app/communities", label: "Communities" },
+  { icon: AnimateUser, href: "/app/profile", label: "Profile" },
   { icon: MoreHorizontal, href: "/app/more", label: "More" },
 ];
 
 export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
-  { icon: Home, href: "/app", label: "Home" },
-  { icon: Compass, href: "/app/discover", label: "Explore" },
-  { icon: Plus, href: "/app/post/new", label: "Post" },
-  { icon: Heart, href: "/app/matching", label: "Match" },
+  { icon: AnimateHouse, href: "/app", label: "Home" },
+  { icon: AnimateCompass, href: "/app/discover", label: "Explore" },
+  { icon: AnimatePlus, href: "/app/post/new", label: "Post" },
+  { icon: AnimateHeart, href: "/app/matching", label: "Match" },
   { icon: MoreHorizontal, href: "/app/more", label: "More" },
 ];
 
@@ -83,7 +84,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
     group: "Campus Spotlight & Vaults (Exclusive)",
     items: [
       {
-        icon: Zap,
+        icon: AnimateZap,
         href: "/app/random",
         label: "Random Loop",
         desc: "Meet someone unexpected. Instant real-time serendipitous chat with verified peers",
@@ -91,7 +92,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-amber-500/15 text-amber-500 border-amber-500/30",
       },
       {
-        icon: Lock,
+        icon: AnimateLock,
         href: "/app/crush",
         label: "Secret Crush Vault",
         desc: "5-slot intent-hidden encrypted campus crush match vault",
@@ -99,7 +100,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-pink-500/15 text-pink-500 border-pink-500/30",
       },
       {
-        icon: Sparkles,
+        icon: AnimateSparkles,
         href: "/app/ai",
         label: "Campus AI Assistant",
         desc: "Ask about campus fests, study roadmaps, hostel tips & navigate CampusLoop",
@@ -107,7 +108,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-primary/15 text-primary border-primary/30",
       },
       {
-        icon: Flame,
+        icon: AnimateFlame,
         href: "/app/confessions",
         label: "Campus Confessions",
         desc: "Unfiltered campus thoughts with sealed identity escrow",
@@ -136,7 +137,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
     group: "Student Living & Campus Utilities",
     items: [
       {
-        icon: GraduationCap,
+        icon: AnimateGraduationCap,
         href: "/app/academics",
         label: "Academics & Study Hub",
         desc: "PYQs, lecture notes, branch syllabi & exam preparation resources",
@@ -144,7 +145,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-blue-500/15 text-blue-500 border-blue-500/30",
       },
       {
-        icon: BookOpen,
+        icon: AnimateBookOpen,
         href: "/app/articles",
         label: "Articles & Roadmaps",
         desc: "Placement roadmaps, tech tutorials, interviews & campus long reads",
@@ -168,7 +169,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-cyan-500/15 text-cyan-500 border-cyan-500/30",
       },
       {
-        icon: Search,
+        icon: AnimateSearch,
         href: "/app/lost-and-found",
         label: "Lost & Found Hub",
         desc: "Report and recover misplaced student ID cards, keys, earbuds & gadgets",
@@ -189,7 +190,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
     group: "Core Campus Hubs & Activities",
     items: [
       {
-        icon: Users,
+        icon: AnimateUsers,
         href: "/app/communities",
         label: "Communities & Clubs",
         desc: "Student-created clubs, technical societies & campus interest groups",
@@ -197,7 +198,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-primary/15 text-primary border-primary/30",
       },
       {
-        icon: ShoppingBag,
+        icon: AnimateShoppingBag,
         href: "/app/marketplace",
         label: "Student Marketplace & Canteens",
         desc: "Buy, sell, trade dorm essentials, books, cycles & order from campus food joints",
@@ -213,7 +214,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-amber-500/15 text-amber-500 border-amber-500/30",
       },
       {
-        icon: MessageSquare,
+        icon: AnimateMessageSquare,
         href: "/app/chat",
         label: "Direct Messages",
         desc: "P2P verified student chats, real-time messaging & study rooms",
@@ -221,7 +222,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-blue-500/15 text-blue-500 border-blue-500/30",
       },
       {
-        icon: Heart,
+        icon: AnimateHeart,
         href: "/app/matching",
         label: "Campus Match Deck",
         desc: "Safe vibe matching & swipe deck for verified classmates",
@@ -237,7 +238,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-indigo-500/15 text-indigo-500 border-indigo-500/30",
       },
       {
-        icon: Compass,
+        icon: AnimateCompass,
         href: "/app/discover",
         label: "Campus Radius & Discovery",
         desc: "Explore trending campus pulses, top voices & global campus feeds across India",
@@ -250,7 +251,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
     group: "Account & Safety",
     items: [
       {
-        icon: Bookmark,
+        icon: AnimateBookmark,
         href: "/app/saved",
         label: "Saved Posts",
         desc: "Your private vault of bookmarked posts, threads & resources",
@@ -262,7 +263,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         desc: "Account privacy, notification preferences & verification",
       },
       {
-        icon: ShieldCheck,
+        icon: AnimateShieldCheck,
         href: "/safety",
         label: "Safety & Community Guidelines",
         desc: "Verified student network rules, identity escrow & moderation standards",

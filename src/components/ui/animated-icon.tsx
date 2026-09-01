@@ -14,7 +14,6 @@ import {
 } from "react";
 import { cn } from "@/lib/utils";
 
-// Export direct high-performance animated SVG icons from @animateicons/react/lucide
 export {
   Bell as AnimateBell,
   BellRing as AnimateBellRing,
@@ -23,29 +22,62 @@ export {
   Check as AnimateCheck,
   CheckCheck as AnimateCheckCheck,
   Compass as AnimateCompass,
+  Download as AnimateDownload,
+  FileText as AnimateFileText,
   Flame as AnimateFlame,
+  Folder as AnimateFolder,
   Heart as AnimateHeart,
   House as AnimateHouse,
   Image as AnimateImage,
+  Lock as AnimateLock,
+  LogOut as AnimateLogOut,
+  MapPin as AnimateMapPin,
+  Menu as AnimateMenu,
   MessageCircle as AnimateMessageCircle,
   MessageSquare as AnimateMessageSquare,
   Mic as AnimateMic,
+  Moon as AnimateMoon,
+  Package as AnimatePackage,
+  Paperclip as AnimatePaperclip,
+  Pause as AnimatePause,
   Phone as AnimatePhone,
+  Play as AnimatePlay,
   Plus as AnimatePlus,
+  RefreshCw as AnimateRefreshCw,
   Repeat as AnimateRepeat,
   Repeat2 as AnimateRepeat2,
+  Save as AnimateSave,
   Search as AnimateSearch,
   Send as AnimateSend,
   Settings as AnimateSettings,
   Share as AnimateShare,
   ShieldCheck as AnimateShieldCheck,
+  ShoppingBag as AnimateShoppingBag,
+  ShoppingCart as AnimateShoppingCart,
   SlidersHorizontal as AnimateSlidersHorizontal,
   Sparkles as AnimateSparkles,
+  Star as AnimateStar,
+  Store as AnimateStore,
+  Sun as AnimateSun,
   ThumbsUp as AnimateThumbsUp,
+  Trash as AnimateTrash,
+  Trash2 as AnimateTrash2,
+  TrendingUp as AnimateTrendingUp,
+  Upload as AnimateUpload,
+  User as AnimateUser,
   Users as AnimateUsers,
+  Utensils as AnimateUtensils,
   Video as AnimateVideo,
+  Volume2 as AnimateVolume2,
+  VolumeX as AnimateVolumeX,
   X as AnimateX,
+  Zap as AnimateZap,
 } from "@animateicons/react/lucide";
+// Export direct high-performance animated SVG icons from @animateicons/react/lucide
+export {
+  GraduationCap as AnimateGraduationCap,
+  Smile as AnimateSmile,
+} from "lucide-react";
 
 /**
  * Matches `IconHandle` from @animateicons/react, so call sites are portable.

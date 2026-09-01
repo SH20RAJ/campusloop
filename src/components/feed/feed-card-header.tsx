@@ -1,21 +1,17 @@
 "use client";
 
-import {
-  Archive,
-  Copy,
-  Flag,
-  Link2,
-  MoreHorizontal,
-  Repeat2,
-  School,
-  ShieldCheck,
-  Trash2,
-} from "lucide-react";
+import { Archive, Copy, Flag, Link2, MoreHorizontal, School } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { archivePost, deletePost } from "@/app/app/(main)/post/actions";
+import {
+  AnimatedIcon,
+  AnimateRepeat2,
+  AnimateShieldCheck,
+  AnimateTrash2,
+} from "@/components/ui/animated-icon";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { FeedPost } from "@/hooks/use-feed";
 import { formatTimeAgo } from "@/lib/utils";
@@ -89,7 +85,14 @@ export function FeedCardHeader({
             </span>
           )}
 
-          {isVerified && <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />}
+          {isVerified && (
+            <AnimatedIcon
+              icon={AnimateShieldCheck}
+              animation="pop"
+              size={14}
+              className="text-[#1d9bf0] shrink-0"
+            />
+          )}
 
           {authorHandle && (
             <span className="text-muted-foreground text-xs sm:text-[13px] truncate max-w-[90px] sm:max-w-[130px] shrink-0 sm:shrink">
@@ -152,7 +155,12 @@ export function FeedCardHeader({
                     }}
                     className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2"
                   >
-                    <Repeat2 className="size-4 text-emerald-500" />
+                    <AnimatedIcon
+                      icon={AnimateRepeat2}
+                      animation="nudge-right"
+                      size={16}
+                      className="text-emerald-500"
+                    />
                     <span>Repost or Quote</span>
                   </button>
 
@@ -219,7 +227,7 @@ export function FeedCardHeader({
                         }}
                         className="w-full text-left px-3.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer flex items-center gap-2"
                       >
-                        <Trash2 className="size-4" />
+                        <AnimatedIcon icon={AnimateTrash2} animation="shake" size={16} />
                         <span>Delete Post</span>
                       </button>
                     </>

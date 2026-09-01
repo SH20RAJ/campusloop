@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bookmark, Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
+  AnimateBookmark,
   AnimatedIcon,
+  AnimateHeart,
   AnimateMessageCircle,
   AnimateRepeat2,
   AnimateShare,
@@ -49,6 +50,8 @@ export function FeedCardActions({
 
   const reply = useIconHandle();
   const repost = useIconHandle();
+  const like = useIconHandle();
+  const bookmark = useIconHandle();
   const share = useIconHandle();
   const displayCommentsCount = commentsCount ?? post.commentsCount;
 
@@ -147,6 +150,7 @@ export function FeedCardActions({
           whileTap={{ scale: 0.8 }}
           type="button"
           onClick={onVote}
+          {...like.handlers}
           className={cn(
             "size-8 rounded-full flex items-center justify-center transition-colors cursor-pointer group",
             isLiked
@@ -155,12 +159,17 @@ export function FeedCardActions({
           )}
           aria-label={isLiked ? "Unlike post" : "Like post"}
         >
-          <Heart
-            className={cn(
-              "size-[18px] transition-transform duration-200 group-hover:scale-110",
+          <AnimatedIcon
+            ref={like.ref}
+            icon={AnimateHeart}
+            animation="beat"
+            size={18}
+            animateOnHover={false}
+            playKey={isLiked}
+            iconClassName={cn(
+              "transition-colors",
               isLiked ? "fill-rose-500 text-rose-500" : "text-muted-foreground group-hover:text-rose-500"
             )}
-            fill={isLiked ? "currentColor" : "none"}
           />
         </motion.button>
         {votesCount > 0 && (
@@ -186,6 +195,7 @@ export function FeedCardActions({
         whileTap={{ scale: 0.8 }}
         type="button"
         onClick={handleToggleSave}
+        {...bookmark.handlers}
         className={cn(
           "size-8 rounded-full flex items-center justify-center transition-colors cursor-pointer group",
           isSaved
@@ -194,12 +204,17 @@ export function FeedCardActions({
         )}
         aria-label={isSaved ? "Saved in vault" : "Save post"}
       >
-        <Bookmark
-          className={cn(
-            "size-[18px] transition-transform duration-200 group-hover:scale-110",
+        <AnimatedIcon
+          ref={bookmark.ref}
+          icon={AnimateBookmark}
+          animation="lift"
+          size={18}
+          animateOnHover={false}
+          playKey={isSaved}
+          iconClassName={cn(
+            "transition-colors",
             isSaved ? "fill-amber-500 text-amber-500" : "text-muted-foreground group-hover:text-amber-500"
           )}
-          fill={isSaved ? "currentColor" : "none"}
         />
       </motion.button>
 

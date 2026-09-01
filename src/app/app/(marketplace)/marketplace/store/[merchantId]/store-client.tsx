@@ -897,8 +897,8 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
           }>;
 
           return (
-            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-              <div className="w-full max-w-lg bg-card border border-border rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] sm:max-h-[82vh]">
+            <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+              <div className="w-full max-w-lg bg-card border-t sm:border border-border rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[80vh] animate-in fade-in-0 slide-in-from-bottom-6 duration-200">
                 {/* Fixed Header */}
                 <div className="flex items-start justify-between gap-3 border-b border-border/40 p-4 sm:p-5 shrink-0 bg-card">
                   <div>
@@ -1002,7 +1002,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                 </div>
 
                 {/* Sticky Guaranteed-Visible Footer */}
-                <div className="p-4 sm:p-5 border-t border-border/40 bg-card/95 backdrop-blur-md shrink-0 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))]">
+                <div className="p-4 sm:p-5 border-t border-border/40 bg-card shrink-0 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
                   <button
                     type="button"
                     onClick={handleAddToCart}
@@ -1019,7 +1019,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
 
       {/* ─── Rate & Review Store Modal ─── */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-card border border-border rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div>

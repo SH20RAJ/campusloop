@@ -88,11 +88,13 @@ export function PWAInstallBanner() {
     setIsIOS(isIosDevice);
     setIsAndroid(isAndroidDevice);
 
-    // Check if user dismissed banner recently (within 24 hours)
+    // Check if user dismissed banner recently — 7 day cooldown (30 days after 3+ dismissals)
     const dismissedAt = localStorage.getItem("cl_pwa_dismissed");
+    const dismissCount = Number(localStorage.getItem("cl_pwa_dismiss_count") || "0");
     if (dismissedAt) {
       const daysSinceDismissed = (Date.now() - Number(dismissedAt)) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissed < 1) return;
+      const cooldownDays = dismissCount >= 3 ? 30 : 7;
+      if (daysSinceDismissed < cooldownDays) return;
     }
 
     // Android/Desktop Chrome install event
@@ -172,6 +174,8 @@ export function PWAInstallBanner() {
     setShowIOSModal(false);
     setShowAndroidModal(false);
     localStorage.setItem("cl_pwa_dismissed", String(Date.now()));
+    const prevCount = Number(localStorage.getItem("cl_pwa_dismiss_count") || "0");
+    localStorage.setItem("cl_pwa_dismiss_count", String(prevCount + 1));
   }
 
   if (isMerchantOrAdmin || isStandalone) return null;

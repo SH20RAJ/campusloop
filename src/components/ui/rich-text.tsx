@@ -6,6 +6,9 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
+import { AudioPlayer } from "@/components/media/audio-player";
+import { DocumentCard } from "@/components/media/document-card";
+import { VideoPlayer } from "@/components/media/video-player";
 
 interface RichTextProps {
   content: string;
@@ -37,19 +40,56 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
 
   if (!content) return null;
 
-  // Regular expression to match markdown images: ![alt](url)
-  const imageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g;
+  // Regex to extract markdown media elements: ![tag:extra](url)
+  const mediaRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g;
 
-  // Extract all markdown images
   const images: { alt: string; url: string }[] = [];
+  const videos: { title: string; url: string }[] = [];
+  const audios: { title: string; url: string }[] = [];
+  const documents: { name: string; url: string; size?: number }[] = [];
+
   let match: RegExpExecArray | null;
 
-  while ((match = imageRegex.exec(content)) !== null) {
-    images.push({ alt: match[1] || "Attached image", url: match[2] });
+  while ((match = mediaRegex.exec(content)) !== null) {
+    const rawTag = match[1] || "";
+    const url = match[2];
+
+    const isVideo =
+      rawTag.startsWith("video") ||
+      /\.(mp4|webm|mov|mkv)($|\?)/i.test(url) ||
+      url.includes("/api/files/r2/videos/");
+
+    const isAudio =
+      rawTag.startsWith("audio") ||
+      rawTag.startsWith("voice") ||
+      /\.(mp3|wav|m4a|ogg|aac|webm)($|\?)/i.test(url) ||
+      url.includes("/api/files/r2/audio/");
+
+    const isDoc =
+      rawTag.startsWith("document") ||
+      rawTag.startsWith("pdf") ||
+      rawTag.startsWith("notes") ||
+      /\.(pdf|docx|doc|zip|rar|xlsx|pptx)($|\?)/i.test(url) ||
+      url.includes("/api/files/r2/documents/");
+
+    if (isVideo) {
+      const parts = rawTag.split(":");
+      videos.push({ title: parts[1] || "Campus Video Clip", url });
+    } else if (isAudio) {
+      const parts = rawTag.split(":");
+      audios.push({ title: parts[1] || "Voice Memo", url });
+    } else if (isDoc) {
+      const parts = rawTag.split(":");
+      const name = parts[1] || "Campus Study Notes";
+      const size = parts[2] ? Number.parseInt(parts[2], 10) : undefined;
+      documents.push({ name, url, size });
+    } else {
+      images.push({ alt: rawTag || "Attached image", url });
+    }
   }
 
-  // Text with markdown images removed
-  const textWithoutMdImages = content.replace(imageRegex, "").trim();
+  // Text with markdown media markers removed
+  const textWithoutMedia = content.replace(mediaRegex, "").trim();
 
   function handleOpenImage(e: React.MouseEvent, url: string) {
     e.preventDefault();
@@ -64,13 +104,8 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
     }
   }
 
-  // Helper to parse links, hashtags, and mentions in remaining text
+  // Helper to parse links, hashtags, mentions, and bare URLs
   function parseText(text: string) {
-    // Regex for:
-    // 1. Markdown link: [text](url)
-    // 2. Bare URL: https?://...
-    // 3. Hashtag: #tag
-    // 4. Mention: @username
     const tokenRegex =
       /(\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|https?:\/\/[^\s]+|#[a-zA-Z0-9_]+|@[a-zA-Z0-9_\-.]+)/g;
 
@@ -79,7 +114,6 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
     let tokenMatch: RegExpExecArray | null;
 
     while ((tokenMatch = tokenRegex.exec(text)) !== null) {
-      // Add preceding plain text
       if (tokenMatch.index > lastIndex) {
         parts.push(text.substring(lastIndex, tokenMatch.index));
       }
@@ -102,8 +136,12 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
           </a>
         );
       } else if (raw.startsWith("http://") || raw.startsWith("https://")) {
-        // Bare URL: Check if it's a standalone image URL
+        // Standalone Media URL detection
         const isImageUrl = /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(raw);
+        const isVideoUrl = /\.(mp4|webm|mov)($|\?)/i.test(raw) || raw.includes("/api/files/r2/videos/");
+        const isAudioUrl = /\.(mp3|wav|m4a|ogg)($|\?)/i.test(raw) || raw.includes("/api/files/r2/audio/");
+        const isPdfUrl = /\.(pdf)($|\?)/i.test(raw) || raw.includes("/api/files/r2/documents/");
+
         if (isImageUrl) {
           parts.push(
             <div
@@ -122,6 +160,24 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
               />
             </div>
           );
+        } else if (isVideoUrl) {
+          parts.push(
+            <div key={`video-bare-${tokenMatch.index}`} className="my-2">
+              <VideoPlayer src={raw} />
+            </div>
+          );
+        } else if (isAudioUrl) {
+          parts.push(
+            <div key={`audio-bare-${tokenMatch.index}`} className="my-2">
+              <AudioPlayer src={raw} />
+            </div>
+          );
+        } else if (isPdfUrl) {
+          parts.push(
+            <div key={`doc-bare-${tokenMatch.index}`} className="my-2">
+              <DocumentCard url={raw} name="Campus Document.pdf" />
+            </div>
+          );
         } else {
           parts.push(
             <a
@@ -137,7 +193,6 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
           );
         }
       } else if (raw.startsWith("#")) {
-        // Hashtag
         const tag = raw.slice(1);
         parts.push(
           <Link
@@ -150,7 +205,6 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
           </Link>
         );
       } else if (raw.startsWith("@")) {
-        // Mention
         const username = raw.slice(1);
         parts.push(
           <Link
@@ -167,7 +221,6 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
       lastIndex = tokenRegex.lastIndex;
     }
 
-    // Add remaining plain text
     if (lastIndex < text.length) {
       parts.push(text.substring(lastIndex));
     }
@@ -177,23 +230,39 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
 
   return (
     <div className={`space-y-2 leading-relaxed ${className}`}>
-      {/* Render Text */}
-      {textWithoutMdImages && (
-        <div className="whitespace-pre-wrap break-words">{parseText(textWithoutMdImages)}</div>
+      {/* Render Text Body */}
+      {textWithoutMedia && (
+        <div className="whitespace-pre-wrap break-words">{parseText(textWithoutMedia)}</div>
       )}
 
-      {/* Render Markdown Images / Instagram-Style Multi-Image Carousel */}
-      {images.length > 0 && (
-        <ImageCarousel
-          images={images}
-          onOpenImage={handleOpenImage}
-        />
-      )}
+      {/* Render Attached Videos */}
+      {videos.map((vid, idx) => (
+        <div key={`vid-${idx}`} className="my-2">
+          <VideoPlayer src={vid.url} />
+        </div>
+      ))}
 
-      {/* Rich Embeds (YouTube, Spotify, User Profiles, Communities, Events, Web Previews) */}
+      {/* Render Attached Audio / Voice Notes */}
+      {audios.map((aud, idx) => (
+        <div key={`aud-${idx}`} className="my-2">
+          <AudioPlayer src={aud.url} title={aud.title} />
+        </div>
+      ))}
+
+      {/* Render Attached Notes / PDFs */}
+      {documents.map((doc, idx) => (
+        <div key={`doc-${idx}`} className="my-2">
+          <DocumentCard url={doc.url} name={doc.name} size={doc.size} />
+        </div>
+      ))}
+
+      {/* Render Images / Multi-Image Carousel */}
+      {images.length > 0 && <ImageCarousel images={images} onOpenImage={handleOpenImage} />}
+
+      {/* Rich Embeds */}
       {!disableEmbeds && <PostEmbedRenderer content={content} />}
 
-      {/* Portal-Mounted Fullscreen Lightbox Modal */}
+      {/* Fullscreen Lightbox Modal for Images */}
       {mounted &&
         selectedImage &&
         createPortal(
@@ -206,7 +275,6 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
             }}
             onPointerDown={(e) => e.stopPropagation()}
           >
-            {/* Top Toolbar */}
             <div
               className="w-full max-w-4xl flex items-center justify-between px-2 pt-2 z-10"
               onClick={(e) => e.stopPropagation()}
@@ -240,7 +308,6 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
               </div>
             </div>
 
-            {/* Centered Image */}
             <div
               className="flex-1 flex items-center justify-center w-full max-w-5xl overflow-hidden py-4"
               onClick={(e) => {
@@ -257,7 +324,6 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
               />
             </div>
 
-            {/* Bottom Dismiss Hint */}
             <div className="pb-2 text-center text-xs text-white/50" onClick={(e) => e.stopPropagation()}>
               Tap anywhere outside image to close · Press Esc
             </div>
@@ -341,7 +407,6 @@ function ImageCarousel({ images, onOpenImage }: ImageCarouselProps) {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Current Slide */}
       <div
         className="relative w-full aspect-4/3 sm:aspect-16/10 cursor-pointer overflow-hidden flex items-center justify-center bg-black/20"
         onClick={(e) => onOpenImage(e, images[currentIndex].url)}
@@ -354,7 +419,6 @@ function ImageCarousel({ images, onOpenImage }: ImageCarouselProps) {
           loading="lazy"
         />
 
-        {/* Zoom Hint */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
           <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-md">
             <ZoomIn className="size-4" />
@@ -362,12 +426,10 @@ function ImageCarousel({ images, onOpenImage }: ImageCarouselProps) {
         </div>
       </div>
 
-      {/* Instagram-Style Counter Badge */}
       <div className="absolute top-3 right-3 rounded-full bg-black/65 px-2.5 py-0.5 text-[11px] font-black text-white backdrop-blur-md shadow-xs pointer-events-none">
         {currentIndex + 1}/{images.length}
       </div>
 
-      {/* Previous Button */}
       <button
         type="button"
         aria-label="Previous image"
@@ -377,7 +439,6 @@ function ImageCarousel({ images, onOpenImage }: ImageCarouselProps) {
         <ChevronLeft className="size-4" />
       </button>
 
-      {/* Next Button */}
       <button
         type="button"
         aria-label="Next image"
@@ -387,15 +448,12 @@ function ImageCarousel({ images, onOpenImage }: ImageCarouselProps) {
         <ChevronRight className="size-4" />
       </button>
 
-      {/* Instagram-Style Dot Indicators */}
       <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 p-1 rounded-full bg-black/40 backdrop-blur-xs pointer-events-none">
         {images.map((_, idx) => (
           <span
             key={idx}
             className={`transition-all rounded-full ${
-              idx === currentIndex
-                ? "size-1.5 bg-white scale-125"
-                : "size-1 bg-white/50"
+              idx === currentIndex ? "size-1.5 bg-white scale-125" : "size-1 bg-white/50"
             }`}
           />
         ))}

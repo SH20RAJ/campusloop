@@ -5,20 +5,21 @@ import {
   CheckCheck,
   Copy,
   CornerDownRight,
+  FileText,
   Heart,
   Info,
   Loader2,
+  Mic,
   MoreHorizontal,
   MoreVertical,
   Paperclip,
-  Play,
   Search,
   ShieldCheck,
   Smile,
   Trash2,
   User,
   Users2,
-  Volume2,
+  Video,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -27,7 +28,11 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { ActiveCallOverlay } from "@/components/calls/active-call-overlay";
 import { IncomingCallModal } from "@/components/calls/incoming-call-modal";
-import { AnimateMic, AnimatePhone, AnimateSend, AnimateVideo } from "@/components/ui/animated-icon";
+import { AudioPlayer } from "@/components/media/audio-player";
+import { DocumentCard } from "@/components/media/document-card";
+import { VideoPlayer } from "@/components/media/video-player";
+import { VoiceRecorderModal } from "@/components/media/voice-recorder-modal";
+import { AnimatePhone, AnimateSend, AnimateVideo } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
 import { PresenceDot } from "@/components/ui/presence-dot";
@@ -43,7 +48,7 @@ import {
 import { haptics } from "@/lib/haptics";
 import { isOnline, presenceLabel } from "@/lib/presence";
 import { sounds } from "@/lib/sounds";
-import { uploadImageToImgBB } from "@/lib/upload";
+import { uploadImageToImgBB, uploadMediaFile } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import { ChatMessageContent } from "./chat-message-content";
 import { ChatUserInfoDrawer } from "./chat-user-info-drawer";
@@ -130,6 +135,11 @@ export function MessengerPane({
   const [swipedOffset, setSwipedOffset] = useState<Record<string, number>>({});
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const videoInputRef = useRef<HTMLInputElement | null>(null);
+  const docInputRef = useRef<HTMLInputElement | null>(null);
+  const [showVoiceModal, setShowVoiceModal] = useState(false);
+  const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -543,9 +553,9 @@ export function MessengerPane({
       return;
     }
 
-    setIsUploadingImage(true);
+    setIsUploadingMedia(true);
     try {
-      toast.loading("Sending image sticker...", { id: "chat-img" });
+      toast.loading("Sending photo...", { id: "chat-img" });
       const res = await uploadImageToImgBB(file);
       const url = res.displayUrl || res.url;
       await sendMessage(url);
@@ -555,8 +565,50 @@ export function MessengerPane({
         id: "chat-img",
       });
     } finally {
-      setIsUploadingImage(false);
+      setIsUploadingMedia(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function sendVideoFile(file: File) {
+    if (!file || !conversationId) return;
+    setIsUploadingMedia(true);
+    try {
+      toast.loading("Uploading video to Cloudflare R2...", { id: "chat-video" });
+      const res = await uploadMediaFile(file, "video");
+      await sendMessage(`![video:${file.name}](${res.url})`);
+      toast.success("Video sent! 🎥", { id: "chat-video" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send video", { id: "chat-video" });
+    } finally {
+      setIsUploadingMedia(false);
+      if (videoInputRef.current) videoInputRef.current.value = "";
+    }
+  }
+
+  async function sendDocFile(file: File) {
+    if (!file || !conversationId) return;
+    setIsUploadingMedia(true);
+    try {
+      toast.loading("Uploading document to Cloudflare R2...", { id: "chat-doc" });
+      const res = await uploadMediaFile(file, "document");
+      await sendMessage(`![document:${file.name}:${file.size}](${res.url})`);
+      toast.success("Document sent! 📄", { id: "chat-doc" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send document", { id: "chat-doc" });
+    } finally {
+      setIsUploadingMedia(false);
+      if (docInputRef.current) docInputRef.current.value = "";
+    }
+  }
+
+  async function handleVoiceRecorded(url: string, duration: number) {
+    if (!conversationId) return;
+    try {
+      await sendMessage(`![voice:Voice Note (${duration}s)](${url})`);
+      toast.success("Voice note sent! 🎙️");
+    } catch {
+      toast.error("Failed to send voice note");
     }
   }
 
@@ -571,24 +623,42 @@ export function MessengerPane({
     const clipboardData = e.clipboardData;
     if (!clipboardData) return;
 
-    // 1. Check direct file attachments (Files array, e.g. Gboard / iOS keyboard sticker / copied photo)
+    // 1. Check direct file attachments
     const files = Array.from(clipboardData.files || []);
     const imageFile = files.find((f) => f.type.startsWith("image/"));
     if (imageFile) {
       e.preventDefault();
-      toast.info("Sending pasted sticker / image... 🎨");
+      toast.info("Sending pasted photo... 🎨");
       sendImageFile(imageFile);
       return;
     }
 
-    // 2. Check clipboard items (e.g. data transfer items)
+    const videoFile = files.find((f) => f.type.startsWith("video/"));
+    if (videoFile) {
+      e.preventDefault();
+      toast.info("Sending pasted video... 🎥");
+      sendVideoFile(videoFile);
+      return;
+    }
+
+    const docFile = files.find(
+      (f) => f.type === "application/pdf" || f.name.endsWith(".pdf") || f.name.endsWith(".docx")
+    );
+    if (docFile) {
+      e.preventDefault();
+      toast.info("Sending pasted document... 📄");
+      sendDocFile(docFile);
+      return;
+    }
+
+    // 2. Check clipboard items
     const items = Array.from(clipboardData.items || []);
     for (const item of items) {
       if (item.type.startsWith("image/")) {
         e.preventDefault();
         const file = item.getAsFile();
         if (file) {
-          toast.info("Sending pasted sticker / image... 🎨");
+          toast.info("Sending pasted image... 🎨");
           sendImageFile(file);
           return;
         }
@@ -672,8 +742,9 @@ export function MessengerPane({
   }
 
   function handleSendVoiceMemo() {
-    sendMessage("🎙️ [Voice Memo • 0:14]");
-    toast.success("Voice memo sent! 🎙️");
+    sounds.tap();
+    haptics.light();
+    setShowVoiceModal(true);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -1089,12 +1160,34 @@ export function MessengerPane({
           ) : (
             filteredMessages?.map((msg, idx) => {
               const isMe = msg.senderId === currentUserId;
-              const isDirectMedia =
-                /^https?:\/\/.+\.(gif|jpeg|jpg|png|webp)(\?.*)?$/i.test(msg.body.trim()) ||
-                msg.body.trim().startsWith("https://media.giphy.com/") ||
-                msg.body.trim().startsWith("https://i.giphy.com/");
+              const rawTrimmed = msg.body.trim();
 
-              const isVoiceMemo = msg.body.includes("🎙️ [Voice Memo");
+              const isVideo =
+                rawTrimmed.startsWith("![video") ||
+                /\.(mp4|webm|mov)(\?.*)?$/i.test(rawTrimmed) ||
+                rawTrimmed.includes("/api/files/r2/videos/");
+
+              const isVoiceMemo =
+                rawTrimmed.startsWith("![voice") ||
+                rawTrimmed.startsWith("![audio") ||
+                rawTrimmed.includes("🎙️ [Voice Memo") ||
+                /\.(mp3|wav|m4a|ogg)(\?.*)?$/i.test(rawTrimmed) ||
+                rawTrimmed.includes("/api/files/r2/audio/");
+
+              const isDoc =
+                rawTrimmed.startsWith("![document") ||
+                rawTrimmed.startsWith("![pdf") ||
+                /\.(pdf|docx|doc|zip|rar|xlsx)(\?.*)?$/i.test(rawTrimmed) ||
+                rawTrimmed.includes("/api/files/r2/documents/");
+
+              const isDirectMedia =
+                !isVideo &&
+                !isVoiceMemo &&
+                !isDoc &&
+                (/^https?:\/\/.+\.(gif|jpeg|jpg|png|webp)(\?.*)?$/i.test(rawTrimmed) ||
+                  rawTrimmed.startsWith("https://media.giphy.com/") ||
+                  rawTrimmed.startsWith("https://i.giphy.com/") ||
+                  rawTrimmed.startsWith("![image"));
 
               const prevMsg = idx > 0 ? filteredMessages[idx - 1] : null;
               const showDateSeparator =
@@ -1311,13 +1404,49 @@ export function MessengerPane({
                           </div>
                         )}
 
-                        {/* Content: Direct Image, Voice Memo, or Plain Text with Mentions & Embeds */}
-                        {isDirectMedia ? (
+                        {/* Content: Video, Voice Memo, Document, Direct Image, or Plain Text */}
+                        {isVideo ? (
+                          <div className="my-1 max-w-xs sm:max-w-sm overflow-hidden rounded-2xl">
+                            <VideoPlayer
+                              src={
+                                msg.body.match(/\((https?:\/\/[^\s)]+)\)/)?.[1] ||
+                                (msg.body.startsWith("http") ? msg.body.trim() : msg.body)
+                              }
+                              compact={true}
+                            />
+                          </div>
+                        ) : isVoiceMemo ? (
+                          <AudioPlayer
+                            src={
+                              msg.body.match(/\((https?:\/\/[^\s)]+)\)/)?.[1] ||
+                              (msg.body.startsWith("http") ? msg.body.trim() : msg.body)
+                            }
+                            compact={true}
+                            isMe={isMe}
+                          />
+                        ) : isDoc ? (
+                          <DocumentCard
+                            url={
+                              msg.body.match(/\((https?:\/\/[^\s)]+)\)/)?.[1] ||
+                              (msg.body.startsWith("http") ? msg.body.trim() : msg.body)
+                            }
+                            name={
+                              msg.body.match(/!\[(?:document|pdf):([^:]+)/)?.[1] || "Campus Notes Document"
+                            }
+                            size={
+                              msg.body.match(/!\[(?:document|pdf):[^:]+:(\d+)\]/)?.[1]
+                                ? Number.parseInt(msg.body.match(/!\[(?:document|pdf):[^:]+:(\d+)\]/)![1], 10)
+                                : undefined
+                            }
+                            compact={true}
+                            isMe={isMe}
+                          />
+                        ) : isDirectMedia ? (
                           <div className="relative overflow-hidden rounded-2xl border border-border/40 shadow-xs">
                             <img
-                              src={msg.body.trim()}
+                              src={msg.body.match(/\((https?:\/\/[^\s)]+)\)/)?.[1] || msg.body.trim()}
                               alt="Shared Media"
-                              className="max-h-72 max-w-full rounded-2xl object-cover"
+                              className="max-h-72 max-w-full rounded-2xl object-cover cursor-pointer"
                               loading="lazy"
                             />
                             <div className="absolute bottom-1.5 right-2 bg-black/60 backdrop-blur-xs text-[9px] font-bold text-white px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -1329,48 +1458,6 @@ export function MessengerPane({
                                   />
                                 </span>
                               )}
-                            </div>
-                          </div>
-                        ) : isVoiceMemo ? (
-                          /* WhatsApp Voice Memo Player Mockup */
-                          <div className="flex items-center gap-3 py-1 pr-1 min-w-[200px]">
-                            <button
-                              type="button"
-                              onClick={() => setPlayingVoiceId((prev) => (prev === msg.id ? null : msg.id))}
-                              className={cn(
-                                "size-9 rounded-full flex items-center justify-center shrink-0 cursor-pointer shadow-xs transition-transform active:scale-95",
-                                isMe ? "bg-white text-primary" : "bg-primary text-primary-foreground"
-                              )}
-                            >
-                              {playingVoiceId === msg.id ? (
-                                <Volume2 className="size-4 animate-pulse" />
-                              ) : (
-                                <Play className="size-4 fill-current ml-0.5" />
-                              )}
-                            </button>
-
-                            <div className="flex-1 space-y-1">
-                              {/* Waveform graphic */}
-                              <div className="flex items-center gap-0.5 h-4">
-                                {[3, 8, 14, 9, 12, 16, 8, 11, 15, 7, 10, 14, 6, 12, 8, 4].map((h, i) => (
-                                  <span
-                                    key={i}
-                                    style={{ height: `${h}px` }}
-                                    className={cn(
-                                      "w-1 rounded-full transition-all",
-                                      playingVoiceId === msg.id && i % 3 === 0
-                                        ? "bg-amber-300 animate-pulse"
-                                        : isMe
-                                          ? "bg-white/70"
-                                          : "bg-primary/70"
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                              <div className="flex items-center justify-between text-[10px] opacity-80 font-medium">
-                                <span>0:14</span>
-                                <span>{formatTime(msg.createdAt)}</span>
-                              </div>
                             </div>
                           </div>
                         ) : (
@@ -1487,30 +1574,79 @@ export function MessengerPane({
 
       {/* ─── Messenger Bottom Input Bar (WhatsApp Layout) ─── */}
       <footer className="border-t border-border/40 bg-card/95 backdrop-blur-md px-2.5 sm:px-4 py-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shrink-0 z-20">
-        {isUploadingImage && (
+        {isUploadingMedia && (
           <div className="max-w-4xl mx-auto mb-2 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-bold animate-pulse">
             <Loader2 className="size-3.5 animate-spin" />
-            <span>Uploading and sending image / sticker...</span>
+            <span>Uploading and sending media attachment...</span>
           </div>
         )}
+
+        {/* Hidden inputs for video and documents */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          onChange={handleImageUpload}
+        />
+        <input
+          ref={videoInputRef}
+          type="file"
+          accept="video/mp4,video/webm,video/quicktime"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) sendVideoFile(file);
+          }}
+        />
+        <input
+          ref={docInputRef}
+          type="file"
+          accept="application/pdf,.pdf,.docx,.doc,.zip,.txt"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) sendDocFile(file);
+          }}
+        />
+
         <form
           onSubmit={handleSendSubmit}
           className="max-w-3xl mx-auto w-full flex items-center gap-1.5 bg-muted/50 dark:bg-[#202327] rounded-3xl p-1.5 pl-2.5 border border-border/40 focus-within:border-[#1d9bf0]/60 transition-all shadow-xs"
         >
           {/* Action Attachments */}
-          <div className="flex items-center gap-1 shrink-0 text-[#1d9bf0]">
+          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0 text-[#1d9bf0]">
+            {/* Attachment popover / Photo */}
             <button
               type="button"
-              disabled={isUploadingImage}
+              disabled={isUploadingMedia}
               onClick={() => fileInputRef.current?.click()}
               className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-[#1d9bf0] transition-colors cursor-pointer"
               title="Attach Photo"
             >
-              {isUploadingImage ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Paperclip className="size-4" />
-              )}
+              <Paperclip className="size-4" />
+            </button>
+
+            {/* Video clip attachment */}
+            <button
+              type="button"
+              disabled={isUploadingMedia}
+              onClick={() => videoInputRef.current?.click()}
+              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-sky-500 transition-colors cursor-pointer"
+              title="Attach Video"
+            >
+              <Video className="size-4" />
+            </button>
+
+            {/* Document / Notes attachment */}
+            <button
+              type="button"
+              disabled={isUploadingMedia}
+              onClick={() => docInputRef.current?.click()}
+              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-indigo-500 transition-colors cursor-pointer"
+              title="Attach Study Notes / PDF"
+            >
+              <FileText className="size-4" />
             </button>
 
             <button
@@ -1525,7 +1661,7 @@ export function MessengerPane({
             <button
               type="button"
               onClick={() => setShowStickerPicker(true)}
-              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-[#1d9bf0] transition-colors cursor-pointer"
+              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-amber-500 transition-colors cursor-pointer"
               title="Send Sticker / Emoji"
             >
               <Smile className="size-4" />
@@ -1559,10 +1695,10 @@ export function MessengerPane({
               type="button"
               onClick={handleSendVoiceMemo}
               aria-label="Record voice memo"
-              className="flex size-8 shrink-0 items-center justify-center rounded-full hover:bg-muted/70 text-muted-foreground hover:text-[#1d9bf0] transition-all cursor-pointer mr-1 active:scale-90"
-              title="Click to send voice note"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full hover:bg-muted/70 text-rose-500 transition-all cursor-pointer mr-1 active:scale-90"
+              title="Record voice note"
             >
-              <AnimateMic size={16} />
+              <Mic className="size-4" />
             </button>
           )}
         </form>
@@ -1756,6 +1892,13 @@ export function MessengerPane({
           onCallEnded={() => setActiveCall(null)}
         />
       )}
+
+      {/* Voice Recorder Modal */}
+      <VoiceRecorderModal
+        isOpen={showVoiceModal}
+        onClose={() => setShowVoiceModal(false)}
+        onAudioRecorded={handleVoiceRecorded}
+      />
     </div>
   );
 }

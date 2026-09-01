@@ -8,16 +8,19 @@ import {
   BarChart3,
   Check,
   ChevronDown,
+  FileText,
   Flame,
   Globe,
   HelpCircle,
   Loader2,
   Lock,
+  Mic,
   School,
   Smile,
   Type,
   Users,
   VenetianMask,
+  Video,
   X,
   Zap,
 } from "lucide-react";
@@ -25,6 +28,10 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { AudioPlayer } from "@/components/media/audio-player";
+import { DocumentCard } from "@/components/media/document-card";
+import { VideoPlayer } from "@/components/media/video-player";
+import { VoiceRecorderModal } from "@/components/media/voice-recorder-modal";
 import { PollOptionsEditor } from "@/components/post/poll-options-editor";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
 import { AnimateImage, AnimateSparkles } from "@/components/ui/animated-icon";
@@ -44,7 +51,7 @@ import { confirmOptimisticPost, optimisticAddPost, revertOptimisticPost } from "
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import type { TrendingHashtag } from "@/lib/trending-hashtags";
-import { uploadImageToImgBB } from "@/lib/upload";
+import { uploadImageToImgBB, uploadMediaFile } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 
 export type PostType = "NORMAL" | "MEME" | "CONFESSION" | "POLL" | "QUESTION";
@@ -106,8 +113,15 @@ export function PostComposer({
   const [charCount, setCharCount] = useState(0);
 
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadedVideos, setUploadedVideos] = useState<string[]>([]);
+  const [uploadedAudios, setUploadedAudios] = useState<{ url: string; title: string }[]>([]);
+  const [uploadedDocs, setUploadedDocs] = useState<{ url: string; name: string; size: number }[]>([]);
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const videoInputRef = useRef<HTMLInputElement | null>(null);
+  const docInputRef = useRef<HTMLInputElement | null>(null);
 
   const { communities } = useCommunities();
   const { profile } = useProfile();
@@ -126,7 +140,7 @@ export function PostComposer({
     const validImageFiles = files.filter((f) => f.type.startsWith("image/"));
     if (validImageFiles.length === 0) return;
 
-    setIsUploadingImage(true);
+    setIsUploadingMedia(true);
     try {
       toast.loading(
         validImageFiles.length > 1 ? `Uploading ${validImageFiles.length} photos...` : "Uploading photo...",
@@ -146,9 +160,62 @@ export function PostComposer({
         id: "img-upload",
       });
     } finally {
-      setIsUploadingImage(false);
+      setIsUploadingMedia(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  async function handleUploadVideos(files: File[]) {
+    const validVideos = files.filter(
+      (f) => f.type.startsWith("video/") || f.name.match(/\.(mp4|webm|mov)$/i)
+    );
+    if (validVideos.length === 0) return;
+
+    setIsUploadingMedia(true);
+    try {
+      toast.loading("Uploading video clip to Cloudflare R2...", { id: "video-upload" });
+      for (const file of validVideos) {
+        const res = await uploadMediaFile(file, "video");
+        setUploadedVideos((prev) => [...prev, res.url]);
+      }
+      sounds.pop();
+      haptics.success();
+      toast.success("Video attached! 🎥", { id: "video-upload" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload video", {
+        id: "video-upload",
+      });
+    } finally {
+      setIsUploadingMedia(false);
+      if (videoInputRef.current) videoInputRef.current.value = "";
+    }
+  }
+
+  async function handleUploadDocs(files: File[]) {
+    if (files.length === 0) return;
+
+    setIsUploadingMedia(true);
+    try {
+      toast.loading("Uploading study notes / PDF to Cloudflare R2...", { id: "doc-upload" });
+      for (const file of files) {
+        const res = await uploadMediaFile(file, "document");
+        setUploadedDocs((prev) => [...prev, { url: res.url, name: file.name, size: file.size }]);
+      }
+      sounds.pop();
+      haptics.success();
+      toast.success("Document attached! 📄", { id: "doc-upload" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload document", {
+        id: "doc-upload",
+      });
+    } finally {
+      setIsUploadingMedia(false);
+      if (docInputRef.current) docInputRef.current.value = "";
+    }
+  }
+
+  function handleAudioRecorded(url: string, duration: number) {
+    setUploadedAudios((prev) => [...prev, { url, title: `Voice Memo (${duration}s)` }]);
   }
 
   const editor = useEditor({
@@ -249,8 +316,13 @@ export function PostComposer({
   const isConfession = postType === "CONFESSION";
   const anonActive = isAnonymous || isConfession;
   const overLimit = charCount > MAX_CHARS;
-  const hasContent = charCount > 0 || uploadedImages.length > 0;
-  const canPost = hasContent && !overLimit && !isLoading && !isUploadingImage;
+  const hasContent =
+    charCount > 0 ||
+    uploadedImages.length > 0 ||
+    uploadedVideos.length > 0 ||
+    uploadedAudios.length > 0 ||
+    uploadedDocs.length > 0;
+  const canPost = hasContent && !overLimit && !isLoading && !isUploadingMedia;
 
   async function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault();
@@ -265,6 +337,23 @@ export function PostComposer({
     if (uploadedImages.length > 0) {
       const imageMarkdown = uploadedImages.map((img) => `\n\n![Image](${img})`).join("");
       body = `${body.trim()}${imageMarkdown}`;
+    }
+
+    if (uploadedVideos.length > 0) {
+      const videoMarkdown = uploadedVideos.map((vid) => `\n\n![video:Campus Video Clip](${vid})`).join("");
+      body = `${body.trim()}${videoMarkdown}`;
+    }
+
+    if (uploadedAudios.length > 0) {
+      const audioMarkdown = uploadedAudios.map((aud) => `\n\n![voice:${aud.title}](${aud.url})`).join("");
+      body = `${body.trim()}${audioMarkdown}`;
+    }
+
+    if (uploadedDocs.length > 0) {
+      const docMarkdown = uploadedDocs
+        .map((doc) => `\n\n![document:${doc.name}:${doc.size}](${doc.url})`)
+        .join("");
+      body = `${body.trim()}${docMarkdown}`;
     }
 
     if (!body.trim()) {
@@ -427,8 +516,34 @@ export function PostComposer({
       icon: AnimateImage,
       color: "text-emerald-500 hover:bg-emerald-500/10",
       onClick: openFilePicker,
-      disabled: isUploadingImage,
-      loading: isUploadingImage,
+      disabled: isUploadingMedia,
+      loading: isUploadingMedia,
+    },
+    {
+      id: "video",
+      label: "Video Clip",
+      icon: Video,
+      color: "text-sky-500 hover:bg-sky-500/10",
+      onClick: () => videoInputRef.current?.click(),
+      disabled: isUploadingMedia,
+      loading: isUploadingMedia,
+    },
+    {
+      id: "voice",
+      label: "Voice Memo",
+      icon: Mic,
+      color: "text-rose-500 hover:bg-rose-500/10",
+      onClick: () => setShowVoiceRecorder(true),
+      disabled: isUploadingMedia,
+    },
+    {
+      id: "document",
+      label: "Notes / PDF",
+      icon: FileText,
+      color: "text-indigo-500 hover:bg-indigo-500/10",
+      onClick: () => docInputRef.current?.click(),
+      disabled: isUploadingMedia,
+      loading: isUploadingMedia,
     },
     {
       id: "gif",
@@ -491,6 +606,28 @@ export function PostComposer({
         multiple
         className="hidden"
         onChange={handleImageFileChange}
+      />
+      <input
+        ref={videoInputRef}
+        type="file"
+        accept="video/mp4,video/webm,video/quicktime"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          if (files.length > 0) handleUploadVideos(files);
+        }}
+      />
+      <input
+        ref={docInputRef}
+        type="file"
+        accept="application/pdf,.pdf,.docx,.doc,.zip,.txt"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          if (files.length > 0) handleUploadDocs(files);
+        }}
       />
 
       <div
@@ -738,7 +875,7 @@ export function PostComposer({
           </div>
         )}
 
-        {/* ─── Media grid (Instagram style) ─── */}
+        {/* ─── Media grid (Images) ─── */}
         {uploadedImages.length > 0 && (
           <div
             className={cn(
@@ -766,13 +903,61 @@ export function PostComposer({
                 </button>
               </div>
             ))}
-            {isUploadingImage && (
+            {isUploadingMedia && (
               <div className="flex aspect-square items-center justify-center rounded-2xl border border-dashed border-border bg-muted/40">
                 <Loader2 className="size-5 animate-spin text-muted-foreground" />
               </div>
             )}
           </div>
         )}
+
+        {/* ─── Video Previews ─── */}
+        {uploadedVideos.map((vidUrl, idx) => (
+          <div key={`vid-prev-${idx}`} className="relative px-4 pb-3">
+            <VideoPlayer src={vidUrl} />
+            <button
+              type="button"
+              onClick={() => setUploadedVideos((prev) => prev.filter((_, i) => i !== idx))}
+              className="absolute top-2 right-6 size-7 rounded-full bg-black/75 text-white flex items-center justify-center hover:bg-destructive transition-colors cursor-pointer shadow-md"
+              title="Remove video"
+              aria-label="Remove video"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        ))}
+
+        {/* ─── Audio & Voice Note Previews ─── */}
+        {uploadedAudios.map((aud, idx) => (
+          <div key={`aud-prev-${idx}`} className="relative px-4 pb-3">
+            <AudioPlayer src={aud.url} title={aud.title} />
+            <button
+              type="button"
+              onClick={() => setUploadedAudios((prev) => prev.filter((_, i) => i !== idx))}
+              className="absolute top-2 right-6 size-7 rounded-full bg-black/75 text-white flex items-center justify-center hover:bg-destructive transition-colors cursor-pointer shadow-md"
+              title="Remove audio"
+              aria-label="Remove audio"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        ))}
+
+        {/* ─── Document & Study Notes Previews ─── */}
+        {uploadedDocs.map((doc, idx) => (
+          <div key={`doc-prev-${idx}`} className="relative px-4 pb-3">
+            <DocumentCard url={doc.url} name={doc.name} size={doc.size} />
+            <button
+              type="button"
+              onClick={() => setUploadedDocs((prev) => prev.filter((_, i) => i !== idx))}
+              className="absolute top-2 right-6 size-7 rounded-full bg-black/75 text-white flex items-center justify-center hover:bg-destructive transition-colors cursor-pointer shadow-md"
+              title="Remove document"
+              aria-label="Remove document"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        ))}
 
         {/* ─── Poll options ─── */}
         {postType === "POLL" && (
@@ -920,6 +1105,12 @@ export function PostComposer({
         isOpen={showStickerPicker}
         onClose={() => setShowStickerPicker(false)}
         onSelectSticker={(sticker) => setUploadedImages((prev) => [...prev, sticker.url])}
+      />
+
+      <VoiceRecorderModal
+        isOpen={showVoiceRecorder}
+        onClose={() => setShowVoiceRecorder(false)}
+        onAudioRecorded={handleAudioRecorded}
       />
     </form>
   );

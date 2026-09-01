@@ -1,6 +1,4 @@
-"use client";
-
-import { Bell, Check, Loader2, Power, Volume2, VolumeX } from "lucide-react";
+import { Bell, Check, Copy, ExternalLink, Loader2, Power, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -98,6 +96,14 @@ export function MerchantDashboardClient() {
     }
   }
 
+  function handleCopyStoreLink() {
+    if (!merchant) return;
+    sounds.tap();
+    haptics.light();
+    navigator.clipboard.writeText(`https://campusloop.space/app/marketplace/store/${merchant.id}`);
+    toast.success("Public store link copied to clipboard! 📋");
+  }
+
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-4">
@@ -127,7 +133,31 @@ export function MerchantDashboardClient() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {merchant?.id && (
+            <>
+              <Link
+                href={`/app/marketplace/store/${merchant.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold bg-muted hover:bg-muted/80 text-foreground border border-border/60 transition-colors"
+                title="View live public store page as students see it"
+              >
+                <ExternalLink className="size-3.5 text-primary" />
+                <span>Open Store ↗</span>
+              </Link>
+              <button
+                type="button"
+                onClick={handleCopyStoreLink}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold bg-muted hover:bg-muted/80 text-foreground border border-border/60 transition-colors cursor-pointer"
+                title="Copy public store link"
+              >
+                <Copy className="size-3.5" />
+                <span>Copy Link</span>
+              </button>
+            </>
+          )}
+
           <button
             type="button"
             onClick={() => {

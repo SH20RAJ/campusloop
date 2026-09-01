@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2, Save, Store, Truck } from "lucide-react";
+import { Copy, ExternalLink, Loader2, Save, Store, Truck } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -85,6 +86,14 @@ export function MerchantStoreClient() {
     }
   }
 
+  function handleCopyLink() {
+    if (!merchant?.id) return;
+    sounds.tap();
+    haptics.light();
+    navigator.clipboard.writeText(`https://campusloop.space/app/marketplace/store/${merchant.id}`);
+    toast.success("Store link copied to clipboard! 📋");
+  }
+
   if (isLoading) {
     return (
       <div className="max-w-2xl mx-auto p-4 space-y-4">
@@ -96,11 +105,35 @@ export function MerchantStoreClient() {
 
   return (
     <main className="max-w-2xl mx-auto p-4 space-y-6 select-none pb-24">
-      <div>
-        <h1 className="text-xl font-black text-foreground tracking-tight">Store Profile &amp; Settings</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Configure business details, delivery radius, and prep timing
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-card border border-border/40 p-5 rounded-3xl shadow-xs">
+        <div>
+          <h1 className="text-xl font-black text-foreground tracking-tight">Store Profile &amp; Settings</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Configure business details, delivery radius, and prep timing
+          </p>
+        </div>
+
+        {merchant?.id && (
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/app/marketplace/store/${merchant.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold bg-muted hover:bg-muted/80 text-foreground border border-border/60 transition-colors"
+            >
+              <ExternalLink className="size-3.5 text-primary" />
+              <span>Open Store ↗</span>
+            </Link>
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold bg-muted hover:bg-muted/80 text-foreground border border-border/60 transition-colors cursor-pointer"
+            >
+              <Copy className="size-3.5" />
+              <span>Copy Link</span>
+            </button>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSave} className="space-y-5">

@@ -5,7 +5,9 @@ import {
   Bike,
   CalendarCheck2,
   Clock,
+  Copy,
   DollarSign,
+  ExternalLink,
   Gauge,
   LayoutDashboard,
   LogOut,
@@ -266,6 +268,47 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
 
         {/* Bottom User Info & Switch to Student App */}
         <div className="pt-3 border-t border-border/30 space-y-2 px-1">
+          {/* Quick Storefront Actions */}
+          {merchant && (
+            <div className="p-3 rounded-2xl bg-muted/40 border border-border/60 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                  Storefront
+                </span>
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-500">
+                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
+                </span>
+              </div>
+              <p className="text-xs font-black text-foreground truncate">{merchant.name}</p>
+              <div className="flex items-center gap-1.5">
+                <Link
+                  href={`/app/marketplace/store/${merchant.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 h-8 rounded-xl bg-foreground text-background font-bold text-[11px] flex items-center justify-center gap-1 hover:opacity-90 transition-opacity"
+                >
+                  <ExternalLink className="size-3" />
+                  <span>Open Store</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    sounds.tap();
+                    haptics.light();
+                    navigator.clipboard.writeText(
+                      `https://campusloop.space/app/marketplace/store/${merchant.id}`
+                    );
+                    toast.success("Store link copied! 📋");
+                  }}
+                  className="size-8 rounded-xl bg-card border border-border/60 hover:bg-muted text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                  title="Copy Public Storefront Link"
+                >
+                  <Copy className="size-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+
           <Link
             href="/app/marketplace"
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
@@ -317,6 +360,47 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
                   <X className="size-4" />
                 </button>
               </div>
+
+              {/* Quick Storefront Actions in Mobile Drawer */}
+              {merchant && (
+                <div className="p-3 rounded-2xl bg-muted/40 border border-border/60 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                      Storefront
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-500">
+                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
+                    </span>
+                  </div>
+                  <p className="text-xs font-black text-foreground truncate">{merchant.name}</p>
+                  <div className="flex items-center gap-1.5">
+                    <Link
+                      href={`/app/marketplace/store/${merchant.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 h-8 rounded-xl bg-foreground text-background font-bold text-[11px] flex items-center justify-center gap-1 hover:opacity-90 transition-opacity"
+                    >
+                      <ExternalLink className="size-3" />
+                      <span>Open Store</span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sounds.tap();
+                        haptics.light();
+                        navigator.clipboard.writeText(
+                          `https://campusloop.space/app/marketplace/store/${merchant.id}`
+                        );
+                        toast.success("Store link copied! 📋");
+                      }}
+                      className="size-8 rounded-xl bg-card border border-border/60 hover:bg-muted text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                      title="Copy Public Storefront Link"
+                    >
+                      <Copy className="size-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <nav className="space-y-1">
                 <p className="px-2 text-[10px] font-black uppercase text-muted-foreground">General Store</p>

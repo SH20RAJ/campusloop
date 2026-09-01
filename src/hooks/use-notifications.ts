@@ -67,10 +67,11 @@ export function useNotifications(tab: NotificationTab = "all") {
     `/api/notifications?tab=${tab}`,
     fetcher,
     {
+      refreshInterval: 6000,
       revalidateOnFocus: true,
       revalidateIfStale: true,
       keepPreviousData: true,
-      dedupingInterval: 4000,
+      dedupingInterval: 3000,
     }
   );
 
@@ -215,8 +216,9 @@ export function useNotifications(tab: NotificationTab = "all") {
 
 export function useUnreadNotificationsCount() {
   const { data } = useSWR<{ unreadCount: number }>("/api/notifications/unread-count", fetcher, {
-    refreshInterval: 25000,
-    dedupingInterval: 8000,
+    refreshInterval: 6000,
+    dedupingInterval: 3000,
+    revalidateOnFocus: true,
   });
 
   return data?.unreadCount || 0;

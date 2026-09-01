@@ -1,13 +1,53 @@
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { posts, userProfiles, votes } from "@/db/schema";
+import { anonIdentityVault, posts, userProfiles, votes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { openSealedIdentity } from "@/lib/anonymity";
 import { createNotification } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
+}
+
+async function sendLikeNotification(postId: string, actorProfileId: string) {
+  try {
+    const db = getDb();
+    const targetPost = await db.query.posts.findFirst({
+      where: eq(posts.id, postId),
+    });
+
+    if (!targetPost) return;
+
+    let targetAuthorId = targetPost.authorId;
+
+    // If anonymous, resolve the recipient's real profile ID from identity vault
+    if (!targetAuthorId && targetPost.isAnonymous && targetPost.pseudonym) {
+      try {
+        const vault = await db.query.anonIdentityVault.findFirst({
+          where: eq(anonIdentityVault.handle, targetPost.pseudonym),
+        });
+        if (vault?.sealedIdentity) {
+          targetAuthorId = openSealedIdentity(vault.sealedIdentity);
+        }
+      } catch (err) {
+        console.warn("Could not unseal anonymous author for like notification:", err);
+      }
+    }
+
+    if (targetAuthorId && targetAuthorId !== actorProfileId) {
+      await createNotification({
+        userId: targetAuthorId,
+        type: "LIKE",
+        actorId: actorProfileId,
+        referenceId: postId,
+        previewText: targetPost.body || targetPost.title || "Liked your post",
+      });
+    }
+  } catch (error) {
+    console.warn("Failed to dispatch like notification:", error);
+  }
 }
 
 export async function POST(req: Request, { params }: RouteParams) {
@@ -49,6 +89,12 @@ export async function POST(req: Request, { params }: RouteParams) {
       } else if (existingVote.value !== value) {
         // Update vote value
         await db.update(votes).set({ value }).where(eq(votes.id, existingVote.id));
+
+        // Trigger notification if updated to an upvote
+        if (value === 1) {
+          sendLikeNotification(id, profile.id).catch(() => {});
+        }
+
         return NextResponse.json({ message: "Vote updated", userVote: value });
       } else {
         // Vote already set to desired value
@@ -65,21 +111,9 @@ export async function POST(req: Request, { params }: RouteParams) {
 
         // Trigger notification if it's an upvote
         if (value === 1) {
-          const targetPost = await db.query.posts.findFirst({
-            where: eq(posts.id, id),
-          });
-          // Anonymous posts have no addressable author — skip to avoid a
-          // notification FK failure or an identity leak.
-          if (targetPost?.authorId && targetPost.authorId !== profile.id) {
-            createNotification({
-              userId: targetPost.authorId,
-              type: "LIKE",
-              actorId: profile.id,
-              referenceId: id,
-              previewText: targetPost.body,
-            }).catch((err) => console.warn("Like notification error:", err));
-          }
+          sendLikeNotification(id, profile.id).catch(() => {});
         }
+
         return NextResponse.json({ message: "Vote cast", userVote: value });
       }
     }

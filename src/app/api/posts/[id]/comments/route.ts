@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { anonIdentityVault, comments, posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { deriveAnonHandle, sealIdentity } from "@/lib/anonymity";
+import { deriveAnonHandle, openSealedIdentity, sealIdentity } from "@/lib/anonymity";
 import { runSafetyCheck } from "@/lib/moderation/rules";
 import { cleanNotificationSnippet, createNotification, notifyMentions } from "@/lib/notifications";
 import { rejectViewerWrite } from "@/lib/viewer";
@@ -147,9 +147,20 @@ export async function POST(req: Request, { params }: RouteParams) {
         const parentComment = await db.query.comments.findFirst({
           where: eq(comments.id, parentId),
         });
-        if (parentComment?.authorId && parentComment.authorId !== profile.id) {
+        let parentAuthorId = parentComment?.authorId;
+        if (!parentAuthorId && parentComment?.isAnonymous && parentComment?.pseudonym) {
+          const vault = await db.query.anonIdentityVault.findFirst({
+            where: eq(anonIdentityVault.handle, parentComment.pseudonym),
+          });
+          if (vault?.sealedIdentity) {
+            try {
+              parentAuthorId = openSealedIdentity(vault.sealedIdentity);
+            } catch {}
+          }
+        }
+        if (parentAuthorId && parentAuthorId !== profile.id) {
           await createNotification({
-            userId: parentComment.authorId,
+            userId: parentAuthorId,
             type: "REPLY",
             actorId: profile.id,
             referenceId: id,
@@ -160,9 +171,20 @@ export async function POST(req: Request, { params }: RouteParams) {
         const targetPost = await db.query.posts.findFirst({
           where: eq(posts.id, id),
         });
-        if (targetPost?.authorId && targetPost.authorId !== profile.id) {
+        let postAuthorId = targetPost?.authorId;
+        if (!postAuthorId && targetPost?.isAnonymous && targetPost?.pseudonym) {
+          const vault = await db.query.anonIdentityVault.findFirst({
+            where: eq(anonIdentityVault.handle, targetPost.pseudonym),
+          });
+          if (vault?.sealedIdentity) {
+            try {
+              postAuthorId = openSealedIdentity(vault.sealedIdentity);
+            } catch {}
+          }
+        }
+        if (postAuthorId && postAuthorId !== profile.id) {
           await createNotification({
-            userId: targetPost.authorId,
+            userId: postAuthorId,
             type: "COMMENT",
             actorId: profile.id,
             referenceId: id,

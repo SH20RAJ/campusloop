@@ -51,7 +51,7 @@ export async function GET(req: Request) {
 
     let stores = await db.query.merchants.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
-      orderBy: [desc(merchants.rating), desc(merchants.createdAt)],
+      orderBy: [desc(merchants.isOpen), desc(merchants.rating), desc(merchants.createdAt)],
       with: {
         offers: {
           where: eq(marketplaceOffers.isActive, true),
@@ -74,7 +74,7 @@ export async function GET(req: Request) {
       }
       stores = await db.query.merchants.findMany({
         where: fallbackConditions.length > 0 ? and(...fallbackConditions) : undefined,
-        orderBy: [desc(merchants.rating), desc(merchants.createdAt)],
+        orderBy: [desc(merchants.isOpen), desc(merchants.rating), desc(merchants.createdAt)],
         limit: 12,
         with: {
           offers: { where: eq(marketplaceOffers.isActive, true), limit: 2 },

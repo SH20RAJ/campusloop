@@ -75,7 +75,7 @@ export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
   { icon: Compass, href: "/app/discover", label: "Explore" },
   { icon: Plus, href: "/app/post/new", label: "Post" },
   { icon: Heart, href: "/app/matching", label: "Match" },
-  { icon: ShoppingBag, href: "/app/marketplace", label: "Market" },
+  { icon: MoreHorizontal, href: "/app/more", label: "More" },
 ];
 
 export const MORE_HUB_SECTIONS: NavGroup[] = [
@@ -276,4 +276,3 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
     ],
   },
 ];
-

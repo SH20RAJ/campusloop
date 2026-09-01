@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
+import { CommunityHubStrip } from "@/components/marketplace/community-hub-strip";
 import {
   EmptyState,
   FilterPills,
@@ -27,9 +28,9 @@ import {
   RowSkeleton,
   SearchField,
 } from "@/components/ui/app-shell";
-import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { InstagramIcon } from "@/components/ui/social-icons";
-import { CommunityHubStrip } from "@/components/marketplace/community-hub-strip";
+import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
+import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -53,8 +54,20 @@ const CATEGORY_PILLS = CATEGORIES.map((c) => ({ id: c.id, label: c.label, icon: 
 
 export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: MarketplaceClientProps) {
   const router = useRouter();
+  const { profile } = useProfile();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const isBitMesraStudent = useMemo(() => {
+    const slug = profile?.institution?.slug?.toLowerCase();
+    const name = (profile?.institution?.name || collegeName || "").toLowerCase();
+    return (
+      slug === "bit-mesra" ||
+      slug === "bitmesra" ||
+      name.includes("mesra") ||
+      name.includes("birla institute of technology, mesra")
+    );
+  }, [profile, collegeName]);
 
   const { totalItemsCount, overallSubtotal } = useMarketplaceCart();
 
@@ -119,6 +132,40 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
         onChange={setSearchQuery}
         placeholder="Search canteens, rentals or services"
       />
+
+      {/* ─── Arman's Night Canteen Live Announcement Banner ─── */}
+      <div className="mx-4 my-2.5 rounded-3xl border border-amber-500/35 bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-orange-500/15 p-4 sm:p-5 relative overflow-hidden shadow-xs">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 relative z-10">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/25 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+              </span>
+              <span>🔴 LIVE STARTING TODAY · NIGHT CANTEEN</span>
+            </div>
+            <h3 className="text-sm sm:text-base font-black text-foreground flex items-center gap-1.5">
+              <span>🌙 Arman&apos;s Night Canteen is Officially LIVE!</span>
+            </h3>
+            <p className="text-xs text-muted-foreground max-w-lg font-medium">
+              Late night Maggi, hot chicken rolls, burgers, thick shakes &amp; combos delivered straight to
+              your hostel room till 4 AM. Use code{" "}
+              <span className="font-bold text-foreground">NIGHTOWL20</span> for 20% OFF!
+            </p>
+          </div>
+          <Link
+            href="/app/marketplace/store/merch_armans_night_canteen"
+            onClick={() => {
+              sounds.tap();
+              haptics.success();
+            }}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-foreground text-background text-xs font-black shadow-md hover:opacity-90 transition-all active:scale-95 shrink-0 cursor-pointer"
+          >
+            <span>Order from Arman&apos;s</span>
+            <ChevronRight className="size-3.5" />
+          </Link>
+        </div>
+      </div>
 
       {/* ─── 6 Campus Marketplace Vertical Hub Cards ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 px-4 py-2">
@@ -243,31 +290,34 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
         </Link>
       </div>
 
-      {/* ─── Campus Expansion Banner (Instagram Highlighted) ─── */}
-      <div className="mx-4 my-2 rounded-2xl border border-pink-500/30 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-amber-500/10 p-4 relative overflow-hidden">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
-          <div className="space-y-0.5">
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-600 dark:text-pink-400 text-[9px] font-black uppercase tracking-wider">
-              <span>🚀 Want this at your campus?</span>
+      {/* ─── Campus Expansion Banner (Only shown to non-BIT Mesra students) ─── */}
+      {!isBitMesraStudent && (
+        <div className="mx-4 my-2 rounded-2xl border border-pink-500/30 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-amber-500/10 p-4 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
+            <div className="space-y-0.5">
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-600 dark:text-pink-400 text-[9px] font-black uppercase tracking-wider">
+                <span>🚀 Want this at your campus?</span>
+              </div>
+              <h4 className="text-xs sm:text-sm font-black text-foreground">
+                Bring CampusLoop Marketplace to Your College
+              </h4>
+              <p className="text-[11px] text-muted-foreground max-w-md">
+                We partner directly with campus canteens, laundries, cycle rentals, and water suppliers.
+                Contact us on Instagram to onboard your campus vendors!
+              </p>
             </div>
-            <h4 className="text-xs sm:text-sm font-black text-foreground">
-              Bring CampusLoop Marketplace to Your College
-            </h4>
-            <p className="text-[11px] text-muted-foreground max-w-md">
-              We partner directly with campus canteens, laundries, cycle rentals, and water suppliers. Contact us on Instagram to onboard your campus vendors!
-            </p>
+            <a
+              href="https://www.instagram.com/campusloop.space/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white text-xs font-black shadow-sm hover:opacity-95 transition-transform active:scale-95 shrink-0"
+            >
+              <InstagramIcon className="size-3" />
+              <span>DM @campusloop.space</span>
+            </a>
           </div>
-          <a
-            href="https://www.instagram.com/campusloop.space/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white text-xs font-black shadow-sm hover:opacity-95 transition-transform active:scale-95 shrink-0"
-          >
-            <InstagramIcon className="size-3" />
-            <span>DM @campusloop.space</span>
-          </a>
         </div>
-      </div>
+      )}
 
       {/* ─── Community-Maintained Campus Utility Hubs (6 Dedicated Services) ─── */}
       <CommunityHubStrip />

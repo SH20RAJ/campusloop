@@ -25,14 +25,14 @@ async function main() {
   console.log(`🔒 Closed ${closeResult.length} existing merchants across campus:`);
   closeResult.forEach((m) => console.log(`   - [CLOSED] ${m.name} (${m.id})`));
 
-  // 2. Find BIT Mesra institution (or fallback institution)
+  // 2. Find BIT Mesra institution explicitly
   let bitm = await db.query.institutions.findFirst({
     where: (inst, { or, eq, ilike }) =>
       or(
-        eq(inst.slug, "bit-mesra"),
+        eq(inst.id, "inst_35df75700bb23dd30311ef5f"),
         eq(inst.slug, "bitmesra"),
-        ilike(inst.name, "%Birla Institute of Technology%"),
-        eq(inst.id, "inst_35df75700bb23dd30311ef5f")
+        eq(inst.slug, "bit-mesra"),
+        ilike(inst.name, "%Mesra%")
       ),
   });
 

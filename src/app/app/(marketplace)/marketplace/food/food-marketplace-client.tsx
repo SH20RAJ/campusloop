@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ArrowLeft,
   ChevronRight,
   Clock,
   Flame,
@@ -12,7 +11,6 @@ import {
   Plus,
   Search,
   ShieldCheck,
-  ShoppingBag,
   Sparkles,
   Star,
   UtensilsCrossed,
@@ -21,8 +19,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
-import { InstagramIcon } from "@/components/ui/social-icons";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InstagramIcon } from "@/components/ui/social-icons";
 import { useMarketplaceCart } from "@/hooks/use-marketplace-cart";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
@@ -51,7 +49,13 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
   const [pureVegOnly, setPureVegOnly] = useState(false);
   const [productPage, setProductPage] = useState(1);
 
-  const { items: cartItems, addItem, updateQuantity, totalItemsCount, overallSubtotal } = useMarketplaceCart();
+  const {
+    items: cartItems,
+    addItem,
+    updateQuantity,
+    totalItemsCount,
+    overallSubtotal,
+  } = useMarketplaceCart();
 
   // 1. Fetch Stores / Outlets
   const { data: storesData, isLoading: isStoresLoading } = useSWR<{ stores: any[] }>(
@@ -89,7 +93,8 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
 
       if (selectedTag === "all") return true;
       const q = selectedTag.toLowerCase();
-      const combined = `${store.name} ${store.description} ${(store.products || []).map((p: any) => p.name).join(" ")}`.toLowerCase();
+      const combined =
+        `${store.name} ${store.description} ${(store.products || []).map((p: any) => p.name).join(" ")}`.toLowerCase();
       return combined.includes(q);
     });
   }, [stores, pureVegOnly, selectedTag]);
@@ -107,12 +112,47 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
             Craving Night Mess or Canteen Chow?
           </h1>
           <p className="text-xs sm:text-sm text-white/90 font-medium">
-            Hot momos, butter paneer rolls, and midnight cold coffee delivered in 15–20 mins inside {collegeName}.
+            Hot momos, butter paneer rolls, and midnight cold coffee delivered in 15–20 mins inside{" "}
+            {collegeName}.
           </p>
         </div>
 
         <div className="absolute right-3 -bottom-6 opacity-20 sm:opacity-30 pointer-events-none">
           <UtensilsCrossed className="size-48" />
+        </div>
+      </div>
+
+      {/* ─── Arman's Night Canteen Live Announcement Banner ─── */}
+      <div className="rounded-3xl border border-amber-500/35 bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-orange-500/15 p-4 sm:p-5 relative overflow-hidden shadow-xs">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 relative z-10">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/25 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+              </span>
+              <span>🔴 LIVE STARTING TODAY · NIGHT CANTEEN</span>
+            </div>
+            <h3 className="text-sm sm:text-base font-black text-foreground flex items-center gap-1.5">
+              <span>🌙 Arman&apos;s Night Canteen is Officially LIVE!</span>
+            </h3>
+            <p className="text-xs text-muted-foreground max-w-lg font-medium">
+              Sizzling Maggi, double egg chicken rolls, burgers, thick shakes &amp; combos delivered to your
+              hostel room till 4 AM. Use code <span className="font-bold text-foreground">NIGHTOWL20</span>{" "}
+              for 20% OFF!
+            </p>
+          </div>
+          <Link
+            href="/app/marketplace/store/merch_armans_night_canteen"
+            onClick={() => {
+              sounds.tap();
+              haptics.success();
+            }}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-foreground text-background text-xs font-black shadow-md hover:opacity-90 transition-all active:scale-95 shrink-0 cursor-pointer"
+          >
+            <span>Order from Arman&apos;s</span>
+            <ChevronRight className="size-3.5" />
+          </Link>
         </div>
       </div>
 
@@ -231,7 +271,11 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
                   {/* Store Cover Image with Badges */}
                   <div className="relative h-44 w-full bg-muted overflow-hidden">
                     <img
-                      src={store.coverUrl || store.logoUrl || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=300&fit=crop"}
+                      src={
+                        store.coverUrl ||
+                        store.logoUrl ||
+                        "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=300&fit=crop"
+                      }
                       alt={store.name}
                       className="size-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -289,7 +333,9 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
 
                     {popularItems.length > 0 && (
                       <div className="flex items-center gap-1.5 pt-1 overflow-hidden">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0">Popular:</span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0">
+                          Popular:
+                        </span>
                         <div className="flex items-center gap-1 truncate">
                           {popularItems.map((p: any) => (
                             <span
@@ -362,7 +408,10 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
                     {/* Dish Image + Veg Badge */}
                     <div className="relative h-32 w-full rounded-xl overflow-hidden bg-muted">
                       <img
-                        src={product.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop"}
+                        src={
+                          product.imageUrl ||
+                          "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop"
+                        }
                         alt={product.name}
                         className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -516,7 +565,8 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
               Bring CampusLoop Food Delivery to Your College
             </h4>
             <p className="text-[11px] text-muted-foreground max-w-md">
-              We partner directly with campus canteens, night messes, and food trucks. Contact us on Instagram to onboard your campus food spots!
+              We partner directly with campus canteens, night messes, and food trucks. Contact us on Instagram
+              to onboard your campus food spots!
             </p>
           </div>
           <a

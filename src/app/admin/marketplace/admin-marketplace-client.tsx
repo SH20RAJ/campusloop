@@ -89,15 +89,24 @@ export function AdminMarketplaceClient() {
   const [prodIsVeg, setProdIsVeg] = useState(true);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
 
-  const { data, isLoading, mutate } = useSWR<{ merchants: any[] }>(
-    "/api/admin/marketplace/merchants",
-    fetcher,
-    { dedupingInterval: 6000 }
-  );
+  const { data, isLoading, mutate } = useSWR<{
+    merchants: any[];
+    stats?: {
+      totalMerchants: number;
+      activeMerchants: number;
+      totalProducts: number;
+      totalOrders: number;
+      totalGmv: number;
+    };
+  }>("/api/admin/marketplace/merchants", fetcher, { dedupingInterval: 6000 });
 
   const merchants = data?.merchants || [];
-  const totalProducts = merchants.reduce((sum, m) => sum + (m.products?.length || 0), 0);
-  const totalOrders = merchants.reduce((sum, m) => sum + (m.orders?.length || 0), 0);
+  const stats = data?.stats;
+  const activeStoresCount = stats?.activeMerchants ?? merchants.filter((m) => m.isOpen).length;
+  const totalProducts =
+    stats?.totalProducts ?? merchants.reduce((sum, m) => sum + (m.products?.length || 0), 0);
+  const totalOrders = stats?.totalOrders ?? merchants.reduce((sum, m) => sum + (m.orders?.length || 0), 0);
+  const totalGmv = stats?.totalGmv ?? 0;
 
   const filteredMerchants = useMemo(() => {
     return merchants.filter((m) => {
@@ -314,9 +323,12 @@ export function AdminMarketplaceClient() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
           <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Active Stores
+            Registered Stores
           </p>
-          <p className="text-2xl font-black text-foreground">{merchants.length}</p>
+          <p className="text-2xl font-black text-foreground">
+            {merchants.length}{" "}
+            <span className="text-xs text-muted-foreground font-semibold">({activeStoresCount} Open)</span>
+          </p>
         </div>
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
           <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -325,14 +337,16 @@ export function AdminMarketplaceClient() {
           <p className="text-2xl font-black text-foreground">{totalProducts}</p>
         </div>
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Live Orders</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Campus Orders
+          </p>
           <p className="text-2xl font-black text-foreground">{totalOrders}</p>
         </div>
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
           <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Est. Campus GMV
+            Campus GMV (Gross Value)
           </p>
-          <p className="text-2xl font-black text-emerald-500">₹1,85,000</p>
+          <p className="text-2xl font-black text-emerald-500">₹{totalGmv.toLocaleString("en-IN")}</p>
         </div>
       </div>
 

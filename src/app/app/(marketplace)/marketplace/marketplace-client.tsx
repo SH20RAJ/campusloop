@@ -171,14 +171,16 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 relative z-10">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-black uppercase tracking-wider">
-                <span>🚀 EXPANDING TO NEW COLLEGES</span>
+                <span>🚀 1,000+ STUDENT SIGNUPS REQUIRED TO UNLOCK</span>
               </div>
               <h3 className="text-sm sm:text-base font-black text-foreground">
                 Want Night Canteens &amp; Store Delivery at {collegeName}?
               </h3>
-              <p className="text-xs text-muted-foreground max-w-lg font-medium">
-                CampusLoop Marketplace is currently live at BIT Mesra. DM us on Instagram to onboard your
-                campus canteens, stationery stores, and bike rentals!
+              <p className="text-xs text-muted-foreground max-w-lg font-medium leading-relaxed">
+                CampusLoop Marketplace is currently live at BIT Mesra. To launch night canteens, laundry, and
+                bike rentals at your campus, your college must have{" "}
+                <span className="font-bold text-foreground">1,000+ verified student signups</span>. Share
+                CampusLoop with your batchmates and DM us to unlock!
               </p>
             </div>
             <a
@@ -511,7 +513,7 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
               <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
                 {isBitMesraStudent
                   ? "Check back shortly or browse upcoming listings in other categories."
-                  : `CampusLoop Marketplace is currently live at BIT Mesra and expanding across Indian colleges. Drop us a DM on Instagram to get your campus night canteen & local stalls listed first!`}
+                  : `CampusLoop Marketplace launches once a college reaches 1,000+ verified student signups. Get your campus batchmates on CampusLoop and DM us on Instagram to prioritize your college!`}
               </p>
             </div>
             {!isBitMesraStudent && (
@@ -526,7 +528,7 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all shadow-sm active:scale-95 cursor-pointer"
               >
                 <InstagramIcon className="size-3.5 fill-current" />
-                <span>Invite Us via Instagram DM @campusloop.space</span>
+                <span>Invite Us via Instagram DM (1K+ Students)</span>
               </a>
             )}
           </div>

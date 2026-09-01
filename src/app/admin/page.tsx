@@ -6,6 +6,8 @@ import {
   Ghost,
   GraduationCap,
   ShieldAlert,
+  ShoppingBag,
+  Store,
   TrendingUp,
   UserCheck,
   Users,
@@ -92,6 +94,22 @@ export default async function AdminDashboard() {
           accent="blue"
           href="/admin/posts"
           hint={`${stats.publishedPosts} published`}
+        />
+        <StatCard
+          label="Campus Stores"
+          value={stats.totalMerchants}
+          icon={Store}
+          accent="orange"
+          href="/admin/marketplace"
+          hint="Night canteens & hubs"
+        />
+        <StatCard
+          label="Campus Orders"
+          value={stats.totalOrders}
+          icon={ShoppingBag}
+          accent="green"
+          href="/admin/marketplace"
+          hint={`₹${stats.totalGmv.toLocaleString("en-IN")} total GMV`}
         />
         <StatCard
           label="Pending Review"

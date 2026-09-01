@@ -19,15 +19,35 @@ export async function GET() {
           columns: { id: true, name: true, slug: true },
         },
         products: {
-          columns: { id: true, name: true, price: true },
+          columns: { id: true, name: true, price: true, isAvailable: true, categoryName: true },
         },
         orders: {
-          columns: { id: true, total: true, status: true },
+          columns: { id: true, total: true, status: true, createdAt: true },
         },
       },
     });
 
-    return NextResponse.json({ merchants: allMerchants });
+    const totalGmv = allMerchants.reduce((sum, m) => {
+      const storeGmv = (m.orders || [])
+        .filter((o: any) => !["REJECTED", "CANCELLED"].includes(o.status))
+        .reduce((s: number, o: any) => s + (o.total || 0), 0);
+      return sum + storeGmv;
+    }, 0);
+
+    const totalOrdersCount = allMerchants.reduce((sum, m) => sum + (m.orders?.length || 0), 0);
+    const totalProductsCount = allMerchants.reduce((sum, m) => sum + (m.products?.length || 0), 0);
+    const activeMerchantsCount = allMerchants.filter((m) => m.status === "ACTIVE" && m.isOpen).length;
+
+    return NextResponse.json({
+      merchants: allMerchants,
+      stats: {
+        totalMerchants: allMerchants.length,
+        activeMerchants: activeMerchantsCount,
+        totalProducts: totalProductsCount,
+        totalOrders: totalOrdersCount,
+        totalGmv,
+      },
+    });
   } catch (error) {
     console.error("Error in admin merchants GET:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -72,55 +92,40 @@ export async function POST(req: Request) {
 
     const cleanLoginUsername = loginUsername?.trim().toLowerCase() || cleanSlug.replace(/[^a-z0-9]/g, "");
 
-    // Generated when the admin does not supply one. Held in plaintext only
-    // for the length of this request: it is hashed before storage and returned
-    // once so the admin can pass it to the shopkeeper.
     const issuedPassword: string = loginPassword?.trim() || generateMerchantPassword();
     const hashedPassword = await hashMerchantPassword(issuedPassword);
 
-    const verticalTypeMap: Record<string, string> = {
-      food: "FOOD",
-      rentals: "RENTALS",
-      barber: "BARBER",
-      laundry: "LAUNDRY",
-      water: "WATER",
-      essentials: "MART",
-    };
-    const resolvedVerticalType = verticalTypeMap[categorySlug?.toLowerCase() || "food"] || "FOOD";
-
-    const [newMerchant] = await db
+    const [created] = await db
       .insert(merchants)
       .values({
         name: name.trim(),
         slug: cleanSlug,
         institutionId,
         categorySlug: categorySlug || "food",
-        verticalType: resolvedVerticalType,
         description: description?.trim() || null,
         address: address.trim(),
         locationPin: locationPin?.trim() || null,
         phone: phone?.trim() || null,
         email: email?.trim() || null,
-        logoUrl: logoUrl || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=300&fit=crop",
-        coverUrl:
-          coverUrl || "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200&h=400&fit=crop",
-        deliveryFee: typeof deliveryFee === "number" ? deliveryFee : 20,
-        minOrderValue: typeof minOrderValue === "number" ? minOrderValue : 80,
-        estimatedPrepTime: estimatedPrepTime || "15–20 min",
-        loginUsername: cleanLoginUsername,
-        loginPassword: issuedPassword,
+        logoUrl: logoUrl?.trim() || null,
+        coverUrl: coverUrl?.trim() || null,
+        deliveryFee: typeof deliveryFee === "number" ? deliveryFee : 0,
+        minOrderValue: typeof minOrderValue === "number" ? minOrderValue : 0,
+        estimatedPrepTime: estimatedPrepTime?.trim() || "15-20 min",
         status: "ACTIVE",
         isOpen: true,
+        loginUsername: cleanLoginUsername,
+        loginPassword: hashedPassword,
       })
       .returning();
 
     return NextResponse.json({
       success: true,
-      merchant: newMerchant,
-      temporaryPassword: issuedPassword,
+      merchant: created,
+      issuedPassword,
     });
   } catch (error) {
-    console.error("Error in admin merchant creation:", error);
+    console.error("Error creating merchant in admin:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

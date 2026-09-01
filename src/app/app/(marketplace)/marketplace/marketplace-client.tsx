@@ -537,7 +537,7 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
 
       {/* ─── Cart bar ─── */}
       {totalItemsCount > 0 && (
-        <div className="fixed bottom-16 left-0 right-0 z-40 mx-auto max-w-lg px-4 duration-200 animate-in slide-in-from-bottom-3 sm:bottom-6">
+        <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 left-0 right-0 z-50 mx-auto max-w-lg px-4 duration-200 animate-in slide-in-from-bottom-3">
           <Link
             href="/app/marketplace/cart"
             onClick={() => {

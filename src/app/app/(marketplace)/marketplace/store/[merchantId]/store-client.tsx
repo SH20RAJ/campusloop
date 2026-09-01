@@ -282,7 +282,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen border-x border-border/20 bg-background text-foreground select-none pb-32">
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen border-x border-border/20 bg-background text-foreground select-none pb-44 md:pb-32">
       {/* ─── Top Sticky Bar (Twitter/X style) ─── */}
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border/30 bg-background/85 px-4 py-2.5 backdrop-blur-xl">
         <div className="flex items-center gap-3 min-w-0">
@@ -852,7 +852,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
 
       {/* ─── Sticky Bottom Floating Cart Bar ─── */}
       {currentStoreGroup && currentStoreGroup.items.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 p-4 pointer-events-none">
+        <div className="fixed bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:bottom-5 left-0 right-0 z-50 px-4 pointer-events-none">
           <div className="mx-auto max-w-2xl pointer-events-auto">
             <Link
               href="/app/marketplace/cart"

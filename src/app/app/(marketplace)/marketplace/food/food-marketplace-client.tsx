@@ -583,7 +583,7 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
 
       {/* ─── Floating Cart Pill Bar ─── */}
       {totalItemsCount > 0 && (
-        <div className="fixed bottom-16 sm:bottom-6 left-0 right-0 z-40 p-4 pointer-events-none flex justify-center">
+        <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 left-0 right-0 z-50 p-4 pointer-events-none flex justify-center">
           <Link
             href="/app/marketplace/checkout"
             className="pointer-events-auto flex items-center justify-between gap-4 w-full max-w-md px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 to-amber-500 text-white shadow-xl hover:shadow-2xl transition-all active:scale-95"

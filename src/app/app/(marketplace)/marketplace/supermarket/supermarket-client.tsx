@@ -338,7 +338,7 @@ export function SupermarketMarketplaceClient({
 
       {/* ─── Sticky Cart Bottom Bar if Items in Cart ─── */}
       {totalItemsCount > 0 && (
-        <div className="fixed bottom-4 left-4 right-4 max-w-lg mx-auto z-40">
+        <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 left-4 right-4 max-w-lg mx-auto z-50">
           <Link
             href="/app/marketplace/checkout"
             onClick={() => {

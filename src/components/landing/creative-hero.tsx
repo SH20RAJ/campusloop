@@ -14,14 +14,12 @@ import {
   School,
   Send,
   ShieldCheck,
-  Sparkles,
   Vote,
   Zap,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -72,7 +70,8 @@ const FEATURED_CAMPUSES = [
     meme: {
       tag: "Aura -5,000",
       title: "Dropping chai on syllabus printout",
-      caption: "Popular senior tried to do a cool walk past R&D gate and spilled hot cutting chai directly on the only 5-year PYQ notes booklet 💀",
+      caption:
+        "Popular senior tried to do a cool walk past R&D gate and spilled hot cutting chai directly on the only 5-year PYQ notes booklet 💀",
       likes: 624,
       category: "Aura Check",
     },
@@ -120,7 +119,8 @@ const FEATURED_CAMPUSES = [
     meme: {
       tag: "Faculty Lore",
       title: "Prof. Sharma's 8:01 AM gate lock",
-      caption: "When the professor said 'door closes at 8:00 AM sharp' and you made eye contact through the glass at 8:00:30 AM while holding your breakfast roll 🚶‍♂️🔒",
+      caption:
+        "When the professor said 'door closes at 8:00 AM sharp' and you made eye contact through the glass at 8:00:30 AM while holding your breakfast roll 🚶‍♂️🔒",
       likes: 890,
       category: "Professor Lore",
     },
@@ -168,7 +168,8 @@ const FEATURED_CAMPUSES = [
     meme: {
       tag: "Batch Tees",
       title: "Official Fest Merch vs What We Got",
-      caption: "Design committee on Figma: Cyberpunk neon masterpiece. The vendor who delivered it 2 hours before the fest opening: Dark blue polyester rag 😭",
+      caption:
+        "Design committee on Figma: Cyberpunk neon masterpiece. The vendor who delivered it 2 hours before the fest opening: Dark blue polyester rag 😭",
       likes: 710,
       category: "Viral Tees",
     },
@@ -216,7 +217,8 @@ const FEATURED_CAMPUSES = [
     meme: {
       tag: "Aura +10,000",
       title: "Fingerprint scanner worked on 8:29:59 PM",
-      caption: "Biometric machine turned green with literally 1 second left before the late penalty siren. Entire hostel lobby gave a standing ovation 🏆",
+      caption:
+        "Biometric machine turned green with literally 1 second left before the late penalty siren. Entire hostel lobby gave a standing ovation 🏆",
       likes: 1040,
       category: "Aura Check",
     },
@@ -264,7 +266,8 @@ const FEATURED_CAMPUSES = [
     meme: {
       tag: "Inside Joke",
       title: "Hostel 12 vs 13 Chai Debate",
-      caption: "When a fresher asks which hostel has better midnight parathas and triggers a 45-minute philosophical dissertation between seniors 🥟",
+      caption:
+        "When a fresher asks which hostel has better midnight parathas and triggers a 45-minute philosophical dissertation between seniors 🥟",
       likes: 670,
       category: "Campus Lore",
     },
@@ -330,9 +333,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
     sounds.pop();
     haptics.light();
     setVotedId(optId);
-    setPollOptions((prev) =>
-      prev.map((opt) => (opt.id === optId ? { ...opt, votes: opt.votes + 1 } : opt))
-    );
+    setPollOptions((prev) => prev.map((opt) => (opt.id === optId ? { ...opt, votes: opt.votes + 1 } : opt)));
   }
 
   // Handle Like Confession
@@ -359,31 +360,33 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
   const totalPollVotes = pollOptions.reduce((acc, curr) => acc + curr.votes, 0);
 
   return (
-    <section className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 pt-24 pb-16 sm:pt-28 sm:pb-20 overflow-hidden">
+    <section className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 pt-20 pb-12 sm:pt-28 sm:pb-20 overflow-hidden">
       {/* ── Ambient Background Lighting ── */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-32 left-1/2 -z-10 h-[380px] w-[600px] -translate-x-1/2 rounded-full bg-linear-to-b from-primary/15 via-indigo-500/10 to-transparent blur-3xl opacity-70"
       />
 
-      <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-8">
+      <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-8">
         {/* ──────── LEFT COLUMN: Clean Minimal Value Proposition ──────── */}
-        <div className="space-y-5 lg:col-span-6 lg:pr-4 text-center lg:text-left">
+        <div className="space-y-4 sm:space-y-5 lg:col-span-6 lg:pr-4 text-center lg:text-left">
           {/* Status Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 backdrop-blur-md">
-            <span className="relative flex size-2">
+          <div className="inline-flex flex-wrap items-center justify-center lg:justify-start gap-1.5 sm:gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 backdrop-blur-md">
+            <span className="relative flex size-2 shrink-0">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-foreground">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-foreground whitespace-nowrap">
               1,350+ Indian Colleges
             </span>
-            <span className="text-muted-foreground/40">•</span>
-            <span className="text-xs font-semibold text-primary">Verified Students Only</span>
+            <span className="text-muted-foreground/40 hidden xs:inline">•</span>
+            <span className="text-[11px] sm:text-xs font-semibold text-primary whitespace-nowrap">
+              Verified Students Only
+            </span>
           </div>
 
           {/* Headline */}
-          <h1 className="font-heading text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.08]">
+          <h1 className="font-heading text-3xl xs:text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.12] sm:leading-[1.08] break-words">
             Your campus.
             <br />
             <span className="bg-linear-to-r from-primary via-violet-400 to-indigo-400 bg-clip-text text-transparent italic">
@@ -392,20 +395,20 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
           </h1>
 
           {/* Description */}
-          <p className="max-w-xl mx-auto lg:mx-0 text-sm sm:text-base leading-relaxed text-muted-foreground">
+          <p className="max-w-xl mx-auto lg:mx-0 text-xs sm:text-base leading-relaxed text-muted-foreground">
             The private collegiate network for Indian students. Settle canteen debates, spill anonymous
             confessions safely, buy and sell dorm gear, and vibe match — gated strictly by your{" "}
             <span className="font-semibold text-foreground">.ac.in college email</span>.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-1">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-2.5 sm:gap-3 pt-1 w-full max-w-sm sm:max-w-none mx-auto lg:mx-0">
             {isAuthenticated ? (
               <Link
                 href="/app"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "w-full sm:w-auto rounded-xl px-6 font-bold shadow-md shadow-primary/20 text-sm gap-2"
+                  "w-full sm:w-auto h-11 sm:h-12 rounded-2xl px-6 font-black shadow-md shadow-primary/20 text-xs sm:text-sm gap-2 flex items-center justify-center"
                 )}
               >
                 <span>Open CampusLoop</span>
@@ -416,7 +419,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                 href="/handler/sign-up"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "w-full sm:w-auto rounded-xl px-6 font-bold shadow-md shadow-primary/20 text-sm gap-2"
+                  "w-full sm:w-auto h-11 sm:h-12 rounded-2xl px-6 font-black shadow-md shadow-primary/20 text-xs sm:text-sm gap-2 flex items-center justify-center"
                 )}
               >
                 <span>Verify with college email</span>
@@ -428,7 +431,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
               href="/colleges"
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
-                "w-full sm:w-auto rounded-xl border-border/80 bg-background/50 hover:bg-card text-foreground font-semibold px-5 text-sm"
+                "w-full sm:w-auto h-11 sm:h-12 rounded-2xl border-border/80 bg-background/50 hover:bg-card text-foreground font-bold px-5 text-xs sm:text-sm flex items-center justify-center"
               )}
             >
               <School className="size-4 mr-1.5 text-primary" />
@@ -448,7 +451,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
           )}
 
           {/* Minimal Trust Strip */}
-          <div className="pt-3 border-t border-border/40 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-[11px] text-muted-foreground font-medium">
+          <div className="pt-3 border-t border-border/40 flex flex-wrap items-center justify-center lg:justify-start gap-x-4 sm:gap-x-5 gap-y-2 text-[10px] sm:text-[11px] text-muted-foreground font-medium">
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="size-3.5 text-emerald-500 shrink-0" />
               <span>100% Verified Accounts</span>
@@ -467,7 +470,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
         {/* ──────── RIGHT COLUMN: Clean Minimal Interactive Artifacts ──────── */}
         <div className="lg:col-span-6 w-full max-w-lg mx-auto">
           {/* Card Container */}
-          <div className="rounded-2xl border border-border/60 bg-card/95 backdrop-blur-xl shadow-xl p-4 sm:p-5 space-y-3.5">
+          <div className="rounded-3xl border border-border/60 bg-card/95 backdrop-blur-xl shadow-xl p-3.5 sm:p-5 space-y-3">
             {/* Top Bar: Campus Picker & Live Status */}
             <div className="flex items-center justify-between pb-3 border-b border-border/40">
               {/* Campus Selector Dropdown */}
@@ -569,12 +572,8 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                     </div>
 
                     <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3.5 space-y-2">
-                      <h4 className="text-xs sm:text-sm font-black text-foreground">
-                        {campus.meme.title}
-                      </h4>
-                      <p className="text-xs leading-relaxed text-muted-foreground">
-                        {campus.meme.caption}
-                      </p>
+                      <h4 className="text-xs sm:text-sm font-black text-foreground">{campus.meme.title}</h4>
+                      <p className="text-xs leading-relaxed text-muted-foreground">{campus.meme.caption}</p>
                     </div>
 
                     <div className="flex items-center justify-between pt-1 text-xs text-muted-foreground">
@@ -688,7 +687,9 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                             <div className="flex items-center justify-between px-3 py-2">
                               <span className={cn(isVoted && "text-primary font-bold")}>{opt.text}</span>
                               {votedId && (
-                                <span className="font-mono text-[10px] font-bold text-foreground">{pct}%</span>
+                                <span className="font-mono text-[10px] font-bold text-foreground">
+                                  {pct}%
+                                </span>
                               )}
                             </div>
                           </button>

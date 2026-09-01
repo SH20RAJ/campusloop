@@ -1,21 +1,14 @@
 "use client";
 
 import {
-  ArrowRight,
   Bike,
-  Building,
-  Check,
   ChevronDown,
-  ChevronRight,
-  Copy,
-  DollarSign,
   Droplet,
   Edit2,
   ExternalLink,
   Eye,
   EyeOff,
   KeyRound,
-  Loader2,
   Package,
   Plus,
   RefreshCw,
@@ -25,7 +18,6 @@ import {
   ShieldCheck,
   Shirt,
   ShoppingBag,
-  Star,
   Store,
   Trash2,
   UtensilsCrossed,
@@ -241,6 +233,43 @@ export function AdminMarketplaceClient() {
     }
   }
 
+  // 1-Click Store Open / Close status toggle
+  async function handleToggleStoreStatus(store: any) {
+    sounds.tap();
+    haptics.medium();
+    const nextIsOpen = !store.isOpen;
+    try {
+      const res = await fetch(`/api/admin/marketplace/merchants/${store.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isOpen: nextIsOpen }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(`${store.name} is now ${nextIsOpen ? "OPEN 🟢" : "CLOSED 🔴"}`);
+      mutate();
+    } catch {
+      toast.error("Failed to update store status");
+    }
+  }
+
+  // 1-Click Product In-Stock / Out-of-Stock toggle
+  async function handleToggleProductAvailability(prodId: string, currentAvailable: boolean) {
+    sounds.tap();
+    haptics.light();
+    try {
+      const res = await fetch("/api/admin/marketplace/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: prodId, isAvailable: !currentAvailable }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(`Product marked ${!currentAvailable ? "In Stock 🟢" : "Out of Stock 🔴"}`);
+      mutate();
+    } catch {
+      toast.error("Failed to update product stock");
+    }
+  }
+
   // Delete product
   async function handleDeleteProduct(prodId: string) {
     if (!confirm("Are you sure you want to delete this product?")) return;
@@ -427,16 +456,19 @@ export function AdminMarketplaceClient() {
                             <div>
                               <div className="flex items-center gap-2">
                                 <h3 className="text-sm font-black text-foreground">{store.name}</h3>
-                                <span
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleStoreStatus(store)}
                                   className={cn(
-                                    "px-2 py-0.5 rounded-full text-[9px] font-black uppercase",
+                                    "px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase transition-all cursor-pointer hover:scale-105 active:scale-95",
                                     store.isOpen
-                                      ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
-                                      : "bg-rose-500/15 text-rose-500 border border-rose-500/30"
+                                      ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 hover:bg-emerald-500/25"
+                                      : "bg-rose-500/15 text-rose-500 border border-rose-500/30 hover:bg-rose-500/25"
                                   )}
+                                  title={`Click to ${store.isOpen ? "Close" : "Open"} store`}
                                 >
-                                  {store.isOpen ? "OPEN" : "CLOSED"}
-                                </span>
+                                  {store.isOpen ? "🟢 OPEN" : "🔴 CLOSED"}
+                                </button>
                               </div>
                               <p className="text-xs text-muted-foreground">
                                 {store.institution?.name?.split(",")[0] || "BIT Mesra"} · {store.address}
@@ -551,7 +583,22 @@ export function AdminMarketplaceClient() {
                                       </p>
                                     </div>
 
-                                    <div className="flex items-center gap-1 shrink-0">
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleToggleProductAvailability(p.id, p.isAvailable ?? true)
+                                        }
+                                        className={cn(
+                                          "px-2 py-0.5 rounded-md text-[10px] font-black uppercase transition-all cursor-pointer",
+                                          p.isAvailable !== false
+                                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                                            : "bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20"
+                                        )}
+                                        title={`Click to mark ${p.isAvailable !== false ? "Out of Stock" : "In Stock"}`}
+                                      >
+                                        {p.isAvailable !== false ? "In Stock" : "Sold Out"}
+                                      </button>
                                       <button
                                         type="button"
                                         onClick={() => {

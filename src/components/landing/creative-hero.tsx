@@ -360,7 +360,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
   const totalPollVotes = pollOptions.reduce((acc, curr) => acc + curr.votes, 0);
 
   return (
-    <section className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 pt-20 pb-12 sm:pt-28 sm:pb-20 overflow-hidden">
+    <section className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 pt-20 pb-12 sm:pt-28 sm:pb-20 overflow-x-clip">
       {/* ── Ambient Background Lighting ── */}
       <div
         aria-hidden="true"
@@ -386,10 +386,10 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
           </div>
 
           {/* Headline */}
-          <h1 className="font-heading text-3xl xs:text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.12] sm:leading-[1.08] break-words">
+          <h1 className="font-heading text-[28px] xs:text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.14] sm:leading-[1.08]">
             Your campus.
             <br />
-            <span className="bg-linear-to-r from-primary via-violet-400 to-indigo-400 bg-clip-text text-transparent italic">
+            <span className="bg-linear-to-r from-primary via-violet-400 to-indigo-400 bg-clip-text text-transparent italic pr-1">
               Completely unfiltered.
             </span>
           </h1>

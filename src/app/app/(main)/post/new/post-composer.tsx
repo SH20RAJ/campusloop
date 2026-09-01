@@ -8,6 +8,7 @@ import {
   BarChart3,
   Check,
   ChevronDown,
+  Flame,
   Globe,
   HelpCircle,
   Loader2,

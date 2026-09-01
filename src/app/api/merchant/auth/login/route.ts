@@ -2,7 +2,7 @@ import { eq, ilike, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { merchants } from "@/db/schema";
-import { hashMerchantPassword, verifyMerchantPassword } from "@/lib/marketplace/merchant-password";
+import { verifyMerchantPassword } from "@/lib/marketplace/merchant-password";
 import { createMerchantSessionToken, setMerchantSessionCookie } from "@/lib/merchant-auth";
 
 export const dynamic = "force-dynamic";
@@ -59,20 +59,6 @@ export async function POST(req: Request) {
         { error: "This merchant store account is currently suspended or closed. Contact campus admin." },
         { status: 403 }
       );
-    }
-
-    // Upgrade legacy plaintext rows in place, now that we know the password is
-    // genuinely correct. Nobody is locked out by the migration; each account
-    // is hashed the first time it signs in.
-    if (verification.needsRehash) {
-      const hashed = await hashMerchantPassword(cleanPassword);
-      await db
-        .update(merchants)
-        .set({
-          loginPassword: hashed,
-          loginUsername: merchant.loginUsername || merchant.slug,
-        })
-        .where(eq(merchants.id, merchant.id));
     }
 
     const token = await createMerchantSessionToken(merchant.id);

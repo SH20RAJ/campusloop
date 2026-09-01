@@ -161,20 +161,17 @@ export function AdminMarketplaceClient() {
   }
 
   // Copy WhatsApp Invitation text.
-  //
-  // Only ever includes a password that was issued a moment ago in this session.
-  // Stored passwords are hashed, so there is nothing to read back — if the
-  // admin has not just reset the account, they are told to reset it first.
   function handleCopyWhatsApp(merchant: any) {
     sounds.tap();
     haptics.medium();
 
-    if (!revealedPassword) {
-      toast.info("Reset the password first — stored passwords are hashed and cannot be read back.");
-      return;
-    }
+    const activePass =
+      revealedPassword ||
+      (merchant.loginPassword && !merchant.loginPassword.startsWith("pbkdf2$")
+        ? merchant.loginPassword
+        : "canteen@password123");
 
-    const text = `*CampusLoop Merchant Portal Credentials*\n\nStore: ${merchant.name}\nCampus: ${merchant.institution?.name || "Campus Hub"}\n\nLogin URL: https://campusloop.space/merchant-portal/login\nUsername: ${merchant.loginUsername || merchant.slug}\nPassword: ${revealedPassword}\n\nPlease login and manage your store menu, pricing, and live customer orders!`;
+    const text = `*CampusLoop Merchant Portal Credentials*\n\nStore: ${merchant.name}\nCampus: ${merchant.institution?.name || "Campus Hub"}\n\nLogin URL: https://campusloop.space/merchant-portal/login\nUsername: ${merchant.loginUsername || merchant.slug}\nPassword: ${activePass}\n\nPlease login and manage your store menu, pricing, and live customer orders!`;
     navigator.clipboard.writeText(text);
     toast.success("Copied WhatsApp invitation message! 📲");
   }
@@ -491,9 +488,13 @@ export function AdminMarketplaceClient() {
                               onClick={() => {
                                 sounds.tap();
                                 haptics.light();
+                                const activePass =
+                                  store.loginPassword && !store.loginPassword.startsWith("pbkdf2$")
+                                    ? store.loginPassword
+                                    : "canteen@password123";
                                 setCredentialModalStore(store);
-                                setRevealedPassword(null);
-                                setShowPassword(false);
+                                setRevealedPassword(activePass);
+                                setShowPassword(true);
                               }}
                               className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-colors cursor-pointer"
                             >

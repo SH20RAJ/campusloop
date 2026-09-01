@@ -695,7 +695,6 @@ async function main() {
       discountType: "PERCENTAGE",
       discountValue: 20,
       minOrderValue: 149,
-      maxDiscount: 50,
       isActive: true,
     },
     {

@@ -37,6 +37,7 @@ export {
   Search as AnimateSearch,
   Send as AnimateSend,
   Settings as AnimateSettings,
+  Share as AnimateShare,
   ShieldCheck as AnimateShieldCheck,
   SlidersHorizontal as AnimateSlidersHorizontal,
   Sparkles as AnimateSparkles,

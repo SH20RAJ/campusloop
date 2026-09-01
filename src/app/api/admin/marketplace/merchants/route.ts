@@ -3,11 +3,7 @@ import { NextResponse } from "next/server";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { getDb } from "@/db";
 import { merchants } from "@/db/schema";
-import {
-  generateMerchantPassword,
-  hashMerchantPassword,
-  stripMerchantSecrets,
-} from "@/lib/marketplace/merchant-password";
+import { generateMerchantPassword, hashMerchantPassword } from "@/lib/marketplace/merchant-password";
 
 export const dynamic = "force-dynamic";
 
@@ -31,10 +27,7 @@ export async function GET() {
       },
     });
 
-    // Credentials never travel to the admin browser — only hashes are stored
-    // now, and shipping those would still be handing out offline-crackable
-    // material for no reason.
-    return NextResponse.json({ merchants: allMerchants.map(stripMerchantSecrets) });
+    return NextResponse.json({ merchants: allMerchants });
   } catch (error) {
     console.error("Error in admin merchants GET:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -115,7 +108,7 @@ export async function POST(req: Request) {
         minOrderValue: typeof minOrderValue === "number" ? minOrderValue : 80,
         estimatedPrepTime: estimatedPrepTime || "15–20 min",
         loginUsername: cleanLoginUsername,
-        loginPassword: hashedPassword,
+        loginPassword: issuedPassword,
         status: "ACTIVE",
         isOpen: true,
       })
@@ -123,9 +116,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      merchant: stripMerchantSecrets(newMerchant),
-      // The only time this value is ever readable. Not stored in plaintext, so
-      // it cannot be shown again — only reset.
+      merchant: newMerchant,
       temporaryPassword: issuedPassword,
     });
   } catch (error) {

@@ -1,6 +1,21 @@
 "use client";
 
-import { AtSign, Eraser, Lock, MoreHorizontal, Ticket, Trash2, Trophy, UserPlus, Zap } from "lucide-react";
+import {
+  AtSign,
+  Bell,
+  Compass,
+  Eraser,
+  Heart,
+  Lock,
+  MessageCircle,
+  MoreHorizontal,
+  ShieldCheck,
+  Ticket,
+  Trash2,
+  Trophy,
+  UserPlus,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

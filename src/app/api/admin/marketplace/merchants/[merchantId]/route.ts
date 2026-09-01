@@ -3,11 +3,7 @@ import { NextResponse } from "next/server";
 import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { getDb } from "@/db";
 import { merchants, products } from "@/db/schema";
-import {
-  generateMerchantPassword,
-  hashMerchantPassword,
-  stripMerchantSecrets,
-} from "@/lib/marketplace/merchant-password";
+import { generateMerchantPassword } from "@/lib/marketplace/merchant-password";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +39,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Merchant not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ merchant: stripMerchantSecrets(merchant) });
+    return NextResponse.json({ merchant });
   } catch (error) {
     console.error("Error in admin single merchant GET:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -105,33 +101,22 @@ export async function PATCH(req: Request, { params }: RouteParams) {
     if (upiId !== undefined) updateData.upiId = upiId?.trim() || null;
     if (logoUrl !== undefined) updateData.logoUrl = logoUrl?.trim() || null;
     if (coverUrl !== undefined) updateData.coverUrl = coverUrl?.trim() || null;
-    if (deliveryFee !== undefined)
-      updateData.deliveryFee = typeof deliveryFee === "number" ? deliveryFee : parseInt(deliveryFee, 10) || 0;
-    if (minOrderValue !== undefined)
-      updateData.minOrderValue =
-        typeof minOrderValue === "number" ? minOrderValue : parseInt(minOrderValue, 10) || 0;
-    if (estimatedPrepTime !== undefined) updateData.estimatedPrepTime = estimatedPrepTime?.trim() || null;
+    if (deliveryFee !== undefined) updateData.deliveryFee = Number(deliveryFee) || 0;
+    if (minOrderValue !== undefined) updateData.minOrderValue = Number(minOrderValue) || 0;
+    if (estimatedPrepTime !== undefined)
+      updateData.estimatedPrepTime = estimatedPrepTime?.trim() || "15–20 min";
     if (status !== undefined) updateData.status = status;
     if (isOpen !== undefined) updateData.isOpen = Boolean(isOpen);
     if (loginUsername !== undefined) updateData.loginUsername = loginUsername?.trim().toLowerCase() || null;
-    // Hashed on the way in. An empty value clears the credential, which
-    // leaves the account unable to sign in until a new password is issued —
-    // that is the intended meaning of clearing it.
     let issuedPassword: string | null = null;
 
-    // `rotatePassword: true` lets the admin UI ask for a new credential without
-    // inventing one itself — password generation belongs on the server, next to
-    // the hashing, not in a browser bundle.
     if (body.rotatePassword === true) {
       issuedPassword = generateMerchantPassword();
-      updateData.loginPassword = await hashMerchantPassword(issuedPassword);
+      updateData.loginPassword = issuedPassword;
     } else if (typeof loginPassword === "string" && loginPassword.trim()) {
-      // An empty field means "leave the password alone", the same as every
-      // other change-password form. Treating blank as "clear the credential"
-      // would let an admin lock a store out just by saving the edit page.
       const trimmed = loginPassword.trim();
       issuedPassword = trimmed;
-      updateData.loginPassword = await hashMerchantPassword(trimmed);
+      updateData.loginPassword = trimmed;
     }
 
     const [updated] = await db
@@ -146,8 +131,7 @@ export async function PATCH(req: Request, { params }: RouteParams) {
 
     return NextResponse.json({
       success: true,
-      merchant: stripMerchantSecrets(updated),
-      // Echoed once so the admin can hand it over; never retrievable later.
+      merchant: updated,
       temporaryPassword: issuedPassword,
     });
   } catch (error) {

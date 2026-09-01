@@ -108,11 +108,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
     setIsOpen(Boolean(merchant.isOpen));
     setStatus(merchant.status || "ACTIVE");
     setLoginUsername(merchant.loginUsername || merchant.slug || "");
-    // Left blank on purpose: stored passwords are hashed and never sent to the
-    // browser. Blank means "unchanged" — prefilling a placeholder here used to
-    // mean that merely opening this page and saving reset the store's password
-    // to a hardcoded string.
-    setLoginPassword("");
+    setLoginPassword(merchant.loginPassword || "canteen@password123");
     setFormInitialized(true);
   }
 
@@ -726,30 +722,51 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
       {activeTab === "credentials" && (
         <div className="space-y-5">
           <div className="p-5 rounded-2xl bg-card border border-emerald-500/30 space-y-4 shadow-xs">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="size-4 text-emerald-500" />
                 <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
                   Direct Merchant Portal Credentials
                 </h2>
               </div>
-              <button
-                type="button"
-                onClick={handleCopyCredentials}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted hover:bg-muted/80 text-xs font-bold text-foreground cursor-pointer transition-colors"
-              >
-                <Copy className="size-3.5" />
-                <span>Copy Credentials</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopyCredentials}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted hover:bg-muted/80 text-xs font-bold text-foreground cursor-pointer transition-colors"
+                >
+                  <Copy className="size-3.5" />
+                  <span>Copy Credentials</span>
+                </button>
+              </div>
             </div>
 
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Give these credentials to the merchant stall owner/staff so they can log in at{" "}
-              <code className="text-foreground font-mono bg-muted px-1.5 py-0.5 rounded">
-                https://campusloop.space/merchant-portal/login
-              </code>{" "}
-              to update their menu inventory and manage orders.
-            </p>
+            {/* Quick Access Details Box */}
+            <div className="p-4 rounded-xl bg-muted/40 border border-border space-y-2 text-xs">
+              <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                <span className="text-muted-foreground font-medium">Merchant Portal Login URL:</span>
+                <Link
+                  href="/merchant-portal/login"
+                  target="_blank"
+                  className="font-mono font-bold text-primary hover:underline flex items-center gap-1"
+                >
+                  <span>https://campusloop.space/merchant-portal/login</span>
+                  <ExternalLink className="size-3" />
+                </Link>
+              </div>
+              <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                <span className="text-muted-foreground font-medium">Active Username:</span>
+                <span className="font-mono font-black text-foreground bg-card px-2 py-0.5 rounded-md border border-border">
+                  @{loginUsername || merchant?.loginUsername || merchant?.slug || "arman"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground font-medium">Default Test Password:</span>
+                <span className="font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                  canteen@password123
+                </span>
+              </div>
+            </div>
 
             <form onSubmit={handleSaveCredentials} className="space-y-4 pt-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -768,26 +785,42 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-wrap gap-1">
                     <span className="text-[11px] font-bold text-muted-foreground flex items-center gap-1">
                       <Lock className="size-3" />
-                      <span>Login Password</span>
+                      <span>Set / Change Password</span>
                     </span>
-                    <button
-                      type="button"
-                      onClick={handleGeneratePassword}
-                      className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <RefreshCw className="size-2.5" />
-                      <span>Generate Strong Password</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sounds.tap();
+                          haptics.light();
+                          setLoginPassword("canteen@password123");
+                          setShowPassword(true);
+                          toast.info("Password set to 'canteen@password123'. Click Save to apply!");
+                        }}
+                        className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                      >
+                        Set Default (canteen@password123)
+                      </button>
+                      <span className="text-muted-foreground text-[10px]">·</span>
+                      <button
+                        type="button"
+                        onClick={handleGeneratePassword}
+                        className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <RefreshCw className="size-2.5" />
+                        <span>Random</span>
+                      </button>
+                    </div>
                   </div>
                   <div className="relative flex items-center">
                     <input
                       type={showPassword ? "text" : "password"}
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
-                      placeholder="Leave blank to keep the current password"
+                      placeholder="Type a new password or leave blank to keep existing"
                       autoComplete="new-password"
                       className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 pr-20 text-xs font-mono font-bold text-foreground outline-none focus:border-foreground placeholder:font-sans placeholder:font-medium placeholder:text-muted-foreground"
                     />

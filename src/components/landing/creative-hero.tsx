@@ -360,18 +360,18 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
   const totalPollVotes = pollOptions.reduce((acc, curr) => acc + curr.votes, 0);
 
   return (
-    <section className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 pt-20 pb-12 sm:pt-28 sm:pb-20 overflow-x-clip">
+    <section className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 pt-16 pb-10 sm:pt-28 sm:pb-20">
       {/* ── Ambient Background Lighting ── */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-32 left-1/2 -z-10 h-[380px] w-[600px] -translate-x-1/2 rounded-full bg-linear-to-b from-primary/15 via-indigo-500/10 to-transparent blur-3xl opacity-70"
       />
 
-      <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-8">
+      <div className="grid items-center gap-6 sm:gap-8 lg:grid-cols-12 lg:gap-8">
         {/* ──────── LEFT COLUMN: Clean Minimal Value Proposition ──────── */}
-        <div className="space-y-4 sm:space-y-5 lg:col-span-6 lg:pr-4 text-center lg:text-left">
+        <div className="space-y-3 sm:space-y-5 lg:col-span-6 lg:pr-4 text-center lg:text-left">
           {/* Status Badge */}
-          <div className="inline-flex flex-wrap items-center justify-center lg:justify-start gap-1.5 sm:gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 backdrop-blur-md">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 backdrop-blur-md">
             <span className="relative flex size-2 shrink-0">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
@@ -379,23 +379,23 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-foreground whitespace-nowrap">
               1,350+ Indian Colleges
             </span>
-            <span className="text-muted-foreground/40 hidden xs:inline">•</span>
+            <span className="text-muted-foreground/40">·</span>
             <span className="text-[11px] sm:text-xs font-semibold text-primary whitespace-nowrap">
-              Verified Students Only
+              Verified Only
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="font-heading text-[28px] xs:text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.14] sm:leading-[1.08]">
+          <h1 className="font-heading text-[32px] sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.1] sm:leading-[1.08]">
             Your campus.
             <br />
-            <span className="bg-linear-to-r from-primary via-violet-400 to-indigo-400 bg-clip-text text-transparent italic pr-1">
+            <span className="inline-block bg-linear-to-r from-primary via-violet-400 to-indigo-400 bg-clip-text text-transparent italic">
               Completely unfiltered.
             </span>
           </h1>
 
           {/* Description */}
-          <p className="max-w-xl mx-auto lg:mx-0 text-xs sm:text-base leading-relaxed text-muted-foreground">
+          <p className="max-w-xl mx-auto lg:mx-0 text-sm sm:text-base leading-relaxed text-muted-foreground">
             The private collegiate network for Indian students. Settle canteen debates, spill anonymous
             confessions safely, buy and sell dorm gear, and vibe match — gated strictly by your{" "}
             <span className="font-semibold text-foreground">.ac.in college email</span>.
@@ -408,7 +408,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                 href="/app"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "w-full sm:w-auto h-11 sm:h-12 rounded-2xl px-6 font-black shadow-md shadow-primary/20 text-xs sm:text-sm gap-2 flex items-center justify-center"
+                  "w-full sm:w-auto h-11 sm:h-12 rounded-2xl px-6 font-black shadow-md shadow-primary/20 text-sm gap-2 flex items-center justify-center"
                 )}
               >
                 <span>Open CampusLoop</span>
@@ -419,7 +419,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                 href="/handler/sign-up"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "w-full sm:w-auto h-11 sm:h-12 rounded-2xl px-6 font-black shadow-md shadow-primary/20 text-xs sm:text-sm gap-2 flex items-center justify-center"
+                  "w-full sm:w-auto h-11 sm:h-12 rounded-2xl px-6 font-black shadow-md shadow-primary/20 text-sm gap-2 flex items-center justify-center"
                 )}
               >
                 <span>Verify with college email</span>
@@ -431,7 +431,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
               href="/colleges"
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
-                "w-full sm:w-auto h-11 sm:h-12 rounded-2xl border-border/80 bg-background/50 hover:bg-card text-foreground font-bold px-5 text-xs sm:text-sm flex items-center justify-center"
+                "w-full sm:w-auto h-11 sm:h-12 rounded-2xl border-border/80 bg-background/50 hover:bg-card text-foreground font-bold px-5 text-sm flex items-center justify-center"
               )}
             >
               <School className="size-4 mr-1.5 text-primary" />
@@ -451,16 +451,16 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
           )}
 
           {/* Minimal Trust Strip */}
-          <div className="pt-3 border-t border-border/40 flex flex-wrap items-center justify-center lg:justify-start gap-x-4 sm:gap-x-5 gap-y-2 text-[10px] sm:text-[11px] text-muted-foreground font-medium">
-            <div className="flex items-center gap-1.5">
+          <div className="pt-3 border-t border-border/40 flex items-center justify-center lg:justify-start gap-x-3 sm:gap-x-5 gap-y-1.5 text-[10px] sm:text-[11px] text-muted-foreground font-medium">
+            <div className="flex items-center gap-1">
               <ShieldCheck className="size-3.5 text-emerald-500 shrink-0" />
-              <span>100% Verified Accounts</span>
+              <span>Verified</span>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <Lock className="size-3.5 text-primary shrink-0" />
-              <span>Sealed Identity Escrow</span>
+              <span>Identity Escrow</span>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <Building2 className="size-3.5 text-indigo-400 shrink-0" />
               <span>Zero Outsiders</span>
             </div>

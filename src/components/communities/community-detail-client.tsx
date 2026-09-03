@@ -237,6 +237,7 @@ export function CommunityDetailClient({
       status: "PUBLISHED",
       riskScore: 0,
       isEdited: false,
+      isSeeded: false,
       repostOfId: null,
       repostComment: null,
       createdAt: new Date(),

@@ -64,6 +64,7 @@ export const userProfiles = pgTable(
      * there is no stale "true" left behind for anyone to clean up.
      */
     lastSeenAt: timestamp("last_seen_at", { withTimezone: true }),
+    isSeeded: boolean("is_seeded").default(false).notNull(),
     createdAt,
     updatedAt,
   },
@@ -75,6 +76,7 @@ export const userProfiles = pgTable(
     index("user_profiles_points_idx").on(table.points),
     index("user_profiles_branch_idx").on(table.branch),
     index("user_profiles_last_seen_idx").on(table.lastSeenAt),
+    index("user_profiles_is_seeded_idx").on(table.isSeeded),
   ]
 );
 

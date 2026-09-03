@@ -47,7 +47,7 @@ export async function GET(req: Request) {
     }
 
     const isViewer = institutionId ? await isViewerProfile({ institutionId }) : false;
-    const conditions: SQL[] = [eq(posts.status, "PUBLISHED")];
+    const conditions: SQL[] = [eq(posts.status, "PUBLISHED"), eq(posts.isSeeded, false)];
 
     if (scope === "CAMPUS") {
       if (isViewer && targetInstitutionIds.length > 0) {

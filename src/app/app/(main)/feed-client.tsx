@@ -188,6 +188,7 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
       status: "PUBLISHED",
       riskScore: 0,
       isEdited: false,
+      isSeeded: false,
       repostOfId: null,
       repostComment: null,
       communityId: null,

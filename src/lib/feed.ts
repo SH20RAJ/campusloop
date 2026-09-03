@@ -32,7 +32,7 @@ export type FeedPost = {
 
 export type FeedFilter = "trending" | "latest" | "confessions" | "polls" | "questions";
 
-const published = eq(posts.status, "PUBLISHED");
+const published = and(eq(posts.status, "PUBLISHED"), eq(posts.isSeeded, false));
 const commentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)`;
 const voteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id}), 0)`;
 const reportCountSql = sql<number>`coalesce((select count(*)::int from ${reports} where ${reports.targetType} = 'POST' and ${reports.targetId} = ${posts.id}), 0)`;

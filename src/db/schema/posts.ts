@@ -45,6 +45,7 @@ export const posts = pgTable(
     status: contentStatusEnum("status").default("PUBLISHED").notNull(),
     riskScore: integer("risk_score").default(0).notNull(),
     communityId: text("community_id"),
+    isSeeded: boolean("is_seeded").default(false).notNull(),
     createdAt,
     updatedAt,
   },
@@ -55,6 +56,7 @@ export const posts = pgTable(
     index("posts_type_status_created_idx").on(table.type, table.status, table.createdAt),
     index("posts_community_status_created_idx").on(table.communityId, table.status, table.createdAt),
     index("posts_repost_idx").on(table.repostOfId),
+    index("posts_is_seeded_idx").on(table.isSeeded, table.status, table.createdAt),
   ]
 );
 

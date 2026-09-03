@@ -386,6 +386,7 @@ export function PostComposer({
       status: "PUBLISHED",
       riskScore: 0,
       isEdited: false,
+      isSeeded: false,
       repostOfId: null,
       repostComment: null,
       communityId: selectedCommunityId !== "NONE" ? selectedCommunityId : null,

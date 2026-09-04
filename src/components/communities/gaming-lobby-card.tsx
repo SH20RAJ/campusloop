@@ -134,7 +134,7 @@ export function GamingLobbyCard({ item }: GamingLobbyCardProps) {
               >
                 {item.host.displayName}
               </Link>
-              {(item.host.points || 0) >= 150 && <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />}
+              {(item.host.points || 0) >= 150 && <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />}
               <span className="text-[11px] text-muted-foreground truncate">@{item.host.username}</span>
               <span className="text-[10px] text-muted-foreground/60">·</span>
               <span className="text-[11px] text-muted-foreground/80 shrink-0">

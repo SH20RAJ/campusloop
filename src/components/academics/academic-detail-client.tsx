@@ -332,7 +332,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
                 >
                   {resource.uploader?.displayName}
                 </Link>
-                {resource.isVerified && <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />}
+                {resource.isVerified && <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />}
                 <span className="text-[11px] text-muted-foreground truncate">
                   @{resource.uploader?.username}
                 </span>

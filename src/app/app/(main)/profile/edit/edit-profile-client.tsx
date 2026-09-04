@@ -668,7 +668,7 @@ export function EditProfileClient() {
         {/* ─── Academic Info with Presets ─── */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
           <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-            <ShieldCheck className="size-3.5 text-blue-500" /> Academic & Campus Info
+            <ShieldCheck className="size-3.5 text-[#a170ff]" /> Academic & Campus Info
           </h3>
 
           <div className="space-y-3">

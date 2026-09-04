@@ -92,8 +92,8 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
         };
       case "COMMENT":
         return {
-          icon: <AnimateMessageCircle size={14} className="text-[#1d9bf0]" />,
-          badgeBg: "bg-[#1d9bf0]/15 border-[#1d9bf0]/30 text-[#1d9bf0]",
+          icon: <AnimateMessageCircle size={14} className="text-[#a170ff]" />,
+          badgeBg: "bg-[#a170ff]/15 border-[#a170ff]/30 text-[#a170ff]",
           actionText: "replied to your discussion",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
           actionLabel: "Reply",
@@ -101,8 +101,8 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
       case "REPLY":
       case "STORY_REPLY":
         return {
-          icon: <AnimateMessageCircle size={14} className="text-[#1d9bf0]" />,
-          badgeBg: "bg-[#1d9bf0]/15 border-[#1d9bf0]/30 text-[#1d9bf0]",
+          icon: <AnimateMessageCircle size={14} className="text-[#a170ff]" />,
+          badgeBg: "bg-[#a170ff]/15 border-[#a170ff]/30 text-[#a170ff]",
           actionText: "replied to your comment",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
           actionLabel: "Reply",
@@ -408,7 +408,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
                     {n.actor?.displayName || "A Student"}
                   </Link>
 
-                  {isVerified && <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />}
+                  {isVerified && <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />}
 
                   <span className="text-muted-foreground font-medium">@{n.actor?.username || "student"}</span>
 

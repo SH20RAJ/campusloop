@@ -271,7 +271,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   playKey={unreadNotificationsCount}
                 />
                 {unreadNotificationsCount > 0 && (
-                  <span className="absolute top-2 right-2 size-2 rounded-full bg-[#1d9bf0]" />
+                  <span className="absolute top-2 right-2 size-2 rounded-full bg-[#a170ff]" />
                 )}
               </Link>
             </div>
@@ -332,7 +332,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                       />
                     </AnimateIcon>
                     {isNotifications && unreadNotificationsCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-[#1d9bf0] text-white text-[10px] font-black flex items-center justify-center border-2 border-background shadow-xs">
+                      <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-[#a170ff] text-white text-[10px] font-black flex items-center justify-center border-2 border-background shadow-xs">
                         {unreadNotificationsCount > 99 ? "99+" : unreadNotificationsCount}
                       </span>
                     )}

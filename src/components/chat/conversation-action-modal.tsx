@@ -118,7 +118,7 @@ export function ConversationActionModal({
               <h3 className="text-sm font-bold text-foreground truncate flex items-center gap-1">
                 <span>{other?.displayName}</span>
                 {other?.points && other.points >= 150 && (
-                  <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+                  <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />
                 )}
               </h3>
               <p className="text-xs text-muted-foreground truncate">@{other?.username}</p>

@@ -317,7 +317,7 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
                       <div>
                         <div className="flex items-center gap-1.5">
                           <h3 className="text-sm font-black text-foreground leading-none">{college.name}</h3>
-                          <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+                          <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />
                         </div>
                         <p className="text-[11px] text-muted-foreground mt-1">
                           {college.district ? `${college.district}, ` : ""}

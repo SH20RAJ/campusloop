@@ -276,7 +276,7 @@ export function RightSidebar() {
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-black text-foreground truncate group-hover:underline flex items-center gap-1">
                         <span>{peer.displayName}</span>
-                        {peer.points >= 150 && <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />}
+                        {peer.points >= 150 && <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />}
                       </p>
                       <p className="text-[11px] text-muted-foreground truncate">@{peer.username}</p>
                     </div>

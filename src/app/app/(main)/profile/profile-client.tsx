@@ -534,7 +534,7 @@ export function ProfileClientView({
                 )}
                 {points >= 150 && (
                   <span title="Verified Campus Star">
-                    <ShieldCheck className="size-5 text-[#1d9bf0] shrink-0" />
+                    <ShieldCheck className="size-5 text-[#a170ff] shrink-0" />
                   </span>
                 )}
               </div>

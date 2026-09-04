@@ -132,7 +132,7 @@ export function CollegeLeaderboardPodium({ students, collegeName }: CollegeLeade
                 <div className="text-center w-full min-w-0">
                   <p className="text-xs font-extrabold text-foreground truncate flex items-center justify-center gap-1">
                     <span>{top1.displayName}</span>
-                    <span className="text-blue-500 text-[11px]" title="Verified">
+                    <span className="text-[#a170ff] text-[11px]" title="Verified">
                       ✓
                     </span>
                   </p>
@@ -284,7 +284,7 @@ export function CollegeLeaderboardPodium({ students, collegeName }: CollegeLeade
                       <p className="text-xs font-extrabold text-foreground truncate flex items-center gap-1">
                         <span>{student.displayName}</span>
                         {(student.points || 0) >= 150 && (
-                          <span className="text-blue-500 text-[10px]" title="Verified Student">
+                          <span className="text-[#a170ff] text-[10px]" title="Verified Student">
                             ✓
                           </span>
                         )}

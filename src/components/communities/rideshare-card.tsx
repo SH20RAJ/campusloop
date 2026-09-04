@@ -106,7 +106,7 @@ export function RideshareCard({ item }: RideshareCardProps) {
                 {item.creator.displayName}
               </Link>
               {(item.creator.points || 0) >= 150 && (
-                <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+                <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />
               )}
               <span className="text-[11px] text-muted-foreground truncate">@{item.creator.username}</span>
               <span className="text-[10px] text-muted-foreground/60">·</span>

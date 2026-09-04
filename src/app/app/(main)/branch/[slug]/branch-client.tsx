@@ -183,7 +183,7 @@ export function BranchDirectoryClient() {
                   <Link href={`/@${student.username}`} className="min-w-0 group/name block">
                     <p className="text-sm font-bold text-foreground truncate group-hover/name:underline flex items-center gap-1">
                       <span className="truncate">{student.displayName}</span>
-                      {student.points >= 150 && <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />}
+                      {student.points >= 150 && <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
                       @{student.username}

@@ -297,7 +297,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
           <div className="min-w-0">
             <h1 className="text-sm font-black text-foreground tracking-tight truncate flex items-center gap-1.5">
               <span>{store.name}</span>
-              <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+              <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />
             </h1>
             <p className="text-[11px] text-muted-foreground font-medium">
               {products.length} menu items · {store.categorySlug}
@@ -397,7 +397,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-black text-foreground tracking-tight">{store.name}</h2>
-            <ShieldCheck className="size-4 text-blue-500" />
+            <ShieldCheck className="size-4 text-[#a170ff]" />
           </div>
           {store.description && (
             <p className="text-xs text-muted-foreground leading-relaxed mt-1">{store.description}</p>

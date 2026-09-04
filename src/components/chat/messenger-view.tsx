@@ -445,7 +445,7 @@ export function MessengerView({
                   <div className="min-w-0 flex-1 space-y-0.5">
                     <p className="text-xs font-black text-foreground truncate flex items-center gap-1">
                       <span>{user.displayName}</span>
-                      <ShieldCheck className="size-3 text-blue-500 shrink-0" />
+                      <ShieldCheck className="size-3 text-[#a170ff] shrink-0" />
                     </p>
                     <p className="text-[10px] text-muted-foreground truncate">
                       @{user.username} {user.branch ? `• ${user.branch}` : ""}
@@ -542,7 +542,7 @@ export function MessengerView({
                         >
                           <span className="truncate">{other.displayName}</span>
                           {other.points && other.points >= 150 && (
-                            <ShieldCheck className="size-3 text-[#1d9bf0] shrink-0" />
+                            <ShieldCheck className="size-3 text-[#a170ff] shrink-0" />
                           )}
                           {conv.isPinned && (
                             <span title="Pinned chat">

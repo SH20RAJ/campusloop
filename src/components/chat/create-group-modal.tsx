@@ -464,7 +464,7 @@ export function CreateGroupModal({ isOpen, onClose, currentUserId, onGroupCreate
                           <p className="text-xs font-black text-foreground truncate flex items-center gap-1">
                             <span>{user.displayName}</span>
                             {user.points && user.points >= 150 && (
-                              <ShieldCheck className="size-3 text-[#1d9bf0] shrink-0" />
+                              <ShieldCheck className="size-3 text-[#a170ff] shrink-0" />
                             )}
                           </p>
                           <p className="text-[11px] text-muted-foreground truncate">

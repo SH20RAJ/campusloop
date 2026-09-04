@@ -84,7 +84,7 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
             <h4 className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">
               {student.displayName}
             </h4>
-            <span className="text-blue-500 text-[10px] font-black" title="Verified Student">
+            <span className="text-[#a170ff] text-[10px] font-black" title="Verified Student">
               ✓
             </span>
           </div>

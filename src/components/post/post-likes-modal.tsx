@@ -248,7 +248,7 @@ export function PostLikesModal({ postId, isOpen, onClose, currentUserId }: PostL
                         <p className="text-sm font-black text-foreground truncate group-hover:text-primary transition-colors flex items-center gap-1">
                           <span>{user.displayName}</span>
                           {user.isVerified && (
-                            <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+                            <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />
                           )}
                         </p>
                         <p className="text-xs text-muted-foreground truncate font-medium">

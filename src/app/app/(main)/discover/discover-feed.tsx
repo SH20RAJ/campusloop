@@ -474,7 +474,7 @@ export function DiscoverFeed() {
                                   {user.displayName}
                                 </span>
                                 {(user.points || 0) >= 150 && (
-                                  <ShieldCheck className="size-4 text-[#1d9bf0] shrink-0" />
+                                  <ShieldCheck className="size-4 text-[#a170ff] shrink-0" />
                                 )}
                                 <span className="text-xs text-muted-foreground">@{user.username}</span>
                               </div>
@@ -722,7 +722,7 @@ export function DiscoverFeed() {
                                   {peer.displayName}
                                 </p>
                                 {(peer.points || 0) >= 150 && (
-                                  <ShieldCheck className="size-3.5 text-[#1d9bf0] shrink-0" />
+                                  <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />
                                 )}
                               </div>
                               <p className="text-xs text-muted-foreground truncate">@{peer.username}</p>

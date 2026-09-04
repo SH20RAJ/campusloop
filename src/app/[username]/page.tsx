@@ -276,7 +276,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                     {profile.displayName}
                   </h2>
                   {(profile.points || 0) >= 150 && (
-                    <span className="text-blue-500 font-bold" title="Verified Campus Star">
+                    <span className="text-[#a170ff] font-bold" title="Verified Campus Star">
                       ✓
                     </span>
                   )}

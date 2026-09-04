@@ -337,7 +337,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
                     <div className="min-w-0 space-y-0.5">
                       <p className="text-xs font-black text-foreground truncate flex items-center gap-1">
                         <span>{c.target?.displayName || "Classmate"}</span>
-                        <ShieldCheck className="size-3 text-blue-500 shrink-0" />
+                        <ShieldCheck className="size-3 text-[#a170ff] shrink-0" />
                       </p>
                       <p className="text-[10px] text-muted-foreground truncate">
                         @{c.target?.username} {c.target?.branch ? `• ${c.target.branch}` : ""}
@@ -400,7 +400,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
         {/* Safety & Anonymity Footnote */}
         <div className="rounded-2xl bg-muted/40 p-3 text-[10px] text-muted-foreground leading-relaxed space-y-1">
           <p className="font-bold text-foreground flex items-center gap-1">
-            <ShieldCheck className="size-3 text-blue-500" />
+            <ShieldCheck className="size-3 text-[#a170ff]" />
             CampusLoop Zero-Embarrassment Guarantee
           </p>
           <p>

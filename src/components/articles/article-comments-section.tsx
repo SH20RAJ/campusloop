@@ -190,7 +190,7 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-foreground group-hover:underline flex items-center gap-1">
                         <span>{author?.displayName || `@${author?.username}`}</span>
-                        {isVerified && <ShieldCheck className="size-3 text-blue-500 shrink-0" />}
+                        {isVerified && <ShieldCheck className="size-3 text-[#a170ff] shrink-0" />}
                       </p>
                       <p className="text-[10px] text-muted-foreground truncate">
                         @{author?.username}
@@ -299,7 +299,7 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
                               </Avatar>
                               <p className="text-[11px] font-bold text-foreground group-hover:underline flex items-center gap-1">
                                 <span>{replyAuthor?.displayName || `@${replyAuthor?.username}`}</span>
-                                {replyVerified && <ShieldCheck className="size-2.5 text-blue-500 shrink-0" />}
+                                {replyVerified && <ShieldCheck className="size-2.5 text-[#a170ff] shrink-0" />}
                               </p>
                             </Link>
 

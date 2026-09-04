@@ -887,7 +887,7 @@ export function MessengerPane({
                       Group
                     </span>
                   ) : (
-                    <ShieldCheck className="size-3.5 text-blue-500 shrink-0" />
+                    <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />
                   )}
                 </div>
 
@@ -1612,16 +1612,16 @@ export function MessengerPane({
 
         <form
           onSubmit={handleSendSubmit}
-          className="max-w-3xl mx-auto w-full flex items-center gap-1.5 bg-muted/50 dark:bg-[#202327] rounded-3xl p-1.5 pl-2.5 border border-border/40 focus-within:border-[#1d9bf0]/60 transition-all shadow-xs"
+          className="max-w-3xl mx-auto w-full flex items-center gap-1.5 bg-muted/50 dark:bg-[#202327] rounded-3xl p-1.5 pl-2.5 border border-border/40 focus-within:border-[#a170ff]/60 transition-all shadow-xs"
         >
           {/* Action Attachments */}
-          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0 text-[#1d9bf0]">
+          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0 text-[#a170ff]">
             {/* Attachment popover / Photo */}
             <button
               type="button"
               disabled={isUploadingMedia}
               onClick={() => fileInputRef.current?.click()}
-              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-[#1d9bf0] transition-colors cursor-pointer"
+              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-[#a170ff] transition-colors cursor-pointer"
               title="Attach Photo"
             >
               <Paperclip className="size-4" />
@@ -1652,7 +1652,7 @@ export function MessengerPane({
             <button
               type="button"
               onClick={() => setShowGifPicker(true)}
-              className="flex h-5 px-1.5 items-center justify-center rounded border border-[#1d9bf0]/50 text-[10px] font-black text-[#1d9bf0] hover:bg-[#1d9bf0]/10 transition-colors cursor-pointer leading-none"
+              className="flex h-5 px-1.5 items-center justify-center rounded border border-[#a170ff]/50 text-[10px] font-black text-[#a170ff] hover:bg-[#a170ff]/10 transition-colors cursor-pointer leading-none"
               title="Send GIF"
             >
               GIF
@@ -1686,7 +1686,7 @@ export function MessengerPane({
               type="submit"
               disabled={isSending}
               aria-label="Send message"
-              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#1d9bf0] text-white hover:opacity-90 shadow-xs transition-transform active:scale-90 cursor-pointer mr-1"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#a170ff] text-white hover:opacity-90 shadow-xs transition-transform active:scale-90 cursor-pointer mr-1"
             >
               <AnimateSend size={16} className="text-white" />
             </button>

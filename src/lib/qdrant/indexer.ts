@@ -110,6 +110,65 @@ export async function indexProfileVector(profile: {
 }
 
 /**
+ * Asynchronously indexes an academic resource for semantic search and recommendation matching.
+ */
+export async function indexAcademicResourceVector(resource: {
+  id: string;
+  title: string;
+  subjectCode: string;
+  subjectName: string;
+  branch: string;
+  semester: number;
+  resourceType: string;
+  description?: string | null;
+  moduleOrChapter?: string | null;
+  institutionId?: string | null;
+  uploaderId?: string | null;
+  tags?: string[];
+}): Promise<boolean> {
+  try {
+    const textToEmbed = [
+      resource.subjectCode,
+      resource.subjectName,
+      resource.title,
+      resource.branch,
+      `Semester ${resource.semester}`,
+      resource.resourceType,
+      resource.moduleOrChapter || "",
+      resource.description || "",
+      ...(resource.tags || []),
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    const vector = await generateEmbedding(textToEmbed);
+
+    return await qdrant.upsert(COLLECTIONS.ACADEMIC_RESOURCES, [
+      {
+        id: resource.id,
+        vector,
+        payload: {
+          resourceId: resource.id,
+          institutionId: resource.institutionId ?? null,
+          uploaderId: resource.uploaderId ?? "",
+          title: resource.title,
+          subjectCode: resource.subjectCode,
+          subjectName: resource.subjectName,
+          branch: resource.branch,
+          semester: resource.semester,
+          resourceType: resource.resourceType,
+        },
+      },
+    ]);
+  } catch (err) {
+    if (process.env.NODE_ENV !== "test") {
+      console.warn("[Qdrant Indexer Error] Failed to index academic resource:", err);
+    }
+    return false;
+  }
+}
+
+/**
  * Removes a post from Qdrant vector index upon deletion.
  */
 export async function removePostVector(postId: string): Promise<boolean> {

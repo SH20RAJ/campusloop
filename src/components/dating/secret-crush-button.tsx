@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Loader2, Lock, Sparkles } from "lucide-react";
+import { Heart, Loader2, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -55,7 +55,7 @@ export function SecretCrushButton({ targetId, targetName, className }: SecretCru
         )}
         title={`Secret Crush on ${targetName}`}
       >
-        <Sparkles className="size-4 sm:size-3.5 text-primary shrink-0" />
+        <Heart className="size-4 sm:size-3.5 text-primary shrink-0" />
         <span className="hidden sm:inline">Secret Crush</span>
       </button>
 
@@ -69,7 +69,7 @@ export function SecretCrushButton({ targetId, targetName, className }: SecretCru
 
           <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border/40 bg-card p-6 shadow-2xl space-y-4 text-center animate-in zoom-in-95">
             <div className="size-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center mx-auto shadow-md shadow-primary/25">
-              <Sparkles className="size-6" />
+              <Heart className="size-6" />
             </div>
 
             <div className="space-y-1">
@@ -102,11 +102,7 @@ export function SecretCrushButton({ targetId, targetName, className }: SecretCru
                 onClick={handleCrush}
                 className="flex-1 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/95 text-xs font-black shadow-xs transition-transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
-                {isLoading ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <Sparkles className="size-3.5" />
-                )}
+                {isLoading ? <Loader2 className="size-3.5 animate-spin" /> : <Heart className="size-3.5" />}
                 <span>Lock In</span>
               </button>
             </div>

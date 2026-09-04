@@ -15,6 +15,7 @@
 		"db:push": "drizzle-kit push",
 		"db:studio": "drizzle-kit studio",
 		"db:seed": "bun run scripts/seed-colleges.ts",
+		"db:seed-demo": "bun run scripts/seed-demo-account.ts",
 		"db:backfill-anon": "bun run scripts/backfill-anon-vault.ts",
 		"db:migrate-follows": "bun run scripts/migrate-follows.ts",
 		"db:seed-follows": "bun run scripts/seed-follows.ts",

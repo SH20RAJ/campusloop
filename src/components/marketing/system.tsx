@@ -69,6 +69,7 @@ const FOOTER_COLUMNS: { title: string; links: { href: string; label: string }[] 
     title: "Product",
     links: [
       { href: "/overview", label: "Platform Overview" },
+      { href: "/demo", label: "Testing & Demo Access" },
       { href: "/colleges", label: "College Directory" },
       { href: "/handler/sign-up", label: "Join CampusLoop" },
     ],

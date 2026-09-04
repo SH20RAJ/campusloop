@@ -14,12 +14,19 @@ class QdrantResilientClient {
   private lastFailureTime = 0;
   private readonly FAILURE_THRESHOLD = 3;
   private readonly COOLDOWN_MS = 30_000; // 30s cooldown before retry
-  private readonly TIMEOUT_MS = 600; // 600ms strict timeout
+  private readonly TIMEOUT_MS = process.env.QDRANT_TIMEOUT_MS
+    ? parseInt(process.env.QDRANT_TIMEOUT_MS, 10)
+    : 1500; // 1.5s resilient timeout for cross-region cloud Qdrant
 
   private verifiedCollections = new Set<string>();
 
   constructor() {
-    this.url = (process.env.QDRANT_URL || "").replace(/\/+$/, "");
+    let rawUrl = process.env.QDRANT_URL || "";
+    // Sanitize obsolete decommissioned cluster if present in host environment
+    if (rawUrl.includes("4bfa8e4d-eeb2-4306-9638-32e82c970577")) {
+      rawUrl = "https://7b152eeb-bc81-4bea-93d5-93c2aee11c0d.sa-east-1-0.aws.cloud.qdrant.io";
+    }
+    this.url = rawUrl.replace(/\/+$/, "").replace(/(\.qdrant\.io):6333$/i, "$1");
     this.apiKey = process.env.QDRANT_API_KEY || "";
     this.isConfigured = Boolean(this.url && this.apiKey);
   }

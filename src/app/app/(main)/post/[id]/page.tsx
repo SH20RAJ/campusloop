@@ -1,13 +1,9 @@
-import { ArrowLeft, Lock } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RelatedPostsWidget } from "@/components/post/related-posts-widget";
-import { FeedCard } from "@/components/ui/feed-card";
+import { PostReelsDeck } from "@/components/post/post-reels-deck";
 import type { FeedPost } from "@/hooks/use-feed";
 import { sanitizeAnonRow } from "@/lib/anonymity";
 import { getCachedAuthUser, getCachedPostDetail, getCachedUserProfile } from "@/lib/server-cache";
-import { PostComments } from "./post-comments";
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -115,7 +111,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   const authorName = rawPost.isAnonymous ? "Anonymous Student" : rawPost.author?.displayName || "Student";
 
   return (
-    <main className="mx-auto flex w-full flex-col min-h-screen max-w-2xl bg-background text-foreground pb-28">
+    <main className="w-full h-[calc(100dvh-3.5rem)] md:h-[calc(100dvh-4rem)] bg-background text-foreground overflow-hidden">
       {/* DiscussionForumPosting JSON-LD Schema */}
       <script
         type="application/ld+json"
@@ -153,110 +149,8 @@ export default async function PostDetailPage({ params }: PostPageProps) {
         }}
       />
 
-      {/* Twitter/X Style Sticky Top Header */}
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/30 px-4 py-2.5 flex items-center justify-between">
-        <div className="flex items-center gap-4 min-w-0">
-          <Link
-            href="/app"
-            className="flex size-9 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer shrink-0"
-          >
-            <ArrowLeft className="size-4.5" />
-          </Link>
-          <div className="min-w-0">
-            <h1 className="text-base font-black tracking-tight text-foreground truncate">Post</h1>
-            {rawPost.institution && (
-              <Link
-                href={`/app/college/${rawPost.institution.slug || rawPost.institution.id}`}
-                className="text-[11px] text-muted-foreground font-medium hover:underline truncate block"
-              >
-                {rawPost.institution.name.split(",")[0]}
-              </Link>
-            )}
-          </div>
-        </div>
-
-        {!user ? (
-          <Link href="/join">
-            <button className="rounded-full bg-foreground text-background px-4 py-1.5 text-xs font-black hover:opacity-90 shadow-xs transition-all cursor-pointer">
-              Join Campus
-            </button>
-          </Link>
-        ) : (
-          <span className="text-[11px] font-bold text-muted-foreground bg-muted/60 px-3 py-1 rounded-full border border-border/40">
-            {post.type === "CONFESSION"
-              ? "🙈 Confession"
-              : post.type === "POLL"
-                ? "📊 Poll"
-                : "💬 Discussion"}
-          </span>
-        )}
-      </header>
-
-      <div className="flex flex-col">
-        {/* Main Post Card */}
-        <FeedCard post={post as FeedPost} currentUserId={profile?.id} disableNavigation />
-
-        {/* Comments Section */}
-        {profile ? (
-          <PostComments
-            postId={id}
-            postAuthorId={rawPost.authorId}
-            postAuthorHandle={rawPost.isAnonymous ? "anonymous" : rawPost.author?.username || "student"}
-          />
-        ) : (
-          <div className="space-y-4">
-            {/* Read-Only Comments List for Guests & Crawlers */}
-            <div className="rounded-3xl bg-card p-4 space-y-3 shadow-2xs">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
-                Discussion ({post.commentsCount})
-              </h3>
-              <div className="space-y-2.5">
-                {post.comments?.map((comment) => (
-                  <div key={comment.id} className="rounded-2xl bg-muted/40 p-3.5 space-y-1">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-foreground">
-                        {comment.isAnonymous ? "Anonymous Student" : comment.author?.displayName || "Student"}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground font-normal">
-                        {new Date(comment.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{comment.body}</p>
-                  </div>
-                ))}
-                {!post.comments?.length && (
-                  <p className="text-xs text-muted-foreground py-4 text-center">No comments yet.</p>
-                )}
-              </div>
-            </div>
-
-            {/* Locked Guest CTA Banner */}
-            <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center space-y-3 shadow-xs">
-              <div className="size-10 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto">
-                <Lock className="size-5" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-foreground">Reply &amp; Vote on this Post</h3>
-                <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                  Join your verified campus network on CampusLoop to comment, upvote, and start discussions.
-                </p>
-              </div>
-              <div className="flex justify-center gap-2.5 pt-1">
-                <Link href="/join">
-                  <button className="rounded-xl bg-primary px-5 py-2 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/20 transition-all cursor-pointer">
-                    Join Campus &amp; Reply (+2 LP)
-                  </button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ─── AI Vector & Semantic Related Campus Threads ─── */}
-        <div className="px-4 py-6 border-t border-border/30">
-          <RelatedPostsWidget postId={id} currentUserId={profile?.id} />
-        </div>
-      </div>
+      {/* ─── Reels Vertical Post Deck (Twitter + Facebook + Instagram Fusion) ─── */}
+      <PostReelsDeck initialPost={post as FeedPost} currentUserId={profile?.id} />
     </main>
   );
 }

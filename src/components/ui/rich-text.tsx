@@ -1,26 +1,37 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, ExternalLink, X, ZoomIn } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ExternalLink, X, ZoomIn } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
 import { AudioPlayer } from "@/components/media/audio-player";
 import { DocumentCard } from "@/components/media/document-card";
 import { VideoPlayer } from "@/components/media/video-player";
 import { isMediaImageUrl } from "@/lib/embeds";
+import { cn } from "@/lib/utils";
 
 interface RichTextProps {
   content: string;
   className?: string;
   disableEmbeds?: boolean;
   onImageClick?: (url: string) => void;
+  maxHeight?: number;
 }
 
-export function RichText({ content, className = "", disableEmbeds = false, onImageClick }: RichTextProps) {
+export function RichText({
+  content,
+  className = "",
+  disableEmbeds = false,
+  onImageClick,
+  maxHeight,
+}: RichTextProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isClamped, setIsClamped] = useState(false);
+  const textContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -241,11 +252,50 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
     return parts;
   }
 
+  useEffect(() => {
+    if (maxHeight && textContainerRef.current) {
+      if (textContainerRef.current.scrollHeight > maxHeight + 8) {
+        setIsClamped(true);
+      } else {
+        setIsClamped(false);
+      }
+    }
+  }, [maxHeight, textWithoutMedia]);
+
   return (
     <div className={`space-y-2 leading-relaxed ${className}`}>
       {/* Render Text Body */}
       {textWithoutMedia && (
-        <div className="whitespace-pre-wrap break-words">{parseText(textWithoutMedia)}</div>
+        <div className="relative">
+          <div
+            ref={textContainerRef}
+            className={cn(
+              "whitespace-pre-wrap break-words transition-all duration-200",
+              maxHeight && isClamped && !isExpanded && "overflow-hidden relative"
+            )}
+            style={maxHeight && isClamped && !isExpanded ? { maxHeight: `${maxHeight}px` } : undefined}
+          >
+            {parseText(textWithoutMedia)}
+            {maxHeight && isClamped && !isExpanded && (
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card via-card/80 to-transparent" />
+            )}
+          </div>
+
+          {maxHeight && isClamped && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsExpanded((prev) => !prev);
+              }}
+              className="mt-1.5 inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline cursor-pointer select-none"
+            >
+              <span>{isExpanded ? "Show less" : "Show more"}</span>
+              {isExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+            </button>
+          )}
+        </div>
       )}
 
       {/* Render Attached Videos */}

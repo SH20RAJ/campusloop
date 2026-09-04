@@ -2,17 +2,12 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Compass,
   GraduationCap,
-  Heart,
   HelpCircle,
-  Home,
   Menu,
   MoreHorizontal,
-  Plus,
   School,
   ShieldCheck,
-  ShoppingBag,
   Sliders,
   UserCircle,
   VenetianMask,
@@ -47,7 +42,6 @@ import { SOCIAL_LINKS } from "@/constants/socials";
 import type { UserProfile } from "@/db/schema";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { haptics } from "@/lib/haptics";
-import { isBitMesraCampus } from "@/lib/marketplace/locations";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
@@ -183,17 +177,12 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
     collegeName ||
     "";
 
-  const isBitStudent = !isViewer && isBitMesraCampus(institutionIdentifier);
-
-  const mobileBottomItems: NavItem[] = isBitStudent
-    ? [
-        { icon: Home, href: "/app", label: "Home" },
-        { icon: Compass, href: "/app/discover", label: "Explore" },
-        { icon: Plus, href: "/app/post/new", label: "Post" },
-        { icon: Heart, href: "/app/matching", label: "Match" },
-        { icon: ShoppingBag, href: "/app/marketplace", label: "Market" },
-      ]
-    : MOBILE_BOTTOM_ITEMS;
+  const mobileBottomItems: NavItem[] = MOBILE_BOTTOM_ITEMS.filter((item) => {
+    if (isViewer && ["/app/matching", "/app/chat"].includes(item.href)) {
+      return false;
+    }
+    return true;
+  });
 
   const desktopNavItems = [
     ...DESKTOP_NAV_ITEMS.filter((item) => {
@@ -551,8 +540,8 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                       playKey={isActive}
                       iconClassName={cn("transition-colors", isActive ? "text-foreground" : "")}
                     />
-                    {item.href === "/app/marketplace" && !marketplaceSeen && (
-                      <span className="absolute -top-1 -right-1 size-2 rounded-full bg-emerald-500" />
+                    {item.href === "/app/more" && !marketplaceSeen && (
+                      <span className="absolute -top-1 -right-1 size-2 rounded-full bg-amber-500 animate-pulse" />
                     )}
                     {item.href === "/app/notifications" && unreadNotificationsCount > 0 && (
                       <span className="absolute -top-1 -right-1 size-2 rounded-full bg-primary" />

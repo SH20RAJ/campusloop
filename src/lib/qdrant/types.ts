@@ -41,6 +41,18 @@ export interface ProfileVectorPayload extends QdrantPointPayload {
   points?: number;
 }
 
+export interface AcademicResourceVectorPayload extends QdrantPointPayload {
+  resourceId: string;
+  institutionId?: string | null;
+  uploaderId: string;
+  title: string;
+  subjectCode: string;
+  subjectName: string;
+  branch: string;
+  semester: number;
+  resourceType: string;
+}
+
 export interface QdrantCollectionConfig {
   name: string;
   vectorSize: number;

@@ -151,7 +151,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
     haptics.light();
 
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://campusloop.space";
-    const shareUrl = `${baseUrl}/app/academics?id=${item.id}`;
+    const shareUrl = `${baseUrl}/app/academics/${item.id}`;
 
     if (navigator.share) {
       navigator
@@ -264,7 +264,11 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
 
       {/* ─── Subject Code & Module Header ─── */}
       <div className="space-y-1.5">
-        <div className="flex items-center gap-2 text-xs font-bold text-indigo-400 flex-wrap">
+        <Link
+          href={`/app/academics/${item.id}`}
+          onClick={() => sounds.tap()}
+          className="inline-flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex-wrap"
+        >
           <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={14} className="shrink-0" />
           <span className="truncate">
             {item.subjectCode} • {item.subjectName}
@@ -274,9 +278,17 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
               {item.moduleOrChapter}
             </span>
           )}
-        </div>
+        </Link>
 
-        <h3 className="text-sm font-bold text-foreground leading-snug">{item.title}</h3>
+        <Link
+          href={`/app/academics/${item.id}`}
+          onClick={() => sounds.tap()}
+          className="block group"
+        >
+          <h3 className="text-sm font-bold text-foreground group-hover:text-indigo-400 transition-colors leading-snug">
+            {item.title}
+          </h3>
+        </Link>
 
         {item.description && (
           <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">{item.description}</p>

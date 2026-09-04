@@ -35,12 +35,21 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default async function AcademicsPage() {
+interface AcademicsPageProps {
+  searchParams?: Promise<{ id?: string }>;
+}
+
+export default async function AcademicsPage({ searchParams }: AcademicsPageProps) {
   const user = await getCachedAuthUser();
   if (!user) redirect("/handler/sign-in");
 
   const profile = await getCachedUserProfile(user.id);
   if (!profile) redirect("/app/onboarding");
+
+  const resolvedParams = searchParams ? await searchParams : undefined;
+  if (resolvedParams?.id) {
+    redirect(`/app/academics/${resolvedParams.id}`);
+  }
 
   return <AcademicsClient profileId={profile.id} />;
 }

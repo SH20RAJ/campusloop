@@ -21,7 +21,9 @@ export async function GET(req: Request) {
     const searchQuery = searchParams.get("q");
     const scope = searchParams.get("scope") || "campus"; // 'campus' or 'global'
     const sort = searchParams.get("sort") || "latest";
-    const limit = Math.min(parseInt(searchParams.get("limit") || "30", 10), 60);
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.min(Math.max(1, parseInt(searchParams.get("limit") || "20", 10)), 50);
+    const offset = (page - 1) * limit;
 
     const db = getDb();
     const conditions = [];
@@ -72,10 +74,23 @@ export async function GET(req: Request) {
       orderByClause = [desc(academicResources.viewsCount), desc(academicResources.createdAt)];
     }
 
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // Count query for pagination
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(academicResources)
+      .where(whereClause);
+
+    const total = count || 0;
+    const totalPages = Math.ceil(total / limit);
+    const hasMore = page < totalPages;
+
     const items = await db.query.academicResources.findMany({
-      where: conditions.length > 0 ? and(...conditions) : undefined,
+      where: whereClause,
       orderBy: orderByClause,
       limit,
+      offset,
       with: {
         uploader: {
           columns: {
@@ -106,7 +121,14 @@ export async function GET(req: Request) {
       commentsCount: item.comments?.length || 0,
     }));
 
-    return NextResponse.json({ items: enriched });
+    return NextResponse.json({
+      items: enriched,
+      total,
+      page,
+      limit,
+      hasMore,
+      totalPages,
+    });
   } catch (error) {
     console.error("Error fetching academic resources:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

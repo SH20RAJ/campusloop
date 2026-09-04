@@ -4,7 +4,7 @@ import { BookOpen, Link2, Loader2, Plus, UploadCloud, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import { AcademicCard } from "@/components/communities/academic-card";
 import {
   AnimateBookOpen,
@@ -91,8 +91,12 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   const [formFileName, setFormFileName] = useState("");
   const [formDescription, setFormDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  const apiUrl = useMemo(() => {
+  const getKey = (pageIndex: number, previousPageData: any) => {
+    if (previousPageData && (!previousPageData.items?.length || !previousPageData.hasMore)) {
+      return null;
+    }
     const params = new URLSearchParams();
     if (selectedType !== "all") params.set("resourceType", selectedType);
     if (selectedBranch !== "All") params.set("branch", selectedBranch);
@@ -100,14 +104,51 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
     if (searchQuery.trim()) params.set("q", searchQuery.trim());
     params.set("scope", scope);
     params.set("sort", sortBy);
+    params.set("page", String(pageIndex + 1));
+    params.set("limit", "15");
     return `/api/academics?${params.toString()}`;
-  }, [selectedType, selectedBranch, selectedSemester, searchQuery, scope, sortBy]);
+  };
 
-  const { data, isLoading, mutate } = useSWR<{ items: any[] }>(apiUrl, fetcher, {
+  const { data, size, setSize, isLoading, isValidating, mutate } = useSWRInfinite<{
+    items: any[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+    totalPages: number;
+  }>(getKey, fetcher, {
+    revalidateFirstPage: false,
     dedupingInterval: 4000,
   });
 
-  const items = data?.items || [];
+  const items = useMemo(() => {
+    return data ? data.flatMap((page) => page.items || []) : [];
+  }, [data]);
+
+  const totalCount = data?.[0]?.total ?? 0;
+  const isInitialLoading = isLoading && items.length === 0;
+  const isEmpty = !isLoading && items.length === 0;
+  const isReachingEnd = isEmpty || (data && !data[data.length - 1]?.hasMore);
+  const isLoadingMore =
+    isLoading || (size > 0 && data && typeof data[size - 1] === "undefined") || isValidating;
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isReachingEnd && !isLoadingMore) {
+          setSize((prev) => prev + 1);
+        }
+      },
+      { threshold: 0.1, rootMargin: "300px" }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [isReachingEnd, isLoadingMore, setSize]);
 
   // Scroll to highlight element if present in query param
   useEffect(() => {
@@ -209,7 +250,9 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
               <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={18} className="text-indigo-500" />
               <span>Academic Vault</span>
             </h1>
-            <span className="text-xs text-muted-foreground font-medium">· Notes, Books &amp; PYQs</span>
+            <span className="text-xs text-muted-foreground font-medium">
+              {totalCount > 0 ? `· ${totalCount.toLocaleString()} resources` : "· Notes, Books & PYQs"}
+            </span>
           </div>
 
           <button
@@ -367,21 +410,50 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
 
       {/* ─── Academic Resources Feed ─── */}
       <section className="divide-y divide-border/20">
-        {isLoading ? (
+        {isInitialLoading ? (
           <div className="p-4 space-y-4">
             <Skeleton className="h-32 w-full rounded-2xl" />
             <Skeleton className="h-32 w-full rounded-2xl" />
             <Skeleton className="h-32 w-full rounded-2xl" />
           </div>
         ) : items.length > 0 ? (
-          items.map((item) => (
-            <AcademicCard
-              key={item.id}
-              item={item}
-              currentUserId={profileId}
-              isHighlighted={highlightId === item.id}
-            />
-          ))
+          <>
+            {items.map((item) => (
+              <AcademicCard
+                key={item.id}
+                item={item}
+                currentUserId={profileId}
+                isHighlighted={highlightId === item.id}
+              />
+            ))}
+
+            {/* Sentinel element for infinite scroll */}
+            <div ref={loadMoreRef} className="flex flex-col items-center justify-center p-4 min-h-16">
+              {isLoadingMore && (
+                <div className="flex items-center gap-2 py-3 text-xs font-semibold text-muted-foreground">
+                  <Loader2 className="size-4 animate-spin text-indigo-500" />
+                  <span>Loading more vault resources...</span>
+                </div>
+              )}
+              {isReachingEnd && (
+                <div className="py-6 text-center">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-muted/40 border border-border/40 text-[11px] font-semibold text-muted-foreground">
+                    <span>✨ Reached end of vault ({totalCount.toLocaleString()} resources)</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sounds.tap();
+                        setShowUploadModal(true);
+                      }}
+                      className="text-indigo-500 hover:underline font-bold cursor-pointer"
+                    >
+                      + Add your notes
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           <div className="py-24 text-center px-4 space-y-3">
             <BookOpen className="size-10 text-muted-foreground/40 mx-auto" />

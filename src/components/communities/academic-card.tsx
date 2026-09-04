@@ -252,7 +252,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
                   icon={AnimateShieldCheck}
                   animation="pop"
                   size={13}
-                  className="text-[#a170ff] shrink-0"
+                  className="text-brand shrink-0"
                 />
               )}
               <span className="text-[11px] text-muted-foreground truncate">@{item.uploader.username}</span>

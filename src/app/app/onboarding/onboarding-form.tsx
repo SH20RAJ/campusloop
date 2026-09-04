@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Camera, Check, Loader2, Lock, School, Search, Sparkles } from "lucide-react";
+import { AlertCircle, Camera, Check, Loader2, Lock, School, Search, Zap } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -348,7 +348,7 @@ export function OnboardingForm({
                     onClick={handleGenerateAvatar}
                     className="px-3 py-1 rounded-full border border-border/70 bg-card text-[11px] font-bold text-foreground hover:bg-muted transition-colors cursor-pointer"
                   >
-                    <Sparkles className="size-3 inline mr-1" /> Use Cartoon Avatar Anyway
+                    <Zap className="size-3 inline mr-1" /> Use Cartoon Avatar Anyway
                   </button>
                   <button
                     type="button"

@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Calendar,
-  Check,
-  Image as ImageIcon,
-  Loader2,
-  MapPin,
-  Save,
-  Sparkles,
-  Trash2,
-  Trophy,
-  Upload,
-  Users,
-  X,
-} from "lucide-react";
+import { ArrowLeft, Calendar, Check, Image as ImageIcon, Loader2, MapPin, Save, Zap, Trash2, Trophy, Upload, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -364,7 +350,7 @@ export function NewEventClient() {
             onClick={() => submit("PUBLISHED")}
             className="h-8 cursor-pointer gap-1.5 rounded-full bg-primary px-3.5 text-xs font-black text-primary-foreground shadow-md shadow-primary/20 hover:opacity-90 active:scale-95"
           >
-            {isSubmitting ? <Loader2 className="size-3.5 animate-spin" /> : <Sparkles className="size-3.5" />}
+            {isSubmitting ? <Loader2 className="size-3.5 animate-spin" /> : <Zap className="size-3.5" />}
             <span>Publish</span>
           </Button>
         </div>
@@ -879,7 +865,7 @@ export function NewEventClient() {
                 onClick={() => setDescription(DESCRIPTION_TEMPLATE)}
                 className="flex cursor-pointer items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-black text-primary hover:bg-primary/20"
               >
-                <Sparkles className="size-3" />
+                <Zap className="size-3" />
                 Use template
               </button>
             )}

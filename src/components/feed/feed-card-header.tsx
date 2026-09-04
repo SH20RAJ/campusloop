@@ -90,7 +90,7 @@ export function FeedCardHeader({
               icon={AnimateShieldCheck}
               animation="pop"
               size={14}
-              className="text-[#a170ff] shrink-0"
+              className="text-brand shrink-0"
             />
           )}
 
@@ -128,7 +128,7 @@ export function FeedCardHeader({
                 e.stopPropagation();
                 setShowMenu(!showMenu);
               }}
-              className="size-7 rounded-full flex items-center justify-center text-muted-foreground/60 hover:text-[#a170ff] hover:bg-[#a170ff]/10 transition-colors cursor-pointer"
+              className="size-7 rounded-full flex items-center justify-center text-muted-foreground/60 hover:text-brand hover:bg-brand/10 transition-colors cursor-pointer"
               aria-label="More options"
             >
               <MoreHorizontal className="size-4" />

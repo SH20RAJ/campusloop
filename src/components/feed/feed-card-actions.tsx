@@ -103,10 +103,10 @@ export function FeedCardActions({
         type="button"
         onClick={onOpenComments}
         {...reply.handlers}
-        className="flex items-center gap-1.5 text-xs hover:text-[#a170ff] transition-colors group cursor-pointer"
+        className="flex items-center gap-1.5 text-xs hover:text-brand transition-colors group cursor-pointer"
         aria-label="Reply"
       >
-        <div className="size-8 rounded-full group-hover:bg-[#a170ff]/10 flex items-center justify-center transition-colors">
+        <div className="size-8 rounded-full group-hover:bg-brand/10 flex items-center justify-center transition-colors">
           <AnimatedIcon
             ref={reply.ref}
             icon={AnimateMessageCircle}
@@ -224,10 +224,10 @@ export function FeedCardActions({
         type="button"
         onClick={onShare}
         {...share.handlers}
-        className="flex items-center gap-1.5 text-xs hover:text-[#a170ff] transition-colors group cursor-pointer"
+        className="flex items-center gap-1.5 text-xs hover:text-brand transition-colors group cursor-pointer"
         aria-label="Share"
       >
-        <div className="size-8 rounded-full group-hover:bg-[#a170ff]/10 flex items-center justify-center transition-colors">
+        <div className="size-8 rounded-full group-hover:bg-brand/10 flex items-center justify-center transition-colors">
           <AnimatedIcon
             ref={share.ref}
             icon={AnimateShare}

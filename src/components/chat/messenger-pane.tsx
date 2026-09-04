@@ -1,5 +1,6 @@
 "use client";
 
+import { MessageCircleHeartIcon } from "@animateicons/react/lucide";
 import {
   ArrowLeft,
   CheckCheck,
@@ -801,10 +802,10 @@ export function MessengerPane({
   if (!conversationId) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-muted-foreground p-6 text-center select-none bg-background">
-        <div className="size-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-3.5 shadow-xs text-primary">
-          <User className="size-7" />
+        <div className="size-20 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 shadow-sm text-primary">
+          <MessageCircleHeartIcon size={64} duration={1} color="#ffffff" />
         </div>
-        <h2 className="text-base font-black text-foreground">CampusLoop Messenger</h2>
+        <h2 className="text-lg font-black text-foreground">CampusLoop Messenger</h2>
         <p className="text-xs text-muted-foreground max-w-sm mt-1 leading-relaxed">
           Select a verified student, study pod, or campus group to start chatting.
         </p>
@@ -887,7 +888,7 @@ export function MessengerPane({
                       Group
                     </span>
                   ) : (
-                    <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />
+                    <ShieldCheck className="size-3.5 text-brand shrink-0" />
                   )}
                 </div>
 
@@ -1612,16 +1613,16 @@ export function MessengerPane({
 
         <form
           onSubmit={handleSendSubmit}
-          className="max-w-3xl mx-auto w-full flex items-center gap-1.5 bg-muted/50 dark:bg-[#202327] rounded-3xl p-1.5 pl-2.5 border border-border/40 focus-within:border-[#a170ff]/60 transition-all shadow-xs"
+          className="max-w-3xl mx-auto w-full flex items-center gap-1.5 bg-muted/50 dark:bg-[#202327] rounded-3xl p-1.5 pl-2.5 border border-border/40 focus-within:border-brand/60 transition-all shadow-xs"
         >
           {/* Action Attachments */}
-          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0 text-[#a170ff]">
+          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0 text-brand">
             {/* Attachment popover / Photo */}
             <button
               type="button"
               disabled={isUploadingMedia}
               onClick={() => fileInputRef.current?.click()}
-              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-[#a170ff] transition-colors cursor-pointer"
+              className="flex size-8 items-center justify-center rounded-full hover:bg-muted/70 text-brand transition-colors cursor-pointer"
               title="Attach Photo"
             >
               <Paperclip className="size-4" />
@@ -1652,7 +1653,7 @@ export function MessengerPane({
             <button
               type="button"
               onClick={() => setShowGifPicker(true)}
-              className="flex h-5 px-1.5 items-center justify-center rounded border border-[#a170ff]/50 text-[10px] font-black text-[#a170ff] hover:bg-[#a170ff]/10 transition-colors cursor-pointer leading-none"
+              className="flex h-5 px-1.5 items-center justify-center rounded border border-brand/50 text-[10px] font-black text-brand hover:bg-brand/10 transition-colors cursor-pointer leading-none"
               title="Send GIF"
             >
               GIF
@@ -1686,7 +1687,7 @@ export function MessengerPane({
               type="submit"
               disabled={isSending}
               aria-label="Send message"
-              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#a170ff] text-white hover:opacity-90 shadow-xs transition-transform active:scale-90 cursor-pointer mr-1"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-white hover:opacity-90 shadow-xs transition-transform active:scale-90 cursor-pointer mr-1"
             >
               <AnimateSend size={16} className="text-white" />
             </button>

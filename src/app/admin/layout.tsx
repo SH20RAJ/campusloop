@@ -21,6 +21,7 @@ import {
   FileText,
   Ghost,
   LayoutDashboard,
+  Link2,
   MessageSquare,
   School,
   ScrollText,
@@ -52,6 +53,8 @@ const commercialNav = [
   { href: "/admin/marketplace/products", label: "Products", icon: UtensilsCrossed },
   { href: "/admin/marketplace/rentals", label: "Bike Rentals", icon: Bike },
 ];
+
+const growthNav = [{ href: "/admin/links", label: "Short Links & Refs", icon: Link2 }];
 
 const systemNav = [{ href: "/admin/audit", label: "Audit Log", icon: ScrollText }];
 
@@ -106,6 +109,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               Marketplace
             </p>
             {commercialNav.map((item) => (
+              <NavLink key={item.href} {...item} />
+            ))}
+          </nav>
+
+          <nav className="space-y-1" aria-label="Growth">
+            <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+              Growth &amp; Referrals
+            </p>
+            {growthNav.map((item) => (
               <NavLink key={item.href} {...item} />
             ))}
           </nav>

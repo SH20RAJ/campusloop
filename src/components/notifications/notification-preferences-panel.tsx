@@ -1,23 +1,9 @@
 "use client";
 
-import {
-  AtSign,
-  Bell,
-  Heart,
-  MessageCircle,
-  Repeat2,
-  Send,
-  Sparkles,
-  UserPlus,
-  Users,
-  Zap,
-} from "lucide-react";
+import { AtSign, Bell, Heart, MessageCircle, Repeat2, Send, Zap, UserPlus, Users } from "lucide-react";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
-import {
-  type NotificationPreferenceSet,
-  useNotificationPreferences,
-} from "@/hooks/use-notification-preferences";
+import { type NotificationPreferenceSet, useNotificationPreferences } from "@/hooks/use-notification-preferences";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -42,7 +28,7 @@ const ROWS: PreferenceRow[] = [
     key: "followedPosts",
     label: "Posts from people you follow",
     description: "Know when your friends and follows drop something new",
-    icon: <Sparkles className="size-3.5 text-violet-500" />,
+    icon: <Zap className="size-3.5 text-violet-500" />,
   },
   {
     key: "followedPostsFriendsOnly",

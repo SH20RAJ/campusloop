@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  CheckCircle2,
-  Clock,
-  Droplet,
-  Flame,
-  Home,
-  MapPin,
-  Minus,
-  Plus,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  Truck,
-  Zap,
-} from "lucide-react";
+import { CheckCircle2, Clock, Droplet, Flame, Home, MapPin, Minus, Plus, ShieldCheck, Zap, Star, Truck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";

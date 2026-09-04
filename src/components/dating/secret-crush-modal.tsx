@@ -1,5 +1,6 @@
 "use client";
 
+import { HeartIcon } from "@animateicons/react/lucide";
 import {
   Flame,
   Heart,
@@ -161,8 +162,8 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/40 pb-4">
           <div className="flex items-center gap-3">
-            <div className="size-11 rounded-2xl bg-linear-to-tr from-rose-500/20 to-pink-500/20 border border-rose-500/30 flex items-center justify-center text-rose-500">
-              <Heart className="size-5.5 fill-rose-500 stroke-rose-500" />
+            <div className="size-14 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-rose-400 flex items-center justify-center text-white shadow-md shrink-0">
+              <HeartIcon size={64} duration={1} color="#ffffff" />
             </div>
             <div>
               <h2 className="text-base font-black tracking-tight text-foreground flex items-center gap-2">
@@ -337,7 +338,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
                     <div className="min-w-0 space-y-0.5">
                       <p className="text-xs font-black text-foreground truncate flex items-center gap-1">
                         <span>{c.target?.displayName || "Classmate"}</span>
-                        <ShieldCheck className="size-3 text-[#a170ff] shrink-0" />
+                        <ShieldCheck className="size-3 text-brand shrink-0" />
                       </p>
                       <p className="text-[10px] text-muted-foreground truncate">
                         @{c.target?.username} {c.target?.branch ? `• ${c.target.branch}` : ""}
@@ -400,7 +401,7 @@ export function SecretCrushModal({ isOpen, onClose }: SecretCrushModalProps) {
         {/* Safety & Anonymity Footnote */}
         <div className="rounded-2xl bg-muted/40 p-3 text-[10px] text-muted-foreground leading-relaxed space-y-1">
           <p className="font-bold text-foreground flex items-center gap-1">
-            <ShieldCheck className="size-3 text-[#a170ff]" />
+            <ShieldCheck className="size-3 text-brand" />
             CampusLoop Zero-Embarrassment Guarantee
           </p>
           <p>

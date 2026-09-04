@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, Sparkles, ThumbsUp } from "lucide-react";
+import { MessageSquare, Zap, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -51,7 +51,7 @@ export function RelatedPostsWidget({ postId, currentUserId, initialItems }: Rela
     <section className="rounded-2xl border border-border/40 bg-card/60 p-4 space-y-3 shadow-xs">
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-          <Sparkles className="size-3.5 text-primary" />
+          <Zap className="size-3.5 text-primary" />
           <span>More like this</span>
         </h3>
         <span className="text-[11px] font-medium text-muted-foreground/70">

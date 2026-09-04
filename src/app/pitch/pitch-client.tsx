@@ -1,38 +1,10 @@
 "use client";
 
-import {
-  Ban,
-  BookOpen,
-  BriefcaseBusiness,
-  ExternalLink,
-  EyeOff,
-  Flame,
-  Heart,
-  HeartHandshake,
-  Layers,
-  Megaphone,
-  MessagesSquare,
-  ShieldCheck,
-  ShoppingBag,
-  Sparkles,
-  Split,
-  Store,
-  Ticket,
-  TrendingUp,
-  Trophy,
-} from "lucide-react";
+import { Ban, BookOpen, BriefcaseBusiness, ExternalLink, EyeOff, Flame, Heart, HeartHandshake, Layers, Megaphone, MessagesSquare, ShieldCheck, ShoppingBag, Zap, Split, Store, Ticket, TrendingUp, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Reveal } from "@/components/landing/reveal";
-import {
-  CTABand,
-  GradientText,
-  MarketingFooter,
-  MarketingHeader,
-  Section,
-  SectionHeading,
-  StatCard,
-} from "@/components/marketing/system";
+import { CTABand, GradientText, MarketingFooter, MarketingHeader, Section, SectionHeading, StatCard } from "@/components/marketing/system";
 
 const PAIN_POINTS = [
   {
@@ -358,7 +330,7 @@ export function PitchClient() {
                 Priya sees nothing. Later, Priya secretly adds Rahul...
               </p>
               <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center gap-1.5">
-                <Sparkles className="size-3.5" /> Mutual Match! Direct Chat Unlocked
+                <Zap className="size-3.5" /> Mutual Match! Direct Chat Unlocked
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { ArrowLeft, LayoutDashboard, PenTool, Sparkles } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, PenTool, Zap } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -66,7 +66,7 @@ export default async function ArticlesLayout({ children }: { children: React.Rea
             </Link>
 
             <span className="hidden lg:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black border border-primary/20 ml-1">
-              <Sparkles className="size-3" />
+              <Zap className="size-3" />
               <span>Medium / Hashnode Edition</span>
             </span>
           </div>

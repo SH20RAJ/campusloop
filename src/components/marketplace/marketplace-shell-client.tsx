@@ -1,21 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Bike,
-  Droplet,
-  Grid,
-  History,
-  Home,
-  Scissors,
-  Search,
-  Shirt,
-  ShoppingBag,
-  ShoppingCart,
-  Sparkles,
-  Store,
-  UtensilsCrossed,
-} from "lucide-react";
+import { ArrowLeft, Bike, Droplet, Grid, History, Home, Scissors, Search, Shirt, ShoppingBag, ShoppingCart, Zap, Store, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -96,7 +81,7 @@ export function MarketplaceShellClient({ children, profile, viewerMode }: Market
             </Link>
 
             <span className="hidden lg:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black border border-emerald-500/20 ml-1">
-              <Sparkles className="size-3" />
+              <Zap className="size-3" />
               <span>{profile?.institution?.name?.split(",")[0] || "Campus Hub"}</span>
             </span>
           </div>

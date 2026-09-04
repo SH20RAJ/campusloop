@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Check,
-  ImagePlus,
-  Loader2,
-  Package,
-  Plus,
-  Save,
-  Sparkles,
-  Trash2,
-  X,
-} from "lucide-react";
+import { ArrowLeft, Check, ImagePlus, Loader2, Package, Plus, Save, Zap, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -507,7 +496,7 @@ export function EditProductClient({ productId }: EditProductClientProps) {
         <div className="p-5 sm:p-6 rounded-3xl bg-card border border-border space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Sparkles className="size-4 text-amber-500" />
+              <Zap className="size-4 text-amber-500" />
               <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
                 Item Add-ons &amp; Customizations
               </h2>

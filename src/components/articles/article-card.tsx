@@ -137,7 +137,7 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-foreground truncate flex items-center gap-1">
                     <span>{authorName}</span>
-                    {isVerified && <ShieldCheck className="size-3 text-[#a170ff] shrink-0" />}
+                    {isVerified && <ShieldCheck className="size-3 text-brand shrink-0" />}
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">
                     @{authorUsername} · {collegeShort}

@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  Calendar,
-  CheckCircle2,
-  Clock,
-  Home,
-  MapPin,
-  Package,
-  Plus,
-  ShieldCheck,
-  Shirt,
-  Sparkles,
-  Star,
-  Truck,
-  Wind,
-} from "lucide-react";
+import { Calendar, CheckCircle2, Clock, Home, MapPin, Package, Plus, ShieldCheck, Shirt, Zap, Star, Truck, Wind } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";

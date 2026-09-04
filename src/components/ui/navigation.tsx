@@ -20,7 +20,6 @@ import { toast } from "sonner";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
 import { DreamCampusesModal } from "@/components/preview/dream-campuses-modal";
-import { triggerPWAInstall } from "@/components/pwa/pwa-install-banner";
 import {
   AnimateBellRing,
   AnimateDownload,
@@ -214,7 +213,9 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   sounds.tap();
                   haptics.light();
                   setShowMobileMenu(true);
@@ -271,7 +272,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   playKey={unreadNotificationsCount}
                 />
                 {unreadNotificationsCount > 0 && (
-                  <span className="absolute top-2 right-2 size-2 rounded-full bg-[#a170ff]" />
+                  <span className="absolute top-2 right-2 size-2 rounded-full bg-brand" />
                 )}
               </Link>
             </div>
@@ -332,7 +333,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                       />
                     </AnimateIcon>
                     {isNotifications && unreadNotificationsCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-[#a170ff] text-white text-[10px] font-black flex items-center justify-center border-2 border-background shadow-xs">
+                      <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-brand text-white text-[10px] font-black flex items-center justify-center border-2 border-background shadow-xs">
                         {unreadNotificationsCount > 99 ? "99+" : unreadNotificationsCount}
                       </span>
                     )}
@@ -386,18 +387,6 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 </Button>
               </Link>
               <FeedAnonymityQuickToggle initialMode={profile?.feedVisibility} />
-              {/* <button
-                type="button"
-                onClick={() => {
-                  sounds.tap();
-                  haptics.light();
-                  triggerPWAInstall();
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-colors cursor-pointer"
-              >
-                <AnimatedIcon icon={AnimateZap} animation="twinkle" size={14} />
-                <span>Install CampusLoop App</span>
-              </button> */}
             </div>
           )}
         </div>
@@ -630,7 +619,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                       <Link
                         key={item.href}
                         href={item.href}
-                        prefetch={true}
+                        prefetch={false}
                         onClick={() => setShowMobileMenu(false)}
                         className={cn(
                           "flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer",
@@ -659,33 +648,6 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 {/* Anonymity Quick Switcher in Mobile Drawer */}
                 <div className="pt-2">
                   <FeedAnonymityQuickToggle initialMode={profile?.feedVisibility} />
-                </div>
-
-                {/* Direct PWA App Install Button */}
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      sounds.tap();
-                      haptics.light();
-                      setShowMobileMenu(false);
-                      triggerPWAInstall();
-                    }}
-                    className="w-full flex items-center justify-between p-3 rounded-2xl border border-primary/40 bg-gradient-to-r from-primary/15 to-primary/5 hover:from-primary/25 hover:to-primary/10 text-primary transition-all cursor-pointer shadow-xs group select-none"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="size-7 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
-                        <AnimatedIcon icon={AnimateZap} animation="twinkle" size={14} />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-xs font-black text-foreground group-hover:text-primary transition-colors">
-                          Install Web App (PWA)
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">Fullscreen 0ms app experience</p>
-                      </div>
-                    </div>
-                    <AnimatedIcon icon={AnimateDownload} animation="nudge-up" size={16} />
-                  </button>
                 </div>
 
                 {/* Secondary Quick Links */}

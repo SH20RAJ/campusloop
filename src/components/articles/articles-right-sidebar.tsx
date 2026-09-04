@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, Flame, PenTool, Sparkles, Users } from "lucide-react";
+import { ArrowUpRight, Flame, PenTool, Zap, Users } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -40,7 +40,7 @@ export function ArticlesRightSidebar() {
       <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-purple-500/10 p-5 shadow-xs">
         <div className="space-y-2 relative z-10">
           <div className="flex items-center gap-1.5 text-xs font-black text-primary uppercase tracking-wider">
-            <Sparkles className="size-3.5" />
+            <Zap className="size-3.5" />
             <span>Campus Journalism</span>
           </div>
           <h3 className="text-base font-black text-foreground tracking-tight leading-snug">

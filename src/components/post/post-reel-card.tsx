@@ -1,8 +1,20 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { BadgeCheck, Bookmark, Heart, MessageCircle, MoreHorizontal, Repeat2, Share2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  BadgeCheck,
+  Bookmark,
+  Heart,
+  MessageCircle,
+  MoreHorizontal,
+  Pause,
+  Play,
+  Repeat2,
+  Share2,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
 import { PostLikesModal } from "@/components/post/post-likes-modal";
@@ -43,6 +55,15 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   const [showReactionTray, setShowReactionTray] = useState(false);
   const [activeReaction, setActiveReaction] = useState<string | null>(null);
 
+  // Video Reel State (Image 3)
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [showPlayPauseRipple, setShowPlayPauseRipple] = useState(false);
+  const [isExpandedCaption, setIsExpandedCaption] = useState(false);
+  const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
+
   const [showReport, setShowReport] = useState(false);
   const [showRepostModal, setShowRepostModal] = useState(false);
   const [showShareStoryModal, setShowShareStoryModal] = useState(false);
@@ -50,12 +71,79 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   const [quoteThoughts, setQuoteThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
 
+  // Extract direct video URL if present in body
+  const videoUrl = useMemo(() => {
+    if (!post.body) return null;
+    // Markdown video tag ![...](url.mp4)
+    const mdMatch = post.body.match(/!\[.*?\]\((https?:\/\/[^\s)]+\.(?:mp4|webm|mov)[^\s)]*)\)/i);
+    if (mdMatch) return mdMatch[1];
+
+    // Raw video URL
+    const rawMatch = post.body.match(/(https?:\/\/[^\s<>"']+\.(?:mp4|webm|mov)[^\s<>"']*)/i);
+    if (rawMatch) return rawMatch[1];
+
+    return null;
+  }, [post.body]);
+
+  // Clean body text by stripping raw video URL for caption display
+  const captionText = useMemo(() => {
+    if (!videoUrl) return post.body;
+    return post.body
+      .replace(new RegExp(`!\\[.*?\\]\\(${videoUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)`, "gi"), "")
+      .replace(videoUrl, "")
+      .trim();
+  }, [post.body, videoUrl]);
+
   useEffect(() => {
     setUserVote(post.userVote);
     setVotesCount(post.votesCount);
     setCommentsCount(post.commentsCount);
     setIsSaved(Boolean(post.isSaved));
   }, [post.userVote, post.votesCount, post.commentsCount, post.isSaved]);
+
+  // Video Autoplay & Pause when card is active/inactive
+  useEffect(() => {
+    if (!videoRef.current || !videoUrl) return;
+    if (isActive) {
+      videoRef.current.play().catch(() => {});
+      setIsPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, [isActive, videoUrl]);
+
+  // Video time update progress
+  function handleTimeUpdate() {
+    if (!videoRef.current) return;
+    const current = videoRef.current.currentTime;
+    const duration = videoRef.current.duration || 1;
+    setProgress((current / duration) * 100);
+  }
+
+  // Toggle Video Play / Pause on tap
+  function handleTogglePlay(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setIsPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+    setShowPlayPauseRipple(true);
+    setTimeout(() => setShowPlayPauseRipple(false), 600);
+  }
+
+  function handleToggleMute(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    const nextMuted = !isMuted;
+    videoRef.current.muted = nextMuted;
+    setIsMuted(nextMuted);
+    sounds.tap();
+  }
 
   const authorName = post.isAnonymous
     ? post.pseudonym || "Anonymous Student"
@@ -116,7 +204,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
       setIsReposted(true);
       setShowRepostModal(false);
       setQuoteThoughts("");
-      toast.success(isQuote ? "Quote posted to your feed! ✨" : "Post reposted to your campus timeline! 🔄");
+      toast.success(isQuote ? "Quote posted to your campus timeline! ✨" : "Loop reposted! 🔄");
     } catch {
       toast.error("Failed to repost.");
     } finally {
@@ -132,14 +220,14 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     if (navigator.share) {
       navigator
         .share({
-          title: `Post by ${authorName} on CampusLoop`,
+          title: `Loop by ${authorName} on CampusLoop`,
           text: post.body.slice(0, 100),
           url: shareUrl,
         })
         .catch(() => {});
     } else {
       navigator.clipboard.writeText(shareUrl);
-      toast.success("Post link copied to clipboard! 📋");
+      toast.success("Loop link copied to clipboard! 📋");
     }
   }
 
@@ -157,266 +245,483 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     }
   }
 
-  return (
-    <article
-      onDoubleClick={handleDoubleTap}
-      className={cn(
-        "relative w-full max-w-xl mx-auto rounded-3xl border border-border/80 bg-card/90 backdrop-blur-2xl shadow-2xl p-4 sm:p-5 flex flex-col justify-between max-h-[calc(100dvh-5rem)] overflow-y-auto no-scrollbar select-none transition-all",
-        isActive ? "ring-1 ring-primary/25 shadow-primary/5" : "opacity-95"
-      )}
-    >
-      {/* ─── Double Tap Heart Animation (Instagram Reels) ─── */}
-      <AnimatePresence>
-        {showDoubleTapHeart && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1.3, opacity: 1 }}
-            exit={{ scale: 1.6, opacity: 0 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center"
-          >
-            <div className="rounded-full bg-black/40 p-6 backdrop-blur-md">
-              <Heart className="size-20 fill-rose-500 text-rose-500 drop-shadow-lg animate-pulse" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  // Author follow toggle
+  async function handleToggleFollowAuthor(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!post.authorId || post.isAnonymous || !authorHandle) return;
+    const nextFollow = !isFollowingAuthor;
+    setIsFollowingAuthor(nextFollow);
+    sounds.tap();
+    try {
+      const endpoint = `/api/profile/${encodeURIComponent(authorHandle)}/follow`;
+      const res = await fetch(endpoint, {
+        method: nextFollow ? "POST" : "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to follow");
+      if (nextFollow) {
+        toast.success(`Following @${authorHandle}`);
+      }
+    } catch {
+      setIsFollowingAuthor(!nextFollow);
+    }
+  }
 
-      <div className="space-y-3">
-        {/* ─── Header: Twitter / Facebook Blend ─── */}
-        <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-2.5">
-          <div className="flex items-center gap-3 min-w-0">
-            {/* Avatar with active ring */}
-            <div className="relative shrink-0">
-              <Avatar className="size-10 border border-border/80 shadow-xs">
+  // ─── PURE INSTAGRAM REELS VIDEO LAYOUT (Image 3) ───
+  if (videoUrl) {
+    return (
+      <div className="relative flex items-center justify-center gap-3 sm:gap-4 w-full h-full max-h-[calc(100dvh-5.5rem)]">
+        <div
+          onDoubleClick={handleDoubleTap}
+          onClick={handleTogglePlay}
+          className="relative w-full max-w-[340px] sm:max-w-[380px] h-[calc(100dvh-6.5rem)] max-h-[680px] rounded-3xl overflow-hidden bg-black border border-border/80 shadow-2xl flex items-center justify-center cursor-pointer select-none"
+        >
+          {/* 9:16 Video Player */}
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            loop
+            playsInline
+            muted={isMuted}
+            onTimeUpdate={handleTimeUpdate}
+            className="w-full h-full object-cover"
+          />
+
+          {/* Double Tap Heart Animation */}
+          <AnimatePresence>
+            {showDoubleTapHeart && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1.3, opacity: 1 }}
+                exit={{ scale: 1.6, opacity: 0 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+                className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center"
+              >
+                <div className="rounded-full bg-black/40 p-6 backdrop-blur-md">
+                  <Heart className="size-20 fill-rose-500 text-rose-500 drop-shadow-lg animate-pulse" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Tap Play/Pause Ripple Indicator */}
+          <AnimatePresence>
+            {showPlayPauseRipple && (
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1.1, opacity: 1 }}
+                exit={{ scale: 1.3, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center"
+              >
+                <div className="size-16 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white">
+                  {isPlaying ? <Play className="size-7 fill-white ml-0.5" /> : <Pause className="size-7 fill-white" />}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Sound Toggle (Bottom-Right) */}
+          <button
+            type="button"
+            onClick={handleToggleMute}
+            className="absolute bottom-4 right-4 z-30 size-9 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/75 transition-colors cursor-pointer"
+            aria-label={isMuted ? "Unmute video" : "Mute video"}
+          >
+            {isMuted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
+          </button>
+
+          {/* Bottom Gradient & Author/Caption Info */}
+          <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 pb-3 text-white space-y-2 pointer-events-auto">
+            {/* Author details */}
+            <div className="flex items-center gap-2.5">
+              <Avatar className="size-9 border-2 border-white/40 shrink-0">
                 {avatarUrl && <AvatarImage src={avatarUrl} alt={authorName} />}
-                <AvatarFallback className="bg-muted font-black text-xs text-foreground">
+                <AvatarFallback className="bg-muted text-foreground text-xs font-bold">
                   {avatarFallback}
                 </AvatarFallback>
               </Avatar>
-              {!post.isAnonymous && (
-                <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-emerald-500 ring-2 ring-background" />
+
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-bold text-xs sm:text-sm truncate drop-shadow-sm">{authorName}</span>
+                {!post.isAnonymous && <BadgeCheck className="size-3.5 text-primary shrink-0" />}
+              </div>
+
+              {!post.isAnonymous && post.authorId && post.authorId !== currentUserId && (
+                <button
+                  type="button"
+                  onClick={handleToggleFollowAuthor}
+                  className={`ml-1 text-[11px] font-bold px-2.5 py-1 rounded-full border transition-all cursor-pointer select-none ${
+                    isFollowingAuthor
+                      ? "bg-white/20 border-white/30 text-white"
+                      : "bg-white text-black border-white hover:bg-white/90"
+                  }`}
+                >
+                  {isFollowingAuthor ? "Following" : "Follow"}
+                </button>
               )}
             </div>
 
-            {/* Author details & campus line */}
-            <div className="min-w-0 flex-1 leading-tight">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="font-bold text-sm sm:text-[15px] text-foreground truncate">
-                  {authorName}
-                </span>
-                {!post.isAnonymous && (
-                  <BadgeCheck className="size-4 text-foreground shrink-0 fill-foreground/10" />
+            {/* Caption */}
+            {captionText && (
+              <div className="text-xs text-white/90 leading-relaxed pr-8">
+                <p className={cn("transition-all", !isExpandedCaption && "line-clamp-2")}>
+                  {captionText}
+                </p>
+                {captionText.length > 90 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsExpandedCaption((prev) => !prev);
+                    }}
+                    className="text-[11px] font-bold text-white/70 hover:text-white mt-0.5 cursor-pointer"
+                  >
+                    {isExpandedCaption ? "Show less" : "...more"}
+                  </button>
                 )}
-                <span className="text-xs text-muted-foreground truncate">@{authorHandle}</span>
               </div>
+            )}
 
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-                {post.institution && (
-                  <>
-                    <span className="truncate max-w-[140px] sm:max-w-[180px] font-medium">
-                      {post.institution.name.split(",")[0]}
-                    </span>
-                    <span>·</span>
-                  </>
-                )}
-                <span>{formatTimeAgo(new Date(post.createdAt))}</span>
-              </div>
+            {/* Campus Line */}
+            {post.institution && (
+              <p className="text-[10px] text-white/60 font-medium">
+                {post.institution.name.split(",")[0]} · {formatTimeAgo(new Date(post.createdAt))}
+              </p>
+            )}
+
+            {/* Video Progress Scrub Bar */}
+            <div className="w-full h-1 bg-white/25 rounded-full overflow-hidden mt-2">
+              <div
+                className="h-full bg-primary transition-all duration-100 ease-linear rounded-full"
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </div>
+        </div>
 
-          {/* Right side tag & menu */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="rounded-full border border-border/60 bg-muted/30 px-2.5 py-0.5 text-[11px] font-bold text-foreground">
-              {post.type === "CONFESSION" ? "🎭 Confession" : post.type === "POLL" ? "📊 Poll" : "💬 Yap"}
-            </span>
-
+        {/* ─── Floating Vertical Action Column (Right Side like Instagram Image 3) ─── */}
+        <div className="flex flex-col items-center gap-3.5 z-30 select-none shrink-0 text-foreground">
+          {/* 1. Like */}
+          <div className="flex flex-col items-center gap-1">
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowReport(true);
-              }}
-              aria-label="More options"
-              className="p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer rounded-full hover:bg-muted/40"
-            >
-              <MoreHorizontal className="size-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* ─── Post Text with Max Height & "Show more" button ─── */}
-        <div className="text-[15px] text-foreground leading-relaxed pt-0.5">
-          <RichText content={post.body} maxHeight={185} />
-        </div>
-
-        {/* ─── Embedded Original Quoted Post (Twitter Style) ─── */}
-        {post.repostOf && (
-          <div className="rounded-2xl border border-border/60 bg-muted/20 p-3 text-xs space-y-1">
-            <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
-              <span className="font-bold text-foreground">
-                @{post.repostOf.author?.username || "student"}
-              </span>
-              {post.repostOf.institution && (
-                <>
-                  <span>·</span>
-                  <span>{post.repostOf.institution.name.split(",")[0]}</span>
-                </>
+              onClick={() => handleVote()}
+              aria-label="Like post"
+              className={cn(
+                "size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+                userVote === 1 ? "text-rose-500 bg-rose-500/10 border-rose-500/30" : "hover:text-foreground"
               )}
-            </div>
-            <p className="text-foreground/90 line-clamp-3 leading-relaxed">{post.repostOf.body}</p>
+            >
+              <Heart className={cn("size-5.5 sm:size-6", userVote === 1 && "fill-rose-500")} />
+            </button>
+            <span className="text-[11px] font-bold text-muted-foreground tabular-nums">
+              {votesCount > 0 ? votesCount : "Like"}
+            </span>
           </div>
-        )}
 
-        {/* ─── Poll Component ─── */}
-        {post.type === "POLL" && post.pollOptions && (
-          <div className="pt-1">
-            <PollCard post={post} />
+          {/* 2. Comment */}
+          <div className="flex flex-col items-center gap-1">
+            <button
+              type="button"
+              onClick={() => onOpenComments(post)}
+              aria-label="Comment"
+              className="size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer hover:text-foreground"
+            >
+              <MessageCircle className="size-5.5 sm:size-6" />
+            </button>
+            <span className="text-[11px] font-bold text-muted-foreground tabular-nums">
+              {commentsCount > 0 ? commentsCount : "Reply"}
+            </span>
           </div>
-        )}
+
+          {/* 3. Repost */}
+          <div className="flex flex-col items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setShowRepostModal(true)}
+              aria-label="Repost"
+              className={cn(
+                "size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+                isReposted ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/30" : "hover:text-foreground"
+              )}
+            >
+              <Repeat2 className={cn("size-5.5 sm:size-6", isReposted && "rotate-180")} />
+            </button>
+            <span className="text-[11px] font-bold text-muted-foreground">Loop</span>
+          </div>
+
+          {/* 4. Bookmark */}
+          <button
+            type="button"
+            onClick={handleToggleSave}
+            aria-label="Save"
+            className={cn(
+              "size-10 sm:size-11 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+              isSaved ? "text-primary fill-primary" : "hover:text-foreground text-muted-foreground"
+            )}
+          >
+            <Bookmark className={cn("size-5", isSaved && "fill-primary")} />
+          </button>
+
+          {/* 5. Share */}
+          <button
+            type="button"
+            onClick={handleShare}
+            aria-label="Share"
+            className="size-10 sm:size-11 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer hover:text-foreground text-muted-foreground"
+          >
+            <Share2 className="size-5" />
+          </button>
+
+          {/* 6. More Options */}
+          <button
+            type="button"
+            onClick={() => setShowReport(true)}
+            aria-label="Report"
+            className="size-9 rounded-full border border-border/60 bg-card/80 backdrop-blur-xl flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            <MoreHorizontal className="size-4" />
+          </button>
+        </div>
+
+        {/* Modals */}
+        <FeedCardRepostModal
+          isOpen={showRepostModal}
+          onClose={() => setShowRepostModal(false)}
+          quoteThoughts={quoteThoughts}
+          setQuoteThoughts={setQuoteThoughts}
+          onExecuteRepost={handleExecuteRepost}
+          originalPostAuthorHandle={authorHandle}
+          isReposting={isReposting}
+        />
+        <ShareStoryModal isOpen={showShareStoryModal} onClose={() => setShowShareStoryModal(false)} post={post} />
+        <PostLikesModal postId={post.id} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
+        <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
       </div>
+    );
+  }
 
-      {/* ─── Footer: Facebook Reactions + Twitter Action Row + Reels Drawer ─── */}
-      <div className="pt-4 mt-2 border-t border-border/40 space-y-2">
-        {/* Facebook-style reaction count bar */}
-        {votesCount > 0 && (
-          <div className="flex items-center justify-between text-xs text-muted-foreground px-1 pb-1">
+  // ─── IMMERSIVE CARD LAYOUT FOR TEXT, POLLS & IMAGES ───
+  return (
+    <div className="relative flex items-center justify-center gap-3 sm:gap-4 w-full h-full max-h-[calc(100dvh-5.5rem)]">
+      <article
+        onDoubleClick={handleDoubleTap}
+        className={cn(
+          "relative w-full max-w-xl mx-auto rounded-3xl border border-border/80 bg-card/95 backdrop-blur-2xl shadow-2xl p-5 sm:p-6 flex flex-col justify-between max-h-[calc(100dvh-5.5rem)] overflow-y-auto no-scrollbar select-none transition-all",
+          isActive ? "ring-1 ring-primary/25 shadow-primary/5" : "opacity-95"
+        )}
+      >
+        {/* Double Tap Heart Animation */}
+        <AnimatePresence>
+          {showDoubleTapHeart && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1.3, opacity: 1 }}
+              exit={{ scale: 1.6, opacity: 0 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center"
+            >
+              <div className="rounded-full bg-black/40 p-6 backdrop-blur-md">
+                <Heart className="size-20 fill-rose-500 text-rose-500 drop-shadow-lg animate-pulse" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="space-y-3.5">
+          {/* Header */}
+          <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative shrink-0">
+                <Avatar className="size-11 border border-border/80 shadow-xs">
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt={authorName} />}
+                  <AvatarFallback className="bg-muted font-black text-xs text-foreground">
+                    {avatarFallback}
+                  </AvatarFallback>
+                </Avatar>
+                {!post.isAnonymous && (
+                  <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-emerald-500 ring-2 ring-background" />
+                )}
+              </div>
+
+              <div className="min-w-0 flex-1 leading-tight">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-bold text-sm sm:text-[15px] text-foreground truncate">
+                    {authorName}
+                  </span>
+                  {!post.isAnonymous && (
+                    <BadgeCheck className="size-4 text-primary shrink-0" />
+                  )}
+                  <span className="text-xs text-muted-foreground truncate">@{authorHandle}</span>
+                </div>
+
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+                  {post.institution && (
+                    <>
+                      <span className="truncate max-w-[140px] sm:max-w-[200px] font-medium">
+                        {post.institution.name.split(",")[0]}
+                      </span>
+                      <span>·</span>
+                    </>
+                  )}
+                  <span>{formatTimeAgo(new Date(post.createdAt))}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tag Badge */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="rounded-full border border-border/60 bg-muted/40 px-2.5 py-0.5 text-[11px] font-bold text-foreground">
+                {post.type === "CONFESSION" ? "🎭 Confession" : post.type === "POLL" ? "📊 Poll" : "💬 Yap"}
+              </span>
+            </div>
+          </div>
+
+          {/* Post Text */}
+          <div className="text-[15px] sm:text-base text-foreground leading-relaxed pt-1">
+            <RichText content={post.body} maxHeight={240} />
+          </div>
+
+          {/* Embedded Repost */}
+          {post.repostOf && (
+            <div className="rounded-2xl border border-border/60 bg-muted/20 p-3 text-xs space-y-1">
+              <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
+                <span className="font-bold text-foreground">
+                  @{post.repostOf.author?.username || "student"}
+                </span>
+                {post.repostOf.institution && (
+                  <>
+                    <span>·</span>
+                    <span>{post.repostOf.institution.name.split(",")[0]}</span>
+                  </>
+                )}
+              </div>
+              <p className="text-foreground/90 line-clamp-3 leading-relaxed">{post.repostOf.body}</p>
+            </div>
+          )}
+
+          {/* Poll Component */}
+          {post.type === "POLL" && post.pollOptions && (
+            <div className="pt-1">
+              <PollCard post={post} />
+            </div>
+          )}
+        </div>
+
+        {/* Footer Reaction Count */}
+        <div className="pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
+          {votesCount > 0 ? (
             <button
               type="button"
               onClick={() => setShowLikesModal(true)}
               className="flex items-center gap-1 hover:underline cursor-pointer"
             >
-              <span className="flex -space-x-1 items-center">
-                <span className="size-4.5 rounded-full bg-rose-500 text-white flex items-center justify-center text-[10px]">
-                  {activeReaction || "❤️"}
-                </span>
+              <span className="size-4.5 rounded-full bg-rose-500 text-white flex items-center justify-center text-[10px]">
+                {activeReaction || "❤️"}
               </span>
               <span className="font-bold text-foreground ml-1">{votesCount}</span>
               <span>reactions</span>
             </button>
+          ) : (
+            <span>Be the first to react</span>
+          )}
 
-            <button
-              type="button"
-              onClick={() => onOpenComments(post)}
-              className="hover:underline cursor-pointer"
-            >
-              <span>{commentsCount} comments</span>
-            </button>
-          </div>
-        )}
-
-        {/* Action Row */}
-        <div className="relative flex items-center justify-between text-muted-foreground text-xs">
-          {/* Reaction Picker Popup (Facebook Style) */}
-          <AnimatePresence>
-            {showReactionTray && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                transition={{ duration: 0.15 }}
-                className="absolute bottom-11 left-0 z-40 flex items-center gap-1 rounded-full border border-border/80 bg-card/95 backdrop-blur-xl p-1.5 shadow-2xl"
-              >
-                {QUICK_REACTIONS.map((r) => (
-                  <button
-                    key={r.label}
-                    type="button"
-                    onClick={() => handleVote(r.emoji)}
-                    className="size-9 flex items-center justify-center text-lg hover:scale-130 transition-transform cursor-pointer rounded-full hover:bg-muted/40"
-                    title={r.label}
-                  >
-                    {r.emoji}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* 1. Vote / Like Button (Facebook & Twitter style) */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => handleVote()}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                setShowReactionTray((prev) => !prev);
-              }}
-              onMouseEnter={() => setShowReactionTray(true)}
-              className={cn(
-                "group flex items-center gap-1.5 py-1.5 px-2.5 rounded-full transition-all cursor-pointer",
-                userVote === 1
-                  ? "text-rose-500 font-bold bg-rose-500/10"
-                  : "hover:text-foreground hover:bg-muted/40"
-              )}
-            >
-              <Heart
-                className={cn(
-                  "size-4.5 transition-transform group-hover:scale-110",
-                  userVote === 1 && "fill-rose-500"
-                )}
-              />
-              <span>{userVote === 1 ? (activeReaction ? activeReaction : "Liked") : "Like"}</span>
-            </button>
-          </div>
-
-          {/* 2. Comment Button (Instagram Reels style slide-up trigger) */}
           <button
             type="button"
             onClick={() => onOpenComments(post)}
-            className="group flex items-center gap-1.5 py-1.5 px-2.5 rounded-full hover:text-foreground hover:bg-muted/40 transition-all cursor-pointer"
+            className="hover:underline cursor-pointer font-medium"
           >
-            <MessageCircle className="size-4.5 group-hover:scale-110 transition-transform" />
-            <span>Comment</span>
-            {commentsCount > 0 && <span className="font-bold">({commentsCount})</span>}
+            {commentsCount} comments
           </button>
+        </div>
+      </article>
 
-          {/* 3. Repost Button (Twitter style) */}
+      {/* Floating Action Column (Right Side) */}
+      <div className="flex flex-col items-center gap-3.5 z-30 select-none shrink-0 text-foreground">
+        {/* Like */}
+        <div className="flex flex-col items-center gap-1">
+          <button
+            type="button"
+            onClick={() => handleVote()}
+            aria-label="Like post"
+            className={cn(
+              "size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+              userVote === 1 ? "text-rose-500 bg-rose-500/10 border-rose-500/30" : "hover:text-foreground"
+            )}
+          >
+            <Heart className={cn("size-5.5 sm:size-6", userVote === 1 && "fill-rose-500")} />
+          </button>
+          <span className="text-[11px] font-bold text-muted-foreground tabular-nums">
+            {votesCount > 0 ? votesCount : "Like"}
+          </span>
+        </div>
+
+        {/* Comment */}
+        <div className="flex flex-col items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onOpenComments(post)}
+            aria-label="Comment"
+            className="size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer hover:text-foreground"
+          >
+            <MessageCircle className="size-5.5 sm:size-6" />
+          </button>
+          <span className="text-[11px] font-bold text-muted-foreground tabular-nums">
+            {commentsCount > 0 ? commentsCount : "Reply"}
+          </span>
+        </div>
+
+        {/* Repost */}
+        <div className="flex flex-col items-center gap-1">
           <button
             type="button"
             onClick={() => setShowRepostModal(true)}
-            disabled={isReposting}
+            aria-label="Repost"
             className={cn(
-              "group flex items-center gap-1.5 py-1.5 px-2.5 rounded-full transition-all cursor-pointer",
-              isReposted
-                ? "text-emerald-500 font-bold bg-emerald-500/10"
-                : "hover:text-foreground hover:bg-muted/40"
+              "size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+              isReposted ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/30" : "hover:text-foreground"
             )}
           >
-            <Repeat2
-              className={cn(
-                "size-4.5 group-hover:scale-110 transition-transform",
-                isReposted && "rotate-180"
-              )}
-            />
-            <span className="hidden sm:inline">Repost</span>
+            <Repeat2 className={cn("size-5.5 sm:size-6", isReposted && "rotate-180")} />
           </button>
-
-          {/* 4. Bookmark Button */}
-          <button
-            type="button"
-            onClick={handleToggleSave}
-            aria-label="Save post"
-            className={cn(
-              "p-1.5 rounded-full transition-colors cursor-pointer",
-              isSaved ? "text-foreground" : "hover:text-foreground hover:bg-muted/40"
-            )}
-          >
-            <Bookmark className={cn("size-4.5", isSaved && "fill-foreground")} />
-          </button>
-
-          {/* 5. Share Button */}
-          <button
-            type="button"
-            onClick={handleShare}
-            aria-label="Share post"
-            className="p-1.5 rounded-full hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
-          >
-            <Share2 className="size-4.5" />
-          </button>
+          <span className="text-[11px] font-bold text-muted-foreground">Loop</span>
         </div>
+
+        {/* Bookmark */}
+        <button
+          type="button"
+          onClick={handleToggleSave}
+          aria-label="Save"
+          className={cn(
+            "size-10 sm:size-11 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+            isSaved ? "text-primary fill-primary" : "hover:text-foreground text-muted-foreground"
+          )}
+        >
+          <Bookmark className={cn("size-5", isSaved && "fill-primary")} />
+        </button>
+
+        {/* Share */}
+        <button
+          type="button"
+          onClick={handleShare}
+          aria-label="Share"
+          className="size-10 sm:size-11 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer hover:text-foreground text-muted-foreground"
+        >
+          <Share2 className="size-5" />
+        </button>
+
+        {/* More Options */}
+        <button
+          type="button"
+          onClick={() => setShowReport(true)}
+          aria-label="Report"
+          className="size-9 rounded-full border border-border/60 bg-card/80 backdrop-blur-xl flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          <MoreHorizontal className="size-4" />
+        </button>
       </div>
 
-      {/* ─── Modals: Repost, Share Story, Likes, Report ─── */}
+      {/* Modals */}
       <FeedCardRepostModal
         isOpen={showRepostModal}
         onClose={() => setShowRepostModal(false)}
@@ -426,20 +731,9 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         originalPostAuthorHandle={authorHandle}
         isReposting={isReposting}
       />
-
-      <ShareStoryModal
-        isOpen={showShareStoryModal}
-        onClose={() => setShowShareStoryModal(false)}
-        post={post}
-      />
-
+      <ShareStoryModal isOpen={showShareStoryModal} onClose={() => setShowShareStoryModal(false)} post={post} />
       <PostLikesModal postId={post.id} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
-
-      <ReportDialog
-        postId={post.id}
-        isOpen={showReport}
-        onClose={() => setShowReport(false)}
-      />
-    </article>
+      <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
+    </div>
   );
 }

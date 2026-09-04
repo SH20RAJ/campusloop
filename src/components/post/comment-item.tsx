@@ -170,7 +170,7 @@ export function CommentItem({
                   icon={AnimateShieldCheck}
                   animation="pop"
                   size={14}
-                  className="text-[#a170ff] shrink-0"
+                  className="text-brand shrink-0"
                 />
               )}
 
@@ -219,9 +219,9 @@ export function CommentItem({
                 }
               }}
               {...reply.handlers}
-              className="flex items-center gap-1.5 hover:text-[#a170ff] transition-colors cursor-pointer group/reply"
+              className="flex items-center gap-1.5 hover:text-brand transition-colors cursor-pointer group/reply"
             >
-              <div className="size-7 rounded-full group-hover/reply:bg-[#a170ff]/10 flex items-center justify-center transition-colors">
+              <div className="size-7 rounded-full group-hover/reply:bg-brand/10 flex items-center justify-center transition-colors">
                 <AnimatedIcon
                   ref={reply.ref}
                   icon={AnimateMessageCircle}

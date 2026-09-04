@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Pin, Search, Sparkles, Trash2, TrendingUp, User } from "lucide-react";
+import { Loader2, Pin, Search, Zap, Trash2, TrendingUp, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -213,7 +213,7 @@ export function FeedBoostsClient() {
                       onClick={() => setSelection({ kind: "POST", id: post.id, label: post.label })}
                       className="w-full flex items-center gap-3 rounded-xl border border-border/60 p-2.5 text-left hover:border-border hover:bg-muted/40 cursor-pointer"
                     >
-                      <Sparkles className="size-4 text-muted-foreground shrink-0" />
+                      <Zap className="size-4 text-muted-foreground shrink-0" />
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm text-foreground truncate">{post.label}</span>
                         <span className="block text-[11px] text-muted-foreground">

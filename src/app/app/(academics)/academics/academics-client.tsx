@@ -6,14 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWRInfinite from "swr/infinite";
 import { AcademicCard } from "@/components/communities/academic-card";
-import {
-  AnimateBookOpen,
-  AnimateCheck,
-  AnimatedIcon,
-  AnimatePlus,
-  AnimateSearch,
-  AnimateSparkles,
-} from "@/components/ui/animated-icon";
+import { AnimateBookOpen, AnimateCheck, AnimatedIcon, AnimatePlus, AnimateSearch, AnimateZap } from "@/components/ui/animated-icon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
@@ -705,7 +698,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                   </>
                 ) : (
                   <>
-                    <AnimatedIcon icon={AnimateSparkles} animation="twinkle" size={13} />
+                    <AnimatedIcon icon={AnimateZap} animation="twinkle" size={13} />
                     <span>Publish &amp; Earn 20 LP</span>
                   </>
                 )}

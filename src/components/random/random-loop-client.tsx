@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Loader2,
-  MessageSquare,
-  MoreVertical,
-  Send,
-  Shield,
-  ShieldAlert,
-  ShieldCheck,
-  Sparkles,
-  UserCheck,
-  Video,
-  X,
-  Zap,
-} from "lucide-react";
+import { ArrowLeft, Loader2, MessageSquare, MoreVertical, Send, Shield, ShieldAlert, ShieldCheck, Zap, UserCheck, Video, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -526,7 +512,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
             onClick={handleFindSomeone}
             className="w-full h-13 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-base flex items-center justify-center gap-2 shadow-lg cursor-pointer transition-transform active:scale-[0.99]"
           >
-            <Sparkles className="size-5" />
+            <Zap className="size-5" />
             <span>Find Someone in the Loop</span>
           </button>
           <p className="text-center text-[10px] text-muted-foreground mt-2">

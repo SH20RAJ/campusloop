@@ -1,15 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
-import {
-  GraduationCap,
-  HeartHandshakeIcon,
-  School,
-  ShieldCheck,
-  Sparkles,
-  UserRound,
-  Zap,
-} from "lucide-react";
+import { GraduationCap, HeartHandshakeIcon, School, ShieldCheck, Zap, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimateX } from "@/components/ui/animated-icon";
@@ -173,7 +165,7 @@ function TopCard({
         <div className="flex items-center gap-1.5">
           {candidate.likedYou && (
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/90 px-2.5 py-1 text-[10px] font-black text-primary-foreground backdrop-blur-md shadow-sm">
-              <Sparkles className="size-2.5" /> Likes your vibe
+              <Zap className="size-2.5" /> Likes your vibe
             </span>
           )}
           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/25 px-2.5 py-1 text-[10px] font-extrabold text-emerald-300 backdrop-blur-md border border-emerald-500/30">
@@ -230,7 +222,7 @@ function TopCard({
                 key={interest}
                 className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-md"
               >
-                <Sparkles className="size-2.5 text-primary" /> You both like {interest}
+                <Zap className="size-2.5 text-primary" /> You both like {interest}
               </span>
             ))}
           </div>

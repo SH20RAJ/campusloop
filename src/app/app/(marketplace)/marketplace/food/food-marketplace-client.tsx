@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  ChevronRight,
-  Clock,
-  Flame,
-  History,
-  MapPin,
-  Minus,
-  Percent,
-  Plus,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  UtensilsCrossed,
-} from "lucide-react";
+import { ChevronRight, Clock, Flame, History, MapPin, Minus, Percent, Plus, Search, ShieldCheck, Zap, Star, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -369,7 +355,7 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
         <div className="flex items-center justify-between px-1 border-t border-border/30 pt-5">
           <div>
             <h2 className="text-sm font-black text-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="size-4 text-amber-500" />
+              <Zap className="size-4 text-amber-500" />
               <span>All Dishes &amp; Quick Bites</span>
             </h2>
             <p className="text-[11px] text-muted-foreground">

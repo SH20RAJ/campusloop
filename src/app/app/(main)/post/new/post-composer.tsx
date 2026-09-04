@@ -2,28 +2,7 @@
 
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import {
-  AlertTriangle,
-  ArrowLeft,
-  BarChart3,
-  Check,
-  ChevronDown,
-  FileText,
-  Flame,
-  Globe,
-  HelpCircle,
-  Loader2,
-  Lock,
-  Mic,
-  School,
-  Smile,
-  Type,
-  Users,
-  VenetianMask,
-  Video,
-  X,
-  Zap,
-} from "lucide-react";
+import { AlertTriangle, ArrowLeft, BarChart3, Check, ChevronDown, FileText, Flame, Globe, HelpCircle, Loader2, Lock, Mic, School, Smile, Type, Users, VenetianMask, Video, X, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -34,14 +13,10 @@ import { VideoPlayer } from "@/components/media/video-player";
 import { VoiceRecorderModal } from "@/components/media/voice-recorder-modal";
 import { PollOptionsEditor } from "@/components/post/poll-options-editor";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
-import { AnimateImage, AnimateSparkles } from "@/components/ui/animated-icon";
+import { AnimateImage, AnimateZap } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
-import {
-  detectMentionTrigger,
-  MentionSuggestions,
-  type TriggerContext,
-} from "@/components/ui/mention-autocomplete";
+import { detectMentionTrigger, MentionSuggestions, type TriggerContext } from "@/components/ui/mention-autocomplete";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { useCommunities } from "@/hooks/use-communities";
 import type { FeedPost } from "@/hooks/use-feed";
@@ -549,7 +524,7 @@ export function PostComposer({
     {
       id: "gif",
       label: "GIF",
-      icon: AnimateSparkles,
+      icon: AnimateZap,
       color: "text-primary hover:bg-primary/10",
       onClick: () => setShowGifPicker(true),
     },

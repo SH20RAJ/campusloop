@@ -1,22 +1,6 @@
 "use client";
 
-import {
-  ArrowUp,
-  BookOpen,
-  ExternalLink,
-  Flame,
-  Mic,
-  MicOff,
-  Radio,
-  ShoppingBag,
-  Sparkles,
-  ThumbsDown,
-  ThumbsUp,
-  Volume2,
-  VolumeX,
-  WandSparkles,
-  X,
-} from "lucide-react";
+import { ArrowUp, BookOpen, ExternalLink, Flame, Mic, MicOff, Radio, ShoppingBag, Zap, ThumbsDown, ThumbsUp, Volume2, VolumeX, Wand2, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +17,7 @@ interface ChatMessage {
   feedback?: "helpful" | "unhelpful";
 }
 
-const QUICK_ACTIONS: Array<{ label: string; prompt: string; mode: AiMode; icon: typeof Sparkles }> = [
+const QUICK_ACTIONS: Array<{ label: string; prompt: string; mode: AiMode; icon: typeof Zap }> = [
   {
     label: "What's happening on my campus?",
     prompt: "What's happening on my campus today?",
@@ -44,7 +28,7 @@ const QUICK_ACTIONS: Array<{ label: string; prompt: string; mode: AiMode; icon: 
     label: "What did I miss?",
     prompt: "Give me a useful recap of what I missed recently on campus.",
     mode: "personal",
-    icon: Sparkles,
+    icon: Zap,
   },
   {
     label: "Help me study",
@@ -62,7 +46,7 @@ const QUICK_ACTIONS: Array<{ label: string; prompt: string; mode: AiMode; icon: 
     label: "Make my post better",
     prompt: "Help me improve this post without changing its facts:",
     mode: "create",
-    icon: WandSparkles,
+    icon: Wand2,
   },
 ];
 
@@ -254,7 +238,7 @@ export function CampusAiClient() {
       <div className="mb-6 flex items-center justify-between border-b border-border/40 pb-4">
         <div>
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-muted-foreground">
-            <Sparkles className="size-3.5 text-primary" />
+            <Zap className="size-3.5 text-primary" />
             <span>Campus AI</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">Ask your campus.</h1>
@@ -338,7 +322,7 @@ export function CampusAiClient() {
                       : "bg-muted-foreground/30 text-foreground"
                 )}
               >
-                {isListening ? <Mic className="size-6" /> : <Sparkles className="size-6" />}
+                {isListening ? <Mic className="size-6" /> : <Zap className="size-6" />}
               </div>
             </div>
 
@@ -391,7 +375,7 @@ export function CampusAiClient() {
           <div className="py-4 space-y-6">
             <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-xs">
               <div className="flex items-center gap-2.5 text-primary mb-2 font-black text-sm">
-                <Sparkles className="size-4" />
+                <Zap className="size-4" />
                 <span>Grounded Campus Knowledge</span>
               </div>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
@@ -524,7 +508,7 @@ export function CampusAiClient() {
         {/* Loading / Searching Status Indicator */}
         {loading && (
           <div className="flex items-center gap-2 rounded-2xl border border-border/40 bg-card/60 px-4 py-2.5 text-xs text-muted-foreground animate-pulse w-fit">
-            <Sparkles className="size-3.5 text-primary animate-spin" />
+            <Zap className="size-3.5 text-primary animate-spin" />
             <span>{toolStatus || "Analyzing campus discussions..."}</span>
           </div>
         )}

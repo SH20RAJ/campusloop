@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Sparkles, ThumbsUp } from "lucide-react";
+import { ArrowRight, Zap, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -77,7 +77,7 @@ export function SimilarResourcesWidget({ resourceId, subjectCode }: SimilarResou
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="flex size-6 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
-            <Sparkles className="size-3.5 animate-pulse" />
+            <Zap className="size-3.5 animate-pulse" />
           </span>
           <div>
             <h3 className="text-sm font-black text-foreground tracking-tight">

@@ -1,11 +1,12 @@
 "use client";
 
 import confetti from "canvas-confetti";
-import { Cake, Heart, MessageCircle, Zap } from "lucide-react";
+import { Cake, MessageCircle, PartyPopper, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { sounds } from "@/lib/sounds";
 
 interface BirthdayCardProps {
   student: {
@@ -32,13 +33,14 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
 
   function handleConfetti(e: React.MouseEvent) {
     e.stopPropagation();
+    sounds.tap();
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = (rect.left + rect.width / 2) / window.innerWidth;
     const y = (rect.top + rect.height / 2) / window.innerHeight;
 
     confetti({
-      particleCount: 50,
-      spread: 70,
+      particleCount: 60,
+      spread: 75,
       origin: { x, y },
       colors: ["#ec4899", "#8b5cf6", "#3b82f6", "#f59e0b", "#10b981"],
     });
@@ -58,17 +60,17 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
 
   return (
     <div
-      className={`group relative flex items-center justify-between p-3.5 rounded-3xl transition-all duration-300 ${
+      className={`group relative flex items-center justify-between p-3.5 sm:p-4 rounded-3xl transition-all duration-300 ${
         isToday
-          ? "bg-linear-to-r from-pink-500/10 via-purple-500/10 to-amber-500/5 border border-pink-500/30 shadow-xs hover:border-pink-500/50"
-          : "bg-card hover:bg-muted/40 shadow-2xs"
+          ? "bg-gradient-to-r from-pink-500/15 via-primary/10 to-amber-500/10 border border-pink-500/40 shadow-md hover:border-pink-500/60"
+          : "bg-card border border-border/50 hover:bg-muted/40 shadow-2xs"
       }`}
     >
       <Link href={`/@${student.username}`} className="flex items-center gap-3 min-w-0 flex-1">
         <div className="relative shrink-0">
-          <Avatar className="size-11 rounded-full border-2 border-background shadow-xs group-hover:scale-105 transition-transform">
+          <Avatar className="size-11 sm:size-12 rounded-full border-2 border-background shadow-xs group-hover:scale-105 transition-transform">
             <AvatarImage src={student.avatarUrl || ""} className="rounded-full object-cover" />
-            <AvatarFallback className="font-bold text-sm bg-primary/10 text-primary rounded-full">
+            <AvatarFallback className="font-black text-xs bg-primary/10 text-primary rounded-full">
               {(student.displayName?.[0] || "S").toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -81,10 +83,10 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
 
         <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-1.5">
-            <h4 className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">
+            <h4 className="text-xs sm:text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
               {student.displayName}
             </h4>
-            <span className="text-[#a170ff] text-[10px] font-black" title="Verified Student">
+            <span className="text-primary text-[10px] font-black" title="Verified Student">
               ✓
             </span>
           </div>
@@ -102,47 +104,44 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
         </div>
       </Link>
 
-      <div className="flex items-center gap-2 shrink-0 ml-3">
+      <div className="flex items-center gap-2 shrink-0 ml-2">
         {isToday ? (
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={handleConfetti}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95 ${
-                wished
-                  ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
-                  : "bg-pink-500 text-white hover:bg-pink-600 shadow-pink-500/20"
-              }`}
-              title="Pop confetti"
-            >
-              {wished ? <Heart className="size-3.5 fill-emerald-500" /> : <Zap className="size-3.5" />}
-              <span>{wished ? "Wished!" : "🎉 Wish"}</span>
-            </button>
-
-            <Link
-              href={`/app/chat?userId=${student.id}`}
-              className="flex size-8 items-center justify-center rounded-full bg-muted/60 hover:bg-muted text-foreground hover:text-primary transition-colors cursor-pointer"
-              title="Send DM birthday wish"
-            >
-              <MessageCircle className="size-4" />
-            </Link>
-          </div>
+          <button
+            type="button"
+            onClick={handleConfetti}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-xs select-none active:scale-95 ${
+              wished
+                ? "bg-pink-500/20 text-pink-500 border border-pink-500/40"
+                : "bg-pink-500 text-white hover:bg-pink-600 hover:scale-105"
+            }`}
+          >
+            <PartyPopper className="size-3.5" />
+            <span>{wished ? "Wished! 🥳" : "Wish 🎂"}</span>
+          </button>
         ) : (
-          <div className="text-right">
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-foreground bg-muted/60 px-2.5 py-1 rounded-full">
-              <Cake className="size-3 text-pink-500" /> {birthDateFormatted}
-            </span>
+          <div className="text-right space-y-0.5">
+            {birthDateFormatted && (
+              <span className="text-xs font-bold text-foreground block">
+                {birthDateFormatted}
+              </span>
+            )}
             {student.daysUntil !== undefined && (
-              <p className="text-[10px] text-muted-foreground mt-0.5 font-semibold">
-                {student.daysUntil === 0
-                  ? "Today! 🎉"
-                  : student.daysUntil === 1
-                    ? "Tomorrow"
-                    : `In ${student.daysUntil} days`}
-              </p>
+              <span className="text-[10px] text-muted-foreground block font-medium">
+                {student.daysUntil === 1
+                  ? "Tomorrow"
+                  : `In ${student.daysUntil} days`}
+              </span>
             )}
           </div>
         )}
+
+        <Link
+          href={`/app/chat?recipientId=${student.id}`}
+          className="size-8 rounded-full border border-border/70 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+          title="Send Direct Message"
+        >
+          <MessageCircle className="size-3.5" />
+        </Link>
       </div>
     </div>
   );

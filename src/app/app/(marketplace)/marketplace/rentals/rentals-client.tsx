@@ -1,24 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  BatteryCharging,
-  Bike,
-  CalendarCheck2,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  Fuel,
-  Gauge,
-  History,
-  KeyRound,
-  MapPin,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  Zap,
-} from "lucide-react";
+import { ArrowLeft, BatteryCharging, Bike, CalendarCheck2, CheckCircle2, ChevronRight, Clock, Fuel, Gauge, History, KeyRound, MapPin, Search, ShieldCheck, Zap, Star } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import useSWR from "swr";

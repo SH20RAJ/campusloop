@@ -1,18 +1,6 @@
 "use client";
 
-import {
-  Check,
-  Copy,
-  Download,
-  MessageCircle,
-  Palette,
-  QrCode,
-  Share2,
-  Smartphone,
-  Sparkles,
-  Square,
-  X,
-} from "lucide-react";
+import { Check, Copy, Download, MessageCircle, Palette, QrCode, Share2, Smartphone, Zap, Square, X } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -753,7 +741,7 @@ export function BrandedQrModal({
             <div>
               <h2 className="text-sm font-black text-foreground tracking-tight flex items-center gap-1.5">
                 Share QR Code
-                <Sparkles className="size-3 text-primary animate-pulse" />
+                <Zap className="size-3 text-primary animate-pulse" />
               </h2>
               <p className="text-[11px] text-muted-foreground font-medium">
                 High-res scannable badge for campus sharing

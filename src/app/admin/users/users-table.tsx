@@ -585,7 +585,7 @@ export function UsersTable({
                               </span>
                               {hasBlueBadge && (
                                 <span title="Verified Purple Badge (≥150 LP)">
-                                  <ShieldCheck className="size-3.5 fill-[#a170ff] text-background shrink-0" />
+                                  <ShieldCheck className="size-3.5 fill-brand text-background shrink-0" />
                                 </span>
                               )}
                             </div>

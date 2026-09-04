@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, GraduationCap, Sparkles, Zap } from "lucide-react";
+import { ArrowLeft, BookOpen, GraduationCap, Zap } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FirstVisitNotificationPrompt } from "@/components/notifications/first-visit-notification-prompt";

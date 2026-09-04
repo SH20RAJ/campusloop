@@ -1,17 +1,22 @@
 "use client";
 
 import {
+  Cake,
+  Calendar,
   Globe,
   GraduationCap,
   Hash,
   MapPin,
   MessageCircle,
   MoreHorizontal,
+  PartyPopper,
+  Plus,
   School,
   Search,
   ShieldCheck,
   Users,
   X,
+  Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -474,7 +479,7 @@ export function DiscoverFeed() {
                                   {user.displayName}
                                 </span>
                                 {(user.points || 0) >= 150 && (
-                                  <ShieldCheck className="size-4 text-[#a170ff] shrink-0" />
+                                  <ShieldCheck className="size-4 text-brand shrink-0" />
                                 )}
                                 <span className="text-xs text-muted-foreground">@{user.username}</span>
                               </div>
@@ -700,6 +705,116 @@ export function DiscoverFeed() {
                 </div>
               )}
 
+              {/* ─── Campus Events & Club Organizer Option ─── */}
+              <div className="border-b border-border/30 pb-4 px-4 pt-1">
+                <div className="rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/15 via-card to-background p-4 sm:p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="size-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
+                        <Calendar className="size-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black text-foreground">Host a Campus Event 🎉</h3>
+                        <p className="text-[11px] text-muted-foreground">Club meets, hostel fests, hackathons &amp; LANs</p>
+                      </div>
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
+                      Open to All
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Organize your club meeting, wing tournament, branch orientation, or campus cultural night with verified student RSVPs, live headcount, and push reminders.
+                  </p>
+
+                  <div className="flex items-center gap-2 pt-1 flex-wrap">
+                    <Link
+                      href="/app/events/new"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-all shadow-xs"
+                    >
+                      <Plus className="size-3.5" />
+                      <span>Organize Event</span>
+                    </Link>
+
+                    <Link
+                      href="/app/events"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-bold transition-colors"
+                    >
+                      <Calendar className="size-3.5" />
+                      <span>Explore Events Calendar</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* ─── Default Communities & Hubs ─── */}
+              <div className="border-b border-border/30 pb-4 px-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-[17px] font-black text-foreground tracking-tight flex items-center gap-2">
+                      <Users className="size-4 text-primary" />
+                      <span>Campus Communities</span>
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Student interest groups &amp; sub-hubs</p>
+                  </div>
+                  <Link
+                    href="/app/communities"
+                    className="text-xs font-bold text-primary hover:underline"
+                  >
+                    View all
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                  {[
+                    { name: "Coding & Tech", icon: "💻", href: "/app/communities?category=TECH", desc: "Devs & CP" },
+                    { name: "Music & Arts", icon: "🎸", href: "/app/communities?category=MUSIC", desc: "Jams & bands" },
+                    { name: "Hostel Life", icon: "🏢", href: "/app/communities?category=HOSTEL", desc: "Wing banter" },
+                    { name: "Placement Prep", icon: "🎯", href: "/app/communities?category=CAREER", desc: "OA & interviews" },
+                    { name: "Esports Arena", icon: "🎮", href: "/app/gaming", desc: "Tournaments" },
+                    { name: "Study Vault", icon: "📚", href: "/app/academics", desc: "Notes & PYQs" },
+                  ].map((hub) => (
+                    <Link
+                      key={hub.name}
+                      href={hub.href}
+                      className="p-3 rounded-2xl border border-border/50 bg-card hover:bg-muted/40 transition-colors block space-y-1 shadow-2xs group"
+                    >
+                      <div className="text-lg">{hub.icon}</div>
+                      <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                        {hub.name}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground truncate">{hub.desc}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* ─── Indirect Campus Birthdays Banner ─── */}
+              <div className="border-b border-border/30 pb-4 px-4">
+                <Link
+                  href="/app/birthdays"
+                  className="flex items-center justify-between p-3.5 sm:p-4 rounded-3xl border border-pink-500/30 bg-gradient-to-r from-pink-500/10 via-purple-500/5 to-card hover:border-pink-500/50 transition-all shadow-2xs group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-2xl bg-pink-500/15 text-pink-500 flex items-center justify-center shrink-0">
+                      <Cake className="size-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-black text-foreground group-hover:text-pink-500 transition-colors flex items-center gap-1.5">
+                        <span>Campus Birthdays Today</span>
+                        <PartyPopper className="size-3.5 text-pink-500 animate-bounce" />
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground">
+                        Pop confetti, send anonymous wishes &amp; view student milestones
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold text-pink-500 shrink-0 ml-2">
+                    Open Board →
+                  </span>
+                </Link>
+              </div>
+
               {/* Who to Follow / Connect */}
               {suggestedPeers && suggestedPeers.length > 0 && (
                 <div className="border-b border-border/30 pb-4 px-4 space-y-3">
@@ -722,7 +837,7 @@ export function DiscoverFeed() {
                                   {peer.displayName}
                                 </p>
                                 {(peer.points || 0) >= 150 && (
-                                  <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />
+                                  <ShieldCheck className="size-3.5 text-brand shrink-0" />
                                 )}
                               </div>
                               <p className="text-xs text-muted-foreground truncate">@{peer.username}</p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Loader2, School, Sparkles, X } from "lucide-react";
+import { ArrowLeft, Loader2, School, Zap, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -61,7 +61,7 @@ export function LikesClient() {
           <ArrowLeft className="size-4.5" />
         </Link>
         <h1 className="flex items-center gap-2 text-base font-black tracking-tight text-foreground">
-          <Sparkles className="size-4 text-primary" />
+          <Zap className="size-4 text-primary" />
           <span>Likes you</span>
           {likes.length > 0 && (
             <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
@@ -79,7 +79,7 @@ export function LikesClient() {
         ) : likes.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-24 text-center">
             <div className="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
-              <Sparkles className="size-7" />
+              <Zap className="size-7" />
             </div>
             <div>
               <p className="text-base font-bold text-foreground">No matches yet</p>
@@ -136,7 +136,7 @@ export function LikesClient() {
                       aria-label={`Match with ${admirer.displayName}`}
                       className="flex h-8 flex-1 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-95 cursor-pointer"
                     >
-                      <Sparkles className="size-4" />
+                      <Zap className="size-4" />
                     </button>
                   </div>
                 </div>

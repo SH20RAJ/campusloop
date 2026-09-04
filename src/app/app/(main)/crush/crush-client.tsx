@@ -329,7 +329,7 @@ export function CrushClient() {
                     <div className="min-w-0">
                       <p className="text-xs font-black text-foreground truncate group-hover:text-primary transition-colors flex items-center gap-1">
                         <span>{slot.target?.displayName}</span>
-                        <ShieldCheck className="size-3 text-[#a170ff] shrink-0" />
+                        <ShieldCheck className="size-3 text-brand shrink-0" />
                       </p>
                       <p className="text-[10px] text-muted-foreground truncate">
                         @{slot.target?.username} {slot.target?.branch ? `• ${slot.target.branch}` : ""}
@@ -387,7 +387,7 @@ export function CrushClient() {
       {/* ─── Safety & Anonymity Callout ─── */}
       <div className="rounded-2xl border border-border/40 bg-muted/20 p-4 text-xs text-muted-foreground space-y-1.5">
         <p className="font-bold text-foreground flex items-center gap-1.5">
-          <ShieldCheck className="size-4 text-[#a170ff]" />
+          <ShieldCheck className="size-4 text-brand" />
           How Secret Crush Works
         </p>
         <p className="text-[11px] leading-relaxed">

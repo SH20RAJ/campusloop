@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Camera,
-  EyeOff,
-  Globe,
-  Heart,
-  Lock,
-  RotateCcw,
-  ShieldCheck,
-  SlidersHorizontal,
-  Sparkles,
-} from "lucide-react";
+import { ArrowLeft, Camera, EyeOff, Globe, Heart, Lock, RotateCcw, ShieldCheck, SlidersHorizontal, Zap } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -269,7 +258,7 @@ export function DatingAppClient() {
         {genderGateRequired ? (
           <div className="m-auto w-full max-w-sm space-y-5 rounded-3xl border border-border/70 bg-card p-6 text-center shadow-lg">
             <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20">
-              <Sparkles className="size-7" />
+              <Zap className="size-7" />
             </div>
             <div>
               <h2 className="text-lg font-black text-foreground">Select your gender</h2>
@@ -322,7 +311,7 @@ export function DatingAppClient() {
         ) : (
           <div className="m-auto w-full max-w-sm space-y-4 rounded-3xl border border-dashed border-border/80 bg-card/60 p-8 text-center shadow-xs">
             <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20">
-              <Sparkles className="size-7" />
+              <Zap className="size-7" />
             </div>
             <div>
               <h3 className="text-base font-black text-foreground">That&apos;s everyone for now</h3>

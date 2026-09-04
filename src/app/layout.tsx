@@ -1,6 +1,8 @@
 import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import type { Metadata, Viewport } from "next";
 import { Toaster } from "sonner";
+import { Suspense } from "react";
+import { ReferralTracker } from "@/components/analytics/referral-tracker";
 import { SWRProvider } from "@/components/providers/swr-provider";
 import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
 import { OfflineIndicator } from "@/components/ui/offline-indicator";
@@ -318,6 +320,9 @@ export default function RootLayout({
         <HexclaveProvider app={hexclaveServerApp}>
           <HexclaveTheme>
             <SWRProvider>
+              <Suspense fallback={null}>
+                <ReferralTracker />
+              </Suspense>
               <RouteProgress />
               <OfflineIndicator />
               {children}

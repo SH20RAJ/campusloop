@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  Bookmark,
-  ChevronRight,
-  GraduationCap,
-  MessageSquare,
-  Sparkles,
-  ThumbsUp,
-  UploadCloud,
-  X,
-  Zap,
-} from "lucide-react";
+import { Bookmark, ChevronRight, GraduationCap, MessageSquare, Zap, ThumbsUp, UploadCloud, X } from "lucide-react";
 import Link from "next/link";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { sounds } from "@/lib/sounds";
@@ -60,7 +50,7 @@ export function AcademicAuthModal({
     AI: {
       title: "Unlock Campus AI Study Cram Assistant",
       subtitle: "Instant 15-minute exam summaries, key formulas, and chapter breakdowns.",
-      icon: Sparkles,
+      icon: Zap,
       color: "text-cyan-400",
       bg: "bg-cyan-500/15",
     },

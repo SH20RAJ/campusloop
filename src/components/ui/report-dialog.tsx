@@ -1,13 +1,22 @@
 "use client";
 
-import { XIcon } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronDown, Loader2, X } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface ReportDialogProps {
   postId: string;
   isOpen: boolean;
   onClose: () => void;
 }
+
+const REPORT_REASONS = [
+  { value: "HARASSMENT", label: "Harassment or Bullying" },
+  { value: "DOXXING", label: "Doxxing or Personal Info" },
+  { value: "HATE_SPEECH", label: "Hate Speech" },
+  { value: "SPAM", label: "Spam or Misleading" },
+  { value: "OTHER", label: "Other Campus Guideline Violation" },
+];
 
 export function ReportDialog({ postId, isOpen, onClose }: ReportDialogProps) {
   const [reason, setReason] = useState("HARASSMENT");
@@ -35,11 +44,12 @@ export function ReportDialog({ postId, isOpen, onClose }: ReportDialogProps) {
       }
 
       setSuccess(true);
+      toast.success("Thank you. The report has been submitted to campus moderators.");
       setTimeout(() => {
         setSuccess(false);
         setDetails("");
         onClose();
-      }, 1500);
+      }, 1200);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -48,81 +58,109 @@ export function ReportDialog({ postId, isOpen, onClose }: ReportDialogProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg animate-in fade-in zoom-in-95">
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-150"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md rounded-3xl border border-border/80 bg-card p-6 shadow-2xl animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
+          type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity"
+          className="absolute right-4 top-4 size-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
+          aria-label="Close"
         >
-          <XIcon className="h-4 w-4" />
+          <X className="size-4" />
         </button>
 
-        <h2 className="text-lg font-semibold tracking-tight mb-4">Report Post</h2>
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="size-9 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center">
+            <AlertTriangle className="size-5" />
+          </div>
+          <div>
+            <h2 className="text-base font-black tracking-tight text-foreground">Report Post</h2>
+            <p className="text-xs text-muted-foreground">Keep your campus safe and constructive</p>
+          </div>
+        </div>
 
         {success ? (
-          <div className="py-6 text-center text-sm font-medium text-green-500">
-            Thank you. The report has been submitted for review.
+          <div className="py-8 text-center space-y-2">
+            <CheckCircle2 className="size-10 text-emerald-500 mx-auto animate-bounce" />
+            <p className="text-sm font-bold text-foreground">Report Submitted</p>
+            <p className="text-xs text-muted-foreground">Our campus safety team will review this shortly.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <label
-                htmlFor="reason"
-                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                htmlFor="report-reason"
+                className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
               >
                 Reason
               </label>
-              <select
-                id="reason"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none focus:border-ring"
-              >
-                <option value="HARASSMENT">Harassment or Bullying</option>
-                <option value="DOXXING">Doxxing or Personal Info</option>
-                <option value="HATE_SPEECH">Hate Speech</option>
-                <option value="SPAM">Spam or Misleading</option>
-                <option value="OTHER">Other Violation</option>
-              </select>
+              <div className="relative">
+                <select
+                  id="report-reason"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  className="w-full appearance-none rounded-xl border border-border/70 bg-muted/40 px-3.5 py-2.5 text-xs text-foreground font-semibold shadow-xs outline-none focus:ring-1 focus:ring-primary cursor-pointer pr-9"
+                >
+                  {REPORT_REASONS.map((r) => (
+                    <option key={r.value} value={r.value} className="bg-card text-foreground">
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <label
-                htmlFor="details"
-                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                htmlFor="report-details"
+                className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
               >
                 Details (Optional)
               </label>
               <textarea
-                id="details"
+                id="report-details"
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 rows={3}
-                placeholder="Provide additional details..."
-                className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                placeholder="Explain the context for moderators..."
+                className="w-full rounded-xl border border-border/70 bg-muted/30 px-3.5 py-2.5 text-xs text-foreground shadow-xs placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary resize-none"
               />
             </div>
 
             {error && (
-              <div className="rounded-md bg-destructive/15 p-3 text-xs text-destructive border border-destructive/20">
+              <div className="rounded-xl bg-destructive/15 p-3 text-xs text-destructive border border-destructive/20 font-medium">
                 {error}
               </div>
             )}
 
-            <div className="flex gap-3 justify-end pt-2">
+            <div className="flex gap-2.5 justify-end pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-md border border-input h-9 px-4 text-sm font-medium hover:bg-muted"
+                className="rounded-xl border border-border/80 px-4 py-2 text-xs font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="rounded-md bg-destructive h-9 px-4 text-sm font-medium text-white shadow-sm hover:bg-destructive/90 disabled:opacity-50"
+                className="rounded-xl bg-destructive px-5 py-2 text-xs font-bold text-white shadow-xs hover:bg-destructive/90 transition-all cursor-pointer select-none disabled:opacity-50 flex items-center gap-1.5"
               >
-                {isLoading ? "Submitting..." : "Report"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <span>Report</span>
+                )}
               </button>
             </div>
           </form>

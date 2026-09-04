@@ -51,7 +51,7 @@ export function FollowListRow({
               {user.displayName}
             </span>
             {user.points >= 150 && (
-              <span className="text-[#a170ff] text-xs font-bold" title="Verified Campus Star">
+              <span className="text-brand text-xs font-bold" title="Verified Campus Star">
                 ✓
               </span>
             )}

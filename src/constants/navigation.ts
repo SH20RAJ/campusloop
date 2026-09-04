@@ -1,36 +1,6 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  Building2,
-  Cake,
-  Calendar,
-  Car,
-  Gamepad2,
-  HelpCircle,
-  Hourglass,
-  MoreHorizontal,
-  School,
-  Sliders,
-} from "lucide-react";
-import {
-  AnimateBellRing,
-  AnimateBookmark,
-  AnimateBookOpen,
-  AnimateCompass,
-  AnimateFlame,
-  AnimateGraduationCap,
-  AnimateHeart,
-  AnimateHouse,
-  AnimateLock,
-  AnimateMessageSquare,
-  AnimatePlus,
-  AnimateSearch,
-  AnimateShieldCheck,
-  AnimateShoppingBag,
-  AnimateSparkles,
-  AnimateUser,
-  AnimateUsers,
-  AnimateZap,
-} from "@/components/ui/animated-icon";
+import { Building2, Cake, Calendar, Car, Gamepad2, HelpCircle, Hourglass, MoreHorizontal, School, Sliders } from "lucide-react";
+import { AnimateBellRing, AnimateBookmark, AnimateBookOpen, AnimateCompass, AnimateFlame, AnimateGraduationCap, AnimateHeart, AnimateHouse, AnimateLock, AnimateMessageSquare, AnimatePlus, AnimateSearch, AnimateShieldCheck, AnimateShoppingBag, AnimateZap, AnimateUser, AnimateUsers } from "@/components/ui/animated-icon";
 
 export interface NavItem {
   icon: LucideIcon | React.ComponentType<any>;
@@ -108,7 +78,7 @@ export const MORE_HUB_SECTIONS: NavGroup[] = [
         badgeColor: "bg-indigo-500/15 text-indigo-500 border-indigo-500/30",
       },
       {
-        icon: AnimateSparkles,
+        icon: AnimateZap,
         href: "/app/ai",
         label: "Campus AI Assistant",
         desc: "Ask about campus fests, study roadmaps, hostel tips & navigate CampusLoop",

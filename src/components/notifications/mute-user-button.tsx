@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, BellOff, Check, Loader2, MessageCircle, Sparkles } from "lucide-react";
+import { Bell, BellOff, Check, Loader2, MessageCircle, Zap } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { type MuteChannel, useUserMute } from "@/hooks/use-notification-preferences";
@@ -24,7 +24,7 @@ const OPTIONS: MuteOption[] = [
     channel: "POST",
     label: "Their posts",
     hint: "Stop post alerts, keep them in your feed",
-    icon: Sparkles,
+    icon: Zap,
   },
   {
     channel: "MESSAGE",

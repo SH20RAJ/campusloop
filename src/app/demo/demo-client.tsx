@@ -1,23 +1,6 @@
 "use client";
 
-import {
-  ArrowRight,
-  Award,
-  Check,
-  Compass,
-  Copy,
-  Heart,
-  Hourglass,
-  KeyRound,
-  Mail,
-  MessageSquare,
-  Repeat2,
-  School,
-  Share2,
-  ShieldCheck,
-  ShoppingBag,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, Award, Check, Compass, Copy, Heart, Hourglass, KeyRound, Mail, MessageSquare, Repeat2, School, Share2, ShieldCheck, ShoppingBag, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -150,7 +133,7 @@ export function DemoClient() {
             variant="secondary"
             className="rounded-full px-3.5 py-1 text-xs font-semibold bg-primary/10 text-primary border-primary/20"
           >
-            <Sparkles className="mr-1.5 size-3.5" />
+            <Zap className="mr-1.5 size-3.5" />
             Public Investor &amp; Evaluator Access
           </Badge>
 

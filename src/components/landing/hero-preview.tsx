@@ -1,26 +1,7 @@
 "use client";
 
-import {
-  BadgeCheck,
-  Bike,
-  CheckCircle2,
-  Flame,
-  Heart,
-  Lock,
-  MessageCircle,
-  Repeat,
-  Send,
-  Sparkles,
-  Zap,
-} from "lucide-react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "motion/react";
+import { BadgeCheck, Bike, CheckCircle2, Flame, Heart, Lock, MessageCircle, Repeat, Send, Zap } from "lucide-react";
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -490,7 +471,7 @@ export function HeroPreview() {
                   <CardContent className="space-y-2 p-3.5">
                     <div className="flex items-center justify-between">
                       <Badge className="bg-pink-500/15 text-pink-500 border-pink-500/30 text-[10px] font-bold gap-1">
-                        <Sparkles className="size-2.5" />
+                        <Zap className="size-2.5" />
                         Crush Alert
                       </Badge>
                       <span className="text-[10px] font-bold text-pink-500">Just Now</span>

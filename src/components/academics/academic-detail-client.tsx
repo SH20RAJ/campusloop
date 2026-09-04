@@ -1,25 +1,6 @@
 "use client";
 
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowUp,
-  Bookmark,
-  BookOpen,
-  Bot,
-  CheckCircle2,
-  ChevronRight,
-  Download,
-  ExternalLink,
-  Eye,
-  FileText,
-  Maximize2,
-  Minimize2,
-  Send,
-  Share2,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Bookmark, BookOpen, Bot, CheckCircle2, ChevronRight, Download, ExternalLink, Eye, FileText, Maximize2, Minimize2, Send, Share2, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -362,7 +343,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
                 >
                   {resource.uploader?.displayName}
                 </Link>
-                {resource.isVerified && <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />}
+                {resource.isVerified && <ShieldCheck className="size-3.5 text-brand shrink-0" />}
                 <span className="text-[11px] text-muted-foreground truncate">
                   @{resource.uploader?.username}
                 </span>
@@ -489,7 +470,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
             disabled={isGeneratingAi}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-card hover:bg-muted/80 border border-border/70 text-foreground transition-all cursor-pointer active:scale-95 disabled:opacity-50"
           >
-            <Sparkles className="size-3 text-indigo-400" />
+            <Zap className="size-3 text-indigo-400" />
             <span>Core Formulas &amp; Concepts</span>
           </button>
 

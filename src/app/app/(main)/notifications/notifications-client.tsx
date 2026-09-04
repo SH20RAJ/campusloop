@@ -1,36 +1,12 @@
 "use client";
 
-import {
-  AtSign,
-  Bell,
-  Compass,
-  Eraser,
-  Heart,
-  Lock,
-  MessageCircle,
-  MoreHorizontal,
-  ShieldCheck,
-  Ticket,
-  Trash2,
-  Trophy,
-  UserPlus,
-  Zap,
-} from "lucide-react";
+import { AtSign, Bell, Compass, Eraser, Heart, Lock, MessageCircle, MoreHorizontal, ShieldCheck, Ticket, Trash2, Trophy, UserPlus, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
-import {
-  AnimateCheckCheck,
-  AnimatedIcon,
-  AnimateHeart,
-  AnimateMessageCircle,
-  AnimateRepeat2,
-  AnimateSend,
-  AnimateSparkles,
-  AnimateUsers,
-} from "@/components/ui/animated-icon";
+import { AnimateCheckCheck, AnimatedIcon, AnimateHeart, AnimateMessageCircle, AnimateRepeat2, AnimateSend, AnimateZap, AnimateUsers } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { type NotificationItem, type NotificationTab, useNotifications } from "@/hooks/use-notifications";
@@ -92,8 +68,8 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
         };
       case "COMMENT":
         return {
-          icon: <AnimateMessageCircle size={14} className="text-[#a170ff]" />,
-          badgeBg: "bg-[#a170ff]/15 border-[#a170ff]/30 text-[#a170ff]",
+          icon: <AnimateMessageCircle size={14} className="text-brand" />,
+          badgeBg: "bg-brand/15 border-brand/30 text-brand",
           actionText: "replied to your discussion",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
           actionLabel: "Reply",
@@ -101,8 +77,8 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
       case "REPLY":
       case "STORY_REPLY":
         return {
-          icon: <AnimateMessageCircle size={14} className="text-[#a170ff]" />,
-          badgeBg: "bg-[#a170ff]/15 border-[#a170ff]/30 text-[#a170ff]",
+          icon: <AnimateMessageCircle size={14} className="text-brand" />,
+          badgeBg: "bg-brand/15 border-brand/30 text-brand",
           actionText: "replied to your comment",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
           actionLabel: "Reply",
@@ -173,7 +149,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
         };
       case "NEW_POST":
         return {
-          icon: <AnimateSparkles size={14} className="text-violet-500" />,
+          icon: <AnimateZap size={14} className="text-violet-500" />,
           badgeBg: "bg-violet-500/15 border-violet-500/30 text-violet-500",
           actionText: "posted something new",
           href: n.referenceId ? `/app/post/${n.referenceId}` : "/app",
@@ -408,7 +384,7 @@ export function NotificationsClient({ initialNotifications, initialUnreadCount }
                     {n.actor?.displayName || "A Student"}
                   </Link>
 
-                  {isVerified && <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />}
+                  {isVerified && <ShieldCheck className="size-3.5 text-brand shrink-0" />}
 
                   <span className="text-muted-foreground font-medium">@{n.actor?.username || "student"}</span>
 

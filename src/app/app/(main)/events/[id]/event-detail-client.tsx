@@ -1,21 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Bell,
-  Calendar,
-  Check,
-  Download,
-  ExternalLink,
-  Gift,
-  MapPin,
-  QrCode,
-  School,
-  Share2,
-  Sparkles,
-  Trophy,
-  Users,
-} from "lucide-react";
+import { ArrowLeft, Bell, Calendar, Check, Download, ExternalLink, Gift, MapPin, QrCode, School, Share2, Zap, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -547,7 +532,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
           <div className="space-y-3 pt-6 border-t border-border/40">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-black tracking-tight text-foreground flex items-center gap-1.5">
-                <Sparkles className="size-4 text-primary" />
+                <Zap className="size-4 text-primary" />
                 <span>Similar Campus Events</span>
               </h2>
               <Link

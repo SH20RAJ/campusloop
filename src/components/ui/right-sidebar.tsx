@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Clock, MoreHorizontal, Plus, RotateCw, Search, ShieldCheck, Sparkles, Trophy, Users } from "lucide-react";
+import { Calendar, Clock, MoreHorizontal, Plus, RotateCw, Search, ShieldCheck, Zap, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -120,7 +120,7 @@ export function RightSidebar() {
           {/* Host Event Action Card */}
           <div className="rounded-2xl border border-primary/30 bg-linear-to-br from-primary/15 via-background to-card p-4 space-y-2.5">
             <div className="flex items-center gap-2 text-primary font-black text-xs">
-              <Sparkles className="size-4" />
+              <Zap className="size-4" />
               <span>Organising on Campus?</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
@@ -276,7 +276,7 @@ export function RightSidebar() {
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-black text-foreground truncate group-hover:underline flex items-center gap-1">
                         <span>{peer.displayName}</span>
-                        {peer.points >= 150 && <ShieldCheck className="size-3.5 text-[#a170ff] shrink-0" />}
+                        {peer.points >= 150 && <ShieldCheck className="size-3.5 text-brand shrink-0" />}
                       </p>
                       <p className="text-[11px] text-muted-foreground truncate">@{peer.username}</p>
                     </div>

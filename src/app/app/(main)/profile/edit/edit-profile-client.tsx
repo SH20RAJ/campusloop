@@ -1,24 +1,6 @@
 "use client";
 
-import {
-  AlertCircle,
-  ArrowLeft,
-  Cake,
-  Camera,
-  Check,
-  Image as ImageIcon,
-  Loader2,
-  Lock,
-  Move,
-  Plus,
-  Save,
-  ShieldCheck,
-  Sparkles,
-  User,
-  VenetianMask,
-  X,
-  Zap,
-} from "lucide-react";
+import { AlertCircle, ArrowLeft, Cake, Camera, Check, Image as ImageIcon, Loader2, Lock, Move, Plus, Save, ShieldCheck, Zap, User, VenetianMask, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -424,7 +406,7 @@ export function EditProfileClient() {
                   className="py-1.5 px-2.5 rounded-xl border border-border/50 text-muted-foreground hover:text-foreground text-[11px] font-semibold hover:bg-muted/40 transition-all cursor-pointer flex items-center gap-1 opacity-70 hover:opacity-100"
                   title="Use cartoon illustration (reduces match reach)"
                 >
-                  <Sparkles className="size-3" /> Cartoon Illustration
+                  <Zap className="size-3" /> Cartoon Illustration
                 </button>
               </div>
             </div>
@@ -668,7 +650,7 @@ export function EditProfileClient() {
         {/* ─── Academic Info with Presets ─── */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">
           <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-            <ShieldCheck className="size-3.5 text-[#a170ff]" /> Academic & Campus Info
+            <ShieldCheck className="size-3.5 text-brand" /> Academic & Campus Info
           </h3>
 
           <div className="space-y-3">

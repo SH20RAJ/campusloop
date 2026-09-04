@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Download, Printer, QrCode, Sparkles } from "lucide-react";
+import { Copy, Download, Printer, QrCode, Zap } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -96,7 +96,7 @@ export function MerchantQrClient() {
         <h1 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
           <QrCode className="size-5 text-primary" />
           <span>Offline QR Codes &amp; Table Posters</span>
-          <Sparkles className="size-4 text-primary animate-pulse" />
+          <Zap className="size-4 text-primary animate-pulse" />
         </h1>
         <p className="text-xs text-muted-foreground mt-0.5">
           Print ultra high-resolution table standees and counter checkout posters with embedded CampusLoop

@@ -1,28 +1,6 @@
 "use client";
 
-import {
-  ArrowRight,
-  Check,
-  CheckCircle,
-  ChevronDown,
-  Coins,
-  Copy,
-  ExternalLink,
-  Flame,
-  GraduationCap,
-  Heart,
-  Info,
-  KeyRound,
-  Lock,
-  MessageSquare,
-  Shield,
-  ShieldAlert,
-  ShieldCheck,
-  Smartphone,
-  Sparkles,
-  XCircle,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, Check, CheckCircle, ChevronDown, Coins, Copy, ExternalLink, Flame, GraduationCap, Heart, Info, KeyRound, Lock, MessageSquare, Shield, ShieldAlert, ShieldCheck, Smartphone, Zap, XCircle } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -357,7 +335,7 @@ export function AboutClient() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
             <div className="space-y-1.5">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-0.5 text-[11px] font-black text-emerald-600 dark:text-emerald-400">
-                <Sparkles className="h-3.5 w-3.5" /> Full Verified Access • Pre-Seeded Activities
+                <Zap className="h-3.5 w-3.5" /> Full Verified Access • Pre-Seeded Activities
               </div>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-foreground">
                 Public Testing &amp;{" "}

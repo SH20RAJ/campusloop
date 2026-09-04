@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
 import { FollowButton } from "@/components/profile/follow-button";
@@ -67,7 +67,7 @@ export function FeedRecommendedUsers({ className }: FeedRecommendedUsersProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="flex size-6 items-center justify-center rounded-lg bg-primary/15 text-primary">
-            <Sparkles className="size-3.5" />
+            <Zap className="size-3.5" />
           </div>
           <div>
             <h3 className="text-[14px] font-black text-foreground tracking-tight flex items-center gap-1.5">

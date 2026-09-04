@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Bookmark,
-  ChevronRight,
-  GraduationCap,
-  MessageSquare,
-  ShieldCheck,
-  Sparkles,
-  Zap,
-} from "lucide-react";
+import { Bookmark, ChevronRight, GraduationCap, MessageSquare, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -84,7 +76,7 @@ export function AcademicAuthBenefitsCard({ returnTo, className }: AcademicAuthBe
 
         <div className="flex items-start gap-2.5 p-2.5 rounded-2xl bg-card/80 border border-border/50">
           <div className="flex size-7 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400 shrink-0">
-            <Sparkles className="size-3.5" />
+            <Zap className="size-3.5" />
           </div>
           <div className="text-xs">
             <p className="font-bold text-foreground">AI Study Cram &amp; Formulas</p>

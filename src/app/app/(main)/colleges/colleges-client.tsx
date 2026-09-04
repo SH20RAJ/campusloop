@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  Building2,
-  ChevronLeft,
-  ChevronRight,
-  Crown,
-  Flame,
-  Medal,
-  Plus,
-  School,
-  Search,
-  Sparkles,
-  Trophy,
-  X,
-  Zap,
-} from "lucide-react";
+import { Building2, ChevronLeft, ChevronRight, Crown, Flame, Medal, Plus, School, Search, Zap, Trophy, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -553,7 +539,7 @@ export default function CollegesClient() {
                       </p>
                     </div>
                     <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                      <Sparkles className="size-3" /> Season 1 Live
+                      <Zap className="size-3" /> Season 1 Live
                     </span>
                   </div>
 

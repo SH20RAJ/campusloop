@@ -243,7 +243,7 @@ export function ChatUserInfoDrawer({
             <h3 className="text-base font-black text-foreground flex items-center justify-center gap-1.5">
               <span>{otherParticipant.displayName}</span>
               {(otherParticipant.points || 0) >= 150 && (
-                <ShieldCheck className="size-4 text-[#a170ff] shrink-0" />
+                <ShieldCheck className="size-4 text-brand shrink-0" />
               )}
             </h3>
             <p className="text-xs text-muted-foreground">@{otherParticipant.username}</p>

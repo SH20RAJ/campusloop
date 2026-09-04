@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, BookOpen, Clock, Flame, Gift, Hash, Heart, Sparkles, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Clock, Flame, Gift, Hash, Heart, Zap, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -117,7 +117,7 @@ export function InlineDatingWidget() {
     <div className="py-3 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none">
       <div className="flex items-center gap-3 min-w-0">
         <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-          <Sparkles className="size-5 text-primary" />
+          <Zap className="size-5 text-primary" />
         </div>
 
         <div className="space-y-0.5 min-w-0">

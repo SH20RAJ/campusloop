@@ -33,9 +33,9 @@ export type FeedPost = {
 export type FeedFilter = "trending" | "latest" | "confessions" | "polls" | "questions";
 
 const published = and(eq(posts.status, "PUBLISHED"), eq(posts.isSeeded, false));
-const commentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)`;
-const voteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id}), 0)`;
-const reportCountSql = sql<number>`coalesce((select count(*)::int from ${reports} where ${reports.targetType} = 'POST' and ${reports.targetId} = ${posts.id}), 0)`;
+const commentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = "posts"."id" and ${comments.status} = 'PUBLISHED'), 0)`;
+const voteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = "posts"."id"), 0)`;
+const reportCountSql = sql<number>`coalesce((select count(*)::int from ${reports} where ${reports.targetType} = 'POST' and ${reports.targetId} = "posts"."id"), 0)`;
 const trendingSql = sql<number>`(${voteScoreSql} + ${commentCountSql} - ${reportCountSql})`;
 
 function filterCondition(filter: FeedFilter) {
@@ -193,10 +193,10 @@ export type ApiFeedSort =
   | "most_discussed"
   | "random";
 
-const recentVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id} and ${votes.createdAt} > now() - interval '7 days'), 0)`;
-const recentCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED' and ${comments.createdAt} > now() - interval '7 days'), 0)`;
-const totalVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id}), 0)`;
-const totalCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)`;
+const recentVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = "posts"."id" and ${votes.createdAt} > now() - interval '7 days'), 0)`;
+const recentCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = "posts"."id" and ${comments.status} = 'PUBLISHED' and ${comments.createdAt} > now() - interval '7 days'), 0)`;
+const totalVoteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = "posts"."id"), 0)`;
+const totalCommentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = "posts"."id" and ${comments.status} = 'PUBLISHED'), 0)`;
 const hoursSinceSql = sql<number>`(extract(epoch from (now() - ${posts.createdAt})) / 3600.0)`;
 
 /**
@@ -303,11 +303,11 @@ function getForYouScoreSql(
       : sql<number>`0.0`;
 
   const alreadyVotedPenaltySql = viewerProfileId
-    ? sql<number>`(case when exists(select 1 from ${votes} where ${votes.postId} = ${posts.id} and ${votes.userId} = ${viewerProfileId}) then -120.0 else 0.0 end)`
+    ? sql<number>`(case when exists(select 1 from ${votes} where ${votes.postId} = "posts"."id" and ${votes.userId} = ${viewerProfileId}) then -120.0 else 0.0 end)`
     : sql<number>`0.0`;
 
   const alreadyCommentedPenaltySql = viewerProfileId
-    ? sql<number>`(case when exists(select 1 from ${comments} where ${comments.postId} = ${posts.id} and ${comments.authorId} = ${viewerProfileId} and ${comments.status} = 'PUBLISHED') then -90.0 else 0.0 end)`
+    ? sql<number>`(case when exists(select 1 from ${comments} where ${comments.postId} = "posts"."id" and ${comments.authorId} = ${viewerProfileId} and ${comments.status} = 'PUBLISHED') then -90.0 else 0.0 end)`
     : sql<number>`0.0`;
 
   const ownPostPenaltySql = viewerProfileId
@@ -532,16 +532,23 @@ export async function resolveFeedPage(options: {
   });
 
   const byId = new Map(
-    hydrated.map((post) => [
-      post.id,
-      {
-        ...post,
-        _counts: countsMap.get(post.id) || {
-          commentCount: post.comments?.length || 0,
-          voteScore: post.votes?.reduce((acc, v) => acc + (v?.value || 0), 0) || 0,
+    hydrated.map((post) => {
+      const dbCounts = countsMap.get(post.id);
+      const computedVoteScore = post.votes?.reduce((acc, v) => acc + (v?.value || 0), 0) || 0;
+      return [
+        post.id,
+        {
+          ...post,
+          _counts: {
+            commentCount: dbCounts?.commentCount ?? (post.comments?.length || 0),
+            voteScore:
+              dbCounts !== undefined
+                ? Math.max(Number(dbCounts.voteScore || 0), computedVoteScore)
+                : computedVoteScore,
+          },
         },
-      },
-    ])
+      ];
+    })
   );
   return ids
     .map((postId) => byId.get(postId))
@@ -612,10 +619,19 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
     const votesList = post.votes || [];
     const commentsList = post.comments || [];
     const counts = (post as any)._counts;
-    const votesCount = counts?.voteScore ?? votesList.reduce((acc, vote) => acc + (vote?.value || 0), 0);
-    const commentsCount = counts?.commentCount ?? commentsList.length;
+    const votesListSum = votesList.reduce((acc, vote) => acc + (vote?.value || 0), 0);
     const userVoteObj = votesList.find((v) => v?.userId === viewerProfileId);
     const userVote = userVoteObj ? userVoteObj.value : 0;
+    const rawVoteScore =
+      counts?.voteScore !== undefined && counts?.voteScore !== null ? Number(counts.voteScore) : undefined;
+    let votesCount = rawVoteScore !== undefined ? Math.max(rawVoteScore, votesListSum) : votesListSum;
+    if (userVote === 1 && votesCount < 1) {
+      votesCount = 1;
+    }
+    const rawCommentCount =
+      counts?.commentCount !== undefined && counts?.commentCount !== null ? Number(counts.commentCount) : undefined;
+    const commentsCount =
+      rawCommentCount !== undefined ? Math.max(rawCommentCount, commentsList.length) : commentsList.length;
 
     const formattedPollOptions = post.pollOptions?.map((opt) => {
       const optVotesList = opt.votes || [];

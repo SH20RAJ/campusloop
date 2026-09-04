@@ -33,9 +33,9 @@ export type DetailPollOption = {
 
 export async function getPostDetail(postId: string, viewerProfileId: string) {
   const db = getDb();
-  const commentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = ${posts.id} and ${comments.status} = 'PUBLISHED'), 0)`;
-  const voteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = ${posts.id}), 0)`;
-  const reportCountSql = sql<number>`coalesce((select count(*)::int from ${reports} where ${reports.targetType} = 'POST' and ${reports.targetId} = ${posts.id}), 0)`;
+  const commentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = "posts"."id" and ${comments.status} = 'PUBLISHED'), 0)`;
+  const voteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = "posts"."id"), 0)`;
+  const reportCountSql = sql<number>`coalesce((select count(*)::int from ${reports} where ${reports.targetType} = 'POST' and ${reports.targetId} = "posts"."id"), 0)`;
 
   const [post] = await db
     .select({
@@ -100,8 +100,8 @@ export async function getPostDetail(postId: string, viewerProfileId: string) {
           .select({
             id: pollOptions.id,
             text: pollOptions.text,
-            voteCount: sql<number>`coalesce((select count(*)::int from ${pollVotes} where ${pollVotes.optionId} = ${pollOptions.id}), 0)`,
-            selectedByViewer: sql<boolean>`exists(select 1 from ${pollVotes} where ${pollVotes.optionId} = ${pollOptions.id} and ${pollVotes.userId} = ${viewerProfileId})`,
+            voteCount: sql<number>`coalesce((select count(*)::int from ${pollVotes} where ${pollVotes.optionId} = "poll_options"."id"), 0)`,
+            selectedByViewer: sql<boolean>`exists(select 1 from ${pollVotes} where ${pollVotes.optionId} = "poll_options"."id" and ${pollVotes.userId} = ${viewerProfileId})`,
           })
           .from(pollOptions)
           .where(eq(pollOptions.postId, postId))

@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
           isAnonymous: posts.isAnonymous,
           createdAt: posts.createdAt,
           authorId: posts.authorId,
-          votes: sql<number>`coalesce((select count(*)::int from votes where votes.post_id = ${posts.id}), 0)`,
+          votes: sql<number>`coalesce((select count(*)::int from votes where votes.post_id = "posts"."id"), 0)`,
         })
         .from(posts)
         // An exact id paste is the common case when an admin is looking at a

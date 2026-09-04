@@ -91,6 +91,7 @@ export function FeedCardActions({
   }
 
   const isLiked = userVote === 1;
+  const effectiveVotesCount = isLiked && votesCount <= 0 ? 1 : votesCount;
 
   return (
     <div
@@ -172,7 +173,7 @@ export function FeedCardActions({
             )}
           />
         </motion.button>
-        {votesCount > 0 && (
+        {effectiveVotesCount > 0 && (
           <button
             type="button"
             onClick={(e) => {
@@ -185,7 +186,7 @@ export function FeedCardActions({
             )}
             title="View who liked this post"
           >
-            {votesCount}
+            {effectiveVotesCount}
           </button>
         )}
       </div>

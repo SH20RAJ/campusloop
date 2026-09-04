@@ -63,7 +63,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
     if (isLoading) return;
     const isUpvoted = userVote === 1;
     const newValue = isUpvoted ? 0 : 1;
-    const newCount = isUpvoted ? votesCount - 1 : votesCount + 1;
+    const newCount = isUpvoted ? Math.max(0, votesCount - 1) : votesCount + 1;
 
     if (newValue === 1) {
       sounds.pop();
@@ -275,35 +275,42 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
           )}
 
           {/* Facebook / Twitter Style Liked By Row */}
-          {votesCount > 0 && disableNavigation && (
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowLikesModal(true);
-              }}
-              className="flex items-center gap-1.5 pt-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer group w-fit"
-            >
-              <div className="size-4 rounded-full bg-rose-500 flex items-center justify-center text-white shrink-0 shadow-2xs">
-                <Heart className="size-2.5 fill-white text-white" />
-              </div>
-              <span className="font-semibold group-hover:underline">
-                {votesCount === 1 ? "1 person liked this" : `${votesCount} people liked this`}
-              </span>
-            </div>
-          )}
+          {(() => {
+            const effectiveVotesCount = userVote === 1 && votesCount <= 0 ? 1 : votesCount;
+            return (
+              <>
+                {effectiveVotesCount > 0 && disableNavigation && (
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowLikesModal(true);
+                    }}
+                    className="flex items-center gap-1.5 pt-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer group w-fit"
+                  >
+                    <div className="size-4 rounded-full bg-rose-500 flex items-center justify-center text-white shrink-0 shadow-2xs">
+                      <Heart className="size-2.5 fill-white text-white" />
+                    </div>
+                    <span className="font-semibold group-hover:underline">
+                      {effectiveVotesCount === 1 ? "1 person liked this" : `${effectiveVotesCount} people liked this`}
+                    </span>
+                  </div>
+                )}
 
-          {/* Action Bar */}
-          <FeedCardActions
-            post={post}
-            userVote={userVote}
-            votesCount={votesCount}
-            commentsCount={commentsCount}
-            onVote={handleVote}
-            onInstantRepost={() => handleExecuteRepost(false)}
-            onShare={handleSharePost}
-            onOpenComments={() => setShowCommentsModal(true)}
-            onOpenLikes={() => setShowLikesModal(true)}
-          />
+                {/* Action Bar */}
+                <FeedCardActions
+                  post={post}
+                  userVote={userVote}
+                  votesCount={effectiveVotesCount}
+                  commentsCount={commentsCount}
+                  onVote={handleVote}
+                  onInstantRepost={() => handleExecuteRepost(false)}
+                  onShare={handleSharePost}
+                  onOpenComments={() => setShowCommentsModal(true)}
+                  onOpenLikes={() => setShowLikesModal(true)}
+                />
+              </>
+            );
+          })()}
         </div>
       </div>
 

@@ -12,10 +12,10 @@
 <p align="center">
   <a href="https://campusloop.space"><strong>🌐 Live App (campusloop.space)</strong></a> •
   <a href="https://campusloop.space/demo"><strong>🔑 Demo Access (/demo)</strong></a> •
+  <a href="docs/PROJECT_BRIEF.md"><strong>📑 Project Brief & Viral Playbook</strong></a> •
   <a href="ARCHITECTURE.md"><strong>🏛️ System Architecture</strong></a> •
   <a href="https://campusloop.space/overview"><strong>📊 Strategic Overview</strong></a> •
-  <a href="https://campusloop.space/pitch"><strong>⚡ Pitch Deck</strong></a> •
-  <a href="https://campusloop.space/safety"><strong>🛡️ Safety & Standards</strong></a>
+  <a href="https://campusloop.space/pitch"><strong>⚡ Pitch Deck</strong></a>
 </p>
 
 ---

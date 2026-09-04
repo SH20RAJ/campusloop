@@ -11,7 +11,10 @@ interface RouteParams {
 export async function GET(req: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const user = await getCachedAuthUser();
+    let user = null;
+    try {
+      user = await getCachedAuthUser();
+    } catch {}
     const profile = user ? await getCachedUserProfile(user.id) : null;
 
     const similar = await getSimilarAcademicResources(id, {

@@ -266,7 +266,7 @@ export async function POST(req: Request) {
       semester: created.semester,
       resourceType: created.resourceType,
       description: created.description,
-      tags: created.tags,
+      tags: (created.tags as string[]) || undefined,
     }).catch((err) => {
       console.warn("Background Qdrant indexing failed for resource", created.id, err);
     });

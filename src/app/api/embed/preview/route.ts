@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isMediaImageUrl } from "@/lib/embeds";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,11 @@ export async function GET(req: Request) {
 
     if (!targetUrl) {
       return NextResponse.json({ error: "Missing url parameter" }, { status: 400 });
+    }
+
+    // Direct media/image assets do not have rich web link previews
+    if (isMediaImageUrl(targetUrl)) {
+      return NextResponse.json({ url: targetUrl, isMedia: true });
     }
 
     // Validate URL format
@@ -51,11 +57,9 @@ export async function GET(req: Request) {
 
       const contentType = response.headers.get("content-type") || "";
       if (!contentType.includes("text/html") && !contentType.includes("application/xhtml+xml")) {
+        // Direct media files (images, audio, videos, binaries) do not have HTML OpenGraph previews
         return NextResponse.json({
           url: targetUrl,
-          title: host,
-          siteName: host,
-          favicon,
         });
       }
 
@@ -64,12 +68,9 @@ export async function GET(req: Request) {
       html = text.slice(0, 150000);
     } catch {
       clearTimeout(timeoutId);
-      // Return basic host preview if fetch fails
+      // Return basic fallback if fetch fails
       return NextResponse.json({
         url: targetUrl,
-        title: host,
-        siteName: host,
-        favicon,
       });
     }
 

@@ -81,10 +81,50 @@ export function extractTweetId(url: string): string | null {
 }
 
 /**
+ * Detect whether a URL points directly to an image or media asset
+ * (supports file extensions and popular image CDNs like Unsplash, ImgBB, Pexels, Cloudinary, etc.)
+ */
+export function isMediaImageUrl(url: string): boolean {
+  if (!url) return false;
+  // File extensions for common image formats
+  if (/\.(jpe?g|png|gif|webp|svg|avif|bmp|ico)($|\?)/i.test(url)) return true;
+
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    if (
+      host.includes("images.unsplash.com") ||
+      host.includes("unsplash.com") ||
+      host.includes("i.ibb.co") ||
+      host.includes("ibb.co") ||
+      host.includes("images.pexels.com") ||
+      host.includes("res.cloudinary.com") ||
+      host.includes("i.imgur.com") ||
+      host.includes("imgur.com") ||
+      host.includes("cdn.discordapp.com") ||
+      host.includes("media.tenor.com") ||
+      host.includes("giphy.com") ||
+      parsed.pathname.includes("/api/files/r2/images/") ||
+      parsed.pathname.includes("/api/files/r2/videos/") ||
+      parsed.pathname.includes("/api/files/r2/audio/") ||
+      parsed.pathname.includes("/api/files/r2/documents/")
+    ) {
+      return true;
+    }
+  } catch {
+    // Ignore URL parse error
+  }
+  return false;
+}
+
+/**
  * Parse a given text and extract all embeddable links and internal entity references
  */
 export function extractEmbedsFromText(text: string): ParsedEmbed[] {
   if (!text) return [];
+
+  // Strip all markdown media tags ![...](url) so attached media is never treated as link embeds
+  const textWithoutMarkdownMedia = text.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, "");
 
   const embeds: ParsedEmbed[] = [];
   const seenUrls = new Set<string>();
@@ -93,7 +133,7 @@ export function extractEmbedsFromText(text: string): ParsedEmbed[] {
   const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
   let match: RegExpExecArray | null;
 
-  while ((match = urlRegex.exec(text)) !== null) {
+  while ((match = urlRegex.exec(textWithoutMarkdownMedia)) !== null) {
     const rawUrl = match[1];
     if (seenUrls.has(rawUrl)) continue;
     seenUrls.add(rawUrl);
@@ -224,8 +264,8 @@ export function extractEmbedsFromText(text: string): ParsedEmbed[] {
     }
 
     // F. General OpenGraph external link
-    // Only add if not an image link (which is already rendered inline)
-    if (!/\.(jpeg|jpg|gif|png|webp|svg)(\?.*)?$/i.test(cleanUrl)) {
+    // Only add if not an image or media link (which is already rendered inline or in carousels)
+    if (!isMediaImageUrl(cleanUrl)) {
       embeds.push({
         type: "opengraph",
         rawUrl: cleanUrl,

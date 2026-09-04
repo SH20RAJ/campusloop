@@ -70,4 +70,17 @@ describe("Link and Embed Parsing Engine", () => {
     expect(article).toBeDefined();
     expect(article?.slug).toBe("getting-started-ai");
   });
+
+  it("does not extract markdown image attachments as link previews", () => {
+    const postWithImages = `
+      Pure hostel engineering. Best meal of the entire week.
+      #HostelChronicles #3AMMaggi #HostelLore
+
+      ![Image](https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&auto=format&fit=crop&q=60)
+      ![Image](https://images.unsplash.com/photo-1612927601601-6638404737ce?w=800&auto=format&fit=crop&q=60)
+    `;
+
+    const embeds = extractEmbedsFromText(postWithImages);
+    expect(embeds).toHaveLength(0);
+  });
 });

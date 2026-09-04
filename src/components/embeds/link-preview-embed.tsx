@@ -3,6 +3,7 @@
 import { ExternalLink, Globe } from "lucide-react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/api";
+import { isMediaImageUrl } from "@/lib/embeds";
 
 interface LinkPreviewEmbedProps {
   url: string;
@@ -18,10 +19,21 @@ interface OgData {
 }
 
 export function LinkPreviewEmbed({ url }: LinkPreviewEmbedProps) {
-  const { data, isLoading } = useSWR<OgData>(`/api/embed/preview?url=${encodeURIComponent(url)}`, fetcher, {
-    revalidateOnFocus: false,
-    dedupingInterval: 86400000,
-  });
+  // If this URL is a direct media/image asset, never show as a link preview
+  const isImage = isMediaImageUrl(url);
+
+  const { data, isLoading } = useSWR<OgData>(
+    isImage ? null : `/api/embed/preview?url=${encodeURIComponent(url)}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 86400000,
+    }
+  );
+
+  if (isImage) {
+    return null;
+  }
 
   if (isLoading) {
     return (
@@ -35,15 +47,20 @@ export function LinkPreviewEmbed({ url }: LinkPreviewEmbedProps) {
     );
   }
 
-  if (!data || (!data.title && !data.description && !data.image)) {
-    return null;
-  }
-
   let domain = "";
   try {
     domain = new URL(url).hostname.replace(/^www\./, "");
   } catch {
     domain = url;
+  }
+
+  // If no rich metadata exists, or title is merely the bare domain without image or description, do not render
+  if (
+    !data ||
+    (!data.title && !data.description && !data.image) ||
+    (!data.image && !data.description && (!data.title || data.title.toLowerCase() === domain.toLowerCase()))
+  ) {
+    return null;
   }
 
   return (

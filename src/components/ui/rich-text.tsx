@@ -9,6 +9,7 @@ import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
 import { AudioPlayer } from "@/components/media/audio-player";
 import { DocumentCard } from "@/components/media/document-card";
 import { VideoPlayer } from "@/components/media/video-player";
+import { isMediaImageUrl } from "@/lib/embeds";
 
 interface RichTextProps {
   content: string;
@@ -136,8 +137,20 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
           </a>
         );
       } else if (raw.startsWith("http://") || raw.startsWith("https://")) {
+        // If this URL is already an attached image, video, audio, or document, do not render again
+        const isAlreadyAttached =
+          images.some((img) => img.url === raw) ||
+          videos.some((vid) => vid.url === raw) ||
+          audios.some((aud) => aud.url === raw) ||
+          documents.some((doc) => doc.url === raw);
+
+        if (isAlreadyAttached) {
+          lastIndex = tokenRegex.lastIndex;
+          continue;
+        }
+
         // Standalone Media URL detection
-        const isImageUrl = /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(raw);
+        const isImageUrl = isMediaImageUrl(raw);
         const isVideoUrl = /\.(mp4|webm|mov)($|\?)/i.test(raw) || raw.includes("/api/files/r2/videos/");
         const isAudioUrl = /\.(mp3|wav|m4a|ogg)($|\?)/i.test(raw) || raw.includes("/api/files/r2/audio/");
         const isPdfUrl = /\.(pdf)($|\?)/i.test(raw) || raw.includes("/api/files/r2/documents/");
@@ -260,7 +273,7 @@ export function RichText({ content, className = "", disableEmbeds = false, onIma
       {images.length > 0 && <ImageCarousel images={images} onOpenImage={handleOpenImage} />}
 
       {/* Rich Embeds */}
-      {!disableEmbeds && <PostEmbedRenderer content={content} />}
+      {!disableEmbeds && <PostEmbedRenderer content={textWithoutMedia} />}
 
       {/* Fullscreen Lightbox Modal for Images */}
       {mounted &&

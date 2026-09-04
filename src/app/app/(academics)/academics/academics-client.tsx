@@ -17,13 +17,15 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
+import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
+import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadMediaFile } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 
 interface AcademicsClientProps {
-  profileId: string;
+  profileId: string | null;
 }
 
 const RESOURCE_TYPES = [
@@ -77,6 +79,8 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
 
   // Upload modal state
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalReason, setAuthModalReason] = useState<"SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI">("UPLOAD");
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formTitle, setFormTitle] = useState("");
@@ -258,6 +262,11 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
           <button
             type="button"
             onClick={() => {
+              if (!profileId) {
+                setAuthModalReason("UPLOAD");
+                setIsAuthModalOpen(true);
+                return;
+              }
               sounds.tap();
               haptics.light();
               setShowUploadModal(true);
@@ -294,6 +303,11 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
             </button>
           )}
         </div>
+
+        {/* Guest conversion banner if not logged in */}
+        {!profileId && (
+          <AcademicAuthBenefitsCard returnTo="/app/academics" />
+        )}
 
         {/* ─── Scope Switcher & Resource Types Filter Strip ─── */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
@@ -422,7 +436,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
               <AcademicCard
                 key={item.id}
                 item={item}
-                currentUserId={profileId}
+                currentUserId={profileId || undefined}
                 isHighlighted={highlightId === item.id}
               />
             ))}
@@ -700,6 +714,14 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Guest conversion modal */}
+      <AcademicAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        actionReason={authModalReason}
+        returnTo="/app/academics"
+      />
     </main>
   );
 }

@@ -6,13 +6,20 @@ import {
   CheckCircle,
   ChevronDown,
   Coins,
+  Copy,
+  ExternalLink,
+  Flame,
+  GraduationCap,
   Heart,
   Info,
+  KeyRound,
   Lock,
+  MessageSquare,
   Shield,
   ShieldAlert,
   ShieldCheck,
   Smartphone,
+  Sparkles,
   XCircle,
   Zap,
 } from "lucide-react";
@@ -20,6 +27,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
+import { DEMO_CREDENTIALS } from "@/lib/demo-credentials";
 
 // Whitelisted Indian institutions for the mock verification tool
 const whitelistedColleges = [
@@ -54,6 +62,18 @@ const whitelistedColleges = [
 ];
 
 export function AboutClient() {
+  // ─── 0. DEMO ACCESS COPY STATE ───
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const handleCopy = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    toast.success(`Copied ${field} to clipboard!`);
+    setTimeout(() => {
+      setCopiedField(null);
+    }, 2000);
+  };
+
   // ─── 1. VERIFICATION SIMULATOR STATE ───
   const [emailInput, setEmailInput] = useState("");
   const [verificationStep, setVerificationStep] = useState<"input" | "otp" | "verified" | "unlisted">(
@@ -317,6 +337,162 @@ export function AboutClient() {
             >
               Safety Protocols
             </a>
+            <a
+              href="#demo-access"
+              className="rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 font-bold text-xs px-5 py-2.5 flex items-center gap-1.5 transition-all"
+            >
+              <KeyRound className="h-3.5 w-3.5" /> Public Demo Credentials
+            </a>
+          </div>
+        </section>
+
+        {/* ─── Public Testing & Investor Demo Credentials Section ─── */}
+        <section
+          id="demo-access"
+          className="rounded-[32px] border-2 border-primary/40 bg-card/90 backdrop-blur-md p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-500/10 rounded-full blur-2xl pointer-events-none -ml-20 -mb-20" />
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-0.5 text-[11px] font-black text-emerald-600 dark:text-emerald-400">
+                <Sparkles className="h-3.5 w-3.5" /> Full Verified Access • Pre-Seeded Activities
+              </div>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-foreground">
+                Public Testing &amp;{" "}
+                <span className="bg-linear-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-transparent">
+                  Investor Demo Credentials
+                </span>
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground font-medium max-w-2xl leading-relaxed">
+                No college email? No problem! Use these official shared credentials to test 100% of verified
+                student features, explore 1,351 college hubs, direct/group messages, dating swipes, stories,
+                and refer students.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <a
+                href="/demo"
+                className="rounded-full bg-primary hover:bg-primary/90 text-white font-black text-xs px-5 py-2.5 shadow-lg shadow-primary/25 flex items-center gap-1.5 transition-all"
+              >
+                Open Demo Portal <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+              <a
+                href="/auth/login"
+                className="rounded-full bg-muted border border-border/80 hover:bg-muted/80 text-foreground font-bold text-xs px-4 py-2.5 transition-all"
+              >
+                Sign In
+              </a>
+            </div>
+          </div>
+
+          {/* Credentials Display Grid */}
+          <div className="grid sm:grid-cols-3 gap-3.5 relative z-10">
+            {/* Email */}
+            <div className="p-4 rounded-2xl bg-muted/40 border border-border/60 hover:border-primary/40 transition-all space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
+                Demo Email (Login ID)
+              </span>
+              <div className="flex items-center justify-between gap-2">
+                <code className="text-xs font-mono font-black text-foreground truncate">
+                  {DEMO_CREDENTIALS.email}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => handleCopy(DEMO_CREDENTIALS.email, "email")}
+                  className="p-1.5 rounded-lg border border-border/80 bg-background hover:bg-muted text-muted-foreground hover:text-foreground transition-all shrink-0 cursor-pointer"
+                  title="Copy email"
+                >
+                  {copiedField === "email" ? (
+                    <Check className="h-3.5 w-3.5 text-emerald-500" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Password */}
+            <div className="p-4 rounded-2xl bg-muted/40 border border-border/60 hover:border-primary/40 transition-all space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
+                Demo Password
+              </span>
+              <div className="flex items-center justify-between gap-2">
+                <code className="text-xs font-mono font-black text-foreground truncate">
+                  {DEMO_CREDENTIALS.password}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => handleCopy(DEMO_CREDENTIALS.password, "password")}
+                  className="p-1.5 rounded-lg border border-border/80 bg-background hover:bg-muted text-muted-foreground hover:text-foreground transition-all shrink-0 cursor-pointer"
+                  title="Copy password"
+                >
+                  {copiedField === "password" ? (
+                    <Check className="h-3.5 w-3.5 text-emerald-500" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Referral Link */}
+            <div className="p-4 rounded-2xl bg-muted/40 border border-border/60 hover:border-primary/40 transition-all space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
+                Student Referral Link
+              </span>
+              <div className="flex items-center justify-between gap-2">
+                <code className="text-xs font-mono font-black text-foreground truncate">
+                  {DEMO_CREDENTIALS.referralUrl}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => handleCopy(DEMO_CREDENTIALS.referralUrl, "referral")}
+                  className="p-1.5 rounded-lg border border-border/80 bg-background hover:bg-muted text-muted-foreground hover:text-foreground transition-all shrink-0 cursor-pointer"
+                  title="Copy referral link"
+                >
+                  {copiedField === "referral" ? (
+                    <Check className="h-3.5 w-3.5 text-emerald-500" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Seeded Features Highlights */}
+          <div className="pt-2 border-t border-border/60 flex flex-wrap items-center justify-between gap-3 text-[11px] font-bold text-muted-foreground relative z-10">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="flex items-center gap-1.5 text-foreground">
+                <GraduationCap className="h-3.5 w-3.5 text-primary" /> 1,351 College Hubs
+              </span>
+              <span className="flex items-center gap-1.5 text-foreground">
+                <MessageSquare className="h-3.5 w-3.5 text-emerald-500" /> Direct &amp; Group Chat
+              </span>
+              <span className="flex items-center gap-1.5 text-foreground">
+                <Heart className="h-3.5 w-3.5 text-rose-500" /> Dating Deck &amp; Crush Match
+              </span>
+              <span className="flex items-center gap-1.5 text-foreground">
+                <Flame className="h-3.5 w-3.5 text-amber-500" /> 450 LP Gold Star
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const text = `CampusLoop Public Demo Access:\nEmail: ${DEMO_CREDENTIALS.email}\nPassword: ${DEMO_CREDENTIALS.password}\nPortal: https://campusloop.space/demo\nReferral: ${DEMO_CREDENTIALS.referralUrl}`;
+                handleCopy(text, "all");
+              }}
+              className="text-[11px] font-black text-primary hover:underline flex items-center gap-1 cursor-pointer ml-auto"
+            >
+              {copiedField === "all" ? (
+                <Check className="h-3.5 w-3.5 text-emerald-500" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+              {copiedField === "all" ? "Copied All Credentials!" : "Copy Full Access Pack"}
+            </button>
           </div>
         </section>
 

@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { academicResources, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { indexAcademicResourceVector } from "@/lib/qdrant/indexer";
+import { searchAcademicResourcesVector } from "@/lib/recommendations/academic-recommendations";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { rejectViewerWrite } from "@/lib/viewer";
 
@@ -10,7 +12,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    const user = await getCachedAuthUser();
+    let user = null;
+    try {
+      user = await getCachedAuthUser();
+    } catch {}
     const profile = user ? await getCachedUserProfile(user.id) : null;
     const userInstitutionId = profile?.institutionId || "inst_35df75700bb23dd30311ef5f";
 
@@ -121,9 +126,52 @@ export async function GET(req: Request) {
       commentsCount: item.comments?.length || 0,
     }));
 
+    // If search query is provided on page 1, check Qdrant for semantic matches
+    let vectorItems: any[] = [];
+    if (searchQuery?.trim() && page === 1) {
+      try {
+        const sem = semesterStr && semesterStr !== "all" ? parseInt(semesterStr, 10) : undefined;
+        const vMatches = await searchAcademicResourcesVector(searchQuery.trim(), {
+          limit,
+          branch: branch && branch !== "all" && branch !== "All" ? branch : undefined,
+          semester: !isNaN(sem as number) ? sem : undefined,
+          resourceType: resourceType && resourceType !== "all" && resourceType !== "ALL" ? resourceType : undefined,
+          institutionId: scope === "campus" && userInstitutionId ? userInstitutionId : undefined,
+        });
+        if (vMatches.length > 0) {
+          vectorItems = vMatches.map((vm) => ({
+            ...vm.resource,
+            isSemanticMatch: true,
+            semanticScore: vm.score,
+            commentsCount: 0,
+          }));
+        }
+      } catch (err) {
+        console.warn("Error running vector search in GET academics:", err);
+      }
+    }
+
+    // Merge vector items with SQL results, deduplicating by ID
+    const seenIds = new Set<string>();
+    const finalItems: any[] = [];
+
+    for (const v of vectorItems) {
+      if (!seenIds.has(v.id)) {
+        seenIds.add(v.id);
+        finalItems.push(v);
+      }
+    }
+
+    for (const item of enriched) {
+      if (!seenIds.has(item.id)) {
+        seenIds.add(item.id);
+        finalItems.push(item);
+      }
+    }
+
     return NextResponse.json({
-      items: enriched,
-      total,
+      items: finalItems.slice(0, limit),
+      total: Math.max(total, finalItems.length),
       page,
       limit,
       hasMore,
@@ -207,6 +255,21 @@ export async function POST(req: Request) {
         .set({ points: sql`${userProfiles.points} + 20` })
         .where(eq(userProfiles.id, profile.id));
     } catch {}
+
+    // Index into Qdrant in background for vector search & recommendations
+    indexAcademicResourceVector({
+      id: created.id,
+      title: created.title,
+      subjectCode: created.subjectCode,
+      subjectName: created.subjectName,
+      branch: created.branch,
+      semester: created.semester,
+      resourceType: created.resourceType,
+      description: created.description,
+      tags: created.tags,
+    }).catch((err) => {
+      console.warn("Background Qdrant indexing failed for resource", created.id, err);
+    });
 
     return NextResponse.json({
       success: true,

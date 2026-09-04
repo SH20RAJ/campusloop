@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { AcademicDetailClient } from "@/components/academics/academic-detail-client";
 import { resolveAcademicResource } from "@/lib/academics/slug";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: AcademicSlugPageProps): Promi
     };
   }
 
-  const title = `${resource.title} (${resource.subjectCode}) | CampusLoop Academics`;
+  const title = `${resource.title} (${resource.subjectCode}) | Free PDF Download | CampusLoop`;
   const description =
     resource.description ||
-    `Download ${resource.subjectCode} - ${resource.subjectName} notes and question papers for ${resource.branch} Semester ${resource.semester}.`;
+    `Download ${resource.subjectCode} - ${resource.subjectName} verified notes, question papers, and lab manuals for ${resource.branch} Semester ${resource.semester}. Direct PDF preview without sign-up.`;
   const canonicalUrl = `https://campusloop.space/app/academics/${resource.id}`;
 
   return {
@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: AcademicSlugPageProps): Promi
       resource.resourceType,
       "Campus Notes",
       "PYQ Question Papers",
+      "Direct PDF Download",
       resource.institution?.name || "College Notes",
     ],
     alternates: { canonical: canonicalUrl },
@@ -61,17 +62,14 @@ export async function generateMetadata({ params }: AcademicSlugPageProps): Promi
 export default async function AcademicResourceSlugPage({ params }: AcademicSlugPageProps) {
   const { slug } = await params;
   const user = await getCachedAuthUser();
-  if (!user) redirect("/handler/sign-in");
-
-  const profile = await getCachedUserProfile(user.id);
-  if (!profile) redirect("/app/onboarding");
+  const profile = user ? await getCachedUserProfile(user.id) : null;
 
   const resource = await resolveAcademicResource(slug);
   if (!resource) {
     notFound();
   }
 
-  // Schema.org structured data for LearningResource
+  // Schema.org structured data for Google LearningResource rich snippets
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LearningResource",
@@ -92,12 +90,13 @@ export default async function AcademicResourceSlugPage({ params }: AcademicSlugP
       "@type": "Person",
       name: resource.uploader?.displayName || "Verified Student",
     },
+    isAccessibleForFree: true,
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <AcademicDetailClient initialResource={resource} currentUserId={profile.id} />
+      <AcademicDetailClient initialResource={resource} currentUserId={profile?.id ?? null} />
     </>
   );
 }

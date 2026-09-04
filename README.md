@@ -11,11 +11,36 @@
 
 <p align="center">
   <a href="https://campusloop.space"><strong>🌐 Live App (campusloop.space)</strong></a> •
+  <a href="https://campusloop.space/demo"><strong>🔑 Demo Access (/demo)</strong></a> •
   <a href="ARCHITECTURE.md"><strong>🏛️ System Architecture</strong></a> •
   <a href="https://campusloop.space/overview"><strong>📊 Strategic Overview</strong></a> •
   <a href="https://campusloop.space/pitch"><strong>⚡ Pitch Deck</strong></a> •
   <a href="https://campusloop.space/safety"><strong>🛡️ Safety & Standards</strong></a>
 </p>
+
+---
+
+## 🔑 Public Investor & Tester Demo Access (All Features Unlocked)
+
+For investors, evaluators, and public testers without a `.ac.in` / `.edu` college email address, we provide an official **Full-Access Verified Student Demo Account** preloaded with realistic campus activity, mutual friendships, chats, active stories, notifications, events, and utility listings:
+
+| Parameter | Value | Notes |
+|---|---|---|
+| **Demo Hub Portal** | [**`https://campusloop.space/demo`**](https://campusloop.space/demo) | 1-Click Copy credentials, live metrics & feature cards |
+| **Sign-In Page** | [**`https://campusloop.space/handler/sign-in`**](https://campusloop.space/handler/sign-in) | Instant authentication into the live app shell |
+| **Demo Email** | `demo@campusloop.space` | Whitelisted verified campus student address |
+| **Demo Password** | `CampusLoop@2026!` | Shared testing credential |
+| **Username** | `@demo_tester` | Verified Student profile with 450 LP (Gold Star ⭐) |
+| **Referral Link** | [**`https://campusloop.space/join?ref=demo_tester`**](https://campusloop.space/join?ref=demo_tester) | Share with college students (+20 LP per verified join) |
+| **Seed / Refresh Command** | `bun run db:seed-demo` | Idempotent seeder synchronizing auth, DB & rich activity |
+
+### 🚀 What You Can Test with This Account
+- **Campus Feed & Confessions**: Post anonymous confessions with client-side PII scrubbing, launch interactive live polls, quote-repost with Web Audio chimes, and comment on threads.
+- **Campus Match & Secret Crush**: Swipe student cards, match instantly, and lock crushes in the cryptographically sealed escrow vault (`/app/crush`).
+- **Realtime Chat & PeerJS Calls**: 1-on-1 direct messages, group team channels, and direct WebRTC P2P audio/video calling (`/app/chat`).
+- **24-Hour Campus Stories (Vibes)**: Post visual campus vibes with progress bars, heart reactions, and archive highlights (`/app/stories`).
+- **10+ Utility Hubs**: Create cycle/drafter buy & sell listings, report lost & found items, coordinate airport/station cab pools, find flatmates, 5v5 gaming lobbies, and seal convocation time capsules (`/app/capsule`).
+- **College Hub Switcher**: Seamlessly switch feeds across 1,350+ indexed Indian college hubs (`/app/colleges`).
 
 ---
 

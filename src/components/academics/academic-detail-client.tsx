@@ -24,6 +24,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
+import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
+import { AcademicPdfViewer } from "@/components/academics/academic-pdf-viewer";
 import { SimilarResourcesWidget } from "@/components/academics/similar-resources-widget";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { haptics } from "@/lib/haptics";
@@ -32,7 +35,7 @@ import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface AcademicDetailClientProps {
   initialResource: any;
-  currentUserId?: string;
+  currentUserId?: string | null;
 }
 
 export function AcademicDetailClient({ initialResource, currentUserId }: AcademicDetailClientProps) {
@@ -58,6 +61,10 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
+  // Guest conversion modal
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalReason, setAuthModalReason] = useState<"SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI">("SAVE");
+
   const totalVotes = upvotes + downvotes;
   const reliability = totalVotes > 0 ? Math.round((upvotes / totalVotes) * 100) : 100;
   const uploaderAvatar = getAvatarUrl(
@@ -67,6 +74,12 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
 
   // Handle voting
   async function handleVote(type: "UP" | "DOWN") {
+    if (!currentUserId) {
+      setAuthModalReason("VOTE");
+      setIsAuthModalOpen(true);
+      return;
+    }
+
     sounds.pop();
     haptics.medium();
 
@@ -147,6 +160,12 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
 
   // AI Cram Generator
   function handleGenerateAiCram(promptType: "CONCEPTS" | "EXAM_TIPS" | "CHECKLIST") {
+    if (!currentUserId) {
+      setAuthModalReason("AI");
+      setIsAuthModalOpen(true);
+      return;
+    }
+
     sounds.tap();
     haptics.medium();
     setIsGeneratingAi(true);
@@ -185,6 +204,12 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
   async function handleSubmitComment(e: React.FormEvent) {
     e.preventDefault();
     if (!commentText.trim()) return;
+
+    if (!currentUserId) {
+      setAuthModalReason("COMMENT");
+      setIsAuthModalOpen(true);
+      return;
+    }
 
     setIsSubmittingComment(true);
     sounds.tap();
@@ -245,6 +270,11 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
           <button
             type="button"
             onClick={() => {
+              if (!currentUserId) {
+                setAuthModalReason("SAVE");
+                setIsAuthModalOpen(true);
+                return;
+              }
               sounds.tap();
               haptics.light();
               setIsSaved(!isSaved);
@@ -415,70 +445,22 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         </div>
       </div>
 
-      {/* ─── Interactive Document Previewer ─── */}
+      {/* ─── Interactive Document Previewer & Reader ─── */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <FileText className="size-3.5 text-indigo-400" />
-            <span>Document Preview &amp; Reader</span>
-          </h2>
-          <button
-            type="button"
-            onClick={() => setIsPreviewExpanded(!isPreviewExpanded)}
-            className="text-[11px] font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
-          >
-            {isPreviewExpanded ? (
-              <>
-                <Minimize2 className="size-3" />
-                <span>Normal View</span>
-              </>
-            ) : (
-              <>
-                <Maximize2 className="size-3" />
-                <span>Expand Reader</span>
-              </>
-            )}
-          </button>
-        </div>
-
-        <div
-          className={cn(
-            "w-full rounded-3xl border border-border/60 bg-card overflow-hidden shadow-xs relative transition-all",
-            isPreviewExpanded ? "h-[85vh]" : "h-[480px]"
-          )}
-        >
-          {previewUrl ? (
-            <iframe
-              src={previewUrl}
-              title={resource.title}
-              className="w-full h-full border-0 bg-background"
-              allow="autoplay"
-              loading="lazy"
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-3">
-              <div className="flex size-14 items-center justify-center rounded-2xl bg-muted/60 text-muted-foreground">
-                <FileText className="size-7" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-foreground">Direct File Material</p>
-                <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-                  This document is stored on secure Cloudflare R2 / Drive storage. Tap below to download or
-                  view.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleDownload}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-black bg-primary text-primary-foreground hover:opacity-90 shadow-md cursor-pointer transition-all"
-              >
-                <Download className="size-4" />
-                <span>Download &amp; Open Document</span>
-              </button>
-            </div>
-          )}
-        </div>
+        <AcademicPdfViewer
+          fileUrl={resource.fileUrl}
+          driveUrl={resource.driveUrl}
+          title={resource.title}
+          subjectCode={resource.subjectCode}
+          resourceType={resource.resourceType}
+          onDownload={handleDownload}
+        />
       </div>
+
+      {/* ─── Guest Student Perks & Personal Vault Conversion ─── */}
+      {!currentUserId && (
+        <AcademicAuthBenefitsCard returnTo={`/app/academics/${resource.id}`} />
+      )}
 
       {/* ─── Campus AI Study Cram Assistant ─── */}
       <div className="rounded-3xl border border-indigo-500/30 bg-linear-to-r from-indigo-500/8 via-card to-card p-4 sm:p-5 space-y-3 shadow-xs">
@@ -650,6 +632,14 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
           })}
         </div>
       </div>
+
+      {/* ─── Academic Auth Modal for Unregistered Visitors ─── */}
+      <AcademicAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        actionReason={authModalReason}
+        returnTo={`/app/academics/${resource.id}`}
+      />
     </div>
   );
 }

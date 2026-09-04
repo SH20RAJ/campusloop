@@ -78,6 +78,18 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
   const reliability = totalVotes > 0 ? Math.round((upvotes / totalVotes) * 100) : 100;
 
   async function handleVote(type: "UP" | "DOWN") {
+    if (!currentUserId) {
+      toast.info("Sign in with college email to upvote and earn 50 LP!", {
+        action: {
+          label: "Sign In",
+          onClick: () => {
+            window.location.href = `/handler/sign-in?returnTo=/app/academics/${item.id}`;
+          },
+        },
+      });
+      return;
+    }
+
     sounds.pop();
     haptics.medium();
 
@@ -170,6 +182,18 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
   async function handleSubmitComment(e: React.FormEvent) {
     e.preventDefault();
     if (!commentText.trim()) return;
+
+    if (!currentUserId) {
+      toast.info("Sign in with college email to post comments & doubts!", {
+        action: {
+          label: "Sign In",
+          onClick: () => {
+            window.location.href = `/handler/sign-in?returnTo=/app/academics/${item.id}`;
+          },
+        },
+      });
+      return;
+    }
 
     setIsSubmittingComment(true);
     sounds.send();

@@ -133,6 +133,14 @@ export async function seedDemoAccount() {
     console.log(`✅ Updated Demo User Profile: @${existingProfile.username} (ID: ${existingProfile.id})`);
   }
 
+  // 5. Seed Comprehensive Features & Activities for Demo Account
+  try {
+    const { seedDemoActivities } = await import("./seed-demo-activities");
+    await seedDemoActivities();
+  } catch (err) {
+    console.warn("Notice: Seed activities encountered a warning:", err);
+  }
+
   console.log("\n=======================================================");
   console.log("🎉 CAMPUSLOOP PUBLIC DEMO ACCOUNT READY FOR SHARING:");
   console.log(`📧 Email:    ${DEMO_CREDENTIALS.email}`);

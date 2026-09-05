@@ -465,6 +465,14 @@ export function PostComposer({
     fileInputRef.current?.click();
   }
 
+  function openVideoPicker() {
+    videoInputRef.current?.click();
+  }
+
+  function openDocPicker() {
+    docInputRef.current?.click();
+  }
+
   function insertTag(tag: string) {
     editor?.commands.focus();
     editor?.commands.insertContent(`${tag} `);
@@ -500,7 +508,7 @@ export function PostComposer({
       label: "Video Clip",
       icon: Video,
       color: "text-sky-500 hover:bg-sky-500/10",
-      onClick: () => videoInputRef.current?.click(),
+      onClick: openVideoPicker,
       disabled: isUploadingMedia,
       loading: isUploadingMedia,
     },
@@ -517,7 +525,7 @@ export function PostComposer({
       label: "Notes / PDF",
       icon: FileText,
       color: "text-indigo-500 hover:bg-indigo-500/10",
-      onClick: () => docInputRef.current?.click(),
+      onClick: openDocPicker,
       disabled: isUploadingMedia,
       loading: isUploadingMedia,
     },

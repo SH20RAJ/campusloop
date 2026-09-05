@@ -415,7 +415,7 @@ export function MessengerPane({
     } finally {
       setIsLoadingOlder(false);
     }
-  }, [conversationId, isLoadingOlder, hasMoreOlder, messages, mutate]);
+  }, [conversationId, isLoadingOlder, hasMoreOlder, messages, mutate, setIsLoadingOlder, setHasMoreOlder]);
 
   // Handle scroll to detect when user reaches top of conversation
   const handleScroll = useCallback(() => {

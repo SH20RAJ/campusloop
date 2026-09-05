@@ -32,6 +32,17 @@ export default [
 			...reactHooksPlugin.configs.recommended.rules,
 			"react/react-in-jsx-scope": "off",
 			"react-hooks/set-state-in-effect": "off",
+			"react-hooks/refs": "warn",
+			"@typescript-eslint/no-explicit-any": "warn",
+			"@typescript-eslint/no-unused-vars": [
+				"warn",
+				{
+					argsIgnorePattern: "^_",
+					varsIgnorePattern: "^_",
+					caughtErrorsIgnorePattern: "^_",
+				},
+			],
+			"@next/next/no-img-element": "warn",
 		},
 	},
 	{

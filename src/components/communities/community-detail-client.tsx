@@ -151,6 +151,8 @@ export function CommunityDetailClient({
     }
   }, [community.rules]);
 
+  const [referenceTime] = useState(() => Date.now());
+
   // Reddit-Style Algorithmic Community Feed Sorting
   const filteredPosts = useMemo(() => {
     const list = [...posts];
@@ -158,7 +160,7 @@ export function CommunityDetailClient({
       return list.filter((p) => p.type === "POLL" || p.type === "QUESTION");
     }
 
-    const now = Date.now();
+    const now = referenceTime;
 
     switch (redditSort) {
       case "new":
@@ -195,7 +197,7 @@ export function CommunityDetailClient({
           return scoreB - scoreA;
         });
     }
-  }, [posts, activeTab, redditSort, topTimeWindow]);
+  }, [posts, activeTab, redditSort, topTimeWindow, referenceTime]);
 
   async function handleShareInvite() {
     const shareUrl =

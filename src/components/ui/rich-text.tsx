@@ -50,6 +50,16 @@ export function RichText({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedImage]);
 
+  useEffect(() => {
+    if (maxHeight && textContainerRef.current) {
+      if (textContainerRef.current.scrollHeight > maxHeight + 8) {
+        setIsClamped(true);
+      } else {
+        setIsClamped(false);
+      }
+    }
+  }, [maxHeight, content]);
+
   if (!content) return null;
 
   // Regex to extract markdown media elements: ![tag:extra](url)
@@ -251,16 +261,6 @@ export function RichText({
 
     return parts;
   }
-
-  useEffect(() => {
-    if (maxHeight && textContainerRef.current) {
-      if (textContainerRef.current.scrollHeight > maxHeight + 8) {
-        setIsClamped(true);
-      } else {
-        setIsClamped(false);
-      }
-    }
-  }, [maxHeight, textWithoutMedia]);
 
   return (
     <div className={`space-y-2 leading-relaxed ${className}`}>

@@ -147,7 +147,7 @@ export function PullToRefresh({ onRefresh, children, disabled = false }: PullToR
       <div
         style={{
           transform: pullDistance > 0 ? `translate3d(0, ${pullDistance * 0.35}px, 0)` : undefined,
-          transition: isPullingRef.current ? "none" : "transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+          transition: pullDistance > 0 ? "none" : "transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1)",
         }}
       >
         {children}

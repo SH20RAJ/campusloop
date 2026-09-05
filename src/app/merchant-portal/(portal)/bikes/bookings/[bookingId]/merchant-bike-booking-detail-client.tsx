@@ -31,6 +31,7 @@ interface MerchantBikeBookingDetailClientProps {
 
 export function MerchantBikeBookingDetailClient({ bookingId }: MerchantBikeBookingDetailClientProps) {
   const router = useRouter();
+  const [nowTime] = useState(() => Date.now());
 
   // Modals for Handover and Return
   const [showHandoverModal, setShowHandoverModal] = useState(false);
@@ -199,7 +200,6 @@ export function MerchantBikeBookingDetailClient({ bookingId }: MerchantBikeBooki
 
   // Late return calculation
   const expectedReturnTime = new Date(booking.endAt).getTime();
-  const nowTime = Date.now();
   const isLate = booking.status === "ACTIVE" && nowTime > expectedReturnTime;
   const lateHours = isLate ? Math.ceil((nowTime - expectedReturnTime) / (1000 * 60 * 60)) : 0;
 

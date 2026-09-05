@@ -94,7 +94,9 @@ export function CommunitiesIndexClient({
 
   const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
   const isValidatingRef = useRef(isValidating);
-  isValidatingRef.current = isValidating;
+  useEffect(() => {
+    isValidatingRef.current = isValidating;
+  }, [isValidating]);
 
   useEffect(() => {
     if (!sentinelNode || activeTab !== "feed" || isReachingFeedEnd) return;

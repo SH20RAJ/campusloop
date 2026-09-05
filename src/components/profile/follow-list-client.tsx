@@ -71,7 +71,9 @@ export function FollowListClient({
 
   const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
   const isValidatingRef = useRef(isValidating);
-  isValidatingRef.current = isValidating;
+  useEffect(() => {
+    isValidatingRef.current = isValidating;
+  }, [isValidating]);
 
   useEffect(() => {
     if (!sentinelNode || isReachingEnd) return;

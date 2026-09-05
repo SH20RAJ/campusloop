@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Check, CheckCircle, ChevronDown, Coins, Copy, ExternalLink, Flame, GraduationCap, Heart, Info, KeyRound, Lock, MessageSquare, Shield, ShieldAlert, ShieldCheck, Smartphone, Zap, XCircle } from "lucide-react";
+import Link from "next/link";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -350,18 +351,18 @@ export function AboutClient() {
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <a
+              <Link
                 href="/demo"
                 className="rounded-full bg-primary hover:bg-primary/90 text-white font-black text-xs px-5 py-2.5 shadow-lg shadow-primary/25 flex items-center gap-1.5 transition-all"
               >
                 Open Demo Portal <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/auth/login"
                 className="rounded-full bg-muted border border-border/80 hover:bg-muted/80 text-foreground font-bold text-xs px-4 py-2.5 transition-all"
               >
                 Sign In
-              </a>
+              </Link>
             </div>
           </div>
 

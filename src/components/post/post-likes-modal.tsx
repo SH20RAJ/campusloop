@@ -100,7 +100,10 @@ export function PostLikesModal({ postId, isOpen, onClose, currentUserId }: PostL
 
   const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
   const isValidatingRef = useRef(isValidating);
-  isValidatingRef.current = isValidating;
+
+  useEffect(() => {
+    isValidatingRef.current = isValidating;
+  }, [isValidating]);
 
   useEffect(() => {
     if (!sentinelNode || isReachingEnd || !isOpen) return;

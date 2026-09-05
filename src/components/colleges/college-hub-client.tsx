@@ -120,7 +120,9 @@ export function CollegeHubClient({
   }, [isLoadingMore, hasMore, page, college.id]);
 
   const loadMorePostsRef = useRef(loadMorePosts);
-  loadMorePostsRef.current = loadMorePosts;
+  useEffect(() => {
+    loadMorePostsRef.current = loadMorePosts;
+  }, [loadMorePosts]);
 
   useEffect(() => {
     if (!sentinelNode || !hasMore || activeTab !== "feed") return;

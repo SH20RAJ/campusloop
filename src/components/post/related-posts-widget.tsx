@@ -6,7 +6,7 @@ import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetcher } from "@/lib/api";
 import type { RelatedPostItem } from "@/lib/recommendations/related-posts";
-import { cn } from "@/lib/utils";
+import { cleanSnippet, cn } from "@/lib/utils";
 
 interface RelatedPostsWidgetProps {
   postId: string;
@@ -65,7 +65,7 @@ export function RelatedPostsWidget({ postId, currentUserId, initialItems }: Rela
           const authorName = isAnon
             ? post.pseudonym || "Anonymous Student"
             : post.author?.displayName || "Student";
-          const snippet = post.body.length > 110 ? `${post.body.slice(0, 108)}...` : post.body;
+          const snippet = cleanSnippet(post.body, 110);
 
           return (
             <Link

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { cleanSnippet } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -147,7 +148,7 @@ export async function GET(req: Request) {
       .sort((a, b) => b.score - a.score)
       .slice(0, 4)
       .map(({ post: p }) => {
-        const title = p.title || p.body.slice(0, 80) + (p.body.length > 80 ? "..." : "");
+        const title = cleanSnippet(p.title || p.body, 80) || "Campus Buzz Discussion";
         const postTotal = (p.votes || []).length + (p.comments || []).length;
         const inst = p.institution?.name?.split(",")[0] || collegeName;
         return {

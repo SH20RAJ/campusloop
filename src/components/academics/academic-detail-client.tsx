@@ -283,52 +283,13 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         </div>
       </div>
 
-      {/* ─── Resource Hero Banner ─── */}
-      <div className="space-y-3.5">
-        {/* Badges strip */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="flex items-center gap-1 text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 shadow-2xs">
-            <BookOpen className="size-3" />
-            <span>{resource.resourceType.replace("_", " ")}</span>
-          </span>
-
-          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-muted border border-border/50 text-foreground">
-            {resource.subjectCode} • {resource.subjectName}
-          </span>
-
-          {resource.moduleOrChapter && (
-            <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30">
-              {resource.moduleOrChapter}
-            </span>
-          )}
-
-          <div
-            className={cn(
-              "text-[10px] font-black px-2.5 py-0.5 rounded-full border flex items-center gap-1 ml-auto",
-              reliability >= 80
-                ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-                : "bg-amber-500/15 text-amber-500 border-amber-500/30"
-            )}
-          >
-            <span>🎯 {reliability}% Reliable</span>
-          </div>
-        </div>
-
-        {/* Title */}
-        <h1 className="text-xl sm:text-2xl font-black text-foreground leading-tight tracking-tight">
-          {resource.title}
-        </h1>
-
-        {/* Description */}
-        {resource.description && (
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{resource.description}</p>
-        )}
-
-        {/* Uploader Card & Campus Info */}
-        <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-card border border-border/60 shadow-xs flex-wrap">
-          <div className="flex items-center gap-2.5 min-w-0">
+      {/* ─── Twitter/X Style Main Resource Tweet Header ─── */}
+      <div className="space-y-3">
+        {/* Author row */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <Link href={`/@${resource.uploader?.username}`} className="shrink-0">
-              <Avatar className="size-10 rounded-full border border-border/60">
+              <Avatar className="size-11 rounded-full border border-border/50">
                 <AvatarImage src={uploaderAvatar} />
                 <AvatarFallback className="text-xs font-bold">
                   {resource.uploader?.displayName?.[0] || "U"}
@@ -336,93 +297,153 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
               </Avatar>
             </Link>
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 leading-tight">
                 <Link
                   href={`/@${resource.uploader?.username}`}
-                  className="text-xs sm:text-sm font-bold text-foreground hover:underline truncate"
+                  className="text-sm sm:text-base font-black text-foreground hover:underline truncate"
                 >
                   {resource.uploader?.displayName}
                 </Link>
                 {resource.isVerified && <ShieldCheck className="size-3.5 text-brand shrink-0" />}
-                <span className="text-[11px] text-muted-foreground truncate">
-                  @{resource.uploader?.username}
-                </span>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5">
-                <span>{resource.institution?.name?.split(",")[0] || "Campus"}</span>
-                <span>·</span>
-                <span>Shared {formatTimeAgo(resource.createdAt)}</span>
-              </div>
+              <p className="text-xs text-muted-foreground truncate mt-0.5">
+                @{resource.uploader?.username} · {resource.institution?.name?.split(",")[0] || "Campus"}
+              </p>
             </div>
           </div>
 
-          {/* Quick CTA Buttons */}
-          <div className="flex items-center gap-2 ml-auto">
+          {/* Save & Share action buttons */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
-              onClick={handleDownload}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white transition-all cursor-pointer shadow-md active:scale-95"
+              onClick={() => {
+                if (!currentUserId) {
+                  setAuthModalReason("SAVE");
+                  setIsAuthModalOpen(true);
+                  return;
+                }
+                sounds.tap();
+                haptics.light();
+                setIsSaved(!isSaved);
+                toast.success(isSaved ? "Removed from Study Vault" : "Saved to Study Vault 🔖");
+              }}
+              className={cn(
+                "flex size-8.5 items-center justify-center rounded-full border transition-all cursor-pointer",
+                isSaved
+                  ? "bg-amber-500/15 text-amber-500 border-amber-500/30"
+                  : "border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground"
+              )}
+              title="Save to Study Vault"
             >
-              <Download className="size-3.5" />
-              <span>Get Material</span>
-              <ExternalLink className="size-2.5 opacity-80" />
+              <Bookmark className={cn("size-4", isSaved && "fill-current")} />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleShare}
+              className="flex size-8.5 items-center justify-center rounded-full border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
+              title="Share note link"
+            >
+              <Share2 className="size-4" />
             </button>
           </div>
         </div>
-      </div>
 
-      {/* ─── Metrics & Upvote Strip ─── */}
-      <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/20 border border-border/40 text-xs flex-wrap gap-2">
-        <div className="flex items-center gap-2">
-          {/* Upvote / Downvote */}
-          <div className="flex items-center bg-card rounded-full border border-border/50 p-0.5 shadow-2xs">
+        {/* Tweet content area */}
+        <div className="space-y-2 pt-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-muted text-foreground border border-border/50">
+              {resource.subjectCode}
+            </span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              {resource.subjectName}
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/25">
+              {resource.resourceType.replace("_", " ")}
+            </span>
+            {resource.moduleOrChapter && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                {resource.moduleOrChapter}
+              </span>
+            )}
+          </div>
+
+          <h1 className="text-lg sm:text-2xl font-black text-foreground tracking-tight leading-snug">
+            {resource.title}
+          </h1>
+
+          {resource.description && (
+            <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed font-normal">
+              {resource.description}
+            </p>
+          )}
+
+          <div className="flex items-center gap-2 text-xs text-muted-foreground pt-0.5">
+            <span>Shared {formatTimeAgo(resource.createdAt)}</span>
+            <span>·</span>
+            <span>{resource.branch}</span>
+            <span>·</span>
+            <span>Semester {resource.semester}</span>
+          </div>
+        </div>
+
+        {/* ─── Twitter Metrics Bar (Hairline divided) ─── */}
+        <div className="border-y border-border/25 py-3 my-2 flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
+          <span>
+            <strong className="text-foreground font-black tabular-nums">{upvotes}</strong> Helpful
+          </span>
+          <span>
+            <strong className="text-foreground font-black tabular-nums">{views}</strong> Views
+          </span>
+          <span>
+            <strong className="text-foreground font-black tabular-nums">{downloads}</strong> Downloads
+          </span>
+          <span className="ml-auto font-bold text-emerald-400">
+            🎯 {reliability}% Verified Accuracy
+          </span>
+        </div>
+
+        {/* ─── Twitter Action Bar ─── */}
+        <div className="flex items-center justify-between pb-3 border-b border-border/25 text-xs">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => handleVote("UP")}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer",
+                "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer",
                 userVote === "UP"
-                  ? "bg-indigo-500/20 text-indigo-400 font-black shadow-xs"
-                  : "hover:text-foreground hover:bg-muted/60 text-muted-foreground"
+                  ? "bg-primary/20 text-primary font-black shadow-xs"
+                  : "hover:text-foreground hover:bg-muted text-muted-foreground"
               )}
             >
-              <ArrowUp className={cn("size-3.5", userVote === "UP" && "stroke-3")} />
-              <span className="tabular-nums">{upvotes} Helpful</span>
+              <ArrowUp className={cn("size-4", userVote === "UP" && "stroke-3")} />
+              <span className="tabular-nums">{upvotes} Upvote</span>
             </button>
-
-            <div className="h-3.5 w-px bg-border/40" />
 
             <button
               type="button"
               onClick={() => handleVote("DOWN")}
               className={cn(
-                "flex items-center gap-1 px-2 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer",
+                "flex items-center gap-1 px-2.5 py-1.5 rounded-full font-bold transition-all cursor-pointer",
                 userVote === "DOWN"
                   ? "bg-rose-500/20 text-rose-400 font-black"
-                  : "hover:text-foreground hover:bg-muted/60 text-muted-foreground"
+                  : "hover:text-foreground hover:bg-muted text-muted-foreground"
               )}
               title="Report outdated / incorrect"
             >
-              <ArrowDown className="size-3.5" />
+              <ArrowDown className="size-4" />
             </button>
           </div>
 
-          <span className="flex items-center gap-1 text-[11px] text-muted-foreground px-2">
-            <Eye className="size-3" />
-            <span className="tabular-nums">{views} views</span>
-          </span>
-
-          <span className="flex items-center gap-1 text-[11px] text-muted-foreground px-2">
-            <Download className="size-3" />
-            <span className="tabular-nums">{downloads} downloads</span>
-          </span>
-        </div>
-
-        <div className="flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
-          <span>Branch:</span>
-          <span className="font-bold text-foreground">{resource.branch}</span>
-          <span>·</span>
-          <span>Semester {resource.semester}</span>
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-primary text-primary-foreground hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer"
+          >
+            <Download className="size-3.5" />
+            <span>Get Material</span>
+            <ExternalLink className="size-2.5 opacity-80" />
+          </button>
         </div>
       </div>
 
@@ -505,38 +526,43 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
       {/* ─── Vector Similarity Recommendation Shelf ─── */}
       <SimilarResourcesWidget resourceId={resource.id} subjectCode={resource.subjectCode} />
 
-      {/* ─── Peer Reviews & Errata Discussions ─── */}
-      <div className="space-y-3.5 pt-4 border-t border-border/25">
+      {/* ─── Twitter/X Style Peer Reviews & Discussion Thread ─── */}
+      <div className="space-y-4 pt-4 border-t border-border/25">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-black text-foreground">
               Peer Reviews &amp; Syllabus Accuracy ({comments.length})
             </h3>
             <p className="text-[11px] text-muted-foreground">
-              Student verified corrections, missing solutions &amp; tips
+              Student verified corrections, missing solutions &amp; exam tips
             </p>
           </div>
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-muted border border-border/50 text-muted-foreground">
-            {reliability}% Community Verified
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-muted border border-border/40 text-muted-foreground">
+            {reliability}% Verified Accurate
           </span>
         </div>
 
-        {/* Comment Composer */}
+        {/* Twitter-style inline reply box */}
         <form
           onSubmit={handleSubmitComment}
-          className="flex flex-col gap-2.5 bg-card p-3 rounded-2xl border border-border/60 shadow-xs"
+          className="flex items-start gap-3 py-3 border-y border-border/20"
         >
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground font-medium">Is this material accurate?</span>
-            <div className="flex items-center gap-1">
+          <Avatar className="size-9 rounded-full border border-border/40 shrink-0 mt-0.5">
+            <AvatarImage src={uploaderAvatar} />
+            <AvatarFallback className="text-xs font-bold">You</AvatarFallback>
+          </Avatar>
+
+          <div className="flex-1 space-y-2">
+            {/* Accuracy switcher pills */}
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => setIsHelpful(true)}
                 className={cn(
-                  "px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
+                  "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer",
                   isHelpful
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                    : "text-muted-foreground hover:text-foreground border border-transparent"
                 )}
               >
                 ✅ Accurate &amp; Verified
@@ -545,73 +571,94 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
                 type="button"
                 onClick={() => setIsHelpful(false)}
                 className={cn(
-                  "px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
+                  "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer",
                   !isHelpful
-                    ? "bg-amber-500/20 text-amber-400 border border-amber-500/40"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
+                    : "text-muted-foreground hover:text-foreground border border-transparent"
                 )}
               >
                 ⚠️ Outdated / Errata
               </button>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Add formula correction, exam hints, or review..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              className="flex-1 bg-muted/30 px-3 py-2 rounded-xl text-xs text-foreground placeholder:text-muted-foreground/60 border border-border/40 outline-none focus:border-indigo-500"
-            />
-            <button
-              type="submit"
-              disabled={isSubmittingComment || !commentText.trim()}
-              className="px-3 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold disabled:opacity-40 hover:opacity-90 transition-all cursor-pointer shrink-0 shadow-2xs flex items-center gap-1"
-            >
-              <Send className="size-3" />
-              <span>Post</span>
-            </button>
+            {/* Input & Reply Button */}
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Post your review, formula correction, or exam tip..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                className="flex-1 bg-muted/30 px-3.5 py-2 rounded-full text-xs text-foreground placeholder:text-muted-foreground/60 border border-border/40 outline-none focus:border-primary transition-colors"
+              />
+              <button
+                type="submit"
+                disabled={isSubmittingComment || !commentText.trim()}
+                className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-black disabled:opacity-40 hover:opacity-90 transition-all cursor-pointer shrink-0 shadow-2xs"
+              >
+                Reply
+              </button>
+            </div>
           </div>
         </form>
 
-        {/* Existing Comments List */}
-        <div className="space-y-2">
-          {comments.map((c) => {
-            const commentAvatar = getAvatarUrl(c.author?.avatarUrl, c.author?.username);
-            return (
-              <div key={c.id} className="p-3 rounded-2xl bg-muted/15 border border-border/30 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="size-5 rounded-full">
+        {/* Threaded Replies List */}
+        {comments.length === 0 ? (
+          <div className="py-8 text-center space-y-1 text-muted-foreground">
+            <p className="text-xs font-semibold">No peer reviews yet</p>
+            <p className="text-[11px]">Be the first to verify syllabus accuracy or post corrections.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-border/20">
+            {comments.map((c) => {
+              const commentAvatar = getAvatarUrl(c.author?.avatarUrl, c.author?.username);
+              return (
+                <div key={c.id} className="flex items-start gap-3 py-3.5 group">
+                  <div className="flex flex-col items-center shrink-0">
+                    <Avatar className="size-8.5 rounded-full border border-border/40">
                       <AvatarImage src={commentAvatar} />
-                      <AvatarFallback className="text-[9px]">
+                      <AvatarFallback className="text-[10px] font-bold">
                         {c.author?.displayName?.[0] || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-xs font-bold text-foreground">
-                      {c.author?.displayName || "Student"}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">{formatTimeAgo(c.createdAt)}</span>
+                    <div className="w-0.5 flex-1 bg-border/25 mt-2 -mb-2 rounded-full min-h-3" />
                   </div>
 
-                  <span
-                    className={cn(
-                      "text-[9px] font-black px-2 py-0.2 rounded-md border",
-                      c.isHelpful
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
-                        : "bg-amber-500/10 text-amber-400 border-amber-500/25"
-                    )}
-                  >
-                    {c.isHelpful ? "VERIFIED ACCURATE" : "ERRATA NOTED"}
-                  </span>
-                </div>
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 leading-none">
+                        <span className="text-xs font-bold text-foreground hover:underline">
+                          {c.author?.displayName || "Student"}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          @{c.author?.username || "student"}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground/60">·</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {formatTimeAgo(c.createdAt)}
+                        </span>
+                      </div>
 
-                <p className="text-xs text-muted-foreground/90 pl-7 leading-relaxed">{c.body}</p>
-              </div>
-            );
-          })}
-        </div>
+                      <span
+                        className={cn(
+                          "text-[9px] font-black px-2 py-0.5 rounded-full border",
+                          c.isHelpful
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
+                            : "bg-amber-500/10 text-amber-400 border-amber-500/25"
+                        )}
+                      >
+                        {c.isHelpful ? "VERIFIED ACCURATE" : "ERRATA NOTED"}
+                      </span>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed pt-0.5">
+                      {c.body}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* ─── Academic Auth Modal for Unregistered Visitors ─── */}

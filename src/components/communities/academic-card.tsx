@@ -224,26 +224,29 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
     <article
       id={`academic-${item.id}`}
       className={cn(
-        "p-4 border-b border-border/25 hover:bg-muted/5 transition-all select-none",
-        isHighlighted && "bg-indigo-500/5 ring-2 ring-indigo-500/30 rounded-2xl"
+        "px-4 py-3.5 border-b border-border/25 hover:bg-muted/10 transition-colors select-none",
+        isHighlighted && "bg-primary/5 ring-1 ring-primary/30"
       )}
     >
-      {/* ─── Uploader Header ─── */}
-      <div className="flex items-start justify-between gap-3 mb-2.5">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <Link href={`/@${item.uploader.username}`} className="shrink-0">
-            <Avatar className="size-9 rounded-full border border-border/50">
-              <AvatarImage src={avatar} />
-              <AvatarFallback className="text-xs font-bold">
-                {item.uploader.displayName[0] || "U"}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 leading-none">
+      <div className="flex items-start gap-3">
+        {/* Left Column: Author Avatar */}
+        <Link href={`/@${item.uploader.username}`} className="shrink-0 mt-0.5">
+          <Avatar className="size-10 rounded-full border border-border/40 hover:opacity-90 transition-opacity">
+            <AvatarImage src={avatar} />
+            <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
+              {item.uploader.displayName[0] || "U"}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+
+        {/* Right Column: Tweet Content */}
+        <div className="flex-1 min-w-0 space-y-1.5">
+          {/* Header Row: Author Name, Handle, Time, and Type Badge */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
               <Link
                 href={`/@${item.uploader.username}`}
-                className="text-xs font-bold text-foreground hover:underline truncate"
+                className="text-sm font-bold text-foreground hover:underline truncate"
               >
                 {item.uploader.displayName}
               </Link>
@@ -255,191 +258,160 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
                   className="text-brand shrink-0"
                 />
               )}
-              <span className="text-[11px] text-muted-foreground truncate">@{item.uploader.username}</span>
-              <span className="text-[10px] text-muted-foreground/60">·</span>
-              <span className="text-[11px] text-muted-foreground/80 shrink-0">
+              <span className="text-xs text-muted-foreground truncate">
+                @{item.uploader.username}
+              </span>
+              <span className="text-[11px] text-muted-foreground/60">·</span>
+              <span className="text-xs text-muted-foreground shrink-0">
                 {formatTimeAgo(item.createdAt)}
               </span>
             </div>
-            {item.institution && (
-              <p className="text-[10px] text-muted-foreground font-medium truncate mt-0.5">
-                {item.institution.name.split(",")[0]}
+
+            {/* Type & Share */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                {item.resourceType.replace("_", " ")}
+              </span>
+
+              <button
+                type="button"
+                onClick={handleShare}
+                className="size-7 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                title="Share or Copy Link"
+              >
+                <AnimatedIcon icon={AnimateShare} animation="pop" size={13} />
+              </button>
+            </div>
+          </div>
+
+          {/* Subject Badge & Title */}
+          <div className="space-y-1">
+            <Link
+              href={`/app/academics/${item.id}`}
+              onClick={() => sounds.tap()}
+              className="block group cursor-pointer"
+            >
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
+                <span className="font-mono font-bold text-primary">{item.subjectCode}</span>
+                <span>·</span>
+                <span className="truncate">{item.subjectName}</span>
+                {item.moduleOrChapter && (
+                  <>
+                    <span>·</span>
+                    <span className="font-semibold text-amber-500">{item.moduleOrChapter}</span>
+                  </>
+                )}
+              </div>
+
+              <h3 className="text-[15px] font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
+                {item.title}
+              </h3>
+            </Link>
+
+            {item.description && (
+              <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed line-clamp-2">
+                {item.description}
               </p>
             )}
           </div>
-        </div>
 
-        {/* Resource Type & Module Pill */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 shadow-2xs">
-            {item.resourceType.replace("_", " ")}
-          </span>
-
-          <button
-            type="button"
-            onClick={handleShare}
-            className="size-7 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-            title="Share or Copy Link"
-          >
-            <AnimatedIcon icon={AnimateShare} animation="pop" size={13} />
-          </button>
-        </div>
-      </div>
-
-      {/* ─── Subject Code & Module Header ─── */}
-      <div className="space-y-1.5">
-        <Link
-          href={`/app/academics/${item.id}`}
-          onClick={() => sounds.tap()}
-          className="inline-flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex-wrap"
-        >
-          <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={14} className="shrink-0" />
-          <span className="truncate">
-            {item.subjectCode} • {item.subjectName}
-          </span>
-          {item.moduleOrChapter && (
-            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30">
-              {item.moduleOrChapter}
+          {/* Subtle Context Row */}
+          <div className="flex items-center gap-2 text-[11px] text-muted-foreground pt-0.5 flex-wrap">
+            <span>Sem {item.semester}</span>
+            <span>·</span>
+            <span>{item.branch}</span>
+            {item.institution && (
+              <>
+                <span>·</span>
+                <span className="truncate">{item.institution.name.split(",")[0]}</span>
+              </>
+            )}
+            <span className="ml-auto text-[10px] font-bold text-emerald-500">
+              🎯 {reliability}% Verified
             </span>
-          )}
-        </Link>
-
-        <Link
-          href={`/app/academics/${item.id}`}
-          onClick={() => sounds.tap()}
-          className="block group"
-        >
-          <h3 className="text-sm font-bold text-foreground group-hover:text-indigo-400 transition-colors leading-snug">
-            {item.title}
-          </h3>
-        </Link>
-
-        {item.description && (
-          <p className="text-xs text-muted-foreground/90 leading-relaxed font-normal">{item.description}</p>
-        )}
-      </div>
-
-      {/* ─── Meta Badges (Branch, Semester, Reliability) ─── */}
-      <div className="flex flex-wrap items-center gap-2 pt-3">
-        <div className="flex items-center gap-1 text-[11px] font-semibold text-muted-foreground px-2.5 py-1 rounded-xl bg-muted/40 border border-border/40">
-          <AnimatedIcon
-            icon={AnimateGraduationCap}
-            animation="pop"
-            size={13}
-            className="text-primary shrink-0"
-          />
-          <span>{item.branch}</span>
-        </div>
-
-        <div className="text-[11px] font-semibold text-muted-foreground px-2.5 py-1 rounded-xl bg-muted/30 border border-border/30">
-          <span>Semester {item.semester}</span>
-        </div>
-
-        <div
-          className={cn(
-            "text-[10px] font-black px-2.5 py-1 rounded-xl border flex items-center gap-1",
-            reliability >= 80
-              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/30"
-              : reliability >= 50
-                ? "bg-amber-500/10 text-amber-500 border-amber-500/30"
-                : "bg-rose-500/10 text-rose-500 border-rose-500/30"
-          )}
-          title={`${reliability}% verified positive student rating`}
-        >
-          <span>🎯 {reliability}% Reliable</span>
-        </div>
-
-        {item.fileUrl && (
-          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/25">
-            Cloudflare R2 Direct File
-          </span>
-        )}
-      </div>
-
-      {/* ─── Live Analytics & Action Footer ─── */}
-      <div className="flex items-center justify-between pt-3.5 border-t border-border/15 mt-3 text-xs flex-wrap gap-2">
-        {/* Left: Upvote / Downvote & Comments Toggle */}
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <div className="flex items-center bg-muted/30 rounded-full border border-border/40 p-0.5">
-            <button
-              type="button"
-              onClick={() => handleVote("UP")}
-              className={cn(
-                "flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
-                userVote === "UP"
-                  ? "bg-indigo-500/20 text-indigo-400 font-black shadow-2xs"
-                  : "hover:text-foreground hover:bg-muted"
-              )}
-              title="Upvote (Accurate & helpful)"
-            >
-              <ArrowUp className={cn("size-3.5", userVote === "UP" && "stroke-3")} />
-              <span className="tabular-nums">{upvotes}</span>
-            </button>
-
-            <div className="h-3.5 w-px bg-border/40" />
-
-            <button
-              type="button"
-              onClick={() => handleVote("DOWN")}
-              className={cn(
-                "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold transition-all cursor-pointer",
-                userVote === "DOWN"
-                  ? "bg-rose-500/20 text-rose-400 font-black shadow-2xs"
-                  : "hover:text-foreground hover:bg-muted"
-              )}
-              title="Downvote (Inaccurate or obsolete)"
-            >
-              <ArrowDown className={cn("size-3.5", userVote === "DOWN" && "stroke-3")} />
-              {downvotes > 0 && <span className="tabular-nums">{downvotes}</span>}
-            </button>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowComments(!showComments)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full hover:bg-muted transition-colors cursor-pointer text-muted-foreground hover:text-foreground"
-          >
-            <AnimatedIcon icon={AnimateMessageSquare} animation="pop" size={13} />
-            <span className="text-[11px] font-semibold">
-              {commentsList.length || item.commentsCount || 0}
+          {/* Twitter Action Bar */}
+          <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
+            {/* Comments Toggle */}
+            <button
+              type="button"
+              onClick={() => setShowComments(!showComments)}
+              className="flex items-center gap-1.5 hover:text-sky-400 transition-colors cursor-pointer group"
+            >
+              <span className="p-1.5 rounded-full group-hover:bg-sky-500/10 transition-colors">
+                <AnimatedIcon icon={AnimateMessageSquare} animation="pop" size={14} />
+              </span>
+              <span className="text-[11px] font-semibold tabular-nums">
+                {commentsList.length || item.commentsCount || 0}
+              </span>
+            </button>
+
+            {/* Upvote / Downvote */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => handleVote("UP")}
+                className={cn(
+                  "flex items-center gap-1 hover:text-primary transition-colors cursor-pointer group",
+                  userVote === "UP" && "text-primary font-bold"
+                )}
+                title="Upvote"
+              >
+                <span className="p-1.5 rounded-full group-hover:bg-primary/10 transition-colors">
+                  <ArrowUp className={cn("size-3.5", userVote === "UP" && "stroke-3")} />
+                </span>
+                <span className="text-[11px] font-semibold tabular-nums">{upvotes}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleVote("DOWN")}
+                className={cn(
+                  "p-1.5 rounded-full hover:bg-rose-500/10 hover:text-rose-400 transition-colors cursor-pointer",
+                  userVote === "DOWN" && "text-rose-400"
+                )}
+                title="Downvote errata"
+              >
+                <ArrowDown className="size-3.5" />
+              </button>
+            </div>
+
+            {/* Views */}
+            <span className="flex items-center gap-1 text-[11px] opacity-70">
+              <Eye className="size-3.5" />
+              <span className="tabular-nums">{views}</span>
             </span>
-          </button>
 
-          <span className="flex items-center gap-1 text-[11px] font-medium opacity-70" title="Total Views">
-            <Eye className="size-3" />
-            <span className="tabular-nums">{views}</span>
-          </span>
+            {/* Downloads */}
+            <span className="flex items-center gap-1 text-[11px] opacity-70">
+              <AnimatedIcon icon={AnimateDownload} animation="nudge-up" size={13} />
+              <span className="tabular-nums">{downloads}</span>
+            </span>
+
+            {/* Get Notes Action Button */}
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-2xs"
+            >
+              <span>Get</span>
+              <ExternalLink className="size-2.5 opacity-80" />
+            </button>
+          </div>
         </div>
-
-        {/* Right: Open / Download Action */}
-        <button
-          type="button"
-          onClick={handleDownload}
-          className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white transition-all cursor-pointer shadow-xs active:scale-95"
-        >
-          <AnimatedIcon icon={AnimateDownload} animation="nudge-up" size={13} />
-          <span>Get Notes</span>
-          <ExternalLink className="size-2.5 opacity-80" />
-        </button>
       </div>
 
-      {/* ─── Expandable Peer Reviews & Reliability Comments ─── */}
+      {/* ─── Expandable Peer Reviews & Reliability Comments (Twitter Thread Style) ─── */}
       {showComments && (
-        <div className="mt-3 pt-3 border-t border-border/20 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-foreground">
-              Peer Reliability Reviews &amp; Notes
-            </span>
-            <span className="text-[10px] text-muted-foreground">Community verified</span>
-          </div>
-
+        <div className="mt-2.5 ml-0 sm:ml-11 border-l-2 border-border/25 pl-3 sm:pl-4 space-y-3">
           {/* Comment Composer */}
           <form
             onSubmit={handleSubmitComment}
-            className="flex flex-col gap-2 bg-muted/20 p-2.5 rounded-2xl border border-border/30"
+            className="flex flex-col gap-2 py-2 border-b border-border/20"
           >
             <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground">Is this syllabus-aligned?</span>
+              <span className="text-muted-foreground font-medium">Is this material accurate?</span>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
@@ -447,8 +419,8 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
                   className={cn(
                     "px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
                     isHelpful
-                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                      : "text-muted-foreground"
+                      ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                      : "text-muted-foreground hover:text-foreground border border-transparent"
                   )}
                 >
                   ✅ Accurate
@@ -459,11 +431,11 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
                   className={cn(
                     "px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
                     !isHelpful
-                      ? "bg-amber-500/20 text-amber-400 border border-amber-500/40"
-                      : "text-muted-foreground"
+                      ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
+                      : "text-muted-foreground hover:text-foreground border border-transparent"
                   )}
                 >
-                  ⚠️ Errata / Outdated
+                  ⚠️ Errata
                 </button>
               </div>
             </div>
@@ -471,52 +443,51 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                placeholder="Add formula correction, exam tip, or reliability feedback..."
+                placeholder="Post your reply or verification..."
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none"
+                className="flex-1 bg-muted/30 px-3 py-1.5 rounded-full text-xs text-foreground placeholder:text-muted-foreground/60 border border-border/30 outline-none focus:border-primary transition-colors"
               />
               <button
                 type="submit"
                 disabled={isSubmittingComment || !commentText.trim()}
-                className="size-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-all cursor-pointer shrink-0 shadow-2xs"
+                className="px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black disabled:opacity-40 hover:opacity-90 transition-all cursor-pointer shrink-0 shadow-2xs"
               >
-                <Send className="size-3" />
+                Reply
               </button>
             </div>
           </form>
 
           {/* Comments List */}
-          <div className="space-y-2 max-h-56 overflow-y-auto pr-1 no-scrollbar">
+          <div className="space-y-2 max-h-56 overflow-y-auto pr-1 no-scrollbar divide-y divide-border/15">
             {commentsList.length === 0 ? (
-              <p className="text-[11px] text-muted-foreground italic py-1 text-center">
+              <p className="text-[11px] text-muted-foreground italic py-2 text-center">
                 No peer comments yet. Be the first to verify!
               </p>
             ) : (
               commentsList.map((c) => (
-                <div key={c.id} className="p-2.5 rounded-xl bg-muted/15 border border-border/20 space-y-1">
+                <div key={c.id} className="pt-2 first:pt-0 space-y-1">
                   <div className="flex items-center justify-between text-[11px]">
                     <div className="flex items-center gap-1.5 font-bold text-foreground">
                       <span>{c.author?.displayName || "Student"}</span>
                       <span className="text-[10px] text-muted-foreground font-normal">
                         @{c.author?.username}
                       </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className={cn(
-                          "text-[9px] font-black px-1.5 py-0.2 rounded-full",
-                          c.isHelpful
-                            ? "bg-emerald-500/15 text-emerald-400"
-                            : "bg-amber-500/15 text-amber-400"
-                        )}
-                      >
-                        {c.isHelpful ? "Helpful ✅" : "Notice ⚠️"}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground/70">
+                      <span className="text-[10px] text-muted-foreground/60">·</span>
+                      <span className="text-[10px] text-muted-foreground/80">
                         {formatTimeAgo(c.createdAt)}
                       </span>
                     </div>
+                    <span
+                      className={cn(
+                        "text-[9px] font-black px-1.5 py-0.2 rounded-full",
+                        c.isHelpful
+                          ? "bg-emerald-500/15 text-emerald-400"
+                          : "bg-amber-500/15 text-amber-400"
+                      )}
+                    >
+                      {c.isHelpful ? "Helpful ✅" : "Notice ⚠️"}
+                    </span>
                   </div>
                   <p className="text-xs text-foreground/90 font-normal leading-relaxed">{c.body}</p>
                 </div>

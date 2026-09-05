@@ -4,6 +4,7 @@ import { getDb } from "@/db";
 import { events, institutions, marketplaceItems, posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { redis } from "@/lib/redis";
+import { cleanSnippet } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -110,7 +111,7 @@ export async function GET(req: Request) {
       newMarketplaceListingsCount: activeMarketplace.length,
       highlights: recentPosts.slice(0, 3).map((p) => ({
         id: p.id,
-        excerpt: p.title || p.body.slice(0, 80),
+        excerpt: cleanSnippet(p.title || p.body, 80),
         type: p.type,
       })),
     };

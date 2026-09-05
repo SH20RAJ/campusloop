@@ -93,8 +93,8 @@ export function SimilarResourcesWidget({ resourceId, subjectCode }: SimilarResou
         </span>
       </div>
 
-      {/* ─── Responsive Grid ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* ─── Twitter/X Style Recommended List ─── */}
+      <div className="divide-y divide-border/20 rounded-2xl border border-border/30 bg-card/30 overflow-hidden">
         {similarList.map(({ resource: item, matchScore, matchReason }) => {
           const avatar = getAvatarUrl(item.uploader.avatarUrl, item.uploader.username);
 
@@ -103,53 +103,52 @@ export function SimilarResourcesWidget({ resourceId, subjectCode }: SimilarResou
               key={item.id}
               href={`/app/academics/${item.id}`}
               onClick={() => sounds.tap()}
-              className="flex flex-col justify-between p-3.5 rounded-2xl border border-border/60 bg-card/60 hover:bg-muted/40 hover:border-indigo-500/40 transition-all group cursor-pointer shadow-2xs"
+              className="flex items-center justify-between gap-3 p-3.5 hover:bg-muted/30 transition-colors group cursor-pointer"
             >
-              <div className="space-y-2">
-                {/* Match reason pill & type */}
-                <div className="flex items-center justify-between gap-1 text-[10px] font-bold">
-                  <span className="px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 truncate max-w-[170px]">
-                    {matchReason}
-                  </span>
-                  <span className="text-muted-foreground uppercase text-[9px] font-black">
-                    {item.resourceType.replace("_", " ")}
-                  </span>
-                </div>
+              <div className="flex items-start gap-3 min-w-0 flex-1">
+                <Avatar className="size-8.5 rounded-full border border-border/40 shrink-0 mt-0.5">
+                  <AvatarImage src={avatar} />
+                  <AvatarFallback className="text-[10px] font-bold">
+                    {item.uploader.displayName?.[0] || "U"}
+                  </AvatarFallback>
+                </Avatar>
 
-                {/* Title */}
-                <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                  {item.title}
-                </h4>
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground flex-wrap">
+                    <span className="font-semibold text-primary/90 bg-primary/10 px-1.5 py-0.2 rounded-md">
+                      {matchReason}
+                    </span>
+                    <span>·</span>
+                    <span className="font-mono font-bold text-foreground/80">{item.subjectCode}</span>
+                    <span>·</span>
+                    <span className="uppercase font-bold text-muted-foreground/80">
+                      {item.resourceType.replace("_", " ")}
+                    </span>
+                  </div>
 
-                {/* Subject Code & Semester */}
-                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <span className="font-semibold text-foreground/80">{item.subjectCode}</span>
-                  <span>·</span>
-                  <span>Sem {item.semester}</span>
-                  <span>·</span>
-                  <span>{item.branch}</span>
+                  <h4 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-1">
+                    {item.title}
+                  </h4>
+
+                  <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <span className="truncate max-w-[120px] font-medium text-foreground/70">
+                      {item.uploader.displayName}
+                    </span>
+                    <span>·</span>
+                    <span>Sem {item.semester}</span>
+                    <span>·</span>
+                    <span className="truncate max-w-[100px]">{item.branch}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Footer with uploader & stats */}
-              <div className="flex items-center justify-between pt-2.5 mt-2 border-t border-border/20 text-[11px] text-muted-foreground">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <Avatar className="size-4.5 rounded-full">
-                    <AvatarImage src={avatar} />
-                    <AvatarFallback className="text-[9px]">{item.uploader.displayName[0]}</AvatarFallback>
-                  </Avatar>
-                  <span className="truncate max-w-[100px] font-medium text-foreground/70">
-                    {item.uploader.displayName}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 text-[10px] font-bold">
-                  <span className="flex items-center gap-0.5 text-indigo-400">
-                    <ThumbsUp className="size-2.5" />
-                    <span>{item.upvotesCount}</span>
-                  </span>
-                  <ArrowRight className="size-3 text-muted-foreground/60 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
-                </div>
+              {/* Right: Upvotes & Arrow */}
+              <div className="flex items-center gap-2 shrink-0 pl-2">
+                <span className="flex items-center gap-1 text-[11px] font-bold text-primary/80 bg-primary/5 px-2 py-1 rounded-full border border-primary/15">
+                  <ThumbsUp className="size-3" />
+                  <span>{item.upvotesCount}</span>
+                </span>
+                <ArrowRight className="size-3.5 text-muted-foreground/50 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
               </div>
             </Link>
           );

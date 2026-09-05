@@ -27,7 +27,7 @@ import type { FeedPost } from "@/hooks/use-feed";
 import { repostPost, voteOnPost } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
+import { cleanSnippet, cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 
 interface PostReelCardProps {
   post: FeedPost;
@@ -221,7 +221,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
       navigator
         .share({
           title: `Loop by ${authorName} on CampusLoop`,
-          text: post.body.slice(0, 100),
+          text: cleanSnippet(post.body, 100),
           url: shareUrl,
         })
         .catch(() => {});

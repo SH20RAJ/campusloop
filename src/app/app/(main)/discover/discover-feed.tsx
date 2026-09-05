@@ -36,7 +36,7 @@ import { type FeedPost, useFeed } from "@/hooks/use-feed";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn } from "@/lib/utils";
+import { cleanSnippet, cn } from "@/lib/utils";
 
 const TABS = [
   { id: "EXPLORE", label: "Explore" },
@@ -346,10 +346,10 @@ export function DiscoverFeed() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
             <input
               type="text"
-              placeholder={`Search students, posts, colleges...`}
+              placeholder="Search CampusLoop..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full h-9 pl-9 pr-8 rounded-full bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all shadow-2xs"
+              className="w-full h-9 pl-9 pr-8 rounded-full bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background text-xs font-medium placeholder:text-muted-foreground/70 outline-none transition-all shadow-2xs"
             />
             {searchQuery && (
               <button
@@ -655,8 +655,8 @@ export function DiscoverFeed() {
                       href={item.href}
                       className="block px-4 py-3 hover:bg-muted/30 transition-colors group cursor-pointer"
                     >
-                      <p className="text-sm font-black text-foreground group-hover:underline leading-snug">
-                        {item.headline}
+                      <p className="text-sm font-bold text-foreground group-hover:underline leading-snug">
+                        {cleanSnippet(item.headline, 90)}
                       </p>
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1">
                         <span>{item.timeAgo}</span>

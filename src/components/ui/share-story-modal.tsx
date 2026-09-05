@@ -4,6 +4,7 @@ import { Check, Copy, Download, MessageCircle, Share2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { FeedPost } from "@/hooks/use-feed";
+import { cleanSnippet } from "@/lib/utils";
 
 interface ShareStoryModalProps {
   post: FeedPost;
@@ -32,12 +33,13 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
 
   function handleShareWhatsApp() {
     let text = "";
+    const cleanBody = cleanSnippet(post.body, 120);
     if (post.type === "CONFESSION") {
-      text = `🤫 Anonymous Confession on CampusLoop:\n"${post.body.slice(0, 120)}${post.body.length > 120 ? "..." : ""}"\n\nRead full tea at: ${postUrl}`;
+      text = `🤫 Anonymous Confession on CampusLoop:\n"${cleanBody}"\n\nRead full tea at: ${postUrl}`;
     } else if (post.type === "POLL") {
-      text = `📊 Campus Poll on CampusLoop:\n"${post.body.slice(0, 120)}${post.body.length > 120 ? "..." : ""}"\n\nCast your vote at: ${postUrl}`;
+      text = `📊 Campus Poll on CampusLoop:\n"${cleanBody}"\n\nCast your vote at: ${postUrl}`;
     } else {
-      text = `🔥 Hot topic on CampusLoop:\n"${post.body.slice(0, 120)}${post.body.length > 120 ? "..." : ""}"\n\nJoin the discussion at: ${postUrl}`;
+      text = `🔥 Hot topic on CampusLoop:\n"${cleanBody}"\n\nJoin the discussion at: ${postUrl}`;
     }
 
     const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
@@ -74,7 +76,7 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
         try {
           await navigator.share({
             title: "CampusLoop",
-            text: `Check out this campus post on CampusLoop: "${post.body.slice(0, 100)}..."`,
+            text: `Check out this campus post on CampusLoop: "${cleanSnippet(post.body, 100)}"`,
             url: postUrl,
           });
         } catch {

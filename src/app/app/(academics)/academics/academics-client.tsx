@@ -16,6 +16,7 @@ import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadMediaFile } from "@/lib/upload";
 import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 
 interface AcademicsClientProps {
   profileId: string | null;
@@ -238,13 +239,13 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-28">
-      {/* ─── Sticky Header & Omnibar Search ─── */}
-      <header className="sticky top-0 z-40 flex flex-col gap-2.5 border-b border-border/30 bg-background/85 px-4 pt-3 pb-2 backdrop-blur-xl">
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-28 border-x border-border/30 bg-background">
+      {/* ─── Sticky Twitter/X Header & Omnibar Search ─── */}
+      <header className="sticky top-0 z-40 flex flex-col gap-2.5 border-b border-border/30 bg-background/85 px-4 pt-3 pb-1 backdrop-blur-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h1 className="text-base font-black text-foreground tracking-tight flex items-center gap-2">
-              <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={18} className="text-indigo-500" />
+              <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={18} className="text-primary" />
               <span>Academic Vault</span>
             </h1>
             <span className="text-xs text-muted-foreground font-medium">
@@ -284,15 +285,15 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by subject (CS201), topic, module, book, or PYQ..."
-            className="w-full h-10 rounded-2xl bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background pl-10 pr-9 text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all text-foreground"
+            className="w-full h-9.5 rounded-full bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background pl-10 pr-9 text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all text-foreground"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 size-5 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 size-4.5 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
             >
-              <X className="size-3.5" />
+              <X className="size-3" />
             </button>
           )}
         </div>
@@ -302,44 +303,8 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
           <AcademicAuthBenefitsCard returnTo="/app/academics" />
         )}
 
-        {/* ─── Scope Switcher & Resource Types Filter Strip ─── */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
-          {/* Campus vs All India Scope */}
-          <div className="flex items-center bg-muted/40 p-0.5 rounded-full border border-border/40 shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                sounds.tap();
-                setScope("campus");
-              }}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-black transition-all cursor-pointer",
-                scope === "campus"
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              🏫 My Campus
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                sounds.tap();
-                setScope("global");
-              }}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-[11px] font-black transition-all cursor-pointer",
-                scope === "global"
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              🇮🇳 All Colleges
-            </button>
-          </div>
-
-          <div className="h-4 w-px bg-border/40 shrink-0 mx-0.5" />
-
+        {/* ─── Twitter-Style Sliding Tabs for Resource Types ─── */}
+        <div className="flex border-b border-border/25 overflow-x-auto no-scrollbar pt-0.5">
           {RESOURCE_TYPES.map((type) => {
             const isSelected = selectedType === type.id;
             return (
@@ -352,66 +317,109 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                   setSelectedType(type.id);
                 }}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold shrink-0 transition-all cursor-pointer shadow-2xs active:scale-95",
+                  "relative pb-2.5 pt-1 px-3 text-xs font-bold transition-colors cursor-pointer shrink-0",
                   isSelected
-                    ? "bg-foreground text-background font-black shadow-xs"
-                    : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted border border-border/40"
+                    ? "text-foreground font-black"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 <span>{type.label}</span>
+                {isSelected && (
+                  <motion.div
+                    layoutId="academic-tab-indicator"
+                    className="absolute -bottom-px left-0 right-0 h-0.5 bg-foreground rounded-full"
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  />
+                )}
               </button>
             );
           })}
         </div>
 
-        {/* ─── Secondary Filter Bar (Branch, Semester, Sort) ─── */}
-        <div className="flex items-center justify-between gap-2 pt-1">
-          {/* Branch Dropdown */}
-          <select
-            value={selectedBranch}
-            onChange={(e) => {
-              sounds.tap();
-              setSelectedBranch(e.target.value);
-            }}
-            className="h-8 rounded-xl bg-muted/40 border border-border/40 px-2.5 text-[11px] font-bold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
-          >
-            {BRANCHES.map((b) => (
-              <option key={b} value={b}>
-                {b === "All" ? "🎓 All Branches" : b}
-              </option>
-            ))}
-          </select>
+        {/* ─── Secondary Filter Strip (Campus/India, Branch, Semester, Sort) ─── */}
+        <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar pb-1.5 pt-0.5">
+          {/* Scope Selector */}
+          <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                sounds.tap();
+                setScope("campus");
+              }}
+              className={cn(
+                "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer",
+                scope === "campus"
+                  ? "bg-foreground text-background shadow-xs font-black"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              🏫 My Campus
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                sounds.tap();
+                setScope("global");
+              }}
+              className={cn(
+                "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer",
+                scope === "global"
+                  ? "bg-foreground text-background shadow-xs font-black"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              🇮🇳 All Colleges
+            </button>
+          </div>
 
-          {/* Semester Dropdown */}
-          <select
-            value={selectedSemester}
-            onChange={(e) => {
-              sounds.tap();
-              setSelectedSemester(e.target.value);
-            }}
-            className="h-8 rounded-xl bg-muted/40 border border-border/40 px-2.5 text-[11px] font-bold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
-          >
-            {SEMESTERS.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.id === "all" ? "📚 All Semesters" : s.label}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+            {/* Branch Dropdown */}
+            <select
+              value={selectedBranch}
+              onChange={(e) => {
+                sounds.tap();
+                setSelectedBranch(e.target.value);
+              }}
+              className="h-7.5 rounded-full bg-muted/40 border border-border/40 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
+            >
+              {BRANCHES.map((b) => (
+                <option key={b} value={b}>
+                  {b === "All" ? "🎓 All Branches" : b}
+                </option>
+              ))}
+            </select>
 
-          {/* Sort By Dropdown */}
-          <select
-            value={sortBy}
-            onChange={(e) => {
-              sounds.tap();
-              setSortBy(e.target.value as any);
-            }}
-            className="h-8 rounded-xl bg-muted/40 border border-border/40 px-2.5 text-[11px] font-bold text-muted-foreground hover:text-foreground outline-none cursor-pointer ml-auto"
-          >
-            <option value="latest">⏱️ Latest</option>
-            <option value="popular">🔥 Most Upvoted</option>
-            <option value="downloads">📥 Most Downloaded</option>
-            <option value="views">👁️ Most Viewed</option>
-          </select>
+            {/* Semester Dropdown */}
+            <select
+              value={selectedSemester}
+              onChange={(e) => {
+                sounds.tap();
+                setSelectedSemester(e.target.value);
+              }}
+              className="h-7.5 rounded-full bg-muted/40 border border-border/40 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
+            >
+              {SEMESTERS.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.id === "all" ? "📚 All Sems" : s.label}
+                </option>
+              ))}
+            </select>
+
+            {/* Sort Dropdown */}
+            <select
+              value={sortBy}
+              onChange={(e) => {
+                sounds.tap();
+                setSortBy(e.target.value as any);
+              }}
+              className="h-7.5 rounded-full bg-muted/40 border border-border/40 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
+            >
+              <option value="latest">⏱️ Latest</option>
+              <option value="popular">🔥 Most Upvoted</option>
+              <option value="downloads">📥 Most Downloaded</option>
+              <option value="views">👁️ Most Viewed</option>
+            </select>
+          </div>
         </div>
       </header>
 

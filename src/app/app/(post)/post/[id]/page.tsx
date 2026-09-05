@@ -12,6 +12,7 @@ import { formatApiFeedPosts, resolveFeedPage } from "@/lib/feed";
 import { getRecommendedUsers } from "@/lib/recommendations/recommended-users";
 import { getRelatedPosts } from "@/lib/recommendations/related-posts";
 import { getCachedAuthUser, getCachedPostDetail, getCachedUserProfile } from "@/lib/server-cache";
+import { cleanSnippet } from "@/lib/utils";
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   }
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
-  const snippet = post.body.length > 150 ? `${post.body.slice(0, 147)}...` : post.body;
+  const snippet = cleanSnippet(post.body, 150) || "Explore student yaps, confessions, and campus discussions on CampusLoop.";
   const title = `${post.type === "CONFESSION" ? "Confession" : "Discussion"} by ${authorName} in ${post.institution?.name?.split(",")[0] || "Campus"}`;
   const url = `https://campusloop.space/app/post/${id}`;
 

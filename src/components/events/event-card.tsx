@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
+import { AddToCalendarDropdown } from "./add-to-calendar-dropdown";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -221,8 +222,8 @@ export function EventCard({ event }: EventCardProps) {
           </div>
         </div>
 
-        {/* Footer info & Register CTA */}
-        <div className="mt-2 flex items-center justify-between gap-3 border-t border-border/30 pt-2">
+        {/* Footer info & Actions */}
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2.5 border-t border-border/30 pt-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="font-semibold text-foreground">{attendeeCount}</span>
             <span>registered</span>
@@ -230,28 +231,45 @@ export function EventCard({ event }: EventCardProps) {
             <span className="font-bold text-foreground">{event.entryFee || "Free"}</span>
           </div>
 
-          <button
-            type="button"
-            onClick={event.participationType === "TEAM" ? undefined : handleQuickRegister}
-            disabled={isMutating || isRegistered}
-            className={cn(
-              "flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-4 text-xs font-black transition-all active:scale-95",
-              isRegistered
-                ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                : "bg-primary text-primary-foreground hover:opacity-90 shadow-2xs"
-            )}
-          >
-            {isRegistered ? (
-              <>
-                <Check className="size-3.5" />
-                Registered
-              </>
-            ) : event.participationType === "TEAM" ? (
-              "View & Form Team"
-            ) : (
-              "Register Now"
-            )}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <AddToCalendarDropdown
+              event={{
+                id: event.id,
+                title: event.title,
+                description: event.description,
+                venue: event.venue,
+                mode: event.mode,
+                startDate: event.startDate,
+                endDate: event.endDate,
+                slug: event.slug,
+                clubName: event.clubName,
+              }}
+              variant="button"
+            />
+
+            <button
+              type="button"
+              onClick={event.participationType === "TEAM" ? undefined : handleQuickRegister}
+              disabled={isMutating || isRegistered}
+              className={cn(
+                "flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-4 text-xs font-black transition-all active:scale-95",
+                isRegistered
+                  ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "bg-primary text-primary-foreground hover:opacity-90 shadow-2xs"
+              )}
+            >
+              {isRegistered ? (
+                <>
+                  <Check className="size-3.5" />
+                  Registered
+                </>
+              ) : event.participationType === "TEAM" ? (
+                "View & Form Team"
+              ) : (
+                "Register Now"
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </Link>

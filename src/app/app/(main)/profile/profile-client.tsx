@@ -175,7 +175,7 @@ export function ProfileClientView({
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialPosts.length >= 20);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setPosts(initialPosts);
@@ -210,8 +210,7 @@ export function ProfileClientView({
   }, [isLoadingMore, hasMore, page, profile.id]);
 
   useEffect(() => {
-    const sentinel = observerRef.current;
-    if (!sentinel || !hasMore) return;
+    if (!sentinelNode || !hasMore || activeTab !== "posts") return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -219,12 +218,12 @@ export function ProfileClientView({
           loadMorePosts();
         }
       },
-      { threshold: 0.2, rootMargin: "100px" }
+      { threshold: 0.2, rootMargin: "250px" }
     );
 
-    observer.observe(sentinel);
+    observer.observe(sentinelNode);
     return () => observer.disconnect();
-  }, [hasMore, isLoadingMore, loadMorePosts]);
+  }, [sentinelNode, hasMore, isLoadingMore, loadMorePosts, activeTab]);
 
   const points = profile.points || 0;
   const tier = getCloutTier(points);
@@ -852,7 +851,7 @@ export function ProfileClientView({
 
             {/* Infinite Scroll Trigger Sentinel */}
             {hasMore && (
-              <div ref={observerRef} className="py-6 flex items-center justify-center">
+              <div ref={setSentinelNode} className="py-6 flex items-center justify-center">
                 {isLoadingMore && (
                   <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
                     <Loader2 className="size-4 animate-spin text-primary" />

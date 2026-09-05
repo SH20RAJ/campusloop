@@ -77,7 +77,7 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
     }
   );
 
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [loadMoreNode, setLoadMoreNode] = useState<HTMLDivElement | null>(null);
 
   // Flatten all feed items
   const allItems = useMemo(() => {
@@ -127,6 +127,7 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
         const matchesSeller =
           item.seller?.displayName?.toLowerCase().includes(q) ||
           item.seller?.username?.toLowerCase().includes(q);
+
         if (!matchesTitle && !matchesDesc && !matchesLocation && !matchesCategory && !matchesSeller) {
           return false;
         }
@@ -136,26 +137,27 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
     });
   }, [marketplaceListings, selectedCategory, selectedPriceFilter, hideSold, searchQuery]);
 
-  const hasMore = data?.[data.length - 1]?.hasMore;
-  const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+  const hasMore = Boolean(data?.[data.length - 1]?.hasMore);
+  const isLoadingMore = Boolean(
+    isLoading || (isValidating && size > 1) || (size > 0 && data && typeof data[size - 1] === "undefined")
+  );
 
   // Infinite Scroll Trigger
   useEffect(() => {
-    const node = loadMoreRef.current;
-    if (!node || !hasMore || isLoadingMore) return;
+    if (!loadMoreNode || !hasMore || isLoadingMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
           setSize((s) => s + 1);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: "300px" }
     );
 
-    observer.observe(node);
+    observer.observe(loadMoreNode);
     return () => observer.disconnect();
-  }, [hasMore, isLoadingMore, setSize]);
+  }, [loadMoreNode, hasMore, isLoadingMore, setSize]);
 
   function handleCategoryChange(catId: string) {
     sounds.tap();
@@ -347,7 +349,7 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
         )}
 
         {/* Infinite Scroll Trigger */}
-        <div ref={loadMoreRef} className="py-6 text-center">
+        <div ref={setLoadMoreNode} className="py-6 text-center">
           {isLoadingMore && (
             <div className="flex justify-center py-2">
               <Loader2 className="size-5 animate-spin text-muted-foreground" />

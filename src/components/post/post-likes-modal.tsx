@@ -98,27 +98,25 @@ export function PostLikesModal({ postId, isOpen, onClose, currentUserId }: PostL
   const isLoadingInitial = isLoading && users.length === 0;
   const isLoadingMore = isValidating && data && typeof data[size - 1] === "undefined";
 
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
+  const isValidatingRef = useRef(isValidating);
+  isValidatingRef.current = isValidating;
 
   useEffect(() => {
-    if (isReachingEnd || isValidating || !isOpen) return;
+    if (!sentinelNode || isReachingEnd || !isOpen) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && !isReachingEnd && !isValidatingRef.current) {
           setSize((prev) => prev + 1);
         }
       },
       { rootMargin: "250px" }
     );
 
-    const currentSentinel = sentinelRef.current;
-    if (currentSentinel) observer.observe(currentSentinel);
-
-    return () => {
-      if (currentSentinel) observer.unobserve(currentSentinel);
-    };
-  }, [isReachingEnd, isValidating, setSize, isOpen]);
+    observer.observe(sentinelNode);
+    return () => observer.disconnect();
+  }, [sentinelNode, isReachingEnd, setSize, isOpen]);
 
   if (!isOpen) return null;
 
@@ -276,7 +274,7 @@ export function PostLikesModal({ postId, isOpen, onClose, currentUserId }: PostL
               })}
 
               {/* Sentinel element for infinite scrolling */}
-              {!isReachingEnd && <div ref={sentinelRef} className="h-2" />}
+              {!isReachingEnd && <div ref={setSentinelNode} className="h-2" />}
 
               {/* Loading More Spinner */}
               {isLoadingMore && (

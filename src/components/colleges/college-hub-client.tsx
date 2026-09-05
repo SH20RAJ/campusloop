@@ -85,7 +85,7 @@ export function CollegeHubClient({
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialPosts.length >= 20);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setPosts(initialPosts);
@@ -119,22 +119,24 @@ export function CollegeHubClient({
     }
   }, [isLoadingMore, hasMore, page, college.id]);
 
+  const loadMorePostsRef = useRef(loadMorePosts);
+  loadMorePostsRef.current = loadMorePosts;
+
   useEffect(() => {
-    const sentinel = observerRef.current;
-    if (!sentinel || !hasMore || activeTab !== "feed") return;
+    if (!sentinelNode || !hasMore || activeTab !== "feed") return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-          loadMorePosts();
+          loadMorePostsRef.current();
         }
       },
-      { threshold: 0.2, rootMargin: "150px" }
+      { threshold: 0.2, rootMargin: "250px" }
     );
 
-    observer.observe(sentinel);
+    observer.observe(sentinelNode);
     return () => observer.disconnect();
-  }, [hasMore, isLoadingMore, loadMorePosts, activeTab]);
+  }, [sentinelNode, hasMore, isLoadingMore, activeTab]);
 
   // Filtered and Sorted Posts
   const filteredPosts = useMemo(() => {
@@ -431,7 +433,7 @@ export function CollegeHubClient({
 
             {/* Infinite Scroll Sentinel */}
             {hasMore && (
-              <div ref={observerRef} className="py-6 flex items-center justify-center">
+              <div ref={setSentinelNode} className="py-6 flex items-center justify-center">
                 {isLoadingMore && (
                   <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
                     <Loader2 className="size-4 animate-spin text-primary" />

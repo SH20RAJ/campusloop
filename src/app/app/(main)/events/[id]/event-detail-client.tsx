@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { fetcher } from "@/lib/api";
+import { downloadAppleCalendarIcs, openGoogleCalendar, type CalendarEvent } from "@/lib/calendar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { getAvatarUrl } from "@/lib/utils";
@@ -85,46 +86,18 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
     minute: "2-digit",
   })} – ${endDate.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`;
 
-  // Google Calendar URL Generator
-  function getGoogleCalendarUrl() {
-    const startIso = startDate.toISOString().replace(/-|:|\.\d\d\d/g, "");
-    const endIso = endDate.toISOString().replace(/-|:|\.\d\d\d/g, "");
-    const details = encodeURIComponent(
-      `${event.description}\n\nOrganized by: ${event.clubName}\nRegister & Details: ${window.location.href}`
-    );
-    const location = encodeURIComponent(event.venue || event.mode);
-    const title = encodeURIComponent(event.title);
-
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startIso}/${endIso}&details=${details}&location=${location}`;
-  }
-
-  // Download .ics file
-  function downloadIcs() {
-    haptics.light();
-    const icsContent = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//CampusLoop//Campus Events//EN",
-      "BEGIN:VEVENT",
-      `SUMMARY:${event.title}`,
-      `DESCRIPTION:${event.description.slice(0, 300)}`,
-      `LOCATION:${event.venue || event.mode}`,
-      `DTSTART:${startDate.toISOString().replace(/-|:|\.\d\d\d/g, "")}`,
-      `DTEND:${endDate.toISOString().replace(/-|:|\.\d\d\d/g, "")}`,
-      `URL:${window.location.href}`,
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
-
-    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
-    link.setAttribute("download", `${event.slug || "event"}.ics`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success("Calendar invite (.ics) downloaded 📅");
-  }
+  // Unified Calendar Event for Google and Apple Calendar
+  const calendarEvent: CalendarEvent = {
+    id: event.id,
+    title: event.title,
+    description: event.description,
+    venue: event.venue,
+    mode: event.mode,
+    startDate: event.startDate,
+    endDate: event.endDate,
+    slug: event.slug,
+    clubName: event.clubName,
+  };
 
   async function handleToggleReminder() {
     if (isTogglingReminder) return;
@@ -357,26 +330,40 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
             </div>
           </div>
 
-          {/* Calendar Quick Add Links */}
-          <div className="flex items-center gap-2 pt-2 border-t border-border/30 text-xs">
-            <span className="text-muted-foreground font-semibold">Calendar:</span>
-            <a
-              href={getGoogleCalendarUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold text-primary hover:underline flex items-center gap-1"
-            >
-              <span>Add to Google Calendar</span>
-              <ExternalLink className="size-3" />
-            </a>
-            <span>·</span>
-            <button
-              onClick={downloadIcs}
-              className="font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <Download className="size-3" />
-              <span>Download .ics</span>
-            </button>
+          {/* Calendar Quick Add Actions */}
+          <div className="flex flex-wrap items-center justify-between gap-2.5 pt-3 border-t border-border/30 text-xs">
+            <span className="text-muted-foreground font-bold flex items-center gap-1.5">
+              <Calendar className="size-3.5 text-primary" />
+              <span>Add to personal calendar:</span>
+            </span>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => openGoogleCalendar(calendarEvent)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/40 bg-muted/30 hover:bg-muted/70 text-foreground text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs"
+              >
+                <div className="size-3.5 text-blue-500 shrink-0">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="size-full">
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
+                  </svg>
+                </div>
+                <span>Google Calendar</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => downloadAppleCalendarIcs(calendarEvent)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/40 bg-muted/30 hover:bg-muted/70 text-foreground text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs"
+              >
+                <div className="size-3.5 text-foreground shrink-0">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="size-full">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-2 .6-2.65 1.35-.58.67-1.09 1.74-.95 2.77.99.08 2.03-.52 2.68-1.27z" />
+                  </svg>
+                </div>
+                <span>Apple Calendar</span>
+              </button>
+            </div>
           </div>
         </div>
 

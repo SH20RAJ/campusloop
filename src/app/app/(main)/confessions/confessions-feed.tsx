@@ -42,24 +42,23 @@ export function ConfessionsFeed() {
     randomSeed
   );
 
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [loadMoreNode, setLoadMoreNode] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const node = loadMoreRef.current;
-    if (!node || isReachingEnd || isLoadingMore) return;
+    if (!loadMoreNode || isReachingEnd || isLoadingMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && !isReachingEnd && !isLoadingMore) {
           setSize((s) => s + 1);
         }
       },
-      { threshold: 0.01, rootMargin: "600px 0px" }
+      { threshold: 0.05, rootMargin: "300px" }
     );
 
-    observer.observe(node);
+    observer.observe(loadMoreNode);
     return () => observer.disconnect();
-  }, [isReachingEnd, isLoadingMore, setSize]);
+  }, [loadMoreNode, isReachingEnd, isLoadingMore, setSize]);
 
   function handleScopeToggle(newScope: "CAMPUS" | "GLOBAL") {
     sounds.tap();
@@ -189,7 +188,7 @@ export function ConfessionsFeed() {
 
               {/* Infinite Scroll Trigger */}
               <div
-                ref={loadMoreRef}
+                ref={setLoadMoreNode}
                 className="flex flex-col justify-center items-center py-8 text-xs text-muted-foreground gap-2"
               >
                 {isLoadingMore ? (

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import { Button } from "@/components/ui/button";
+import { AddToCalendarDropdown } from "@/components/events/add-to-calendar-dropdown";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -154,25 +155,42 @@ export function EventEmbed({ eventId }: EventEmbedProps) {
             <span>{event.attendeeCount || 0} attending</span>
           </div>
 
-          <Button
-            size="sm"
-            onClick={handleQuickRegister}
-            disabled={isRegistering || userRegistered}
-            className={`h-8 px-3.5 text-xs font-black rounded-full shrink-0 transition-all cursor-pointer ${
-              userRegistered
-                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
-                : "bg-primary text-primary-foreground hover:opacity-90 shadow-2xs"
-            }`}
-          >
-            {userRegistered ? (
-              <>
-                <Check className="size-3 mr-1" />
-                <span>Registered</span>
-              </>
-            ) : (
-              <span>Register</span>
-            )}
-          </Button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <AddToCalendarDropdown
+              event={{
+                id: event.id,
+                title: event.title,
+                description: event.description,
+                venue: event.venue,
+                mode: event.mode,
+                startDate: event.startDate,
+                endDate: event.endDate,
+                slug: event.slug,
+                clubName: event.clubName,
+              }}
+              variant="minimal"
+            />
+
+            <Button
+              size="sm"
+              onClick={handleQuickRegister}
+              disabled={isRegistering || userRegistered}
+              className={`h-8 px-3.5 text-xs font-black rounded-full shrink-0 transition-all cursor-pointer ${
+                userRegistered
+                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                  : "bg-primary text-primary-foreground hover:opacity-90 shadow-2xs"
+              }`}
+            >
+              {userRegistered ? (
+                <>
+                  <Check className="size-3 mr-1" />
+                  <span>Registered</span>
+                </>
+              ) : (
+                <span>Register</span>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </Link>

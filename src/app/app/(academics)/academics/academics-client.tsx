@@ -89,7 +89,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   const [formFileName, setFormFileName] = useState("");
   const [formDescription, setFormDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [loadMoreNode, setLoadMoreNode] = useState<HTMLDivElement | null>(null);
 
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && (!previousPageData.items?.length || !previousPageData.hasMore)) {
@@ -126,14 +126,14 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   const totalCount = data?.[0]?.total ?? 0;
   const isInitialLoading = isLoading && items.length === 0;
   const isEmpty = !isLoading && items.length === 0;
-  const isReachingEnd = isEmpty || (data && !data[data.length - 1]?.hasMore);
-  const isLoadingMore =
-    isLoading || (size > 0 && data && typeof data[size - 1] === "undefined") || isValidating;
+  const isReachingEnd = isEmpty || Boolean(data && !data[data.length - 1]?.hasMore);
+  const isLoadingMore = Boolean(
+    isLoading || (isValidating && size > 1) || (size > 0 && data && typeof data[size - 1] === "undefined")
+  );
 
   // Infinite scroll observer
   useEffect(() => {
-    const target = loadMoreRef.current;
-    if (!target) return;
+    if (!loadMoreNode || isReachingEnd || isLoadingMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -144,9 +144,9 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
       { threshold: 0.1, rootMargin: "300px" }
     );
 
-    observer.observe(target);
+    observer.observe(loadMoreNode);
     return () => observer.disconnect();
-  }, [isReachingEnd, isLoadingMore, setSize]);
+  }, [loadMoreNode, isReachingEnd, isLoadingMore, setSize]);
 
   // Scroll to highlight element if present in query param
   useEffect(() => {
@@ -443,10 +443,10 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
             ))}
 
             {/* Sentinel element for infinite scroll */}
-            <div ref={loadMoreRef} className="flex flex-col items-center justify-center p-4 min-h-16">
+            <div ref={setLoadMoreNode} className="flex flex-col items-center justify-center p-4 min-h-16">
               {isLoadingMore && (
                 <div className="flex items-center gap-2 py-3 text-xs font-semibold text-muted-foreground">
-                  <Loader2 className="size-4 animate-spin text-indigo-500" />
+                  <Loader2 className="size-4 animate-spin text-primary" />
                   <span>Loading more vault resources...</span>
                 </div>
               )}
@@ -460,7 +460,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                         sounds.tap();
                         setShowUploadModal(true);
                       }}
-                      className="text-indigo-500 hover:underline font-bold cursor-pointer"
+                      className="text-primary hover:underline font-bold cursor-pointer"
                     >
                       + Add your notes
                     </button>

@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Loader2, Users } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useSWRInfinite from "swr/infinite";
 import { type FollowListItem, FollowListRow } from "@/components/profile/follow-list-row";
 import { fetcher } from "@/lib/api";
@@ -69,27 +69,25 @@ export function FollowListClient({
   const isReachingEnd = data ? data[data.length - 1]?.hasMore === false : false;
   const isLoadingMore = isValidating && data && typeof data[size - 1] === "undefined";
 
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
+  const isValidatingRef = useRef(isValidating);
+  isValidatingRef.current = isValidating;
 
   useEffect(() => {
-    if (isReachingEnd || isValidating) return;
+    if (!sentinelNode || isReachingEnd) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && !isReachingEnd && !isValidatingRef.current) {
           setSize((prev) => prev + 1);
         }
       },
-      { rootMargin: "400px" }
+      { threshold: 0.1, rootMargin: "250px" }
     );
 
-    const currentSentinel = sentinelRef.current;
-    if (currentSentinel) observer.observe(currentSentinel);
-
-    return () => {
-      if (currentSentinel) observer.unobserve(currentSentinel);
-    };
-  }, [isReachingEnd, isValidating, setSize]);
+    observer.observe(sentinelNode);
+    return () => observer.disconnect();
+  }, [sentinelNode, isReachingEnd, setSize]);
 
   const tabs: { id: FollowDirection; label: string; count: number }[] = [
     { id: "followers", label: "Followers", count: followersCount },
@@ -166,7 +164,7 @@ export function FollowListClient({
         </div>
       )}
 
-      {!isReachingEnd && <div ref={sentinelRef} className="h-1" />}
+      {!isReachingEnd && <div ref={setSentinelNode} className="h-1" />}
 
       {isReachingEnd && users.length > 0 && (
         <p className="py-6 text-center text-[11px] font-semibold text-muted-foreground">

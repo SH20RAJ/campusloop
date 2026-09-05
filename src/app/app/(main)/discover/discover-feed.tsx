@@ -240,20 +240,21 @@ export function DiscoverFeed() {
   } = useFeed(scope, feedType, feedSort);
   const { colleges, isLoading: collegesLoading } = useColleges(120);
 
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [loadMoreNode, setLoadMoreNode] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const node = loadMoreRef.current;
-    if (!node || isReachingEnd || isLoadingMore || trimmedSearch) return;
+    if (!loadMoreNode || isReachingEnd || isLoadingMore || trimmedSearch) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) setSize((s) => s + 1);
+        if (entries[0].isIntersecting && !isReachingEnd && !isLoadingMore) {
+          setSize((s) => s + 1);
+        }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: "300px" }
     );
-    observer.observe(node);
+    observer.observe(loadMoreNode);
     return () => observer.disconnect();
-  }, [isReachingEnd, isLoadingMore, setSize, trimmedSearch]);
+  }, [loadMoreNode, isReachingEnd, isLoadingMore, setSize, trimmedSearch]);
 
   async function handleFollowToggle(peerId: string, peerName: string) {
     sounds.tap();
@@ -874,7 +875,7 @@ export function DiscoverFeed() {
                   </div>
                 )}
 
-                <div ref={loadMoreRef} className="py-6 text-center">
+                <div ref={setLoadMoreNode} className="py-6 text-center">
                   {isLoadingMore && <FeedSkeleton />}
                 </div>
               </div>
@@ -925,7 +926,7 @@ export function DiscoverFeed() {
                   </div>
                 )}
 
-                <div ref={loadMoreRef} className="py-6 text-center">
+                <div ref={setLoadMoreNode} className="py-6 text-center">
                   {isLoadingMore && <FeedSkeleton />}
                 </div>
               </div>
@@ -1074,7 +1075,7 @@ export function DiscoverFeed() {
                 </div>
               )}
 
-              <div ref={loadMoreRef} className="py-6 text-center">
+              <div ref={setLoadMoreNode} className="py-6 text-center">
                 {isLoadingMore && <FeedSkeleton />}
               </div>
             </div>

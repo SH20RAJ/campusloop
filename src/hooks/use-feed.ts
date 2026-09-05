@@ -144,7 +144,9 @@ export function useFeed(
   const isReachingEnd = Boolean(
     data && (data.length === 0 || (data[data.length - 1] && data[data.length - 1].length < PAGE_LIMIT))
   );
-  const isLoadingMore = Boolean(isLoading || (size > 0 && data && typeof data[size - 1] === "undefined"));
+  const isLoadingMore = Boolean(
+    isLoading || (isValidating && size > 1) || (size > 0 && data && typeof data[size - 1] === "undefined")
+  );
 
   return {
     feed,

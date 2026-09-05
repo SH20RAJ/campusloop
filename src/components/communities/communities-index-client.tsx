@@ -92,27 +92,25 @@ export function CommunitiesIndexClient({
   const isEmptyFeed = data?.[0]?.items?.length === 0;
   const isReachingFeedEnd = isEmptyFeed || (data && data[data.length - 1]?.hasMore === false);
 
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
+  const isValidatingRef = useRef(isValidating);
+  isValidatingRef.current = isValidating;
 
   useEffect(() => {
-    if (activeTab !== "feed" || isReachingFeedEnd || isValidating) return;
+    if (!sentinelNode || activeTab !== "feed" || isReachingFeedEnd) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isReachingFeedEnd && !isValidating) {
+        if (entries[0].isIntersecting && !isReachingFeedEnd && !isValidatingRef.current) {
           setSize((prev) => prev + 1);
         }
       },
-      { rootMargin: "400px" }
+      { threshold: 0.1, rootMargin: "250px" }
     );
 
-    const currentSentinel = sentinelRef.current;
-    if (currentSentinel) observer.observe(currentSentinel);
-
-    return () => {
-      if (currentSentinel) observer.unobserve(currentSentinel);
-    };
-  }, [activeTab, isReachingFeedEnd, isValidating, setSize]);
+    observer.observe(sentinelNode);
+    return () => observer.disconnect();
+  }, [sentinelNode, activeTab, isReachingFeedEnd, setSize]);
 
   // Filtered communities list for Explore tab
   const filteredCommunities = useMemo(() => {
@@ -383,7 +381,7 @@ export function CommunitiesIndexClient({
             initialPosts.map((post) => <FeedCard key={post.id} post={post} currentUserId={profileId} />)}
 
           {/* Infinite Scroll Sentinel */}
-          <div ref={sentinelRef} className="py-6 flex justify-center items-center">
+          <div ref={setSentinelNode} className="py-6 flex justify-center items-center">
             {isValidating ? (
               <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold">
                 <Loader2 className="size-4 animate-spin text-primary" />

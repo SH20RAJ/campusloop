@@ -162,29 +162,25 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
   const isEmpty = data?.[0]?.items?.length === 0;
   const isReachingEnd = isEmpty || (data && data[data.length - 1]?.hasMore === false);
 
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
+  const isValidatingRef = useRef(isValidating);
+  isValidatingRef.current = isValidating;
 
   useEffect(() => {
-    if (isReachingEnd || isValidating) return;
+    if (!sentinelNode || isReachingEnd) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isReachingEnd && !isValidating) {
+        if (entries[0].isIntersecting && !isReachingEnd && !isValidatingRef.current) {
           setSize((prev) => prev + 1);
         }
       },
-      { rootMargin: "400px" }
+      { threshold: 0.1, rootMargin: "250px" }
     );
 
-    const currentSentinel = sentinelRef.current;
-    if (currentSentinel) {
-      observer.observe(currentSentinel);
-    }
-
-    return () => {
-      if (currentSentinel) observer.unobserve(currentSentinel);
-    };
-  }, [isReachingEnd, isValidating, setSize]);
+    observer.observe(sentinelNode);
+    return () => observer.disconnect();
+  }, [sentinelNode, isReachingEnd, setSize]);
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24 border-x border-border/20 bg-background text-foreground select-none">
@@ -262,7 +258,7 @@ export function DedicatedHubClient({ hubType, profileId }: DedicatedHubClientPro
         })}
 
         {/* Loading Sentinel */}
-        <div ref={sentinelRef} className="py-6 flex justify-center items-center">
+        <div ref={setSentinelNode} className="py-6 flex justify-center items-center">
           {isValidating ? (
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold">
               <Loader2 className="size-4 animate-spin text-primary" />

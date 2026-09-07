@@ -4,6 +4,7 @@ import { CheckCircle2, ExternalLink, FileText, Globe, GraduationCap, Search, Spa
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { gtagEvent, trackAcademicSourceClick } from "@/lib/analytics/ga4";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
@@ -220,6 +221,7 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
                 type="button"
                 onClick={() => {
                   sounds.tap();
+                  gtagEvent("academic_source_submit_clicked", { source: "banner" });
                   onOpenUploadModal();
                 }}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
@@ -343,6 +345,14 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
             <div className="flex items-center justify-between gap-2 pt-4 mt-3 border-t border-border/30">
               <Link
                 href={source.campusLoopFilterUrl}
+                onClick={() => {
+                  trackAcademicSourceClick({
+                    id: source.id,
+                    name: source.name,
+                    university: source.university,
+                    action: "browse_internal",
+                  });
+                }}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600/15 hover:bg-indigo-600 text-indigo-400 hover:text-white font-bold text-xs transition-all cursor-pointer"
               >
                 <FileText className="size-3.5" />
@@ -353,6 +363,14 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
                 href={source.officialUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => {
+                  trackAcademicSourceClick({
+                    id: source.id,
+                    name: source.name,
+                    university: source.university,
+                    action: "visit_external",
+                  });
+                }}
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-semibold transition-colors"
               >
                 <span>Visit Source</span>

@@ -14,6 +14,7 @@ import { fetcher } from "@/lib/api";
 import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
 import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
 import { getGuestDownloadCount, GUEST_DOWNLOAD_LIMIT } from "@/lib/academic-download-limiter";
+import { trackAcademicSearch, trackFeedSwitch } from "@/lib/analytics/ga4";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadMediaFile } from "@/lib/upload";
@@ -103,6 +104,19 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
       setGuestRemaining(Math.max(0, GUEST_DOWNLOAD_LIMIT - used));
     }
   }, [profileId]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) return;
+    const timer = setTimeout(() => {
+      trackAcademicSearch(
+        searchQuery.trim(),
+        selectedBranch !== "All" ? selectedBranch : undefined,
+        selectedSemester !== "all" ? selectedSemester : undefined,
+        selectedType !== "all" ? selectedType : undefined
+      );
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedBranch, selectedSemester, selectedType]);
 
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && (!previousPageData.items?.length || !previousPageData.hasMore)) {

@@ -2,7 +2,9 @@
 
 import { Bookmark, ChevronRight, Download, GraduationCap, MessageSquare, Zap, ThumbsUp, UploadCloud, X } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { trackAuthModalCta, trackAuthModalTrigger } from "@/lib/analytics/ga4";
 import { sounds } from "@/lib/sounds";
 
 interface AcademicAuthModalProps {
@@ -66,6 +68,12 @@ export function AcademicAuthModal({
   const CurrentIcon = reasonText.icon;
   const signInUrl = `/handler/sign-in${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ""}`;
 
+  useEffect(() => {
+    if (isOpen) {
+      trackAuthModalTrigger(actionReason, returnTo);
+    }
+  }, [isOpen, actionReason, returnTo]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md p-0 overflow-hidden border-indigo-500/30 bg-card rounded-3xl shadow-2xl">
@@ -120,6 +128,7 @@ export function AcademicAuthModal({
               href={signInUrl}
               onClick={() => {
                 sounds.tap();
+                trackAuthModalCta(actionReason, "sign_in");
                 onClose();
               }}
               className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow-md transition-all active:scale-95 cursor-pointer"
@@ -130,7 +139,10 @@ export function AcademicAuthModal({
 
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => {
+                trackAuthModalCta(actionReason, "dismiss");
+                onClose();
+              }}
               className="w-full py-2 text-center text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
             >
               Continue Browsing as Guest

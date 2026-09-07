@@ -2,6 +2,7 @@ import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import type { Metadata, Viewport } from "next";
 import { Toaster } from "sonner";
 import { Suspense } from "react";
+import { GoogleAnalyticsScripts, GoogleAnalyticsTracker } from "@/components/analytics/google-analytics";
 import { ReferralTracker } from "@/components/analytics/referral-tracker";
 import { SWRProvider } from "@/components/providers/swr-provider";
 import { PWAInstallBanner } from "@/components/pwa/pwa-install-banner";
@@ -331,11 +332,13 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-sans">
+        <GoogleAnalyticsScripts />
         <HexclaveProvider app={hexclaveServerApp}>
           <HexclaveTheme>
             <SWRProvider>
               <Suspense fallback={null}>
                 <ReferralTracker />
+                <GoogleAnalyticsTracker />
               </Suspense>
               <RouteProgress />
               <OfflineIndicator />

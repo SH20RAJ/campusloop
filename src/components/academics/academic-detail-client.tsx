@@ -3,7 +3,7 @@
 import { ArrowDown, ArrowLeft, ArrowUp, Bookmark, BookOpen, Bot, CheckCircle2, ChevronRight, Download, ExternalLink, Eye, FileText, Maximize2, Minimize2, Send, Share2, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
 import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
@@ -11,6 +11,14 @@ import { AcademicPdfViewer } from "@/components/academics/academic-pdf-viewer";
 import { SimilarResourcesWidget } from "@/components/academics/similar-resources-widget";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { checkAndRecordDownload } from "@/lib/academic-download-limiter";
+import {
+  gtagEvent,
+  trackAcademicDownload,
+  trackAcademicLimitReached,
+  trackAcademicShare,
+  trackAcademicView,
+  trackAcademicVote,
+} from "@/lib/analytics/ga4";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
@@ -54,6 +62,20 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
     initialResource.uploader?.username
   );
 
+  // Track Academic Material View in GA4
+  useEffect(() => {
+    trackAcademicView({
+      id: resource.id,
+      title: resource.title,
+      subjectCode: resource.subjectCode,
+      subjectName: resource.subjectName,
+      branch: resource.branch,
+      semester: resource.semester,
+      resourceType: resource.resourceType,
+      institutionName: resource.institution?.name,
+    });
+  }, [resource.id]);
+
   // Handle voting
   async function handleVote(type: "UP" | "DOWN") {
     if (!currentUserId) {
@@ -64,6 +86,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
 
     sounds.pop();
     haptics.medium();
+    trackAcademicVote(resource.id, type, resource.subjectCode);
 
     if (type === "UP") {
       if (userVote === "UP") {
@@ -109,6 +132,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
     if (!downloadCheck.allowed) {
       sounds.pop();
       haptics.error();
+      trackAcademicLimitReached();
       setAuthModalReason("DOWNLOAD_LIMIT");
       setIsAuthModalOpen(true);
       toast.error("You've used all 5 free guest downloads! Sign in or register for unlimited downloads 🎓");
@@ -118,6 +142,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
     sounds.tap();
     haptics.success();
     setDownloads((d: number) => d + 1);
+    trackAcademicDownload(resource, !currentUserId, downloadCheck.count);
 
     fetch(`/api/academics/${resource.id}/analytics`, {
       method: "POST",
@@ -144,8 +169,10 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
   function handleShare() {
     sounds.tap();
     haptics.light();
+    const canNativeShare = typeof navigator !== "undefined" && "share" in navigator;
+    trackAcademicShare(resource.id, resource.subjectCode, canNativeShare ? "share_api" : "clipboard");
     const url = window.location.href;
-    if (navigator.share) {
+    if (canNativeShare) {
       navigator.share({
         title: resource.title,
         text: `Download ${resource.subjectCode} (${resource.subjectName}) study materials on CampusLoop:`,
@@ -167,6 +194,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
 
     sounds.tap();
     haptics.medium();
+    gtagEvent("ai_study_cram_generated", { subject_code: resource.subjectCode, prompt_type: promptType });
     setIsGeneratingAi(true);
 
     setTimeout(() => {

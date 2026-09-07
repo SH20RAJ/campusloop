@@ -5,6 +5,7 @@ import { Download, PlusSquare, Share, X, Zap } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
+import { trackPWAInstallOutcome } from "@/lib/analytics/ga4";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 
@@ -157,6 +158,9 @@ export function PWAInstallBanner() {
         haptics.match();
         setInstalled(true);
         setShowBanner(false);
+        trackPWAInstallOutcome("accepted");
+      } else {
+        trackPWAInstallOutcome("dismissed");
       }
       globalDeferredPrompt = null;
       setDeferredPrompt(null);
@@ -170,6 +174,7 @@ export function PWAInstallBanner() {
   function handleDismiss() {
     sounds.tap();
     haptics.light();
+    trackPWAInstallOutcome("dismissed");
     setShowBanner(false);
     setShowIOSModal(false);
     setShowAndroidModal(false);

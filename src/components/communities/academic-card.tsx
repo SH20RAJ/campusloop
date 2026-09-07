@@ -16,6 +16,12 @@ import {
 } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { checkAndRecordDownload } from "@/lib/academic-download-limiter";
+import {
+  trackAcademicDownload,
+  trackAcademicLimitReached,
+  trackAcademicShare,
+  trackAcademicVote,
+} from "@/lib/analytics/ga4";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -95,6 +101,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
 
     sounds.pop();
     haptics.medium();
+    trackAcademicVote(item.id, type, item.subjectCode);
 
     if (type === "UP") {
       if (userVote === "UP") {
@@ -144,6 +151,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
     if (!downloadCheck.allowed) {
       sounds.pop();
       haptics.error();
+      trackAcademicLimitReached();
       toast.info("You've used all 5 free guest downloads! Sign in to get unlimited notes & PYQ access 🎓", {
         action: {
           label: "Sign In",
@@ -158,6 +166,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
     sounds.tap();
     haptics.light();
     setDownloads((prev) => prev + 1);
+    trackAcademicDownload(item, !currentUserId, downloadCheck.count);
 
     const targetUrl = item.fileUrl || item.driveUrl;
     if (targetUrl) {
@@ -186,6 +195,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
     e.stopPropagation();
     sounds.tap();
     haptics.light();
+    trackAcademicShare(item.id, item.subjectCode, "clipboard");
 
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://campusloop.space";
     const shareUrl = `${baseUrl}/app/academics/${item.id}`;

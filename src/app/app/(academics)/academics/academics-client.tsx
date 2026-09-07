@@ -1,6 +1,7 @@
 "use client";
 
-import { BookOpen, Link2, Loader2, Plus, UploadCloud, X } from "lucide-react";
+import { BookOpen, Globe, Link2, Loader2, Plus, UploadCloud, X } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
 import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
+import { getGuestDownloadCount, GUEST_DOWNLOAD_LIMIT } from "@/lib/academic-download-limiter";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadMediaFile } from "@/lib/upload";
@@ -43,8 +45,11 @@ const BRANCHES = [
   "Electrical",
   "Chemical",
   "BioTech",
+  "Architecture",
   "Management",
   "Pharmacy",
+  "Design",
+  "Basic Sciences",
 ] as const;
 
 const SEMESTERS = [
@@ -90,6 +95,14 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   const [formDescription, setFormDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [loadMoreNode, setLoadMoreNode] = useState<HTMLDivElement | null>(null);
+  const [guestRemaining, setGuestRemaining] = useState<number>(GUEST_DOWNLOAD_LIMIT);
+
+  useEffect(() => {
+    if (!profileId) {
+      const used = getGuestDownloadCount();
+      setGuestRemaining(Math.max(0, GUEST_DOWNLOAD_LIMIT - used));
+    }
+  }, [profileId]);
 
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && (!previousPageData.items?.length || !previousPageData.hasMore)) {
@@ -302,6 +315,32 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
         {!profileId && (
           <AcademicAuthBenefitsCard returnTo="/app/academics" />
         )}
+
+        {/* ─── Connected Sources & Archives Directory Quick Access ─── */}
+        <div className="flex items-center justify-between gap-2 pt-0.5">
+          <Link
+            href="/app/academics/sources"
+            className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/20 text-indigo-400 text-xs font-bold transition-all group"
+          >
+            <div className="flex items-center gap-2">
+              <Globe className="size-3.5 text-indigo-400 group-hover:rotate-12 transition-transform" />
+              <span>Partner University Archives (BIT Mesra, AKTU, VTU)</span>
+            </div>
+            <span className="text-[10px] uppercase tracking-wider font-black px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
+              10 Sources &rarr;
+            </span>
+          </Link>
+
+          {!profileId && (
+            <div
+              className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold shrink-0"
+              title="Guests enjoy 5 free downloads before sign-in is requested"
+            >
+              <span>🎁</span>
+              <span>{guestRemaining}/5 Free</span>
+            </div>
+          )}
+        </div>
 
         {/* ─── Twitter-Style Sliding Tabs for Resource Types ─── */}
         <div className="flex border-b border-border/25 overflow-x-auto no-scrollbar pt-0.5">

@@ -25,6 +25,7 @@ export async function GET() {
       `https://${HOST}/overview`,
       `https://${HOST}/pitch`,
       `https://${HOST}/app/academics`,
+      `https://${HOST}/app/academics/sources`,
     ];
 
     // 2. Colleges
@@ -76,7 +77,7 @@ export async function GET() {
     const academicList = await db.query.academicResources.findMany({
       columns: { id: true },
       orderBy: [desc(academicResources.createdAt)],
-      limit: 2000,
+      limit: 5000,
     });
     for (const res of academicList) {
       urls.push(`https://${HOST}/app/academics/${res.id}`);

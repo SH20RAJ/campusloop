@@ -3,6 +3,7 @@
 import { BookOpen, Download, ExternalLink, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { checkAndRecordDownload } from "@/lib/academic-download-limiter";
 import type { DeckAcademicResource } from "./deck-types";
 
 interface DeckAcademicDropCardProps {
@@ -15,6 +16,19 @@ export function DeckAcademicDropCard({ resource }: DeckAcademicDropCardProps) {
     : `/app/academics`;
 
   function handleDownload() {
+    const downloadCheck = checkAndRecordDownload(false);
+    if (!downloadCheck.allowed) {
+      toast.info("You've used all 5 free guest downloads! Sign in for unlimited access 🎓", {
+        action: {
+          label: "Sign In",
+          onClick: () => {
+            window.location.href = `/handler/sign-in?returnTo=${encodeURIComponent(previewUrl)}`;
+          },
+        },
+      });
+      return;
+    }
+
     const url = resource.fileUrl || resource.driveUrl;
     if (!url) {
       toast.error("File preview is loading...");

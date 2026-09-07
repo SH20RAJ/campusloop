@@ -1,6 +1,6 @@
 "use client";
 
-import { Bookmark, ChevronRight, GraduationCap, MessageSquare, Zap, ThumbsUp, UploadCloud, X } from "lucide-react";
+import { Bookmark, ChevronRight, Download, GraduationCap, MessageSquare, Zap, ThumbsUp, UploadCloud, X } from "lucide-react";
 import Link from "next/link";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { sounds } from "@/lib/sounds";
@@ -8,7 +8,7 @@ import { sounds } from "@/lib/sounds";
 interface AcademicAuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  actionReason?: "SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI";
+  actionReason?: "SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI" | "DOWNLOAD_LIMIT";
   returnTo?: string;
 }
 
@@ -53,6 +53,13 @@ export function AcademicAuthModal({
       icon: Zap,
       color: "text-cyan-400",
       bg: "bg-cyan-500/15",
+    },
+    DOWNLOAD_LIMIT: {
+      title: "Unlock Unlimited Free Downloads",
+      subtitle: "You've reached your 5 free guest downloads limit! Sign in or create a free account with your college email for unlimited downloads, verified solutions & offline sync.",
+      icon: Download,
+      color: "text-rose-500",
+      bg: "bg-rose-500/15",
     },
   }[actionReason];
 

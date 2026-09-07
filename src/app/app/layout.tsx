@@ -11,41 +11,32 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
  */
 export const metadata: Metadata = {
   robots: {
-    index: false,
+    index: true,
     follow: true,
   },
 };
 
 export default async function AppRootLayout({ children }: { children: React.ReactNode }) {
   const user = await getCachedAuthUser();
-  if (!user) {
-    redirect("/handler/sign-in");
-  }
 
-  const profile = await getCachedUserProfile(user.id);
+  if (user) {
+    const profile = await getCachedUserProfile(user.id);
 
-  if (profile?.role === "ADMIN") {
-    return (
-      <>
-        <PresenceHeartbeat />
-        {children}
-      </>
-    );
-  }
-
-  const email = user.primaryEmail;
-  if (!email) {
-    redirect("/invalid-email");
-  }
-  const domain = email.split("@")[1]?.toLowerCase();
-
-  if (!domain) {
-    redirect("/invalid-email");
+    if (profile?.role !== "ADMIN") {
+      const email = user.primaryEmail;
+      if (!email) {
+        redirect("/invalid-email");
+      }
+      const domain = email.split("@")[1]?.toLowerCase();
+      if (!domain) {
+        redirect("/invalid-email");
+      }
+    }
   }
 
   return (
     <>
-      <PresenceHeartbeat />
+      {user && <PresenceHeartbeat />}
       {children}
     </>
   );

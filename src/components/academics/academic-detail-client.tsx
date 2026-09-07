@@ -10,6 +10,7 @@ import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
 import { AcademicPdfViewer } from "@/components/academics/academic-pdf-viewer";
 import { SimilarResourcesWidget } from "@/components/academics/similar-resources-widget";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { checkAndRecordDownload } from "@/lib/academic-download-limiter";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
@@ -44,7 +45,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
 
   // Guest conversion modal
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authModalReason, setAuthModalReason] = useState<"SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI">("SAVE");
+  const [authModalReason, setAuthModalReason] = useState<"SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI" | "DOWNLOAD_LIMIT">("SAVE");
 
   const totalVotes = upvotes + downvotes;
   const reliability = totalVotes > 0 ? Math.round((upvotes / totalVotes) * 100) : 100;
@@ -104,6 +105,16 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
 
   // Handle file open & download tracking
   function handleDownload() {
+    const downloadCheck = checkAndRecordDownload(Boolean(currentUserId));
+    if (!downloadCheck.allowed) {
+      sounds.pop();
+      haptics.error();
+      setAuthModalReason("DOWNLOAD_LIMIT");
+      setIsAuthModalOpen(true);
+      toast.error("You've used all 5 free guest downloads! Sign in or register for unlimited downloads 🎓");
+      return;
+    }
+
     sounds.tap();
     haptics.success();
     setDownloads((d: number) => d + 1);
@@ -117,6 +128,13 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
     const targetUrl = resource.fileUrl || resource.driveUrl;
     if (targetUrl) {
       window.open(targetUrl, "_blank", "noopener,noreferrer");
+      if (!currentUserId) {
+        if (downloadCheck.remaining > 0) {
+          toast.success(`Downloaded! (${downloadCheck.remaining} free guest downloads remaining)`);
+        } else {
+          toast.info("Downloaded! That was your 5th free download. Sign in anytime for unlimited access! 🎓");
+        }
+      }
     } else {
       toast.error("File link is currently unavailable");
     }

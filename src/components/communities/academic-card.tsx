@@ -15,6 +15,7 @@ import {
   AnimateShieldCheck,
 } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { checkAndRecordDownload } from "@/lib/academic-download-limiter";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -139,6 +140,21 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
   }
 
   async function handleDownload() {
+    const downloadCheck = checkAndRecordDownload(Boolean(currentUserId));
+    if (!downloadCheck.allowed) {
+      sounds.pop();
+      haptics.error();
+      toast.info("You've used all 5 free guest downloads! Sign in to get unlimited notes & PYQ access 🎓", {
+        action: {
+          label: "Sign In",
+          onClick: () => {
+            window.location.href = `/handler/sign-in?returnTo=/app/academics/${item.id}`;
+          },
+        },
+      });
+      return;
+    }
+
     sounds.tap();
     haptics.light();
     setDownloads((prev) => prev + 1);
@@ -146,6 +162,13 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
     const targetUrl = item.fileUrl || item.driveUrl;
     if (targetUrl) {
       window.open(targetUrl, "_blank");
+      if (!currentUserId) {
+        if (downloadCheck.remaining > 0) {
+          toast.success(`Downloaded! (${downloadCheck.remaining} free guest downloads remaining)`);
+        } else {
+          toast.info("Downloaded! That was your 5th free download. Sign in for unlimited access! 🎓");
+        }
+      }
     } else {
       toast.info("Notes are compiling for preview...");
     }

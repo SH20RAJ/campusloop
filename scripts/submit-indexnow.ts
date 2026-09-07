@@ -34,6 +34,7 @@ async function runIndexNowSubmission() {
     `https://${HOST}/colleges`,
     `https://${HOST}/pitch`,
     `https://${HOST}/app/academics`,
+    `https://${HOST}/app/academics/sources`,
     `https://${HOST}/sitemap.xml`,
     `https://${HOST}/sitemaps/academics.xml`,
     `https://${HOST}/sitemaps/colleges.xml`,

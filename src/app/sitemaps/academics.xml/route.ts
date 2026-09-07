@@ -15,7 +15,7 @@ export async function GET() {
         updatedAt: true,
       },
       orderBy: [desc(academicResources.createdAt)],
-      limit: 5000,
+      limit: 25000,
     });
 
     const rootUrl = `
@@ -23,6 +23,11 @@ export async function GET() {
     <loc>https://campusloop.space/app/academics</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://campusloop.space/app/academics/sources</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>`;
 
     const urls = list

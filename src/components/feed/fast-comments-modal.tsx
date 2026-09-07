@@ -1,12 +1,24 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUp, Loader2, MessageCircle, Reply, Shield, User, X } from "lucide-react";
+import {
+  ArrowUp,
+  ChevronDown,
+  Heart,
+  Loader2,
+  MessageCircle,
+  MoreHorizontal,
+  Plus,
+  Reply,
+  Shield,
+  User,
+  X,
+} from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { AnimateHeart, AnimateImage } from "@/components/ui/animated-icon";
+import { AnimateImage } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   detectMentionTrigger,
@@ -55,13 +67,19 @@ const fetcher = <T,>(url: string): Promise<T> =>
 
 const QUICK_REACTIONS = ["❤️", "🔥", "😂", "👏", "😮", "💯"];
 
-export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange }: FastCommentsModalProps) {
+export function FastCommentsModal({
+  post,
+  isOpen,
+  onClose,
+  onCommentCountChange,
+}: FastCommentsModalProps) {
   const { profile } = useProfile();
 
   const [commentText, setCommentText] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likedComments, setLikedComments] = useState<Record<string, boolean>>({});
+  const [sortMode, setSortMode] = useState<"best" | "latest" | "oldest">("best");
   const [mentionTrigger, setMentionTrigger] = useState<TriggerContext | null>(null);
   const [replyingTo, setReplyingTo] = useState<{
     id: string;
@@ -73,6 +91,48 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // ─── Visual Viewport tracking for mobile virtual keyboard insets (Fixes Image 3 bug) ───
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+
+  const scrollToBottom = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.visualViewport) return;
+
+    const vv = window.visualViewport;
+
+    function handleViewportChange() {
+      if (!vv) return;
+      const currentHeight = vv.height;
+      setViewportHeight(currentHeight);
+
+      // Calculates how much the mobile software keyboard is pushing up
+      const offset = Math.max(0, window.innerHeight - currentHeight - (vv.offsetTop || 0));
+      setKeyboardOffset(offset);
+
+      if (offset > 0 && scrollContainerRef.current) {
+        setTimeout(scrollToBottom, 80);
+      }
+    }
+
+    vv.addEventListener("resize", handleViewportChange);
+    vv.addEventListener("scroll", handleViewportChange);
+    handleViewportChange();
+
+    return () => {
+      vv.removeEventListener("resize", handleViewportChange);
+      vv.removeEventListener("scroll", handleViewportChange);
+    };
+  }, []);
 
   async function handleUploadCommentFiles(files: File[]) {
     const validImageFiles = files.filter((f) => f.type.startsWith("image/"));
@@ -98,7 +158,6 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
     const clipboardData = e.clipboardData;
     if (!clipboardData) return;
 
-    // 1. Direct Files
     const files = Array.from(clipboardData.files || []);
     const directImageFiles = files.filter((f) => f.type.startsWith("image/"));
     if (directImageFiles.length > 0) {
@@ -107,7 +166,6 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
       return;
     }
 
-    // 2. Clipboard Items
     const items = Array.from(clipboardData.items || []);
     const itemImageFiles = items
       .filter((item) => item.type.startsWith("image/"))
@@ -120,7 +178,6 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
       return;
     }
 
-    // 3. HTML / Web Sticker / GIF
     const html = clipboardData.getData("text/html");
     if (html) {
       const match = html.match(/<img[^>]+src="([^">]+)"/i);
@@ -136,7 +193,6 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
           setCommentText((prev) => `${prev.trim()}${imgMarkdown}`);
           toast.success("Sticker / GIF attached! 📸");
           setTimeout(() => inputRef.current?.focus(), 50);
-          return;
         }
       }
     }
@@ -183,17 +239,9 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
     }
   }, [isOpen]);
 
-  // Scroll to bottom when comments change
-  const scrollToBottom = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({
-        top: scrollContainerRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  };
-
   const handleToggleLike = (commentId: string) => {
+    sounds.tap();
+    haptics.light();
     setLikedComments((prev) => ({
       ...prev,
       [commentId]: !prev[commentId],
@@ -242,7 +290,6 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
     const currentList = comments || [];
     const updatedList = [...currentList, optimisticComment];
 
-    // Optimistically update list
     sounds.send();
     haptics.success();
     mutate(updatedList, false);
@@ -268,11 +315,9 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
         throw new Error(errData.error || "Failed to post comment");
       }
 
-      // Revalidate to sync canonical data
       await mutate();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not post comment");
-      // Rollback
       mutate(currentList, false);
       onCommentCountChange?.(currentList.length);
     } finally {
@@ -288,73 +333,140 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
   };
 
   const handleInsertEmoji = (emoji: string) => {
+    sounds.tap();
+    haptics.light();
     setCommentText((prev) => prev + emoji);
     inputRef.current?.focus();
   };
 
-  const commentsList = comments || [];
-  const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
+  const authorHandle = post.isAnonymous
+    ? post.pseudonym || "anonymous"
+    : post.author?.username || "student";
+
+  // Dynamic sorting (matching Image 2)
+  const sortedComments = useMemo(() => {
+    const list = [...(comments || [])];
+    if (sortMode === "latest") {
+      return list.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    }
+    if (sortMode === "oldest") {
+      return list.sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+    }
+    // "best" (default): sort by likes/points
+    return list.sort(
+      (a, b) =>
+        (b.author?.points || 0) +
+        (likedComments[b.id] ? 1 : 0) -
+        ((a.author?.points || 0) + (likedComments[a.id] ? 1 : 0))
+    );
+  }, [comments, sortMode, likedComments]);
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center select-none">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center select-none overflow-hidden">
           {/* Backdrop Blur */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/70 backdrop-blur-xs"
+            className="absolute inset-0 bg-black/75 backdrop-blur-md"
             onClick={onClose}
           />
 
-          {/* Modal / Bottom Drawer Container */}
+          {/* Modal / Bottom Drawer Container with Keyboard Inset & 100dvh flex column */}
           <motion.div
             initial={{ y: "100%", opacity: 0.8 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 450, damping: 38 }}
-            className="relative z-10 w-full sm:max-w-lg h-[82vh] sm:h-[680px] max-h-[90vh] bg-card text-card-foreground rounded-t-3xl sm:rounded-3xl border border-border/50 shadow-2xl flex flex-col overflow-hidden"
+            style={{
+              maxHeight: viewportHeight ? `${Math.min(viewportHeight * 0.94, 760)}px` : "92dvh",
+              height: viewportHeight ? `${Math.min(viewportHeight * 0.94, 760)}px` : "88dvh",
+              paddingBottom: keyboardOffset > 0 ? `${keyboardOffset}px` : undefined,
+            }}
+            className="relative z-10 w-full sm:max-w-lg bg-[#0d0d16]/98 text-foreground rounded-t-[32px] sm:rounded-3xl border-t border-purple-500/25 sm:border sm:border-purple-500/30 shadow-2xl flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Mobile Drag Indicator */}
-            <div className="w-full flex items-center justify-center pt-2.5 pb-1 sm:hidden">
-              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            {/* ─── Mobile Drag Indicator ─── */}
+            <div className="w-full flex items-center justify-center pt-3 pb-1 sm:hidden shrink-0">
+              <div className="w-12 h-1 rounded-full bg-white/20" />
             </div>
 
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-border/30 shrink-0">
+            {/* ─── Header ─── */}
+            <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-b border-white/[0.06] shrink-0">
               <div className="flex items-center gap-2">
-                <MessageCircle className="size-4.5 text-primary" />
-                <h3 className="text-sm font-black text-foreground tracking-tight">Comments</h3>
-                <span className="text-[11px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                  {commentsList.length}
+                <MessageCircle className="size-4.5 text-purple-400" />
+                <h3 className="text-base font-black text-foreground tracking-tight">Comments</h3>
+                <span className="text-xs font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-full">
+                  {comments?.length ?? post.commentsCount ?? 0}
                 </span>
               </div>
 
               <button
                 type="button"
                 onClick={onClose}
-                className="size-8 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                className="size-8 rounded-full bg-white/[0.05] hover:bg-white/10 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
                 aria-label="Close"
               >
                 <X className="size-4" />
               </button>
             </div>
 
-            {/* Original Post Context Pill */}
-            <div className="px-4 sm:px-5 py-2.5 bg-muted/20 border-b border-border/20 flex items-center gap-2.5 shrink-0">
-              <span className="text-[11px] font-bold text-foreground truncate max-w-[130px]">
-                @{authorHandle}:
-              </span>
-              <p className="text-xs text-muted-foreground truncate flex-1">{post.body}</p>
+            {/* ─── Original Post Context Card (matching Image 2) ─── */}
+            <div className="mx-4 mt-2.5 mb-1.5 p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3 shrink-0">
+              <Avatar className="size-9 rounded-full border border-purple-500/30 shrink-0 mt-0.5">
+                <AvatarImage src={post.isAnonymous ? "" : post.author?.avatarUrl || ""} />
+                <AvatarFallback className="text-[11px] font-black bg-muted text-foreground">
+                  {post.isAnonymous ? "🙈" : post.author?.displayName?.[0] || "S"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-bold text-foreground truncate">@{authorHandle}</span>
+                  <span className="text-muted-foreground text-[11px]">
+                    {formatTimeAgo(post.createdAt)}
+                  </span>
+                </div>
+                <p className="text-xs text-foreground/90 leading-relaxed line-clamp-3 font-normal">
+                  {post.body}
+                </p>
+              </div>
             </div>
 
-            {/* Scrollable Comments List */}
+            {/* ─── Sort & Filter Bar (matching Image 2) ─── */}
+            <div className="flex items-center justify-between px-4 py-2 shrink-0 border-b border-white/[0.06] text-xs">
+              <div className="flex items-center gap-1.5 font-bold text-foreground">
+                <span>🔥</span>
+                <span>Top comments</span>
+                <ChevronDown className="size-3 text-muted-foreground" />
+              </div>
+              <div className="flex items-center gap-1.5 text-muted-foreground text-[11px]">
+                <span>Sort by</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSortMode((prev) =>
+                      prev === "best" ? "latest" : prev === "latest" ? "oldest" : "best"
+                    )
+                  }
+                  className="px-2.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/10 border border-white/10 text-xs font-semibold text-foreground flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <span>{sortMode === "best" ? "Best" : sortMode === "latest" ? "Latest" : "Oldest"}</span>
+                  <ChevronDown className="size-3 text-muted-foreground" />
+                </button>
+              </div>
+            </div>
+
+            {/* ─── Scrollable Comments List (flex-1 min-h-0 so composer stays visible above keyboard) ─── */}
             <div
               ref={scrollContainerRef}
-              className="flex-1 overflow-y-auto px-4 sm:px-5 py-3 space-y-4 divide-y divide-border/20 scroll-smooth"
+              className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-5 py-3 space-y-4 divide-y divide-white/[0.06] scroll-smooth"
             >
               {isLoading ? (
                 <div className="space-y-4 pt-2">
@@ -368,9 +480,9 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                     </div>
                   ))}
                 </div>
-              ) : commentsList.length === 0 ? (
+              ) : sortedComments.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center py-16 px-4 space-y-2">
-                  <div className="size-12 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground">
+                  <div className="size-12 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-muted-foreground">
                     <MessageCircle className="size-6 stroke-1" />
                   </div>
                   <p className="text-xs font-bold text-foreground">No comments yet</p>
@@ -379,110 +491,139 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                   </p>
                 </div>
               ) : (
-                commentsList.map((c) => {
+                sortedComments.map((c) => {
                   const isAnon = c.isAnonymous;
-                  const cDisplayName = isAnon ? "Anonymous Student" : c.author?.displayName || "Student";
-                  const cHandle = isAnon ? c.pseudonym || "anonymous" : c.author?.username || "student";
+                  const cDisplayName = isAnon
+                    ? "Anonymous Student"
+                    : c.author?.displayName || "Student";
+                  const cHandle = isAnon
+                    ? c.pseudonym || "anonymous"
+                    : c.author?.username || "student";
                   const cAvatar = isAnon
                     ? ""
                     : getAvatarUrl(c.author?.avatarUrl, c.author?.username ?? "student");
                   const isLiked = Boolean(likedComments[c.id]);
+                  const isCurrentUser = profile?.id && c.authorId === profile.id;
+                  const isOP = post.authorId && c.authorId === post.authorId;
 
                   return (
-                    <div key={c.id} className="flex items-start justify-between gap-3 pt-3 first:pt-0 group">
-                      <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                        {isAnon ? (
-                          <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
-                            <Shield className="size-4" />
-                          </div>
-                        ) : (
-                          <Link href={`/@${cHandle}`} onClick={onClose} className="shrink-0">
-                            <Avatar className="size-8 rounded-full border border-border/40 hover:opacity-90 transition-opacity">
-                              <AvatarImage src={cAvatar} />
-                              <AvatarFallback className="text-[10px] font-bold">
-                                {cDisplayName[0] || "U"}
-                              </AvatarFallback>
-                            </Avatar>
-                          </Link>
-                        )}
+                    <div key={c.id} className="flex items-start gap-3 pt-3.5 first:pt-0 group">
+                      {isAnon ? (
+                        <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0 text-muted-foreground mt-0.5">
+                          <Shield className="size-4" />
+                        </div>
+                      ) : (
+                        <Link href={`/@${cHandle}`} onClick={onClose} className="shrink-0 mt-0.5">
+                          <Avatar className="size-8 rounded-full border border-white/10 hover:opacity-90 transition-opacity">
+                            <AvatarImage src={cAvatar} />
+                            <AvatarFallback className="text-[10px] font-bold">
+                              {cDisplayName[0] || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                        </Link>
+                      )}
 
-                        <div className="min-w-0 flex-1 space-y-1">
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center justify-between gap-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-xs font-bold text-foreground truncate">{cDisplayName}</span>
-                            <span className="text-[10px] text-muted-foreground truncate">@{cHandle}</span>
-                            <span className="text-[10px] text-muted-foreground">
-                              • {formatTimeAgo(c.createdAt)}
+                            <span className="text-xs font-bold text-foreground truncate">
+                              {cDisplayName}
                             </span>
-                            {isAnon && (
-                              <span className="text-[9px] font-bold bg-muted/60 text-muted-foreground px-1.5 py-0.2 rounded-md">
-                                Anon
+                            {isCurrentUser && (
+                              <span className="text-[10px] font-bold bg-purple-950/70 text-purple-300 border border-purple-500/30 px-1.5 py-0.2 rounded-md">
+                                You
                               </span>
                             )}
+                            {isOP && !isCurrentUser && (
+                              <span className="text-[10px] font-bold bg-indigo-950/70 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.2 rounded-md">
+                                OP
+                              </span>
+                            )}
+                            <span className="text-[11px] text-muted-foreground">
+                              {formatTimeAgo(c.createdAt)}
+                            </span>
                           </div>
 
-                          <div className="text-xs text-foreground/90 leading-relaxed break-words font-normal">
-                            <RichText content={c.body} />
-                          </div>
+                          <button
+                            type="button"
+                            className="size-6 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground opacity-60 hover:opacity-100 transition-opacity"
+                            aria-label="More options"
+                          >
+                            <MoreHorizontal className="size-3.5" />
+                          </button>
+                        </div>
 
-                          {/* Quick Reply Button */}
-                          <div className="flex items-center gap-3 pt-0.5">
-                            <button
-                              type="button"
-                              onClick={() => handleStartReply(c, cHandle, cDisplayName)}
-                              className="flex items-center gap-1 text-[11px] font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer active:scale-95"
+                        <div className="text-[13px] text-foreground/95 leading-relaxed break-words font-normal">
+                          <RichText content={c.body} />
+                        </div>
+
+                        {/* Comment Actions: Heart + Reply */}
+                        <div className="flex items-center gap-4 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleLike(c.id)}
+                            className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer"
+                          >
+                            <Heart
+                              className={cn(
+                                "size-3.5 transition-transform active:scale-125",
+                                isLiked ? "fill-rose-500 text-rose-500" : "text-muted-foreground"
+                              )}
+                            />
+                            <span
+                              className={cn(
+                                "tabular-nums text-xs",
+                                isLiked && "text-rose-500 font-bold"
+                              )}
                             >
-                              <Reply className="size-3" />
-                              <span>Reply</span>
-                            </button>
-                          </div>
+                              {(c.author?.points || 0) + (isLiked ? 1 : 0) || (isLiked ? 1 : "")}
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleStartReply(c, cHandle, cDisplayName)}
+                            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                          >
+                            Reply
+                          </button>
                         </div>
                       </div>
-
-                      {/* Comment Like Button (Instagram Style) */}
-                      <button
-                        type="button"
-                        onClick={() => handleToggleLike(c.id)}
-                        className={cn(
-                          "flex flex-col items-center gap-0.5 pt-1 text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer shrink-0 group-hover:opacity-100",
-                          isLiked && "text-rose-500"
-                        )}
-                        aria-label="Like comment"
-                      >
-                        <AnimateHeart
-                          size={14}
-                          className={cn(
-                            "transition-transform active:scale-125",
-                            isLiked && "fill-rose-500 text-rose-500"
-                          )}
-                        />
-                      </button>
                     </div>
                   );
                 })
               )}
             </div>
 
-            {/* Quick Emoji Reaction Bar */}
-            <div className="px-4 py-1.5 border-t border-border/20 flex items-center justify-between gap-1 overflow-x-auto shrink-0 bg-muted/10">
+            {/* ─── Quick Emoji Reaction Bar (matching Image 2) ─── */}
+            <div className="px-4 py-2 border-t border-white/[0.06] flex items-center justify-between gap-1 overflow-x-auto shrink-0 bg-white/[0.02]">
               {QUICK_REACTIONS.map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
                   onClick={() => handleInsertEmoji(emoji)}
-                  className="text-base sm:text-lg hover:scale-125 transition-transform p-1 cursor-pointer"
+                  className="size-9 sm:size-10 rounded-full bg-white/[0.06] hover:bg-white/10 border border-white/[0.08] flex items-center justify-center text-base sm:text-lg hover:scale-115 active:scale-95 transition-all cursor-pointer shadow-xs"
                 >
                   {emoji}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => handleInsertEmoji("✨")}
+                className="size-9 sm:size-10 rounded-full bg-white/[0.06] hover:bg-white/10 border border-white/[0.08] flex items-center justify-center text-muted-foreground hover:text-white hover:scale-115 active:scale-95 transition-all cursor-pointer shadow-xs"
+                aria-label="Add reaction"
+              >
+                <Plus className="size-4" />
+              </button>
             </div>
 
-            {/* Fixed Bottom Input Bar */}
-            <div className="p-3 sm:p-4 border-t border-border/30 bg-card shrink-0 space-y-2">
+            {/* ─── Bottom Composer Bar (matching Image 2) ─── */}
+            <div className="p-3 sm:p-4 border-t border-white/[0.08] bg-[#0d0d16] shrink-0 space-y-2">
               {/* Replying Context Banner */}
               {replyingTo && (
-                <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-muted/60 border border-border/40 text-xs">
+                <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/30 text-xs">
                   <span className="text-muted-foreground font-medium flex items-center gap-1.5">
-                    <Reply className="size-3 text-primary shrink-0" />
+                    <Reply className="size-3 text-purple-400 shrink-0" />
                     <span>
                       Replying to <strong className="text-foreground">@{replyingTo.handle}</strong>
                     </span>
@@ -504,15 +645,15 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
 
               <div className="flex items-center gap-2.5">
                 {/* Current User Avatar */}
-                <Avatar className="size-8.5 rounded-full border border-border/40 shrink-0">
+                <Avatar className="size-9 rounded-full border border-white/15 shrink-0">
                   <AvatarImage src={isAnonymous ? "" : profile?.avatarUrl || ""} />
                   <AvatarFallback className="text-[10px] font-bold bg-muted text-foreground">
                     {isAnonymous ? "🙈" : profile?.displayName?.[0] || "U"}
                   </AvatarFallback>
                 </Avatar>
 
-                {/* Input with embedded actions */}
-                <div className="relative flex-1 flex items-center gap-2 rounded-full border border-border/50 bg-background px-3.5 py-1.5 focus-within:border-foreground/40 transition-colors">
+                {/* Input Capsule with embedded Photo and GIF actions */}
+                <div className="relative flex-1 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 focus-within:border-purple-500/50 transition-colors">
                   <MentionSuggestions
                     trigger={mentionTrigger}
                     onSelect={handleSelectSuggestion}
@@ -553,14 +694,28 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploadingImage}
                     className="text-muted-foreground hover:text-foreground transition-colors p-1 cursor-pointer disabled:opacity-40"
-                    title="Attach photo (or paste from clipboard)"
+                    title="Attach photo"
                     aria-label="Attach photo"
                   >
                     {isUploadingImage ? (
-                      <Loader2 className="size-3.5 animate-spin text-primary" />
+                      <Loader2 className="size-4 animate-spin text-purple-400" />
                     ) : (
-                      <AnimateImage size={14} />
+                      <AnimateImage size={15} />
                     )}
+                  </button>
+
+                  {/* GIF Badge Button (matching Image 2) */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sounds.tap();
+                      haptics.light();
+                      toast.info("Tip: You can paste any GIF link or image from your clipboard!");
+                    }}
+                    className="px-1.5 py-0.5 rounded-md border border-white/20 text-[10px] font-black text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    title="Insert GIF"
+                  >
+                    GIF
                   </button>
 
                   {/* Anonymous Toggle Pill */}
@@ -570,7 +725,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                     className={cn(
                       "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
                       isAnonymous
-                        ? "bg-primary/20 text-primary border border-primary/40"
+                        ? "bg-purple-950/80 text-purple-300 border border-purple-500/40"
                         : "text-muted-foreground hover:text-foreground"
                     )}
                     title={isAnonymous ? "Commenting Anonymously" : "Commenting as yourself"}
@@ -587,22 +742,22 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                       </>
                     )}
                   </button>
-
-                  {/* Send Button */}
-                  <button
-                    type="button"
-                    disabled={!commentText.trim() || isSubmitting}
-                    onClick={handleSendComment}
-                    className="size-7 rounded-full bg-foreground text-background flex items-center justify-center hover:opacity-90 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-xs"
-                    aria-label="Send comment"
-                  >
-                    {isSubmitting ? (
-                      <Loader2 className="size-3 animate-spin" />
-                    ) : (
-                      <ArrowUp className="size-3.5 stroke-2" />
-                    )}
-                  </button>
                 </div>
+
+                {/* Send Button: Elevated Circular Purple Gradient Button (matching Image 2) */}
+                <button
+                  type="button"
+                  disabled={!commentText.trim() || isSubmitting}
+                  onClick={handleSendComment}
+                  className="size-10 rounded-full bg-gradient-to-tr from-purple-600 via-primary to-indigo-500 text-white flex items-center justify-center hover:opacity-95 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                  aria-label="Send comment"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <ArrowUp className="size-4.5 stroke-[2.5]" />
+                  )}
+                </button>
               </div>
             </div>
           </motion.div>

@@ -12,6 +12,7 @@ CampusLoop (https://campusloop.space) is an exclusive campus social platform eng
 - **College Directory (/app/colleges)**: 1,350+ indexed Indian college hubs covering IITs, NITs, BITS, IIITs, Delhi University, state universities, and private institutions.
 - **Communities & Sub-Hubs (/app/communities)**: Student-run clubs, hostel groups, academic branches, placement prep circles, and hobby spaces.
 - **Loop Points (LP) & Gamification**: Clout tiering rewarding peer helpfulness, academic notes sharing, community answers, and verified student status.
+- **Academic Study Vault & PYQs (/app/academics)**: Free, zero-login direct PDF downloads for verified engineering notes, previous year question papers (PYQs), AKTU quantum series, formula cheat sheets, lab manuals, and official syllabus modules across 1,350+ Indian colleges with personalized recommendations.
 - **Student Marketplace (/app/marketplace)**: Peer-to-peer textbook trading, hostel cycle rentals, dorm essentials, and student-run micro-stores.
 - **Batch Time Capsules (/app/capsule)**: Cryptographically locked digital capsules buried until graduation day.
 

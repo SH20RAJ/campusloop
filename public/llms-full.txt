@@ -21,12 +21,15 @@ CampusLoop is India's dedicated collegiate social network connecting students ac
 ## Public Sitemap & Routes
 - Landing Page: `https://campusloop.space/`
 - App Home Feed: `https://campusloop.space/app`
+- Academic Study Vault & PYQs: `https://campusloop.space/app/academics`
 - College Directory: `https://campusloop.space/app/colleges`
 - Campus Radius Discovery: `https://campusloop.space/app/discover`
 - Student Communities: `https://campusloop.space/app/communities`
 - Campus Match / Dating: `https://campusloop.space/app/dating`
 - Peer Marketplace: `https://campusloop.space/app/marketplace`
 - Time Capsules: `https://campusloop.space/app/capsule`
+- Academics XML Sitemap: `https://campusloop.space/sitemaps/academics.xml`
+- Main Sitemap Index: `https://campusloop.space/sitemap.xml`
 - About CampusLoop: `https://campusloop.space/about`
 - Safety Center: `https://campusloop.space/safety`
 - Privacy Policy: `https://campusloop.space/privacy`

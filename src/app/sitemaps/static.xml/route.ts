@@ -14,6 +14,7 @@ export async function GET() {
     { url: "https://campusloop.space/terms", priority: "0.7", changefreq: "monthly" },
     { url: "https://campusloop.space/contact", priority: "0.7", changefreq: "monthly" },
     { url: "https://campusloop.space/join", priority: "0.9", changefreq: "weekly" },
+    { url: "https://campusloop.space/app/academics", priority: "1.0", changefreq: "daily" },
   ];
 
   const urls = pages

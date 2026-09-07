@@ -24,6 +24,9 @@ export async function GET() {
   <sitemap>
     <loc>https://campusloop.space/sitemaps/events.xml</loc>
   </sitemap>
+  <sitemap>
+    <loc>https://campusloop.space/sitemaps/academics.xml</loc>
+  </sitemap>
 </sitemapindex>`;
 
   return new NextResponse(xml, {

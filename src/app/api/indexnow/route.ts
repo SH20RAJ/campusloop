@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { communities, institutions, posts, userProfiles } from "@/db/schema";
+import { academicResources, communities, institutions, posts, userProfiles } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +24,7 @@ export async function GET() {
       `https://${HOST}/colleges`,
       `https://${HOST}/overview`,
       `https://${HOST}/pitch`,
+      `https://${HOST}/app/academics`,
     ];
 
     // 2. Colleges
@@ -69,6 +70,16 @@ export async function GET() {
       if (prof.username) {
         urls.push(`https://${HOST}/@${prof.username}`);
       }
+    }
+
+    // 6. Academic Resources (Notes, PYQs, Cheat Sheets)
+    const academicList = await db.query.academicResources.findMany({
+      columns: { id: true },
+      orderBy: [desc(academicResources.createdAt)],
+      limit: 2000,
+    });
+    for (const res of academicList) {
+      urls.push(`https://${HOST}/app/academics/${res.id}`);
     }
 
     // IndexNow allows max 10,000 URLs per batch payload

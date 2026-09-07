@@ -111,6 +111,12 @@ export const metadata: Metadata = {
   },
   category: "social networking",
   classification: "Student Community Platform",
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "googlee64a1d7f8a9e0b1c",
+    other: {
+      "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || "ff35ddf54af340798feb9034fcd9d317",
+    },
+  },
   other: {
     "geo.region": "IN",
     "geo.placename": "India",
@@ -202,6 +208,13 @@ export default function RootLayout({
                 {
                   "@type": "SiteNavigationElement",
                   position: 3,
+                  name: "Academic Study Vault & PYQs",
+                  description: "Free engineering notes, previous year question papers, formula cheat sheets, and lab manuals",
+                  url: "https://campusloop.space/app/academics",
+                },
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 4,
                   name: "College Directory",
                   description: "1,350+ verified Indian college hubs and university networks",
                   url: "https://campusloop.space/app/colleges",

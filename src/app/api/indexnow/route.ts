@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { academicResources, communities, institutions, posts, userProfiles } from "@/db/schema";
+import { academicResources, articles, communities, events, institutions, posts, userProfiles } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -13,33 +13,58 @@ export async function GET() {
   try {
     const db = getDb();
 
-    // 1. Static URLs
+    // 1. Static Canonical URLs
     const urls: string[] = [
       `https://${HOST}/`,
-      `https://${HOST}/about`,
-      `https://${HOST}/contact`,
-      `https://${HOST}/join`,
-      `https://${HOST}/privacy`,
-      `https://${HOST}/safety`,
-      `https://${HOST}/colleges`,
-      `https://${HOST}/overview`,
-      `https://${HOST}/pitch`,
       `https://${HOST}/app/academics`,
       `https://${HOST}/app/academics/sources`,
+      `https://${HOST}/colleges`,
+      `https://${HOST}/app/articles`,
+      `https://${HOST}/app/events`,
+      `https://${HOST}/app/communities`,
+      `https://${HOST}/overview`,
+      `https://${HOST}/pitch`,
+      `https://${HOST}/about`,
+      `https://${HOST}/demo`,
+      `https://${HOST}/safety`,
+      `https://${HOST}/privacy`,
+      `https://${HOST}/terms`,
+      `https://${HOST}/contact`,
     ];
 
-    // 2. Colleges
+    // 2. Colleges (Canonical public URLs)
     const collegeList = await db.query.institutions.findMany({
       columns: { id: true, slug: true },
       orderBy: [desc(institutions.createdAt)],
-      limit: 1000,
+      limit: 1500,
     });
     for (const c of collegeList) {
-      urls.push(`https://${HOST}/app/college/${c.slug || c.id}`);
-      urls.push(`https://${HOST}/college/${c.id}`);
+      urls.push(`https://${HOST}/college/${c.slug || c.id}`);
     }
 
-    // 3. Posts
+    // 3. Articles (Published Canonical URLs)
+    const articleList = await db.query.articles.findMany({
+      columns: { slug: true },
+      where: eq(articles.status, "PUBLISHED"),
+      orderBy: [desc(articles.publishedAt)],
+      limit: 1000,
+    });
+    for (const a of articleList) {
+      urls.push(`https://${HOST}/a/${a.slug}`);
+    }
+
+    // 4. Events (Published Canonical URLs)
+    const eventList = await db.query.events.findMany({
+      columns: { id: true, slug: true },
+      where: eq(events.status, "PUBLISHED"),
+      orderBy: [desc(events.startDate)],
+      limit: 1000,
+    });
+    for (const e of eventList) {
+      urls.push(`https://${HOST}/e/${e.slug || e.id}`);
+    }
+
+    // 5. Posts (Public Non-Anonymous Posts)
     const postList = await db.query.posts.findMany({
       columns: { id: true },
       where: eq(posts.status, "PUBLISHED"),
@@ -50,7 +75,7 @@ export async function GET() {
       urls.push(`https://${HOST}/app/post/${p.id}`);
     }
 
-    // 4. Communities
+    // 6. Communities (Canonical URLs)
     const commList = await db.query.communities.findMany({
       columns: { id: true },
       orderBy: [desc(communities.createdAt)],
@@ -58,10 +83,9 @@ export async function GET() {
     });
     for (const comm of commList) {
       urls.push(`https://${HOST}/app/communities/${comm.id}`);
-      urls.push(`https://${HOST}/c/${comm.id}`);
     }
 
-    // 5. User profiles
+    // 7. Student Profiles
     const profileList = await db.query.userProfiles.findMany({
       columns: { username: true },
       orderBy: [desc(userProfiles.createdAt)],
@@ -73,7 +97,7 @@ export async function GET() {
       }
     }
 
-    // 6. Academic Resources (Notes, PYQs, Cheat Sheets)
+    // 8. Academic Resources (Notes, PYQs, Formula Sheets)
     const academicList = await db.query.academicResources.findMany({
       columns: { id: true },
       orderBy: [desc(academicResources.createdAt)],
@@ -84,11 +108,12 @@ export async function GET() {
     }
 
     // IndexNow allows max 10,000 URLs per batch payload
+    const batchUrls = urls.slice(0, 10000);
     const payload = {
       host: HOST,
       key: INDEXNOW_KEY,
       keyLocation: KEY_LOCATION,
-      urlList: urls,
+      urlList: batchUrls,
     };
 
     const res = await fetch("https://api.indexnow.org/indexnow", {
@@ -100,7 +125,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       status: res.status,
-      totalUrlsSubmitted: urls.length,
+      totalUrlsSubmitted: batchUrls.length,
     });
   } catch (error) {
     console.error("IndexNow API submission error:", error);

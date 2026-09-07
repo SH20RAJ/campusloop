@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
   const title = `${article.title} — By @${article.author?.username || "student"} | CampusLoop`;
   const description = article.excerpt || article.subtitle || `Read ${article.title} on CampusLoop.`;
-  const url = `https://campusloop.space/app/articles/${article.slug}`;
+  const url = `https://campusloop.space/a/${article.slug}`;
   const ogImage = article.coverImageUrl || "https://campusloop.space/og-image.png";
 
   return {
@@ -47,6 +47,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     alternates: {
       canonical: url,
     },
+    robots: { index: true, follow: true },
     openGraph: {
       title,
       description,
@@ -156,7 +157,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://campusloop.space/app/articles/${article.slug}`,
+      "@id": `https://campusloop.space/a/${article.slug}`,
     },
   };
 

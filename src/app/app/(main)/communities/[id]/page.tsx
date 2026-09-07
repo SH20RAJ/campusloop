@@ -70,18 +70,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CommunityDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const user = await getCachedAuthUser();
-  if (!user) redirect("/handler/sign-in");
+  const [user, comm] = await Promise.all([getCachedAuthUser(), getCachedCommunity(id)]);
 
-  // Parallelize user profile and community lookup
-  const [profile, comm] = await Promise.all([getCachedUserProfile(user.id), getCachedCommunity(id)]);
-
-  if (!profile) redirect("/app/onboarding");
   if (!comm) notFound();
 
-  const userMembership = comm.members.find((m) => m.userId === profile.id);
+  // If community is private or unlisted, require authentication
+  if (comm.privacy !== "PUBLIC" && !user) {
+    redirect("/handler/sign-in");
+  }
+
+  const profile = user ? await getCachedUserProfile(user.id) : null;
+  if (user && !profile) redirect("/app/onboarding");
+
+  const userMembership = profile ? comm.members.find((m) => m.userId === profile.id) : null;
   const isMember = Boolean(userMembership && userMembership.status === "ACTIVE");
-  const isAdmin = Boolean(comm.creatorId === profile.id || userMembership?.role === "ADMIN");
+  const isAdmin = Boolean(profile && (comm.creatorId === profile.id || userMembership?.role === "ADMIN"));
   const activeMembersCount = comm.members.filter((m) => m.status === "ACTIVE").length;
 
   const db = getDb();
@@ -122,11 +125,11 @@ export default async function CommunityDetailPage({ params }: PageProps) {
   const formattedPosts = communityPosts.map((post) => {
     const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
     const commentsCount = post.comments.length;
-    const userVote = post.votes.find((v) => v.userId === profile.id)?.value || 0;
+    const userVote = profile ? post.votes.find((v) => v.userId === profile.id)?.value || 0 : 0;
 
     const formattedPollOptions = post.pollOptions?.map((opt) => {
       const optVotesCount = opt.votes.length;
-      const userVoted = opt.votes.some((v) => v.userId === profile.id);
+      const userVoted = profile ? opt.votes.some((v) => v.userId === profile.id) : false;
       return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
     });
 
@@ -169,7 +172,7 @@ export default async function CommunityDetailPage({ params }: PageProps) {
     category: c.category,
     avatarUrl: c.avatarUrl,
     membersCount: c.members.length,
-    isMember: c.members.some((m) => m.userId === profile.id),
+    isMember: profile ? c.members.some((m) => m.userId === profile.id) : false,
   }));
 
   return (

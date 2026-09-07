@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = `${college.name} Campus Hub | CampusLoop`;
   const description = `Connect with verified students at ${college.name} (${college.district || college.state || "India"}). Confessions, clubs, campus Q&A, and live feed.`;
-  const url = `https://campusloop.space/app/college/${college.slug || college.id}`;
+  const url = `https://campusloop.space/college/${college.slug || college.id}`;
 
   return {
     title,

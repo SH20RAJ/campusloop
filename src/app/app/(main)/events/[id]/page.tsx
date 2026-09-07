@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
     }
 
     const key = event.slug || event.id;
-    const canonical = `https://campusloop.space/app/events/${key}`;
+    const canonical = `https://campusloop.space/e/${key}`;
     const title = `${event.title} | ${event.clubName} — CampusLoop Events`;
     const description =
       event.tagline || `${event.title} hosted by ${event.clubName}. Register solo or in teams on CampusLoop.`;
@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
       title,
       description,
       alternates: { canonical },
+      robots: { index: true, follow: true },
       keywords: [
         event.title,
         event.clubName,
@@ -99,12 +100,12 @@ export default async function EventPage({ params }: EventPageProps) {
           event.status === "CANCELLED"
             ? "https://schema.org/EventCancelled"
             : "https://schema.org/EventScheduled",
-        url: `https://campusloop.space/app/events/${event.slug || event.id}`,
+        url: `https://campusloop.space/e/${event.slug || event.id}`,
         location:
           event.mode === "ONLINE"
             ? {
                 "@type": "VirtualLocation",
-                url: event.meetingUrl || `https://campusloop.space/app/events/${event.slug || event.id}`,
+                url: event.meetingUrl || `https://campusloop.space/e/${event.slug || event.id}`,
               }
             : {
                 "@type": "Place",
@@ -121,7 +122,7 @@ export default async function EventPage({ params }: EventPageProps) {
           price: event.isPaid ? event.entryFee : "0",
           priceCurrency: "INR",
           availability: "https://schema.org/InStock",
-          url: `https://campusloop.space/app/events/${event.slug || event.id}`,
+          url: `https://campusloop.space/e/${event.slug || event.id}`,
         },
       };
     }

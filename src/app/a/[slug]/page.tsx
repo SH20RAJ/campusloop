@@ -27,6 +27,8 @@ export async function generateMetadata({ params }: ArticleShortLinkProps): Promi
   return {
     title,
     description,
+    alternates: { canonical: url },
+    robots: { index: true, follow: true },
     openGraph: {
       title,
       description,

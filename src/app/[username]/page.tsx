@@ -199,8 +199,34 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
   const institutionName = profile.institution?.name || "Indian Institute of Technology";
   const campusShort = institutionName.split(",")[0];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    dateCreated: profile.createdAt.toISOString(),
+    mainEntity: {
+      "@type": "Person",
+      name: profile.displayName,
+      alternateName: `@${profile.username}`,
+      identifier: profile.username,
+      description: profile.bio || profile.headline || undefined,
+      image: profile.avatarUrl || undefined,
+      url: `https://campusloop.space/@${profile.username}`,
+      alumniOf: institutionName
+        ? {
+            "@type": "EducationalOrganization",
+            name: institutionName,
+          }
+        : undefined,
+      knowsAbout: profile.branch ? [profile.branch, "College Academics"] : undefined,
+    },
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden pb-16 select-none">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Top Floating Glass Header */}
       <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/80 px-6 backdrop-blur-xl">
         <Link href="/" className="flex items-center gap-2.5">

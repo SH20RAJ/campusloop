@@ -23,11 +23,6 @@ export async function GET() {
     <loc>https://campusloop.space/app/communities/${item.id}</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://campusloop.space/c/${item.id}</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
   </url>`
       )
       .join("");

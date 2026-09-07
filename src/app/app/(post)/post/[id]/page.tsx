@@ -227,12 +227,56 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   }
 
   const campusName = rawPost.institution?.name?.split(",")[0] || "Campus";
+  const postTitle = `${rawPost.type === "CONFESSION" ? "Confession" : "Discussion"} in ${campusName}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DiscussionForumPosting",
+    headline: postTitle,
+    text: rawPost.body,
+    datePublished: rawPost.createdAt.toISOString(),
+    url: `https://campusloop.space/app/post/${rawPost.id}`,
+    author: rawPost.isAnonymous
+      ? {
+          "@type": "Person",
+          name: "Anonymous Student",
+        }
+      : {
+          "@type": "Person",
+          name: rawPost.author?.displayName || "Student",
+          url: rawPost.author?.username ? `https://campusloop.space/@${rawPost.author.username}` : undefined,
+        },
+    publisher: {
+      "@type": "Organization",
+      name: "CampusLoop",
+      url: "https://campusloop.space",
+      logo: "https://campusloop.space/logo.png",
+    },
+    interactionStatistic: [
+      {
+        "@type": "InteractionCounter",
+        interactionType: "https://schema.org/LikeAction",
+        userInteractionCount: votesCount,
+      },
+      {
+        "@type": "InteractionCounter",
+        interactionType: "https://schema.org/CommentAction",
+        userInteractionCount: commentsCount,
+      },
+    ],
+  };
 
   return (
-    <PostReelsDeck
-      initialItems={initialItems}
-      currentUserId={profile?.id}
-      campusName={campusName}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <PostReelsDeck
+        initialItems={initialItems}
+        currentUserId={profile?.id}
+        campusName={campusName}
+      />
+    </>
   );
 }

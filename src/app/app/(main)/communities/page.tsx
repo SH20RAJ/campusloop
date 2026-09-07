@@ -1,6 +1,5 @@
 import { desc, isNotNull } from "drizzle-orm";
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import {
   CommunitiesIndexClient,
   type CommunityItem,
@@ -12,11 +11,11 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
   title: "Student Communities & Sub-Hubs",
-  description: "Browse interest groups, technical societies, and student-created communities on CampusLoop.",
-  keywords: ["Student Communities", "College Sub-Hubs", "Campus Clubs", "Student Groups India"],
+  description: "Browse interest groups, technical societies, and student-created communities across 1,350+ Indian colleges on CampusLoop.",
+  keywords: ["Student Communities", "College Sub-Hubs", "Campus Clubs", "Student Groups India", "Coding Clubs"],
   alternates: { canonical: "https://campusloop.space/app/communities" },
   openGraph: {
-    title: "Student Communities & Sub-Hubs",
+    title: "Student Communities & Sub-Hubs | CampusLoop",
     description: "Browse interest groups and student communities on CampusLoop.",
     url: "https://campusloop.space/app/communities",
     siteName: "CampusLoop",
@@ -33,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Student Communities & Sub-Hubs",
+    title: "Student Communities & Sub-Hubs | CampusLoop",
     description: "Browse interest groups and student communities on CampusLoop.",
     images: ["https://campusloop.space/og-image.png"],
   },
@@ -42,13 +41,11 @@ export const metadata: Metadata = {
 
 export default async function CommunitiesPage() {
   const user = await getCachedAuthUser();
-  if (!user) redirect("/handler/sign-in");
-
   const db = getDb();
 
-  // Execute profile, communities, and community posts queries concurrently in a single round-trip
+  // Execute profile, communities, and community posts queries concurrently
   const [profile, allCommunities, rawCommunityPosts] = await Promise.all([
-    getCachedUserProfile(user.id),
+    user ? getCachedUserProfile(user.id) : Promise.resolve(null),
     db.query.communities.findMany({
       orderBy: [desc(communities.createdAt)],
       with: {
@@ -79,16 +76,18 @@ export default async function CommunitiesPage() {
     }),
   ]);
 
-  if (!profile) redirect("/app/onboarding");
-
   const formattedPosts = rawCommunityPosts.map((post) => {
     const votesCount = (post.votes || []).reduce((acc, vote) => acc + vote.value, 0);
     const commentsCount = (post.comments || []).length;
-    const userVote = (post.votes || []).find((v) => v.userId === profile.id)?.value || 0;
+    const userVote = profile
+      ? (post.votes || []).find((v) => v.userId === profile.id)?.value || 0
+      : 0;
 
     const formattedPollOptions = post.pollOptions?.map((opt) => {
       const optVotesCount = (opt.votes || []).length;
-      const userVoted = (opt.votes || []).some((v) => v.userId === profile.id);
+      const userVoted = profile
+        ? (opt.votes || []).some((v) => v.userId === profile.id)
+        : false;
       return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
     });
 
@@ -108,11 +107,31 @@ export default async function CommunitiesPage() {
     } as unknown as FeedPost;
   });
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Student Communities & Campus Sub-Hubs",
+    url: "https://campusloop.space/app/communities",
+    description: "Directory of student-created technical clubs, cultural societies, and special interest groups across Indian colleges.",
+    publisher: {
+      "@type": "Organization",
+      name: "CampusLoop",
+      url: "https://campusloop.space",
+      logo: "https://campusloop.space/logo.png",
+    },
+  };
+
   return (
-    <CommunitiesIndexClient
-      initialCommunities={allCommunities as unknown as CommunityItem[]}
-      initialPosts={formattedPosts}
-      profileId={profile.id}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <CommunitiesIndexClient
+        initialCommunities={allCommunities as unknown as CommunityItem[]}
+        initialPosts={formattedPosts}
+        profileId={profile?.id || ""}
+      />
+    </>
   );
 }

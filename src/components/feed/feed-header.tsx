@@ -1,6 +1,6 @@
 "use client";
 
-import { Flame, Globe, ListFilter, RotateCw, School } from "lucide-react";
+import { Flame, Globe, ListFilter, RotateCw, School, Search } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -124,7 +124,7 @@ export function FeedHeader({
                 >
                   <span>{s.label}</span>
                   {isCurrent && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-10 rounded-full bg-primary" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-10 rounded-full bg-primary shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
                   )}
                 </button>
 
@@ -142,6 +142,16 @@ export function FeedHeader({
             );
           })}
         </div>
+
+        {/* Quick Search Button (matching Image 2) */}
+        <Link
+          href="/app/search"
+          className="flex size-8 shrink-0 items-center justify-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer mr-1"
+          aria-label="Search"
+          title="Search campus discussions"
+        >
+          <Search className="size-4" />
+        </Link>
 
         {/* Filter button */}
         <button

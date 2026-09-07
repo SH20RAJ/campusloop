@@ -90,7 +90,7 @@ export function FeedCardHeader({
               icon={AnimateShieldCheck}
               animation="pop"
               size={14}
-              className="text-brand shrink-0"
+              className="text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)] shrink-0"
             />
           )}
 
@@ -261,10 +261,10 @@ export function FeedCardHeader({
             <Link
               href={`/app/college/${post.institution?.slug || post.institutionId}`}
               onClick={(e) => e.stopPropagation()}
-              className="hover:text-foreground truncate max-w-[140px] sm:max-w-[200px] inline-flex items-center gap-1 transition-colors"
+              className="hover:text-foreground truncate max-w-[150px] sm:max-w-[220px] inline-flex items-center gap-1.5 transition-colors"
               title={post.institution?.name || ""}
             >
-              <School className="size-3 shrink-0 text-muted-foreground/60" />
+              <span className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)] shrink-0" />
               <span className="truncate">{institutionDisplayName}</span>
             </Link>
           )}

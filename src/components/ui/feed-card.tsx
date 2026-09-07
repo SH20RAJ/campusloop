@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Heart, Repeat2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
 import { FeedCardActions } from "@/components/feed/feed-card-actions";
@@ -18,7 +18,7 @@ import type { FeedPost } from "@/hooks/use-feed";
 import { repostPost, voteOnPost } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { getAvatarUrl } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
 import { ShareStoryModal } from "./share-story-modal";
@@ -58,6 +58,19 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const avatarUrl = post.isAnonymous
     ? ""
     : getAvatarUrl(post.author?.avatarUrl, post.author?.username ?? "student");
+
+  const extractedHashtags = useMemo(() => {
+    const text = post.body || "";
+    const tags: string[] = [];
+    const hashtagRegex = /#([\w-]+)/g;
+    let match;
+    while ((match = hashtagRegex.exec(text)) !== null) {
+      if (!tags.includes(match[1])) {
+        tags.push(match[1]);
+      }
+    }
+    return tags;
+  }, [post.body]);
 
   async function handleVote() {
     if (isLoading) return;
@@ -244,6 +257,26 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
           >
             <RichText content={post.body} />
           </div>
+
+          {/* Hashtags Row (matching Image 2) */}
+          {extractedHashtags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1.5" onClick={(e) => e.stopPropagation()}>
+              {extractedHashtags.map((tag, idx) => (
+                <Link
+                  key={tag}
+                  href={`/app/hashtag/${tag}`}
+                  className={cn(
+                    "rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors shrink-0",
+                    idx === 0
+                      ? "border border-purple-500/40 bg-purple-950/40 text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.2)] hover:bg-purple-900/50"
+                      : "border border-border/50 bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                  )}
+                >
+                  #{tag}
+                </Link>
+              ))}
+            </div>
+          )}
 
           {/* Embedded Original Quoted Post */}
           {post.repostOf && (

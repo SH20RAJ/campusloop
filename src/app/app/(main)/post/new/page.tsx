@@ -16,7 +16,7 @@ const POST_TYPES = ["NORMAL", "CONFESSION", "POLL", "QUESTION"] as const;
 type PostTypeParam = (typeof POST_TYPES)[number];
 
 interface NewPostPageProps {
-  searchParams: Promise<{ type?: string }>;
+  searchParams: Promise<{ type?: string; text?: string }>;
 }
 
 export default async function NewPostPage({ searchParams }: NewPostPageProps) {
@@ -25,7 +25,7 @@ export default async function NewPostPage({ searchParams }: NewPostPageProps) {
     redirect("/handler/sign-in");
   }
 
-  const { type } = await searchParams;
+  const { type, text } = await searchParams;
   const requested = (type || "").toUpperCase() as PostTypeParam;
   const initialType = POST_TYPES.includes(requested) ? requested : "NORMAL";
 
@@ -38,7 +38,7 @@ export default async function NewPostPage({ searchParams }: NewPostPageProps) {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen border-x border-border/30 bg-background">
-      <PostComposer initialType={initialType} variant="page" />
+      <PostComposer initialType={initialType} initialContent={text} variant="page" />
     </main>
   );
 }

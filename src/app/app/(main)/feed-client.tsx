@@ -29,6 +29,7 @@ import { confirmOptimisticPost, optimisticAddPost, revertOptimisticPost } from "
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import type { TrendingHashtag } from "@/lib/trending-hashtags";
+import { cn } from "@/lib/utils";
 
 export function FeedClient({ forcedType }: { forcedType?: string }) {
   const router = useRouter();
@@ -173,6 +174,9 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
 
     setIsQuickPosting(true);
     setQuickText("");
+    try {
+      sessionStorage.removeItem("campusloop_draft_post");
+    } catch {}
 
     const tempId = `temp_${Date.now()}`;
     const optimisticPost: FeedPost = {
@@ -350,34 +354,64 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
                       ))}
                     </div>
                   )}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between pt-0.5">
                     <Link
-                      href="/app/post/new"
-                      className="text-xs text-primary font-bold hover:underline cursor-pointer"
+                      href={
+                        quickText.trim()
+                          ? `/app/post/new?text=${encodeURIComponent(quickText.trim())}`
+                          : "/app/post/new"
+                      }
+                      onClick={() => {
+                        if (quickText.trim()) {
+                          try {
+                            sessionStorage.setItem("campusloop_draft_post", quickText.trim());
+                          } catch {}
+                        }
+                      }}
+                      className="text-xs text-primary font-bold hover:underline cursor-pointer flex items-center gap-1.5 transition-colors group"
                     >
-                      Open full editor (poll, photos, confession)
+                      <span>Open full editor (poll, photos, confession)</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/20 group-hover:bg-primary/20">
+                        Draft saved ⚡
+                      </span>
                     </Link>
-                    <button
-                      type="submit"
-                      disabled={isQuickPosting || !quickText.trim()}
-                      className="px-4 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
-                    >
-                      {isQuickPosting ? "Posting..." : "Post"}
-                    </button>
+                    <span className="text-[11px] text-muted-foreground/80 font-mono font-medium">
+                      {quickText.length}/2000
+                    </span>
                   </div>
                 </div>
               )}
             </div>
-            {!quickText && (
-              <div className="flex items-center gap-1.5 shrink-0 pt-1">
-                <Link
-                  href="/app/post/new"
-                  className="px-4 py-1.5 rounded-full bg-foreground text-background text-xs font-black hover:opacity-90 transition-all cursor-pointer shadow-2xs"
-                >
-                  Post
-                </Link>
-              </div>
-            )}
+
+            {/* Permanent Top-Right Post Button (Never vanishes on mobile or desktop) */}
+            <div className="flex items-center gap-1.5 shrink-0 pt-1">
+              <button
+                type={quickText.trim() ? "submit" : "button"}
+                onClick={(e) => {
+                  if (!quickText.trim()) {
+                    e.preventDefault();
+                    router.push("/app/post/new");
+                  }
+                }}
+                disabled={isQuickPosting}
+                className={cn(
+                  "px-4 py-1.5 rounded-full text-xs font-black transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95",
+                  quickText.trim()
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/25 shadow-sm"
+                    : "bg-muted hover:bg-muted/80 text-foreground"
+                )}
+                title={quickText.trim() ? "Post now" : "Create a post"}
+              >
+                {isQuickPosting ? (
+                  <>
+                    <span className="size-3 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                    <span>Posting...</span>
+                  </>
+                ) : (
+                  "Post"
+                )}
+              </button>
+            </div>
           </div>
         </form>
 

@@ -4,7 +4,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { AlertTriangle, ArrowLeft, BarChart3, Check, ChevronDown, FileText, Flame, Globe, HelpCircle, Loader2, Lock, Mic, School, Smile, Type, Users, VenetianMask, Video, X, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { AudioPlayer } from "@/components/media/audio-player";
@@ -50,6 +50,8 @@ interface PostComposerProps {
    * lands on a confession rather than a blank post.
    */
   initialType?: PostType;
+  /** Pre-filled text to initialize the composer (e.g. from quick composer draft) */
+  initialContent?: string;
   /** Community name to lock the composer to, hiding the audience picker. */
   lockedCommunityName?: string;
   onPublished?: (post: FeedPost) => void;
@@ -65,6 +67,7 @@ export function PostComposer({
   communityId: initialCommunityId,
   variant = "page",
   initialType,
+  initialContent,
   lockedCommunityName,
   onPublished,
   onPublishConfirmed,
@@ -195,7 +198,7 @@ export function PostComposer({
 
   const editor = useEditor({
     extensions: [StarterKit],
-    content: "",
+    content: initialContent || "",
     editorProps: {
       attributes: {
         class: cn(
@@ -268,6 +271,36 @@ export function PostComposer({
       setMentionTrigger(detectMentionTrigger(textBefore, textBefore.length));
     },
   });
+
+  useEffect(() => {
+    if (!editor) return;
+    const searchParamText =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("text")
+        : null;
+    let sessionDraft: string | null = null;
+    try {
+      sessionDraft =
+        typeof window !== "undefined"
+          ? sessionStorage.getItem("campusloop_draft_post")
+          : null;
+    } catch {}
+
+    const textToRestore = initialContent || searchParamText || sessionDraft;
+    if (textToRestore && !editor.getText().trim()) {
+      editor.commands.setContent(textToRestore);
+      setCharCount(textToRestore.length);
+      toast.success("Draft restored from quick post ✍️", { id: "draft-restored" });
+      try {
+        sessionStorage.removeItem("campusloop_draft_post");
+      } catch {}
+    } else if (textToRestore && editor.getText().trim()) {
+      setCharCount(editor.getText().length);
+      try {
+        sessionStorage.removeItem("campusloop_draft_post");
+      } catch {}
+    }
+  }, [editor, initialContent]);
 
   function handleSelectSuggestion(replacement: string, trigger: TriggerContext) {
     if (!editor) return;
@@ -388,6 +421,10 @@ export function PostComposer({
 
     const toastId = `publish_${tempId}`;
     toast.loading("Publishing your post...", { id: toastId });
+
+    try {
+      sessionStorage.removeItem("campusloop_draft_post");
+    } catch {}
 
     if (isModal) {
       onPublished?.(optimisticPost);

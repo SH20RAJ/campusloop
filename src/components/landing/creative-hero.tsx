@@ -482,37 +482,43 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
 
   return (
     <section className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 pt-24 pb-16 sm:pt-32 sm:pb-24 overflow-x-clip">
+      {/* ─── Ambient Radiant Brand Glow ─── */}
+      <div className="pointer-events-none absolute -top-28 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-to-tr from-purple-600/25 via-primary/20 to-indigo-600/10 blur-[130px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute top-1/2 left-1/4 -translate-y-1/2 w-[350px] h-[350px] bg-purple-500/10 blur-[100px] rounded-full -z-10" />
+
       <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
-        {/* ──────── LEFT COLUMN: Twitter-Style Clean Minimal Typography (2 Colors Max) ──────── */}
+        {/* ──────── LEFT COLUMN: Rich Brand Typography with Vibrant Primary Color ──────── */}
         <div className="flex flex-col items-start text-left space-y-6 lg:col-span-6">
-          {/* Twitter-style pill label: strictly text-foreground and text-muted-foreground */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-muted/30 px-3.5 py-1 text-xs font-semibold text-muted-foreground">
-            <span className="size-1.5 rounded-full bg-foreground" />
-            <span className="text-foreground font-bold">1,350+ COLLEGES</span>
-            <span>·</span>
+          {/* Pill label with primary gradient border & glowing dot */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-950/40 px-3.5 py-1 text-xs font-semibold text-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.25)]">
+            <span className="size-2 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.9)] animate-pulse" />
+            <span className="text-purple-300 font-black">1,350+ COLLEGES</span>
+            <span className="text-purple-400/50">·</span>
             <span>VERIFIED STUDENT NETWORK</span>
           </div>
 
-          {/* Twitter-Inspired Headline (2 solid tones: pure white foreground & muted-foreground) */}
+          {/* Primary Gradient Headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-[1.05] text-foreground">
             Your campus.
             <br />
-            <span className="text-muted-foreground font-bold">Verified &amp; unfiltered.</span>
+            <span className="bg-gradient-to-r from-purple-400 via-violet-300 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(168,85,247,0.35)]">
+              Verified &amp; unfiltered.
+            </span>
           </h1>
 
-          {/* Minimal 2-color Subtitle */}
+          {/* Subtitle */}
           <p className="max-w-lg text-base sm:text-lg leading-relaxed text-muted-foreground font-normal">
             The private collegiate network for Indian students. Spill anonymous confessions safely, settle
             midnight canteen polls, match with peers, and trade dorm gear — gated strictly by your{" "}
-            <span className="font-semibold text-foreground">college email</span>.
+            <span className="font-semibold text-purple-300">college email</span>.
           </p>
 
-          {/* Twitter-Style Action Buttons: Full-width on mobile, rounded-full */}
+          {/* Primary Gradient Action Buttons */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full pt-1">
             {isAuthenticated ? (
               <Link
                 href="/app"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-foreground px-8 text-[15px] font-bold text-background transition-all hover:opacity-90 active:scale-98"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-gradient-to-r from-purple-600 via-primary to-indigo-600 hover:from-purple-500 hover:to-indigo-500 px-8 text-[15px] font-bold text-white shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:shadow-[0_0_35px_rgba(168,85,247,0.65)] transition-all active:scale-98 cursor-pointer"
               >
                 <span>Enter Campus Feed</span>
                 <ArrowRight className="ml-2 size-4" />
@@ -520,7 +526,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             ) : (
               <Link
                 href="/handler/sign-up"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-foreground px-8 text-[15px] font-bold text-background transition-all hover:opacity-90 active:scale-98"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-gradient-to-r from-purple-600 via-primary to-indigo-600 hover:from-purple-500 hover:to-indigo-500 px-8 text-[15px] font-bold text-white shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:shadow-[0_0_35px_rgba(168,85,247,0.65)] transition-all active:scale-98 cursor-pointer"
               >
                 <span>Get verified with college email</span>
                 <ArrowRight className="ml-2 size-4" />
@@ -529,7 +535,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
 
             <Link
               href="/colleges"
-              className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full border border-border/80 bg-transparent px-6 text-[15px] font-bold text-foreground transition-all hover:bg-muted/50 active:scale-98"
+              className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full border border-purple-500/30 bg-purple-950/20 hover:bg-purple-900/30 hover:border-purple-500/60 px-6 text-[15px] font-bold text-purple-200 transition-all active:scale-98 shadow-xs cursor-pointer"
             >
               <span>Explore 1,350+ Hubs</span>
             </Link>
@@ -541,7 +547,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
               By joining, you verify your student status.{" "}
               <Link
                 href="/handler/sign-up"
-                className="font-semibold text-foreground underline underline-offset-2 hover:opacity-80"
+                className="font-semibold text-purple-300 underline underline-offset-2 hover:text-purple-200"
               >
                 Viewer mode
               </Link>{" "}
@@ -549,28 +555,28 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             </p>
           )}
 
-          {/* Minimal Trust Checklist (2 colors max: text-foreground for checkmarks, text-muted-foreground for text) */}
+          {/* Minimal Trust Checklist with Purple Checkmarks */}
           <div className="pt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground font-medium">
             <div className="flex items-center gap-1.5">
-              <Check className="size-3.5 text-foreground shrink-0" />
-              <span>100% Student Verified</span>
+              <Check className="size-3.5 text-purple-400 shrink-0 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
+              <span className="text-foreground/90 font-semibold">100% Student Verified</span>
             </div>
-            <span>·</span>
+            <span className="text-muted-foreground/40">·</span>
             <div className="flex items-center gap-1.5">
-              <Check className="size-3.5 text-foreground shrink-0" />
-              <span>Zero-Doxxing Escrow</span>
+              <Check className="size-3.5 text-purple-400 shrink-0 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
+              <span className="text-foreground/90 font-semibold">Zero-Doxxing Escrow</span>
             </div>
-            <span>·</span>
+            <span className="text-muted-foreground/40">·</span>
             <div className="flex items-center gap-1.5">
-              <Check className="size-3.5 text-foreground shrink-0" />
-              <span>No Outsiders</span>
+              <Check className="size-3.5 text-purple-400 shrink-0 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
+              <span className="text-foreground/90 font-semibold">No Outsiders</span>
             </div>
           </div>
         </div>
 
         {/* ──────── RIGHT COLUMN: Twitter / X UI Tweet Card ──────── */}
         <div className="lg:col-span-6 w-full max-w-lg mx-auto lg:max-w-none">
-          <div className="rounded-2xl sm:rounded-3xl border border-border/80 bg-card/60 backdrop-blur-md shadow-2xl overflow-hidden transition-all">
+          <div className="rounded-2xl sm:rounded-3xl border border-purple-500/25 bg-card/75 backdrop-blur-xl shadow-2xl shadow-purple-950/20 overflow-hidden transition-all">
             {/* Campus Selector Bar (Clean Twitter-style pill switcher) */}
             <div className="flex items-center justify-between gap-2 px-4 pt-3.5 pb-2.5 border-b border-border/40">
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 max-w-[260px] sm:max-w-none">
@@ -588,7 +594,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                       className={cn(
                         "rounded-full px-3 py-1 text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0",
                         isSelected
-                          ? "bg-foreground text-background"
+                          ? "bg-purple-600 text-white shadow-[0_0_12px_rgba(168,85,247,0.45)]"
                           : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/70 border border-border/40"
                       )}
                     >
@@ -598,9 +604,9 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                 })}
               </div>
 
-              {/* Online Presence Count in strict 2-color text */}
+              {/* Online Presence Count with pulsing dot */}
               <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground shrink-0">
-                <span className="size-2 rounded-full bg-foreground" />
+                <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
                 <span>{campus.activeCount} active</span>
               </div>
             </div>
@@ -620,14 +626,14 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                     }}
                     className={cn(
                       "flex-1 py-3 text-xs sm:text-sm font-semibold transition-all relative cursor-pointer text-center",
-                      isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
+                      isActive ? "text-purple-300 font-bold" : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <span>{tab.label}</span>
                     {isActive && (
                       <motion.div
                         layoutId="twitter-tab-indicator"
-                        className="absolute bottom-0 inset-x-3 h-[3px] rounded-full bg-foreground"
+                        className="absolute bottom-0 inset-x-3 h-[3px] rounded-full bg-primary shadow-[0_0_12px_rgba(168,85,247,0.9)]"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
@@ -805,8 +811,8 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                             className={cn(
                               "rounded-full px-4 py-1.5 text-xs font-bold transition-all cursor-pointer",
                               isVibeSent
-                                ? "bg-foreground text-background"
-                                : "border border-border/80 bg-muted/40 text-foreground hover:bg-muted/70"
+                                ? "bg-rose-500 text-white shadow-md shadow-rose-950/40"
+                                : "bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-900/40"
                             )}
                           >
                             {isVibeSent ? "Vibe Sent! 💌" : "Send Vibe"}
@@ -828,10 +834,10 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         <div className="rounded-2xl border border-border/80 bg-muted/20 p-3.5 space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <Bike className="size-4 text-foreground" />
+                              <Bike className="size-4 text-purple-400" />
                               <span className="font-bold text-foreground text-sm">{campus.market.item}</span>
                             </div>
-                            <span className="text-sm font-black text-foreground">{campus.market.price}</span>
+                            <span className="text-sm font-black text-purple-300">{campus.market.price}</span>
                           </div>
 
                           <p className="text-xs text-muted-foreground leading-relaxed">
@@ -852,8 +858,8 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                             className={cn(
                               "rounded-full px-4 py-1.5 text-xs font-bold transition-all cursor-pointer",
                               isOfferMade
-                                ? "bg-foreground text-background"
-                                : "border border-border/80 bg-muted/40 text-foreground hover:bg-muted/70"
+                                ? "bg-emerald-600 text-white shadow-md shadow-emerald-950/40"
+                                : "bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-900/40"
                             )}
                           >
                             {isOfferMade ? "Offer Sent! ⚡" : "Make ₹ Offer"}

@@ -26,7 +26,7 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
   const [activeIndex, setActiveIndex] = useState(0);
   const [selectedPostForComments, setSelectedPostForComments] = useState<FeedPost | null>(null);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [activeTab, setActiveTab] = useState("for_you");
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const isProgrammaticScrollRef = useRef(false);
@@ -105,32 +105,81 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
     }
   }
 
-  // Load more posts when near bottom of deck
+  // Load more posts when near bottom of deck - Truly infinite scroll
   const loadMorePosts = useCallback(async () => {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingMore) return;
     setIsLoadingMore(true);
     try {
       const nextPage = page + 1;
-      const data = await fetcher<{ posts: FeedPost[] }>(`/api/feed?page=${nextPage}&limit=15&sort=for_you`);
+      const sortParam =
+        activeTab === "latest"
+          ? "latest"
+          : activeTab === "clubs"
+            ? "clubs"
+            : activeTab === "opportunities"
+              ? "opportunities"
+              : "for_you";
+
+      const data = await fetcher<{ posts: FeedPost[] }>(
+        `/api/feed?page=${nextPage}&limit=15&sort=${sortParam}&scope=GLOBAL`
+      );
+
       if (data?.posts && data.posts.length > 0) {
         setItems((prev) => {
           const existingPostIds = new Set(
             prev.filter((i) => i.type === "POST").map((i) => (i as { post: FeedPost }).post.id)
           );
           const freshPosts = data.posts.filter((p) => !existingPostIds.has(p.id));
+          if (freshPosts.length === 0) return prev;
           const newItems: LoopDeckItem[] = freshPosts.map((p) => ({ type: "POST", post: p }));
           return [...prev, ...newItems];
         });
         setPage(nextPage);
       } else {
-        setHasMore(false);
+        // Fallback: If page runs dry, cycle in trending/popular campus posts so scroll never ends
+        const fallback = await fetcher<{ posts: FeedPost[] }>(
+          `/api/feed?page=1&limit=20&sort=trending&scope=GLOBAL`
+        );
+        if (fallback?.posts && fallback.posts.length > 0) {
+          setItems((prev) => {
+            const existingPostIds = new Set(
+              prev.filter((i) => i.type === "POST").map((i) => (i as { post: FeedPost }).post.id)
+            );
+            const freshPosts = fallback.posts.filter((p) => !existingPostIds.has(p.id));
+            if (freshPosts.length === 0) return prev;
+            return [...prev, ...freshPosts.map((p) => ({ type: "POST", post: p } as LoopDeckItem))];
+          });
+        }
       }
     } catch {
       // Ignore network error
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, hasMore, page]);
+  }, [isLoadingMore, page, activeTab]);
+
+  // Tab change handler with instant refresh
+  const handleTabChange = useCallback(async (tabId: string) => {
+    setActiveTab(tabId);
+    sounds.tap();
+    haptics.light();
+    try {
+      const data = await fetcher<{ posts: FeedPost[] }>(
+        `/api/feed?page=1&limit=15&sort=${tabId}&scope=GLOBAL`
+      );
+      if (data?.posts && data.posts.length > 0) {
+        const newItems: LoopDeckItem[] = data.posts.map((p) => ({ type: "POST", post: p }));
+        setItems(newItems);
+        setActiveIndex(0);
+        setPage(1);
+        if (containerRef.current) {
+          containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Keyboard navigation (ArrowDown, ArrowUp, J, K)
   useEffect(() => {
@@ -176,8 +225,8 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
                 document.title = `${author}'s Loop | CampusLoop`;
               }
 
-              // Preload more when approaching end
-              if (newIdx >= items.length - 3) {
+              // Preload more early when approaching end
+              if (newIdx >= items.length - 2) {
                 loadMorePosts();
               }
             }
@@ -198,10 +247,6 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
     return () => observer.disconnect();
   }, [items, loadMorePosts]);
 
-  const activeItem = items[activeIndex];
-
-  const [activeTab, setActiveTab] = useState("for_you");
-
   return (
     <div
       onWheel={handleWheel}
@@ -209,11 +254,11 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
       onTouchEnd={handleTouchEnd}
       className="relative w-full h-dvh overflow-hidden bg-background select-none"
     >
-      {/* ─── Ambient Glow in Background (matching Image 2) ─── */}
-      <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] bg-purple-600/15 blur-[120px] rounded-full -z-10" />
+      {/* ─── Ambient Glow in Background ─── */}
+      <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] bg-purple-600/10 blur-[140px] rounded-full -z-10" />
 
-      {/* ─── Top Header & Subheader Tabs (matching Image 2) ─── */}
-      <header className="absolute top-0 inset-x-0 z-30 px-4 pt-2.5 pb-1 bg-gradient-to-b from-background/95 via-background/80 to-transparent backdrop-blur-md">
+      {/* ─── Top Header & Subheader Tabs ─── */}
+      <header className="absolute top-0 inset-x-0 z-30 px-4 pt-2.5 pb-1 bg-gradient-to-b from-background/95 via-background/85 to-transparent backdrop-blur-md">
         <div className="flex items-center justify-between gap-3">
           {/* Left: Campus Community & Icon */}
           <Link href="/app/colleges" className="flex items-center gap-2.5 group min-w-0">
@@ -242,7 +287,7 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
 
         {/* Subheader Filter Tabs */}
         <div className="flex items-center justify-between gap-2 mt-3 border-b border-border/20 pb-0.5">
-          <div className="flex items-center gap-5 sm:gap-6 text-xs sm:text-sm font-bold">
+          <div className="flex items-center gap-5 sm:gap-6 text-xs sm:text-sm font-bold overflow-x-auto no-scrollbar py-0.5">
             {[
               { id: "for_you", label: "For You" },
               { id: "latest", label: "Latest" },
@@ -252,13 +297,9 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => {
-                  sounds.tap();
-                  haptics.light();
-                  setActiveTab(tab.id);
-                }}
+                onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "relative pb-2 transition-colors cursor-pointer select-none",
+                  "relative pb-2 transition-colors cursor-pointer select-none whitespace-nowrap",
                   activeTab === tab.id
                     ? "text-foreground font-black"
                     : "text-muted-foreground hover:text-foreground font-semibold"
@@ -274,7 +315,7 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
 
           <Link
             href="/app/search"
-            className="size-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+            className="size-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors shrink-0"
             aria-label="Search campus discussions"
           >
             <Search className="size-4" />
@@ -282,16 +323,16 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
         </div>
       </header>
 
-      {/* ─── Vertical Snap Scroll Deck ─── */}
+      {/* ─── Vertical Snap Scroll Deck (Exact Viewport Bounds: top 88px, bottom 64px on mobile / 0 on desktop) ─── */}
       <div
         ref={containerRef}
-        className="w-full h-full overflow-y-scroll snap-y snap-mandatory scroll-smooth no-scrollbar pt-28 pb-20"
+        className="absolute inset-x-0 top-[88px] sm:top-[92px] bottom-[64px] md:bottom-0 overflow-y-scroll snap-y snap-mandatory scroll-smooth no-scrollbar"
       >
         {items.map((item, index) => (
           <div
             key={item.type === "POST" ? item.post.id : item.id}
             data-index={index}
-            className="w-full h-full snap-start snap-always flex items-center justify-center p-2 sm:p-4 shrink-0"
+            className="w-full h-full snap-start snap-always shrink-0 relative overflow-hidden flex flex-col"
           >
             {item.type === "POST" ? (
               <PostReelCard

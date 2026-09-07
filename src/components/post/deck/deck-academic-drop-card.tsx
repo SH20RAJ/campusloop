@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Download, ExternalLink, FileText, GraduationCap } from "lucide-react";
+import { BookOpen, Download, ExternalLink, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import type { DeckAcademicResource } from "./deck-types";
@@ -25,8 +25,8 @@ export function DeckAcademicDropCard({ resource }: DeckAcademicDropCardProps) {
   }
 
   return (
-    <article className="relative w-full max-w-xl mx-auto rounded-3xl border border-border/80 bg-card/95 backdrop-blur-2xl shadow-2xl p-5 sm:p-6 flex flex-col justify-between max-h-[calc(100dvh-5rem)] overflow-y-auto no-scrollbar select-none transition-all">
-      <div className="space-y-4">
+    <div className="relative w-full h-full max-w-xl mx-auto flex flex-col justify-center px-4 py-4 sm:px-6 select-none overflow-hidden">
+      <div className="rounded-3xl bg-white/[0.04] backdrop-blur-xl p-5 sm:p-6 border border-white/10 shadow-2xl space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/40 pb-3">
           <div className="flex items-center gap-2.5">
@@ -97,6 +97,6 @@ export function DeckAcademicDropCard({ resource }: DeckAcademicDropCardProps) {
         <span>Swipe down to continue your loop</span>
         <span className="text-primary font-bold">↓</span>
       </div>
-    </article>
+    </div>
   );
 }

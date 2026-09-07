@@ -10,9 +10,11 @@ import {
   Pause,
   Play,
   Repeat2,
+  Share2,
   Volume2,
   VolumeX,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
@@ -35,15 +37,6 @@ interface PostReelCardProps {
   isActive?: boolean;
 }
 
-const QUICK_REACTIONS = [
-  { emoji: "❤️", label: "Love" },
-  { emoji: "🔥", label: "Fire" },
-  { emoji: "😂", label: "Haha" },
-  { emoji: "👏", label: "Clap" },
-  { emoji: "😮", label: "Wow" },
-  { emoji: "💯", label: "100" },
-];
-
 export function PostReelCard({ post, currentUserId, onOpenComments, isActive = false }: PostReelCardProps) {
   const [userVote, setUserVote] = useState(post.userVote);
   const [votesCount, setVotesCount] = useState(post.votesCount);
@@ -51,8 +44,6 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   const [isSaved, setIsSaved] = useState(Boolean(post.isSaved));
   const [isReposted, setIsReposted] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
-  const [showReactionTray, setShowReactionTray] = useState(false);
-  const [activeReaction, setActiveReaction] = useState<string | null>(null);
 
   // Video Reel State (Image 3)
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -93,42 +84,55 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
       .trim();
   }, [post.body, videoUrl]);
 
-  // Split content into bold headline & body description and extract tags (matching Image 2)
+  // Split content into clean headline & body description and extract tags without duplication
   const { headline, descriptionText, tags } = useMemo(() => {
     const rawBody = post.body || "";
     let h = post.title || "";
     let desc = rawBody;
 
     if (!h) {
-      if (rawBody.includes("\n")) {
-        const parts = rawBody.split("\n").filter((p) => p.trim().length > 0);
-        h = parts[0] || "";
-        desc = parts.slice(1).join("\n");
+      if (rawBody.startsWith("# ")) {
+        const firstLineEnd = rawBody.indexOf("\n");
+        if (firstLineEnd !== -1) {
+          h = rawBody.slice(2, firstLineEnd).trim();
+          desc = rawBody.slice(firstLineEnd + 1).trim();
+        } else {
+          h = rawBody.slice(2).trim();
+          desc = "";
+        }
       } else {
-        const match = rawBody.match(/^([^.?!]+[.?!])\s*(.*)$/s);
-        if (match && match[1].length <= 90 && match[2].length > 0) {
-          h = match[1];
-          desc = match[2];
+        const doubleNewlineIdx = rawBody.indexOf("\n\n");
+        if (doubleNewlineIdx > 0 && doubleNewlineIdx <= 55) {
+          const candidateTitle = rawBody.slice(0, doubleNewlineIdx).trim();
+          if (!candidateTitle.endsWith(".") && !candidateTitle.endsWith("?") && !candidateTitle.endsWith("!")) {
+            h = candidateTitle;
+            desc = rawBody.slice(doubleNewlineIdx + 2).trim();
+          }
         }
       }
     }
 
+    // Strip trailing hashtags block from description text to prevent duplicate display
+    const cleanedDesc = desc.replace(/(\n\s*(?:#[\w-]+\s*)+)$/g, "").trim();
+
     // Extract hashtags from body
-    const foundTags = (rawBody.match(/#([a-zA-Z0-9_]+)/g) || []).map((t) => t.trim());
-    if (foundTags.length === 0) {
+    const rawFoundTags = (rawBody.match(/#([a-zA-Z0-9_-]+)/g) || []).map((t) => t.trim());
+    const uniqueTags = Array.from(new Set(rawFoundTags));
+
+    if (uniqueTags.length === 0) {
       const lower = rawBody.toLowerCase();
       if (lower.includes("exam") || lower.includes("mid-sem") || lower.includes("study") || lower.includes("productive")) {
-        foundTags.push("#Academics", "#Productivity", "#StudentLife");
+        uniqueTags.push("#Academics", "#Productivity", "#StudentLife");
       } else if (lower.includes("crush") || lower.includes("dating") || lower.includes("love") || post.type === "CONFESSION") {
-        foundTags.push("#Confessions", "#CampusCrush", "#StudentLife");
+        uniqueTags.push("#Confessions", "#CampusCrush", "#StudentLife");
       } else if (lower.includes("mess") || lower.includes("food") || lower.includes("canteen") || lower.includes("hostel")) {
-        foundTags.push("#HostelDiaries", "#CampusFood", "#StudentLife");
+        uniqueTags.push("#HostelDiaries", "#CampusFood", "#StudentLife");
       } else {
-        foundTags.push("#CampusLife", "#Discussion", "#StudentLife");
+        uniqueTags.push("#CampusLife", "#Discussion", "#StudentLife");
       }
     }
 
-    return { headline: h, descriptionText: desc, tags: foundTags.slice(0, 3) };
+    return { headline: h, descriptionText: cleanedDesc, tags: uniqueTags.slice(0, 3) };
   }, [post.body, post.title, post.type]);
 
   useEffect(() => {
@@ -203,12 +207,8 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     setUserVote(newValue);
     setVotesCount(newCount);
     if (reactionEmoji) {
-      setActiveReaction(reactionEmoji);
       toast.success(`Reacted ${reactionEmoji}`);
-    } else {
-      setActiveReaction(null);
     }
-    setShowReactionTray(false);
 
     try {
       const data = await voteOnPost(post.id, newValue);
@@ -303,14 +303,124 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     }
   }
 
-  // ─── PURE INSTAGRAM REELS VIDEO LAYOUT (Image 3) ───
+  // Reusable side actions column
+  const renderSideActionRail = () => (
+    <div className="absolute right-3 sm:right-6 bottom-4 sm:bottom-6 z-30 flex flex-col items-center gap-3.5 select-none shrink-0 text-foreground">
+      {/* 1. Like */}
+      <div className="flex flex-col items-center gap-1">
+        <button
+          type="button"
+          onClick={() => handleVote()}
+          aria-label="Like post"
+          className={cn(
+            "size-11 sm:size-12 rounded-full border bg-black/40 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+            userVote === 1
+              ? "border-rose-500/40 text-rose-500 bg-rose-500/20 shadow-[0_0_20px_rgba(244,63,94,0.4)]"
+              : "border-white/10 text-white/90 hover:text-white hover:bg-white/10"
+          )}
+        >
+          <Heart className={cn("size-5 sm:size-5.5", userVote === 1 ? "fill-rose-500 text-rose-500" : "text-rose-500 fill-rose-500/20")} />
+        </button>
+        <span className="text-[11px] sm:text-xs font-bold text-white/80 tabular-nums">
+          {votesCount}
+        </span>
+      </div>
+
+      {/* 2. Comment */}
+      <div className="flex flex-col items-center gap-1">
+        <button
+          type="button"
+          onClick={() => onOpenComments(post)}
+          aria-label="Comment"
+          className="size-11 sm:size-12 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer text-white/90 hover:text-white hover:bg-white/10"
+        >
+          <MessageCircle className="size-5 sm:size-5.5" />
+        </button>
+        <span className="text-[11px] sm:text-xs font-bold text-white/80 tabular-nums">
+          {commentsCount}
+        </span>
+      </div>
+
+      {/* 3. Repost / Loop */}
+      <div className="flex flex-col items-center gap-1">
+        <button
+          type="button"
+          onClick={() => setShowRepostModal(true)}
+          aria-label="Loop post"
+          className={cn(
+            "size-11 sm:size-12 rounded-full border bg-black/40 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+            isReposted
+              ? "border-emerald-500/40 text-emerald-500 bg-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+              : "border-white/10 text-white/90 hover:text-white hover:bg-white/10"
+          )}
+        >
+          <Repeat2 className={cn("size-5 sm:size-5.5", isReposted && "rotate-180")} />
+        </button>
+        <span className="text-[10px] font-bold text-white/60">Loop</span>
+      </div>
+
+      {/* 4. Bookmark */}
+      <button
+        type="button"
+        onClick={handleToggleSave}
+        aria-label="Bookmark"
+        className={cn(
+          "size-11 sm:size-12 rounded-full border bg-black/40 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+          isSaved
+            ? "border-primary/40 text-primary fill-primary shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+            : "border-white/10 text-white/90 hover:text-white hover:bg-white/10"
+        )}
+      >
+        <Bookmark className={cn("size-5", isSaved && "fill-primary")} />
+      </button>
+
+      {/* 5. Share */}
+      <button
+        type="button"
+        onClick={handleShare}
+        aria-label="Share"
+        className="size-11 sm:size-12 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shadow-lg hover:scale-110 active:scale-90"
+      >
+        <Share2 className="size-5" />
+      </button>
+
+      {/* 6. More Options */}
+      <button
+        type="button"
+        onClick={() => setShowReport(true)}
+        aria-label="More options"
+        className="size-11 sm:size-12 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shadow-lg hover:scale-105 active:scale-95"
+      >
+        <MoreHorizontal className="size-5" />
+      </button>
+    </div>
+  );
+
+  const renderModals = () => (
+    <>
+      <FeedCardRepostModal
+        isOpen={showRepostModal}
+        onClose={() => setShowRepostModal(false)}
+        quoteThoughts={quoteThoughts}
+        setQuoteThoughts={setQuoteThoughts}
+        onExecuteRepost={handleExecuteRepost}
+        originalPostAuthorHandle={authorHandle}
+        isReposting={isReposting}
+      />
+      <ShareStoryModal isOpen={showShareStoryModal} onClose={() => setShowShareStoryModal(false)} post={post} />
+      <PostLikesModal postId={post.id} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
+      <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
+    </>
+  );
+
+  // ─── PURE INSTAGRAM REELS VIDEO LAYOUT ───
   if (videoUrl) {
     return (
-      <div className="relative flex items-center justify-center gap-3 sm:gap-4 w-full h-full max-h-[calc(100dvh-5.5rem)]">
+      <div className="relative w-full h-full max-w-lg mx-auto flex items-center justify-center overflow-hidden select-none">
         <div
           onDoubleClick={handleDoubleTap}
           onClick={handleTogglePlay}
-          className="relative w-full max-w-[340px] sm:max-w-[380px] h-[calc(100dvh-6.5rem)] max-h-[680px] rounded-3xl overflow-hidden bg-black border border-border/80 shadow-2xl flex items-center justify-center cursor-pointer select-none"
+          className="relative w-full h-full sm:max-w-[420px] sm:max-h-[calc(100vh-140px)] sm:rounded-3xl overflow-hidden bg-black flex items-center justify-center cursor-pointer select-none"
         >
           {/* 9:16 Video Player */}
           <video
@@ -357,18 +467,18 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
             )}
           </AnimatePresence>
 
-          {/* Sound Toggle (Bottom-Right) */}
+          {/* Sound Toggle */}
           <button
             type="button"
             onClick={handleToggleMute}
-            className="absolute bottom-4 right-4 z-30 size-9 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/75 transition-colors cursor-pointer"
+            className="absolute top-4 right-4 z-30 size-9 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/75 transition-colors cursor-pointer"
             aria-label={isMuted ? "Unmute video" : "Mute video"}
           >
             {isMuted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
           </button>
 
           {/* Bottom Gradient & Author/Caption Info */}
-          <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 pb-3 text-white space-y-2 pointer-events-auto">
+          <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/95 via-black/50 to-transparent p-4 pb-3 pr-16 text-white space-y-2 pointer-events-auto">
             {/* Author details */}
             <div className="flex items-center gap-2.5">
               <Avatar className="size-9 border-2 border-white/40 shrink-0">
@@ -387,11 +497,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
                 <button
                   type="button"
                   onClick={handleToggleFollowAuthor}
-                  className={`ml-1 text-[11px] font-bold px-2.5 py-1 rounded-full border transition-all cursor-pointer select-none ${
+                  className={cn(
+                    "ml-1 text-[11px] font-bold px-2.5 py-1 rounded-full border transition-all cursor-pointer select-none",
                     isFollowingAuthor
                       ? "bg-white/20 border-white/30 text-white"
                       : "bg-white text-black border-white hover:bg-white/90"
-                  }`}
+                  )}
                 >
                   {isFollowingAuthor ? "Following" : "Follow"}
                 </button>
@@ -400,7 +511,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
             {/* Caption */}
             {captionText && (
-              <div className="text-xs text-white/90 leading-relaxed pr-8">
+              <div className="text-xs text-white/90 leading-relaxed">
                 <p className={cn("transition-all", !isExpandedCaption && "line-clamp-2")}>
                   {captionText}
                 </p>
@@ -436,342 +547,163 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           </div>
         </div>
 
-        {/* ─── Floating Vertical Action Column (Right Side matching Image 2) ─── */}
-        <div className="flex flex-col items-center gap-3 z-30 select-none shrink-0 text-foreground">
-          {/* 1. Like */}
-          <div className="flex flex-col items-center gap-1">
-            <button
-              type="button"
-              onClick={() => handleVote()}
-              aria-label="Like post"
-              className={cn(
-                "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-                userVote === 1
-                  ? "border-rose-500/40 text-rose-500 bg-rose-500/15 shadow-[0_0_20px_rgba(244,63,94,0.35)]"
-                  : "border-white/10 text-white/90 hover:text-white"
-              )}
-            >
-              <Heart className={cn("size-5.5", userVote === 1 ? "fill-rose-500 text-rose-500" : "text-rose-500 fill-rose-500/20")} />
-            </button>
-            <span className="text-xs font-bold text-white/80 tabular-nums">
-              {votesCount}
-            </span>
-          </div>
-
-          {/* 2. Comment */}
-          <div className="flex flex-col items-center gap-1">
-            <button
-              type="button"
-              onClick={() => onOpenComments(post)}
-              aria-label="Comment"
-              className="size-11 sm:size-12 rounded-full border border-white/10 bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer text-white/90 hover:text-white"
-            >
-              <MessageCircle className="size-5.5" />
-            </button>
-            <span className="text-xs font-bold text-white/80 tabular-nums">
-              {commentsCount}
-            </span>
-          </div>
-
-          {/* 3. Repost */}
-          <button
-            type="button"
-            onClick={() => setShowRepostModal(true)}
-            aria-label="Loop"
-            className={cn(
-              "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-              isReposted ? "border-emerald-500/40 text-emerald-500 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "border-white/10 text-white/90 hover:text-white"
-            )}
-          >
-            <Repeat2 className={cn("size-5.5", isReposted && "rotate-180")} />
-          </button>
-
-          {/* 4. Bookmark */}
-          <button
-            type="button"
-            onClick={handleToggleSave}
-            aria-label="Save"
-            className={cn(
-              "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-              isSaved ? "border-primary/40 text-primary fill-primary shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 text-white/90 hover:text-white"
-            )}
-          >
-            <Bookmark className={cn("size-5", isSaved && "fill-primary")} />
-          </button>
-
-          {/* 5. More Options */}
-          <button
-            type="button"
-            onClick={() => setShowReport(true)}
-            aria-label="More"
-            className="size-11 sm:size-12 rounded-full border border-white/10 bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer shadow-xl hover:scale-105 active:scale-95"
-          >
-            <MoreHorizontal className="size-5" />
-          </button>
-        </div>
-
-        {/* Modals */}
-        <FeedCardRepostModal
-          isOpen={showRepostModal}
-          onClose={() => setShowRepostModal(false)}
-          quoteThoughts={quoteThoughts}
-          setQuoteThoughts={setQuoteThoughts}
-          onExecuteRepost={handleExecuteRepost}
-          originalPostAuthorHandle={authorHandle}
-          isReposting={isReposting}
-        />
-        <ShareStoryModal isOpen={showShareStoryModal} onClose={() => setShowShareStoryModal(false)} post={post} />
-        <PostLikesModal postId={post.id} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
-        <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
+        {renderSideActionRail()}
+        {renderModals()}
       </div>
     );
   }
 
-  // ─── IMMERSIVE CARD LAYOUT FOR TEXT, POLLS & IMAGES (matching Image 2) ───
+  // ─── IMMERSIVE FULL-PAGE REEL (BORDERLESS & RESPONSIVE TO ALL LENGTHS) ───
   return (
-    <div className="relative flex items-center justify-center gap-3 sm:gap-4 w-full h-full max-h-[calc(100dvh-9rem)]">
-      <article
-        onDoubleClick={handleDoubleTap}
-        className={cn(
-          "relative w-full max-w-[420px] sm:max-w-md mx-auto rounded-3xl border border-purple-500/30 bg-[#0d0d16]/95 backdrop-blur-2xl shadow-[0_0_50px_-10px_rgba(168,85,247,0.22)] p-5 sm:p-6 flex flex-col justify-between max-h-[calc(100dvh-10rem)] overflow-y-auto no-scrollbar select-none transition-all",
-          isActive ? "ring-1 ring-purple-500/40" : "opacity-95"
+    <div
+      onDoubleClick={handleDoubleTap}
+      className="relative w-full h-full flex flex-col justify-between px-4 py-3 sm:px-8 sm:py-5 max-w-2xl mx-auto select-none overflow-hidden"
+    >
+      {/* Double Tap Heart Animation */}
+      <AnimatePresence>
+        {showDoubleTapHeart && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1.3, opacity: 1 }}
+            exit={{ scale: 1.6, opacity: 0 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center"
+          >
+            <div className="rounded-full bg-black/40 p-6 backdrop-blur-md">
+              <Heart className="size-20 fill-rose-500 text-rose-500 drop-shadow-lg animate-pulse" />
+            </div>
+          </motion.div>
         )}
-      >
-        {/* Double Tap Heart Animation */}
-        <AnimatePresence>
-          {showDoubleTapHeart && (
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1.3, opacity: 1 }}
-              exit={{ scale: 1.6, opacity: 0 }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
-              className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center"
-            >
-              <div className="rounded-full bg-black/40 p-6 backdrop-blur-md">
-                <Heart className="size-20 fill-rose-500 text-rose-500 drop-shadow-lg animate-pulse" />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      </AnimatePresence>
 
-        <div className="space-y-4">
-          {/* Header */}
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="relative shrink-0">
-                <Avatar className="size-12 border-2 border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.25)]">
-                  {avatarUrl && <AvatarImage src={avatarUrl} alt={authorName} />}
-                  <AvatarFallback className="bg-purple-950 text-purple-200 font-black text-sm">
-                    {avatarFallback}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
+      {/* ─── Top Author Header ─── */}
+      <div className="flex items-center justify-between gap-3 min-w-0 pr-16 shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <Link
+            href={post.isAnonymous ? "#" : `/@${authorHandle}`}
+            onClick={(e) => {
+              if (post.isAnonymous) e.preventDefault();
+              e.stopPropagation();
+            }}
+            className="relative shrink-0 group"
+          >
+            <Avatar className="size-10 sm:size-11 border border-white/20 shadow-md">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={authorName} />}
+              <AvatarFallback className="bg-purple-950 text-purple-200 font-black text-xs">
+                {avatarFallback}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
 
-              <div className="min-w-0 flex-1 leading-tight">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-bold text-sm sm:text-base text-foreground truncate">
-                    {authorName}
-                  </span>
-                  {!post.isAnonymous && (
-                    <BadgeCheck className="size-4 text-purple-400 fill-purple-400/20 shrink-0" />
-                  )}
-                  <span className="text-xs text-muted-foreground/80 truncate">@{authorHandle}</span>
-                </div>
-
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
-                  <span className="size-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20 shrink-0" />
-                  <span className="truncate font-medium text-foreground/90">
-                    {post.institution?.name?.split(",")[0] || "Birla Institute of Technology"}
-                  </span>
-                </div>
-              </div>
+          <div className="min-w-0 flex-1 leading-tight">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-bold text-sm sm:text-base text-foreground truncate">
+                {authorName}
+              </span>
+              {!post.isAnonymous && (
+                <BadgeCheck className="size-4 text-purple-400 fill-purple-400/20 shrink-0" />
+              )}
+              <span className="text-xs text-muted-foreground/80 truncate">@{authorHandle}</span>
             </div>
 
-            {/* Right: Time ago + Three Dots Options */}
-            <div className="flex items-center gap-1.5 shrink-0 pt-0.5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+              <span className="size-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20 shrink-0" />
+              <span className="truncate font-medium text-foreground/90">
+                {post.institution?.name?.split(",")[0] || "Birla Institute of Technology"}
+              </span>
+              <span>·</span>
               <span>{formatTimeAgo(new Date(post.createdAt))}</span>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowReport(true);
-                }}
-                className="size-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
-                aria-label="More options"
-              >
-                <MoreHorizontal className="size-4" />
-              </button>
             </div>
           </div>
-
-          {/* Post Content: Bold Headline + Description Body */}
-          <div className="space-y-2 pt-1">
-            {headline && (
-              <h2 className="text-base sm:text-lg font-black text-foreground tracking-tight leading-snug">
-                {headline}
-              </h2>
-            )}
-            {descriptionText && (
-              <div className="text-sm sm:text-[15px] text-muted-foreground/95 leading-relaxed font-normal">
-                <RichText content={descriptionText} maxHeight={220} />
-              </div>
-            )}
-          </div>
-
-          {/* Hashtags / Topic Tags (matching Image 2) */}
-          {tags.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap pt-1">
-              {tags.map((tag, idx) => (
-                <span
-                  key={tag}
-                  className={cn(
-                    "text-xs font-bold px-3 py-1 rounded-full transition-all select-none",
-                    idx === 0
-                      ? "bg-purple-950/70 border border-purple-500/40 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.25)]"
-                      : "bg-white/5 border border-white/10 text-white/80"
-                  )}
-                >
-                  {tag.startsWith("#") ? tag : `#${tag}`}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Embedded Repost */}
-          {post.repostOf && (
-            <div className="rounded-2xl border border-border/60 bg-muted/20 p-3 text-xs space-y-1">
-              <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
-                <span className="font-bold text-foreground">
-                  @{post.repostOf.author?.username || "student"}
-                </span>
-                {post.repostOf.institution && (
-                  <>
-                    <span>·</span>
-                    <span>{post.repostOf.institution.name.split(",")[0]}</span>
-                  </>
-                )}
-              </div>
-              <p className="text-foreground/90 line-clamp-3 leading-relaxed">{post.repostOf.body}</p>
-            </div>
-          )}
-
-          {/* Poll Component */}
-          {post.type === "POLL" && post.pollOptions && (
-            <div className="pt-1">
-              <PollCard post={post} />
-            </div>
-          )}
         </div>
 
-        {/* Card Footer Reaction Metrics (matching Image 2: ❤️ 1  💬 0) */}
-        <div className="pt-4 border-t border-white/10 flex items-center gap-5">
+        {/* Follow Button if not own post and not anonymous */}
+        {!post.isAnonymous && post.authorId && currentUserId !== post.authorId && (
           <button
             type="button"
-            onClick={() => handleVote()}
-            className="flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:scale-105 transition-transform cursor-pointer"
-          >
-            <Heart className="size-4.5 fill-rose-500 text-rose-500" />
-            <span className="tabular-nums">{votesCount}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onOpenComments(post)}
-            className="flex items-center gap-1.5 text-xs font-bold text-white/80 hover:text-white hover:scale-105 transition-transform cursor-pointer"
-          >
-            <MessageCircle className="size-4.5" />
-            <span className="tabular-nums">{commentsCount}</span>
-          </button>
-        </div>
-      </article>
-
-      {/* Floating Vertical Action Rail (Right Side matching Image 2) */}
-      <div className="flex flex-col items-center gap-3 z-30 select-none shrink-0 text-foreground">
-        {/* Like */}
-        <div className="flex flex-col items-center gap-1">
-          <button
-            type="button"
-            onClick={() => handleVote()}
-            aria-label="Like post"
+            onClick={handleToggleFollowAuthor}
             className={cn(
-              "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-              userVote === 1
-                ? "border-rose-500/40 text-rose-500 bg-rose-500/15 shadow-[0_0_20px_rgba(244,63,94,0.35)]"
-                : "border-white/10 text-white/90 hover:text-white"
+              "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0",
+              isFollowingAuthor
+                ? "bg-white/10 text-white/80 hover:bg-white/15"
+                : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_12px_rgba(168,85,247,0.35)]"
             )}
           >
-            <Heart className={cn("size-5.5", userVote === 1 ? "fill-rose-500 text-rose-500" : "text-rose-500 fill-rose-500/20")} />
+            {isFollowingAuthor ? "Following" : "Follow"}
           </button>
-          <span className="text-xs font-bold text-white/80 tabular-nums">
-            {votesCount}
-          </span>
-        </div>
-
-        {/* Comment */}
-        <div className="flex flex-col items-center gap-1">
-          <button
-            type="button"
-            onClick={() => onOpenComments(post)}
-            aria-label="Comment"
-            className="size-11 sm:size-12 rounded-full border border-white/10 bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer text-white/90 hover:text-white"
-          >
-            <MessageCircle className="size-5.5" />
-          </button>
-          <span className="text-xs font-bold text-white/80 tabular-nums">
-            {commentsCount}
-          </span>
-        </div>
-
-        {/* Repost */}
-        <button
-          type="button"
-          onClick={() => setShowRepostModal(true)}
-          aria-label="Loop"
-          className={cn(
-            "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-            isReposted ? "border-emerald-500/40 text-emerald-500 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "border-white/10 text-white/90 hover:text-white"
-          )}
-        >
-          <Repeat2 className={cn("size-5.5", isReposted && "rotate-180")} />
-        </button>
-
-        {/* Bookmark */}
-        <button
-          type="button"
-          onClick={handleToggleSave}
-          aria-label="Save"
-          className={cn(
-            "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-            isSaved ? "border-primary/40 text-primary fill-primary shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 text-white/90 hover:text-white"
-          )}
-        >
-          <Bookmark className={cn("size-5", isSaved && "fill-primary")} />
-        </button>
-
-        {/* More Options */}
-        <button
-          type="button"
-          onClick={() => setShowReport(true)}
-          aria-label="More"
-          className="size-11 sm:size-12 rounded-full border border-white/10 bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer shadow-xl hover:scale-105 active:scale-95"
-        >
-          <MoreHorizontal className="size-5" />
-        </button>
+        )}
       </div>
 
-      {/* Modals */}
-      <FeedCardRepostModal
-        isOpen={showRepostModal}
-        onClose={() => setShowRepostModal(false)}
-        quoteThoughts={quoteThoughts}
-        setQuoteThoughts={setQuoteThoughts}
-        onExecuteRepost={handleExecuteRepost}
-        originalPostAuthorHandle={authorHandle}
-        isReposting={isReposting}
-      />
-      <ShareStoryModal isOpen={showShareStoryModal} onClose={() => setShowShareStoryModal(false)} post={post} />
-      <PostLikesModal postId={post.id} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
-      <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
+      {/* ─── Main Content Body (Responsive to all lengths, scrollable if long, with pr-16 for side buttons) ─── */}
+      <div className="flex-1 min-h-0 flex flex-col justify-center overflow-y-auto no-scrollbar pr-14 sm:pr-16 space-y-3 sm:space-y-4 my-auto py-2">
+        {headline && (
+          <h2 className="text-lg sm:text-xl md:text-2xl font-black text-foreground tracking-tight leading-snug">
+            {headline}
+          </h2>
+        )}
+
+        {descriptionText && (
+          <div
+            className={cn(
+              "leading-relaxed font-normal text-foreground/95",
+              descriptionText.length < 140
+                ? "text-base sm:text-lg md:text-xl font-medium"
+                : descriptionText.length < 300
+                  ? "text-sm sm:text-base md:text-lg"
+                  : "text-xs sm:text-sm md:text-base"
+            )}
+          >
+            <RichText content={descriptionText} maxHeight={340} />
+          </div>
+        )}
+
+        {/* Embedded Repost */}
+        {post.repostOf && (
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md p-3.5 text-xs space-y-1.5 shadow-sm">
+            <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
+              <span className="font-bold text-foreground">
+                @{post.repostOf.author?.username || "student"}
+              </span>
+              {post.repostOf.institution && (
+                <>
+                  <span>·</span>
+                  <span>{post.repostOf.institution.name.split(",")[0]}</span>
+                </>
+              )}
+            </div>
+            <p className="text-foreground/90 line-clamp-3 leading-relaxed">{post.repostOf.body}</p>
+          </div>
+        )}
+
+        {/* Poll Component */}
+        {post.type === "POLL" && post.pollOptions && (
+          <div className="pt-1">
+            <PollCard post={post} />
+          </div>
+        )}
+
+        {/* Hashtags / Topic Tags (Rendered cleanly ONCE) */}
+        {tags.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap pt-1">
+            {tags.map((tag, idx) => (
+              <span
+                key={tag}
+                className={cn(
+                  "text-xs font-bold px-3 py-1 rounded-full transition-all select-none",
+                  idx === 0
+                    ? "bg-purple-950/70 border border-purple-500/40 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.25)]"
+                    : "bg-white/5 border border-white/10 text-white/80"
+                )}
+              >
+                {tag.startsWith("#") ? tag : `#${tag}`}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {renderSideActionRail()}
+      {renderModals()}
     </div>
   );
 }

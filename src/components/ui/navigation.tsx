@@ -482,65 +482,82 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
         !pathname.startsWith("/app/stories/new") &&
         !pathname.startsWith("/app/story/") &&
         !pathname.startsWith("/app/post/new") && (
-          <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-border/30 bg-background/90 backdrop-blur-2xl px-2 md:hidden touch-manipulation select-none">
-            {mobileBottomItems.map((item) => {
-              const isActive =
-                pathname === item.href || (item.href !== "/app" && pathname.startsWith(item.href));
-              const Icon = item.icon;
+          <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col border-t border-white/10 bg-[#09090f]/95 backdrop-blur-2xl md:hidden touch-manipulation select-none pb-[env(safe-area-inset-bottom,0px)] shadow-2xl">
+            <div className="flex h-14 items-center justify-around px-2">
+              {mobileBottomItems.map((item) => {
+                const isActive =
+                  pathname === item.href || (item.href !== "/app" && pathname.startsWith(item.href));
+                const Icon = item.icon;
 
-              if (item.href === "/app/post/new") {
-                if (isViewer) return null;
+                if (item.href === "/app/post/new") {
+                  if (isViewer) return null;
+                  return (
+                    <Link
+                      key="create"
+                      href="/app/post/new"
+                      prefetch={true}
+                      onClick={() => {
+                        sounds.tap();
+                        haptics.medium();
+                      }}
+                      className="flex flex-col items-center justify-center -mt-4 shrink-0 mx-1 group cursor-pointer select-none"
+                      aria-label="Create post or confession"
+                    >
+                      <div className="flex size-12 items-center justify-center rounded-full bg-gradient-to-tr from-purple-600 via-primary to-indigo-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.5)] ring-4 ring-[#09090f] group-active:scale-90 transition-transform">
+                        <AnimatedIcon icon={AnimatePlus} animation="spin" size={24} strokeWidth={2.6} />
+                      </div>
+                      <span className="mt-0.5 text-[10px] font-bold text-purple-300 group-hover:text-white transition-colors">
+                        Create
+                      </span>
+                    </Link>
+                  );
+                }
+
                 return (
                   <Link
-                    key="create"
-                    href="/app/post/new"
+                    key={item.href}
+                    href={item.href}
                     prefetch={true}
-                    className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/25 active:scale-90 transition-transform cursor-pointer shrink-0 mx-1"
-                    aria-label="Create post or confession"
+                    onClick={() => {
+                      sounds.tap();
+                      haptics.light();
+                    }}
+                    className={cn(
+                      "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
+                      isActive ? "text-purple-400 font-black" : "text-muted-foreground hover:text-foreground"
+                    )}
                   >
-                    <AnimatedIcon icon={AnimatePlus} animation="spin" size={22} strokeWidth={2.5} />
+                    <div className="relative">
+                      <AnimatedIcon
+                        icon={Icon}
+                        animation="pop"
+                        size={22}
+                        strokeWidth={isActive ? 2.5 : 2}
+                        animateOnHover={false}
+                        playKey={isActive}
+                        iconClassName={cn(
+                          "transition-colors",
+                          isActive ? "text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]" : ""
+                        )}
+                      />
+                      {item.href === "/app/notifications" && unreadNotificationsCount > 0 && (
+                        <span className="absolute -top-1 -right-1 size-2 rounded-full bg-rose-500 ring-2 ring-[#09090f] animate-pulse" />
+                      )}
+                    </div>
+                    <span
+                      className={cn(
+                        "mt-0.5 text-[10px] tracking-tight transition-colors",
+                        isActive ? "text-purple-400 font-bold" : "text-muted-foreground font-medium"
+                      )}
+                    >
+                      {item.label}
+                    </span>
                   </Link>
                 );
-              }
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  prefetch={true}
-                  onClick={() => {
-                    sounds.tap();
-                    haptics.light();
-                  }}
-                  className={cn(
-                    "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
-                    isActive ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <div className="relative">
-                    <AnimatedIcon
-                      icon={Icon}
-                      animation="pop"
-                      size={22}
-                      strokeWidth={isActive ? 2.5 : 2}
-                      // Hover means nothing on a phone; the tab popping as it
-                      // becomes active is the feedback that matters here.
-                      animateOnHover={false}
-                      playKey={isActive}
-                      iconClassName={cn("transition-colors", isActive ? "text-foreground" : "")}
-                    />
-                    {item.href === "/app/more" && !marketplaceSeen && (
-                      <span className="absolute -top-1 -right-1 size-2 rounded-full bg-amber-500 animate-pulse" />
-                    )}
-                    {item.href === "/app/notifications" && unreadNotificationsCount > 0 && (
-                      <span className="absolute -top-1 -right-1 size-2 rounded-full bg-primary" />
-                    )}
-                  </div>
-                  <span className="mt-0.5 text-[9px] font-semibold">{item.label}</span>
-                  {isActive && <div className="absolute bottom-1 size-1 rounded-full bg-primary" />}
-                </Link>
-              );
-            })}
+              })}
+            </div>
+            {/* iOS/Android Home Indicator Bar */}
+            <div className="w-28 h-1 bg-white/20 rounded-full mx-auto mb-1.5 shrink-0" />
           </div>
         )}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ChevronDown, ChevronUp, Zap } from "lucide-react";
+import { Building2, ChevronRight, Search, Zap } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
@@ -200,6 +200,8 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
 
   const activeItem = items[activeIndex];
 
+  const [activeTab, setActiveTab] = useState("for_you");
+
   return (
     <div
       onWheel={handleWheel}
@@ -207,30 +209,83 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
       onTouchEnd={handleTouchEnd}
       className="relative w-full h-dvh overflow-hidden bg-background select-none"
     >
-      {/* ─── Top Floating Header ─── */}
-      <div className="absolute top-2.5 inset-x-3 sm:inset-x-6 z-30 flex items-center justify-between pointer-events-none">
-        {/* Back to Campus Feed button */}
-        <Link
-          href="/app"
-          className="pointer-events-auto flex items-center gap-2 rounded-full border border-border/80 bg-background/85 backdrop-blur-xl px-3.5 py-1.5 text-xs font-bold text-foreground shadow-md hover:bg-muted/80 transition-all cursor-pointer select-none active:scale-95"
-        >
-          <ArrowLeft className="size-4" />
-          <span className="hidden sm:inline">Campus Feed</span>
-        </Link>
+      {/* ─── Ambient Glow in Background (matching Image 2) ─── */}
+      <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] bg-purple-600/15 blur-[120px] rounded-full -z-10" />
 
-        {/* Campus Loop Indicator Badge */}
-        <div className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-border/70 bg-card/85 backdrop-blur-xl px-3.5 py-1 text-[11px] font-bold text-muted-foreground shadow-xs">
-          <Zap className="size-3 text-primary animate-pulse" />
-          <span className="text-foreground font-black">{campusName || "CampusLoop Spotlight"}</span>
-          <span>·</span>
-          <span>Loop #{activeIndex + 1}</span>
+      {/* ─── Top Header & Subheader Tabs (matching Image 2) ─── */}
+      <header className="absolute top-0 inset-x-0 z-30 px-4 pt-2.5 pb-1 bg-gradient-to-b from-background/95 via-background/80 to-transparent backdrop-blur-md">
+        <div className="flex items-center justify-between gap-3">
+          {/* Left: Campus Community & Icon */}
+          <Link href="/app/colleges" className="flex items-center gap-2.5 group min-w-0">
+            <div className="size-10 rounded-full bg-purple-950/80 border border-purple-500/40 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.35)] shrink-0 group-hover:scale-105 transition-transform">
+              <Building2 className="size-5 text-purple-300" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-base font-black text-foreground truncate tracking-tight leading-tight">
+                {campusName || "Birla Institute of Technology"}
+              </h1>
+              <p className="text-[11px] text-muted-foreground truncate font-medium flex items-center gap-1.5 mt-0.5">
+                <span>👥 Campus Community</span>
+                <span>·</span>
+                <span>👥 3.2K members</span>
+              </p>
+            </div>
+          </Link>
+
+          {/* Right: Glowing Loop # Badge */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-950/70 border border-purple-500/40 text-purple-300 font-bold text-xs shadow-[0_0_15px_rgba(168,85,247,0.25)] shrink-0">
+            <Zap className="size-3.5 fill-purple-400 text-purple-400 animate-pulse" />
+            <span>Loop #{activeIndex + 1}</span>
+            <ChevronRight className="size-3.5 text-purple-400/80" />
+          </div>
         </div>
-      </div>
+
+        {/* Subheader Filter Tabs */}
+        <div className="flex items-center justify-between gap-2 mt-3 border-b border-border/20 pb-0.5">
+          <div className="flex items-center gap-5 sm:gap-6 text-xs sm:text-sm font-bold">
+            {[
+              { id: "for_you", label: "For You" },
+              { id: "latest", label: "Latest" },
+              { id: "clubs", label: "Clubs" },
+              { id: "opportunities", label: "Opportunities" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setActiveTab(tab.id);
+                }}
+                className={cn(
+                  "relative pb-2 transition-colors cursor-pointer select-none",
+                  activeTab === tab.id
+                    ? "text-foreground font-black"
+                    : "text-muted-foreground hover:text-foreground font-semibold"
+                )}
+              >
+                {tab.label}
+                {activeTab === tab.id && (
+                  <span className="absolute bottom-0 inset-x-0 h-[3px] rounded-full bg-primary shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          <Link
+            href="/app/search"
+            className="size-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+            aria-label="Search campus discussions"
+          >
+            <Search className="size-4" />
+          </Link>
+        </div>
+      </header>
 
       {/* ─── Vertical Snap Scroll Deck ─── */}
       <div
         ref={containerRef}
-        className="w-full h-full overflow-y-scroll snap-y snap-mandatory scroll-smooth no-scrollbar pt-6 pb-4"
+        className="w-full h-full overflow-y-scroll snap-y snap-mandatory scroll-smooth no-scrollbar pt-28 pb-20"
       >
         {items.map((item, index) => (
           <div
@@ -259,45 +314,6 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
             ) : null}
           </div>
         ))}
-      </div>
-
-      {/* ─── Floating Quick Navigation Pill (Right Side like Instagram Image 3) ─── */}
-      <div className="absolute right-3 sm:right-6 bottom-6 z-30 flex flex-col items-center gap-1.5 rounded-full border border-border/80 bg-card/90 backdrop-blur-2xl p-1.5 shadow-2xl">
-        <button
-          type="button"
-          onClick={() => scrollToIndex(activeIndex - 1)}
-          disabled={activeIndex === 0}
-          aria-label="Previous loop"
-          className={cn(
-            "p-2 rounded-full transition-all cursor-pointer",
-            activeIndex === 0
-              ? "opacity-30 cursor-not-allowed text-muted-foreground"
-              : "hover:bg-muted/60 text-foreground hover:scale-110 active:scale-95"
-          )}
-        >
-          <ChevronUp className="size-4" />
-        </button>
-
-        <div className="px-1 text-[10px] font-black text-muted-foreground tabular-nums select-none">
-          {activeIndex + 1}
-          <span className="opacity-40">/</span>
-          {items.length}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => scrollToIndex(activeIndex + 1)}
-          disabled={activeIndex === items.length - 1}
-          aria-label="Next loop"
-          className={cn(
-            "p-2 rounded-full transition-all cursor-pointer",
-            activeIndex === items.length - 1
-              ? "opacity-30 cursor-not-allowed text-muted-foreground"
-              : "hover:bg-muted/60 text-foreground hover:scale-110 active:scale-95"
-          )}
-        >
-          <ChevronDown className="size-4" />
-        </button>
       </div>
 
       {/* ─── Slide-Up Comments Drawer ─── */}

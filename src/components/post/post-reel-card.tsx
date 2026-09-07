@@ -10,7 +10,6 @@ import {
   Pause,
   Play,
   Repeat2,
-  Share2,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -93,6 +92,44 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
       .replace(videoUrl, "")
       .trim();
   }, [post.body, videoUrl]);
+
+  // Split content into bold headline & body description and extract tags (matching Image 2)
+  const { headline, descriptionText, tags } = useMemo(() => {
+    const rawBody = post.body || "";
+    let h = post.title || "";
+    let desc = rawBody;
+
+    if (!h) {
+      if (rawBody.includes("\n")) {
+        const parts = rawBody.split("\n").filter((p) => p.trim().length > 0);
+        h = parts[0] || "";
+        desc = parts.slice(1).join("\n");
+      } else {
+        const match = rawBody.match(/^([^.?!]+[.?!])\s*(.*)$/s);
+        if (match && match[1].length <= 90 && match[2].length > 0) {
+          h = match[1];
+          desc = match[2];
+        }
+      }
+    }
+
+    // Extract hashtags from body
+    const foundTags = (rawBody.match(/#([a-zA-Z0-9_]+)/g) || []).map((t) => t.trim());
+    if (foundTags.length === 0) {
+      const lower = rawBody.toLowerCase();
+      if (lower.includes("exam") || lower.includes("mid-sem") || lower.includes("study") || lower.includes("productive")) {
+        foundTags.push("#Academics", "#Productivity", "#StudentLife");
+      } else if (lower.includes("crush") || lower.includes("dating") || lower.includes("love") || post.type === "CONFESSION") {
+        foundTags.push("#Confessions", "#CampusCrush", "#StudentLife");
+      } else if (lower.includes("mess") || lower.includes("food") || lower.includes("canteen") || lower.includes("hostel")) {
+        foundTags.push("#HostelDiaries", "#CampusFood", "#StudentLife");
+      } else {
+        foundTags.push("#CampusLife", "#Discussion", "#StudentLife");
+      }
+    }
+
+    return { headline: h, descriptionText: desc, tags: foundTags.slice(0, 3) };
+  }, [post.body, post.title, post.type]);
 
   useEffect(() => {
     setUserVote(post.userVote);
@@ -399,8 +436,8 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           </div>
         </div>
 
-        {/* ─── Floating Vertical Action Column (Right Side like Instagram Image 3) ─── */}
-        <div className="flex flex-col items-center gap-3.5 z-30 select-none shrink-0 text-foreground">
+        {/* ─── Floating Vertical Action Column (Right Side matching Image 2) ─── */}
+        <div className="flex flex-col items-center gap-3 z-30 select-none shrink-0 text-foreground">
           {/* 1. Like */}
           <div className="flex flex-col items-center gap-1">
             <button
@@ -408,14 +445,16 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
               onClick={() => handleVote()}
               aria-label="Like post"
               className={cn(
-                "size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-                userVote === 1 ? "text-rose-500 bg-rose-500/10 border-rose-500/30" : "hover:text-foreground"
+                "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+                userVote === 1
+                  ? "border-rose-500/40 text-rose-500 bg-rose-500/15 shadow-[0_0_20px_rgba(244,63,94,0.35)]"
+                  : "border-white/10 text-white/90 hover:text-white"
               )}
             >
-              <Heart className={cn("size-5.5 sm:size-6", userVote === 1 && "fill-rose-500")} />
+              <Heart className={cn("size-5.5", userVote === 1 ? "fill-rose-500 text-rose-500" : "text-rose-500 fill-rose-500/20")} />
             </button>
-            <span className="text-[11px] font-bold text-muted-foreground tabular-nums">
-              {votesCount > 0 ? votesCount : "Like"}
+            <span className="text-xs font-bold text-white/80 tabular-nums">
+              {votesCount}
             </span>
           </div>
 
@@ -425,30 +464,27 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
               type="button"
               onClick={() => onOpenComments(post)}
               aria-label="Comment"
-              className="size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer hover:text-foreground"
+              className="size-11 sm:size-12 rounded-full border border-white/10 bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer text-white/90 hover:text-white"
             >
-              <MessageCircle className="size-5.5 sm:size-6" />
+              <MessageCircle className="size-5.5" />
             </button>
-            <span className="text-[11px] font-bold text-muted-foreground tabular-nums">
-              {commentsCount > 0 ? commentsCount : "Reply"}
+            <span className="text-xs font-bold text-white/80 tabular-nums">
+              {commentsCount}
             </span>
           </div>
 
           {/* 3. Repost */}
-          <div className="flex flex-col items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setShowRepostModal(true)}
-              aria-label="Repost"
-              className={cn(
-                "size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-                isReposted ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/30" : "hover:text-foreground"
-              )}
-            >
-              <Repeat2 className={cn("size-5.5 sm:size-6", isReposted && "rotate-180")} />
-            </button>
-            <span className="text-[11px] font-bold text-muted-foreground">Loop</span>
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowRepostModal(true)}
+            aria-label="Loop"
+            className={cn(
+              "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+              isReposted ? "border-emerald-500/40 text-emerald-500 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "border-white/10 text-white/90 hover:text-white"
+            )}
+          >
+            <Repeat2 className={cn("size-5.5", isReposted && "rotate-180")} />
+          </button>
 
           {/* 4. Bookmark */}
           <button
@@ -456,31 +492,21 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
             onClick={handleToggleSave}
             aria-label="Save"
             className={cn(
-              "size-10 sm:size-11 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-              isSaved ? "text-primary fill-primary" : "hover:text-foreground text-muted-foreground"
+              "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+              isSaved ? "border-primary/40 text-primary fill-primary shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 text-white/90 hover:text-white"
             )}
           >
             <Bookmark className={cn("size-5", isSaved && "fill-primary")} />
           </button>
 
-          {/* 5. Share */}
-          <button
-            type="button"
-            onClick={handleShare}
-            aria-label="Share"
-            className="size-10 sm:size-11 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer hover:text-foreground text-muted-foreground"
-          >
-            <Share2 className="size-5" />
-          </button>
-
-          {/* 6. More Options */}
+          {/* 5. More Options */}
           <button
             type="button"
             onClick={() => setShowReport(true)}
-            aria-label="Report"
-            className="size-9 rounded-full border border-border/60 bg-card/80 backdrop-blur-xl flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            aria-label="More"
+            className="size-11 sm:size-12 rounded-full border border-white/10 bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer shadow-xl hover:scale-105 active:scale-95"
           >
-            <MoreHorizontal className="size-4" />
+            <MoreHorizontal className="size-5" />
           </button>
         </div>
 
@@ -501,14 +527,14 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     );
   }
 
-  // ─── IMMERSIVE CARD LAYOUT FOR TEXT, POLLS & IMAGES ───
+  // ─── IMMERSIVE CARD LAYOUT FOR TEXT, POLLS & IMAGES (matching Image 2) ───
   return (
-    <div className="relative flex items-center justify-center gap-3 sm:gap-4 w-full h-full max-h-[calc(100dvh-5.5rem)]">
+    <div className="relative flex items-center justify-center gap-3 sm:gap-4 w-full h-full max-h-[calc(100dvh-9rem)]">
       <article
         onDoubleClick={handleDoubleTap}
         className={cn(
-          "relative w-full max-w-xl mx-auto rounded-3xl border border-border/80 bg-card/95 backdrop-blur-2xl shadow-2xl p-5 sm:p-6 flex flex-col justify-between max-h-[calc(100dvh-5.5rem)] overflow-y-auto no-scrollbar select-none transition-all",
-          isActive ? "ring-1 ring-primary/25 shadow-primary/5" : "opacity-95"
+          "relative w-full max-w-[420px] sm:max-w-md mx-auto rounded-3xl border border-purple-500/30 bg-[#0d0d16]/95 backdrop-blur-2xl shadow-[0_0_50px_-10px_rgba(168,85,247,0.22)] p-5 sm:p-6 flex flex-col justify-between max-h-[calc(100dvh-10rem)] overflow-y-auto no-scrollbar select-none transition-all",
+          isActive ? "ring-1 ring-purple-500/40" : "opacity-95"
         )}
       >
         {/* Double Tap Heart Animation */}
@@ -528,59 +554,88 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           )}
         </AnimatePresence>
 
-        <div className="space-y-3.5">
+        <div className="space-y-4">
           {/* Header */}
-          <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-3">
+          <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-3 min-w-0">
               <div className="relative shrink-0">
-                <Avatar className="size-11 border border-border/80 shadow-xs">
+                <Avatar className="size-12 border-2 border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.25)]">
                   {avatarUrl && <AvatarImage src={avatarUrl} alt={authorName} />}
-                  <AvatarFallback className="bg-muted font-black text-xs text-foreground">
+                  <AvatarFallback className="bg-purple-950 text-purple-200 font-black text-sm">
                     {avatarFallback}
                   </AvatarFallback>
                 </Avatar>
-                {!post.isAnonymous && (
-                  <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-emerald-500 ring-2 ring-background" />
-                )}
               </div>
 
               <div className="min-w-0 flex-1 leading-tight">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-bold text-sm sm:text-[15px] text-foreground truncate">
+                  <span className="font-bold text-sm sm:text-base text-foreground truncate">
                     {authorName}
                   </span>
                   {!post.isAnonymous && (
-                    <BadgeCheck className="size-4 text-primary shrink-0" />
+                    <BadgeCheck className="size-4 text-purple-400 fill-purple-400/20 shrink-0" />
                   )}
-                  <span className="text-xs text-muted-foreground truncate">@{authorHandle}</span>
+                  <span className="text-xs text-muted-foreground/80 truncate">@{authorHandle}</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-                  {post.institution && (
-                    <>
-                      <span className="truncate max-w-[140px] sm:max-w-[200px] font-medium">
-                        {post.institution.name.split(",")[0]}
-                      </span>
-                      <span>·</span>
-                    </>
-                  )}
-                  <span>{formatTimeAgo(new Date(post.createdAt))}</span>
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
+                  <span className="size-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20 shrink-0" />
+                  <span className="truncate font-medium text-foreground/90">
+                    {post.institution?.name?.split(",")[0] || "Birla Institute of Technology"}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Tag Badge */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="rounded-full border border-border/60 bg-muted/40 px-2.5 py-0.5 text-[11px] font-bold text-foreground">
-                {post.type === "CONFESSION" ? "🎭 Confession" : post.type === "POLL" ? "📊 Poll" : "💬 Yap"}
-              </span>
+            {/* Right: Time ago + Three Dots Options */}
+            <div className="flex items-center gap-1.5 shrink-0 pt-0.5 text-xs text-muted-foreground">
+              <span>{formatTimeAgo(new Date(post.createdAt))}</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowReport(true);
+                }}
+                className="size-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
+                aria-label="More options"
+              >
+                <MoreHorizontal className="size-4" />
+              </button>
             </div>
           </div>
 
-          {/* Post Text */}
-          <div className="text-[15px] sm:text-base text-foreground leading-relaxed pt-1">
-            <RichText content={post.body} maxHeight={240} />
+          {/* Post Content: Bold Headline + Description Body */}
+          <div className="space-y-2 pt-1">
+            {headline && (
+              <h2 className="text-base sm:text-lg font-black text-foreground tracking-tight leading-snug">
+                {headline}
+              </h2>
+            )}
+            {descriptionText && (
+              <div className="text-sm sm:text-[15px] text-muted-foreground/95 leading-relaxed font-normal">
+                <RichText content={descriptionText} maxHeight={220} />
+              </div>
+            )}
           </div>
+
+          {/* Hashtags / Topic Tags (matching Image 2) */}
+          {tags.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap pt-1">
+              {tags.map((tag, idx) => (
+                <span
+                  key={tag}
+                  className={cn(
+                    "text-xs font-bold px-3 py-1 rounded-full transition-all select-none",
+                    idx === 0
+                      ? "bg-purple-950/70 border border-purple-500/40 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.25)]"
+                      : "bg-white/5 border border-white/10 text-white/80"
+                  )}
+                >
+                  {tag.startsWith("#") ? tag : `#${tag}`}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Embedded Repost */}
           {post.repostOf && (
@@ -608,36 +663,30 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           )}
         </div>
 
-        {/* Footer Reaction Count */}
-        <div className="pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
-          {votesCount > 0 ? (
-            <button
-              type="button"
-              onClick={() => setShowLikesModal(true)}
-              className="flex items-center gap-1 hover:underline cursor-pointer"
-            >
-              <span className="size-4.5 rounded-full bg-rose-500 text-white flex items-center justify-center text-[10px]">
-                {activeReaction || "❤️"}
-              </span>
-              <span className="font-bold text-foreground ml-1">{votesCount}</span>
-              <span>reactions</span>
-            </button>
-          ) : (
-            <span>Be the first to react</span>
-          )}
+        {/* Card Footer Reaction Metrics (matching Image 2: ❤️ 1  💬 0) */}
+        <div className="pt-4 border-t border-white/10 flex items-center gap-5">
+          <button
+            type="button"
+            onClick={() => handleVote()}
+            className="flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:scale-105 transition-transform cursor-pointer"
+          >
+            <Heart className="size-4.5 fill-rose-500 text-rose-500" />
+            <span className="tabular-nums">{votesCount}</span>
+          </button>
 
           <button
             type="button"
             onClick={() => onOpenComments(post)}
-            className="hover:underline cursor-pointer font-medium"
+            className="flex items-center gap-1.5 text-xs font-bold text-white/80 hover:text-white hover:scale-105 transition-transform cursor-pointer"
           >
-            {commentsCount} comments
+            <MessageCircle className="size-4.5" />
+            <span className="tabular-nums">{commentsCount}</span>
           </button>
         </div>
       </article>
 
-      {/* Floating Action Column (Right Side) */}
-      <div className="flex flex-col items-center gap-3.5 z-30 select-none shrink-0 text-foreground">
+      {/* Floating Vertical Action Rail (Right Side matching Image 2) */}
+      <div className="flex flex-col items-center gap-3 z-30 select-none shrink-0 text-foreground">
         {/* Like */}
         <div className="flex flex-col items-center gap-1">
           <button
@@ -645,14 +694,16 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
             onClick={() => handleVote()}
             aria-label="Like post"
             className={cn(
-              "size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-              userVote === 1 ? "text-rose-500 bg-rose-500/10 border-rose-500/30" : "hover:text-foreground"
+              "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+              userVote === 1
+                ? "border-rose-500/40 text-rose-500 bg-rose-500/15 shadow-[0_0_20px_rgba(244,63,94,0.35)]"
+                : "border-white/10 text-white/90 hover:text-white"
             )}
           >
-            <Heart className={cn("size-5.5 sm:size-6", userVote === 1 && "fill-rose-500")} />
+            <Heart className={cn("size-5.5", userVote === 1 ? "fill-rose-500 text-rose-500" : "text-rose-500 fill-rose-500/20")} />
           </button>
-          <span className="text-[11px] font-bold text-muted-foreground tabular-nums">
-            {votesCount > 0 ? votesCount : "Like"}
+          <span className="text-xs font-bold text-white/80 tabular-nums">
+            {votesCount}
           </span>
         </div>
 
@@ -662,30 +713,27 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
             type="button"
             onClick={() => onOpenComments(post)}
             aria-label="Comment"
-            className="size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer hover:text-foreground"
+            className="size-11 sm:size-12 rounded-full border border-white/10 bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer text-white/90 hover:text-white"
           >
-            <MessageCircle className="size-5.5 sm:size-6" />
+            <MessageCircle className="size-5.5" />
           </button>
-          <span className="text-[11px] font-bold text-muted-foreground tabular-nums">
-            {commentsCount > 0 ? commentsCount : "Reply"}
+          <span className="text-xs font-bold text-white/80 tabular-nums">
+            {commentsCount}
           </span>
         </div>
 
         {/* Repost */}
-        <div className="flex flex-col items-center gap-1">
-          <button
-            type="button"
-            onClick={() => setShowRepostModal(true)}
-            aria-label="Repost"
-            className={cn(
-              "size-11 sm:size-12 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-              isReposted ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/30" : "hover:text-foreground"
-            )}
-          >
-            <Repeat2 className={cn("size-5.5 sm:size-6", isReposted && "rotate-180")} />
-          </button>
-          <span className="text-[11px] font-bold text-muted-foreground">Loop</span>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowRepostModal(true)}
+          aria-label="Loop"
+          className={cn(
+            "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+            isReposted ? "border-emerald-500/40 text-emerald-500 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "border-white/10 text-white/90 hover:text-white"
+          )}
+        >
+          <Repeat2 className={cn("size-5.5", isReposted && "rotate-180")} />
+        </button>
 
         {/* Bookmark */}
         <button
@@ -693,31 +741,21 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           onClick={handleToggleSave}
           aria-label="Save"
           className={cn(
-            "size-10 sm:size-11 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
-            isSaved ? "text-primary fill-primary" : "hover:text-foreground text-muted-foreground"
+            "size-11 sm:size-12 rounded-full border bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+            isSaved ? "border-primary/40 text-primary fill-primary shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 text-white/90 hover:text-white"
           )}
         >
           <Bookmark className={cn("size-5", isSaved && "fill-primary")} />
-        </button>
-
-        {/* Share */}
-        <button
-          type="button"
-          onClick={handleShare}
-          aria-label="Share"
-          className="size-10 sm:size-11 rounded-full border border-border/80 bg-card/90 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer hover:text-foreground text-muted-foreground"
-        >
-          <Share2 className="size-5" />
         </button>
 
         {/* More Options */}
         <button
           type="button"
           onClick={() => setShowReport(true)}
-          aria-label="Report"
-          className="size-9 rounded-full border border-border/60 bg-card/80 backdrop-blur-xl flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          aria-label="More"
+          className="size-11 sm:size-12 rounded-full border border-white/10 bg-[#161622]/85 backdrop-blur-xl flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer shadow-xl hover:scale-105 active:scale-95"
         >
-          <MoreHorizontal className="size-4" />
+          <MoreHorizontal className="size-5" />
         </button>
       </div>
 

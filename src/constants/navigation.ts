@@ -44,9 +44,9 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
 export const MOBILE_BOTTOM_ITEMS: NavItem[] = [
   { icon: AnimateHouse, href: "/app", label: "Home" },
   { icon: AnimateCompass, href: "/app/discover", label: "Explore" },
-  { icon: AnimatePlus, href: "/app/post/new", label: "Post" },
-  { icon: AnimateHeart, href: "/app/matching", label: "Match" },
-  { icon: MoreHorizontal, href: "/app/more", label: "More" },
+  { icon: AnimatePlus, href: "/app/post/new", label: "Create" },
+  { icon: AnimateHeart, href: "/app/notifications", label: "Activity" },
+  { icon: AnimateUser, href: "/app/profile", label: "Profile" },
 ];
 
 export const MORE_HUB_SECTIONS: NavGroup[] = [

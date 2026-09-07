@@ -28,7 +28,7 @@ import type { FeedPost } from "@/hooks/use-feed";
 import { repostPost, voteOnPost } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cleanSnippet, cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
+import { cleanSnippet, cn, formatTimeAgo, getAvatarUrl, getCollegeShortName } from "@/lib/utils";
 
 interface PostReelCardProps {
   post: FeedPost;
@@ -653,12 +653,17 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
                   : "text-xs sm:text-sm md:text-base"
             )}
           >
-            <RichText content={descriptionText} maxHeight={340} />
+            <RichText
+              content={descriptionText}
+              maxHeight={340}
+              createdAt={post.createdAt}
+              collegeName={getCollegeShortName(post.institution)}
+            />
           </div>
         )}
 
         {/* Embedded Repost */}
-        {post.repostOf && (
+        {post.repostOf && Boolean(post.repostComment) && post.body?.trim() !== post.repostOf.body?.trim() && (
           <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md p-3.5 text-xs space-y-1.5 shadow-sm">
             <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
               <span className="font-bold text-foreground">
@@ -667,7 +672,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
               {post.repostOf.institution && (
                 <>
                   <span>·</span>
-                  <span>{post.repostOf.institution.name.split(",")[0]}</span>
+                  <span>{getCollegeShortName(post.repostOf.institution)}</span>
                 </>
               )}
             </div>

@@ -18,7 +18,7 @@ import type { FeedPost } from "@/hooks/use-feed";
 import { repostPost, voteOnPost } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { cn, getAvatarUrl } from "@/lib/utils";
+import { cn, getAvatarUrl, getCollegeShortName } from "@/lib/utils";
 import { PollCard } from "./poll-card";
 import { ReportDialog } from "./report-dialog";
 import { ShareStoryModal } from "./share-story-modal";
@@ -33,6 +33,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   const router = useRouter();
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [userVote, setUserVote] = useState(post.userVote);
+  const collegeDisplayName = getCollegeShortName(post.institution);
   const [votesCount, setVotesCount] = useState(post.votesCount);
   const [commentsCount, setCommentsCount] = useState(post.commentsCount);
 
@@ -255,7 +256,11 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
             onClick={(e) => handleCardClick(e)}
             onDoubleClick={handleDoubleTap}
           >
-            <RichText content={post.body} />
+            <RichText
+              content={post.body}
+              createdAt={post.createdAt}
+              collegeName={collegeDisplayName}
+            />
           </div>
 
           {/* Hashtags Row (matching Image 2) */}
@@ -278,8 +283,8 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
             </div>
           )}
 
-          {/* Embedded Original Quoted Post */}
-          {post.repostOf && (
+          {/* Embedded Original Quoted Post (only when user provided separate quote thoughts) */}
+          {post.repostOf && Boolean(post.repostComment) && post.body?.trim() !== post.repostOf.body?.trim() && (
             <Link href={`/app/post/${post.repostOf.id}`} onClick={(e) => e.stopPropagation()}>
               <div className="mt-2.5 rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors p-3 text-xs space-y-1">
                 <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
@@ -290,7 +295,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
                     <>
                       <span>·</span>
                       <span className="truncate text-[11px]">
-                        {post.repostOf.institution.name.split(",")[0]}
+                        {getCollegeShortName(post.repostOf.institution)}
                       </span>
                     </>
                   )}

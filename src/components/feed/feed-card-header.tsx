@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/animated-icon";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { FeedPost } from "@/hooks/use-feed";
-import { formatTimeAgo } from "@/lib/utils";
+import { formatTimeAgo, getCollegeShortName } from "@/lib/utils";
 
 interface FeedCardHeaderProps {
   post: FeedPost;
@@ -63,8 +63,7 @@ export function FeedCardHeader({
     !post.isAnonymous && ((post.author?.points || 0) >= 150 || post.author?.role === "ADMIN")
   );
 
-  const institutionDisplayName =
-    post.institution?.name?.split(",")?.[0]?.replace(/^(Birla Institute of Technology)/i, "BIT") || null;
+  const institutionDisplayName = getCollegeShortName(post.institution) || null;
 
   return (
     <div className="space-y-0.5 min-w-0 select-none">

@@ -64,3 +64,36 @@ export function cleanSnippet(text?: string | null, maxLength = 80): string {
   if (cleaned.length <= maxLength) return cleaned;
   return cleaned.slice(0, maxLength).trim() + "...";
 }
+
+/**
+ * Normalizes college / institution names to clean campus hub tags (e.g. "BIT Mesra", "IIT Bombay")
+ */
+export function getCollegeShortName(inst?: { name?: string | null } | null): string {
+  if (!inst?.name) return "";
+  let name = inst.name.trim();
+  name = name.replace(/Birla Institute of Technology/gi, "BIT");
+  name = name.replace(/Indian Institute of Technology/gi, "IIT");
+  name = name.replace(/National Institute of Technology/gi, "NIT");
+  const parts = name.split(",").map((p) => p.trim()).filter(Boolean);
+  if (parts.length > 1 && (parts[0] === "BIT" || parts[0] === "IIT" || parts[0] === "NIT")) {
+    return `${parts[0]} ${parts[1]}`;
+  }
+  return parts[0] || name;
+}
+
+/**
+ * Formats image post timestamps as "27 August 2026, 12:17" for clean photo overlays
+ */
+export function formatImagePostDate(dateInput?: string | Date | null): string {
+  if (!dateInput) return "";
+  const d = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
+  if (isNaN(d.getTime())) return "";
+
+  const day = d.getDate();
+  const month = d.toLocaleDateString("en-US", { month: "long" });
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+
+  return `${day} ${month} ${year}, ${hours}:${minutes}`;
+}

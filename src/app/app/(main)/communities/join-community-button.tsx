@@ -26,7 +26,11 @@ export function JoinCommunityButton({
   const [isPending, setIsPending] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
-  async function handleToggle() {
+  async function handleToggle(e?: React.MouseEvent) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (isPending) return;
 
     const next = !isMember;

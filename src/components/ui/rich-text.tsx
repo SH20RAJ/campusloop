@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ExternalLink, X, ZoomIn } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ExternalLink, Image as ImageIcon, MapPin, X, ZoomIn } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -10,7 +10,7 @@ import { AudioPlayer } from "@/components/media/audio-player";
 import { DocumentCard } from "@/components/media/document-card";
 import { VideoPlayer } from "@/components/media/video-player";
 import { isMediaImageUrl } from "@/lib/embeds";
-import { cn } from "@/lib/utils";
+import { cn, formatImagePostDate } from "@/lib/utils";
 
 interface RichTextProps {
   content: string;
@@ -18,6 +18,8 @@ interface RichTextProps {
   disableEmbeds?: boolean;
   onImageClick?: (url: string) => void;
   maxHeight?: number;
+  createdAt?: string | Date | null;
+  collegeName?: string | null;
 }
 
 export function RichText({
@@ -26,6 +28,8 @@ export function RichText({
   disableEmbeds = false,
   onImageClick,
   maxHeight,
+  createdAt,
+  collegeName,
 }: RichTextProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -177,10 +181,11 @@ export function RichText({
         const isPdfUrl = /\.(pdf)($|\?)/i.test(raw) || raw.includes("/api/files/r2/documents/");
 
         if (isImageUrl) {
+          const formattedDate = formatImagePostDate(createdAt);
           parts.push(
             <div
               key={`img-bare-${tokenMatch.index}`}
-              className="my-2 block no-card-nav"
+              className="my-2 block no-card-nav relative group rounded-2xl overflow-hidden border border-border/80 bg-muted/20 shadow-xs max-w-lg cursor-pointer"
               data-no-nav="true"
               onClick={(e) => handleOpenImage(e, raw)}
               onPointerDown={(e) => e.stopPropagation()}
@@ -189,9 +194,35 @@ export function RichText({
                 src={raw}
                 alt="Shared media"
                 data-no-nav="true"
-                className="max-h-72 max-w-full rounded-2xl object-cover border border-border shadow-xs hover:opacity-95 transition-opacity cursor-pointer"
+                className="w-full max-h-96 object-cover group-hover:scale-[1.01] transition-transform duration-300"
                 loading="lazy"
               />
+              {/* Bottom Vignette Gradient */}
+              {(formattedDate || collegeName) && (
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
+              )}
+              {/* Stamped Metadata Overlay: Time & College with shadows */}
+              {(formattedDate || collegeName) && (
+                <div className="pointer-events-none absolute bottom-3 left-3.5 z-10 space-y-0.5 select-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                  {formattedDate && (
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                      <ImageIcon className="size-3.5 shrink-0 opacity-90 drop-shadow" />
+                      <span>{formattedDate}</span>
+                    </div>
+                  )}
+                  {collegeName && (
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                      <MapPin className="size-3.5 shrink-0 opacity-90 drop-shadow" />
+                      <span>{collegeName}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-md">
+                  <ZoomIn className="size-4" />
+                </span>
+              </div>
             </div>
           );
         } else if (isVideoUrl) {
@@ -320,7 +351,14 @@ export function RichText({
       ))}
 
       {/* Render Images / Multi-Image Carousel */}
-      {images.length > 0 && <ImageCarousel images={images} onOpenImage={handleOpenImage} />}
+      {images.length > 0 && (
+        <ImageCarousel
+          images={images}
+          onOpenImage={handleOpenImage}
+          createdAt={createdAt}
+          collegeName={collegeName}
+        />
+      )}
 
       {/* Rich Embeds */}
       {!disableEmbeds && <PostEmbedRenderer content={textWithoutMedia} />}
@@ -400,11 +438,14 @@ export function RichText({
 interface ImageCarouselProps {
   images: { alt: string; url: string }[];
   onOpenImage: (e: React.MouseEvent, url: string) => void;
+  createdAt?: string | Date | null;
+  collegeName?: string | null;
 }
 
-function ImageCarousel({ images, onOpenImage }: ImageCarouselProps) {
+function ImageCarousel({ images, onOpenImage, createdAt, collegeName }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const formattedDate = formatImagePostDate(createdAt);
 
   if (images.length === 1) {
     const single = images[0];
@@ -425,6 +466,30 @@ function ImageCarousel({ images, onOpenImage }: ImageCarouselProps) {
             (e.target as HTMLElement).style.display = "none";
           }}
         />
+
+        {/* Bottom Vignette Gradient */}
+        {(formattedDate || collegeName) && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
+        )}
+
+        {/* Stamped Metadata Overlay: Time & College with shadows */}
+        {(formattedDate || collegeName) && (
+          <div className="pointer-events-none absolute bottom-3 left-3.5 z-10 space-y-0.5 select-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+            {formattedDate && (
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                <ImageIcon className="size-3.5 shrink-0 opacity-90 drop-shadow" />
+                <span>{formattedDate}</span>
+              </div>
+            )}
+            {collegeName && (
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                <MapPin className="size-3.5 shrink-0 opacity-90 drop-shadow" />
+                <span>{collegeName}</span>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
           <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-md">
             <ZoomIn className="size-4" />
@@ -481,6 +546,29 @@ function ImageCarousel({ images, onOpenImage }: ImageCarouselProps) {
           className="w-full h-full object-contain transition-all duration-300"
           loading="lazy"
         />
+
+        {/* Bottom Vignette Gradient */}
+        {(formattedDate || collegeName) && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
+        )}
+
+        {/* Stamped Metadata Overlay: Time & College with shadows */}
+        {(formattedDate || collegeName) && (
+          <div className="pointer-events-none absolute bottom-3 left-3.5 z-10 space-y-0.5 select-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+            {formattedDate && (
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                <ImageIcon className="size-3.5 shrink-0 opacity-90 drop-shadow" />
+                <span>{formattedDate}</span>
+              </div>
+            )}
+            {collegeName && (
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                <MapPin className="size-3.5 shrink-0 opacity-90 drop-shadow" />
+                <span>{collegeName}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
           <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-md">

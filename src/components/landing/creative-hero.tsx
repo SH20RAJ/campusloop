@@ -482,26 +482,26 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
 
   return (
     <section className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 pt-24 pb-16 sm:pt-32 sm:pb-24 overflow-x-clip">
-      {/* ─── Ambient Radiant Brand Glow ─── */}
-      <div className="pointer-events-none absolute -top-28 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-to-tr from-purple-600/25 via-primary/20 to-indigo-600/10 blur-[130px] rounded-full -z-10" />
-      <div className="pointer-events-none absolute top-1/2 left-1/4 -translate-y-1/2 w-[350px] h-[350px] bg-purple-500/10 blur-[100px] rounded-full -z-10" />
+      {/* ─── Ambient Radiant Multi-Color Campus Glow ─── */}
+      <div className="pointer-events-none absolute -top-28 left-1/2 -translate-x-1/2 w-[720px] h-[420px] bg-gradient-to-tr from-violet-500/20 via-rose-500/15 to-sky-500/15 blur-[120px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute top-1/2 right-10 -translate-y-1/2 w-[350px] h-[350px] bg-gradient-to-bl from-amber-500/10 via-pink-500/10 to-indigo-500/15 blur-[100px] rounded-full -z-10" />
 
       <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
         {/* ──────── LEFT COLUMN: Rich Brand Typography with Vibrant Primary Color ──────── */}
         <div className="flex flex-col items-start text-left space-y-6 lg:col-span-6">
-          {/* Pill label with primary gradient border & glowing dot */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-950/40 px-3.5 py-1 text-xs font-semibold text-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.25)]">
-            <span className="size-2 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.9)] animate-pulse" />
-            <span className="text-purple-300 font-black">1,350+ COLLEGES</span>
-            <span className="text-purple-400/50">·</span>
-            <span>VERIFIED STUDENT NETWORK</span>
+          {/* Pill label with lively colors & pulsing indicator */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 dark:bg-primary/15 px-3.5 py-1 text-xs font-semibold text-foreground shadow-sm shadow-primary/10">
+            <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
+            <span className="text-primary font-black">1,350+ COLLEGES</span>
+            <span className="text-muted-foreground/40">·</span>
+            <span className="text-foreground/80 font-medium">VERIFIED STUDENT NETWORK</span>
           </div>
 
           {/* Primary Gradient Headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-[1.05] text-foreground">
             Your campus.
             <br />
-            <span className="bg-gradient-to-r from-purple-400 via-violet-300 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(168,85,247,0.35)]">
+            <span className="bg-gradient-to-r from-violet-500 via-fuchsia-500 to-indigo-500 bg-clip-text text-transparent drop-shadow-sm">
               Verified &amp; unfiltered.
             </span>
           </h1>
@@ -510,7 +510,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
           <p className="max-w-lg text-base sm:text-lg leading-relaxed text-muted-foreground font-normal">
             The private collegiate network for Indian students. Spill anonymous confessions safely, settle
             midnight canteen polls, match with peers, and trade dorm gear — gated strictly by your{" "}
-            <span className="font-semibold text-purple-300">college email</span>.
+            <span className="font-semibold text-primary">college email</span>.
           </p>
 
           {/* Primary Gradient Action Buttons */}
@@ -518,7 +518,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             {isAuthenticated ? (
               <Link
                 href="/app"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-gradient-to-r from-purple-600 via-primary to-indigo-600 hover:from-purple-500 hover:to-indigo-500 px-8 text-[15px] font-bold text-white shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:shadow-[0_0_35px_rgba(168,85,247,0.65)] transition-all active:scale-98 cursor-pointer"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-gradient-to-r from-violet-600 via-primary to-indigo-600 hover:from-violet-500 hover:to-indigo-500 px-8 text-[15px] font-bold text-white shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all active:scale-98 cursor-pointer"
               >
                 <span>Enter Campus Feed</span>
                 <ArrowRight className="ml-2 size-4" />
@@ -526,7 +526,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             ) : (
               <Link
                 href="/handler/sign-up"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-gradient-to-r from-purple-600 via-primary to-indigo-600 hover:from-purple-500 hover:to-indigo-500 px-8 text-[15px] font-bold text-white shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:shadow-[0_0_35px_rgba(168,85,247,0.65)] transition-all active:scale-98 cursor-pointer"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-gradient-to-r from-violet-600 via-primary to-indigo-600 hover:from-violet-500 hover:to-indigo-500 px-8 text-[15px] font-bold text-white shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all active:scale-98 cursor-pointer"
               >
                 <span>Get verified with college email</span>
                 <ArrowRight className="ml-2 size-4" />
@@ -535,7 +535,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
 
             <Link
               href="/colleges"
-              className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full border border-purple-500/30 bg-purple-950/20 hover:bg-purple-900/30 hover:border-purple-500/60 px-6 text-[15px] font-bold text-purple-200 transition-all active:scale-98 shadow-xs cursor-pointer"
+              className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full border border-border/70 bg-card/70 hover:bg-muted hover:border-border px-6 text-[15px] font-bold text-foreground transition-all active:scale-98 shadow-xs cursor-pointer"
             >
               <span>Explore 1,350+ Hubs</span>
             </Link>
@@ -547,7 +547,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
               By joining, you verify your student status.{" "}
               <Link
                 href="/handler/sign-up"
-                className="font-semibold text-purple-300 underline underline-offset-2 hover:text-purple-200"
+                className="font-semibold text-primary underline underline-offset-2 hover:text-primary/80"
               >
                 Viewer mode
               </Link>{" "}
@@ -555,30 +555,28 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             </p>
           )}
 
-          {/* Minimal Trust Checklist with Purple Checkmarks */}
-          <div className="pt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground font-medium">
-            <div className="flex items-center gap-1.5">
-              <Check className="size-3.5 text-purple-400 shrink-0 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
-              <span className="text-foreground/90 font-semibold">100% Student Verified</span>
+          {/* Cheerful Colorful Trust Checklist */}
+          <div className="pt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <Check className="size-3.5 text-emerald-500 shrink-0 stroke-[2.5]" />
+              <span>100% Student Verified</span>
             </div>
-            <span className="text-muted-foreground/40">·</span>
-            <div className="flex items-center gap-1.5">
-              <Check className="size-3.5 text-purple-400 shrink-0 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
-              <span className="text-foreground/90 font-semibold">Zero-Doxxing Escrow</span>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+              <Check className="size-3.5 text-rose-500 shrink-0 stroke-[2.5]" />
+              <span>Zero-Doxxing Escrow</span>
             </div>
-            <span className="text-muted-foreground/40">·</span>
-            <div className="flex items-center gap-1.5">
-              <Check className="size-3.5 text-purple-400 shrink-0 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
-              <span className="text-foreground/90 font-semibold">No Outsiders</span>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
+              <Check className="size-3.5 text-sky-500 shrink-0 stroke-[2.5]" />
+              <span>No Outsiders</span>
             </div>
           </div>
         </div>
 
         {/* ──────── RIGHT COLUMN: Twitter / X UI Tweet Card ──────── */}
         <div className="lg:col-span-6 w-full max-w-lg mx-auto lg:max-w-none">
-          <div className="rounded-2xl sm:rounded-3xl border border-purple-500/25 bg-card/75 backdrop-blur-xl shadow-2xl shadow-purple-950/20 overflow-hidden transition-all">
+          <div className="rounded-2xl sm:rounded-3xl border border-border/70 bg-card/90 backdrop-blur-2xl shadow-xl shadow-primary/5 overflow-hidden transition-all">
             {/* Campus Selector Bar (Clean Twitter-style pill switcher) */}
-            <div className="flex items-center justify-between gap-2 px-4 pt-3.5 pb-2.5 border-b border-border/40">
+            <div className="flex items-center justify-between gap-2 px-4 pt-3.5 pb-2.5 border-b border-border/40 bg-muted/20">
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 max-w-[260px] sm:max-w-none">
                 {CAMPUSES.map((c, index) => {
                   const isSelected = selectedCampusIndex === index;
@@ -594,8 +592,8 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                       className={cn(
                         "rounded-full px-3 py-1 text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0",
                         isSelected
-                          ? "bg-purple-600 text-white shadow-[0_0_12px_rgba(168,85,247,0.45)]"
-                          : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/70 border border-border/40"
+                          ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
+                          : "bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted border border-border/40"
                       )}
                     >
                       {c.short}
@@ -605,16 +603,33 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
               </div>
 
               {/* Online Presence Count with pulsing dot */}
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground shrink-0">
-                <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 shrink-0 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
                 <span>{campus.activeCount} active</span>
               </div>
             </div>
 
-            {/* Twitter-style Tab Navigation (With active bottom border line) */}
-            <div className="flex items-center border-b border-border/40 px-2 sm:px-4">
+            {/* Twitter-style Tab Navigation (Color-coded like /app) */}
+            <div className="flex items-center border-b border-border/40 px-2 sm:px-4 bg-muted/10">
               {TABS.map((tab) => {
                 const isActive = activeTab === tab.id;
+                const tabColor =
+                  tab.id === "confession"
+                    ? "text-rose-500"
+                    : tab.id === "poll"
+                      ? "text-blue-500"
+                      : tab.id === "match"
+                        ? "text-pink-500"
+                        : "text-emerald-500";
+                const barColor =
+                  tab.id === "confession"
+                    ? "bg-rose-500"
+                    : tab.id === "poll"
+                      ? "bg-blue-500"
+                      : tab.id === "match"
+                        ? "bg-pink-500"
+                        : "bg-emerald-500";
+
                 return (
                   <button
                     key={tab.id}
@@ -626,14 +641,14 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                     }}
                     className={cn(
                       "flex-1 py-3 text-xs sm:text-sm font-semibold transition-all relative cursor-pointer text-center",
-                      isActive ? "text-purple-300 font-bold" : "text-muted-foreground hover:text-foreground"
+                      isActive ? cn("font-bold", tabColor) : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <span>{tab.label}</span>
                     {isActive && (
                       <motion.div
                         layoutId="twitter-tab-indicator"
-                        className="absolute bottom-0 inset-x-3 h-[3px] rounded-full bg-primary shadow-[0_0_12px_rgba(168,85,247,0.9)]"
+                        className={cn("absolute bottom-0 inset-x-3 h-[3px] rounded-full shadow-sm", barColor)}
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
@@ -645,8 +660,19 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             {/* ─── Tweet Post Body (Authentic Twitter Layout) ─── */}
             <div className="p-4 sm:p-5">
               <div className="flex items-start gap-3">
-                {/* Author Avatar (Twitter Circular Style) */}
-                <div className="size-10 rounded-full border border-border/80 bg-muted/40 flex items-center justify-center shrink-0 text-xs font-black text-foreground">
+                {/* Author Avatar (Twitter Circular Style with Vibrant Rings) */}
+                <div
+                  className={cn(
+                    "size-10 rounded-full flex items-center justify-center shrink-0 text-sm font-black transition-all shadow-xs",
+                    activeTab === "confession"
+                      ? "bg-gradient-to-br from-rose-500/20 via-pink-500/15 to-orange-500/10 border border-rose-500/30 text-rose-500 ring-2 ring-rose-500/20"
+                      : activeTab === "poll"
+                        ? "bg-gradient-to-br from-blue-500/20 via-indigo-500/15 to-cyan-500/10 border border-blue-500/30 text-blue-500 ring-2 ring-blue-500/20"
+                        : activeTab === "match"
+                          ? "bg-gradient-to-br from-pink-500/20 via-purple-500/15 to-violet-500/10 border border-pink-500/30 text-pink-500 ring-2 ring-pink-500/20"
+                          : "bg-gradient-to-br from-emerald-500/20 via-teal-500/15 to-cyan-500/10 border border-emerald-500/30 text-emerald-500 ring-2 ring-emerald-500/20"
+                  )}
+                >
                   {activeTab === "confession"
                     ? "🎭"
                     : activeTab === "poll"
@@ -664,7 +690,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                       <span className="font-bold text-foreground text-sm truncate">
                         {currentHeader.author}
                       </span>
-                      <BadgeCheck className="size-4 text-foreground shrink-0 fill-foreground/10" />
+                      <BadgeCheck className="size-4 text-sky-500 shrink-0 fill-sky-500/15" />
                       <span className="text-muted-foreground text-xs truncate">{currentHeader.handle}</span>
                       <span className="text-muted-foreground text-xs">·</span>
                       <span className="text-muted-foreground text-xs">{currentHeader.time}</span>
@@ -681,7 +707,9 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
 
                   {/* Campus Tag Pill */}
                   <div className="pt-0.5 pb-2">
-                    <span className="text-[11px] font-semibold text-muted-foreground">{campus.name} Hub</span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
+                      🏛️ {campus.name} Hub
+                    </span>
                   </div>
 
                   {/* Tweet Body Content (Per Tab) */}
@@ -699,8 +727,8 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         <p className="text-sm sm:text-[15px] leading-relaxed text-foreground font-normal">
                           {campus.confession.text}
                         </p>
-                        <p className="text-xs font-semibold text-foreground hover:underline cursor-pointer">
-                          {campus.confession.topic}
+                        <p className="inline-block text-xs font-bold text-rose-500 dark:text-rose-400 hover:underline cursor-pointer bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20">
+                          🔥 {campus.confession.topic}
                         </p>
                       </motion.div>
                     )}
@@ -729,29 +757,29 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                                 type="button"
                                 onClick={() => handleVote(opt.id)}
                                 className={cn(
-                                  "group relative w-full overflow-hidden rounded-xl border text-left text-xs sm:text-sm font-semibold transition-all cursor-pointer min-h-[40px]",
+                                  "group relative w-full overflow-hidden rounded-xl border text-left text-xs sm:text-sm font-semibold transition-all cursor-pointer min-h-[42px]",
                                   isVoted
-                                    ? "border-foreground bg-muted/40"
-                                    : "border-border/60 bg-muted/20 hover:border-border/90 hover:bg-muted/40"
+                                    ? "border-blue-500/70 bg-blue-500/10 text-foreground shadow-xs"
+                                    : "border-border/60 bg-muted/20 hover:border-blue-500/40 hover:bg-blue-500/5"
                                 )}
                               >
                                 {votedOptionId && (
                                   <div
-                                    className="absolute inset-y-0 left-0 bg-foreground/15 -z-10 transition-all duration-500"
+                                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500/25 via-indigo-500/20 to-blue-500/15 -z-10 transition-all duration-500"
                                     style={{ width: `${pct}%` }}
                                   />
                                 )}
-                                <div className="flex items-center justify-between px-3.5 py-2">
+                                <div className="flex items-center justify-between px-3.5 py-2.5">
                                   <span
                                     className={cn(
                                       "truncate",
-                                      isVoted ? "text-foreground font-bold" : "text-foreground"
+                                      isVoted ? "text-blue-600 dark:text-blue-400 font-bold" : "text-foreground"
                                     )}
                                   >
                                     {opt.text}
                                   </span>
                                   {votedOptionId && (
-                                    <span className="font-mono text-xs font-bold text-foreground ml-2">
+                                    <span className="font-mono text-xs font-black text-blue-600 dark:text-blue-400 ml-2">
                                       {pct}%
                                     </span>
                                   )}
@@ -761,8 +789,9 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                           })}
                         </div>
 
-                        <p className="text-xs text-muted-foreground pt-1">
-                          {totalVotes} verified votes · {votedOptionId ? "Final results" : "Live campus poll"}
+                        <p className="text-xs text-muted-foreground pt-1 flex items-center gap-1.5 font-medium">
+                          <span className="size-1.5 rounded-full bg-blue-500" />
+                          <span>{totalVotes} verified votes · {votedOptionId ? "Final results" : "Live campus poll"}</span>
                         </p>
                       </motion.div>
                     )}
@@ -777,17 +806,17 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         transition={{ duration: 0.15 }}
                         className="space-y-3"
                       >
-                        <div className="rounded-2xl border border-border/80 bg-muted/20 p-3.5 space-y-2">
+                        <div className="rounded-2xl border border-pink-500/20 bg-gradient-to-br from-pink-500/5 via-purple-500/5 to-transparent p-4 space-y-2.5 shadow-xs">
                           <div className="flex items-center justify-between">
                             <span className="font-bold text-foreground text-sm">{campus.match.name}</span>
-                            <span className="text-xs font-bold text-foreground border border-border/60 rounded-full px-2 py-0.5">
-                              {campus.match.compatibility}% match
+                            <span className="text-xs font-black text-pink-500 dark:text-pink-400 bg-pink-500/10 border border-pink-500/25 rounded-full px-2.5 py-0.5">
+                              💘 {campus.match.compatibility}% match
                             </span>
                           </div>
 
-                          <p className="text-xs text-muted-foreground">{campus.match.branch}</p>
+                          <p className="text-xs font-medium text-muted-foreground">{campus.match.branch}</p>
 
-                          <p className="text-xs sm:text-sm text-foreground italic">
+                          <p className="text-xs sm:text-sm text-foreground italic leading-relaxed">
                             &ldquo;{campus.match.bio}&rdquo;
                           </p>
 
@@ -795,7 +824,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                             {campus.match.tags.map((tag) => (
                               <span
                                 key={tag}
-                                className="rounded-full border border-border/60 bg-card px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground"
+                                className="rounded-full border border-purple-500/20 bg-purple-500/10 px-2.5 py-0.5 text-[11px] font-bold text-purple-600 dark:text-purple-300"
                               >
                                 #{tag.replace(/\s+/g, "")}
                               </span>
@@ -804,18 +833,21 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         </div>
 
                         <div className="flex items-center justify-between pt-1">
-                          <span className="text-xs text-muted-foreground">Verified student connection</span>
+                          <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                            <span className="size-1.5 rounded-full bg-pink-500" />
+                            <span>Verified student connection</span>
+                          </span>
                           <button
                             type="button"
                             onClick={handleSendVibe}
                             className={cn(
-                              "rounded-full px-4 py-1.5 text-xs font-bold transition-all cursor-pointer",
+                              "rounded-full px-4 py-1.5 text-xs font-black transition-all cursor-pointer shadow-sm active:scale-95",
                               isVibeSent
-                                ? "bg-rose-500 text-white shadow-md shadow-rose-950/40"
-                                : "bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-900/40"
+                                ? "bg-rose-500 text-white shadow-rose-500/30"
+                                : "bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 hover:opacity-90 text-white shadow-pink-500/25"
                             )}
                           >
-                            {isVibeSent ? "Vibe Sent! 💌" : "Send Vibe"}
+                            {isVibeSent ? "Vibe Sent! 💌" : "Send Vibe 💖"}
                           </button>
                         </div>
                       </motion.div>
@@ -831,35 +863,40 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         transition={{ duration: 0.15 }}
                         className="space-y-3"
                       >
-                        <div className="rounded-2xl border border-border/80 bg-muted/20 p-3.5 space-y-2">
+                        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-transparent p-4 space-y-2.5 shadow-xs">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <Bike className="size-4 text-purple-400" />
+                              <div className="p-1 rounded-lg bg-emerald-500/15 text-emerald-500">
+                                <Bike className="size-4" />
+                              </div>
                               <span className="font-bold text-foreground text-sm">{campus.market.item}</span>
                             </div>
-                            <span className="text-sm font-black text-purple-300">{campus.market.price}</span>
+                            <span className="text-base font-black text-emerald-600 dark:text-emerald-400">{campus.market.price}</span>
                           </div>
 
                           <p className="text-xs text-muted-foreground leading-relaxed">
                             {campus.market.desc}
                           </p>
 
-                          <div className="flex items-center justify-between pt-1 border-t border-border/40 text-xs text-muted-foreground">
+                          <div className="flex items-center justify-between pt-1.5 border-t border-border/40 text-xs text-muted-foreground font-medium">
                             <span>{campus.market.seller}</span>
-                            <span className="font-semibold text-foreground">Campus handoff</span>
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Campus handoff</span>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between pt-1">
-                          <span className="text-xs text-muted-foreground">1-Tap Student Escrow</span>
+                          <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                            <span className="size-1.5 rounded-full bg-emerald-500" />
+                            <span>1-Tap Student Escrow</span>
+                          </span>
                           <button
                             type="button"
                             onClick={handleMakeOffer}
                             className={cn(
-                              "rounded-full px-4 py-1.5 text-xs font-bold transition-all cursor-pointer",
+                              "rounded-full px-4 py-1.5 text-xs font-black transition-all cursor-pointer shadow-sm active:scale-95",
                               isOfferMade
-                                ? "bg-emerald-600 text-white shadow-md shadow-emerald-950/40"
-                                : "bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-900/40"
+                                ? "bg-emerald-600 text-white shadow-emerald-500/30"
+                                : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white shadow-emerald-500/25"
                             )}
                           >
                             {isOfferMade ? "Offer Sent! ⚡" : "Make ₹ Offer"}
@@ -874,10 +911,10 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                     {/* Reply */}
                     <button
                       type="button"
-                      className="group flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer"
+                      className="group flex items-center gap-1.5 hover:text-sky-500 transition-colors cursor-pointer"
                     >
-                      <div className="p-1.5 rounded-full group-hover:bg-muted/40 transition-colors">
-                        <MessageCircle className="size-4" />
+                      <div className="p-1.5 rounded-full group-hover:bg-sky-500/10 transition-colors">
+                        <MessageCircle className="size-4 group-hover:text-sky-500" />
                       </div>
                       <span>{currentHeader.replies}</span>
                     </button>
@@ -888,11 +925,11 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                       onClick={handleRepostToggle}
                       className={cn(
                         "group flex items-center gap-1.5 transition-colors cursor-pointer",
-                        isReposted ? "text-foreground font-bold" : "hover:text-foreground"
+                        isReposted ? "text-emerald-500 font-bold" : "hover:text-emerald-500"
                       )}
                     >
-                      <div className="p-1.5 rounded-full group-hover:bg-muted/40 transition-colors">
-                        <Repeat2 className="size-4" />
+                      <div className={cn("p-1.5 rounded-full transition-colors", isReposted ? "bg-emerald-500/15" : "group-hover:bg-emerald-500/10")}>
+                        <Repeat2 className={cn("size-4", isReposted && "text-emerald-500")} />
                       </div>
                       <span>{repostCount}</span>
                     </button>
@@ -903,11 +940,11 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                       onClick={handleLikeToggle}
                       className={cn(
                         "group flex items-center gap-1.5 transition-colors cursor-pointer",
-                        isLiked ? "text-foreground font-bold" : "hover:text-foreground"
+                        isLiked ? "text-rose-500 font-bold" : "hover:text-rose-500"
                       )}
                     >
-                      <div className="p-1.5 rounded-full group-hover:bg-muted/40 transition-colors">
-                        <Heart className={cn("size-4", isLiked && "fill-foreground text-foreground")} />
+                      <div className={cn("p-1.5 rounded-full transition-colors", isLiked ? "bg-rose-500/15" : "group-hover:bg-rose-500/10")}>
+                        <Heart className={cn("size-4 transition-transform active:scale-125", isLiked && "fill-rose-500 text-rose-500")} />
                       </div>
                       <span>{likeCount}</span>
                     </button>
@@ -927,16 +964,16 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         onClick={handleBookmarkToggle}
                         aria-label="Bookmark post"
                         className={cn(
-                          "p-1.5 rounded-full hover:bg-muted/40 transition-colors cursor-pointer",
-                          isBookmarked ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                          "p-1.5 rounded-full transition-colors cursor-pointer",
+                          isBookmarked ? "text-primary bg-primary/15" : "text-muted-foreground hover:text-primary hover:bg-primary/10"
                         )}
                       >
-                        <Bookmark className={cn("size-4", isBookmarked && "fill-foreground")} />
+                        <Bookmark className={cn("size-4", isBookmarked && "fill-primary text-primary")} />
                       </button>
                       <button
                         type="button"
                         aria-label="Share post"
-                        className="p-1.5 rounded-full hover:bg-muted/40 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                        className="p-1.5 rounded-full hover:bg-sky-500/10 text-muted-foreground hover:text-sky-500 transition-colors cursor-pointer"
                       >
                         <Share2 className="size-4" />
                       </button>

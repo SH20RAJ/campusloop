@@ -2,6 +2,8 @@ import { eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { academicResources } from "@/db/schema";
+import { getCachedAuthUser } from "@/lib/server-cache";
+import { trackUserBehavior } from "@/lib/user-behavior";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +18,10 @@ export async function POST(req: Request, { params }: RouteParams) {
     const { action } = body;
 
     const db = getDb();
+    let user = null;
+    try {
+      user = await getCachedAuthUser();
+    } catch {}
 
     if (action === "VIEW") {
       const [updated] = await db
@@ -26,6 +32,23 @@ export async function POST(req: Request, { params }: RouteParams) {
         })
         .where(eq(academicResources.id, id))
         .returning();
+
+      if (user && updated) {
+        trackUserBehavior({
+          userId: user.id,
+          eventType: "POST_VIEW",
+          targetType: "POST",
+          targetId: id,
+          metadata: {
+            resourceId: id,
+            action: "VIEW",
+            subjectCode: updated.subjectCode,
+            branch: updated.branch,
+            interests: [updated.subjectName, updated.subjectCode, updated.branch].filter(Boolean),
+          },
+          weight: 1,
+        }).catch(() => {});
+      }
 
       return NextResponse.json({ success: true, viewsCount: updated?.viewsCount || 0 });
     }
@@ -40,6 +63,23 @@ export async function POST(req: Request, { params }: RouteParams) {
         .where(eq(academicResources.id, id))
         .returning();
 
+      if (user && updated) {
+        trackUserBehavior({
+          userId: user.id,
+          eventType: "POST_VIEW",
+          targetType: "POST",
+          targetId: id,
+          metadata: {
+            resourceId: id,
+            action: "DOWNLOAD",
+            subjectCode: updated.subjectCode,
+            branch: updated.branch,
+            interests: [updated.subjectName, updated.subjectCode, updated.branch].filter(Boolean),
+          },
+          weight: 2,
+        }).catch(() => {});
+      }
+
       return NextResponse.json({ success: true, downloadsCount: updated?.downloadsCount || 0 });
     }
 
@@ -52,6 +92,23 @@ export async function POST(req: Request, { params }: RouteParams) {
         })
         .where(eq(academicResources.id, id))
         .returning();
+
+      if (user && updated) {
+        trackUserBehavior({
+          userId: user.id,
+          eventType: "POST_DWELL",
+          targetType: "POST",
+          targetId: id,
+          metadata: {
+            resourceId: id,
+            action: "UPVOTE",
+            subjectCode: updated.subjectCode,
+            branch: updated.branch,
+            interests: [updated.subjectName, updated.subjectCode, updated.branch].filter(Boolean),
+          },
+          weight: 3,
+        }).catch(() => {});
+      }
 
       return NextResponse.json({
         success: true,

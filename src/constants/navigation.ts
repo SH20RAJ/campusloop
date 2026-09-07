@@ -20,6 +20,11 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
   { icon: AnimateHouse, href: "/app", label: "Home" },
   { icon: AnimateCompass, href: "/app/discover", label: "Explore" },
   {
+    icon: AnimateGraduationCap,
+    href: "/app/academics",
+    label: "Academics",
+  },
+  {
     icon: Calendar,
     href: "/app/events",
     label: "Events",

@@ -1,10 +1,11 @@
-import { and, desc, eq, inArray, ne, or } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { getDb } from "@/db";
-import { academicResources } from "@/db/schema";
+import { academicResources, academicResourceVotes } from "@/db/schema";
 import { qdrant } from "@/lib/qdrant/client";
 import { COLLECTIONS } from "@/lib/qdrant/collections";
 import { generateEmbedding } from "@/lib/qdrant/embeddings";
 import type { AcademicResourceVectorPayload } from "@/lib/qdrant/types";
+import { getUserAffinityInterests } from "@/lib/user-behavior";
 
 export interface SimilarAcademicResourceItem {
   resource: {
@@ -401,5 +402,344 @@ export async function searchAcademicResourcesVector(
   }
 
   return [];
+}
+
+export interface PersonalizedAcademicFeedOptions {
+  userId?: string;
+  profile?: {
+    id: string;
+    branch?: string | null;
+    year?: number | null;
+    course?: string | null;
+    institutionId?: string | null;
+    interests?: string[] | null;
+  } | null;
+  scope?: "campus" | "global";
+  branch?: string;
+  resourceType?: string;
+  semester?: number;
+  searchQuery?: string;
+  page: number;
+  limit: number;
+}
+
+/**
+ * Multi-factor personalized recommendation algorithm for CampusLoop Academics.
+ * Adapts to student's college, branch, current semester, learning interests,
+ * behavioral history, curriculum corequisites, and applies 30-min rotation jitter
+ * and diversity interleaving to guarantee fresh and varied notes on every visit.
+ */
+export async function getPersonalizedAcademicFeed(
+  options: PersonalizedAcademicFeedOptions
+): Promise<{
+  items: any[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+  totalPages: number;
+}> {
+  const {
+    userId,
+    profile,
+    scope = "campus",
+    branch,
+    resourceType,
+    semester,
+    searchQuery,
+    page = 1,
+    limit = 20,
+  } = options;
+
+  const db = getDb();
+  const conditions: any[] = [];
+
+  // Scope filter (Campus vs Global)
+  if (scope === "campus" && profile?.institutionId) {
+    conditions.push(eq(academicResources.institutionId, profile.institutionId));
+  }
+
+  // Explicit branch filter if user requested
+  if (branch && branch !== "all" && branch !== "All") {
+    conditions.push(or(eq(academicResources.branch, branch), eq(academicResources.branch, "All")));
+  }
+
+  // Explicit resource type filter if user requested
+  if (resourceType && resourceType !== "all" && resourceType !== "ALL") {
+    conditions.push(eq(academicResources.resourceType, resourceType.toUpperCase()));
+  }
+
+  // Explicit semester filter if user requested
+  if (semester && !isNaN(semester) && semester >= 1 && semester <= 8) {
+    conditions.push(eq(academicResources.semester, semester));
+  }
+
+  // Explicit search query
+  if (searchQuery?.trim()) {
+    const q = `%${searchQuery.trim()}%`;
+    conditions.push(
+      or(
+        ilike(academicResources.title, q),
+        ilike(academicResources.subjectCode, q),
+        ilike(academicResources.subjectName, q),
+        ilike(academicResources.moduleOrChapter, q),
+        ilike(academicResources.description, q)
+      )
+    );
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  // 1. Get total count
+  const [{ count }] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(academicResources)
+    .where(whereClause);
+
+  const total = count || 0;
+  const totalPages = Math.ceil(total / limit);
+  const hasMore = page < totalPages;
+
+  // 2. Fetch candidate pool
+  const candidateLimit = Math.min(100, Math.max(limit * 3, 45));
+  const candidateOffset = Math.max(0, (page - 1) * limit);
+
+  const candidates = await db.query.academicResources.findMany({
+    where: whereClause,
+    orderBy: [desc(academicResources.upvotesCount), desc(academicResources.createdAt)],
+    limit: candidateLimit,
+    offset: candidateOffset,
+    with: {
+      uploader: {
+        columns: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true,
+          points: true,
+        },
+      },
+      institution: {
+        columns: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      comments: {
+        columns: {
+          id: true,
+        },
+      },
+    },
+  });
+
+  if (candidates.length === 0) {
+    return {
+      items: [],
+      total,
+      page,
+      limit,
+      hasMore: false,
+      totalPages,
+    };
+  }
+
+  // 3. Extract User Behavioral Signals
+  const upvotedResourceIds = new Set<string>();
+  const engagedSubjectCodes = new Set<string>();
+  const corequisiteCodes = new Set<string>();
+  let affinityTags: string[] = [];
+
+  if (userId) {
+    try {
+      // Get user's affinity tags from Redis
+      affinityTags = await getUserAffinityInterests(userId);
+    } catch {}
+
+    if (profile?.id) {
+      try {
+        // Fetch up to 20 recent upvotes from academicResourceVotes
+        const recentVotes = await db.query.academicResourceVotes.findMany({
+          where: eq(academicResourceVotes.profileId, profile.id),
+          orderBy: [desc(academicResourceVotes.createdAt)],
+          limit: 20,
+          with: {
+            resource: {
+              columns: {
+                id: true,
+                subjectCode: true,
+                branch: true,
+              },
+            },
+          },
+        });
+
+        for (const v of recentVotes) {
+          if (v.resourceId) upvotedResourceIds.add(v.resourceId);
+          if (v.resource?.subjectCode) {
+            const code = v.resource.subjectCode.toUpperCase();
+            engagedSubjectCodes.add(code);
+            // Check curriculum graph for related topics
+            const related = CURRICULUM_KNOWLEDGE_GRAPH[code];
+            if (related) {
+              for (const r of related) corequisiteCodes.add(r.toUpperCase());
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Could not retrieve user academic votes:", err);
+      }
+    }
+  }
+
+  const userInterests = new Set<string>(
+    [...(profile?.interests || []), ...affinityTags]
+      .map((t) => t.toLowerCase().trim())
+      .filter(Boolean)
+  );
+
+  const targetSems = profile?.year ? [profile.year * 2 - 1, profile.year * 2] : [];
+  const pBranch = profile?.branch ? profile.branch.toLowerCase().trim() : null;
+
+  // 4. Calculate Personalized Score for Each Candidate
+  // Rotating time-slot seed (every 30 minutes, different items get subtle exploration boosts)
+  const timeSlot = Math.floor(Date.now() / (1000 * 60 * 30));
+
+  const scoredCandidates = candidates.map((item) => {
+    let score = 50;
+    let recommendationReason = "";
+
+    // A. Campus Affinity (Same College syllabus)
+    if (profile?.institutionId && item.institutionId === profile.institutionId) {
+      score += 35;
+      if (!recommendationReason) recommendationReason = "Your Campus Syllabus 🏛️";
+    }
+
+    // B. Branch Relevance
+    if (pBranch) {
+      const iBranch = item.branch.toLowerCase().trim();
+      if (
+        iBranch === pBranch ||
+        (pBranch.includes("computer") && iBranch.includes("computer")) ||
+        (pBranch.includes("ece") && iBranch.includes("ece")) ||
+        (pBranch.includes("mech") && iBranch.includes("mech")) ||
+        (pBranch.includes("civil") && iBranch.includes("civil"))
+      ) {
+        score += 40;
+        if (!recommendationReason) recommendationReason = `Curated for ${item.branch} 🎯`;
+      } else if (item.branch === "All") {
+        score += 15;
+      }
+    }
+
+    // C. Current Semester Target
+    if (targetSems.length > 0) {
+      if (targetSems.includes(item.semester)) {
+        score += 35;
+        if (!recommendationReason) recommendationReason = `Semester ${item.semester} Core Subject 📚`;
+      } else if (Math.abs(item.semester - (profile?.year ? profile.year * 2 : 1)) <= 1) {
+        score += 12;
+      }
+    }
+
+    // D. User Interest & Knowledge Graph Relevance
+    let interestMatches = 0;
+    const itemText = `${item.title} ${item.subjectName} ${item.subjectCode} ${item.moduleOrChapter || ""}`.toLowerCase();
+    for (const interest of userInterests) {
+      if (interest && itemText.includes(interest)) {
+        interestMatches++;
+      }
+    }
+    if (interestMatches > 0) {
+      score += Math.min(50, interestMatches * 20);
+      if (!recommendationReason) recommendationReason = "Matches Your Learning Interests 💡";
+    }
+
+    // Corequisite boost from curriculum graph
+    const itemCode = (item.subjectCode || "").toUpperCase();
+    if (engagedSubjectCodes.has(itemCode)) {
+      score += 30;
+      if (!recommendationReason) recommendationReason = `More for ${itemCode} 📑`;
+    } else if (corequisiteCodes.has(itemCode)) {
+      score += 25;
+      if (!recommendationReason) recommendationReason = "Corequisite / Prerequisite Match 🔗";
+    }
+
+    // E. Engagement Quality Factor (Upvotes, Downloads, Views, Verified)
+    const qualityScore = Math.min(
+      45,
+      (item.upvotesCount || 0) * 3 + (item.downloadsCount || 0) * 2 + (item.viewsCount || 0) * 0.1
+    );
+    score += qualityScore;
+    if (item.isVerified) {
+      score += 15;
+    }
+
+    // F. Recency Factor
+    const daysOld = Math.max(0, (Date.now() - new Date(item.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+    score += Math.max(0, 15 - daysOld * 0.2);
+
+    // G. Dynamic Session Rotation Jitter (Solves "everytime I can see same results")
+    const seed = `${profile?.id || "guest"}_${item.id}_${timeSlot}`;
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+    }
+    const rotationJitter = (Math.abs(hash) % 36) - 18; // -18 to +18 points variance
+    score += rotationJitter;
+
+    // H. De-duplication / Down-rank for materials user already upvoted
+    if (upvotedResourceIds.has(item.id)) {
+      score -= 35; // gently lower already upvoted materials to highlight unread ones
+    }
+
+    if (!recommendationReason) {
+      if (item.upvotesCount > 5) recommendationReason = "Trending Among Students 🔥";
+      else if (item.resourceType === "PYQ") recommendationReason = "Exam Prep PYQ 📑";
+      else recommendationReason = "Campus Study Resource 📝";
+    }
+
+    return {
+      ...item,
+      commentsCount: item.comments?.length || 0,
+      personalizedScore: Math.round(score),
+      recommendationReason,
+    };
+  });
+
+  // 5. Diversity Interleaving
+  // Sort by personalizedScore descending
+  scoredCandidates.sort((a, b) => b.personalizedScore - a.personalizedScore);
+
+  const finalItems: any[] = [];
+  const remaining = [...scoredCandidates];
+
+  while (remaining.length > 0 && finalItems.length < limit) {
+    const last1 = finalItems[finalItems.length - 1];
+    const last2 = finalItems[finalItems.length - 2];
+
+    // Find first item that does not repeat the same resourceType twice in a row if possible
+    let pickIndex = 0;
+    if (last1 && last2 && last1.resourceType === last2.resourceType) {
+      const altIndex = remaining.findIndex(
+        (r) =>
+          r.resourceType !== last1.resourceType &&
+          Math.abs(r.personalizedScore - remaining[0].personalizedScore) <= 25
+      );
+      if (altIndex > 0) pickIndex = altIndex;
+    }
+
+    finalItems.push(remaining.splice(pickIndex, 1)[0]);
+  }
+
+  return {
+    items: finalItems,
+    total,
+    page,
+    limit,
+    hasMore,
+    totalPages,
+  };
 }
 

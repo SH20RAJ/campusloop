@@ -4,7 +4,7 @@ import { getDb } from "@/db";
 import { academicResources, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { indexAcademicResourceVector } from "@/lib/qdrant/indexer";
-import { searchAcademicResourcesVector } from "@/lib/recommendations/academic-recommendations";
+import { getPersonalizedAcademicFeed, searchAcademicResourcesVector } from "@/lib/recommendations/academic-recommendations";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { rejectViewerWrite } from "@/lib/viewer";
 
@@ -25,10 +25,28 @@ export async function GET(req: Request) {
     const semesterStr = searchParams.get("semester");
     const searchQuery = searchParams.get("q");
     const scope = searchParams.get("scope") || "campus"; // 'campus' or 'global'
-    const sort = searchParams.get("sort") || "latest";
+    const sort = searchParams.get("sort") || "for_you";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const limit = Math.min(Math.max(1, parseInt(searchParams.get("limit") || "20", 10)), 50);
     const offset = (page - 1) * limit;
+
+    // ✨ Run Personalized Behavioral Recommendation Algorithm when sort is "for_you"
+    if (sort === "for_you" || !sort) {
+      const sem = semesterStr && semesterStr !== "all" ? parseInt(semesterStr, 10) : undefined;
+      const personalizedResult = await getPersonalizedAcademicFeed({
+        userId: user?.id,
+        profile,
+        scope: scope as "campus" | "global",
+        branch: branch || undefined,
+        resourceType: resourceType || undefined,
+        semester: !isNaN(sem as number) ? sem : undefined,
+        searchQuery: searchQuery || undefined,
+        page,
+        limit,
+      });
+
+      return NextResponse.json(personalizedResult);
+    }
 
     const db = getDb();
     const conditions = [];

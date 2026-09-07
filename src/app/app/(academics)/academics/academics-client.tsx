@@ -69,7 +69,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   const [selectedSemester, setSelectedSemester] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [scope, setScope] = useState<"campus" | "global">("campus");
-  const [sortBy, setSortBy] = useState<"latest" | "popular" | "downloads" | "views">("latest");
+  const [sortBy, setSortBy] = useState<"for_you" | "latest" | "popular" | "downloads" | "views">("for_you");
 
   // Upload modal state
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -412,8 +412,9 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 sounds.tap();
                 setSortBy(e.target.value as any);
               }}
-              className="h-7.5 rounded-full bg-muted/40 border border-border/40 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
+              className="h-7.5 rounded-full bg-primary/10 border border-primary/25 px-2.5 text-[11px] font-bold text-primary hover:bg-primary/15 outline-none cursor-pointer"
             >
+              <option value="for_you">✨ For You</option>
               <option value="latest">⏱️ Latest</option>
               <option value="popular">🔥 Most Upvoted</option>
               <option value="downloads">📥 Most Downloaded</option>

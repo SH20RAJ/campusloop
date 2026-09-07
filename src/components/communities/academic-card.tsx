@@ -40,6 +40,8 @@ interface AcademicCardProps {
     viewsCount: number;
     isVerified: boolean;
     commentsCount?: number;
+    recommendationReason?: string;
+    personalizedScore?: number;
     createdAt: string | Date;
     uploader: {
       id: string;
@@ -268,7 +270,12 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
             </div>
 
             {/* Type & Share */}
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+              {item.recommendationReason && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-500/25 shrink-0">
+                  {item.recommendationReason}
+                </span>
+              )}
               <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                 {item.resourceType.replace("_", " ")}
               </span>

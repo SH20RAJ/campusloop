@@ -97,6 +97,9 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
     if (deltaY > swipeThreshold) {
       if (activeIndex < items.length - 1) {
         scrollToIndex(activeIndex + 1);
+      } else {
+        // At bottom of deck: load more and advance
+        loadMorePosts(true);
       }
     } else if (deltaY < -swipeThreshold) {
       if (activeIndex > 0) {
@@ -105,50 +108,82 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
     }
   }
 
-  // Load more posts when near bottom of deck - Truly infinite scroll
-  const loadMorePosts = useCallback(async () => {
+  // Helper to construct query URL based on active tab
+  const getFeedUrl = useCallback((tab: string, pageNum: number) => {
+    let sortParam = "for_you";
+    let typeParam = "";
+    let hashtagParam = "";
+
+    if (tab === "latest") {
+      sortParam = "latest";
+    } else if (tab === "clubs") {
+      sortParam = "trending";
+      typeParam = "COMMUNITY";
+    } else if (tab === "opportunities") {
+      sortParam = "latest";
+      hashtagParam = "opportunities";
+    }
+
+    const params = new URLSearchParams();
+    params.set("page", String(pageNum));
+    params.set("limit", "15");
+    params.set("sort", sortParam);
+    params.set("scope", "GLOBAL");
+    if (typeParam) params.set("type", typeParam);
+    if (hashtagParam) params.set("hashtag", hashtagParam);
+
+    return `/api/feed?${params.toString()}`;
+  }, []);
+
+  // Load more posts when near bottom of deck - Truly infinite scroll with feed algorithm
+  const loadMorePosts = useCallback(async (autoAdvance = false) => {
     if (isLoadingMore) return;
     setIsLoadingMore(true);
     try {
       const nextPage = page + 1;
-      const sortParam =
-        activeTab === "latest"
-          ? "latest"
-          : activeTab === "clubs"
-            ? "clubs"
-            : activeTab === "opportunities"
-              ? "opportunities"
-              : "for_you";
+      const url = getFeedUrl(activeTab, nextPage);
+      const data = await fetcher<FeedPost[] | { posts: FeedPost[] }>(url);
+      const rawPosts: FeedPost[] = Array.isArray(data) ? data : (data?.posts || []);
 
-      const data = await fetcher<{ posts: FeedPost[] }>(
-        `/api/feed?page=${nextPage}&limit=15&sort=${sortParam}&scope=GLOBAL`
-      );
-
-      if (data?.posts && data.posts.length > 0) {
+      if (rawPosts.length > 0) {
+        let addedCount = 0;
         setItems((prev) => {
           const existingPostIds = new Set(
             prev.filter((i) => i.type === "POST").map((i) => (i as { post: FeedPost }).post.id)
           );
-          const freshPosts = data.posts.filter((p) => !existingPostIds.has(p.id));
+          const freshPosts = rawPosts.filter((p) => !existingPostIds.has(p.id));
           if (freshPosts.length === 0) return prev;
+          addedCount = freshPosts.length;
           const newItems: LoopDeckItem[] = freshPosts.map((p) => ({ type: "POST", post: p }));
           return [...prev, ...newItems];
         });
         setPage(nextPage);
+
+        if (autoAdvance) {
+          setTimeout(() => {
+            scrollToIndex(activeIndex + 1);
+          }, 150);
+        }
       } else {
-        // Fallback: If page runs dry, cycle in trending/popular campus posts so scroll never ends
-        const fallback = await fetcher<{ posts: FeedPost[] }>(
+        // Fallback: If page runs dry, cycle in trending/viral campus posts so scroll never ends
+        const fallbackData = await fetcher<FeedPost[] | { posts: FeedPost[] }>(
           `/api/feed?page=1&limit=20&sort=trending&scope=GLOBAL`
         );
-        if (fallback?.posts && fallback.posts.length > 0) {
+        const fallbackPosts: FeedPost[] = Array.isArray(fallbackData) ? fallbackData : (fallbackData?.posts || []);
+        if (fallbackPosts.length > 0) {
           setItems((prev) => {
             const existingPostIds = new Set(
               prev.filter((i) => i.type === "POST").map((i) => (i as { post: FeedPost }).post.id)
             );
-            const freshPosts = fallback.posts.filter((p) => !existingPostIds.has(p.id));
+            const freshPosts = fallbackPosts.filter((p) => !existingPostIds.has(p.id));
             if (freshPosts.length === 0) return prev;
             return [...prev, ...freshPosts.map((p) => ({ type: "POST", post: p } as LoopDeckItem))];
           });
+          if (autoAdvance) {
+            setTimeout(() => {
+              scrollToIndex(activeIndex + 1);
+            }, 150);
+          }
         }
       }
     } catch {
@@ -156,30 +191,52 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, page, activeTab]);
+  }, [isLoadingMore, page, activeTab, getFeedUrl, activeIndex, scrollToIndex]);
 
-  // Tab change handler with instant refresh
+  // Pre-fetch next posts on mount so user always has immediate swipe continuity
+  useEffect(() => {
+    if (items.length <= 2) {
+      loadMorePosts();
+    }
+  }, []);
+
+  // Tab change handler with instant refresh & smooth reset to top
   const handleTabChange = useCallback(async (tabId: string) => {
     setActiveTab(tabId);
     sounds.tap();
     haptics.light();
     try {
-      const data = await fetcher<{ posts: FeedPost[] }>(
-        `/api/feed?page=1&limit=15&sort=${tabId}&scope=GLOBAL`
-      );
-      if (data?.posts && data.posts.length > 0) {
-        const newItems: LoopDeckItem[] = data.posts.map((p) => ({ type: "POST", post: p }));
+      const url = getFeedUrl(tabId, 1);
+      const data = await fetcher<FeedPost[] | { posts: FeedPost[] }>(url);
+      const rawPosts: FeedPost[] = Array.isArray(data) ? data : (data?.posts || []);
+
+      if (rawPosts.length > 0) {
+        const newItems: LoopDeckItem[] = rawPosts.map((p) => ({ type: "POST", post: p }));
         setItems(newItems);
         setActiveIndex(0);
         setPage(1);
         if (containerRef.current) {
           containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
         }
+      } else {
+        // Fallback to general feed if tab-specific filter yields no results
+        const fallback = await fetcher<FeedPost[] | { posts: FeedPost[] }>(
+          `/api/feed?page=1&limit=15&sort=latest&scope=GLOBAL`
+        );
+        const fbPosts: FeedPost[] = Array.isArray(fallback) ? fallback : (fallback?.posts || []);
+        if (fbPosts.length > 0) {
+          setItems(fbPosts.map((p) => ({ type: "POST", post: p })));
+          setActiveIndex(0);
+          setPage(1);
+          if (containerRef.current) {
+            containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }
       }
     } catch {
       // ignore
     }
-  }, []);
+  }, [getFeedUrl]);
 
   // Keyboard navigation (ArrowDown, ArrowUp, J, K)
   useEffect(() => {

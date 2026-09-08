@@ -1,6 +1,23 @@
 "use client";
 
-import { AlertTriangle, ArrowDown, ArrowLeft, ArrowUp, Bookmark, Bot, CheckCircle2, ChevronRight, Download, ExternalLink, FolderPlus, Share2, ShieldCheck, Target, Zap } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowDown,
+  ArrowLeft,
+  ArrowUp,
+  Bookmark,
+  Bot,
+  CheckCircle2,
+  ChevronRight,
+  Download,
+  ExternalLink,
+  FolderOpen,
+  FolderPlus,
+  Share2,
+  ShieldCheck,
+  Target,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -147,9 +164,23 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
       body: JSON.stringify({ action: "DOWNLOAD" }),
     }).catch(() => {});
 
-    const targetUrl = resource.fileUrl || resource.driveUrl;
+    // Detect if this is a Google Drive folder
+    const rawUrl = (resource.fileUrl || resource.driveUrl || "").trim();
+    const driveFolderMatch = rawUrl.match(
+      /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+    );
+    const isDriveFolder = Boolean(driveFolderMatch);
+    const cleanDriveFolderUrl = driveFolderMatch
+      ? `https://drive.google.com/drive/folders/${driveFolderMatch[1]}`
+      : rawUrl;
+
+    const targetUrl = isDriveFolder ? cleanDriveFolderUrl : (resource.fileUrl || resource.driveUrl);
     if (targetUrl) {
       window.open(targetUrl, "_blank", "noopener,noreferrer");
+      if (isDriveFolder) {
+        toast.success("Opening Google Drive study collection! Zero login required");
+        return;
+      }
       if (!currentUserId) {
         if (downloadCheck.remaining > 0) {
           toast.success(`Downloaded! (${downloadCheck.remaining} free guest downloads remaining)`);
@@ -487,10 +518,23 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
           <button
             type="button"
             onClick={handleDownload}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-primary text-primary-foreground hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer"
+            className={cn(
+              "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black shadow-xs cursor-pointer transition-all active:scale-95",
+              Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                ? "bg-amber-500 hover:bg-amber-600 text-neutral-950"
+                : "bg-primary text-primary-foreground hover:opacity-90"
+            )}
           >
-            <Download className="size-3.5" />
-            <span>Get Material</span>
+            {Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i)) ? (
+              <FolderOpen className="size-3.5" />
+            ) : (
+              <Download className="size-3.5" />
+            )}
+            <span>
+              {Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                ? "Open Drive Folder"
+                : "Get Material"}
+            </span>
             <ExternalLink className="size-2.5 opacity-80" />
           </button>
         </div>

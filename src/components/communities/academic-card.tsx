@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ArrowDown, ArrowUp, CheckCircle2, ExternalLink, Eye, Target } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, CheckCircle2, ExternalLink, Eye, FolderOpen, Target } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -167,9 +167,22 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
     setDownloads((prev) => prev + 1);
     trackAcademicDownload(item, !currentUserId, downloadCheck.count);
 
-    const targetUrl = item.fileUrl || item.driveUrl;
+    const rawUrl = (item.fileUrl || item.driveUrl || "").trim();
+    const driveFolderMatch = rawUrl.match(
+      /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+    );
+    const isDriveFolder = Boolean(driveFolderMatch);
+    const cleanDriveFolderUrl = driveFolderMatch
+      ? `https://drive.google.com/drive/folders/${driveFolderMatch[1]}`
+      : rawUrl;
+
+    const targetUrl = isDriveFolder ? cleanDriveFolderUrl : (item.fileUrl || item.driveUrl);
     if (targetUrl) {
-      window.open(targetUrl, "_blank");
+      window.open(targetUrl, "_blank", "noopener,noreferrer");
+      if (isDriveFolder) {
+        toast.success("Opening Google Drive study collection! Zero login required");
+        return;
+      }
       if (!currentUserId) {
         if (downloadCheck.remaining > 0) {
           toast.success(`Downloaded! (${downloadCheck.remaining} free guest downloads remaining)`);
@@ -390,9 +403,21 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
           <button
             type="button"
             onClick={handleDownload}
-            className="flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs"
+            className={cn(
+              "flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95",
+              Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                ? "bg-amber-500 hover:bg-amber-600 text-neutral-950 font-black"
+                : "bg-primary text-primary-foreground hover:opacity-90"
+            )}
           >
-            <span>Preview</span>
+            {Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i)) ? (
+              <FolderOpen className="size-3 shrink-0" />
+            ) : null}
+            <span>
+              {Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                ? "Open Folder"
+                : "Preview"}
+            </span>
             <ExternalLink className="size-2.5 opacity-80" />
           </button>
         </div>
@@ -579,9 +604,21 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
             <button
               type="button"
               onClick={handleDownload}
-              className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-2xs"
+              className={cn(
+                "flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95",
+                Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                  ? "bg-amber-500 hover:bg-amber-600 text-neutral-950 font-black"
+                  : "bg-primary text-primary-foreground hover:opacity-90"
+              )}
             >
-              <span>Get</span>
+              {Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i)) ? (
+                <FolderOpen className="size-3 shrink-0" />
+              ) : null}
+              <span>
+                {Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                  ? "Open Folder"
+                  : "Get"}
+              </span>
               <ExternalLink className="size-2.5 opacity-80" />
             </button>
           </div>

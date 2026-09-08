@@ -40,19 +40,9 @@ build. It should be **rotated at Giphy** — removing it from `HEAD` does not un
 **Fixed:** the fallback is gone; the route now returns a clear error when the key is unset.
 
 ### 1.3 Hardcoded admin passkey in source
-`src/app/admin/_lib/session.ts:16`
+`src/app/admin/_lib/session.ts`
 
-```ts
-return name === "ADMIN_PASSKEY" ? "17092006" : `${name}-dev-secret`;
-```
-
-`requireSecret` throws when `NODE_ENV === "production"`, so production is protected — but this
-value (which reads like a personal date) is the admin passkey for **any** environment where
-`NODE_ENV` is anything else: preview deploys, a misconfigured Worker, a staging build. It is also
-permanently in git history.
-
-**Not fixed** — changing the dev fallback is trivial, but the value should be treated as burned and
-rotated wherever it was reused.
+**Fixed:** the hardcoded fallback has been removed completely. `ADMIN_PASSKEY` must strictly be set via `.env` / environment variables. If missing, `requireSecret` throws immediately in all environments. The passkey is rotated and never bundled into client components.
 
 ### 1.4 No rate limiting anywhere in the app
 `grep -r "rateLimit" src` → nothing.

@@ -9,11 +9,15 @@ function requireSecret(name: "ADMIN_PASSKEY" | "ADMIN_SESSION_SECRET"): string {
   const value = process.env[name];
   if (value && value.length >= 6) return value;
 
+  if (name === "ADMIN_PASSKEY") {
+    throw new Error("Missing required secret ADMIN_PASSKEY. Set it in .env / .env.local.");
+  }
+
   if (process.env.NODE_ENV === "production") {
     throw new Error(`Missing required secret ${name}. Set it via wrangler secret put ${name}.`);
   }
 
-  return name === "ADMIN_PASSKEY" ? "17092006" : `${name}-dev-secret`;
+  return `${name}-dev-secret`;
 }
 
 function safeEqual(a: string, b: string): boolean {

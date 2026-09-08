@@ -18,9 +18,19 @@ import {
   Sun,
   ZoomIn,
   ZoomOut,
+  Play,
+  Video,
+  Globe,
+  Sparkles,
+  Bot,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+  buildAcademicStudyPrompt,
+  getChatGptStudyUrl,
+  getClaudeStudyUrl,
+} from "@/lib/academics/ai-prompts";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -31,6 +41,8 @@ interface AcademicPdfViewerProps {
   title: string;
   subjectCode: string;
   resourceType?: string;
+  department?: string;
+  semester?: number | string;
   onDownload?: () => void;
   className?: string;
 }
@@ -41,6 +53,8 @@ export function AcademicPdfViewer({
   title,
   subjectCode,
   resourceType: _resourceType,
+  department,
+  semester,
   onDownload,
   className,
 }: AcademicPdfViewerProps) {
@@ -59,10 +73,28 @@ export function AcademicPdfViewer({
   const rawUrl = (fileUrl || driveUrl || "").trim();
   const isGoogleDrive = rawUrl.includes("drive.google.com");
 
+  // YouTube Video & Playlist detection:
+  const isYoutube = /(?:youtube\.com|youtu\.be)/i.test(rawUrl);
+  const ytVideoMatch = rawUrl.match(
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
+  );
+  const ytPlaylistMatch = rawUrl.match(/[?&]list=([a-zA-Z0-9_-]+)/i);
+  const ytVideoId = ytVideoMatch ? ytVideoMatch[1] : null;
+  const ytPlaylistId = ytPlaylistMatch ? ytPlaylistMatch[1] : null;
+  const isYoutubePlaylist = Boolean(ytPlaylistId);
+
+  // Google Sites & Academic Web Portal detection (Image 3 fix):
+  const isGoogleSites = rawUrl.toLowerCase().includes("sites.google.com");
+  const isGenericWebSite =
+    rawUrl.startsWith("http") &&
+    !isGoogleDrive &&
+    !isYoutube &&
+    !isGoogleSites &&
+    !rawUrl.toLowerCase().includes(".pdf") &&
+    !/\.(docx?|pptx?|xlsx?)$/i.test(rawUrl) &&
+    !rawUrl.toLowerCase().endsWith(".ms14");
+
   // Google Drive Folder detection:
-  // e.g. https://drive.google.com/drive/u/5/folders/1PKWw6EIpRpjfdR3HnQlV6HQH8PIegFod?usp=drive_link
-  // or https://drive.google.com/drive/folders/1PKWw6EIpRpjfdR3HnQlV6HQH8PIegFod
-  // or https://drive.google.com/embeddedfolderview?id=1PKWw6EIpRpjfdR3HnQlV6HQH8PIegFod
   const driveFolderMatch = rawUrl.match(
     /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
   );
@@ -83,9 +115,37 @@ export function AcademicPdfViewer({
   const isDirectPdf = rawUrl.toLowerCase().includes(".pdf");
   const isOfficeDoc = /\.(docx?|pptx?|xlsx?)$/i.test(rawUrl);
 
+  // AI Study URLs
+  const aiPrompt = useMemo(
+    () =>
+      buildAcademicStudyPrompt({
+        title,
+        subjectCode,
+        department,
+        semester,
+        materialUrl: rawUrl,
+      }),
+    [title, subjectCode, department, semester, rawUrl]
+  );
+  const chatGptUrl = useMemo(() => getChatGptStudyUrl(aiPrompt), [aiPrompt]);
+  const claudeUrl = useMemo(() => getClaudeStudyUrl(aiPrompt), [aiPrompt]);
+
   // Determine embeddable URL
   const embedUrl = useMemo(() => {
     if (!rawUrl) return null;
+
+    if (isYoutube) {
+      if (ytVideoId && ytPlaylistId) {
+        return `https://www.youtube-nocookie.com/embed/${ytVideoId}?list=${ytPlaylistId}&rel=0&modestbranding=1`;
+      }
+      if (ytPlaylistId) {
+        return `https://www.youtube-nocookie.com/embed/videoseries?list=${ytPlaylistId}&rel=0&modestbranding=1`;
+      }
+      if (ytVideoId) {
+        return `https://www.youtube-nocookie.com/embed/${ytVideoId}?rel=0&modestbranding=1`;
+      }
+      return null;
+    }
 
     if (isRealDriveFolder) {
       // Official Google Drive Embedded Folder Viewer: clean iframe display without SAMEORIGIN block
@@ -104,6 +164,12 @@ export function AcademicPdfViewer({
       return rawUrl.replace(/\/view(\?.*)?$/, "/preview").replace(/\/edit(\?.*)?$/, "/preview");
     }
 
+    if (isGoogleSites || isGenericWebSite) {
+      // CRITICAL FIX FOR IMAGE 3: Never pass sites.google.com or web portals through docs.google.com/viewer,
+      // as that dumps raw HTML code onto the screen. Use direct portal URL.
+      return rawUrl;
+    }
+
     if (viewerEngine === "google" || isOfficeDoc) {
       // Google Docs Viewer API: renders PDFs, PPTs, DOCs cleanly server-side without auto-downloads or x-frame blocks
       return `https://docs.google.com/viewer?url=${encodeURIComponent(rawUrl)}&embedded=true`;
@@ -116,7 +182,23 @@ export function AcademicPdfViewer({
 
     // Otherwise pass raw
     return rawUrl;
-  }, [rawUrl, isRealDriveFolder, isDriveFolder, driveFolderId, folderViewMode, isGoogleDrive, driveFileId, viewerEngine, isOfficeDoc, isDirectPdf]);
+  }, [
+    rawUrl,
+    isYoutube,
+    ytVideoId,
+    ytPlaylistId,
+    isRealDriveFolder,
+    isDriveFolder,
+    driveFolderId,
+    folderViewMode,
+    isGoogleDrive,
+    driveFileId,
+    isGoogleSites,
+    isGenericWebSite,
+    viewerEngine,
+    isOfficeDoc,
+    isDirectPdf,
+  ]);
 
   // Handle direct download or open
   function handleDownloadClick(e?: React.MouseEvent) {
@@ -280,21 +362,76 @@ export function AcademicPdfViewer({
           <span
             className={cn(
               "flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider shrink-0",
-              isDriveFolder
-                ? "bg-amber-500/15 text-amber-500 border border-amber-500/30"
-                : "bg-indigo-500/15 text-indigo-400 border border-indigo-500/25"
+              isYoutube
+                ? "bg-rose-500/15 text-rose-400 border border-rose-500/30"
+                : isGoogleSites || isGenericWebSite
+                  ? "bg-sky-500/15 text-sky-400 border border-sky-500/30"
+                  : isDriveFolder
+                    ? "bg-amber-500/15 text-amber-500 border border-amber-500/30"
+                    : "bg-indigo-500/15 text-indigo-400 border border-indigo-500/25"
             )}
           >
-            {isDriveFolder ? <FolderArchive className="size-3" /> : <FileText className="size-3" />}
-            <span>{isDriveFolder ? "Drive Collection" : isGoogleDrive ? "Drive PDF" : "PDF Doc"}</span>
+            {isYoutube ? (
+              <Play className="size-3 fill-current" />
+            ) : isGoogleSites || isGenericWebSite ? (
+              <Globe className="size-3" />
+            ) : isDriveFolder ? (
+              <FolderArchive className="size-3" />
+            ) : (
+              <FileText className="size-3" />
+            )}
+            <span>
+              {isYoutube
+                ? isYoutubePlaylist
+                  ? "YouTube Playlist"
+                  : "YouTube Video"
+                : isGoogleSites
+                  ? "Course Website"
+                  : isGenericWebSite
+                    ? "Web Portal"
+                    : isDriveFolder
+                      ? "Drive Collection"
+                      : isGoogleDrive
+                        ? "Drive PDF"
+                        : "PDF Doc"}
+            </span>
           </span>
           <span className="text-xs font-bold text-foreground truncate max-w-[200px] sm:max-w-xs">
             {title}
           </span>
         </div>
 
-        {/* Right: Controls (Zoom, Night Mode, Rotate, Fullscreen, Direct Download) */}
+        {/* Right: Controls (AI Study, Zoom, Night Mode, Rotate, Fullscreen, Direct Download) */}
         <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+          {/* Quick AI Study Buttons */}
+          <button
+            type="button"
+            onClick={() => {
+              sounds.tap();
+              haptics.medium();
+              window.open(chatGptUrl, "_blank", "noopener,noreferrer");
+            }}
+            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all cursor-pointer"
+            title="Teach me this syllabus on ChatGPT"
+          >
+            <Bot className="size-3" />
+            <span>ChatGPT</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              sounds.tap();
+              haptics.medium();
+              window.open(claudeUrl, "_blank", "noopener,noreferrer");
+            }}
+            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all cursor-pointer"
+            title="Teach me this syllabus on Claude"
+          >
+            <Sparkles className="size-3" />
+            <span>Claude</span>
+          </button>
+
           {/* Drive Folder Layout Switcher (Grid vs List) */}
           {isDriveFolder && isRealDriveFolder && (
             <div className="flex items-center bg-card rounded-full border border-border/50 p-0.5">
@@ -336,7 +473,7 @@ export function AcademicPdfViewer({
           )}
 
           {/* Viewer Engine Switcher (for direct PDFs/Docs) */}
-          {!isGoogleDrive && isDirectPdf && (
+          {!isGoogleDrive && !isYoutube && !isGoogleSites && isDirectPdf && (
             <button
               type="button"
               onClick={() => {
@@ -353,7 +490,7 @@ export function AcademicPdfViewer({
               className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border border-border/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
               title={
                 viewerEngine === "google"
-                  ? "Currently using Google Docs Viewer API (prevents auto-downloads). Click to switch to Native View"
+                  ? "Currently using Google Docs Viewer API. Click to switch to Native View"
                   : "Currently using Native View. Click to switch to Google Docs Viewer API"
               }
             >
@@ -362,8 +499,8 @@ export function AcademicPdfViewer({
             </button>
           )}
 
-          {/* Zoom controls (for direct embeds) */}
-          {!isDriveFolder && (
+          {/* Zoom controls (for direct document embeds) */}
+          {!isDriveFolder && !isYoutube && (
             <div className="hidden sm:flex items-center bg-card rounded-full border border-border/50 p-0.5">
               <button
                 type="button"
@@ -435,20 +572,59 @@ export function AcademicPdfViewer({
             {isFullscreen ? <Minimize2 className="size-3.5" /> : <Maximize2 className="size-3.5" />}
           </button>
 
-          {/* Direct Download / Open Button (No Login Required) */}
+          {/* Direct Download / Open / Watch Button (No Login Required) */}
           <button
             type="button"
-            onClick={handleDownloadClick}
+            onClick={() => {
+              if (isYoutube || isGoogleSites || isGenericWebSite) {
+                window.open(rawUrl, "_blank", "noopener,noreferrer");
+                toast.success(
+                  isYoutube
+                    ? "Opening YouTube video!"
+                    : "Opening course portal in new tab!"
+                );
+              } else {
+                handleDownloadClick();
+              }
+            }}
             className={cn(
               "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black shadow-xs cursor-pointer transition-all active:scale-95",
-              isDriveFolder
-                ? "bg-amber-500 hover:bg-amber-600 text-neutral-950"
-                : "bg-indigo-600 hover:bg-indigo-500 text-white"
+              isYoutube
+                ? "bg-rose-600 hover:bg-rose-500 text-white"
+                : isGoogleSites || isGenericWebSite
+                  ? "bg-sky-600 hover:bg-sky-500 text-white"
+                  : isDriveFolder
+                    ? "bg-amber-500 hover:bg-amber-600 text-neutral-950"
+                    : "bg-indigo-600 hover:bg-indigo-500 text-white"
             )}
-            title={isDriveFolder ? "Open folder in Google Drive (No login required)" : "Download PDF (No login required)"}
+            title={
+              isYoutube
+                ? "Watch on YouTube (No login required)"
+                : isGoogleSites || isGenericWebSite
+                  ? "Open website in new tab (No login required)"
+                  : isDriveFolder
+                    ? "Open folder in Google Drive (No login required)"
+                    : "Download PDF (No login required)"
+            }
           >
-            {isDriveFolder ? <FolderOpen className="size-3.5" /> : <Download className="size-3.5" />}
-            <span className="hidden sm:inline">{isDriveFolder ? "Open Folder" : "Download"}</span>
+            {isYoutube ? (
+              <Play className="size-3.5 fill-current" />
+            ) : isGoogleSites || isGenericWebSite ? (
+              <ExternalLink className="size-3.5" />
+            ) : isDriveFolder ? (
+              <FolderOpen className="size-3.5" />
+            ) : (
+              <Download className="size-3.5" />
+            )}
+            <span className="hidden sm:inline">
+              {isYoutube
+                ? "Watch on YouTube"
+                : isGoogleSites || isGenericWebSite
+                  ? "Open Portal"
+                  : isDriveFolder
+                    ? "Open Folder"
+                    : "Download"}
+            </span>
           </button>
 
           {/* Copy link or open direct */}
@@ -467,6 +643,68 @@ export function AcademicPdfViewer({
           )}
         </div>
       </div>
+
+      {/* ─── YouTube Video / Playlist Cinema Banner ─── */}
+      {isYoutube && (
+        <div className="flex items-center justify-between gap-3 px-3 sm:px-4 py-2 bg-rose-500/10 border-b border-rose-500/20 text-xs text-foreground shrink-0 flex-wrap">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="flex size-6 items-center justify-center rounded-lg bg-rose-500/20 text-rose-400 shrink-0">
+              <Play className="size-3.5 fill-current" />
+            </span>
+            <div className="min-w-0 leading-tight">
+              <p className="font-bold text-xs truncate">
+                {isYoutubePlaylist ? "Curated YouTube Lecture Playlist" : "Verified YouTube Video Lecture"}
+              </p>
+              <p className="text-[10px] text-muted-foreground truncate">
+                Distraction-free campus cinema learning mode. Watch and take notes seamlessly.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
+            <a
+              href={rawUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-black text-[11px] transition-all shadow-xs"
+            >
+              <span>Watch on YouTube</span>
+              <ExternalLink className="size-2.5" />
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Google Sites & Web Portal Smart Banner (Fix for Image 3) ─── */}
+      {(isGoogleSites || isGenericWebSite) && (
+        <div className="flex items-center justify-between gap-3 px-3 sm:px-4 py-2 bg-sky-500/10 border-b border-sky-500/20 text-xs text-foreground shrink-0 flex-wrap">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="flex size-6 items-center justify-center rounded-lg bg-sky-500/20 text-sky-400 shrink-0">
+              <Globe className="size-3.5" />
+            </span>
+            <div className="min-w-0 leading-tight">
+              <p className="font-bold text-xs truncate">
+                {isGoogleSites ? "Official Campus Course Website / Professor Portal" : "External Web Resource"}
+              </p>
+              <p className="text-[10px] text-muted-foreground truncate">
+                Live course website embed. If your college network blocks in-frame viewing, tap Open Portal.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
+            <a
+              href={rawUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sky-600 hover:bg-sky-500 text-white font-black text-[11px] transition-all shadow-xs"
+            >
+              <span>Open Course Portal</span>
+              <ExternalLink className="size-2.5" />
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* ─── Drive Folder Smart Banner ─── */}
       {isDriveFolder && (
@@ -531,8 +769,9 @@ export function AcademicPdfViewer({
               key={embedUrl}
               src={embedUrl}
               title={title}
-              className="w-full h-full border-0 bg-white"
-              allow="autoplay; encrypted-media; fullscreen"
+              className={cn("w-full h-full border-0", isYoutube ? "bg-black" : "bg-white")}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              allowFullScreen
               loading="lazy"
               onLoad={() => setIsLoading(false)}
               onError={() => {

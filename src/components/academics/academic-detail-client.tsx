@@ -7,20 +7,35 @@ import {
   ArrowUp,
   Bookmark,
   Bot,
+  Check,
   CheckCircle2,
   ChevronRight,
   Download,
   ExternalLink,
+  Eye,
+  FileCheck,
+  FileText,
+  Flame,
   FolderOpen,
   FolderPlus,
+  Globe,
+  Loader2,
+  MessageSquare,
+  Play,
+  QrCode,
   Share2,
   ShieldCheck,
+  Sparkles,
   Target,
+  ThumbsUp,
+  TrendingUp,
   Zap,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { AcademicAiStudyBar } from "@/components/academics/academic-ai-study-bar";
 import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
 import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
 import { AcademicPdfViewer } from "@/components/academics/academic-pdf-viewer";
@@ -520,20 +535,32 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
             onClick={handleDownload}
             className={cn(
               "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black shadow-xs cursor-pointer transition-all active:scale-95",
-              Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
-                ? "bg-amber-500 hover:bg-amber-600 text-neutral-950"
-                : "bg-primary text-primary-foreground hover:opacity-90"
+              /(?:youtube\.com|youtu\.be)/i.test(resource.fileUrl || resource.driveUrl || "")
+                ? "bg-rose-600 hover:bg-rose-500 text-white"
+                : (resource.fileUrl || resource.driveUrl || "").toLowerCase().includes("sites.google.com")
+                  ? "bg-sky-600 hover:bg-sky-500 text-white"
+                  : Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                    ? "bg-amber-500 hover:bg-amber-600 text-neutral-950"
+                    : "bg-primary text-primary-foreground hover:opacity-90"
             )}
           >
-            {Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i)) ? (
+            {/(?:youtube\.com|youtu\.be)/i.test(resource.fileUrl || resource.driveUrl || "") ? (
+              <Play className="size-3.5 fill-current" />
+            ) : (resource.fileUrl || resource.driveUrl || "").toLowerCase().includes("sites.google.com") ? (
+              <Globe className="size-3.5" />
+            ) : Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i)) ? (
               <FolderOpen className="size-3.5" />
             ) : (
               <Download className="size-3.5" />
             )}
             <span>
-              {Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
-                ? "Open Drive Folder"
-                : "Get Material"}
+              {/(?:youtube\.com|youtu\.be)/i.test(resource.fileUrl || resource.driveUrl || "")
+                ? "Watch on YouTube"
+                : (resource.fileUrl || resource.driveUrl || "").toLowerCase().includes("sites.google.com")
+                  ? "Open Course Portal"
+                  : Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                    ? "Open Drive Folder"
+                    : "Get Material"}
             </span>
             <ExternalLink className="size-2.5 opacity-80" />
           </button>
@@ -556,6 +583,8 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
           title={resource.title}
           subjectCode={resource.subjectCode}
           resourceType={resource.resourceType}
+          department={resource.branch || undefined}
+          semester={resource.semester || undefined}
           onDownload={handleDownload}
         />
       </div>
@@ -565,64 +594,29 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         <AcademicAuthBenefitsCard returnTo={`/app/academics/${resource.id}`} />
       )}
 
-      {/* ─── Campus AI Study Cram Assistant ─── */}
-      <div className="rounded-3xl border border-indigo-500/30 bg-linear-to-r from-indigo-500/8 via-card to-card p-4 sm:p-5 space-y-3 shadow-xs">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="flex size-8 items-center justify-center rounded-xl bg-indigo-600 text-white font-bold shadow-xs">
-              <Bot className="size-4.5" />
-            </span>
-            <div>
-              <h3 className="text-sm font-black text-foreground">Campus AI Study Cram Assistant</h3>
-              <p className="text-[11px] text-muted-foreground">
-                Instant syllabus breakdown &amp; key concepts for {resource.subjectCode}
-              </p>
-            </div>
-          </div>
-          <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 uppercase">
-            AI Helper
-          </span>
+      {/* ─── Study with AI Agents (ChatGPT & Claude) ─── */}
+      <AcademicAiStudyBar
+        title={resource.title}
+        subjectCode={resource.subjectCode}
+        courseCode={resource.courseCode || resource.subjectCode}
+        department={resource.branch || undefined}
+        semester={resource.semester || undefined}
+        description={resource.description || undefined}
+        materialUrl={resource.driveUrl || resource.fileUrl || ""}
+        collegeName={resource.institution?.name}
+      />
+
+      {/* ─── Campus AI Study Cram Assistant Coming Soon Banner ─── */}
+      <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 min-w-0">
+          <Sparkles className="size-4 text-indigo-400 shrink-0 animate-pulse" />
+          <p className="truncate">
+            <strong className="text-foreground">Campus AI Study Cram Assistant</strong> will be launched on CampusLoop Academics soon...
+          </p>
         </div>
-
-        {/* AI Action Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          <button
-            type="button"
-            onClick={() => handleGenerateAiCram("CONCEPTS")}
-            disabled={isGeneratingAi}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-card hover:bg-muted/80 border border-border/70 text-foreground transition-all cursor-pointer active:scale-95 disabled:opacity-50"
-          >
-            <Zap className="size-3 text-indigo-400" />
-            <span>Core Formulas &amp; Concepts</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleGenerateAiCram("EXAM_TIPS")}
-            disabled={isGeneratingAi}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-card hover:bg-muted/80 border border-border/70 text-foreground transition-all cursor-pointer active:scale-95 disabled:opacity-50"
-          >
-            <Zap className="size-3 text-amber-400 shrink-0" />
-            <span>15-Min Exam Cram</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleGenerateAiCram("CHECKLIST")}
-            disabled={isGeneratingAi}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-card hover:bg-muted/80 border border-border/70 text-foreground transition-all cursor-pointer active:scale-95 disabled:opacity-50"
-          >
-            <CheckCircle2 className="size-3 text-emerald-400" />
-            <span>Syllabus Verification</span>
-          </button>
-        </div>
-
-        {/* Generated AI Content Output */}
-        {aiAnalysis && (
-          <div className="p-3.5 rounded-2xl bg-card border border-indigo-500/25 text-xs text-foreground/90 leading-relaxed whitespace-pre-line mt-2 space-y-1 shadow-2xs">
-            {aiAnalysis}
-          </div>
-        )}
+        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
+          Coming Soon
+        </span>
       </div>
 
       {/* ─── Vector Similarity Recommendation Shelf ─── */}

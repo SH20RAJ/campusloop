@@ -5,6 +5,7 @@ import Link from "next/link";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AcademicAiStudyBar } from "@/components/academics/academic-ai-study-bar";
 import { fetcher } from "@/lib/api";
 import { sounds } from "@/lib/sounds";
 import { getAvatarUrl } from "@/lib/utils";
@@ -138,6 +139,24 @@ export function SimilarResourcesWidget({ resourceId, subjectCode }: SimilarResou
                     <span>Sem {item.semester}</span>
                     <span>·</span>
                     <span className="truncate max-w-[100px]">{item.branch}</span>
+                  </div>
+
+                  <div
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    className="pt-1"
+                  >
+                    <AcademicAiStudyBar
+                      compact
+                      title={item.title}
+                      subjectCode={item.subjectCode}
+                      department={item.branch}
+                      semester={item.semester}
+                      materialUrl={item.fileUrl || `https://campusloop.space/app/academics/${item.id}`}
+                      pageUrl={`https://campusloop.space/app/academics/${item.id}`}
+                    />
                   </div>
                 </div>
               </div>

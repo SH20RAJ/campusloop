@@ -56,9 +56,10 @@ CampusLoop is designed to empower college students with a safe, engaging, and fe
 - **Mobile Bottom Navigation**: The mobile bottom bar has 5 core tabs: **Home (`/app`)**, **Colleges (`/app/colleges`)**, **Post (`/app/post/new`)**, **Chat (`/chat`)**, and **Dating (`/app/dating`)**.
 - **Anonymity Mode Switcher**: Desktop sidebar and mobile drawer feature a quick switcher between **All Posts & Anon 🎭** and **Public Only (No Anon) 🛡️**. Switching dispatches `campusloop_feed_visibility_change` on the window and saves to `localStorage` + `/api/profile/me` for instant zero-reload timeline filtering.
 
-### 7. Full-Page Routes (`page.tsx`) Over Popups for Creation Workflows
-- **ALWAYS** prefer creating dedicated Next.js App Router full-page routes (`page.tsx`) with rich SEO metadata, Twitter/X-style full-width minimal UI/UX, and optimal secure backend + frontend, instead of modal popups for creation flows (e.g. Campus Hub posting, community creation, listing creation).
-- Popups/modals should only be reserved for micro-interactions (fast comment reply, repost quote, quick reaction). Dedicated pages ensure 100% mobile space utilization, avoid cramped modal scrolling, and enable deep linkability.
+### 7. Dedicated Full-Page Routes (`page.tsx`) with Maximum SEO Over Popups for Creation & Editing
+- **ALWAYS** create dedicated Next.js App Router full-page routes (`page.tsx`) with maximum SEO metadata, OpenGraph tags, JSON-LD Schema.org structured data, Twitter/X-style full-width clean UX, and robust backend/frontend, instead of modal popups for creation and editing workflows (e.g. Note/Resource Upload at `/app/academics/upload`, Study Playlist creation at `/app/academics/playlists/new`, Campus Hub posting, community creation, listing creation).
+- Popups/modals are strictly forbidden for complex creation and editing forms and are reserved ONLY for micro-interactions (e.g. fast comment reply, quick repost quote, quick reaction).
+- Dedicated pages maximize Google/search indexing, utilize 100% of mobile screen real estate, avoid cramped modal scrolling, and enable deep linkability and shareability.
 
 ### 8. PeerJS WebRTC Calling & Control vs. Media Plane Isolation
 - Control plane (authentication, authorization, session state, ringing timeouts, block verification) runs strictly through Cloudflare Workers and PostgreSQL (`call_sessions` table).
@@ -72,9 +73,14 @@ CampusLoop is designed to empower college students with a safe, engaging, and fe
 
 ### 10. Official Social Media Channels Priority
 - Always prioritize official social media links in the order:
-  1. **Instagram (🔥 Highlighted)**: `https://www.instagram.com/campusloop.space/` (`@campusloop.space`)
+  1. **Instagram (Highlighted)**: `https://www.instagram.com/campusloop.space/` (`@campusloop.space`)
   2. **LinkedIn**: `https://www.linkedin.com/company/mycampusloop/?viewAsMember=true` (`CampusLoop`)
   3. **X (Twitter)**: `https://x.com/company/mycampusloop/` (`@mycampusloop`)
+
+### 11. Iconography Standard: Zero Raw Emojis & Professionally Creative Form UX
+- **NEVER** use raw emoji characters in UI labels, badges, tabs, buttons, or toast notifications. Emojis look amateurish and inconsistent across platforms.
+- **ALWAYS** use `lucide-react` icons or custom animated SVGs (`@/components/ui/animated-icon`).
+- **NO Primitive Form UI**: Avoid generic, plain forms with bare inputs. Form experiences must be creatively professional: visual category cards, drag-and-drop file upload with live previews, auto-detection (e.g. Drive permissions), tag generators, and sticky live preview cards with real-time validation checklists.
 
 ---
 

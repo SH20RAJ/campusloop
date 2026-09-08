@@ -1,4 +1,4 @@
-import { ArrowLeft, GraduationCap, Zap } from "lucide-react";
+import { ArrowLeft, Eye, GraduationCap, Zap } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FirstVisitNotificationPrompt } from "@/components/notifications/first-visit-notification-prompt";
@@ -47,9 +47,12 @@ export default async function AcademicsLayout({ children }: { children: React.Re
           <main className="flex-1 w-full min-w-0 min-h-screen">
             {viewerMode && (
               <div className="sticky top-0 z-30 flex items-center justify-center gap-2 border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-center text-[11px] font-semibold text-amber-600 dark:text-amber-400 backdrop-blur-md">
-                <span>
-                  👀 You&apos;re browsing in <strong>Viewer Mode</strong> — sign up with your college email to
-                  post, vote, and chat.
+                <span className="inline-flex items-center gap-1.5">
+                  <Eye className="size-3.5 shrink-0" />
+                  <span>
+                    You&apos;re browsing in <strong>Viewer Mode</strong> — sign up with your college email to
+                    post, vote, and chat.
+                  </span>
                 </span>
               </div>
             )}

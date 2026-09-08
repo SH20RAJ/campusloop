@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, ExternalLink, Eye } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, CheckCircle2, ExternalLink, Eye, Target } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -115,7 +115,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
         if (userVote === "DOWN") setDownvotes((c) => Math.max(0, c - 1));
         setUpvotes((c) => c + 1);
         setUserVote("UP");
-        toast.success("Upvoted! Notes marked as reliable & helpful 📚");
+        toast.success("Upvoted! Notes marked as reliable & helpful");
         fetch(`/api/academics/${item.id}/analytics`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -151,7 +151,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
       sounds.pop();
       haptics.error();
       trackAcademicLimitReached();
-      toast.info("You've used all 5 free guest downloads! Sign in to get unlimited notes & PYQ access 🎓", {
+      toast.info("You've used all 5 free guest downloads! Sign in to get unlimited notes & PYQ access", {
         action: {
           label: "Sign In",
           onClick: () => {
@@ -174,7 +174,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
         if (downloadCheck.remaining > 0) {
           toast.success(`Downloaded! (${downloadCheck.remaining} free guest downloads remaining)`);
         } else {
-          toast.info("Downloaded! That was your 5th free download. Sign in for unlimited access! 🎓");
+          toast.info("Downloaded! That was your 5th free download. Sign in for unlimited access!");
         }
       }
     } else {
@@ -209,7 +209,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
         .catch(() => {});
     } else {
       navigator.clipboard.writeText(shareUrl);
-      toast.success("Resource link copied to clipboard! 📋");
+      toast.success("Resource link copied to clipboard!");
     }
   }
 
@@ -241,7 +241,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
       });
       const data = (await res.json()) as { comment?: any; error?: string };
       if (res.ok && data.comment) {
-        toast.success("Review & comment posted! 💬");
+        toast.success("Review & comment posted!");
         setCommentText("");
         mutateComments();
       } else {
@@ -339,8 +339,9 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
                 {item.moduleOrChapter}
               </span>
             )}
-            <span className="ml-auto text-emerald-500 font-bold">
-              🎯 {reliability}% Verified
+            <span className="ml-auto text-emerald-500 font-bold inline-flex items-center gap-1">
+              <Target className="size-3 shrink-0" />
+              <span>{reliability}% Verified</span>
             </span>
           </div>
         </div>
@@ -510,8 +511,9 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
                 <span className="truncate">{item.institution.name.split(",")[0]}</span>
               </>
             )}
-            <span className="ml-auto text-[10px] font-bold text-emerald-500">
-              🎯 {reliability}% Verified
+            <span className="ml-auto text-[10px] font-bold text-emerald-500 inline-flex items-center gap-1">
+              <Target className="size-2.5 shrink-0" />
+              <span>{reliability}% Verified</span>
             </span>
           </div>
 
@@ -601,25 +603,27 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
                   type="button"
                   onClick={() => setIsHelpful(true)}
                   className={cn(
-                    "px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
+                    "px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer inline-flex items-center gap-1",
                     isHelpful
                       ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
                       : "text-muted-foreground hover:text-foreground border border-transparent"
                   )}
                 >
-                  ✅ Accurate
+                  <CheckCircle2 className="size-2.5 shrink-0" />
+                  <span>Accurate</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsHelpful(false)}
                   className={cn(
-                    "px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
+                    "px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer inline-flex items-center gap-1",
                     !isHelpful
                       ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
                       : "text-muted-foreground hover:text-foreground border border-transparent"
                   )}
                 >
-                  ⚠️ Errata
+                  <AlertTriangle className="size-2.5 shrink-0" />
+                  <span>Errata</span>
                 </button>
               </div>
             </div>
@@ -678,13 +682,23 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
                     </div>
                     <span
                       className={cn(
-                        "text-[9px] font-black px-1.5 py-0.2 rounded-full",
+                        "text-[9px] font-black px-1.5 py-0.2 rounded-full inline-flex items-center gap-1",
                         c.isHelpful
                           ? "bg-emerald-500/15 text-emerald-400"
                           : "bg-amber-500/15 text-amber-400"
                       )}
                     >
-                      {c.isHelpful ? "Helpful ✅" : "Notice ⚠️"}
+                      {c.isHelpful ? (
+                        <>
+                          <CheckCircle2 className="size-2.5 shrink-0" />
+                          <span>Helpful</span>
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle className="size-2.5 shrink-0" />
+                          <span>Notice</span>
+                        </>
+                      )}
                     </span>
                   </div>
                   <p className="text-xs text-foreground/90 font-normal leading-relaxed">{c.body}</p>

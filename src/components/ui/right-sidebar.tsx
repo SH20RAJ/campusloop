@@ -186,8 +186,9 @@ export function RightSidebar() {
                       {ev.title}
                     </p>
                     {ev.prizesDescription && (
-                      <p className="text-[10px] font-black text-amber-500 truncate">
-                        🏆 {ev.prizesDescription}
+                      <p className="text-[10px] font-black text-amber-500 truncate flex items-center gap-1">
+                        <Trophy className="size-2.5 shrink-0" />
+                        <span>{ev.prizesDescription}</span>
                       </p>
                     )}
                   </Link>

@@ -8,6 +8,7 @@ import {
   Eye,
   FolderPlus,
   Layers,
+  Lightbulb,
   ListOrdered,
   Loader2,
   Plus,
@@ -202,7 +203,7 @@ export function PlaylistDetailClient({ slugOrId }: { slugOrId: string }) {
     sounds.tap();
     haptics.light();
     navigator.clipboard.writeText(window.location.href);
-    toast.success("Playlist link copied to clipboard! 📋");
+    toast.success("Playlist link copied to clipboard!");
   }
 
   if (isLoading) {
@@ -447,11 +448,12 @@ export function PlaylistDetailClient({ slugOrId }: { slugOrId: string }) {
                       {item.curatorNote && (
                         <p
                           className={cn(
-                            "text-[10px] line-clamp-1 mt-0.5 italic",
+                            "text-[10px] line-clamp-1 mt-0.5 italic flex items-center gap-1",
                             isActive ? "text-white/80" : "text-indigo-400"
                           )}
                         >
-                          💡 {item.curatorNote}
+                          <Lightbulb className="size-2.5 shrink-0" />
+                          <span>{item.curatorNote}</span>
                         </p>
                       )}
                     </div>

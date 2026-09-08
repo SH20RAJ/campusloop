@@ -113,7 +113,7 @@ export function AcademicPdfViewer({
     link.click();
     document.body.removeChild(link);
 
-    toast.success("Download started! Zero login required 🚀");
+    toast.success("Download started! Zero login required");
   }
 
   // Handle zoom controls
@@ -258,7 +258,7 @@ export function AcademicPdfViewer({
                 toast.info(
                   viewerEngine === "google"
                     ? "Switched to Native Browser PDF View"
-                    : "Switched to Google Docs Viewer API ⚡"
+                    : "Switched to Google Docs Viewer API"
                 );
               }}
               className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border border-border/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
@@ -305,7 +305,7 @@ export function AcademicPdfViewer({
               sounds.tap();
               haptics.light();
               setIsNightMode(!isNightMode);
-              toast.info(isNightMode ? "Reader night mode off" : "Reader night mode enabled (inverted) 🌙");
+              toast.info(isNightMode ? "Reader night mode off" : "Reader night mode enabled (inverted)");
             }}
             className={cn(
               "p-1.5 rounded-full border transition-all cursor-pointer",

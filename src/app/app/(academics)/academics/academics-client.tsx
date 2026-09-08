@@ -1,16 +1,15 @@
 "use client";
 
-import { BookOpen, FolderPlus, Globe, LayoutGrid, Link2, List, Loader2, Plus, Sparkles, UploadCloud, X } from "lucide-react";
+import { BookOpen, FolderPlus, Gift, Globe, LayoutGrid, List, Loader2, Plus, School, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 import { AcademicPlaylistCard } from "@/components/academics/academic-playlist-card";
 import { AcademicCard } from "@/components/communities/academic-card";
 import { AnimateBookOpen, AnimateCheck, AnimatedIcon, AnimatePlus, AnimateSearch, AnimateZap } from "@/components/ui/animated-icon";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
 import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
@@ -19,7 +18,6 @@ import { getGuestDownloadCount, GUEST_DOWNLOAD_LIMIT } from "@/lib/academic-down
 import { trackAcademicSearch } from "@/lib/analytics/ga4";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
-import { uploadMediaFile } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 
@@ -29,14 +27,14 @@ interface AcademicsClientProps {
 
 const RESOURCE_TYPES = [
   { id: "all", label: "All Types" },
-  { id: "PLAYLISTS", label: "Study Playlists 📑" },
-  { id: "NOTES", label: "Lecture Notes 📝" },
-  { id: "MODULE", label: "Module / Unit 📘" },
-  { id: "BOOK", label: "Whole Book 📚" },
-  { id: "PPT", label: "PPT / Slides 📊" },
-  { id: "PYQ", label: "PYQs & Papers 📑" },
-  { id: "CHEAT_SHEET", label: "Cheat Sheets ⚡" },
-  { id: "LAB_MANUAL", label: "Lab Manuals 🔬" },
+  { id: "PLAYLISTS", label: "Study Playlists" },
+  { id: "NOTES", label: "Lecture Notes" },
+  { id: "MODULE", label: "Module / Unit" },
+  { id: "BOOK", label: "Whole Book" },
+  { id: "PPT", label: "PPT / Slides" },
+  { id: "PYQ", label: "PYQs & Papers" },
+  { id: "CHEAT_SHEET", label: "Cheat Sheets" },
+  { id: "LAB_MANUAL", label: "Lab Manuals" },
 ] as const;
 
 const BRANCHES = [
@@ -57,7 +55,7 @@ const BRANCHES = [
 ] as const;
 
 const SEMESTERS = [
-  { id: "all", label: "All Sem" },
+  { id: "all", label: "All Sems" },
   { id: "1", label: "Sem 1" },
   { id: "2", label: "Sem 2" },
   { id: "3", label: "Sem 3" },
@@ -89,24 +87,8 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
     }
   }, []);
 
-  // Upload modal state
-  const [showUploadModal, setShowUploadModal] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalReason, setAuthModalReason] = useState<"SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI">("UPLOAD");
-  const [isUploading, setIsUploading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formTitle, setFormTitle] = useState("");
-  const [formSubjectCode, setFormSubjectCode] = useState("");
-  const [formSubjectName, setFormSubjectName] = useState("");
-  const [formBranch, setFormBranch] = useState("Computer Science");
-  const [formSemester, setFormSemester] = useState(1);
-  const [formResourceType, setFormResourceType] = useState("NOTES");
-  const [formModule, setFormModule] = useState("");
-  const [formDriveUrl, setFormDriveUrl] = useState("");
-  const [formFileUrl, setFormFileUrl] = useState("");
-  const [formFileName, setFormFileName] = useState("");
-  const [formDescription, setFormDescription] = useState("");
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [loadMoreNode, setLoadMoreNode] = useState<HTMLDivElement | null>(null);
   const [guestRemaining, setGuestRemaining] = useState<number>(GUEST_DOWNLOAD_LIMIT);
 
@@ -210,86 +192,6 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
     }
   }, [highlightId, items]);
 
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    sounds.tap();
-    haptics.medium();
-
-    try {
-      const res = await uploadMediaFile(file);
-      if (res?.url) {
-        setFormFileUrl(res.url);
-        setFormFileName(file.name);
-        toast.success(`File uploaded to Cloudflare R2: ${file.name} 🚀`);
-      } else {
-        toast.error("File upload failed. Try sharing a Google Drive link.");
-      }
-    } catch {
-      toast.error("Upload error. Check connection.");
-    } finally {
-      setIsUploading(false);
-    }
-  }
-
-  async function handleCreateResource(e: React.FormEvent) {
-    e.preventDefault();
-    if (!formTitle.trim() || !formSubjectCode.trim() || !formSubjectName.trim()) {
-      toast.error("Please provide Title, Subject Code, and Subject Name");
-      return;
-    }
-    if (!formFileUrl && !formDriveUrl.trim()) {
-      toast.error("Please upload a file or attach a Google Drive / Web link");
-      return;
-    }
-
-    setIsSubmitting(true);
-    sounds.send();
-    haptics.medium();
-
-    try {
-      const res = await fetch("/api/academics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: formTitle.trim(),
-          description: formDescription.trim(),
-          subjectCode: formSubjectCode.trim(),
-          subjectName: formSubjectName.trim(),
-          branch: formBranch,
-          semester: Number(formSemester),
-          resourceType: formResourceType,
-          moduleOrChapter: formModule.trim() || null,
-          driveUrl: formDriveUrl.trim() || null,
-          fileUrl: formFileUrl || null,
-        }),
-      });
-
-      const json = (await res.json()) as { success?: boolean; error?: string };
-      if (res.ok && json.success) {
-        toast.success("Study resource shared! +20 Loop Points (LP) earned 🎉");
-        setShowUploadModal(false);
-        setFormTitle("");
-        setFormSubjectCode("");
-        setFormSubjectName("");
-        setFormModule("");
-        setFormDriveUrl("");
-        setFormFileUrl("");
-        setFormFileName("");
-        setFormDescription("");
-        mutate();
-      } else {
-        toast.error(json.error || "Failed to publish resource");
-      }
-    } catch {
-      toast.error("Network error while publishing resource");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col min-h-screen select-none pb-28 px-3 sm:px-6 lg:px-8 bg-background">
       {/* ─── Compact Sticky Header: Search & Navigation ─── */}
@@ -355,23 +257,17 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
               <span className="hidden sm:inline">New Stack</span>
             </Link>
 
-            <button
-              type="button"
+            <Link
+              href="/app/academics/upload"
               onClick={() => {
-                if (!profileId) {
-                  setAuthModalReason("UPLOAD");
-                  setIsAuthModalOpen(true);
-                  return;
-                }
                 sounds.tap();
                 haptics.light();
-                setShowUploadModal(true);
               }}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer"
             >
               <AnimatedIcon icon={AnimatePlus} animation="pop" size={13} />
               <span>Upload Notes</span>
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -445,13 +341,14 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 setScope("campus");
               }}
               className={cn(
-                "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer",
+                "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5",
                 scope === "campus"
                   ? "bg-foreground text-background shadow-xs font-black"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              🏫 My Campus
+              <School className="size-3 shrink-0" />
+              <span>My Campus</span>
             </button>
             <button
               type="button"
@@ -460,13 +357,14 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 setScope("global");
               }}
               className={cn(
-                "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer",
+                "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5",
                 scope === "global"
                   ? "bg-foreground text-background shadow-xs font-black"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              🇮🇳 All Colleges
+              <Globe className="size-3 shrink-0" />
+              <span>All Colleges</span>
             </button>
           </div>
 
@@ -482,7 +380,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
             >
               {BRANCHES.map((b) => (
                 <option key={b} value={b}>
-                  {b === "All" ? "🎓 All Branches" : b}
+                  {b === "All" ? "All Branches" : b}
                 </option>
               ))}
             </select>
@@ -498,7 +396,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
             >
               {SEMESTERS.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.id === "all" ? "📚 All Sems" : s.label}
+                  {s.id === "all" ? "All Sems" : s.label}
                 </option>
               ))}
             </select>
@@ -512,11 +410,11 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
               }}
               className="h-7.5 rounded-full bg-primary/10 border border-primary/25 px-2.5 text-[11px] font-bold text-primary hover:bg-primary/15 outline-none cursor-pointer"
             >
-              <option value="for_you">✨ For You</option>
-              <option value="latest">⏱️ Latest</option>
-              <option value="popular">🔥 Most Upvoted</option>
-              <option value="downloads">📥 Most Downloaded</option>
-              <option value="views">👁️ Most Viewed</option>
+              <option value="for_you">For You (Recommended)</option>
+              <option value="latest">Latest</option>
+              <option value="popular">Most Upvoted</option>
+              <option value="downloads">Most Downloaded</option>
+              <option value="views">Most Viewed</option>
             </select>
           </div>
         </div>
@@ -549,7 +447,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
               className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold shrink-0"
               title="Guests enjoy 5 free downloads before sign-in is requested"
             >
-              <span>🎁</span>
+              <Gift className="size-3 text-amber-500" />
               <span>{guestRemaining}/5 Free</span>
             </div>
           )}
@@ -671,17 +569,15 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 {isReachingEnd && (
                   <div className="py-6 text-center">
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-muted/40 border border-border/40 text-[11px] font-semibold text-muted-foreground">
-                      <span>✨ Reached end of vault ({totalCount.toLocaleString()} resources)</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          sounds.tap();
-                          setShowUploadModal(true);
-                        }}
+                      <Sparkles className="size-3 text-primary" />
+                      <span>Reached end of vault ({totalCount.toLocaleString()} resources)</span>
+                      <Link
+                        href="/app/academics/upload"
+                        onClick={() => sounds.tap()}
                         className="text-primary hover:underline font-bold cursor-pointer"
                       >
                         + Add your notes
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 )}
@@ -697,243 +593,18 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                   LP!
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowUploadModal(true)}
+              <Link
+                href="/app/academics/upload"
+                onClick={() => sounds.tap()}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer"
               >
                 <Plus className="size-3.5" />
                 <span>Upload First Notes</span>
-              </button>
+              </Link>
             </div>
           )}
         </section>
       </div>
-
-      {/* ─── Upload Study Resource Modal ─── */}
-      <Dialog open={showUploadModal} onOpenChange={setShowUploadModal}>
-        <DialogContent className="sm:max-w-lg rounded-3xl p-5 max-h-[90vh] overflow-y-auto no-scrollbar">
-          <DialogHeader>
-            <DialogTitle className="text-base font-black flex items-center gap-2">
-              <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={18} className="text-indigo-500" />
-              <span>Share Notes, PPTs &amp; Books</span>
-            </DialogTitle>
-          </DialogHeader>
-
-          <form onSubmit={handleCreateResource} className="space-y-3.5 pt-2">
-            {/* Title */}
-            <div>
-              <label className="text-[11px] font-bold text-muted-foreground">Resource Title *</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Complete Trees & Graphs Handwritten Notes (Midsem)"
-                value={formTitle}
-                onChange={(e) => setFormTitle(e.target.value)}
-                className="w-full h-9 rounded-xl bg-muted/40 border border-border/40 px-3 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary"
-              />
-            </div>
-
-            {/* Subject Code & Subject Name */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground">Subject Code *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. CS201 / IT301"
-                  value={formSubjectCode}
-                  onChange={(e) => setFormSubjectCode(e.target.value.toUpperCase())}
-                  className="w-full h-9 rounded-xl bg-muted/40 border border-border/40 px-3 text-xs font-bold uppercase text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary"
-                />
-              </div>
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground">Subject Name *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Data Structures"
-                  value={formSubjectName}
-                  onChange={(e) => setFormSubjectName(e.target.value)}
-                  className="w-full h-9 rounded-xl bg-muted/40 border border-border/40 px-3 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary"
-                />
-              </div>
-            </div>
-
-            {/* Resource Type & Module / Chapter */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground">Resource Type</label>
-                <select
-                  value={formResourceType}
-                  onChange={(e) => setFormResourceType(e.target.value)}
-                  className="w-full h-9 rounded-xl bg-muted/40 border border-border/40 px-2 text-xs font-bold text-foreground outline-none"
-                >
-                  <option value="NOTES">📝 Lecture Notes</option>
-                  <option value="MODULE">📘 Module / Unit Notes</option>
-                  <option value="BOOK">📚 Complete Course Book</option>
-                  <option value="PPT">📊 PPT / Presentation Slides</option>
-                  <option value="PYQ">📑 PYQ Exam Paper</option>
-                  <option value="CHEAT_SHEET">⚡ Formula / Cheat Sheet</option>
-                  <option value="LAB_MANUAL">🔬 Lab Manual &amp; Code</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground">
-                  Module / Chapter (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Module 2 / Unit 3 / Full"
-                  value={formModule}
-                  onChange={(e) => setFormModule(e.target.value)}
-                  className="w-full h-9 rounded-xl bg-muted/40 border border-border/40 px-3 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Branch & Semester */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground">Branch</label>
-                <select
-                  value={formBranch}
-                  onChange={(e) => setFormBranch(e.target.value)}
-                  className="w-full h-9 rounded-xl bg-muted/40 border border-border/40 px-2 text-xs font-bold text-foreground outline-none"
-                >
-                  {BRANCHES.filter((b) => b !== "All").map((b) => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
-                  ))}
-                  <option value="All">All Branches (Common Course)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-muted-foreground">Semester</label>
-                <select
-                  value={formSemester}
-                  onChange={(e) => setFormSemester(Number(e.target.value))}
-                  className="w-full h-9 rounded-xl bg-muted/40 border border-border/40 px-2 text-xs font-bold text-foreground outline-none"
-                >
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
-                    <option key={s} value={s}>
-                      Semester {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Direct File Upload (Cloudflare R2) */}
-            <div>
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Upload Document (R2 Direct Storage)
-              </label>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.pptx,.ppt,.docx,.doc,.zip,.txt"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
-              <div className="mt-1 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-2xl border border-dashed border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-bold transition-all cursor-pointer select-none"
-                >
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" />
-                      <span>Uploading to R2...</span>
-                    </>
-                  ) : formFileUrl ? (
-                    <>
-                      <AnimatedIcon
-                        icon={AnimateCheck}
-                        animation="pop"
-                        size={14}
-                        className="text-emerald-500"
-                      />
-                      <span className="truncate max-w-[200px] text-emerald-500 font-black">
-                        {formFileName || "File Attached"}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <UploadCloud className="size-4" />
-                      <span>Choose PDF / PPT / DOCX / ZIP</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Google Drive or External Link */}
-            <div>
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Or Google Drive / Notion / GitHub Link
-              </label>
-              <div className="relative mt-1">
-                <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                <input
-                  type="url"
-                  placeholder="https://drive.google.com/..."
-                  value={formDriveUrl}
-                  onChange={(e) => setFormDriveUrl(e.target.value)}
-                  className="w-full h-9 rounded-xl bg-muted/40 border border-border/40 pl-8.5 pr-3 text-xs font-medium text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary"
-                />
-              </div>
-            </div>
-
-            {/* Description & Exam Tips */}
-            <div>
-              <label className="text-[11px] font-bold text-muted-foreground">
-                Notes Description &amp; Exam Tips
-              </label>
-              <textarea
-                rows={2}
-                placeholder="e.g. Covers Module 1 to 3 with solved midsem PYQs from 2024 and 2025."
-                value={formDescription}
-                onChange={(e) => setFormDescription(e.target.value)}
-                className="w-full rounded-xl bg-muted/40 border border-border/40 p-2.5 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary resize-none"
-              />
-            </div>
-
-            {/* Submit Action */}
-            <div className="pt-2 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowUploadModal(false)}
-                className="px-4 py-2 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting || isUploading}
-                className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer shadow-xs active:scale-95"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="size-3.5 animate-spin" />
-                    <span>Publishing...</span>
-                  </>
-                ) : (
-                  <>
-                    <AnimatedIcon icon={AnimateZap} animation="twinkle" size={13} />
-                    <span>Publish &amp; Earn 20 LP</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
 
       {/* Guest conversion modal */}
       <AcademicAuthModal

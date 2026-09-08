@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowLeft, ArrowUp, Bookmark, Bot, CheckCircle2, ChevronRight, Download, ExternalLink, FolderPlus, Share2, ShieldCheck, Zap } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowLeft, ArrowUp, Bookmark, Bot, CheckCircle2, ChevronRight, Download, ExternalLink, FolderPlus, Share2, ShieldCheck, Target, Zap } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -98,7 +98,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         if (userVote === "DOWN") setDownvotes((c: number) => Math.max(0, c - 1));
         setUpvotes((c: number) => c + 1);
         setUserVote("UP");
-        toast.success("Upvoted! Marked as syllabus-accurate 🎯");
+        toast.success("Upvoted! Marked as syllabus-accurate");
         fetch(`/api/academics/${resource.id}/analytics`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -132,7 +132,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
       trackAcademicLimitReached();
       setAuthModalReason("DOWNLOAD_LIMIT");
       setIsAuthModalOpen(true);
-      toast.error("You've used all 5 free guest downloads! Sign in or register for unlimited downloads 🎓");
+      toast.error("You've used all 5 free guest downloads! Sign in or register for unlimited downloads");
       return;
     }
 
@@ -154,7 +154,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         if (downloadCheck.remaining > 0) {
           toast.success(`Downloaded! (${downloadCheck.remaining} free guest downloads remaining)`);
         } else {
-          toast.info("Downloaded! That was your 5th free download. Sign in anytime for unlimited access! 🎓");
+          toast.info("Downloaded! That was your 5th free download. Sign in anytime for unlimited access!");
         }
       }
     } else {
@@ -177,7 +177,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
       });
     } else {
       navigator.clipboard.writeText(url);
-      toast.success("Study link copied to clipboard! 📋");
+      toast.success("Study link copied to clipboard!");
     }
   }
 
@@ -197,7 +197,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
     setTimeout(() => {
       if (promptType === "CONCEPTS") {
         setAiAnalysis(
-          `### 🧠 Core Concepts & Formula Checklist for ${resource.subjectCode}:\n\n` +
+          `### Core Concepts & Formula Checklist for ${resource.subjectCode}:\n\n` +
             `1. **Key Definitions & Principles**: Understand core theorems, definitions, and mathematical relations outlined in this material.\n` +
             `2. **High-Yield Exam Topics**: Focus on numericals, step-by-step algorithms, and diagrams often tested in end-sem papers.\n` +
             `3. **Common Mistakes to Avoid**: Always verify standard boundary conditions, units, and derivation assumptions.\n\n` +
@@ -205,7 +205,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         );
       } else if (promptType === "EXAM_TIPS") {
         setAiAnalysis(
-          `### ⚡ 15-Minute Exam Cram Strategy for ${resource.subjectName}:\n\n` +
+          `### 15-Minute Exam Cram Strategy for ${resource.subjectName}:\n\n` +
             `• **First 5 mins**: Scan all block diagrams and formula boxes highlighted in these notes.\n` +
             `• **Next 5 mins**: Review solved examples and past question paper patterns.\n` +
             `• **Last 5 mins**: Rehearse key terminology and definitions to score max theory marks.\n\n` +
@@ -213,7 +213,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         );
       } else {
         setAiAnalysis(
-          `### 📋 Syllabus Alignment & Peer Verification:\n\n` +
+          `### Syllabus Alignment & Peer Verification:\n\n` +
             `• **Relevance**: Verified by ${resource.institution?.name?.split(",")[0] || "Campus"} peers with a ${reliability}% accuracy rating.\n` +
             `• **Coverage**: Covers essential modules for ${resource.subjectCode} (${resource.subjectName}).\n` +
             `• **Recommended Study Order**: Read lecture notes first, write down cheat sheet formulas, then test yourself against past question papers.`
@@ -253,7 +253,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
 
       setComments((prev) => [json.comment, ...prev]);
       setCommentText("");
-      toast.success("Review posted! Thanks for verifying campus notes 🌟");
+      toast.success("Review posted! Thanks for verifying campus notes.");
       haptics.success();
     } catch {
       toast.error("Could not post review. Please try again.");
@@ -297,7 +297,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
               sounds.tap();
               haptics.light();
               setIsSaved(!isSaved);
-              toast.success(isSaved ? "Removed from Study Vault" : "Saved to Study Vault 🔖");
+              toast.success(isSaved ? "Removed from Study Vault" : "Saved to Study Vault");
             }}
             className={cn(
               "flex size-8 items-center justify-center rounded-full border transition-all cursor-pointer",
@@ -363,7 +363,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
                 sounds.tap();
                 haptics.light();
                 setIsSaved(!isSaved);
-                toast.success(isSaved ? "Removed from Study Vault" : "Saved to Study Vault 🔖");
+                toast.success(isSaved ? "Removed from Study Vault" : "Saved to Study Vault");
               }}
               className={cn(
                 "flex size-8.5 items-center justify-center rounded-full border transition-all cursor-pointer",
@@ -436,8 +436,9 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
           <span>
             <strong className="text-foreground font-black tabular-nums">{downloads}</strong> Downloads
           </span>
-          <span className="ml-auto font-bold text-emerald-400">
-            🎯 {reliability}% Verified Accuracy
+          <span className="ml-auto font-bold text-emerald-400 inline-flex items-center gap-1">
+            <Target className="size-3 shrink-0" />
+            <span>{reliability}% Verified Accuracy</span>
           </span>
         </div>
 
@@ -557,7 +558,8 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
             disabled={isGeneratingAi}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-card hover:bg-muted/80 border border-border/70 text-foreground transition-all cursor-pointer active:scale-95 disabled:opacity-50"
           >
-            <span>⚡ 15-Min Exam Cram</span>
+            <Zap className="size-3 text-amber-400 shrink-0" />
+            <span>15-Min Exam Cram</span>
           </button>
 
           <button
@@ -621,19 +623,21 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
                     : "text-muted-foreground hover:text-foreground border border-transparent"
                 )}
               >
-                ✅ Accurate &amp; Verified
+                <CheckCircle2 className="size-3 inline mr-1 text-emerald-400" />
+                <span>Accurate &amp; Verified</span>
               </button>
               <button
                 type="button"
                 onClick={() => setIsHelpful(false)}
                 className={cn(
-                  "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer",
+                  "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1",
                   !isHelpful
                     ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
                     : "text-muted-foreground hover:text-foreground border border-transparent"
                 )}
               >
-                ⚠️ Outdated / Errata
+                <AlertTriangle className="size-3 inline mr-1 text-amber-400" />
+                <span>Outdated / Errata</span>
               </button>
             </div>
 

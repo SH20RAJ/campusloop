@@ -107,7 +107,7 @@ export function AddToPlaylistModal({
         });
         sounds.pop();
         haptics.success();
-        toast.success(`Added to "${playlist.title}" 📚`);
+        toast.success(`Added to "${playlist.title}"`);
       }
     } catch {
       toast.error("Could not update playlist");
@@ -147,7 +147,7 @@ export function AddToPlaylistModal({
       if (data.playlist) {
         sounds.pop();
         haptics.success();
-        toast.success(`Created "${data.playlist.title}" with this material! 🚀`);
+        toast.success(`Created "${data.playlist.title}" with this material!`);
         setPlaylists((prev) => [data.playlist, ...prev]);
         setSelectedPlaylistIds((prev) => new Set([...prev, data.playlist.id]));
         setNewTitle("");

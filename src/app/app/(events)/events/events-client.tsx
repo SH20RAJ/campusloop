@@ -2,10 +2,15 @@
 
 import {
   Calendar,
+  Code2,
   Compass,
+  Flame,
   Globe,
+  GraduationCap,
   Grid3X3,
   LayoutList,
+  MapPin,
+  PartyPopper,
   Plus,
   Radio,
   School,
@@ -13,6 +18,7 @@ import {
   Sparkles,
   Trophy,
   Users,
+  Users2,
   X,
   Zap,
 } from "lucide-react";
@@ -27,25 +33,25 @@ import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
 const EVENT_TABS = [
-  { id: "trending", label: "Trending 🔥" },
-  { id: "upcoming", label: "Upcoming 📅" },
-  { id: "latest", label: "Latest ✨" },
+  { id: "trending", label: "Trending", icon: Flame },
+  { id: "upcoming", label: "Upcoming", icon: Calendar },
+  { id: "latest", label: "Latest", icon: Sparkles },
 ] as const;
 
 const CATEGORIES = [
-  { id: "ALL", label: "All Events" },
-  { id: "hackathons", label: "Hackathons 💻" },
-  { id: "fests", label: "Fests 🎪" },
-  { id: "competitions", label: "Competitions 🏆" },
-  { id: "workshops", label: "Workshops 🎓" },
-  { id: "meetups", label: "Meetups 🤝" },
+  { id: "ALL", label: "All Events", icon: Calendar },
+  { id: "hackathons", label: "Hackathons", icon: Code2 },
+  { id: "fests", label: "Fests", icon: PartyPopper },
+  { id: "competitions", label: "Competitions", icon: Trophy },
+  { id: "workshops", label: "Workshops", icon: GraduationCap },
+  { id: "meetups", label: "Meetups", icon: Users2 },
 ];
 
 const MODES = [
-  { id: "ALL", label: "All Modes" },
-  { id: "IN_PERSON", label: "In-Person 📍" },
-  { id: "ONLINE", label: "Online 🌐" },
-  { id: "HYBRID", label: "Hybrid ⚡" },
+  { id: "ALL", label: "All Modes", icon: null },
+  { id: "IN_PERSON", label: "In-Person", icon: MapPin },
+  { id: "ONLINE", label: "Online", icon: Globe },
+  { id: "HYBRID", label: "Hybrid", icon: Zap },
 ];
 
 export function EventsClient() {
@@ -239,6 +245,7 @@ export function EventsClient() {
               <div className="no-scrollbar flex items-center gap-1 overflow-x-auto shrink-0">
                 {MODES.map((mode) => {
                   const isActive = modeFilter === mode.id;
+                  const Icon = mode.icon;
                   return (
                     <button
                       key={mode.id}
@@ -249,13 +256,14 @@ export function EventsClient() {
                         setModeFilter(mode.id);
                       }}
                       className={cn(
-                        "rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 border",
+                        "rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 border flex items-center gap-1.5",
                         isActive
                           ? "bg-foreground text-background border-foreground font-black shadow-xs"
                           : "bg-muted/30 text-muted-foreground hover:text-foreground border-border/40"
                       )}
                     >
-                      {mode.label}
+                      {Icon && <Icon className="size-3" />}
+                      <span>{mode.label}</span>
                     </button>
                   );
                 })}
@@ -268,6 +276,7 @@ export function EventsClient() {
               <div className="flex items-center gap-1.5 shrink-0">
                 {CATEGORIES.map((cat) => {
                   const isActive = activeCategory === cat.id;
+                  const Icon = cat.icon;
                   return (
                     <button
                       key={cat.id}
@@ -278,12 +287,13 @@ export function EventsClient() {
                         setActiveCategory(cat.id);
                       }}
                       className={cn(
-                        "flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 border",
+                        "flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 border",
                         isActive
                           ? "bg-primary text-primary-foreground border-primary shadow-xs font-black"
                           : "bg-muted/30 text-muted-foreground hover:bg-muted/60 hover:text-foreground border-border/40"
                       )}
                     >
+                      <Icon className="size-3" />
                       <span>{cat.label}</span>
                     </button>
                   );
@@ -294,6 +304,7 @@ export function EventsClient() {
               <div className="flex items-center rounded-full bg-muted/40 p-0.5 border border-border/40 shrink-0 ml-auto">
                 {EVENT_TABS.map((tab) => {
                   const isActive = activeTab === tab.id;
+                  const Icon = tab.icon;
                   return (
                     <button
                       key={tab.id}
@@ -304,13 +315,14 @@ export function EventsClient() {
                         setActiveTab(tab.id);
                       }}
                       className={cn(
-                        "px-2.5 py-0.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
+                        "px-2.5 py-0.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1",
                         isActive
                           ? "bg-background text-foreground shadow-xs font-black"
                           : "text-muted-foreground hover:text-foreground"
                       )}
                     >
-                      {tab.label}
+                      <Icon className="size-3" />
+                      <span>{tab.label}</span>
                     </button>
                   );
                 })}

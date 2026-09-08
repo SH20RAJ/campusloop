@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Calendar, Check, Download, ExternalLink, Gift, MapPin, QrCode, School, Share2, Zap, Trophy, Users } from "lucide-react";
+import { ArrowLeft, Bell, Calendar, Check, CheckCircle2, Download, ExternalLink, Gift, MapPin, QrCode, School, Share2, Zap, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -170,7 +170,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
       sounds.pop();
       haptics.medium();
       setShowRegModal(false);
-      toast.success("🎉 Registration Confirmed! +25 Loop Points added to your clout.");
+      toast.success("Registration Confirmed! +25 Loop Points added to your clout.");
       mutate(`/api/events/${eventId}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to register");
@@ -270,8 +270,15 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black text-sm text-foreground">
-                  {event.isRegistered ? "You're Registered! 🎉" : "Ready to participate?"}
+                <span className="font-black text-sm text-foreground flex items-center gap-1.5">
+                  {event.isRegistered ? (
+                    <>
+                      <CheckCircle2 className="size-4 text-emerald-500 inline" />
+                      <span>You&apos;re Registered!</span>
+                    </>
+                  ) : (
+                    "Ready to participate?"
+                  )}
                 </span>
                 <span className="text-xs font-bold text-primary">
                   +{event.loopPointsReward || 25} LP Reward
@@ -547,8 +554,9 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                   </h3>
 
                   {rel.prizesDescription && (
-                    <p className="text-[11px] font-bold text-amber-500 line-clamp-1">
-                      🏆 {rel.prizesDescription}
+                    <p className="text-[11px] font-bold text-amber-500 line-clamp-1 flex items-center gap-1">
+                      <Trophy className="size-2.5 shrink-0" />
+                      <span>{rel.prizesDescription}</span>
                     </p>
                   )}
 

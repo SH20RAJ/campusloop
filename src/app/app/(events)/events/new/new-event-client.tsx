@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Calendar, Check, Image as ImageIcon, Loader2, MapPin, Save, Zap, Trash2, Trophy, Upload, Users, X } from "lucide-react";
+import { ArrowLeft, Calendar, Check, Globe, Image as ImageIcon, Link2, Loader2, Lock, MapPin, Save, Zap, Trash2, Trophy, Upload, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -304,7 +304,7 @@ export function NewEventClient() {
       clearDraft();
       sounds.ting();
       toast.success(
-        status === "DRAFT" ? "Draft saved — publish it when you're ready." : "Campus Event published! 🚀"
+        status === "DRAFT" ? "Draft saved — publish it when you're ready." : "Campus Event published!"
       );
       mutate("/api/events");
       router.push(`/app/events/${data.event.slug || data.event.id}`);
@@ -752,35 +752,44 @@ export function NewEventClient() {
               {[
                 {
                   id: "PUBLIC" as const,
-                  title: "Public 🌐",
+                  title: "Public",
+                  icon: Globe,
                   desc: "Visible in feeds, search & campus directory",
                 },
                 {
                   id: "UNLISTED" as const,
-                  title: "Unlisted 🔗",
+                  title: "Unlisted",
+                  icon: Link2,
                   desc: "Hidden from feeds; joinable only via link/QR",
                 },
                 {
                   id: "PRIVATE" as const,
-                  title: "Campus Only 🔒",
+                  title: "Campus Only",
+                  icon: Lock,
                   desc: "Only students of your college can view/join",
                 },
-              ].map((item) => (
-                <button
-                  type="button"
-                  key={item.id}
-                  onClick={() => setVisibility(item.id)}
-                  className={cn(
-                    "p-3 rounded-2xl border text-left cursor-pointer transition-all active:scale-98 flex flex-col gap-1",
-                    visibility === item.id
-                      ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
-                      : "border-border/40 bg-muted/20 text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <span className="text-xs font-black text-foreground">{item.title}</span>
-                  <span className="text-[10px] leading-tight opacity-80">{item.desc}</span>
-                </button>
-              ))}
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    type="button"
+                    key={item.id}
+                    onClick={() => setVisibility(item.id)}
+                    className={cn(
+                      "p-3 rounded-2xl border text-left cursor-pointer transition-all active:scale-98 flex flex-col gap-1",
+                      visibility === item.id
+                        ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
+                        : "border-border/40 bg-muted/20 text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <span className="text-xs font-black text-foreground flex items-center gap-1.5">
+                      <Icon className="size-3 text-primary" />
+                      <span>{item.title}</span>
+                    </span>
+                    <span className="text-[10px] leading-tight opacity-80">{item.desc}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -898,7 +907,7 @@ export function NewEventClient() {
             disabled={isSubmitting}
             className="h-11 flex-[2] cursor-pointer rounded-full bg-primary text-sm font-black text-primary-foreground shadow-md hover:opacity-90"
           >
-            {isSubmitting ? "Publishing..." : "Publish Campus Event 🚀"}
+            {isSubmitting ? "Publishing..." : "Publish Campus Event"}
           </Button>
         </div>
       </form>

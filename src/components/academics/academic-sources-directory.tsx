@@ -175,10 +175,10 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
 
   const categories = [
     { id: "all", label: "All Repositories (10)" },
-    { id: "Official University Archive", label: "University Archives 🏛️" },
-    { id: "Curated Student Hub", label: "Student Hubs 🎒" },
-    { id: "State Tech Board", label: "Tech Boards 🏫" },
-    { id: "National Repository", label: "National IIT/NIT 🇮🇳" },
+    { id: "Official University Archive", label: "University Archives" },
+    { id: "Curated Student Hub", label: "Student Hubs" },
+    { id: "State Tech Board", label: "Tech Boards" },
+    { id: "National Repository", label: "National IIT/NIT" },
   ];
 
   const filteredSources = VERIFIED_ACADEMIC_SOURCES.filter((s) => {

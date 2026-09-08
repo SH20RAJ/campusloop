@@ -19,11 +19,11 @@ const GRADIENTS = [
 ];
 
 const CATEGORIES = [
-  { value: "SEMESTER_PACK", label: "Semester Survival Pack 🎒" },
-  { value: "EXAM_PREP", label: "Midsem / Endsem Cram Stack ⚡" },
-  { value: "SUBJECT_BUNDLE", label: "Single Subject Master Bundle 📖" },
-  { value: "GATE", label: "GATE & Competitive Coding 🚀" },
-  { value: "CUSTOM", label: "Custom Student Collection 📂" },
+  { value: "SEMESTER_PACK", label: "Semester Survival Pack" },
+  { value: "EXAM_PREP", label: "Midsem / Endsem Cram Stack" },
+  { value: "SUBJECT_BUNDLE", label: "Single Subject Master Bundle" },
+  { value: "GATE", label: "GATE & Competitive Coding" },
+  { value: "CUSTOM", label: "Custom Student Collection" },
 ];
 
 const BRANCHES = [
@@ -144,7 +144,7 @@ export function NewPlaylistClient() {
       const data = (await res.json()) as any;
       sounds.pop();
       haptics.success();
-      toast.success("Study Playlist published successfully! 🚀");
+      toast.success("Study Playlist published successfully!");
       router.push(`/app/academics/playlists/${data.playlist.slug || data.playlist.id}`);
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : "Failed to publish playlist";

@@ -113,7 +113,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
       haptics.medium();
       setIsRegistered(true);
       setAttendeeCount((prev) => prev + 1);
-      toast.success("Registered for event! +25 Loop Points 🎟️");
+      toast.success("Registered for event! +25 Loop Points");
       mutate("/api/events");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to register");

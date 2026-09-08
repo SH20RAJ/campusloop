@@ -67,7 +67,7 @@ export function CapsuleBuryModal({
 
       sounds.archive();
       haptics.success();
-      toast.success("Memory sealed in the Time Capsule! ⏳");
+      toast.success("Memory sealed in the Time Capsule!");
       onEntryBuried?.(entry);
       onClose();
     } catch (err: unknown) {
@@ -78,72 +78,6 @@ export function CapsuleBuryModal({
   }
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs select-none">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto"
-        >
-          {/* Header */}
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-1.5 text-xs font-black text-amber-500 uppercase tracking-wider mb-1">
-                <Lock className="size-3.5" />
-                <span>Bury in Time Capsule</span>
-              </div>
-              <h3 className="text-base font-black text-foreground line-clamp-1">{capsuleTitle}</h3>
-              <p className="text-xs text-muted-foreground font-medium">
-                Sealed until unlock date. No one on campus can read this until the vault opens!
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-full p-1.5 text-muted-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-
-          {/* Type Selector */}
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { id: "LETTER", label: "Letter to Future", icon: FileText },
-              { id: "PREDICTION", label: "Campus Prediction", icon: Wand2 },
-              { id: "PHOTO", label: "Photo Memory", icon: ImageIcon },
-            ].map((t) => {
-              const Icon = t.icon;
-              const isSelected = entryType === t.id;
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => {
-                    sounds.tap();
-                    haptics.light();
-                    setEntryType(t.id as any);
-                  }}
-                  className={cn(
-                    "flex flex-col items-center gap-1.5 p-3 rounded-2xl border text-center transition-all cursor-pointer",
-                    isSelected
-                      ? "bg-amber-500/15 border-amber-500/40 text-foreground ring-1 ring-amber-500/30"
-                      : "bg-muted/30 border-border/40 text-muted-foreground hover:bg-muted/60"
-                  )}
-                >
-                  <Icon className={cn("size-4", isSelected ? "text-amber-500" : "")} />
-                  <span className="text-xs font-bold leading-tight">{t.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
-            <div>
-              <label className="text-xs font-bold text-foreground block mb-1">Subject / Headline *</label>
-              <input
-                type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={

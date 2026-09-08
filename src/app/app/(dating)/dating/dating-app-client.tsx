@@ -279,7 +279,7 @@ export function DatingAppClient() {
                         : "border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    {g === "MALE" ? "👨 Male" : g === "FEMALE" ? "👩 Female" : "🌈 Other"}
+                    {g === "MALE" ? "Male" : g === "FEMALE" ? "Female" : "Other"}
                   </button>
                 ))}
               </div>

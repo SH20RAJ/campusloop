@@ -139,7 +139,10 @@ export function AdminRentalsClient() {
                       </td>
                       <td className="p-3 font-medium">
                         <p className="text-foreground font-bold">{b.student?.displayName}</p>
-                        <p className="text-[10px] text-muted-foreground">📞 {b.customerPhone}</p>
+                        <p className="text-[10px] text-muted-foreground inline-flex items-center gap-1">
+                          <Phone className="size-2.5" />
+                          <span>{b.customerPhone}</span>
+                        </p>
                       </td>
                       <td className="p-3 text-muted-foreground text-[11px]">
                         <p>

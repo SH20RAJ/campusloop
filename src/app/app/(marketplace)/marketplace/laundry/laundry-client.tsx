@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, CheckCircle2, Clock, Home, MapPin, Package, Plus, ShieldCheck, Shirt, Zap, Star, Truck, Wind } from "lucide-react";
+import { Calendar, CheckCircle2, Clock, Home, MapPin, Package, Plus, Rocket, ShieldCheck, Shirt, Zap, Star, Truck, Wind } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
@@ -44,7 +44,7 @@ export function LaundryMarketplaceClient({
   const primaryLaundry = laundryStores[0];
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 pb-20 select-none">
+    <div className="w-full max-w-4xl mx-auto space-y-6 pb-28 select-none">
       {/* ─── Hero Banner ─── */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 p-6 sm:p-8 text-white shadow-lg">
         <div className="relative z-10 max-w-lg space-y-2">
@@ -89,9 +89,10 @@ export function LaundryMarketplaceClient({
             haptics.medium();
             setShowPickupModal(true);
           }}
-          className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition-all cursor-pointer shadow-md active:scale-95 shrink-0"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition-all cursor-pointer shadow-md active:scale-95 shrink-0"
         >
-          Book Pickup Now 🧺
+          <Shirt className="size-3.5" />
+          <span>Book Pickup Now</span>
         </button>
       </div>
 
@@ -268,13 +269,20 @@ export function LaundryMarketplaceClient({
                     setIsSubmitting(false);
                     setShowPickupModal(false);
                     alert(
-                      `Pickup Scheduled! 🧺\nPickup from ${hostelName}, ${roomNumber}. Our laundry partner will arrive in ~25 mins.`
+                      `Pickup Scheduled!\nPickup from ${hostelName}, ${roomNumber}. Our laundry partner will arrive in ~25 mins.`
                     );
                   }, 700);
                 }}
-                className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition-all cursor-pointer shadow-xs"
+                className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition-all cursor-pointer shadow-xs inline-flex items-center justify-center gap-1.5"
               >
-                {isSubmitting ? "Scheduling..." : "Confirm Pickup 🚀"}
+                {isSubmitting ? (
+                  <span>Scheduling...</span>
+                ) : (
+                  <>
+                    <CheckCircle2 className="size-3.5" />
+                    <span>Confirm Pickup</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -286,7 +294,8 @@ export function LaundryMarketplaceClient({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-600 dark:text-pink-400 text-[10px] font-black uppercase tracking-wider">
-              <span>🚀 Want this at your campus?</span>
+              <Rocket className="size-3" />
+              <span>Want this at your campus?</span>
             </div>
             <h4 className="text-sm font-black text-foreground">
               Bring CampusLoop Laundry Express to Your College

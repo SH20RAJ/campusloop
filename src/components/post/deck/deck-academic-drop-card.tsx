@@ -18,7 +18,7 @@ export function DeckAcademicDropCard({ resource }: DeckAcademicDropCardProps) {
   function handleDownload() {
     const downloadCheck = checkAndRecordDownload(false);
     if (!downloadCheck.allowed) {
-      toast.info("You've used all 5 free guest downloads! Sign in for unlimited access 🎓", {
+      toast.info("You've used all 5 free guest downloads! Sign in for unlimited access", {
         action: {
           label: "Sign In",
           onClick: () => {
@@ -48,7 +48,7 @@ export function DeckAcademicDropCard({ resource }: DeckAcademicDropCardProps) {
               <GraduationCap className="size-4" />
             </div>
             <div>
-              <h3 className="font-black text-sm text-foreground">Academic Vault Drop 📚</h3>
+              <h3 className="font-black text-sm text-foreground">Academic Vault Drop</h3>
               <p className="text-[11px] text-muted-foreground">{resource.institutionName || "Campus Study Vault"}</p>
             </div>
           </div>

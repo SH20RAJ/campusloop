@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   Shirt,
   ShoppingBag,
+  Sparkles,
   Star,
   Store,
   Tag,
@@ -41,12 +42,12 @@ interface MarketplaceClientProps {
 
 const CATEGORIES = [
   { id: "all", label: "All Services", icon: Store },
-  { id: "food", label: "🍔 Food & Canteens", icon: UtensilsCrossed },
-  { id: "rentals", label: "🚲 Bike Rentals", icon: Bike },
-  { id: "barber", label: "✂️ Barber & Salon", icon: Scissors },
-  { id: "laundry", label: "🧺 Laundry & Wash", icon: Shirt },
-  { id: "water", label: "💧 Water Delivery", icon: Droplet },
-  { id: "essentials", label: "🛒 Supermarket & Mart", icon: ShoppingBag },
+  { id: "food", label: "Food & Canteens", icon: UtensilsCrossed },
+  { id: "rentals", label: "Bike Rentals", icon: Bike },
+  { id: "barber", label: "Barber & Salon", icon: Scissors },
+  { id: "laundry", label: "Laundry & Wash", icon: Shirt },
+  { id: "water", label: "Water Delivery", icon: Droplet },
+  { id: "essentials", label: "Supermarket & Mart", icon: ShoppingBag },
 ] as const;
 
 const CATEGORY_PILLS = CATEGORIES.map((c) => ({ id: c.id, label: c.label, icon: c.icon }));
@@ -142,10 +143,10 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
                 </span>
-                <span>🔴 LIVE STARTING TODAY · NIGHT CANTEEN</span>
+                <span>LIVE STARTING TODAY · NIGHT CANTEEN</span>
               </div>
               <h3 className="text-sm sm:text-base font-black text-foreground flex items-center gap-1.5">
-                <span>🌙 Arman&apos;s Night Canteen is Officially LIVE!</span>
+                <span>Arman&apos;s Night Canteen is Officially LIVE!</span>
               </h3>
               <p className="text-xs text-muted-foreground max-w-lg font-medium">
                 Late night Maggi, hot chicken rolls, burgers, thick shakes &amp; combos delivered straight to
@@ -171,7 +172,9 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 relative z-10">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-black uppercase tracking-wider">
-                <span>🚀 1,000+ STUDENT SIGNUPS REQUIRED TO UNLOCK</span>
+                <span className="inline-flex items-center gap-1">
+                  <Sparkles className="size-3" /> 1,000+ STUDENT SIGNUPS REQUIRED TO UNLOCK
+                </span>
               </div>
               <h3 className="text-sm sm:text-base font-black text-foreground">
                 Want Night Canteens &amp; Store Delivery at {collegeName}?
@@ -329,7 +332,9 @@ export function MarketplaceClient({ profileId, collegeName = "Campus Hub" }: Mar
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
             <div className="space-y-0.5">
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-600 dark:text-pink-400 text-[9px] font-black uppercase tracking-wider">
-                <span>🚀 Want this at your campus?</span>
+                <span className="inline-flex items-center gap-1">
+                  <Sparkles className="size-3" /> Want this at your campus?
+                </span>
               </div>
               <h4 className="text-xs sm:text-sm font-black text-foreground">
                 Bring CampusLoop Marketplace to Your College

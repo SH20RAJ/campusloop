@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, User, VenetianMask } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import {
@@ -76,7 +76,11 @@ export function CommentItem({
   const isAnon = comment.isAnonymous;
   const displayName = isAnon ? "Anonymous Student" : comment.author?.displayName || "Student";
   const handle = isAnon ? comment.pseudonym || "anonymous" : comment.author?.username || "student";
-  const fallback = isAnon ? "🙈" : (comment.author?.displayName?.[0] ?? "S").toUpperCase();
+  const fallback: React.ReactNode = isAnon ? (
+    <VenetianMask className="size-4 text-purple-400" />
+  ) : (
+    (comment.author?.displayName?.[0] ?? "S").toUpperCase()
+  );
   const avatarUrl = isAnon
     ? ""
     : getAvatarUrl(comment.author?.avatarUrl, comment.author?.username ?? "student");
@@ -293,13 +297,23 @@ export function CommentItem({
                     type="button"
                     onClick={() => setReplyIsAnon(!replyIsAnon)}
                     className={cn(
-                      "text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors cursor-pointer",
+                      "text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors cursor-pointer inline-flex items-center gap-1",
                       replyIsAnon
                         ? "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30"
                         : "bg-muted/60 text-muted-foreground"
                     )}
                   >
-                    {replyIsAnon ? "🕶️ Anon" : "👤 Public"}
+                    {replyIsAnon ? (
+                      <>
+                        <VenetianMask className="size-3 text-purple-500" />
+                        <span>Anon</span>
+                      </>
+                    ) : (
+                      <>
+                        <User className="size-3" />
+                        <span>Public</span>
+                      </>
+                    )}
                   </button>
 
                   <div className="flex items-center gap-2">

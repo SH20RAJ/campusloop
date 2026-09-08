@@ -267,7 +267,7 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
             Official Channels
           </h2>
 
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <a
               href={SOCIAL_LINKS.instagram.url}
               target="_blank"

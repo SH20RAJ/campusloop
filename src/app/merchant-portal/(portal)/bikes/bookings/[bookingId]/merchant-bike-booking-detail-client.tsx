@@ -81,7 +81,7 @@ export function MerchantBikeBookingDetailClient({ bookingId }: MerchantBikeBooki
       } else {
         setHandoverPhotos((prev) => [...prev, url]);
       }
-      toast.success("Photo attached! 📸", { id: "upload-insp" });
+      toast.success("Photo attached!", { id: "upload-insp" });
     } catch {
       toast.error("Failed to upload photo", { id: "upload-insp" });
     } finally {
@@ -120,7 +120,7 @@ export function MerchantBikeBookingDetailClient({ bookingId }: MerchantBikeBooki
       });
 
       mutate();
-      toast.success("Handover Complete! Rental Started 🛵");
+      toast.success("Handover Complete! Rental Started");
       setShowHandoverModal(false);
     } catch {
       toast.error("Failed to start rental");
@@ -242,7 +242,7 @@ export function MerchantBikeBookingDetailClient({ bookingId }: MerchantBikeBooki
         <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs flex items-center justify-between font-bold">
           <div className="flex items-center gap-2">
             <AlertTriangle className="size-4 animate-bounce" />
-            <span>⚠️ Return is OVERDUE by {lateHours} hour(s)</span>
+            <span>Return is OVERDUE by {lateHours} hour(s)</span>
           </div>
           <span>
             Expected: {new Date(booking.endAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -275,7 +275,7 @@ export function MerchantBikeBookingDetailClient({ bookingId }: MerchantBikeBooki
         </div>
 
         {/* Verification Check Badges */}
-        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border/30">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-border/30">
           <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-center space-y-0.5">
             <CheckCircle2 className="size-3.5 text-emerald-500 mx-auto" />
             <p className="text-[10px] font-bold text-emerald-500">Student ID</p>

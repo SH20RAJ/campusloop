@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Clock, Droplet, Flame, Home, MapPin, Minus, Plus, ShieldCheck, Zap, Star, Truck } from "lucide-react";
+import { CheckCircle2, Clock, Droplet, Flame, Home, MapPin, Minus, Plus, Rocket, ShieldCheck, Zap, Star, Truck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
@@ -44,7 +44,7 @@ export function WaterMarketplaceClient({
   const primarySupplier = waterStores[0];
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 pb-20 select-none">
+    <div className="w-full max-w-4xl mx-auto space-y-6 pb-28 select-none">
       {/* ─── Hero Banner ─── */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-cyan-600 via-teal-600 to-blue-600 p-6 sm:p-8 text-white shadow-lg">
         <div className="relative z-10 max-w-lg space-y-2">
@@ -88,9 +88,10 @@ export function WaterMarketplaceClient({
             setSelectedCan(products[0] || { name: "20L Chilled RO Water Jar", price: 30 });
             setShowOrderModal(true);
           }}
-          className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black transition-all cursor-pointer shadow-md active:scale-95 shrink-0"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-6 py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black transition-all cursor-pointer shadow-md active:scale-95 shrink-0"
         >
-          Deliver to My Room 💧
+          <Droplet className="size-3.5 fill-current" />
+          <span>Deliver to My Room</span>
         </button>
       </div>
 
@@ -277,13 +278,20 @@ export function WaterMarketplaceClient({
                     setIsSubmitting(false);
                     setShowOrderModal(false);
                     alert(
-                      `Order Placed! 💧\n${canCount} Jar(s) arriving at ${hostelName}, ${roomNumber} in ~20 mins.`
+                      `Order Placed!\n${canCount} Jar(s) arriving at ${hostelName}, ${roomNumber} in ~20 mins.`
                     );
                   }, 700);
                 }}
-                className="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black transition-all cursor-pointer shadow-xs"
+                className="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black transition-all cursor-pointer shadow-xs inline-flex items-center justify-center gap-1.5"
               >
-                {isSubmitting ? "Dispatching..." : "Confirm Delivery 💧"}
+                {isSubmitting ? (
+                  <span>Dispatching...</span>
+                ) : (
+                  <>
+                    <Droplet className="size-3.5 fill-current" />
+                    <span>Confirm Delivery</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -295,7 +303,8 @@ export function WaterMarketplaceClient({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-600 dark:text-pink-400 text-[10px] font-black uppercase tracking-wider">
-              <span>🚀 Want this at your campus?</span>
+              <Rocket className="size-3" />
+              <span>Want this at your campus?</span>
             </div>
             <h4 className="text-sm font-black text-foreground">
               Bring 20L Water Delivery to Your College Hostels

@@ -187,13 +187,13 @@ export function AdminProductsClient() {
                     <td className="p-3 font-black text-foreground text-sm">₹{p.price}</td>
                     <td className="p-3">
                       {p.isVeg === true && (
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 font-bold text-[10px]">
-                          🟢 VEG
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 font-bold text-[10px]">
+                          <span className="size-1.5 rounded-full bg-emerald-500 inline-block" /> VEG
                         </span>
                       )}
                       {p.isVeg === false && (
-                        <span className="px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-500 font-bold text-[10px]">
-                          🔴 NON-VEG
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-500 font-bold text-[10px]">
+                          <span className="size-1.5 rounded-full bg-rose-500 inline-block" /> NON-VEG
                         </span>
                       )}
                       {p.isVeg === null && <span className="text-[10px] text-muted-foreground">—</span>}
@@ -213,9 +213,13 @@ export function AdminProductsClient() {
                         {togglingId === p.id ? (
                           <Loader2 className="size-3 animate-spin mx-auto" />
                         ) : p.isAvailable ? (
-                          "🟢 In Stock"
+                          <span className="inline-flex items-center gap-1">
+                            <span className="size-1.5 rounded-full bg-emerald-500 inline-block" /> In Stock
+                          </span>
                         ) : (
-                          "🔴 Out of Stock"
+                          <span className="inline-flex items-center gap-1">
+                            <span className="size-1.5 rounded-full bg-rose-500 inline-block" /> Out of Stock
+                          </span>
                         )}
                       </button>
                     </td>

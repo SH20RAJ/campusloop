@@ -35,11 +35,11 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
     let text = "";
     const cleanBody = cleanSnippet(post.body, 120);
     if (post.type === "CONFESSION") {
-      text = `🤫 Anonymous Confession on CampusLoop:\n"${cleanBody}"\n\nRead full tea at: ${postUrl}`;
+      text = `Anonymous Confession on CampusLoop:\n"${cleanBody}"\n\nRead full tea at: ${postUrl}`;
     } else if (post.type === "POLL") {
-      text = `📊 Campus Poll on CampusLoop:\n"${cleanBody}"\n\nCast your vote at: ${postUrl}`;
+      text = `Campus Poll on CampusLoop:\n"${cleanBody}"\n\nCast your vote at: ${postUrl}`;
     } else {
-      text = `🔥 Hot topic on CampusLoop:\n"${cleanBody}"\n\nJoin the discussion at: ${postUrl}`;
+      text = `Campus Discussion on CampusLoop:\n"${cleanBody}"\n\nJoin the discussion at: ${postUrl}`;
     }
 
     const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
@@ -91,7 +91,7 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
   function handleCopyLink() {
     navigator.clipboard.writeText(postUrl);
     setCopied(true);
-    toast.success("Link copied to clipboard! 🚀");
+    toast.success("Link copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   }
 
@@ -162,10 +162,10 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
     ctx.font = "bold 32px sans-serif";
     const postTypeBadge =
       post.type === "CONFESSION"
-        ? "🤫 ANONYMOUS CONFESSION"
+        ? "ANONYMOUS CONFESSION"
         : post.type === "POLL"
-          ? "📊 CAMPUS POLL"
-          : "🔥 CAMPUS PULSE";
+          ? "CAMPUS POLL"
+          : "CAMPUS PULSE";
     ctx.fillText(postTypeBadge, 140, 420);
 
     ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
@@ -223,7 +223,7 @@ export function ShareStoryModal({ post, isOpen, onClose }: ShareStoryModalProps)
     link.href = image;
     link.download = `campusloop-story-${post.id}.png`;
     link.click();
-    toast.success("Story card image downloaded! Upload it to Instagram Story 📲");
+    toast.success("Story card image downloaded! Upload it to Instagram Story");
   }
 
   if (!isOpen) return null;

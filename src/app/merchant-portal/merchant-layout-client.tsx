@@ -7,6 +7,7 @@ import {
   Clock,
   Copy,
   DollarSign,
+  Droplet,
   ExternalLink,
   Gauge,
   LayoutDashboard,
@@ -14,7 +15,9 @@ import {
   Menu,
   Package,
   QrCode,
+  Scissors,
   Settings,
+  Shirt,
   ShoppingBag,
   Star,
   Store,
@@ -219,15 +222,18 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
                 <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-1.5">
                   {merchant?.verticalType === "BARBER" ? (
                     <>
-                      <span>✂️ Barber &amp; Salon Console</span>
+                      <Scissors className="size-3.5" />
+                      <span>Barber &amp; Salon Console</span>
                     </>
                   ) : merchant?.verticalType === "LAUNDRY" ? (
                     <>
-                      <span>🧺 Laundry &amp; Wash Console</span>
+                      <Shirt className="size-3.5" />
+                      <span>Laundry &amp; Wash Console</span>
                     </>
                   ) : merchant?.verticalType === "WATER" ? (
                     <>
-                      <span>💧 RO Water Supply Console</span>
+                      <Droplet className="size-3.5" />
+                      <span>RO Water Supply Console</span>
                     </>
                   ) : (
                     <>
@@ -298,7 +304,7 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
                     navigator.clipboard.writeText(
                       `https://campusloop.space/app/marketplace/store/${merchant.id}`
                     );
-                    toast.success("Store link copied! 📋");
+                    toast.success("Store link copied!");
                   }}
                   className="size-8 rounded-xl bg-card border border-border/60 hover:bg-muted text-foreground flex items-center justify-center transition-colors cursor-pointer"
                   title="Copy Public Storefront Link"
@@ -391,7 +397,7 @@ export function MerchantLayoutClient({ children, profile, merchant }: MerchantLa
                         navigator.clipboard.writeText(
                           `https://campusloop.space/app/marketplace/store/${merchant.id}`
                         );
-                        toast.success("Store link copied! 📋");
+                        toast.success("Store link copied!");
                       }}
                       className="size-8 rounded-xl bg-card border border-border/60 hover:bg-muted text-foreground flex items-center justify-center transition-colors cursor-pointer"
                       title="Copy Public Storefront Link"

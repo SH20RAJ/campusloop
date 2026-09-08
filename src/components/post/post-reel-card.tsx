@@ -13,6 +13,7 @@ import {
   Share2,
   Volume2,
   VolumeX,
+  VenetianMask,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -190,7 +191,11 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     ? post.pseudonym || "Anonymous Student"
     : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
-  const avatarFallback = post.isAnonymous ? "🎭" : (post.author?.displayName?.[0] ?? "S");
+  const avatarFallback: React.ReactNode = post.isAnonymous ? (
+    <VenetianMask className="size-4 text-purple-400" />
+  ) : (
+    post.author?.displayName?.[0] ?? "S"
+  );
   const avatarUrl = post.isAnonymous
     ? ""
     : getAvatarUrl(post.author?.avatarUrl, post.author?.username ?? "student");
@@ -241,7 +246,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
       setIsReposted(true);
       setShowRepostModal(false);
       setQuoteThoughts("");
-      toast.success(isQuote ? "Quote posted to your campus timeline! ✨" : "Loop reposted! 🔄");
+      toast.success(isQuote ? "Quote posted to your campus timeline!" : "Loop reposted!");
     } catch {
       toast.error("Failed to repost.");
     } finally {
@@ -264,7 +269,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         .catch(() => {});
     } else {
       navigator.clipboard.writeText(shareUrl);
-      toast.success("Loop link copied to clipboard! 📋");
+      toast.success("Loop link copied to clipboard!");
     }
   }
 
@@ -274,7 +279,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     haptics.light();
     const nextSaved = !isSaved;
     setIsSaved(nextSaved);
-    toast.success(nextSaved ? "Saved to your bookmarks 🔖" : "Removed from bookmarks");
+    toast.success(nextSaved ? "Saved to your bookmarks" : "Removed from bookmarks");
     try {
       await fetch(`/api/posts/${post.id}/save`, { method: "POST" });
     } catch {

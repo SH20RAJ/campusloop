@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, CheckCircle2, MapPin, Phone, ShieldCheck } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Bike, CheckCircle2, Clock, KeyRound, MapPin, Phone, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -150,16 +150,51 @@ export function BikeBookingClient({ bookingId }: BikeBookingClientProps) {
         >
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <span className="text-sm font-black uppercase tracking-wider block">
-                {booking.status === "REQUESTED" && "🟡 Awaiting Merchant Confirmation"}
-                {booking.status === "CONFIRMED" && "🟢 Booking Confirmed"}
-                {booking.status === "READY_FOR_PICKUP" && "🔑 Ready for Pickup"}
-                {booking.status === "ACTIVE" && "🛵 Trip in Progress"}
-                {booking.status === "RETURNED" && "🔍 Return Inspected"}
-                {booking.status === "COMPLETED" && "🎉 Trip Completed"}
-                {booking.status === "CANCELLED" && "Cancelled"}
-                {booking.status === "REJECTED" && "Rejected by Merchant"}
-                {booking.status === "DISPUTED" && "⚠️ Deposit Under Dispute"}
+              <span className="text-sm font-black uppercase tracking-wider flex items-center gap-1.5 flex-wrap">
+                {booking.status === "REQUESTED" && (
+                  <>
+                    <Clock className="size-4 text-amber-500 shrink-0" />
+                    <span>Awaiting Merchant Confirmation</span>
+                  </>
+                )}
+                {booking.status === "CONFIRMED" && (
+                  <>
+                    <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
+                    <span>Booking Confirmed</span>
+                  </>
+                )}
+                {booking.status === "READY_FOR_PICKUP" && (
+                  <>
+                    <KeyRound className="size-4 text-primary shrink-0" />
+                    <span>Ready for Pickup</span>
+                  </>
+                )}
+                {booking.status === "ACTIVE" && (
+                  <>
+                    <Bike className="size-4 text-primary shrink-0" />
+                    <span>Trip in Progress</span>
+                  </>
+                )}
+                {booking.status === "RETURNED" && (
+                  <>
+                    <Search className="size-4 text-blue-500 shrink-0" />
+                    <span>Return Inspected</span>
+                  </>
+                )}
+                {booking.status === "COMPLETED" && (
+                  <>
+                    <Sparkles className="size-4 text-emerald-500 shrink-0" />
+                    <span>Trip Completed</span>
+                  </>
+                )}
+                {booking.status === "CANCELLED" && <span>Cancelled</span>}
+                {booking.status === "REJECTED" && <span>Rejected by Merchant</span>}
+                {booking.status === "DISPUTED" && (
+                  <>
+                    <AlertTriangle className="size-4 text-amber-500 shrink-0" />
+                    <span>Deposit Under Dispute</span>
+                  </>
+                )}
               </span>
               <p className="text-xs text-muted-foreground">
                 Reg: {booking.bike?.registrationNumber} · {booking.bike?.model}

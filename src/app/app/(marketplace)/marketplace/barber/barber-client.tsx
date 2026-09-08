@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, CheckCircle2, Clock, MapPin, Phone, Scissors, ShieldCheck, Zap, Star, Ticket, User, Users } from "lucide-react";
+import { Calendar, CheckCircle2, Clock, MapPin, Phone, Rocket, Scissors, ShieldCheck, Zap, Star, Ticket, User, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
@@ -41,7 +41,7 @@ export function BarberMarketplaceClient({
   const primaryBarber = barberStores[0];
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 pb-20 select-none">
+    <div className="w-full max-w-4xl mx-auto space-y-6 pb-28 select-none">
       {/* ─── Hero Banner ─── */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 p-6 sm:p-8 text-white shadow-lg">
         <div className="relative z-10 max-w-lg space-y-2">
@@ -117,13 +117,21 @@ export function BarberMarketplaceClient({
                   setActiveToken("09");
                 }, 600);
               }}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs shrink-0"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs shrink-0"
             >
-              {isBookingToken ? "Generating..." : "Get Live Token #09 🎟️"}
+              {isBookingToken ? (
+                <span>Generating...</span>
+              ) : (
+                <>
+                  <Ticket className="size-3.5" />
+                  <span>Get Live Token #09</span>
+                </>
+              )}
             </button>
           ) : (
-            <span className="px-3.5 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-black shadow-xs">
-              Token Confirmed ✅
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-black shadow-xs">
+              <CheckCircle2 className="size-3.5" />
+              <span>Token Confirmed</span>
             </span>
           )}
         </div>
@@ -243,12 +251,13 @@ export function BarberMarketplaceClient({
                   setSelectedService(null);
                   setActiveToken("09");
                   alert(
-                    `Slot booked for ${selectedService.name}! 🎉\nYour Live Token is #09. Please show this token at the salon counter.`
+                    `Slot booked for ${selectedService.name}!\nYour Live Token is #09. Please show this token at the salon counter.`
                   );
                 }}
-                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-black transition-all cursor-pointer shadow-xs"
+                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-black transition-all cursor-pointer shadow-xs inline-flex items-center justify-center gap-1.5"
               >
-                Confirm Slot ✂️
+                <Scissors className="size-3.5" />
+                <span>Confirm Slot</span>
               </button>
             </div>
           </div>
@@ -260,7 +269,8 @@ export function BarberMarketplaceClient({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-600 dark:text-pink-400 text-[10px] font-black uppercase tracking-wider">
-              <span>🚀 Want this at your campus?</span>
+              <Rocket className="size-3" />
+              <span>Want this at your campus?</span>
             </div>
             <h4 className="text-sm font-black text-foreground">
               Bring CampusLoop Salon Tokens to Your College

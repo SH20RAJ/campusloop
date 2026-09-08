@@ -192,8 +192,9 @@ export function MerchantAvailabilityClient() {
               ))}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground">
-              🟢 No active bookings overlapping this bike. It is open for new reservations!
+            <p className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
+              <span className="size-2 rounded-full bg-emerald-500 inline-block shrink-0" />
+              <span>No active bookings overlapping this bike. It is open for new reservations!</span>
             </p>
           )}
         </div>
@@ -285,8 +286,8 @@ export function MerchantAvailabilityClient() {
                   onChange={(e) => setBlockReason(e.target.value as any)}
                   className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
                 >
-                  <option value="MAINTENANCE">🔧 Scheduled Maintenance &amp; Servicing</option>
-                  <option value="MERCHANT_BLOCKED">🔒 Private Reserve / Unavailable</option>
+                  <option value="MAINTENANCE">Scheduled Maintenance &amp; Servicing</option>
+                  <option value="MERCHANT_BLOCKED">Private Reserve / Unavailable</option>
                 </select>
               </div>
 

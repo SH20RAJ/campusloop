@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck2, CheckCircle2, ShieldCheck } from "lucide-react";
+import { Bike, CalendarCheck2, CheckCircle2, KeyRound, Phone, Search, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -46,7 +46,7 @@ export function MerchantBikeBookingsClient() {
 
       if (!res.ok) throw new Error();
       mutate();
-      toast.success(`Booking status updated to ${nextStatus}! 🎉`);
+      toast.success(`Booking status updated to ${nextStatus}!`);
     } catch {
       toast.error("Failed to update status");
     } finally {
@@ -155,8 +155,11 @@ export function MerchantBikeBookingsClient() {
                     <p className="font-bold text-foreground">
                       {booking.student?.displayName} (@{booking.student?.username})
                     </p>
-                    <p className="text-[11px] text-muted-foreground">
-                      📞 {booking.customerPhone} · {booking.hostelAddress}
+                    <p className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
+                      <Phone className="size-3" />
+                      <span>{booking.customerPhone}</span>
+                      <span>·</span>
+                      <span>{booking.hostelAddress}</span>
                     </p>
                   </div>
                 </div>
@@ -220,9 +223,10 @@ export function MerchantBikeBookingsClient() {
                         type="button"
                         disabled={actioningId === booking.id}
                         onClick={() => handleAdvanceStatus(booking.id, "READY_FOR_PICKUP")}
-                        className="px-5 py-2 rounded-full bg-blue-500 hover:bg-blue-400 text-white font-black text-xs transition-all cursor-pointer shadow-xs"
+                        className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-blue-500 hover:bg-blue-400 text-white font-black text-xs transition-all cursor-pointer shadow-xs"
                       >
-                        Mark Ready for Pickup 🔑
+                        <KeyRound className="size-3.5" />
+                        <span>Mark Ready for Pickup</span>
                       </button>
                     )}
 
@@ -230,9 +234,10 @@ export function MerchantBikeBookingsClient() {
                     {booking.status === "READY_FOR_PICKUP" && (
                       <Link
                         href={`/merchant-portal/bikes/bookings/${booking.id}`}
-                        className="px-5 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all cursor-pointer shadow-xs"
+                        className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all cursor-pointer shadow-xs"
                       >
-                        Start Rental &amp; Handover 🛵
+                        <Bike className="size-3.5" />
+                        <span>Start Rental &amp; Handover</span>
                       </Link>
                     )}
 
@@ -240,9 +245,10 @@ export function MerchantBikeBookingsClient() {
                     {booking.status === "ACTIVE" && (
                       <Link
                         href={`/merchant-portal/bikes/bookings/${booking.id}`}
-                        className="px-5 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-black text-xs transition-all cursor-pointer shadow-xs"
+                        className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-black text-xs transition-all cursor-pointer shadow-xs"
                       >
-                        Mark Returned &amp; Inspect 🔍
+                        <Search className="size-3.5" />
+                        <span>Mark Returned &amp; Inspect</span>
                       </Link>
                     )}
 
@@ -252,9 +258,10 @@ export function MerchantBikeBookingsClient() {
                         type="button"
                         disabled={actioningId === booking.id}
                         onClick={() => handleAdvanceStatus(booking.id, "COMPLETED")}
-                        className="px-5 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all cursor-pointer shadow-xs"
+                        className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all cursor-pointer shadow-xs"
                       >
-                        Complete &amp; Settle Deposit 🎉
+                        <CheckCircle2 className="size-3.5" />
+                        <span>Complete &amp; Settle Deposit</span>
                       </button>
                     )}
 

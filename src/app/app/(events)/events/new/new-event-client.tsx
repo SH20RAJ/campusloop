@@ -515,7 +515,7 @@ export function NewEventClient() {
 
           <div>
             <label className="text-xs font-bold text-foreground">Event Mode</label>
-            <div className="mt-1.5 grid grid-cols-3 gap-2">
+            <div className="mt-1.5 grid grid-cols-1 sm:grid-cols-3 gap-2">
               {MODES.map((m) => (
                 <button
                   type="button"
@@ -622,7 +622,7 @@ export function NewEventClient() {
 
           <div>
             <label className="text-xs font-bold text-foreground">How can students join?</label>
-            <div className="mt-1.5 grid grid-cols-3 gap-2">
+            <div className="mt-1.5 grid grid-cols-1 sm:grid-cols-3 gap-2">
               {PARTICIPATION_TYPES.map((p) => (
                 <button
                   type="button"

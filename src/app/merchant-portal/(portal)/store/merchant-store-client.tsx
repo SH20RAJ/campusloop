@@ -78,7 +78,7 @@ export function MerchantStoreClient() {
 
       if (!res.ok) throw new Error();
       mutate();
-      toast.success("Store settings updated! 🎉");
+      toast.success("Store settings updated!");
     } catch {
       toast.error("Failed to update store settings");
     } finally {
@@ -91,7 +91,7 @@ export function MerchantStoreClient() {
     sounds.tap();
     haptics.light();
     navigator.clipboard.writeText(`https://campusloop.space/app/marketplace/store/${merchant.id}`);
-    toast.success("Store link copied to clipboard! 📋");
+    toast.success("Store link copied to clipboard!");
   }
 
   if (isLoading) {
@@ -229,7 +229,7 @@ export function MerchantStoreClient() {
             </label>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1.5">
               <span className="text-[11px] font-bold text-muted-foreground">Delivery Fee (₹)</span>
               <input

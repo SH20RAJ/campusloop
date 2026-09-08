@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronRight, Clock, History, Minus, Percent, Plus, Search, ShieldCheck, ShoppingBag, ShoppingCart, Zap } from "lucide-react";
+import { Check, ChevronRight, Clock, Cookie, History, Milk, Minus, PenTool, Percent, Plug, Plus, Search, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -18,12 +18,12 @@ interface SupermarketMarketplaceClientProps {
 }
 
 const MART_AISLES = [
-  { id: "all", label: "All Items 🛒" },
-  { id: "snacks", label: "Midnight Snacks 🍟" },
-  { id: "beverages", label: "Cold Drinks & Dairy 🥛" },
-  { id: "stationery", label: "Stationery & Exam ✍️" },
-  { id: "toiletries", label: "Grooming & Soap 🧼" },
-  { id: "dorm", label: "Hostel Essentials 🔌" },
+  { id: "all", label: "All Items", icon: ShoppingCart },
+  { id: "snacks", label: "Midnight Snacks", icon: Cookie },
+  { id: "beverages", label: "Cold Drinks & Dairy", icon: Milk },
+  { id: "stationery", label: "Stationery & Exam", icon: PenTool },
+  { id: "toiletries", label: "Grooming & Soap", icon: Sparkles },
+  { id: "dorm", label: "Hostel Essentials", icon: Plug },
 ] as const;
 
 export function SupermarketMarketplaceClient({
@@ -66,7 +66,7 @@ export function SupermarketMarketplaceClient({
   });
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 pb-20">
+    <div className="w-full max-w-5xl mx-auto space-y-6 pb-28">
       {/* ─── Flipkart/Blinkit Style Banner ─── */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-6 sm:p-8 text-white shadow-lg">
         <div className="relative z-10 max-w-lg space-y-2">
@@ -89,7 +89,7 @@ export function SupermarketMarketplaceClient({
       </div>
 
       {/* ─── Search & Order History Links ─── */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <input
@@ -107,7 +107,7 @@ export function SupermarketMarketplaceClient({
             sounds.tap();
             haptics.light();
           }}
-          className="flex items-center gap-1.5 h-11 px-4 rounded-2xl border border-border bg-card hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground transition-colors shrink-0 shadow-xs"
+          className="flex items-center justify-center gap-1.5 h-11 px-4 rounded-2xl border border-border bg-card hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground transition-colors shrink-0 shadow-xs"
         >
           <History className="size-3.5" />
           <span>Mart Orders</span>
@@ -118,6 +118,7 @@ export function SupermarketMarketplaceClient({
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
         {MART_AISLES.map((aisle) => {
           const isActive = selectedAisle === aisle.id;
+          const AisleIcon = aisle.icon;
           return (
             <button
               key={aisle.id}
@@ -128,13 +129,14 @@ export function SupermarketMarketplaceClient({
                 setSelectedAisle(aisle.id);
               }}
               className={cn(
-                "px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 border",
+                "inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 border",
                 isActive
                   ? "bg-foreground text-background border-foreground shadow-sm"
                   : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
               )}
             >
-              {aisle.label}
+              <AisleIcon className="size-3.5" />
+              <span>{aisle.label}</span>
             </button>
           );
         })}
@@ -169,8 +171,9 @@ export function SupermarketMarketplaceClient({
                     {s.name}
                   </h3>
                   <p className="text-[11px] text-muted-foreground truncate">{s.address}</p>
-                  <p className="text-[10px] font-bold text-emerald-500 mt-0.5">
-                    ⚡ {s.estimatedPrepTime || "15 mins"} delivery
+                  <p className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-500 mt-0.5">
+                    <Zap className="size-3 fill-emerald-500 text-emerald-500" />
+                    <span>{s.estimatedPrepTime || "15 mins"} delivery</span>
                   </p>
                 </div>
                 <ChevronRight className="size-4 text-muted-foreground shrink-0" />
@@ -298,7 +301,7 @@ export function SupermarketMarketplaceClient({
                             deliveryFee: p.deliveryFee || 15,
                             quantity: 1,
                           });
-                          toast.success(`Added ${p.name} to cart 🛒`);
+                          toast.success(`Added ${p.name} to cart`);
                         }}
                         className="h-7 px-3 rounded-xl bg-foreground text-background hover:opacity-90 active:scale-95 text-xs font-black transition-all flex items-center gap-1 shadow-xs cursor-pointer"
                       >

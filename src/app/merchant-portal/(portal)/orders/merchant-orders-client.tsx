@@ -172,7 +172,7 @@ export function MerchantOrdersClient() {
       newPlacedOrders.forEach((newOrder) => {
         const studentName = newOrder.student?.displayName || "Student";
         const loc = newOrder.deliveryAddress?.hostelName || "Campus";
-        toast.success(`🔔 NEW ORDER: #${newOrder.orderNumber} (₹${newOrder.total})`, {
+        toast.success(`NEW ORDER: #${newOrder.orderNumber} (₹${newOrder.total})`, {
           description: `${studentName} · ${loc} · ${newOrder.items?.length || 1} item(s)`,
           duration: 10000,
         });
@@ -243,7 +243,7 @@ export function MerchantOrdersClient() {
         }
 
         mutate();
-        toast.success(`Order ${actionLabel}! 🎉`);
+        toast.success(`Order ${actionLabel}!`);
       } catch (err: any) {
         toast.error(err.message || "Status update failed");
       } finally {
@@ -257,7 +257,7 @@ export function MerchantOrdersClient() {
     playNewOrderSound();
     sounds.pop();
     haptics.medium();
-    toast.info("🔊 Testing order chime sound!");
+    toast.info("Testing order chime sound!");
   }
 
   function handleCopyDetails(order: MarketplaceOrder) {
@@ -274,7 +274,7 @@ export function MerchantOrdersClient() {
       )
       .join("\n");
 
-    const text = `📦 Order #${order.orderNumber}
+    const text = `Order #${order.orderNumber}
 Student: ${order.student?.displayName || "Student"} (@${order.student?.username || ""})
 Location: ${order.deliveryAddress?.hostelName || "Campus"}, Room ${order.deliveryAddress?.roomNumber || ""}
 Phone: ${order.deliveryAddress?.phone || "N/A"}
@@ -311,7 +311,7 @@ ${itemsText}`;
               sounds.tap();
               haptics.light();
               setSoundEnabled((prev) => !prev);
-              toast.info(!soundEnabled ? "🔔 Sound notifications turned ON" : "🔕 Sound notifications muted");
+              toast.info(!soundEnabled ? "Sound notifications turned ON" : "Sound notifications muted");
             }}
             className={cn(
               "flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer",
@@ -400,11 +400,11 @@ ${itemsText}`;
             onChange={(e) => setSortBy(e.target.value as SortOption)}
             className="h-11 rounded-2xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground focus:border-foreground outline-none cursor-pointer"
           >
-            <option value="newest">🕒 Newest First</option>
-            <option value="oldest">⏳ Oldest First (Urgent)</option>
-            <option value="highest_total">💰 Highest Value (₹)</option>
-            <option value="delivery_only">🛵 Hostel Delivery Only</option>
-            <option value="pickup_only">🛍️ Store Pickup Only</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First (Urgent)</option>
+            <option value="highest_total">Highest Value (₹)</option>
+            <option value="delivery_only">Hostel Delivery Only</option>
+            <option value="pickup_only">Store Pickup Only</option>
           </select>
         </div>
       </div>

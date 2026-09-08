@@ -24,7 +24,7 @@ export function MerchantQrClient() {
     sounds.tap();
     haptics.light();
     navigator.clipboard.writeText(targetUrl);
-    toast.success("Store link copied to clipboard! 🚀");
+    toast.success("Store link copied to clipboard!");
   }
 
   function handlePrint() {
@@ -52,7 +52,7 @@ export function MerchantQrClient() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      toast.success("High-res QR Code PNG downloaded! 🖼️");
+      toast.success("High-res QR Code PNG downloaded!");
     } catch {
       toast.error("Failed to generate QR download");
     } finally {
@@ -137,8 +137,9 @@ export function MerchantQrClient() {
         </div>
 
         <div className="space-y-1 text-center">
-          <p className="text-xs font-black text-foreground">
-            ⚡ Quick Order · Instant Campus Delivery &amp; Pickup
+          <p className="text-xs font-black text-foreground inline-flex items-center gap-1">
+            <Zap className="size-3 text-amber-500 fill-amber-500" />
+            <span>Quick Order · Instant Campus Delivery &amp; Pickup</span>
           </p>
           <p className="text-[10px] text-muted-foreground font-medium">
             Powered by CampusLoop Marketplace · campusloop.space

@@ -14,18 +14,18 @@ import { cn } from "@/lib/utils";
 const STATUS_OPTIONS = [
   {
     value: "AVAILABLE",
-    label: "🟢 Available",
+    label: "Available",
     color: "text-emerald-500 bg-emerald-500/15 border-emerald-500/30",
   },
   {
     value: "BOOKED",
-    label: "🔵 Booked (Reserved)",
+    label: "Booked (Reserved)",
     color: "text-blue-400 bg-blue-500/15 border-blue-500/30",
   },
-  { value: "RENTED", label: "🟡 Rented Out", color: "text-amber-500 bg-amber-500/15 border-amber-500/30" },
+  { value: "RENTED", label: "Rented Out", color: "text-amber-500 bg-amber-500/15 border-amber-500/30" },
   {
     value: "MAINTENANCE",
-    label: "🔴 In Maintenance",
+    label: "In Maintenance",
     color: "text-rose-500 bg-rose-500/15 border-rose-500/30",
   },
 ];
@@ -277,10 +277,10 @@ export function MerchantFleetClient() {
                   onChange={(e) => setEditStatus(e.target.value)}
                   className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
                 >
-                  <option value="AVAILABLE">🟢 Available (Ready for rent)</option>
-                  <option value="BOOKED">🔵 Booked (Upcoming reservation)</option>
-                  <option value="RENTED">🟡 Rented Out (Currently on trip)</option>
-                  <option value="MAINTENANCE">🔴 In Maintenance (Blocked from booking)</option>
+                  <option value="AVAILABLE">Available (Ready for rent)</option>
+                  <option value="BOOKED">Booked (Upcoming reservation)</option>
+                  <option value="RENTED">Rented Out (Currently on trip)</option>
+                  <option value="MAINTENANCE">In Maintenance (Blocked from booking)</option>
                 </select>
               </div>
 

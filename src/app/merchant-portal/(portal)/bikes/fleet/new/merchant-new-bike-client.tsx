@@ -38,7 +38,7 @@ export function MerchantNewBikeClient() {
       toast.loading("Uploading bike photo...", { id: "upload-bike" });
       const res = await uploadImageToImgBB(files[0]);
       setImageUrl(res.displayUrl || res.url);
-      toast.success("Photo attached! 📸", { id: "upload-bike" });
+      toast.success("Photo attached!", { id: "upload-bike" });
     } catch {
       toast.error("Failed to upload image", { id: "upload-bike" });
     } finally {
@@ -89,7 +89,7 @@ export function MerchantNewBikeClient() {
 
       if (!res.ok) throw new Error("Failed to add vehicle");
 
-      toast.success("Bike added to fleet! 🛵");
+      toast.success("Bike added to fleet!");
       router.push("/merchant-portal/bikes/fleet");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to add bike");
@@ -238,7 +238,7 @@ export function MerchantNewBikeClient() {
             2. Rental Pricing &amp; Security Deposit
           </h2>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1.5">
               <label className="text-[11px] font-bold text-muted-foreground">Daily Price (₹) *</label>
               <input

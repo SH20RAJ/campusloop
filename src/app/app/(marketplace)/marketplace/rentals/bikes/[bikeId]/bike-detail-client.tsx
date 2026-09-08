@@ -12,6 +12,7 @@ import {
   HardHat,
   IdCard,
   ImagePlus,
+  Info,
   Loader2,
   Lock,
   MapPin,
@@ -102,7 +103,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
       toast.loading("Uploading license photo...", { id: "upload-doc" });
       const res = await uploadImageToImgBB(files[0]);
       setDrivingLicenseUrl(res.displayUrl || res.url);
-      toast.success("License photo attached! 📸", { id: "upload-doc" });
+      toast.success("License photo attached!", { id: "upload-doc" });
     } catch {
       toast.error("Failed to upload document", { id: "upload-doc" });
     } finally {
@@ -158,7 +159,7 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
       }
 
       const resData = (await res.json()) as { bookingId: string };
-      toast.success("Booking Requested Successfully! 🚲", { id: "book-bike" });
+      toast.success("Booking Requested Successfully!", { id: "book-bike" });
       router.push(`/app/marketplace/rentals/booking/${resData.bookingId}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to book bike", { id: "book-bike" });
@@ -303,7 +304,10 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
               {availability.isAvailableForDates ? (
                 <>
                   <CheckCircle2 className="size-4 shrink-0" />
-                  <span>🟢 Available for your selected dates ({availability.rentalDays} days)</span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <span>Available for your selected dates ({availability.rentalDays} days)</span>
+                  </span>
                 </>
               ) : (
                 <>
@@ -341,9 +345,12 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
               </span>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-400 font-medium leading-relaxed">
-              💡 <strong>Note:</strong> The ₹{bike.securityDeposit} security deposit is held safely during
-              your trip and refunded 100% directly upon returning the vehicle.
+            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-400 font-medium leading-relaxed flex items-start gap-1.5">
+              <Info className="size-3.5 shrink-0 mt-0.5" />
+              <span>
+                <strong>Note:</strong> The ₹{bike.securityDeposit} security deposit is held safely during
+                your trip and refunded 100% directly upon returning the vehicle.
+              </span>
             </div>
 
             <div className="pt-2 border-t border-border/30 flex items-center justify-between text-sm font-black text-foreground">

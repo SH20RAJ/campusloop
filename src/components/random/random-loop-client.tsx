@@ -1,6 +1,36 @@
 "use client";
 
-import { ArrowLeft, Loader2, MessageSquare, MoreVertical, Send, Shield, ShieldAlert, ShieldCheck, Zap, UserCheck, Video, X } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  Brain,
+  Code2,
+  Film,
+  Gamepad2,
+  Globe,
+  Heart,
+  Loader2,
+  Lock,
+  MessageSquare,
+  Moon,
+  MoreVertical,
+  Music,
+  Rocket,
+  School,
+  Send,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  Smile,
+  Sparkles,
+  Trophy,
+  UserCheck,
+  Video,
+  X,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -27,18 +57,18 @@ interface RandomLoopClientProps {
 }
 
 const INTEREST_CHIPS = [
-  { id: "fun", label: "😂 Just for fun" },
-  { id: "tech", label: "💻 Tech & Dev" },
-  { id: "study", label: "📚 Study & Exams" },
-  { id: "gaming", label: "🎮 Gaming" },
-  { id: "music", label: "🎵 Music & Vibe" },
-  { id: "sports", label: "🏏 Sports" },
-  { id: "movies", label: "🎬 Movies & Anime" },
-  { id: "startups", label: "🚀 Startups" },
-  { id: "relationships", label: "❤️ Relationships" },
-  { id: "latenight", label: "🌙 Late night talks" },
-  { id: "life", label: "🧠 Life & Career" },
-  { id: "surprise", label: "🎲 Surprise me" },
+  { id: "fun", label: "Just for fun", icon: Smile },
+  { id: "tech", label: "Tech & Dev", icon: Code2 },
+  { id: "study", label: "Study & Exams", icon: BookOpen },
+  { id: "gaming", label: "Gaming", icon: Gamepad2 },
+  { id: "music", label: "Music & Vibe", icon: Music },
+  { id: "sports", label: "Sports", icon: Trophy },
+  { id: "movies", label: "Movies & Anime", icon: Film },
+  { id: "startups", label: "Startups", icon: Rocket },
+  { id: "relationships", label: "Relationships", icon: Heart },
+  { id: "latenight", label: "Late night talks", icon: Moon },
+  { id: "life", label: "Life & Career", icon: Brain },
+  { id: "surprise", label: "Surprise me", icon: Sparkles },
 ];
 
 export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
@@ -96,7 +126,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
   useEffect(() => {
     if (session?.isBothVideoAccepted && !isVideoActive) {
       sounds.ting();
-      toast.success("Mutual video accepted! Connecting camera... 📹");
+      toast.success("Mutual video accepted! Connecting camera...");
       setIsVideoActive(true);
       setShowVideoConsentModal(false);
     } else if (
@@ -288,7 +318,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
         setIsVideoActive(true);
         setShowVideoConsentModal(false);
       } else {
-        toast.info("Video request sent! Waiting for consent 📹");
+        toast.info("Video request sent! Waiting for consent.");
       }
     } catch {
       toast.error("Could not request video");
@@ -310,7 +340,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
       if (data.isBothRevealed) {
         sounds.ting();
         haptics.success();
-        toast.success("🎉 You both revealed your identities!");
+        toast.success("You both revealed your identities!");
       } else {
         toast.info("Reveal request sent! Waiting for your partner to agree.");
       }
@@ -335,7 +365,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
       if (data.bothContinued && data.conversationId) {
         sounds.ting();
         haptics.success();
-        toast.success("❤️ Conversation saved to Messages!");
+        toast.success("Conversation saved to Messages!");
         router.push(`/app/chat`);
       } else {
         toast.info("Connection saved! Waiting for partner to also click Keep Talking.");
@@ -427,7 +457,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xl">🏫</span>
+                  <School className="size-6 text-primary" />
                   {selectedMode === "MY_CAMPUS" && <span className="size-2 rounded-full bg-primary" />}
                 </div>
                 <p className="text-sm font-black text-foreground">My Campus</p>
@@ -450,7 +480,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xl">🌎</span>
+                  <Globe className="size-6 text-primary" />
                   {selectedMode === "ANY_CAMPUS" && <span className="size-2 rounded-full bg-primary" />}
                 </div>
                 <p className="text-sm font-black text-foreground">Campus Hopper</p>
@@ -473,19 +503,21 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
             <div className="flex flex-wrap gap-2 pt-1">
               {INTEREST_CHIPS.map((chip) => {
                 const isSelected = selectedInterests.includes(chip.id);
+                const Icon = chip.icon;
                 return (
                   <button
                     key={chip.id}
                     type="button"
                     onClick={() => handleToggleInterest(chip.id)}
                     className={cn(
-                      "px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border",
+                      "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border",
                       isSelected
                         ? "bg-foreground text-background border-foreground font-black shadow-xs scale-105"
                         : "bg-muted/50 text-muted-foreground border-border/40 hover:text-foreground hover:bg-muted"
                     )}
                   >
-                    {chip.label}
+                    <Icon className="size-3.5" />
+                    <span>{chip.label}</span>
                   </button>
                 );
               })}
@@ -540,7 +572,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
           <p className="text-xs text-muted-foreground max-w-xs">
             Matching interests, checking campus eligibility, and finding a verified peer for you.
           </p>
-          <p className="text-[11px] font-bold text-primary pt-2">Someone is probably waiting right now 👀</p>
+          <p className="text-[11px] font-bold text-primary pt-2">Someone is probably waiting right now</p>
         </div>
 
         <button
@@ -618,7 +650,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
       {/* Conversation Starters Carousel */}
       <div className="bg-muted/20 border-b border-border/20 px-4 py-2 flex items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-xs">🎲</span>
+          <Sparkles className="size-3.5 text-primary shrink-0" />
           <p className="text-xs font-semibold text-foreground/90 truncate">
             {RANDOM_LOOP_STARTERS[starterIndex % RANDOM_LOOP_STARTERS.length]}
           </p>
@@ -683,7 +715,8 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
             onClick={handleNextPerson}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 hover:bg-muted text-xs font-bold text-foreground transition-colors cursor-pointer border border-border/40"
           >
-            <span>Next Person ➡️</span>
+            <span>Next Person</span>
+            <ArrowRight className="size-3" />
           </button>
 
           <div className="flex items-center gap-2">
@@ -701,7 +734,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
                 title="Switch conversation to video with mutual consent"
               >
                 <Video className="size-3.5" />
-                <span>{session?.myVideoRequested ? "Video Sent" : "Video 📹"}</span>
+                <span>{session?.myVideoRequested ? "Video Sent" : "Video"}</span>
               </button>
             )}
 
@@ -725,13 +758,14 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
               type="button"
               onClick={handleContinueInMessages}
               className={cn(
-                "flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border",
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border",
                 session?.myContinue
                   ? "bg-rose-500/15 text-rose-500 border-rose-500/30 font-black"
                   : "bg-muted/40 hover:bg-muted border-border/40 text-muted-foreground hover:text-foreground"
               )}
             >
-              <span>❤️ {session?.myContinue ? "Keep Talking (Waiting)" : "Keep Talking"}</span>
+              <Heart className="size-3 text-rose-500 fill-rose-500 shrink-0" />
+              <span>{session?.myContinue ? "Keep Talking (Waiting)" : "Keep Talking"}</span>
             </button>
           </div>
         </div>
@@ -775,15 +809,15 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
 
             <ul className="text-xs text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
-                <span>🛡️</span>
+                <ShieldCheck className="size-4 text-emerald-500 shrink-0 mt-0.5" />
                 <span>Your identity and profile picture remain hidden unless both agree to reveal.</span>
               </li>
               <li className="flex items-start gap-2">
-                <span>🔒</span>
+                <Lock className="size-4 text-primary shrink-0 mt-0.5" />
                 <span>Sharing phone numbers, emails, and social handles is restricted.</span>
               </li>
               <li className="flex items-start gap-2">
-                <span>🚨</span>
+                <AlertTriangle className="size-4 text-rose-500 shrink-0 mt-0.5" />
                 <span>You can disconnect, block, or report at any moment.</span>
               </li>
             </ul>
@@ -895,7 +929,7 @@ export function RandomLoopClient({ currentProfile }: RandomLoopClientProps) {
               <Video className="size-7" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-base font-black text-white">Video Request 📹</h3>
+              <h3 className="text-base font-black text-white">Video Request</h3>
               <p className="text-xs text-zinc-400">
                 {partner?.displayName || "Anonymous Student"} wants to switch this conversation to video.
               </p>

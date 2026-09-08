@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Clock, Flame, History, MapPin, Minus, Percent, Plus, Search, ShieldCheck, Zap, Star, UtensilsCrossed } from "lucide-react";
+import { ChevronRight, Clock, Coffee, Flame, GlassWater, History, Leaf, MapPin, Minus, Moon, Percent, Plus, Search, ShieldCheck, Soup, Sparkles, Star, Utensils, UtensilsCrossed, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -20,12 +20,12 @@ interface FoodMarketplaceClientProps {
 
 const FOOD_TAGS = [
   { id: "all", label: "All Spots", icon: UtensilsCrossed },
-  { id: "veg", label: "Pure Veg 🥦" },
-  { id: "momos", label: "Momos & Rolls 🥟" },
-  { id: "thali", label: "Thali & Meals 🍛" },
-  { id: "night", label: "Late Night 🌙" },
-  { id: "snacks", label: "Maggi & Chai ☕" },
-  { id: "desserts", label: "Beverages & Shakes 🥤" },
+  { id: "veg", label: "Pure Veg", icon: Leaf },
+  { id: "momos", label: "Momos & Rolls", icon: Utensils },
+  { id: "thali", label: "Thali & Meals", icon: Soup },
+  { id: "night", label: "Late Night", icon: Moon },
+  { id: "snacks", label: "Maggi & Chai", icon: Coffee },
+  { id: "desserts", label: "Beverages & Shakes", icon: GlassWater },
 ] as const;
 
 export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }: FoodMarketplaceClientProps) {
@@ -117,10 +117,10 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
               </span>
-              <span>🔴 LIVE STARTING TODAY · NIGHT CANTEEN</span>
+              <span>LIVE STARTING TODAY · NIGHT CANTEEN</span>
             </div>
             <h3 className="text-sm sm:text-base font-black text-foreground flex items-center gap-1.5">
-              <span>🌙 Arman&apos;s Night Canteen is Officially LIVE!</span>
+              <span>Arman&apos;s Night Canteen is Officially LIVE!</span>
             </h3>
             <p className="text-xs text-muted-foreground max-w-lg font-medium">
               Sizzling Maggi, double egg chicken rolls, burgers, thick shakes &amp; combos delivered to your
@@ -534,7 +534,7 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
               }}
               className="px-6 py-2.5 rounded-2xl bg-card border border-border hover:bg-muted text-xs font-black text-foreground shadow-xs transition-all active:scale-95 cursor-pointer"
             >
-              Load More Dishes 🍲
+              Load More Dishes
             </button>
           </div>
         )}
@@ -545,7 +545,9 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-600 dark:text-pink-400 text-[10px] font-black uppercase tracking-wider">
-              <span>🚀 Want this at your campus?</span>
+              <span className="inline-flex items-center gap-1">
+                <Sparkles className="size-3" /> Want this at your campus?
+              </span>
             </div>
             <h4 className="text-sm font-black text-foreground">
               Bring CampusLoop Food Delivery to Your College

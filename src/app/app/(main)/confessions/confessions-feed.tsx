@@ -224,7 +224,7 @@ export function ConfessionsFeed() {
           </div>
 
           {/* ─── Flat Twitter Tabs (Zero Raw Emojis, Clean Lucide Icons) ─── */}
-          <div className="grid grid-cols-4 border-t border-border/20 text-center font-bold text-xs">
+          <div className="grid grid-cols-4 border-t border-border/20 text-center font-bold text-[11px] sm:text-xs">
             {CONFESSION_TABS.map((tab) => {
               const isActive = currentSort === tab.id;
               const TabIcon = tab.icon;

@@ -71,7 +71,7 @@ export function SupermarketDashboardClient() {
       });
       if (!res.ok) throw new Error();
       mutate();
-      toast.success(merchant.isOpen ? "Mart marked as CLOSED" : "Mart is now OPEN for hostel orders! 🛒");
+      toast.success(merchant.isOpen ? "Mart marked as CLOSED" : "Mart is now OPEN for hostel orders!");
     } catch {
       toast.error("Failed to update store status");
     } finally {

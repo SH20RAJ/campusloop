@@ -23,6 +23,7 @@ import {
   Store,
   Trash2,
   User,
+  UtensilsCrossed,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -158,7 +159,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
       : "\nPassword: (unchanged — set a new one above to share it)";
     const text = `CampusLoop Merchant Portal Credentials\nStore: ${name}\nLogin URL: https://campusloop.space/merchant-portal/login\nUsername: ${loginUsername}${passwordLine}`;
     navigator.clipboard.writeText(text);
-    toast.success("Credentials copied to clipboard! 📋");
+    toast.success("Credentials copied to clipboard!");
   }
 
   async function handleSaveCredentials(e: React.FormEvent) {
@@ -187,7 +188,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
 
       sounds.ting();
       haptics.success();
-      toast.success("Merchant login credentials updated successfully! 🔑");
+      toast.success("Merchant login credentials updated successfully!");
       mutate();
     } catch (err: any) {
       toast.error(err.message || "Failed to update credentials");
@@ -229,7 +230,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
 
       sounds.ting();
       haptics.success();
-      toast.success("Merchant profile updated successfully! 🎉");
+      toast.success("Merchant profile updated successfully!");
       mutate();
     } catch (err: any) {
       toast.error(err.message || "Failed to update");
@@ -310,7 +311,7 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
         });
 
         if (!res.ok) throw new Error("Failed to create product");
-        toast.success("Product added to menu! 🍽️");
+        toast.success("Product added to menu!");
       }
 
       mutate();
@@ -556,12 +557,12 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                   onChange={(e) => setCategorySlug(e.target.value)}
                   className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
                 >
-                  <option value="food">🍔 Food &amp; Canteens</option>
-                  <option value="rentals">🚲 Bike &amp; Vehicle Rentals</option>
-                  <option value="barber">✂️ Barber &amp; Salon</option>
-                  <option value="laundry">🧺 Laundry &amp; Wash</option>
-                  <option value="water">💧 20L Water Delivery</option>
-                  <option value="essentials">🛒 Supermarket &amp; Mart</option>
+                  <option value="food">Food &amp; Canteens</option>
+                  <option value="rentals">Bike &amp; Vehicle Rentals</option>
+                  <option value="barber">Barber &amp; Salon</option>
+                  <option value="laundry">Laundry &amp; Wash</option>
+                  <option value="water">20L Water Delivery</option>
+                  <option value="essentials">Supermarket &amp; Mart</option>
                 </select>
               </div>
             </div>
@@ -912,7 +913,9 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                       {p.imageUrl ? (
                         <img src={p.imageUrl} alt={p.name} className="size-full object-cover" />
                       ) : (
-                        <div className="size-full flex items-center justify-center text-xs">🍽️</div>
+                        <div className="size-full flex items-center justify-center text-muted-foreground">
+                          <UtensilsCrossed className="size-4" />
+                        </div>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -927,7 +930,18 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                         {p.originalPrice && (
                           <span className="line-through text-[11px]">₹{p.originalPrice}</span>
                         )}
-                        <span>· {p.isAvailable ? "🟢 In Stock" : "🔴 Out of Stock"}</span>
+                        <span>
+                          ·{" "}
+                          {p.isAvailable ? (
+                            <span className="inline-flex items-center gap-1 text-emerald-500 font-bold text-[11px]">
+                              <span className="size-1.5 rounded-full bg-emerald-500 inline-block" /> In Stock
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-rose-500 font-bold text-[11px]">
+                              <span className="size-1.5 rounded-full bg-rose-500 inline-block" /> Out of Stock
+                            </span>
+                          )}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -1197,8 +1211,8 @@ export function AdminMerchantEditClient({ merchantId }: AdminMerchantEditClientP
                     onChange={(e) => setProdIsVeg(e.target.value === "veg")}
                     className="w-full h-10 rounded-xl bg-muted/40 border border-border px-3 text-xs font-bold text-foreground outline-none"
                   >
-                    <option value="veg">🟢 Pure Veg</option>
-                    <option value="nonveg">🔴 Non-Veg</option>
+                    <option value="veg">Pure Veg</option>
+                    <option value="nonveg">Non-Veg</option>
                   </select>
                 </div>
               </div>

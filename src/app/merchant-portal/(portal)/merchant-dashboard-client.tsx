@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Check, Copy, ExternalLink, Loader2, Power, Volume2, VolumeX } from "lucide-react";
+import { Bell, Check, Copy, ExternalLink, Loader2, MapPin, Phone, Power, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -67,7 +67,7 @@ export function MerchantDashboardClient() {
 
       if (!res.ok) throw new Error();
       mutate();
-      toast.success(nextState ? "🟢 Store is now OPEN for orders!" : "🔴 Store marked as CLOSED");
+      toast.success(nextState ? "Store is now OPEN for orders!" : "Store marked as CLOSED");
     } catch {
       toast.error("Could not update store status");
     } finally {
@@ -89,7 +89,7 @@ export function MerchantDashboardClient() {
 
       if (!res.ok) throw new Error();
       mutate();
-      toast.success(`Order status updated to ${nextStatus}! 🎉`);
+      toast.success(`Order status updated to ${nextStatus}!`);
     } catch {
       toast.error("Failed to update order status");
     } finally {
@@ -102,7 +102,7 @@ export function MerchantDashboardClient() {
     sounds.tap();
     haptics.light();
     navigator.clipboard.writeText(`https://campusloop.space/app/marketplace/store/${merchant.id}`);
-    toast.success("Public store link copied to clipboard! 📋");
+    toast.success("Public store link copied to clipboard!");
   }
 
   if (isLoading) {
@@ -125,7 +125,7 @@ export function MerchantDashboardClient() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card border border-border/40 p-5 rounded-3xl shadow-xs">
         <div>
           <h1 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
-            <span>Good afternoon, {merchant?.name || "Partner"} 👋</span>
+            <span>Good afternoon, {merchant?.name || "Partner"}</span>
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             {merchant?.address} · Campus Partner Dashboard
@@ -162,7 +162,7 @@ export function MerchantDashboardClient() {
             onClick={() => {
               setAudioAlertsEnabled(!audioAlertsEnabled);
               toast.info(
-                !audioAlertsEnabled ? "🔊 Order sound alerts enabled" : "🔇 Order sound alerts muted"
+                !audioAlertsEnabled ? "Order sound alerts enabled" : "Order sound alerts muted"
               );
             }}
             className={cn(
@@ -193,7 +193,19 @@ export function MerchantDashboardClient() {
             )}
           >
             <Power className="size-3.5" />
-            <span>{merchant?.isOpen ? "🟢 Store Open" : "🔴 Store Closed"}</span>
+            <span>
+              {merchant?.isOpen ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Store Open
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="size-2 rounded-full bg-rose-500" />
+                  Store Closed
+                </span>
+              )}
+            </span>
           </button>
         </div>
       </div>
@@ -257,8 +269,9 @@ export function MerchantDashboardClient() {
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/30 pb-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-black text-foreground">
-                      🔔 NEW ORDER #{order.orderNumber}
+                    <span className="text-base font-black text-foreground inline-flex items-center gap-1.5">
+                      <Bell className="size-4 text-amber-500 animate-bounce" />
+                      <span>NEW ORDER #{order.orderNumber}</span>
                     </span>
                     <span className="text-xs font-bold text-muted-foreground">
                       · {formatTimeAgo(order.createdAt)}
@@ -295,12 +308,17 @@ export function MerchantDashboardClient() {
                 {order.deliveryAddress && (
                   <div className="p-3 rounded-2xl bg-muted/40 text-xs text-muted-foreground space-y-1">
                     {order.deliveryAddress.hostelName && (
-                      <p className="font-bold text-foreground">
-                        📍 Deliver to: {order.deliveryAddress.hostelName}, Room{" "}
-                        {order.deliveryAddress.roomNumber}
+                      <p className="font-bold text-foreground inline-flex items-center gap-1">
+                        <MapPin className="size-3.5 text-primary" />
+                        <span>Deliver to: {order.deliveryAddress.hostelName}, Room {order.deliveryAddress.roomNumber}</span>
                       </p>
                     )}
-                    {order.deliveryAddress.phone && <p>📞 Phone: {order.deliveryAddress.phone}</p>}
+                    {order.deliveryAddress.phone && (
+                      <p className="inline-flex items-center gap-1">
+                        <Phone className="size-3" />
+                        <span>Phone: {order.deliveryAddress.phone}</span>
+                      </p>
+                    )}
                     {order.customerNote && <p className="italic">Note: "{order.customerNote}"</p>}
                   </div>
                 )}

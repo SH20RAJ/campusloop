@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, ArrowLeft, Cake, Camera, Check, Image as ImageIcon, Loader2, Lock, Move, Plus, Save, ShieldCheck, Zap, User, VenetianMask, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, Cake, Camera, Check, Image as ImageIcon, Loader2, Lock, Move, Plus, Save, ShieldCheck, Sparkles, Zap, User, VenetianMask, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -154,7 +154,7 @@ export function EditProfileClient() {
       const res = await uploadImageToImgBB(file);
       const newUrl = res.displayUrl || res.url;
       setPhotos((prev) => [...prev, newUrl]);
-      toast.success("Photo added to dating gallery! 📸", { id: "dating-photo" });
+      toast.success("Photo added to dating gallery!", { id: "dating-photo" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed", { id: "dating-photo" });
     } finally {
@@ -171,7 +171,7 @@ export function EditProfileClient() {
     const seed = username.trim() || displayName.trim() || "student";
     const generated = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`;
     setAvatarUrl(generated);
-    toast.success("Generated new Campus avatar! 🎨");
+    toast.success("Generated new Campus avatar!");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -359,12 +359,12 @@ export function EditProfileClient() {
                 <div className="flex items-center gap-2">
                   <h3 className="text-xs font-bold text-foreground">Profile Avatar</h3>
                   {avatarUrl && !avatarUrl.includes("dicebear.com") ? (
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                      📸 Real Photo Verified (+50 LP)
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 inline-flex items-center gap-1">
+                      <Camera className="size-3" /> Real Photo Verified (+50 LP)
                     </span>
                   ) : (
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                      🎁 Upload real photo for 3x boost
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 inline-flex items-center gap-1">
+                      <Sparkles className="size-3" /> Upload real photo for 3x boost
                     </span>
                   )}
                 </div>
@@ -551,7 +551,7 @@ export function EditProfileClient() {
           {/* Gender Selector */}
           <div className="space-y-1.5 pt-1">
             <label className="text-xs font-semibold text-muted-foreground">Gender Identification</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {(["MALE", "FEMALE", "OTHER"] as const).map((g) => (
                 <button
                   key={g}
@@ -631,7 +631,9 @@ export function EditProfileClient() {
               )}
             </div>
             <div className="relative">
-              <span className="absolute left-3.5 top-2 text-xs font-bold text-muted-foreground">🎭 @</span>
+              <span className="absolute left-3.5 top-2 text-xs font-bold text-muted-foreground inline-flex items-center gap-1">
+                <VenetianMask className="size-3.5" /> @
+              </span>
               <input
                 type="text"
                 value={anonUsername}

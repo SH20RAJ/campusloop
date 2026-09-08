@@ -37,14 +37,14 @@ const statusTabs: { value: PostStatusFilter; label: string }[] = [
 ];
 
 const originTabs: { value: PostOriginFilter; label: string }[] = [
-  { value: "ALL", label: "All Posts" },
-  { value: "REAL", label: "Student Posts" },
-  { value: "SEEDED", label: "Platform Seeded" },
+  { value: "all", label: "All Posts" },
+  { value: "real", label: "Student Posts" },
+  { value: "seeded", label: "Platform Seeded" },
 ];
 
 const anonTabs: { value: PostAnonFilter; label: string }[] = [
-  { value: "ALL", label: "All Identities" },
-  { value: "named", label: "Public Profile" },
+  { value: "all", label: "All Identities" },
+  { value: "public", label: "Public Profile" },
   { value: "anon", label: "Anonymous" },
 ];
 
@@ -292,7 +292,7 @@ export function PostsTable({
 
         {/* Anonymity Filter + Search */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-xs font-bold text-muted-foreground mr-1 shrink-0">Type:</span>
             {anonTabs.map((tab) => (
               <button
@@ -444,7 +444,13 @@ export function PostsTable({
                           statusBadgeTone[post.status] ?? "bg-muted text-muted-foreground border-border"
                         }`}
                       >
-                        {post.status === "HIDDEN" ? "🙈 HIDDEN / UNLISTED" : post.status}
+                        {post.status === "HIDDEN" ? (
+                          <span className="inline-flex items-center gap-1">
+                            <EyeOff className="size-3" /> HIDDEN / UNLISTED
+                          </span>
+                        ) : (
+                          post.status
+                        )}
                       </span>
                     </td>
 

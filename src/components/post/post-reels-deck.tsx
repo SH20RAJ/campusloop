@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, ChevronRight, Search, Zap } from "lucide-react";
+import { Building2, ChevronRight, Search, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
@@ -327,9 +327,12 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
                 {campusName || "Birla Institute of Technology"}
               </h1>
               <p className="text-[11px] text-muted-foreground truncate font-medium flex items-center gap-1.5 mt-0.5">
-                <span>👥 Campus Community</span>
+                <span className="inline-flex items-center gap-1">
+                  <Users className="size-3 text-purple-400" />
+                  <span>Campus Community</span>
+                </span>
                 <span>·</span>
-                <span>👥 3.2K members</span>
+                <span>3.2K members</span>
               </p>
             </div>
           </Link>

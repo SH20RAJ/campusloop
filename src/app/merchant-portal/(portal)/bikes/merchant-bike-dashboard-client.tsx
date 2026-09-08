@@ -36,7 +36,7 @@ export function MerchantBikeDashboardClient() {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-4">
         <Skeleton className="h-28 rounded-3xl" />
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Skeleton className="h-24 rounded-2xl" />
           <Skeleton className="h-24 rounded-2xl" />
           <Skeleton className="h-24 rounded-2xl" />
@@ -73,7 +73,7 @@ export function MerchantBikeDashboardClient() {
       </div>
 
       {/* ─── Top Operational Status Counters (PRD Item 7) ─── */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 space-y-1 shadow-2xs">
           <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-emerald-500" />

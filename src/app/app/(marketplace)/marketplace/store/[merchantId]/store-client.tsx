@@ -183,7 +183,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
       selectedAddons,
     });
 
-    toast.success(`Added ${quantity}x "${selectedProduct.name}" to cart! 🛍️`);
+    toast.success(`Added ${quantity}x "${selectedProduct.name}" to cart!`);
     setSelectedProduct(null);
   }
 
@@ -204,7 +204,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
         .catch(() => {});
     } else {
       navigator.clipboard.writeText(shareUrl);
-      toast.success("Store link copied to clipboard! 📋");
+      toast.success("Store link copied to clipboard!");
     }
   }
 
@@ -230,7 +230,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
         throw new Error(data.error || "Failed to submit review");
       }
 
-      toast.success("Thank you for your review! ⭐");
+      toast.success("Thank you for your review!");
       mutateReviews();
       setIsReviewModalOpen(false);
       setReviewComment("");
@@ -355,13 +355,19 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
         <div className="absolute top-3 right-3">
           <span
             className={cn(
-              "px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider backdrop-blur-md border shadow-xs",
+              "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider backdrop-blur-md border shadow-xs",
               store.isOpen
                 ? "bg-emerald-500/80 text-white border-emerald-400/40"
                 : "bg-rose-500/80 text-white border-rose-400/40"
             )}
           >
-            {store.isOpen ? "🟢 Open Now" : "🔴 Currently Closed"}
+            <span
+              className={cn(
+                "size-1.5 rounded-full",
+                store.isOpen ? "bg-white animate-pulse" : "bg-white/70"
+              )}
+            />
+            <span>{store.isOpen ? "Open Now" : "Currently Closed"}</span>
           </span>
         </div>
       </div>
@@ -1066,11 +1072,11 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
                   ))}
                 </div>
                 <span className="text-xs font-black text-amber-500">
-                  {reviewRating === 5 && "Outstanding! ⭐⭐⭐⭐⭐"}
-                  {reviewRating === 4 && "Great Experience! ⭐⭐⭐⭐"}
-                  {reviewRating === 3 && "Average ⭐⭐⭐"}
-                  {reviewRating === 2 && "Needs Improvement ⭐⭐"}
-                  {reviewRating === 1 && "Poor Experience ⭐"}
+                  {reviewRating === 5 && "Outstanding!"}
+                  {reviewRating === 4 && "Great Experience!"}
+                  {reviewRating === 3 && "Average"}
+                  {reviewRating === 2 && "Needs Improvement"}
+                  {reviewRating === 1 && "Poor Experience"}
                 </span>
               </div>
 

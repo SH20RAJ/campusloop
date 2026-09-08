@@ -158,7 +158,7 @@ export function CheckoutClient({ profileId, collegeName = "Campus Hub" }: Checko
       }
 
       const data = (await res.json()) as { primaryOrderId: string };
-      toast.success("Order Placed Successfully! 🎉", { id: "checkout" });
+      toast.success("Order Placed Successfully!", { id: "checkout" });
       clearCart();
       router.push(`/app/marketplace/order/${data.primaryOrderId}`);
     } catch (err) {

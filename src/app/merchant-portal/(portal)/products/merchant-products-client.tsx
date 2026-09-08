@@ -43,7 +43,7 @@ export function MerchantProductsClient() {
 
       if (!res.ok) throw new Error();
       mutate();
-      toast.success(!currentAvailable ? "Item marked as AVAILABLE ✅" : "Item marked as OUT OF STOCK 🔴");
+      toast.success(!currentAvailable ? "Item marked as Available" : "Item marked as Out of Stock");
     } catch {
       toast.error("Failed to update availability");
     } finally {

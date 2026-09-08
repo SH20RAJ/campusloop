@@ -8,7 +8,9 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
+  Flame,
   KeyRound,
+  Leaf,
   Package,
   Plus,
   RefreshCw,
@@ -18,6 +20,7 @@ import {
   ShieldCheck,
   Shirt,
   ShoppingBag,
+  Star,
   Store,
   Trash2,
   UtensilsCrossed,
@@ -158,7 +161,7 @@ export function AdminMarketplaceClient() {
 
       sounds.ting();
       haptics.success();
-      toast.success("New password issued — copy it now, it cannot be shown again. 🔑");
+      toast.success("New password issued — copy it now, it cannot be shown again.");
       mutate();
       setRevealedPassword(data.temporaryPassword);
       setShowPassword(true);
@@ -182,7 +185,7 @@ export function AdminMarketplaceClient() {
 
     const text = `*CampusLoop Merchant Portal Credentials*\n\nStore: ${merchant.name}\nCampus: ${merchant.institution?.name || "Campus Hub"}\n\nLogin URL: https://campusloop.space/merchant-portal/login\nUsername: ${merchant.loginUsername || merchant.slug}\nPassword: ${activePass}\n\nPlease login and manage your store menu, pricing, and live customer orders!`;
     navigator.clipboard.writeText(text);
-    toast.success("Copied WhatsApp invitation message! 📲");
+    toast.success("Copied WhatsApp invitation message!");
   }
 
   // Save product in store modal
@@ -210,7 +213,7 @@ export function AdminMarketplaceClient() {
           }),
         });
         if (!res.ok) throw new Error();
-        toast.success("Product updated! ✨");
+        toast.success("Product updated!");
       } else {
         // Add new product
         const res = await fetch("/api/admin/marketplace/products", {
@@ -226,7 +229,7 @@ export function AdminMarketplaceClient() {
           }),
         });
         if (!res.ok) throw new Error();
-        toast.success("Product added to catalog! 🛒");
+        toast.success("Product added to catalog!");
       }
 
       setProductModalStore(null);
@@ -251,7 +254,7 @@ export function AdminMarketplaceClient() {
         body: JSON.stringify({ isOpen: nextIsOpen }),
       });
       if (!res.ok) throw new Error();
-      toast.success(`${store.name} is now ${nextIsOpen ? "OPEN 🟢" : "CLOSED 🔴"}`);
+      toast.success(`${store.name} is now ${nextIsOpen ? "OPEN" : "CLOSED"}`);
       mutate();
     } catch {
       toast.error("Failed to update store status");
@@ -269,7 +272,7 @@ export function AdminMarketplaceClient() {
         body: JSON.stringify({ id: prodId, isAvailable: !currentAvailable }),
       });
       if (!res.ok) throw new Error();
-      toast.success(`Product marked ${!currentAvailable ? "In Stock 🟢" : "Out of Stock 🔴"}`);
+      toast.success(`Product marked ${!currentAvailable ? "In Stock" : "Out of Stock"}`);
       mutate();
     } catch {
       toast.error("Failed to update product stock");
@@ -478,7 +481,17 @@ export function AdminMarketplaceClient() {
                                   )}
                                   title={`Click to ${store.isOpen ? "Close" : "Open"} store`}
                                 >
-                                  {store.isOpen ? "🟢 OPEN" : "🔴 CLOSED"}
+                                  {store.isOpen ? (
+                                    <span className="inline-flex items-center gap-1.5">
+                                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                      OPEN
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1.5">
+                                      <span className="size-1.5 rounded-full bg-rose-500" />
+                                      CLOSED
+                                    </span>
+                                  )}
                                 </button>
                               </div>
                               <p className="text-xs text-muted-foreground">
@@ -488,8 +501,9 @@ export function AdminMarketplaceClient() {
                                 <span className="text-[11px] font-mono font-bold text-foreground bg-muted px-2 py-0.5 rounded-md">
                                   User: @{store.loginUsername || store.slug}
                                 </span>
-                                <span className="text-[11px] font-bold text-emerald-500">
-                                  ⭐ {store.rating || "4.7"}
+                                <span className="text-[11px] font-bold text-emerald-500 inline-flex items-center gap-0.5">
+                                  <Star className="size-3 fill-amber-400 text-amber-400" />
+                                  {store.rating || "4.7"}
                                 </span>
                               </div>
                             </div>
@@ -845,7 +859,15 @@ export function AdminMarketplaceClient() {
                     prodIsVeg ? "bg-emerald-500/20 text-emerald-500" : "bg-rose-500/20 text-rose-500"
                   )}
                 >
-                  {prodIsVeg ? "Veg 🥦" : "Non-Veg 🍗"}
+                  {prodIsVeg ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      <Leaf className="size-3.5" /> Pure Veg
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5">
+                      <Flame className="size-3.5" /> Non-Veg
+                    </span>
+                  )}
                 </button>
               </div>
 

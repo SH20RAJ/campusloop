@@ -69,9 +69,9 @@ export function AdminNewMerchantClient() {
   function handleCopyCredentials() {
     sounds.tap();
     haptics.medium();
-    const text = `🏪 CampusLoop Merchant Portal Access\nStore: ${name || "Your Store"}\n🌐 Portal Login: https://campusloop.space/merchant-portal/login\n👤 Username: ${loginUsername}\n🔑 Password: ${loginPassword}\n\nInstall on your phone or open in browser to manage your store!`;
+    const text = `CampusLoop Merchant Portal Access\nStore: ${name || "Your Store"}\nPortal Login: https://campusloop.space/merchant-portal/login\nUsername: ${loginUsername}\nPassword: ${loginPassword}\n\nInstall on your phone or open in browser to manage your store!`;
     navigator.clipboard.writeText(text);
-    toast.success("Copied credentials to clipboard! 📋 Ready to share via WhatsApp/SMS.");
+    toast.success("Copied credentials to clipboard! Ready to share via WhatsApp/SMS.");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -111,7 +111,7 @@ export function AdminNewMerchantClient() {
 
       if (!res.ok) throw new Error("Failed to onboard merchant");
 
-      toast.success("Merchant Onboarded Successfully! 🎉");
+      toast.success("Merchant Onboarded Successfully!");
       router.push("/admin/marketplace");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create merchant");
@@ -167,12 +167,12 @@ export function AdminNewMerchantClient() {
                 onChange={(e) => setCategorySlug(e.target.value)}
                 className="w-full h-11 rounded-xl bg-muted/40 border border-border px-3.5 text-xs font-bold text-foreground outline-none"
               >
-                <option value="food">🍔 Food &amp; Canteens (Zomato style)</option>
-                <option value="rentals">🚲 Bike &amp; Vehicle Rentals (Bounce style)</option>
-                <option value="barber">✂️ Barber &amp; Salon Grooming (Urban Company style)</option>
-                <option value="laundry">🧺 Laundry &amp; Dhobi Services (Per-Kg Wash)</option>
-                <option value="water">💧 20L Water Can Delivery (Instant &amp; Pass)</option>
-                <option value="essentials">🛒 Supermarket &amp; Campus Mart (Blinkit style)</option>
+                <option value="food">Food &amp; Canteens (Zomato style)</option>
+                <option value="rentals">Bike &amp; Vehicle Rentals (Bounce style)</option>
+                <option value="barber">Barber &amp; Salon Grooming (Urban Company style)</option>
+                <option value="laundry">Laundry &amp; Dhobi Services (Per-Kg Wash)</option>
+                <option value="water">20L Water Can Delivery (Instant &amp; Pass)</option>
+                <option value="essentials">Supermarket &amp; Campus Mart (Blinkit style)</option>
               </select>
             </div>
 
@@ -274,7 +274,7 @@ export function AdminNewMerchantClient() {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1.5">
               <span className="text-[11px] font-bold text-muted-foreground">Delivery Fee (₹)</span>
               <input

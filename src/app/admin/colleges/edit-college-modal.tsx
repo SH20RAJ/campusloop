@@ -74,7 +74,7 @@ export function EditCollegeModal({ college, onClose, onSaved }: EditCollegeModal
       toast.loading("Uploading college logo...", { id: "upload-logo" });
       const res = await uploadImageToImgBB(file);
       setLogoUrl(res.displayUrl || res.url);
-      toast.success("Logo uploaded successfully! 🎓", { id: "upload-logo" });
+      toast.success("Logo uploaded successfully!", { id: "upload-logo" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Logo upload failed", {
         id: "upload-logo",
@@ -94,7 +94,7 @@ export function EditCollegeModal({ college, onClose, onSaved }: EditCollegeModal
       toast.loading("Uploading campus banner...", { id: "upload-banner" });
       const res = await uploadImageToImgBB(file);
       setBannerUrl(res.displayUrl || res.url);
-      toast.success("Banner uploaded successfully! 🖼️", { id: "upload-banner" });
+      toast.success("Banner uploaded successfully!", { id: "upload-banner" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Banner upload failed", {
         id: "upload-banner",
@@ -149,7 +149,7 @@ export function EditCollegeModal({ college, onClose, onSaved }: EditCollegeModal
         description: description.trim() || null,
       });
 
-      toast.success(`Updated ${name} successfully! 🚀`);
+      toast.success(`Updated ${name} successfully!`);
       onSaved();
       onClose();
     } catch (err) {

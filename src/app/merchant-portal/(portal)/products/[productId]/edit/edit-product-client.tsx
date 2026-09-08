@@ -107,7 +107,7 @@ export function EditProductClient({ productId }: EditProductClientProps) {
       toast.loading("Uploading product image...", { id: "upload-prod" });
       const res = await uploadImageToImgBB(files[0]);
       setImageUrl(res.displayUrl || res.url);
-      toast.success("Image uploaded successfully! 📸", { id: "upload-prod" });
+      toast.success("Image uploaded successfully!", { id: "upload-prod" });
     } catch {
       toast.error("Failed to upload image", { id: "upload-prod" });
     } finally {
@@ -188,7 +188,7 @@ export function EditProductClient({ productId }: EditProductClientProps) {
 
       sounds.ting();
       haptics.success();
-      toast.success("Product updated successfully! 🎉");
+      toast.success("Product updated successfully!");
       mutate();
       router.push("/merchant-portal/products");
     } catch (err: any) {

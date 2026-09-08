@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Plus, Search, Store } from "lucide-react";
+import { ExternalLink, Plus, Search, Star, Store } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -149,19 +149,24 @@ export function AdminMerchantsClient() {
                           onClick={() => {
                             sounds.tap();
                             haptics.light();
-                            const creds = `🏪 ${m.name}\n👤 User: ${user}\n🔑 Pass: ${pass}\n🌐 https://campusloop.space/merchant-portal/login`;
+                            const creds = `Store: ${m.name}\nUsername: ${user}\nPassword: ${pass}\nPortal: https://campusloop.space/merchant-portal/login`;
                             navigator.clipboard.writeText(creds);
-                            toast.success(`Copied credentials for ${m.name}! 📋`);
+                            toast.success(`Copied credentials for ${m.name}!`);
                           }}
                           className="px-2 py-1 rounded-lg bg-muted/60 hover:bg-muted border border-border font-mono text-[10px] font-bold text-foreground flex items-center gap-1 cursor-pointer"
-                          title="Click to copy full WhatsApp message"
+                          title="Click to copy credentials"
                         >
                           <span>@{user}</span>
                           <span className="text-muted-foreground font-normal">({pass})</span>
                         </button>
                       </td>
                       <td className="p-3 text-muted-foreground">{m.phone || "—"}</td>
-                      <td className="p-3 font-bold text-amber-500">⭐ {m.rating}</td>
+                      <td className="p-3 font-bold text-amber-500">
+                        <span className="inline-flex items-center gap-0.5">
+                          <Star className="size-3 fill-amber-400 text-amber-400" />
+                          {m.rating}
+                        </span>
+                      </td>
                       <td className="p-3">
                         <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 font-bold text-[10px]">
                           {m.status}

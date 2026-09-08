@@ -179,7 +179,14 @@ export default async function AdminDashboard() {
               >
                 <div className="flex justify-between items-baseline gap-2">
                   <span className="text-xs font-semibold text-foreground truncate">
-                    {post.isAnonymous ? `👻 ${post.pseudonym || "Anonymous"}` : post.body.slice(0, 40)}
+                    {post.isAnonymous ? (
+                      <span className="inline-flex items-center gap-1">
+                        <Ghost className="size-3 text-muted-foreground" />
+                        <span>{post.pseudonym || "Anonymous"}</span>
+                      </span>
+                    ) : (
+                      post.body.slice(0, 40)
+                    )}
                   </span>
                   <span className="text-[10px] text-muted-foreground shrink-0">
                     {post.institutionName?.split(",")[0]}

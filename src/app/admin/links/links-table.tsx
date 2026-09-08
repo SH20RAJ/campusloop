@@ -107,7 +107,7 @@ export function AdminLinksClient() {
   function copyLink(slug: string) {
     const full = `https://campusloop.space/s/${slug}`;
     navigator.clipboard.writeText(full);
-    toast.success("Short link copied to clipboard! 📋");
+    toast.success("Short link copied to clipboard!");
   }
 
   if (isLoading) {

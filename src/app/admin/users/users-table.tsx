@@ -198,7 +198,7 @@ export function UsersTable({
       setNewDisplayName("");
       setNewUsername("");
       setShowAddForm(false);
-      toast.success("User profile created! 🎉");
+      toast.success("User profile created!");
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create user.");

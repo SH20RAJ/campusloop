@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, BatteryCharging, Bike, CalendarCheck2, CheckCircle2, ChevronRight, Clock, Fuel, Gauge, History, KeyRound, MapPin, Search, ShieldCheck, Zap, Star } from "lucide-react";
+import { ArrowLeft, BatteryCharging, Bike, CalendarCheck2, CheckCircle2, ChevronRight, Clock, Fuel, Gauge, History, KeyRound, MapPin, Rocket, Search, ShieldCheck, Zap, Star } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
@@ -64,7 +64,7 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
   }, [bikes, searchQuery, selectedHub]);
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 pb-20 select-none">
+    <div className="w-full max-w-5xl mx-auto space-y-6 pb-28 select-none">
       {/* ─── Hero Banner ─── */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-6 sm:p-8 text-white shadow-lg">
         <div className="relative z-10 max-w-lg space-y-2">
@@ -149,8 +149,18 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
                       <p className="text-xs text-muted-foreground line-clamp-1">{store.address}</p>
 
                       <div className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground pt-1">
-                        <span className="px-2 py-0.5 rounded-md bg-muted text-foreground/80">
-                          {store.slug.includes("wheels") ? "🚲 Cycles & E-Bikes" : "⚡ EV Scooters & Bikes"}
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-foreground/80">
+                          {store.slug.includes("wheels") ? (
+                            <>
+                              <Bike className="size-3" />
+                              <span>Cycles &amp; E-Bikes</span>
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="size-3 fill-amber-500 text-amber-500" />
+                              <span>EV Scooters &amp; Bikes</span>
+                            </>
+                          )}
                         </span>
                         <span>•</span>
                         <span className="text-emerald-600 dark:text-emerald-400">
@@ -182,27 +192,31 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
         <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-2xl border border-border shrink-0 overflow-x-auto no-scrollbar">
           {[
             { id: "all", label: "All Vehicles" },
-            { id: "ELECTRIC", label: "EV & Electric ⚡" },
-            { id: "PETROL", label: "Cycles & Petrol 🚲" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => {
-                sounds.tap();
-                haptics.light();
-                setFuelFilter(tab.id);
-              }}
-              className={cn(
-                "px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap",
-                fuelFilter === tab.id
-                  ? "bg-foreground text-background shadow-xs font-black"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
+            { id: "ELECTRIC", label: "EV & Electric", icon: Zap },
+            { id: "PETROL", label: "Cycles & Petrol", icon: Bike },
+          ].map((tab) => {
+            const TabIcon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setFuelFilter(tab.id);
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap",
+                  fuelFilter === tab.id
+                    ? "bg-foreground text-background shadow-xs font-black"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {TabIcon && <TabIcon className="size-3" />}
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         <Link
@@ -389,7 +403,7 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
             {/* Duration Selector */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-foreground">Choose Rental Duration</label>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[1, 2, 4, 8].map((hrs) => (
                   <button
                     key={hrs}
@@ -420,7 +434,10 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
               </div>
               <div className="flex items-center justify-between font-medium">
                 <span className="text-muted-foreground">Security Deposit</span>
-                <span className="text-emerald-500 font-bold">WAIVED (Student Verified 🛡️)</span>
+                <span className="inline-flex items-center gap-1 text-emerald-500 font-bold">
+                  <span>WAIVED (Student Verified)</span>
+                  <ShieldCheck className="size-3.5" />
+                </span>
               </div>
               <div className="border-t border-border/40 pt-2 flex items-center justify-between font-black text-sm">
                 <span>Total Due on Pickup</span>
@@ -450,7 +467,7 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
                     setIsSubmittingBooking(false);
                     setBookingBike(null);
                     alert(
-                      `Booking Confirmed! 🎉\nShow your booking token at ${bookingBike.pickupLocation} to collect your keys & helmet.`
+                      `Booking Confirmed!\nShow your booking token at ${bookingBike.pickupLocation} to collect your keys & helmet.`
                     );
                   }, 800);
                 }}
@@ -468,7 +485,8 @@ export function BikeRentalsClient({ profileId, collegeName = "Campus Hub" }: Bik
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-600 dark:text-pink-400 text-[10px] font-black uppercase tracking-wider">
-              <span>🚀 Want this at your campus?</span>
+              <Rocket className="size-3" />
+              <span>Want this at your campus?</span>
             </div>
             <h4 className="text-sm font-black text-foreground">
               Bring CampusLoop Bike &amp; EV Rentals to Your College

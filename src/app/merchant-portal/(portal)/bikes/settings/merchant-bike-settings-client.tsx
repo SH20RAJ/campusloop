@@ -47,7 +47,7 @@ export function MerchantBikeSettingsClient() {
 
           <div className="space-y-1.5">
             <span className="text-[11px] font-bold text-muted-foreground">Allowed Rental Modes</span>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setRentalMode("HOURLY")}

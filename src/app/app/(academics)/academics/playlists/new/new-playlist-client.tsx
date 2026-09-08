@@ -82,7 +82,7 @@ export function NewPlaylistClient() {
       );
       if (res.ok) {
         const data = (await res.json()) as any;
-        setSearchResults(data.resources || []);
+        setSearchResults(data.items || []);
       }
     } catch (err) {
       console.error("Failed to search resources:", err);

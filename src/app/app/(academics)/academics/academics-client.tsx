@@ -79,6 +79,13 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) {
+      setSearchQuery(q);
+    }
+  }, []);
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("campusloop_academics_view_mode") as "grid" | "list" | null;
       if (saved === "grid" || saved === "list") {

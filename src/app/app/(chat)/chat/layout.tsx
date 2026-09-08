@@ -15,18 +15,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://campusloop.space/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Messages",
+        url: "https://campusloop.space/og-chat.png",
+        width: 1536,
+        height: 1024,
+        alt: "CampusLoop Messenger",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Messages",
+    title: "Messages | CampusLoop",
     description: "Chat privately with verified students across your campus loop.",
-    images: ["https://campusloop.space/og-image.png"],
+    images: ["https://campusloop.space/og-chat.png"],
   },
   robots: { index: false, follow: false },
 };

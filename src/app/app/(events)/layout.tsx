@@ -22,6 +22,21 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "https://campusloop.space/og-events.png",
+        width: 1536,
+        height: 1024,
+        alt: "CampusLoop Events — Hackathons & College Fests",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Campus Events, Hackathons & College Fests | CampusLoop",
+    description:
+      "Discover hackathons, technical workshops, and college cultural fests across 1,350+ Indian universities.",
+    images: ["https://campusloop.space/og-events.png"],
   },
 };
 

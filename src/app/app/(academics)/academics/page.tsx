@@ -35,19 +35,19 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://campusloop.space/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "CampusLoop Academic Study Vault — Free Engineering Notes & PYQs",
+        url: "https://campusloop.space/og-academics.png",
+        width: 1536,
+        height: 1024,
+        alt: "CampusLoop Academics — Verified Study Vault",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Academic Notes, PYQs & Cheat Sheets | CampusLoop",
+    title: "CampusLoop Academics — Verified Study Vault for College Students",
     description:
-      "Free semester exam question papers, verified professor notes, and formula cheat sheets shared by verified college students.",
-    images: ["https://campusloop.space/og-image.png"],
+      "Free verified engineering & university course notes, semester-wise PYQs, cheat sheets, and practical lab manuals across 1,350+ campuses in India.",
+    images: ["https://campusloop.space/og-academics.png"],
   },
   robots: {
     index: true,

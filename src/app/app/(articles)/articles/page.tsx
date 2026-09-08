@@ -25,18 +25,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://campusloop.space/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "CampusLoop Articles",
+        url: "https://campusloop.space/og-articles.png",
+        width: 1536,
+        height: 1024,
+        alt: "CampusLoop Editorial",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Campus Articles & Student Long Reads",
-    description: "In-depth student articles, placement guides, and campus insights.",
-    images: ["https://campusloop.space/og-image.png"],
+    title: "CampusLoop Editorial — Student Tech & Campus Journalism",
+    description: "Deep-dives, interview experiences, and campus guides written by verified university students.",
+    images: ["https://campusloop.space/og-articles.png"],
   },
 };
 

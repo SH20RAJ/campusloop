@@ -61,18 +61,18 @@ export async function generateMetadata({ params }: AcademicSlugPageProps): Promi
       type: "article",
       images: [
         {
-          url: "https://campusloop.space/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: `${resource.title} — CampusLoop Study Vault`,
+          url: "https://campusloop.space/og-academics.png",
+          width: 1536,
+          height: 1024,
+          alt: resource.title,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: `${resource.title} (${resource.subjectCode}) | CampusLoop Academics`,
       description,
-      images: ["https://campusloop.space/og-image.png"],
+      images: ["https://campusloop.space/og-academics.png"],
     },
     robots: {
       index: true,

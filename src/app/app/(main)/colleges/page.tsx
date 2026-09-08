@@ -23,18 +23,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://campusloop.space/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Campus Directory & Colleges",
+        url: "https://campusloop.space/og-colleges.png",
+        width: 1536,
+        height: 1024,
+        alt: "CampusLoop College Directory",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Campus Directory & Colleges",
-    description: "Browse and search over 1,350+ verified colleges in India on CampusLoop.",
-    images: ["https://campusloop.space/og-image.png"],
+    title: "1,350+ Indian Colleges & Universities Directory | CampusLoop",
+    description: "Explore campus feeds, verified student networks, and academic resources for 1,350+ Indian colleges.",
+    images: ["https://campusloop.space/og-colleges.png"],
   },
   robots: { index: true, follow: true },
 };

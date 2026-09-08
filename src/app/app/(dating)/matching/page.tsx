@@ -23,18 +23,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://campusloop.space/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Campus Match",
+        url: "https://campusloop.space/og-dating.png",
+        width: 1536,
+        height: 1024,
+        alt: "CampusLoop Match",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Campus Match · Verified Student Matchmaking",
-    description: "Connect with verified college students for friends, study partners, and vibe matching.",
-    images: ["https://campusloop.space/og-image.png"],
+    title: "Campus Match · Verified Student Dating | CampusLoop",
+    description: "Meet verified fellow students on your campus.",
+    images: ["https://campusloop.space/og-dating.png"],
   },
   robots: { index: true, follow: true },
 };

@@ -16,7 +16,13 @@ export const metadata: Metadata = {
     description: "Verified local campus businesses, food delivery, bike rentals, and hostel services.",
     url: "https://campusloop.space/app/marketplace",
     siteName: "CampusLoop Marketplace",
-    images: [{ url: "https://campusloop.space/og-image.png", width: 1200, height: 630 }],
+    images: [{ url: "https://campusloop.space/og-marketplace.png", width: 1536, height: 1024, alt: "CampusLoop Marketplace" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CampusLoop Marketplace | Night Canteens, Rentals & Campus Services",
+    description: "Verified local campus businesses, food delivery, bike rentals, and hostel services.",
+    images: ["https://campusloop.space/og-marketplace.png"],
   },
 };
 

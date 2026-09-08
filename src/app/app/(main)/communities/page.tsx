@@ -23,18 +23,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://campusloop.space/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Student Communities & Sub-Hubs",
+        url: "https://campusloop.space/og-communities.png",
+        width: 1536,
+        height: 1024,
+        alt: "CampusLoop Communities & Clubs",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Student Communities & Sub-Hubs | CampusLoop",
-    description: "Browse interest groups and student communities on CampusLoop.",
-    images: ["https://campusloop.space/og-image.png"],
+    title: "Campus Communities, Clubs & Student Hubs | CampusLoop",
+    description: "Explore student-run clubs, technical societies, and campus chapters across India.",
+    images: ["https://campusloop.space/og-communities.png"],
   },
   robots: { index: true, follow: true },
 };

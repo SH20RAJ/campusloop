@@ -1,8 +1,24 @@
-- [x] **Post Detail Loop Deck (`/app/post/[id]`)**: Fix 1/1 lock, infinite scroll/swipe, show related posts + adjacent campus posts + smart interstitials (user suggestions, academic notes/PYQ drops, campus polls); pure Instagram/TikTok 9:16 vertical video experience with tap play/pause, scrub bar, mute toggle, bottom overlay, and floating right actions column; remove RightSidebar conflict and fix report dialog overlay glitches.
-- [x] **Top-Left Menu Reload Fix**: Fixed mobile top-left profile trigger button (`type="button"`, `e.preventDefault()`, `e.stopPropagation()`) and disabled mobile drawer prefetch storm (`prefetch={false}`) to stop whole-page reloads.
-- [x] **Referral Tracker & Short Links Engine**: Ingest `?ref=...` on landing page, record device/OS/browser/country analytics in Neon DB, set 30-day attribution cookie, build `/s/{slug}` instant 302 redirection, and comprehensive `/admin/links` analytics dashboard.
-- [x] **Discover Page & Birthdays**: Added campus events & club organizer option (`/app/events/new`), campus communities & sub-hubs, indirect birthday banner, removed PWA install option from sidebar, and revamped `/app/birthdays` UI/UX with modern glassmorphism and celebratory confetti.
-- [x] **Theme Color Normalization**: Eliminated all hardcoded `[#a170ff]` across components in favor of CSS variables (`var(--color-brand)`, `text-brand`, `bg-brand`).
-- [x] **Icon Guidelines & Strict Sparkles Prohibition**: Replaced all `Sparkles` SVGs across the app with contextual icons (`Zap`, `Wand2`, `Flame`); integrated `MessageCircleHeartIcon` for chat and `HeartIcon` for secret crush (`@animateicons/react/lucide`).
-- [x] **Twitter/X UI/UX Academics Overhaul & Markdown Image Leak Fix**: Fixed raw markdown image syntax/URL leaks app-wide (`cleanSnippet` & `stripMarkdown` in `src/lib/utils.ts` applied across `/api/trends`, AI pulse, post detail metadata, explore headlines, and share modals); resolved mobile search bar and scope switcher cramping on `/app/discover`; completely overhauled Academic Vault feed (`academics-client.tsx`), Academic Post Card (`academic-card.tsx`), Similar Resources shelf (`similar-resources-widget.tsx`), and Academic Detail thread (`academic-detail-client.tsx`) into authentic Twitter/X timeline aesthetics with 2-column author layout, hairline dividers, sliding tabs with animated indicators, and threaded replies.
-- [x] **Events Google & Apple Calendar Integration & App-Wide Infinite Scroll/Loop Bug Fixes**: Added Google Calendar and Apple Calendar (`.ics` RFC 5545) integrations across event feeds (`event-card.tsx`), embedded post cards (`event-embed.tsx`), and event detail threads (`event-detail-client.tsx`). Audited and fixed app-wide infinite scroll, observer mounting, and runaway fetch loop bugs in `use-feed.ts`, `discover-feed.tsx`, `buy-and-sell-client.tsx`, `confessions-feed.tsx`, `academics-client.tsx`, `communities-index-client.tsx`, `dedicated-hub-client.tsx`, `post-likes-modal.tsx`, `colleges-client.tsx`, and `profile-client.tsx`.
+seed some posts on feeds that will not look like ai generated and keep ingajed new users also send notifications for each things possible also create a const file defined with how many LP's to be given for an activity and completely reconsider things.... and the pointing system , abuse protections and better algoritm for everything.....
+
+---
+
+
+https://campusloop.space/app/academics in here urls like https://campusloop.space/app/academics/acad_dsa_pyq_01 is 404 but still listed on ppage also see the image it has url https://campusloop.space/app/academics/bitsyll_be24102_notes_1 has this url = https://drive.google.com/drive/u/5/folders/1PKWw6EIpRpjfdR3HnQlV6HQH8PIegFod?usp=drive_link but its a folder URL and you tried to embed this, fix it the best way possible 
+
+
+
+---
+
+
+in academics people can also share perticular youtube video and playlist with the best ui ux , personalise whole page ux ac to the file type specially for video watching and learning on the platform 
+
+---
+
+fix ui ux issue of 1st image page like 2nd image , also scan all pages that is not responsive on mobile and fix that.... 3rd image = You are trying to embed sites.google.com as pdf by url find what it is first, personalise things for everything.... 
+
+---
+
+also for each notes/collection of notes (notes listed under it, similar category) add option to open in ai agents like chatgpt/claude with best structured ui ux that will open the file in the ai agent with best prompt to teach and also contains the main link of the notes/collection and remove Campus AI Study Cram Assistant just add a line that something like will be lauched on campusloop academics soon.....
+
+---
+

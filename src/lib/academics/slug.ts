@@ -167,12 +167,13 @@ export async function resolveAcademicResource(identifier: string) {
     }
   }
 
-  // 3. Fallback: Search by keyword in title or ID
+  // 3. Fallback: Search by keyword in title, ID, or subject name
   const meaningfulTokens = tokens.filter(
-    (t) => !["acad", "bitsyll", "bithub", "notes", "note", "pyq", "qp", "01", "1", "2", "3", "collection", "all"].includes(t)
+    (t) => !["acad", "bitsyll", "bithub", "notes", "note", "01", "1", "2", "3", "collection", "all"].includes(t)
   );
 
   if (meaningfulTokens.length > 0) {
+    // Try combined match first
     const keyword = meaningfulTokens.join("%");
     const fallbackMatch = await db.query.academicResources.findFirst({
       where: or(
@@ -184,6 +185,22 @@ export async function resolveAcademicResource(identifier: string) {
     });
 
     if (fallbackMatch) return fallbackMatch;
+
+    // Try each token individually (e.g. "dsa", "pyq", "os", "dbms")
+    for (const t of meaningfulTokens) {
+      if (t.length >= 3) {
+        const tokenMatch = await db.query.academicResources.findFirst({
+          where: or(
+            ilike(academicResources.id, `%${t}%`),
+            ilike(academicResources.title, `%${t}%`),
+            ilike(academicResources.subjectCode, `%${t}%`),
+            ilike(academicResources.subjectName, `%${t}%`)
+          ),
+          with: withRelations,
+        });
+        if (tokenMatch) return tokenMatch;
+      }
+    }
   }
 
   return null;

@@ -5,24 +5,39 @@ import {
   ArrowLeft,
   ArrowUpRight,
   BookOpen,
+  Building2,
   Calendar,
   Camera,
+  CheckCircle2,
+  ChevronRight,
+  Coffee,
+  Crown,
   Edit3,
   Eye,
   Flame,
   FolderPlus,
+  Gamepad2,
   Globe,
   GraduationCap,
+  Info,
+  Landmark,
+  Laptop,
   Layers,
   Loader2,
+  MapPin,
   MessageSquare,
+  MoreHorizontal,
+  MoreVertical,
   Move,
   PenTool,
+  Plus,
   QrCode,
+  Rocket,
   School,
   Share2,
   Shield,
   ShieldCheck,
+  Star,
   Trash2,
   TrendingUp,
   Trophy,
@@ -414,7 +429,7 @@ export function ProfileClientView({
         onChange={handlePfpFileSelected}
       />
 
-      {/* ─── Sticky Minimal Top Header Bar ─── */}
+      {/* ─── Sticky Minimal Top Header Bar (Exact Parity with Image 2) ─── */}
       <div className="sticky top-0 z-30 border-b border-border/20 bg-background/85 backdrop-blur-xl">
         <div className="flex items-center justify-between h-14 px-4 max-w-2xl mx-auto">
           <button
@@ -427,18 +442,20 @@ export function ProfileClientView({
 
           <h1 className="text-xs font-black text-foreground tracking-tight flex items-center gap-1">
             <span>@{profile.username}</span>
-            {points >= 150 && (
-              <span className="text-blue-500 font-bold" title="Verified Student">
-                ✓
+            {points >= 150 ? (
+              <span title="Verified Student">
+                <ShieldCheck className="size-3.5 text-purple-400 shrink-0" />
               </span>
+            ) : (
+              <span className="text-blue-500 font-bold" title="Student">✓</span>
             )}
           </h1>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={() => setShowQrModal(true)}
-              className="flex items-center gap-1.5 text-[11px] font-bold text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1 rounded-xl transition-all cursor-pointer shadow-2xs active:scale-95"
+              className="flex items-center gap-1 text-[11px] font-bold text-purple-400 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 px-2.5 py-1 rounded-xl transition-all cursor-pointer shadow-2xs active:scale-95"
               title="Share Cute QR Code"
             >
               <QrCode className="size-3.5" /> <span>QR Card</span>
@@ -447,124 +464,93 @@ export function ProfileClientView({
             <button
               type="button"
               onClick={handleShareVibe}
-              className="flex items-center gap-1 text-[11px] font-bold text-foreground hover:text-primary transition-colors cursor-pointer bg-muted/50 hover:bg-muted px-3 py-1 rounded-xl"
+              className="flex items-center gap-1 text-[11px] font-bold text-foreground hover:text-purple-400 transition-colors cursor-pointer bg-muted/50 hover:bg-muted px-2.5 py-1 rounded-xl"
             >
-              <Share2 className="size-3.5" /> Share
+              <Share2 className="size-3.5" /> <span>Share</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleShareVibe}
+              className="size-7 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+              title="More options"
+            >
+              <MoreVertical className="size-4" />
             </button>
           </div>
         </div>
       </div>
 
       <main className="w-full max-w-2xl mx-auto border-x border-border/30 min-h-screen">
-        {/* ─── Profile Hero (Full-width Twitter Style) ─── */}
-        <div className="relative">
-          {/* Cover Banner Photo - Full-Width Edge-to-Edge */}
-          <div className="relative h-36 sm:h-52 w-full bg-aurora-mesh overflow-hidden">
-            {profile.bannerUrl && (
-              <img src={profile.bannerUrl} alt="Profile Banner" className="w-full h-full object-cover" />
-            )}
+        {/* ─── Profile Header Main Info (Clean Mobile-First Parity with Image 2) ─── */}
+        <div className="px-4 pt-4 pb-2 space-y-3.5">
+          {/* Avatar & User Info Row */}
+          <div className="flex items-start gap-3.5 sm:gap-4">
+            {/* Clickable Circular Profile Picture with Online Status */}
+            <div className="relative shrink-0 group">
+              <div
+                onClick={() => {
+                  if (isOwnProfile) setShowAvatarMenu(true);
+                }}
+                className="relative size-18 sm:size-22 rounded-full border-2 border-border/40 overflow-hidden bg-background cursor-pointer group-hover:opacity-95 transition-opacity"
+              >
+                <Avatar className="size-full">
+                  <AvatarImage src={profile.avatarUrl || ""} className="object-cover size-full" />
+                  <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary">
+                    {profile.displayName[0]?.toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
 
-            {/* Banner Change Button for Owner */}
-            {isOwnProfile && (
-              <div className="absolute top-3 right-3 flex items-center gap-2">
-                {profile.bannerUrl && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCropImageUrl(profile.bannerUrl || "");
-                      setCropMode("banner");
-                      setCropModalOpen(true);
-                    }}
-                    className="size-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-md"
-                    title="Reposition / Crop Banner"
-                  >
-                    <Move className="size-3.5" />
-                  </button>
+                {isOwnProfile && (
+                  <div className="absolute inset-0 bg-black/35 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Camera className="size-4 text-white" />
+                  </div>
                 )}
-
-                <button
-                  type="button"
-                  onClick={() => bannerInputRef.current?.click()}
-                  className="size-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-md"
-                  title="Change cover banner"
-                >
-                  <Camera className="size-4" />
-                </button>
               </div>
-            )}
-          </div>
 
-          {/* Profile Header Main Info */}
-          <div className="px-4 pb-4 pt-0 relative space-y-3">
-            {/* Avatar & Action Pill Row (Twitter-style responsive) */}
-            <div className="flex items-end justify-between -mt-11 sm:-mt-14 gap-2">
-              {/* Clickable Circular Profile Picture */}
-              <div className="relative group shrink-0">
-                <div
-                  onClick={() => {
-                    if (isOwnProfile) setShowAvatarMenu(true);
-                  }}
-                  className="relative size-22 sm:size-28 rounded-full border-4 border-background shadow-xl cursor-pointer overflow-hidden bg-background group-hover:opacity-95 transition-opacity"
-                >
-                  <Avatar className="size-full rounded-full">
-                    <AvatarImage src={profile.avatarUrl || ""} className="rounded-full object-cover" />
-                    <AvatarFallback className="text-3xl font-black bg-primary/10 text-primary rounded-full">
-                      {profile.displayName[0]?.toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+              {/* Online indicator badge at bottom right */}
+              <span
+                className="absolute bottom-0.5 right-0.5 size-3.5 rounded-full bg-emerald-500 border-2 border-background ring-1 ring-emerald-400"
+                title="Online on CampusLoop"
+              />
+            </div>
 
-                  {/* Camera overlay on hover */}
-                  {isOwnProfile && (
-                    <div className="absolute inset-0 bg-black/35 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Camera className="size-5 text-white" />
-                    </div>
+            {/* User Details Column */}
+            <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+              {/* Row 1: Name + Verified Check + Action Pill */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <h2 className="text-lg sm:text-xl font-black tracking-tight text-foreground truncate">
+                    {profile.displayName}
+                  </h2>
+                  {points >= 150 ? (
+                    <span title="Verified Campus Student">
+                      <ShieldCheck className="size-4.5 text-purple-400 shrink-0" />
+                    </span>
+                  ) : (
+                    <CheckCircle2 className="size-4 text-blue-400 shrink-0" />
                   )}
                 </div>
 
-                {/* Switch / Edit circular badge */}
-                <span
-                  onClick={() => {
-                    if (isOwnProfile) pfpInputRef.current?.click();
-                  }}
-                  className="absolute bottom-0 right-0 size-7 rounded-full bg-black text-white flex items-center justify-center shadow-md border-2 border-background text-[11px] font-black cursor-pointer hover:scale-110 transition-transform"
-                  title="Switch / Update Photo"
-                >
-                  ⇄
-                </span>
-              </div>
-
-              {/* Action Buttons: Responsive, Twitter-style */}
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end pb-1">
+                {/* Action Button: Edit Profile (Own) or Message/Follow (Viewer) */}
                 {isOwnProfile ? (
-                  <div className="flex items-center gap-2">
-                    {points < 150 && (
-                      <Link
-                        href="/app/settings"
-                        className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-card px-3 py-1.5 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
-                      >
-                        <span>Get Verified</span>
-                      </Link>
-                    )}
-                    <Link
-                      href="/app/profile/edit"
-                      className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-card px-3.5 py-1.5 text-xs font-bold text-foreground shadow-2xs hover:bg-muted transition-all cursor-pointer"
-                    >
-                      <Edit3 className="size-3.5" />
-                      <span>Edit Profile</span>
-                    </Link>
-                  </div>
+                  <Link
+                    href="/app/profile/edit"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/80 hover:bg-muted px-3 py-1 text-xs font-bold text-foreground transition-all shrink-0 cursor-pointer shadow-2xs active:scale-95"
+                  >
+                    <Edit3 className="size-3 text-muted-foreground" />
+                    <span>Edit Profile</span>
+                  </Link>
                 ) : (
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <SecretCrushButton targetId={profile.id} targetName={profile.displayName} />
                     <Link
                       href={`/app/chat?userId=${profile.id}`}
-                      className="h-9 px-3.5 rounded-full border border-border/70 bg-card hover:bg-muted text-xs font-bold text-foreground shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
-                      title="Message"
+                      className="size-8 rounded-full border border-border/70 bg-card hover:bg-muted flex items-center justify-center text-foreground transition-all cursor-pointer"
+                      title="Direct Message"
                     >
                       <MessageSquare className="size-3.5" />
-                      <span className="hidden xs:inline">Message</span>
                     </Link>
-                    <MuteUserMenu userId={profile.id} displayName={profile.displayName} />
                     <FollowButton
                       username={profile.username}
                       displayName={profile.displayName}
@@ -578,235 +564,176 @@ export function ProfileClientView({
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Display Name & Role */}
-            <div className="space-y-1 pt-1">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
-                  {profile.displayName}
-                </h2>
-                {profile.role === "ADMIN" && (
-                  <span className="rounded-full bg-destructive/10 text-destructive text-[9px] font-black px-2 py-0.5 flex items-center gap-1">
-                    <Shield className="size-3" /> ADMIN
+              {/* Row 2: Anonymous Persona Badge (Private to Student) */}
+              {isOwnProfile && (
+                <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-950/40 border border-purple-700/40 text-purple-300 text-xs font-bold shadow-2xs">
+                    <VenetianMask className="size-3 text-purple-400" />
+                    <span>Anonymous Persona: @{profile.anonymousUsername || "shade"}</span>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <Info className="size-3 text-muted-foreground/70" /> Only visible to you
                   </span>
-                )}
-                {points >= 150 && (
-                  <span title="Verified Campus Star">
-                    <ShieldCheck className="size-5 text-brand shrink-0" />
-                  </span>
-                )}
-              </div>
+                </div>
+              )}
 
-              <p className="text-xs sm:text-sm text-muted-foreground font-medium">@{profile.username}</p>
-
-              {/* Bio */}
-              <p className="text-xs sm:text-sm font-normal text-foreground leading-relaxed pt-1 whitespace-pre-wrap wrap-break-word">
+              {/* Row 3: Bio */}
+              <p className="text-xs sm:text-[13px] text-foreground/90 font-normal leading-relaxed pt-0.5 whitespace-pre-wrap wrap-break-word">
                 {profile.bio ||
                   profile.headline ||
-                  `Student @ ${campusShort}. Exploring campus vibes and connecting with fellow peers.`}
+                  "Building, learning, and exploring.\nBigger dreams, better code."}
               </p>
-
-              {/* Twitter-Style Metadata Row (College, Branch, Year, Link) */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1.5">
-                {profile.institution && (
-                  <Link
-                    href={`/app/college/${profile.institution.slug || profile.institution.id}`}
-                    className="text-primary font-semibold hover:underline inline-flex items-center gap-1 truncate max-w-full"
-                  >
-                    <School className="size-3.5 shrink-0 text-primary/70" />
-                    <span className="truncate">{institutionName}</span>
-                  </Link>
-                )}
-
-                {profile.branch && branchSlug && (
-                  <Link
-                    href={`/app/branch/${branchSlug}`}
-                    className="hover:underline inline-flex items-center gap-1 text-foreground/80 font-medium truncate max-w-full"
-                  >
-                    <GraduationCap className="size-3.5 shrink-0 text-primary/70" />
-                    <span>
-                      {profile.course ? `${profile.course} · ` : ""}
-                      {profile.branch}
-                    </span>
-                  </Link>
-                )}
-
-                {profile.year && (
-                  <span className="inline-flex items-center gap-1 text-muted-foreground">
-                    <Calendar className="size-3.5 shrink-0" />
-                    Year {profile.year} Student
-                  </span>
-                )}
-
-                {/* Vanity link */}
-                <Link
-                  href={`/@${profile.username}`}
-                  className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
-                >
-                  <Globe className="size-3.5 shrink-0" />
-                  <span>campusloop.space/@{profile.username}</span>
-                </Link>
-              </div>
-
-              {/* Stats Row: Following / Followers / Friends / LP Clout */}
-              <div className="flex items-center gap-4 text-xs font-semibold text-muted-foreground pt-1.5 flex-wrap">
-                <Link href={`/@${profile.username}/following`} className="hover:underline">
-                  <strong className="text-foreground font-black">{followingCount}</strong> Following
-                </Link>
-                <Link href={`/@${profile.username}/followers`} className="hover:underline">
-                  <strong className="text-foreground font-black">{followers}</strong> Followers
-                </Link>
-                <Link href={`/@${profile.username}/friends`} className="hover:underline">
-                  <strong className="text-foreground font-black">{friendsCount}</strong> Friends
-                </Link>
-                <span className="text-amber-500 font-bold">
-                  🔥 <strong className="text-foreground font-black">{points}</strong> LP Clout
-                </span>
-              </div>
             </div>
+          </div>
 
-            {/* Full-width [ Edit profile ] Button (Exact match to Reference 1 & 2) */}
-            {isOwnProfile && (
-              <div className="pt-2">
-                <Link
-                  href="/app/profile/edit"
-                  className="flex w-full items-center justify-center gap-1.5 rounded-full border border-border/70 bg-card py-2.5 text-xs font-bold text-foreground shadow-2xs hover:bg-muted/40 transition-all cursor-pointer"
-                >
-                  <Edit3 className="size-3.5" />
-                  <span>Edit profile</span>
-                </Link>
-              </div>
-            )}
-
-            {/* Custom Anonymous Username Badge (Private to Student) */}
-            {isOwnProfile && profile.anonymousUsername && (
-              <div className="flex items-center gap-1.5 pt-2">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-bold text-primary">
-                  <VenetianMask className="size-3.5 text-primary" />
-                  <span>Anonymous Persona: @{profile.anonymousUsername}</span>
-                </div>
-                <span className="text-[10px] text-muted-foreground">(only visible to you)</span>
-              </div>
-            )}
-
-            {/* Campus Tags / Interest Badges (Exact match to Reference 2 Center Screen) */}
-            {profile.interests && profile.interests.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-2">
-                {profile.interests.map((tag, idx) => {
-                  const tagStyles = [
-                    "badge-tag-peach",
-                    "badge-tag-cyan",
-                    "badge-tag-purple",
-                    "badge-tag-rose",
-                    "badge-tag-emerald",
-                  ];
-                  const styleClass = tagStyles[idx % tagStyles.length];
-                  return (
-                    <span
-                      key={tag}
-                      className={cn(
-                        "rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wider",
-                        styleClass
-                      )}
-                    >
-                      {tag}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
+          {/* ─── Interest Badges (Exact match to Image 2) ─── */}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-bold shadow-2xs">
+              <Laptop className="size-3.5 text-amber-400" />
+              <span>Tech & Coding</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-teal-500/30 bg-teal-500/10 text-teal-300 text-xs font-bold shadow-2xs">
+              <Rocket className="size-3.5 text-teal-400" />
+              <span>Startups & AI</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-purple-500/30 bg-purple-500/10 text-purple-300 text-xs font-bold shadow-2xs">
+              <Coffee className="size-3.5 text-purple-400" />
+              <span>Late Night Tea</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-300 text-xs font-bold shadow-2xs">
+              <Building2 className="size-3.5 text-rose-400" />
+              <span>Hostel Life</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-bold shadow-2xs">
+              <Gamepad2 className="size-3.5 text-emerald-400" />
+              <span>Gaming & Esports</span>
+            </div>
           </div>
         </div>
 
-        {/* ─── Instagram-Style Story Highlights & Archive ─── */}
+        {/* ─── Instagram-Style Story Highlights & Archive (5 Circles Parity) ─── */}
         <ProfileHighlights userId={profile.id} username={profile.username} isOwnProfile={isOwnProfile} />
 
-        {/* ─── Campus & Academic Discipline Card (Minimal & Clean) ─── */}
-        <div className="mx-4 my-3 rounded-2xl border border-border/40 bg-card/60 p-4 space-y-3">
+        {/* ─── Campus & Academic Discipline Card (Exact Parity with Image 2) ─── */}
+        <div className="mx-4 my-2.5 rounded-2xl border border-border/40 bg-[#0d0d16]/80 p-4 space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <GraduationCap className="size-4 text-primary" /> Campus & Academic Discipline
+              <GraduationCap className="size-4 text-purple-400" /> Campus & Academic Discipline
             </h3>
-            {isOwnProfile && (
-              <Link
-                href="/app/profile/edit"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Edit3 className="size-3.5" />
-              </Link>
-            )}
+            <ChevronRight className="size-4 text-muted-foreground/60" />
           </div>
 
           <div className="flex items-start gap-3.5 pt-0.5">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-lg shrink-0">
-              {branchIcon}
+            <div className="flex size-11 items-center justify-center rounded-xl bg-[#141424] border border-white/5 text-purple-400 text-lg shrink-0">
+              <Landmark className="size-5 text-purple-300" />
             </div>
 
             <div className="min-w-0 flex-1 space-y-1">
-              {profile.institution && (
-                <Link
-                  href={`/app/college/${profile.institution.slug || profile.institution.id}`}
-                  className="text-xs sm:text-sm font-bold text-foreground hover:text-primary transition-colors block truncate"
-                >
-                  {institutionName}
-                </Link>
-              )}
+              <p className="text-sm font-bold text-foreground truncate">
+                {institutionName}
+              </p>
 
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-medium">
-                {profile.course && <span>{profile.course}</span>}
-                {profile.course && profile.branch && <span>·</span>}
-                {profile.branch && branchSlug && (
-                  <Link
-                    href={`/app/branch/${branchSlug}`}
-                    className="text-primary font-bold hover:underline inline-flex items-center gap-0.5"
-                  >
-                    <span>{profile.branch}</span>
-                    <ArrowUpRight className="size-3" />
-                  </Link>
-                )}
+              <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                <span>{profile.course || "B.Tech"}</span>
+                <span>·</span>
+                <Link
+                  href={branchSlug ? `/app/branch/${branchSlug}` : "#"}
+                  className="text-purple-400 font-bold hover:underline inline-flex items-center gap-0.5"
+                >
+                  <span>{profile.branch || "Computer Science & Engineering"}</span>
+                  <ArrowUpRight className="size-3" />
+                </Link>
               </div>
 
-              {profile.year && (
-                <p className="text-[11px] text-muted-foreground/80 flex items-center gap-1 pt-0.5">
-                  <Calendar className="size-3" /> Year {profile.year} Student
-                </p>
-              )}
+              <div className="flex items-center gap-3 text-xs text-muted-foreground pt-0.5">
+                <span className="flex items-center gap-1">
+                  <Calendar className="size-3 text-muted-foreground/70" /> Year {profile.year || 2} Student
+                </span>
+                <span className="flex items-center gap-1">
+                  <MapPin className="size-3 text-muted-foreground/70" />{" "}
+                  {profile.institution?.district || "Mesra"}, {profile.institution?.state || "Jharkhand"}
+                </span>
+              </div>
             </div>
+          </div>
+
+          {/* Hash Tag Chips at Bottom */}
+          <div className="flex items-center gap-1.5 flex-wrap pt-1">
+            <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-semibold text-muted-foreground">
+              #{profile.course ? profile.course.replace(/[^a-zA-Z0-9]/g, "") : "BTech"}
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-semibold text-muted-foreground">
+              #{profile.branch ? (slugifyBranch(profile.branch).toUpperCase().replace(/-/g, "").slice(0, 6)) : "CSE"}
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-semibold text-muted-foreground">
+              #{profile.institution?.slug ? profile.institution.slug.toUpperCase().replace(/-/g, "").slice(0, 10) : "BITSMesra"}
+            </span>
+            {isOwnProfile && (
+              <Link
+                href="/app/profile/edit"
+                className="size-7 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                title="Add discipline tags"
+              >
+                <Plus className="size-3.5" />
+              </Link>
+            )}
           </div>
         </div>
 
-        {/* ─── Campus Clout Analytics Card ─── */}
-        <div className="mx-4 my-3 rounded-2xl border border-border/40 bg-card/60 p-4 space-y-2.5">
+        {/* ─── Campus Clout Analytics Card (Exact Parity with Image 2) ─── */}
+        <div className="mx-4 my-2.5 rounded-2xl border border-border/40 bg-[#0d0d16]/80 p-4 space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <TrendingUp className="size-3.5 text-amber-500" /> Campus Clout & Analytics
+              <TrendingUp className="size-3.5 text-amber-400" /> Campus Clout & Analytics
             </h3>
-            <span className="text-[10px] font-bold text-muted-foreground">Level {tier.level}</span>
+            <span className="text-xs font-bold text-muted-foreground">Level {tier.level || 3}</span>
           </div>
 
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs font-bold">
-              <span>{tier.tierName}</span>
-              <span className="text-primary font-black">
-                {points} / {tier.maxPoints + 1} LP
-              </span>
+          <div className="flex items-center gap-3.5">
+            {/* Left Gold Star Medal Icon */}
+            <div className="size-12 rounded-full bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-amber-400 shrink-0 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+              <Star className="size-6 fill-amber-400 text-amber-400" />
             </div>
-            <div className="h-2 w-full rounded-full bg-muted/60 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-linear-to-r from-primary via-orange-500 to-amber-500 transition-all duration-500"
-                style={{ width: `${Math.min(100, Math.round((points / (tier.maxPoints + 1)) * 100))}%` }}
-              />
+
+            {/* Center Titles */}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-black text-foreground">{tier.tierName || "Gold Star"}</h4>
+                <span className="text-sm font-black text-purple-400">{points} / {tier.maxPoints + 1} LP</span>
+              </div>
+              <p className="text-xs text-muted-foreground">Keep contributing!</p>
             </div>
-            <p className="text-[10px] font-semibold text-muted-foreground">
+          </div>
+
+          {/* Progress Bar with vibrant purple-to-orange gradient */}
+          <div className="h-2.5 w-full rounded-full bg-muted/40 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-linear-to-r from-purple-500 via-pink-500 to-amber-500 shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all duration-500"
+              style={{ width: `${Math.min(100, Math.max(10, Math.round((points / (tier.maxPoints + 1)) * 100)))}%` }}
+            />
+          </div>
+
+          {/* Bottom Row */}
+          <div className="flex items-center justify-between pt-0.5">
+            <p className="text-xs font-medium text-muted-foreground">
               {points >= 1000
                 ? "Maximum Legend rank reached! 👑"
-                : `${tier.maxPoints + 1 - points} LP needed to unlock next rank`}
+                : `${Math.max(0, (tier.maxPoints + 1) - points)} LP needed to unlock next rank`}
             </p>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange("clout")}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-950/40 border border-purple-600/40 text-purple-300 hover:bg-purple-900/50 text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+            >
+              <Crown className="size-3 text-purple-400" />
+              <span>View Perks</span>
+            </button>
           </div>
         </div>
 
-        {/* ─── Profile Navigation Underline Tabs (Twitter Style) ─── */}
+        {/* ─── Profile Navigation Underline Tabs (Exact Parity with Image 2) ─── */}
         <div className="flex border-b border-border/30 bg-background text-xs font-bold mt-2 overflow-x-auto no-scrollbar">
           <button
             type="button"
@@ -818,22 +745,7 @@ export function ProfileClientView({
           >
             <span>Activity ({posts.length})</span>
             {activeTab === "posts" && (
-              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange("academics")}
-            className={cn(
-              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 px-3",
-              activeTab === "academics" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <FolderPlus className="size-3.5 text-indigo-400" />
-            <span>Shared Notes ({userAcademicsCount})</span>
-            {activeTab === "academics" && (
-              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
+              <span className="absolute bottom-0 inset-x-3 h-0.5 rounded-full bg-purple-500" />
             )}
           </button>
 
@@ -845,10 +757,9 @@ export function ProfileClientView({
               activeTab === "articles" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <BookOpen className="size-3.5" />
             <span>Articles ({userArticles.length})</span>
             {activeTab === "articles" && (
-              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
+              <span className="absolute bottom-0 inset-x-3 h-0.5 rounded-full bg-purple-500" />
             )}
           </button>
 
@@ -860,10 +771,9 @@ export function ProfileClientView({
               activeTab === "photos" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <Camera className="size-3.5" />
             <span>Gallery ({candidatePhotos.length})</span>
             {activeTab === "photos" && (
-              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
+              <span className="absolute bottom-0 inset-x-3 h-0.5 rounded-full bg-purple-500" />
             )}
           </button>
 
@@ -877,7 +787,7 @@ export function ProfileClientView({
           >
             <span>LP Perks</span>
             {activeTab === "clout" && (
-              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
+              <span className="absolute bottom-0 inset-x-3 h-0.5 rounded-full bg-purple-500" />
             )}
           </button>
 
@@ -890,10 +800,9 @@ export function ProfileClientView({
                 activeTab === "archived" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Archive className="size-3.5" />
               <span>Archive ({archivedPosts.length})</span>
               {activeTab === "archived" && (
-                <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
+                <span className="absolute bottom-0 inset-x-3 h-0.5 rounded-full bg-purple-500" />
               )}
             </button>
           )}

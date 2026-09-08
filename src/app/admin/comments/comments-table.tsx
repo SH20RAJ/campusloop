@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Eye, SearchIcon, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, SearchIcon, Trash2, VenetianMask } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -108,7 +108,7 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
       {/* Table */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="w-full overflow-x-auto">
-          <table className="w-full text-left text-sm text-muted-foreground">
+          <table className="w-full min-w-[700px] text-left text-sm text-muted-foreground">
             <thead className="bg-muted text-xs uppercase text-foreground">
               <tr>
                 <th className="px-6 py-4">Author</th>
@@ -125,7 +125,12 @@ export function CommentsTable({ initialComments, page, totalPages }: CommentsTab
                     <div className="flex flex-col">
                       <span className="font-semibold text-foreground">
                         {c.isAnonymous
-                          ? (revealed[c.id]?.displayName ?? "👻 Anonymous")
+                          ? (revealed[c.id]?.displayName ?? (
+                              <span className="inline-flex items-center gap-1">
+                                <VenetianMask className="size-3 text-purple-400" />
+                                <span>Anonymous</span>
+                              </span>
+                            ))
                           : c.author?.displayName}
                       </span>
                       <span className="text-xs text-muted-foreground">

@@ -530,7 +530,7 @@ export function UsersTable({
       {/* ─── Users Table ─── */}
       <div className="rounded-2xl border border-border/80 bg-card overflow-hidden shadow-xs">
         <div className="w-full overflow-x-auto">
-          <table className="w-full text-left text-xs text-muted-foreground">
+          <table className="w-full min-w-[850px] text-left text-xs text-muted-foreground">
             <thead className="bg-muted/50 border-b border-border/60 text-[11px] font-bold uppercase tracking-wider text-foreground">
               <tr>
                 <th className="px-5 py-3.5">Student / User</th>

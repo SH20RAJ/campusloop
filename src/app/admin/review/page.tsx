@@ -1,4 +1,4 @@
-import { CheckCircle2, ShieldAlert, XCircle } from "lucide-react";
+import { CheckCircle2, ShieldAlert, VenetianMask, XCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -24,19 +24,24 @@ export default async function ReviewQueuePage() {
   const queue = await getPendingReviewPosts(db).catch(() => []);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
-      <header>
-        <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-          <ShieldAlert className="h-6 w-6 text-orange-500" /> Review Queue
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          Content auto-flagged by the safety engine. Approve to publish, reject to hide. Every decision is
-          audit-logged.
-        </p>
+    <div className="space-y-6 max-w-5xl">
+      <header className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+            <ShieldAlert className="h-5 w-5 text-amber-500" />
+            Review Queue
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Posts flagged by automated filters or high-risk rules awaiting manual action.
+          </p>
+        </div>
+        <Badge variant="outline" className="text-xs">
+          {queue.length} pending
+        </Badge>
       </header>
 
       {queue.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center space-y-2">
+        <div className="rounded-xl border border-dashed border-border bg-card/40 p-12 text-center space-y-2">
           <CheckCircle2 className="h-8 w-8 text-emerald-500 mx-auto" />
           <h3 className="text-sm font-bold text-foreground">Queue is clear</h3>
           <p className="text-xs text-muted-foreground">No posts are awaiting review right now.</p>
@@ -52,8 +57,9 @@ export default async function ReviewQueuePage() {
                 <Badge variant={riskTone(post.riskScore)}>Risk {post.riskScore}</Badge>
                 <Badge variant="outline">{post.type}</Badge>
                 {post.isAnonymous && (
-                  <Badge variant="outline" className="text-muted-foreground">
-                    👻 {post.pseudonym || "anon"}
+                  <Badge variant="outline" className="text-muted-foreground inline-flex items-center gap-1">
+                    <VenetianMask className="size-3" />
+                    <span>{post.pseudonym || "anon"}</span>
                   </Badge>
                 )}
                 <span className="text-muted-foreground ml-auto">

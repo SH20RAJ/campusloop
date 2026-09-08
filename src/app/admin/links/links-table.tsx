@@ -184,7 +184,7 @@ export function AdminLinksClient() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full min-w-[700px] text-left text-xs">
               <thead className="border-b border-border/40 bg-muted/30 text-muted-foreground font-bold">
                 <tr>
                   <th className="p-3">Title / Campaign</th>

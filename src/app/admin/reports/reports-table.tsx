@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon, Eye, EyeOff, Trash2Icon, XCircle } from "lucide-react";
+import { CheckIcon, Eye, EyeOff, Trash2Icon, VenetianMask, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -72,7 +72,7 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
 
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full text-left text-sm text-muted-foreground">
+      <table className="w-full min-w-[680px] text-left text-sm text-muted-foreground">
         <thead className="bg-muted text-xs uppercase text-foreground">
           <tr>
             <th className="px-6 py-4">Report Details</th>
@@ -84,14 +84,10 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
         <tbody>
           {initialReports.map((report) => (
             <tr key={report.id} className="border-b border-border hover:bg-muted/50">
-              <td className="px-6 py-4 space-y-1">
-                <span className="font-semibold text-destructive text-xs uppercase bg-destructive/15 px-2 py-0.5 rounded border border-destructive/10">
-                  {report.reason}
-                </span>
+              <td className="px-6 py-4 text-xs">
+                <span className="font-semibold text-foreground uppercase tracking-wider">{report.reason}</span>
                 {report.details && (
-                  <p className="text-xs text-muted-foreground mt-1 max-w-[200px] line-clamp-2">
-                    {report.details}
-                  </p>
+                  <p className="text-muted-foreground mt-1 max-w-[200px] truncate">{report.details}</p>
                 )}
               </td>
               <td className="px-6 py-4 font-medium text-foreground max-w-[300px]">
@@ -99,8 +95,15 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
               </td>
               <td className="px-6 py-4">
                 <div className="flex flex-col">
-                  <span className="font-medium text-foreground">
-                    {report.authorDisplayName ?? revealed[report.postId]?.displayName ?? "👻 Anonymous"}
+                  <span className="font-medium text-foreground flex items-center gap-1.5">
+                    {report.authorDisplayName ?? (
+                      revealed[report.postId]?.displayName ?? (
+                        <span className="inline-flex items-center gap-1">
+                          <VenetianMask className="size-3.5 text-purple-400" />
+                          <span>Anonymous</span>
+                        </span>
+                      )
+                    )}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {report.authorUsername

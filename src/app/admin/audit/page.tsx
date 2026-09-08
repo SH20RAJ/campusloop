@@ -45,7 +45,7 @@ export default async function AuditLogPage({ searchParams }: PageProps) {
 
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="w-full overflow-x-auto">
-          <table className="w-full text-left text-sm text-muted-foreground">
+          <table className="w-full min-w-[600px] text-left text-sm text-muted-foreground">
             <thead className="bg-muted text-xs uppercase text-foreground">
               <tr>
                 <th className="px-5 py-3">Action</th>

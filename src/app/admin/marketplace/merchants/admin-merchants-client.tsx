@@ -81,12 +81,12 @@ export function AdminMerchantsClient() {
           className="h-10 rounded-xl bg-card border border-border px-3 text-xs font-bold text-foreground outline-none w-full sm:w-auto"
         >
           <option value="all">All Categories</option>
-          <option value="food">🍔 Food &amp; Canteens</option>
-          <option value="rentals">🚲 Bike &amp; Vehicle Rentals</option>
-          <option value="barber">✂️ Barber &amp; Salon</option>
-          <option value="laundry">🧺 Laundry &amp; Wash</option>
-          <option value="water">💧 20L Water Delivery</option>
-          <option value="essentials">🛒 Supermarket &amp; Mart</option>
+          <option value="food">Food &amp; Canteens</option>
+          <option value="rentals">Bike &amp; Vehicle Rentals</option>
+          <option value="barber">Barber &amp; Salon</option>
+          <option value="laundry">Laundry &amp; Wash</option>
+          <option value="water">20L Water Delivery</option>
+          <option value="essentials">Supermarket &amp; Mart</option>
         </select>
       </div>
 
@@ -106,7 +106,7 @@ export function AdminMerchantsClient() {
           </div>
         ) : filteredMerchants.length > 0 ? (
           <div className="divide-y divide-border overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full min-w-[800px] text-left text-xs">
               <thead className="bg-muted/40 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="p-3">Store Name</th>

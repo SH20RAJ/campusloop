@@ -7,9 +7,11 @@ import {
   Eye,
   EyeOff,
   RotateCcw,
+  School,
   SearchIcon,
   Trash2,
   UserCheck,
+  VenetianMask,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -28,22 +30,22 @@ import type { PostAnonFilter, PostOriginFilter, PostStatusFilter } from "./page"
 
 const statusTabs: { value: PostStatusFilter; label: string }[] = [
   { value: "ALL", label: "All Statuses" },
-  { value: "PUBLISHED", label: "✅ Published" },
-  { value: "HIDDEN", label: "🙈 Hidden (Unlisted)" },
-  { value: "PENDING_REVIEW", label: "⚠️ Flagged" },
-  { value: "DELETED", label: "🗑️ Deleted" },
+  { value: "PUBLISHED", label: "Published" },
+  { value: "HIDDEN", label: "Hidden" },
+  { value: "PENDING_REVIEW", label: "Flagged" },
+  { value: "DELETED", label: "Deleted" },
 ];
 
 const originTabs: { value: PostOriginFilter; label: string }[] = [
-  { value: "all", label: "All Origins" },
-  { value: "real", label: "👤 Real Students Only" },
-  { value: "seeded", label: "🤖 Seeded / Bot Data" },
+  { value: "ALL", label: "All Posts" },
+  { value: "REAL", label: "Student Posts" },
+  { value: "SEEDED", label: "Platform Seeded" },
 ];
 
 const anonTabs: { value: PostAnonFilter; label: string }[] = [
-  { value: "all", label: "Everyone" },
-  { value: "anon", label: "👻 Anonymous" },
-  { value: "public", label: "Named" },
+  { value: "ALL", label: "All Identities" },
+  { value: "named", label: "Public Profile" },
+  { value: "anon", label: "Anonymous" },
 ];
 
 interface AuthorInfo {
@@ -339,7 +341,7 @@ export function PostsTable({
       {/* ─── Posts Table ─── */}
       <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[700px] text-left text-sm">
             <thead className="bg-muted/50 border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-5 py-3 font-bold">Post Content</th>
@@ -366,8 +368,9 @@ export function PostsTable({
                             {post.type}
                           </span>
                           {post.isAnonymous && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                              👻 {post.pseudonym || "Anon"}
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 inline-flex items-center gap-1">
+                              <VenetianMask className="size-3 text-purple-400" />
+                              <span>{post.pseudonym || "Anon"}</span>
                             </span>
                           )}
                           <span className="text-[10px] text-muted-foreground/70">
@@ -385,8 +388,9 @@ export function PostsTable({
                         </p>
 
                         {post.institution && (
-                          <p className="text-[10px] text-muted-foreground/80 truncate">
-                            🏫 {post.institution.name}
+                          <p className="text-[10px] text-muted-foreground/80 truncate flex items-center gap-1">
+                            <School className="size-3 shrink-0 text-muted-foreground" />
+                            <span>{post.institution.name}</span>
                           </p>
                         )}
                       </div>

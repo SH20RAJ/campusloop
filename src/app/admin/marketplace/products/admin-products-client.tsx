@@ -113,8 +113,8 @@ export function AdminProductsClient() {
             className="h-10 rounded-xl bg-card border border-border px-3 text-xs font-bold text-foreground outline-none"
           >
             <option value="all">All Stock Status</option>
-            <option value="in_stock">🟢 In Stock Only</option>
-            <option value="out_of_stock">🔴 Out of Stock</option>
+            <option value="in_stock">In Stock Only</option>
+            <option value="out_of_stock">Out of Stock</option>
           </select>
         </div>
       </div>
@@ -124,7 +124,7 @@ export function AdminProductsClient() {
         <div className="p-4 border-b border-border flex items-center justify-between">
           <h2 className="text-sm font-black text-foreground">Catalog Items</h2>
           <span className="text-xs text-muted-foreground font-semibold">
-            Showing {filteredProducts.length} of {products.length} products
+            {filteredProducts.length} items listed
           </span>
         </div>
 
@@ -132,11 +132,10 @@ export function AdminProductsClient() {
           <div className="p-4 space-y-2">
             <Skeleton className="h-14 w-full rounded-xl" />
             <Skeleton className="h-14 w-full rounded-xl" />
-            <Skeleton className="h-14 w-full rounded-xl" />
           </div>
         ) : filteredProducts.length > 0 ? (
           <div className="divide-y divide-border overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full min-w-[750px] text-left text-xs">
               <thead className="bg-muted/40 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="p-3">Product Name</th>

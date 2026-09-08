@@ -117,7 +117,7 @@ export function CollegesTable({ initialColleges }: { initialColleges: CollegeRow
       </div>
 
       <div className="w-full overflow-x-auto border border-border rounded-2xl bg-card shadow-xs">
-        <table className="w-full text-left text-sm text-muted-foreground">
+        <table className="w-full min-w-[680px] text-left text-sm text-muted-foreground">
           <thead className="bg-muted/60 text-[11px] font-black uppercase tracking-wider text-foreground border-b border-border">
             <tr>
               <th className="px-6 py-3.5">College &amp; Branding</th>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Globe, Sparkles } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { AcademicSourcesDirectory } from "@/components/academics/academic-sources-directory";
 
 export const metadata: Metadata = {

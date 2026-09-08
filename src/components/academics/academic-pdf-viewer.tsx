@@ -4,10 +4,8 @@ import {
   Cpu,
   Download,
   ExternalLink,
-  Eye,
-  FileCode2,
-  FileSpreadsheet,
   FileText,
+  Loader2,
   Maximize2,
   Minimize2,
   Moon,
@@ -27,7 +25,7 @@ interface AcademicPdfViewerProps {
   driveUrl?: string | null;
   title: string;
   subjectCode: string;
-  resourceType: string;
+  resourceType?: string;
   onDownload?: () => void;
   className?: string;
 }
@@ -37,7 +35,7 @@ export function AcademicPdfViewer({
   driveUrl,
   title,
   subjectCode,
-  resourceType,
+  resourceType: _resourceType,
   onDownload,
   className,
 }: AcademicPdfViewerProps) {
@@ -49,11 +47,14 @@ export function AcademicPdfViewer({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasIframeError, setHasIframeError] = useState<boolean>(false);
 
+  const [viewerEngine, setViewerEngine] = useState<"google" | "native">("google");
+
   // Normalize URLs
-  const rawUrl = fileUrl || driveUrl || "";
+  const rawUrl = (fileUrl || driveUrl || "").trim();
   const isGoogleDrive = rawUrl.includes("drive.google.com");
   const isMultisim = rawUrl.toLowerCase().endsWith(".ms14") || title.toLowerCase().includes("multisim");
   const isDirectPdf = rawUrl.toLowerCase().includes(".pdf");
+  const isOfficeDoc = /\.(docx?|pptx?|xlsx?)$/i.test(rawUrl);
 
   // Determine embeddable URL
   const embedUrl = useMemo(() => {
@@ -64,14 +65,19 @@ export function AcademicPdfViewer({
       return rawUrl.replace(/\/view(\?.*)?$/, "/preview").replace(/\/edit(\?.*)?$/, "/preview");
     }
 
+    if (viewerEngine === "google" || isOfficeDoc) {
+      // Google Docs Viewer API: renders PDFs, PPTs, DOCs cleanly server-side without auto-downloads or x-frame blocks
+      return `https://docs.google.com/viewer?url=${encodeURIComponent(rawUrl)}&embedded=true`;
+    }
+
     if (isDirectPdf) {
-      // If it is a direct PDF, append toolbar and fit parameters
+      // Direct browser native rendering with PDF parameters
       return `${rawUrl}#toolbar=1&navpanes=1&scrollbar=1&view=FitH`;
     }
 
     // Otherwise pass raw
     return rawUrl;
-  }, [rawUrl, isGoogleDrive, isDirectPdf]);
+  }, [rawUrl, isGoogleDrive, viewerEngine, isOfficeDoc, isDirectPdf]);
 
   // Handle direct download
   function handleDownloadClick(e?: React.MouseEvent) {
@@ -154,6 +160,12 @@ export function AcademicPdfViewer({
     return () => document.removeEventListener("fullscreenchange", onFsChange);
   }, []);
 
+  // Reset loading state when URL or engine changes
+  useEffect(() => {
+    setIsLoading(true);
+    setHasIframeError(false);
+  }, [embedUrl]);
+
   // Multisim Circuit Simulation File UI
   if (isMultisim) {
     return (
@@ -234,6 +246,33 @@ export function AcademicPdfViewer({
 
         {/* Right: Controls (Zoom, Night Mode, Rotate, Fullscreen, Direct Download) */}
         <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+          {/* Viewer Engine Switcher (for direct PDFs/Docs) */}
+          {!isGoogleDrive && isDirectPdf && (
+            <button
+              type="button"
+              onClick={() => {
+                sounds.tap();
+                haptics.light();
+                setIsLoading(true);
+                setViewerEngine((e) => (e === "google" ? "native" : "google"));
+                toast.info(
+                  viewerEngine === "google"
+                    ? "Switched to Native Browser PDF View"
+                    : "Switched to Google Docs Viewer API ⚡"
+                );
+              }}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border border-border/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
+              title={
+                viewerEngine === "google"
+                  ? "Currently using Google Docs Viewer API (prevents auto-downloads). Click to switch to Native View"
+                  : "Currently using Native View. Click to switch to Google Docs Viewer API"
+              }
+            >
+              <span className={cn("size-1.5 rounded-full inline-block", viewerEngine === "google" ? "bg-emerald-400" : "bg-indigo-400")} />
+              <span>{viewerEngine === "google" ? "Cloud View" : "Native View"}</span>
+            </button>
+          )}
+
           {/* Zoom controls (for direct embeds) */}
           <div className="hidden sm:flex items-center bg-card rounded-full border border-border/50 p-0.5">
             <button
@@ -333,13 +372,30 @@ export function AcademicPdfViewer({
       <div className="flex-1 w-full h-full relative overflow-hidden bg-neutral-900/95 flex items-center justify-center">
         {embedUrl ? (
           <div
-            className="w-full h-full transition-transform duration-200 origin-center flex items-center justify-center overflow-auto"
+            className="w-full h-full transition-transform duration-200 origin-center flex items-center justify-center overflow-auto relative"
             style={{
               transform: `scale(${zoomLevel / 100}) rotate(${rotation}deg)`,
               filter: isNightMode ? "invert(90%) hue-rotate(180deg)" : "none",
             }}
           >
+            {isLoading && (
+              <div className="absolute inset-0 bg-neutral-950/80 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center space-y-3 z-10 transition-opacity duration-300 pointer-events-none">
+                <div className="flex size-12 items-center justify-center rounded-2xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 shadow-sm">
+                  <Loader2 className="size-6 animate-spin" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-bold text-foreground">Streaming Document Preview...</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {viewerEngine === "google" || isGoogleDrive
+                      ? "Fast Cloud Preview • Zero login required"
+                      : "Native PDF Viewer"}
+                  </p>
+                </div>
+              </div>
+            )}
+
             <iframe
+              key={embedUrl}
               src={embedUrl}
               title={title}
               className="w-full h-full border-0 bg-white"

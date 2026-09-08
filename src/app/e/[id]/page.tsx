@@ -1,6 +1,6 @@
 import { eq, or } from "drizzle-orm";
 import type { Metadata } from "next";
-import EventDetailPage from "@/app/app/(main)/events/[id]/page";
+import EventDetailPage from "@/app/app/(events)/events/[id]/page";
 import { getDb } from "@/db";
 import { events } from "@/db/schema";
 

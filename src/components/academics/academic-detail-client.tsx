@@ -1,13 +1,13 @@
 "use client";
 
-import { ArrowDown, ArrowLeft, ArrowUp, Bookmark, BookOpen, Bot, CheckCircle2, ChevronRight, Download, ExternalLink, Eye, FileText, Maximize2, Minimize2, Send, Share2, ShieldCheck, Zap } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Bookmark, Bot, CheckCircle2, ChevronRight, Download, ExternalLink, FolderPlus, Share2, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
 import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
 import { AcademicPdfViewer } from "@/components/academics/academic-pdf-viewer";
+import { AddToPlaylistModal } from "@/components/academics/add-to-playlist-modal";
 import { SimilarResourcesWidget } from "@/components/academics/similar-resources-widget";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { checkAndRecordDownload } from "@/lib/academic-download-limiter";
@@ -29,17 +29,14 @@ interface AcademicDetailClientProps {
 }
 
 export function AcademicDetailClient({ initialResource, currentUserId }: AcademicDetailClientProps) {
-  const router = useRouter();
-  const [resource, setResource] = useState(initialResource);
+  const [resource] = useState(initialResource);
   const [upvotes, setUpvotes] = useState(initialResource.upvotesCount || 0);
   const [downvotes, setDownvotes] = useState(initialResource.downvotesCount || 0);
   const [downloads, setDownloads] = useState(initialResource.downloadsCount || 0);
-  const [views, setViews] = useState(initialResource.viewsCount || 1);
+  const [views] = useState(initialResource.viewsCount || 1);
   const [userVote, setUserVote] = useState<"UP" | "DOWN" | null>(null);
   const [isSaved, setIsSaved] = useState(false);
-
-  // Document preview expand
-  const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
+  const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
 
   // Peer comments state
   const [comments, setComments] = useState<any[]>(initialResource.comments || []);
@@ -265,11 +262,6 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
     }
   }
 
-  const rawUrl = resource.fileUrl || resource.driveUrl;
-  const isGoogleDrive = rawUrl && rawUrl.includes("drive.google.com");
-  // Form previewable embed URL for Drive or PDF
-  const previewUrl = isGoogleDrive ? rawUrl.replace(/\/view(\?.*)?$/, "/preview") : rawUrl;
-
   return (
     <div className="min-h-screen pb-24 text-foreground select-none max-w-4xl mx-auto px-3 sm:px-6 pt-3 space-y-6">
       {/* ─── Breadcrumb & Top Bar ─── */}
@@ -334,7 +326,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         {/* Author row */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <Link href={`/@${resource.uploader?.username}`} className="shrink-0">
+            <Link href={`/@${resource.uploader?.username}?tab=academics`} className="shrink-0">
               <Avatar className="size-11 rounded-full border border-border/50">
                 <AvatarImage src={uploaderAvatar} />
                 <AvatarFallback className="text-xs font-bold">
@@ -345,7 +337,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 leading-tight">
                 <Link
-                  href={`/@${resource.uploader?.username}`}
+                  href={`/@${resource.uploader?.username}?tab=academics`}
                   className="text-sm sm:text-base font-black text-foreground hover:underline truncate"
                 >
                   {resource.uploader?.displayName}
@@ -483,6 +475,16 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
 
           <button
             type="button"
+            onClick={() => setIsAddToPlaylistOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10 active:scale-95 transition-all cursor-pointer shadow-xs"
+            title="Save to Study Playlist"
+          >
+            <FolderPlus className="size-3.5" />
+            <span className="hidden sm:inline">Add to Playlist</span>
+          </button>
+
+          <button
+            type="button"
             onClick={handleDownload}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-primary text-primary-foreground hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer"
           >
@@ -492,6 +494,14 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
           </button>
         </div>
       </div>
+
+      {/* Add To Study Playlist Modal */}
+      <AddToPlaylistModal
+        isOpen={isAddToPlaylistOpen}
+        onClose={() => setIsAddToPlaylistOpen(false)}
+        resourceId={resource.id}
+        resourceTitle={resource.title}
+      />
 
       {/* ─── Interactive Document Previewer & Reader ─── */}
       <div className="space-y-2">
@@ -672,12 +682,26 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-1.5 leading-none">
-                        <span className="text-xs font-bold text-foreground hover:underline">
-                          {c.author?.displayName || "Student"}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground">
-                          @{c.author?.username || "student"}
-                        </span>
+                        {c.author?.username ? (
+                          <Link
+                            href={`/@${c.author.username}?tab=academics`}
+                            className="text-xs font-bold text-foreground hover:underline"
+                          >
+                            {c.author?.displayName || "Student"}
+                          </Link>
+                        ) : (
+                          <span className="text-xs font-bold text-foreground">
+                            {c.author?.displayName || "Student"}
+                          </span>
+                        )}
+                        {c.author?.username && (
+                          <Link
+                            href={`/@${c.author.username}?tab=academics`}
+                            className="text-[11px] text-muted-foreground hover:underline"
+                          >
+                            @{c.author.username}
+                          </Link>
+                        )}
                         <span className="text-[10px] text-muted-foreground/60">·</span>
                         <span className="text-[11px] text-muted-foreground">
                           {formatTimeAgo(c.createdAt)}

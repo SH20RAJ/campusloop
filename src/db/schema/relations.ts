@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import { academicResourceComments, academicResources, academicResourceVotes } from "./academic-resources";
+import { academicPlaylists, academicPlaylistItems, academicPlaylistStars } from "./academic-playlists";
 import { aiConversations, aiFeedback, aiMessages, aiUsageEvents } from "./ai";
 import { articleComments, articleCommentVotes, articles, articleVotes } from "./articles";
 import { callSessions, userBehaviorEvents } from "./calls-and-analytics";
@@ -398,6 +399,41 @@ export const academicResourceVotesRelations = relations(academicResourceVotes, (
   }),
   profile: one(userProfiles, {
     fields: [academicResourceVotes.profileId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const academicPlaylistsRelations = relations(academicPlaylists, ({ one, many }) => ({
+  creator: one(userProfiles, {
+    fields: [academicPlaylists.creatorId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [academicPlaylists.institutionId],
+    references: [institutions.id],
+  }),
+  items: many(academicPlaylistItems),
+  stars: many(academicPlaylistStars),
+}));
+
+export const academicPlaylistItemsRelations = relations(academicPlaylistItems, ({ one }) => ({
+  playlist: one(academicPlaylists, {
+    fields: [academicPlaylistItems.playlistId],
+    references: [academicPlaylists.id],
+  }),
+  resource: one(academicResources, {
+    fields: [academicPlaylistItems.resourceId],
+    references: [academicResources.id],
+  }),
+}));
+
+export const academicPlaylistStarsRelations = relations(academicPlaylistStars, ({ one }) => ({
+  playlist: one(academicPlaylists, {
+    fields: [academicPlaylistStars.playlistId],
+    references: [academicPlaylists.id],
+  }),
+  user: one(userProfiles, {
+    fields: [academicPlaylistStars.userId],
     references: [userProfiles.id],
   }),
 }));

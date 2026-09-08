@@ -29,9 +29,9 @@ interface Community {
 }
 
 const DEFAULT_AVATARS = [
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
-  "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80",
-  "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80",
+  "https://api.dicebear.com/7.x/initials/svg?seed=Priya&backgroundColor=db2777&textColor=ffffff&fontWeight=800",
+  "https://api.dicebear.com/7.x/initials/svg?seed=Kabir&backgroundColor=2563eb&textColor=ffffff&fontWeight=800",
+  "https://api.dicebear.com/7.x/initials/svg?seed=Aarav&backgroundColor=7c3aed&textColor=ffffff&fontWeight=800",
 ];
 
 const KNOWN_COMMUNITIES: Record<string, Partial<Community> & { tags?: string[] }> = {

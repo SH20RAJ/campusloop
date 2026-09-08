@@ -1,15 +1,13 @@
 "use client";
 
-import { ArrowDown, ArrowUp, ExternalLink, Eye, Send } from "lucide-react";
+import { ArrowDown, ArrowUp, ExternalLink, Eye } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import {
-  AnimateBookOpen,
   AnimateDownload,
   AnimatedIcon,
-  AnimateGraduationCap,
   AnimateMessageSquare,
   AnimateShare,
   AnimateShieldCheck,
@@ -61,13 +59,14 @@ interface AcademicCardProps {
   };
   currentUserId?: string;
   isHighlighted?: boolean;
+  variant?: "row" | "grid";
 }
 
-export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCardProps) {
+export function AcademicCard({ item, currentUserId, isHighlighted, variant = "row" }: AcademicCardProps) {
   const [upvotes, setUpvotes] = useState(item.upvotesCount || 0);
   const [downvotes, setDownvotes] = useState(item.downvotesCount || 0);
   const [downloads, setDownloads] = useState(item.downloadsCount || 0);
-  const [views, setViews] = useState(item.viewsCount || 1);
+  const [views] = useState(item.viewsCount || 1);
   const [userVote, setUserVote] = useState<"UP" | "DOWN" | null>(null);
 
   const [showComments, setShowComments] = useState(false);
@@ -255,6 +254,151 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
     }
   }
 
+  if (variant === "grid") {
+    return (
+      <article
+        id={`academic-${item.id}`}
+        className={cn(
+          "rounded-3xl border border-border/40 bg-card/60 p-4 sm:p-5 flex flex-col justify-between hover:border-border/80 hover:shadow-lg transition-all duration-200 select-none group relative overflow-hidden backdrop-blur-xs",
+          isHighlighted && "border-primary/50 ring-2 ring-primary/20 bg-primary/5"
+        )}
+      >
+        <div className="space-y-3">
+          {/* Header Row: Author & Badges */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Link href={`/@${item.uploader.username}?tab=academics`} className="shrink-0">
+                <Avatar className="size-8 rounded-full border border-border/50 hover:opacity-90 transition-opacity">
+                  <AvatarImage src={avatar} />
+                  <AvatarFallback className="text-[10px] font-bold">
+                    {item.uploader.displayName[0] || "U"}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+              <div className="min-w-0 leading-tight">
+                <Link
+                  href={`/@${item.uploader.username}?tab=academics`}
+                  className="text-xs font-bold text-foreground hover:underline truncate block"
+                >
+                  {item.uploader.displayName}
+                </Link>
+                <span className="text-[10px] text-muted-foreground truncate block">
+                  @{item.uploader.username}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                {item.resourceType.replace("_", " ")}
+              </span>
+              <button
+                type="button"
+                onClick={handleShare}
+                className="size-7 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                title="Share link"
+              >
+                <AnimatedIcon icon={AnimateShare} animation="pop" size={12} />
+              </button>
+            </div>
+          </div>
+
+          {/* Subject info & Title */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <span className="font-mono font-bold text-primary px-1.5 py-0.2 rounded-md bg-primary/10">
+                {item.subjectCode}
+              </span>
+              <span>·</span>
+              <span className="truncate font-medium">{item.subjectName}</span>
+            </div>
+
+            <Link
+              href={`/app/academics/${item.id}`}
+              onClick={() => sounds.tap()}
+              className="block group/title"
+            >
+              <h3 className="text-sm sm:text-[15px] font-bold text-foreground group-hover/title:text-primary transition-colors leading-snug line-clamp-2">
+                {item.title}
+              </h3>
+            </Link>
+
+            {item.description && (
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                {item.description}
+              </p>
+            )}
+          </div>
+
+          {/* Tags & Context */}
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground flex-wrap pt-0.5">
+            <span className="px-2 py-0.5 rounded-full bg-muted/60 font-semibold">Sem {item.semester}</span>
+            <span className="px-2 py-0.5 rounded-full bg-muted/60 font-semibold">{item.branch}</span>
+            {item.moduleOrChapter && (
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20">
+                {item.moduleOrChapter}
+              </span>
+            )}
+            <span className="ml-auto text-emerald-500 font-bold">
+              🎯 {reliability}% Verified
+            </span>
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="pt-3 mt-3 border-t border-border/30 flex items-center justify-between text-xs text-muted-foreground">
+          {/* Upvotes */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => handleVote("UP")}
+              className={cn(
+                "flex items-center gap-1 hover:text-primary transition-colors cursor-pointer group/vote",
+                userVote === "UP" && "text-primary font-bold"
+              )}
+              title="Upvote"
+            >
+              <ArrowUp className={cn("size-3.5", userVote === "UP" && "stroke-3")} />
+              <span className="text-[11px] font-semibold tabular-nums">{upvotes}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleVote("DOWN")}
+              className={cn(
+                "p-1 hover:text-rose-400 transition-colors cursor-pointer",
+                userVote === "DOWN" && "text-rose-400"
+              )}
+              title="Downvote errata"
+            >
+              <ArrowDown className="size-3" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 text-[11px]">
+            <span className="flex items-center gap-1 opacity-70" title="Views">
+              <Eye className="size-3" />
+              <span>{views}</span>
+            </span>
+            <span className="flex items-center gap-1 opacity-70" title="Downloads">
+              <AnimatedIcon icon={AnimateDownload} animation="nudge-up" size={11} />
+              <span>{downloads}</span>
+            </span>
+          </div>
+
+          {/* Primary Action Button */}
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs"
+          >
+            <span>Preview</span>
+            <ExternalLink className="size-2.5 opacity-80" />
+          </button>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article
       id={`academic-${item.id}`}
@@ -265,7 +409,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
     >
       <div className="flex items-start gap-3">
         {/* Left Column: Author Avatar */}
-        <Link href={`/@${item.uploader.username}`} className="shrink-0 mt-0.5">
+        <Link href={`/@${item.uploader.username}?tab=academics`} className="shrink-0 mt-0.5">
           <Avatar className="size-10 rounded-full border border-border/40 hover:opacity-90 transition-opacity">
             <AvatarImage src={avatar} />
             <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
@@ -280,7 +424,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
               <Link
-                href={`/@${item.uploader.username}`}
+                href={`/@${item.uploader.username}?tab=academics`}
                 className="text-sm font-bold text-foreground hover:underline truncate"
               >
                 {item.uploader.displayName}
@@ -509,10 +653,24 @@ export function AcademicCard({ item, currentUserId, isHighlighted }: AcademicCar
                 <div key={c.id} className="pt-2 first:pt-0 space-y-1">
                   <div className="flex items-center justify-between text-[11px]">
                     <div className="flex items-center gap-1.5 font-bold text-foreground">
-                      <span>{c.author?.displayName || "Student"}</span>
-                      <span className="text-[10px] text-muted-foreground font-normal">
-                        @{c.author?.username}
-                      </span>
+                      {c.author?.username ? (
+                        <Link
+                          href={`/@${c.author.username}?tab=academics`}
+                          className="hover:underline"
+                        >
+                          {c.author?.displayName || "Student"}
+                        </Link>
+                      ) : (
+                        <span>{c.author?.displayName || "Student"}</span>
+                      )}
+                      {c.author?.username && (
+                        <Link
+                          href={`/@${c.author.username}?tab=academics`}
+                          className="text-[10px] text-muted-foreground font-normal hover:underline"
+                        >
+                          @{c.author.username}
+                        </Link>
+                      )}
                       <span className="text-[10px] text-muted-foreground/60">·</span>
                       <span className="text-[10px] text-muted-foreground/80">
                         {formatTimeAgo(c.createdAt)}

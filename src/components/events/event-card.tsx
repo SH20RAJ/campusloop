@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Check, Clock, Globe, MapPin, School, Trophy, Users } from "lucide-react";
+import { Calendar, Check, Globe, School, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -48,9 +48,10 @@ export interface EventItem {
 
 interface EventCardProps {
   event: EventItem;
+  variant?: "row" | "grid";
 }
 
-export function EventCard({ event }: EventCardProps) {
+export function EventCard({ event, variant = "row" }: EventCardProps) {
   const [isRegistered, setIsRegistered] = useState(event.isRegistered);
   const [attendeeCount, setAttendeeCount] = useState(event.attendeeCount);
   const [isMutating, setIsMutating] = useState(false);
@@ -119,6 +120,162 @@ export function EventCard({ event }: EventCardProps) {
     } finally {
       setIsMutating(false);
     }
+  }
+
+  if (variant === "grid") {
+    return (
+      <Link
+        href={`/app/events/${event.slug || event.id}`}
+        className="group relative flex flex-col justify-between rounded-3xl border border-border/40 bg-card/75 hover:bg-muted/30 p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:-translate-y-0.5 overflow-hidden"
+      >
+        <div className="space-y-3">
+          {/* Banner with Mode & Deadline */}
+          <div className="relative aspect-16/9 w-full overflow-hidden rounded-2xl bg-muted/40">
+            {event.bannerUrl ? (
+              <img
+                src={event.bannerUrl}
+                alt={event.title}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-muted/60">
+                <Calendar className="size-8 text-muted-foreground/60" />
+              </div>
+            )}
+
+            {/* Mode Tag */}
+            <div className="absolute top-2.5 left-2.5 rounded-full bg-black/75 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-black text-white uppercase tracking-wider shadow-xs">
+              {event.mode}
+            </div>
+
+            {/* Event Type */}
+            <div className="absolute top-2.5 right-2.5 rounded-full bg-primary/90 text-primary-foreground backdrop-blur-md px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-xs">
+              {event.eventType}
+            </div>
+
+            {deadlineText && (
+              <div
+                className={cn(
+                  "absolute bottom-2.5 left-2.5 right-2.5 rounded-xl px-2.5 py-1 text-[11px] font-black text-center backdrop-blur-md truncate shadow-xs",
+                  isUrgentDeadline
+                    ? "bg-red-500/90 text-white animate-pulse"
+                    : "bg-black/80 text-amber-300 border border-amber-500/30"
+                )}
+              >
+                {deadlineText}
+              </div>
+            )}
+          </div>
+
+          {/* Club & Eligibility */}
+          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+            <span className="font-bold text-foreground truncate">{event.clubName}</span>
+            {isRestricted ? (
+              <span className="inline-flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 font-semibold shrink-0">
+                <School className="size-3" />
+                Campus
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground shrink-0">
+                <Globe className="size-3" />
+                All India
+              </span>
+            )}
+          </div>
+
+          {/* Title & Tagline */}
+          <div className="space-y-1">
+            <h3 className="text-base font-black leading-tight text-foreground transition-colors group-hover:text-primary line-clamp-2">
+              {event.title}
+            </h3>
+            {event.tagline && (
+              <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                {event.tagline}
+              </p>
+            )}
+          </div>
+
+          {/* Badges / Perks */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            {event.prizesDescription && (
+              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-black">
+                <Trophy className="size-3.5 shrink-0" />
+                <span className="truncate max-w-[170px]">{event.prizesDescription}</span>
+              </div>
+            )}
+
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[11px] font-medium">
+              <Calendar className="size-3" />
+              <span>{dateStr}</span>
+            </div>
+
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[11px] font-medium">
+              <Users className="size-3" />
+              <span>
+                {event.participationType === "TEAM"
+                  ? "Team"
+                  : event.participationType === "BOTH"
+                  ? "Solo/Team"
+                  : "Individual"}
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-primary/10 text-primary text-[11px] font-black">
+              <span>+{event.loopPointsReward || 25} LP</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer info & Actions */}
+        <div className="mt-4 flex items-center justify-between gap-2 border-t border-border/30 pt-3">
+          <div className="flex flex-col text-xs">
+            <span className="font-black text-foreground">{event.entryFee || "Free"}</span>
+            <span className="text-[10px] text-muted-foreground">{attendeeCount} registered</span>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <AddToCalendarDropdown
+              event={{
+                id: event.id,
+                title: event.title,
+                description: event.description,
+                venue: event.venue,
+                mode: event.mode,
+                startDate: event.startDate,
+                endDate: event.endDate,
+                slug: event.slug,
+                clubName: event.clubName,
+              }}
+              variant="button"
+            />
+
+            <button
+              type="button"
+              onClick={event.participationType === "TEAM" ? undefined : handleQuickRegister}
+              disabled={isMutating || isRegistered}
+              className={cn(
+                "flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-xs font-black transition-all active:scale-95",
+                isRegistered
+                  ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "bg-primary text-primary-foreground hover:opacity-90 shadow-2xs"
+              )}
+            >
+              {isRegistered ? (
+                <>
+                  <Check className="size-3.5" />
+                  Registered
+                </>
+              ) : event.participationType === "TEAM" ? (
+                "Form Team"
+              ) : (
+                "Register"
+              )}
+            </button>
+          </div>
+        </div>
+      </Link>
+    );
   }
 
   return (

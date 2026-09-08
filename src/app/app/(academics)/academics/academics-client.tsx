@@ -1,11 +1,13 @@
 "use client";
 
-import { BookOpen, Globe, Link2, Loader2, Plus, UploadCloud, X } from "lucide-react";
+import { BookOpen, FolderPlus, Globe, LayoutGrid, Link2, List, Loader2, Plus, Sparkles, UploadCloud, X } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
+import { AcademicPlaylistCard } from "@/components/academics/academic-playlist-card";
 import { AcademicCard } from "@/components/communities/academic-card";
 import { AnimateBookOpen, AnimateCheck, AnimatedIcon, AnimatePlus, AnimateSearch, AnimateZap } from "@/components/ui/animated-icon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,7 +16,7 @@ import { fetcher } from "@/lib/api";
 import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
 import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
 import { getGuestDownloadCount, GUEST_DOWNLOAD_LIMIT } from "@/lib/academic-download-limiter";
-import { trackAcademicSearch, trackFeedSwitch } from "@/lib/analytics/ga4";
+import { trackAcademicSearch } from "@/lib/analytics/ga4";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { uploadMediaFile } from "@/lib/upload";
@@ -27,6 +29,7 @@ interface AcademicsClientProps {
 
 const RESOURCE_TYPES = [
   { id: "all", label: "All Types" },
+  { id: "PLAYLISTS", label: "Study Playlists 📑" },
   { id: "NOTES", label: "Lecture Notes 📝" },
   { id: "MODULE", label: "Module / Unit 📘" },
   { id: "BOOK", label: "Whole Book 📚" },
@@ -66,7 +69,6 @@ const SEMESTERS = [
 ] as const;
 
 export function AcademicsClient({ profileId }: AcademicsClientProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const highlightId = searchParams.get("id");
 
@@ -76,6 +78,16 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [scope, setScope] = useState<"campus" | "global">("campus");
   const [sortBy, setSortBy] = useState<"for_you" | "latest" | "popular" | "downloads" | "views">("for_you");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("campusloop_academics_view_mode") as "grid" | "list" | null;
+      if (saved === "grid" || saved === "list") {
+        setViewMode(saved);
+      }
+    }
+  }, []);
 
   // Upload modal state
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -118,7 +130,10 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
     return () => clearTimeout(timer);
   }, [searchQuery, selectedBranch, selectedSemester, selectedType]);
 
+  const isPlaylistsTab = selectedType === "PLAYLISTS";
+
   const getKey = (pageIndex: number, previousPageData: any) => {
+    if (isPlaylistsTab) return null;
     if (previousPageData && (!previousPageData.items?.length || !previousPageData.hasMore)) {
       return null;
     }
@@ -145,6 +160,16 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
     revalidateFirstPage: false,
     dedupingInterval: 4000,
   });
+
+  const { data: playlistsData, isLoading: isPlaylistsLoading } = useSWR<{
+    playlists: any[];
+    pagination: { total: number };
+  }>(
+    isPlaylistsTab
+      ? `/api/academics/playlists?branch=${selectedBranch}&semester=${selectedSemester}&q=${encodeURIComponent(searchQuery)}&scope=${scope}`
+      : null,
+    fetcher
+  );
 
   const items = useMemo(() => {
     return data ? data.flatMap((page) => page.items || []) : [];
@@ -266,37 +291,88 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-28 border-x border-border/30 bg-background">
-      {/* ─── Sticky Twitter/X Header & Omnibar Search ─── */}
-      <header className="sticky top-0 z-40 flex flex-col gap-2.5 border-b border-border/30 bg-background/85 px-4 pt-3 pb-1 backdrop-blur-xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-base font-black text-foreground tracking-tight flex items-center gap-2">
-              <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={18} className="text-primary" />
+    <main className="mx-auto flex w-full max-w-7xl flex-col min-h-screen select-none pb-28 px-3 sm:px-6 lg:px-8 bg-background">
+      {/* ─── Compact Sticky Header: Search & Navigation ─── */}
+      <header className="sticky top-0 z-40 flex flex-col gap-2.5 border-b border-border/30 bg-background/90 pt-3 pb-2 backdrop-blur-xl -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <h1 className="text-base sm:text-lg font-black text-foreground tracking-tight flex items-center gap-2 shrink-0">
+              <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={19} className="text-primary" />
               <span>Academic Vault</span>
             </h1>
-            <span className="text-xs text-muted-foreground font-medium">
+            <span className="text-xs text-muted-foreground font-medium truncate hidden sm:inline">
               {totalCount > 0 ? `· ${totalCount.toLocaleString()} resources` : "· Notes, Books & PYQs"}
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              if (!profileId) {
-                setAuthModalReason("UPLOAD");
-                setIsAuthModalOpen(true);
-                return;
-              }
-              sounds.tap();
-              haptics.light();
-              setShowUploadModal(true);
-            }}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer"
-          >
-            <AnimatedIcon icon={AnimatePlus} animation="pop" size={13} />
-            <span>Upload Notes</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {/* View Mode Switcher (Grid / List) */}
+            <div className="hidden sm:flex items-center rounded-full bg-muted/50 p-0.5 border border-border/40 text-muted-foreground">
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  setViewMode("grid");
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("campusloop_academics_view_mode", "grid");
+                  }
+                }}
+                className={cn(
+                  "p-1.5 rounded-full transition-all cursor-pointer",
+                  viewMode === "grid" ? "bg-background text-foreground shadow-xs" : "hover:text-foreground"
+                )}
+                title="Grid view"
+                aria-label="Grid view"
+              >
+                <LayoutGrid className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  setViewMode("list");
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("campusloop_academics_view_mode", "list");
+                  }
+                }}
+                className={cn(
+                  "p-1.5 rounded-full transition-all cursor-pointer",
+                  viewMode === "list" ? "bg-background text-foreground shadow-xs" : "hover:text-foreground"
+                )}
+                title="List view"
+                aria-label="List view"
+              >
+                <List className="size-3.5" />
+              </button>
+            </div>
+
+            <Link
+              href="/app/academics/playlists/new"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold transition-all shadow-xs"
+              title="Create new Study Playlist"
+            >
+              <FolderPlus className="size-3.5" />
+              <span className="hidden sm:inline">New Stack</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (!profileId) {
+                  setAuthModalReason("UPLOAD");
+                  setIsAuthModalOpen(true);
+                  return;
+                }
+                sounds.tap();
+                haptics.light();
+                setShowUploadModal(true);
+              }}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer"
+            >
+              <AnimatedIcon icon={AnimatePlus} animation="pop" size={13} />
+              <span>Upload Notes</span>
+            </button>
+          </div>
         </div>
 
         {/* Omnibar Search Input */}
@@ -325,38 +401,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
           )}
         </div>
 
-        {/* Guest conversion banner if not logged in */}
-        {!profileId && (
-          <AcademicAuthBenefitsCard returnTo="/app/academics" />
-        )}
-
-        {/* ─── Connected Sources & Archives Directory Quick Access ─── */}
-        <div className="flex items-center justify-between gap-2 pt-0.5">
-          <Link
-            href="/app/academics/sources"
-            className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/20 text-indigo-400 text-xs font-bold transition-all group"
-          >
-            <div className="flex items-center gap-2">
-              <Globe className="size-3.5 text-indigo-400 group-hover:rotate-12 transition-transform" />
-              <span>Partner University Archives (BIT Mesra, AKTU, VTU)</span>
-            </div>
-            <span className="text-[10px] uppercase tracking-wider font-black px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
-              10 Sources &rarr;
-            </span>
-          </Link>
-
-          {!profileId && (
-            <div
-              className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold shrink-0"
-              title="Guests enjoy 5 free downloads before sign-in is requested"
-            >
-              <span>🎁</span>
-              <span>{guestRemaining}/5 Free</span>
-            </div>
-          )}
-        </div>
-
-        {/* ─── Twitter-Style Sliding Tabs for Resource Types ─── */}
+        {/* ─── Sliding Tabs for Resource Types ─── */}
         <div className="flex border-b border-border/25 overflow-x-auto no-scrollbar pt-0.5">
           {RESOURCE_TYPES.map((type) => {
             const isSelected = selectedType === type.id;
@@ -390,7 +435,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
         </div>
 
         {/* ─── Secondary Filter Strip (Campus/India, Branch, Semester, Sort) ─── */}
-        <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar pb-1.5 pt-0.5">
+        <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar pb-1 pt-0.5">
           {/* Scope Selector */}
           <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
             <button
@@ -477,73 +522,193 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
         </div>
       </header>
 
-      {/* ─── Academic Resources Feed ─── */}
-      <section className="divide-y divide-border/20">
-        {isInitialLoading ? (
-          <div className="p-4 space-y-4">
-            <Skeleton className="h-32 w-full rounded-2xl" />
-            <Skeleton className="h-32 w-full rounded-2xl" />
-            <Skeleton className="h-32 w-full rounded-2xl" />
-          </div>
-        ) : items.length > 0 ? (
-          <>
-            {items.map((item) => (
-              <AcademicCard
-                key={item.id}
-                item={item}
-                currentUserId={profileId || undefined}
-                isHighlighted={highlightId === item.id}
-              />
-            ))}
-
-            {/* Sentinel element for infinite scroll */}
-            <div ref={setLoadMoreNode} className="flex flex-col items-center justify-center p-4 min-h-16">
-              {isLoadingMore && (
-                <div className="flex items-center gap-2 py-3 text-xs font-semibold text-muted-foreground">
-                  <Loader2 className="size-4 animate-spin text-primary" />
-                  <span>Loading more vault resources...</span>
-                </div>
-              )}
-              {isReachingEnd && (
-                <div className="py-6 text-center">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-muted/40 border border-border/40 text-[11px] font-semibold text-muted-foreground">
-                    <span>✨ Reached end of vault ({totalCount.toLocaleString()} resources)</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        sounds.tap();
-                        setShowUploadModal(true);
-                      }}
-                      className="text-primary hover:underline font-bold cursor-pointer"
-                    >
-                      + Add your notes
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </>
-        ) : (
-          <div className="py-24 text-center px-4 space-y-3">
-            <BookOpen className="size-10 text-muted-foreground/40 mx-auto" />
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-foreground">No study resources found</h3>
-              <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                Be the first to upload lecture notes, whole books, PPTs, or PYQs for this branch and earn 20
-                LP!
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowUploadModal(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer"
-            >
-              <Plus className="size-3.5" />
-              <span>Upload First Notes</span>
-            </button>
-          </div>
+      {/* ─── Scrollable Page Body (Full Space & Organized) ─── */}
+      <div className="space-y-4 pt-4">
+        {/* Guest conversion banner if not logged in (Natural scroll, NOT sticky) */}
+        {!profileId && (
+          <AcademicAuthBenefitsCard returnTo="/app/academics" dismissible={true} />
         )}
-      </section>
+
+        {/* ─── Connected Sources & Archives Directory Quick Access ─── */}
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href="/app/academics/sources"
+            className="flex-1 flex items-center justify-between gap-2 px-3.5 py-2 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/20 text-indigo-400 text-xs font-bold transition-all group"
+          >
+            <div className="flex items-center gap-2">
+              <Globe className="size-3.5 text-indigo-400 group-hover:rotate-12 transition-transform" />
+              <span>Partner University Archives (BIT Mesra, AKTU, VTU)</span>
+            </div>
+            <span className="text-[10px] uppercase tracking-wider font-black px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
+              10 Sources &rarr;
+            </span>
+          </Link>
+
+          {!profileId && (
+            <div
+              className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold shrink-0"
+              title="Guests enjoy 5 free downloads before sign-in is requested"
+            >
+              <span>🎁</span>
+              <span>{guestRemaining}/5 Free</span>
+            </div>
+          )}
+        </div>
+
+        {/* ─── Academic Resources Feed or Playlists Grid ─── */}
+        <section className="space-y-4">
+          {isPlaylistsTab ? (
+            <div className="space-y-4">
+              {/* Playlists Header Banner */}
+              <div className="rounded-3xl border border-indigo-500/30 bg-linear-to-r from-indigo-500/10 via-purple-500/5 to-card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs font-black text-indigo-400">
+                    <Sparkles className="size-3.5" />
+                    <span>Curated Study Playlists &amp; Bundles</span>
+                  </div>
+                  <h2 className="text-base font-black text-foreground">
+                    Semester Survival Kits &amp; Exam Stacks
+                  </h2>
+                  <p className="text-xs text-muted-foreground max-w-md leading-relaxed">
+                    Complete handwritten notes, 5-year PYQs, and cheat sheets assembled into 1-click playlists for your batch.
+                  </p>
+                </div>
+
+                <Link
+                  href="/app/academics/playlists/new"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white shadow-md cursor-pointer transition-all active:scale-95 shrink-0"
+                >
+                  <Plus className="size-3.5" />
+                  <span>Create Playlist</span>
+                </Link>
+              </div>
+
+              {/* Playlists 3-Column Grid */}
+              {isPlaylistsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <Skeleton className="h-44 w-full rounded-3xl" />
+                  <Skeleton className="h-44 w-full rounded-3xl" />
+                  <Skeleton className="h-44 w-full rounded-3xl" />
+                </div>
+              ) : playlistsData?.playlists && playlistsData.playlists.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {playlistsData.playlists.map((playlist: any) => (
+                    <AcademicPlaylistCard key={playlist.id} playlist={playlist} />
+                  ))}
+                </div>
+              ) : (
+                <div className="py-16 text-center space-y-3 px-4 rounded-3xl border border-dashed border-border/60 bg-card/40">
+                  <FolderPlus className="size-10 text-muted-foreground/40 mx-auto" />
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold text-foreground">No study playlists found</h3>
+                    <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                      Be the first in your branch or semester to create a study playlist and earn +50 Loop Points!
+                    </p>
+                  </div>
+                  <Link
+                    href="/app/academics/playlists/new"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer"
+                  >
+                    <Plus className="size-3.5" />
+                    <span>Create First Playlist</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+          ) : isInitialLoading ? (
+            viewMode === "grid" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                <Skeleton className="h-48 w-full rounded-3xl" />
+                <Skeleton className="h-48 w-full rounded-3xl" />
+                <Skeleton className="h-48 w-full rounded-3xl" />
+                <Skeleton className="h-48 w-full rounded-3xl" />
+                <Skeleton className="h-48 w-full rounded-3xl" />
+                <Skeleton className="h-48 w-full rounded-3xl" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Skeleton className="h-32 w-full rounded-2xl" />
+                <Skeleton className="h-32 w-full rounded-2xl" />
+                <Skeleton className="h-32 w-full rounded-2xl" />
+              </div>
+            )
+          ) : items.length > 0 ? (
+            <>
+              {viewMode === "grid" ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {items.map((item) => (
+                    <AcademicCard
+                      key={item.id}
+                      item={item}
+                      currentUserId={profileId || undefined}
+                      isHighlighted={highlightId === item.id}
+                      variant="grid"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="divide-y divide-border/20 rounded-3xl border border-border/30 bg-card/25 overflow-hidden">
+                  {items.map((item) => (
+                    <AcademicCard
+                      key={item.id}
+                      item={item}
+                      currentUserId={profileId || undefined}
+                      isHighlighted={highlightId === item.id}
+                      variant="row"
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Sentinel element for infinite scroll */}
+              <div ref={setLoadMoreNode} className="flex flex-col items-center justify-center p-4 min-h-16">
+                {isLoadingMore && (
+                  <div className="flex items-center gap-2 py-3 text-xs font-semibold text-muted-foreground">
+                    <Loader2 className="size-4 animate-spin text-primary" />
+                    <span>Loading more vault resources...</span>
+                  </div>
+                )}
+                {isReachingEnd && (
+                  <div className="py-6 text-center">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-muted/40 border border-border/40 text-[11px] font-semibold text-muted-foreground">
+                      <span>✨ Reached end of vault ({totalCount.toLocaleString()} resources)</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sounds.tap();
+                          setShowUploadModal(true);
+                        }}
+                        className="text-primary hover:underline font-bold cursor-pointer"
+                      >
+                        + Add your notes
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="py-24 text-center px-4 space-y-3">
+              <BookOpen className="size-10 text-muted-foreground/40 mx-auto" />
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-foreground">No study resources found</h3>
+                <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                  Be the first to upload lecture notes, whole books, PPTs, or PYQs for this branch and earn 20
+                  LP!
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowUploadModal(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer"
+              >
+                <Plus className="size-3.5" />
+                <span>Upload First Notes</span>
+              </button>
+            </div>
+          )}
+        </section>
+      </div>
 
       {/* ─── Upload Study Resource Modal ─── */}
       <Dialog open={showUploadModal} onOpenChange={setShowUploadModal}>

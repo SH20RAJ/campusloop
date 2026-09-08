@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 interface ProfileDetailProps {
   params: Promise<{ username: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params }: ProfileDetailProps): Promise<Metadata> {
@@ -14,7 +15,9 @@ export async function generateMetadata({ params }: ProfileDetailProps): Promise<
   };
 }
 
-export default async function LegacyProfileRedirectPage({ params }: ProfileDetailProps) {
+export default async function LegacyProfileRedirectPage({ params, searchParams }: ProfileDetailProps) {
   const { username } = await params;
-  redirect(`/@${username}`);
+  const search = await searchParams;
+  const tab = search?.tab;
+  redirect(tab ? `/@${username}?tab=${tab}` : `/@${username}`);
 }

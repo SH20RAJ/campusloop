@@ -13,5 +13,5 @@ export const DEMO_CREDENTIALS = {
   institutionName: "Birla Institute of Technology, Mesra",
   points: 450,
   referralUrl: "https://campusloop.space/join?ref=demo_tester",
-  avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
+  avatarUrl: "https://api.dicebear.com/7.x/initials/svg?seed=DemoTester&backgroundColor=4f46e5&textColor=ffffff&fontWeight=800",
 } as const;

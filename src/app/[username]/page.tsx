@@ -1,8 +1,9 @@
 import { and, desc, eq } from "drizzle-orm";
-import { Lock, School } from "lucide-react";
+import { ArrowUpRight, Download, FolderPlus, Lock, School, ThumbsUp } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { ShareQrButton } from "@/components/common/share-qr-button";
 import { PublicFollowButton } from "@/components/profile/public-follow-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,7 +11,7 @@ import { Navigation } from "@/components/ui/navigation";
 import { RightSidebar } from "@/components/ui/right-sidebar";
 import { getBranchIcon } from "@/constants";
 import { getDb } from "@/db";
-import { institutions, posts, userProfiles } from "@/db/schema";
+import { academicPlaylists, academicResources, institutions, posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import type { FeedPost } from "@/hooks/use-feed";
 import { getFollowCounts, getFollowState } from "@/lib/follows";
@@ -172,16 +173,18 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
           <div className="flex md:pl-64 min-h-screen max-w-full overflow-x-clip">
             <main className="flex-1 w-full min-w-0 max-w-2xl px-0 py-0 pb-28 md:pb-0 mx-auto min-h-screen border-r border-border/30 overflow-x-clip">
-              <ProfileClientView
-                profile={profile}
-                formattedPosts={formattedPosts as FeedPost[]}
-                isOwnProfile={isOwnProfile}
-                currentUserId={currentProfile.id}
-                followersCount={followState.followersCount}
-                followingCount={followState.followingCount}
-                friendsCount={followState.friendsCount}
-                isFollowedByViewer={followState.isFollowedByViewer}
-              />
+              <Suspense fallback={<div className="p-8 text-center text-xs text-muted-foreground">Loading profile...</div>}>
+                <ProfileClientView
+                  profile={profile}
+                  formattedPosts={formattedPosts as FeedPost[]}
+                  isOwnProfile={isOwnProfile}
+                  currentUserId={currentProfile.id}
+                  followersCount={followState.followersCount}
+                  followingCount={followState.followingCount}
+                  friendsCount={followState.friendsCount}
+                  isFollowedByViewer={followState.isFollowedByViewer}
+                />
+              </Suspense>
             </main>
 
             <aside className="hidden lg:block w-80 xl:w-[350px] shrink-0 px-4 py-3">
@@ -194,7 +197,22 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
   }
 
   // If not authenticated, render LinkedIn-style public card
-  const publicFollowCounts = await getFollowCounts(profile.id);
+  const [publicFollowCounts, userAcademicResources, userPlaylists] = await Promise.all([
+    getFollowCounts(profile.id),
+    db.query.academicResources.findMany({
+      where: eq(academicResources.uploaderId, profile.id),
+      orderBy: [desc(academicResources.createdAt)],
+      limit: 6,
+      with: {
+        institution: true,
+      },
+    }),
+    db.query.academicPlaylists.findMany({
+      where: eq(academicPlaylists.creatorId, profile.id),
+      orderBy: [desc(academicPlaylists.createdAt)],
+      limit: 4,
+    }),
+  ]);
   const branchIcon = getBranchIcon(profile.branch || profile.course);
   const institutionName = profile.institution?.name || "Indian Institute of Technology";
   const campusShort = institutionName.split(",")[0];
@@ -371,6 +389,96 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
               <p className="text-xs text-foreground/90 font-medium leading-relaxed whitespace-pre-wrap">
                 {profile.bio}
               </p>
+            </div>
+          )}
+
+          {/* Shared Notes & Study Materials Card */}
+          {(userAcademicResources.length > 0 || userPlaylists.length > 0) && (
+            <div className="rounded-3xl bg-card p-5 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <FolderPlus className="size-4 text-indigo-500" /> Shared Notes & Study Materials (
+                  {userAcademicResources.length + userPlaylists.length})
+                </h3>
+                <Link
+                  href={`/@${profile.username}?tab=academics`}
+                  className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                >
+                  <span>View All</span>
+                  <ArrowUpRight className="size-3" />
+                </Link>
+              </div>
+
+              {/* Study Playlists if any */}
+              {userPlaylists.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                    Curated Stacks & Playlists
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {userPlaylists.map((pl) => (
+                      <Link
+                        key={pl.id}
+                        href={`/app/academics/playlists/${pl.slug}`}
+                        className="p-3 rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition-all flex flex-col justify-between gap-2"
+                      >
+                        <div className="space-y-1 min-w-0">
+                          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400">
+                            {pl.category.replace("_", " ")}
+                          </span>
+                          <h4 className="text-xs font-bold text-foreground line-clamp-1 mt-1">{pl.title}</h4>
+                          {pl.description && (
+                            <p className="text-[10px] text-muted-foreground line-clamp-1">{pl.description}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-1 border-t border-border/30">
+                          <span className="font-semibold">{pl.itemsCount} materials</span>
+                          <span>★ {pl.starsCount}</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Uploaded Resources */}
+              {userAcademicResources.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                    Uploaded Notes & Papers
+                  </span>
+                  <div className="divide-y divide-border/20 rounded-2xl border border-border/30 overflow-hidden">
+                    {userAcademicResources.map((res) => (
+                      <Link
+                        key={res.id}
+                        href={`/app/academics/${res.id}`}
+                        className="flex items-center justify-between p-3 hover:bg-muted/30 transition-colors gap-3"
+                      >
+                        <div className="min-w-0 flex-1 space-y-0.5">
+                          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                            <span className="font-mono font-bold text-foreground/80">{res.subjectCode}</span>
+                            <span>·</span>
+                            <span className="uppercase font-bold text-indigo-400">{res.resourceType}</span>
+                            <span>·</span>
+                            <span>Sem {res.semester}</span>
+                          </div>
+                          <h4 className="text-xs font-bold text-foreground line-clamp-1">{res.title}</h4>
+                        </div>
+                        <div className="flex items-center gap-2.5 text-[10px] text-muted-foreground shrink-0 font-medium">
+                          <span className="flex items-center gap-1">
+                            <Download className="size-3" />
+                            <span>{res.downloadsCount}</span>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <ThumbsUp className="size-3" />
+                            <span>{res.upvotesCount}</span>
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

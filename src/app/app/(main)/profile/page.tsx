@@ -1,6 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { getDb } from "@/db";
 import { posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
@@ -93,14 +94,16 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const followCounts = await getFollowCounts(profile.id);
 
   return (
-    <ProfileClientView
-      profile={profile}
-      formattedPosts={formattedPosts as FeedPost[]}
-      isOwnProfile={isOwnProfile}
-      currentUserId={currentProfile.id}
-      followersCount={followCounts.followersCount}
-      followingCount={followCounts.followingCount}
-      friendsCount={followCounts.friendsCount}
-    />
+    <Suspense fallback={<div className="p-8 text-center text-xs text-muted-foreground">Loading profile...</div>}>
+      <ProfileClientView
+        profile={profile}
+        formattedPosts={formattedPosts as FeedPost[]}
+        isOwnProfile={isOwnProfile}
+        currentUserId={currentProfile.id}
+        followersCount={followCounts.followersCount}
+        followingCount={followCounts.followingCount}
+        friendsCount={followCounts.friendsCount}
+      />
+    </Suspense>
   );
 }

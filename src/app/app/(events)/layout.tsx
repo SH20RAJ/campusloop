@@ -1,4 +1,4 @@
-import { ArrowLeft, GraduationCap, Zap } from "lucide-react";
+import { ArrowLeft, Calendar, Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FirstVisitNotificationPrompt } from "@/components/notifications/first-visit-notification-prompt";
@@ -9,27 +9,27 @@ import { isViewerProfile } from "@/lib/viewer";
 
 export const metadata: Metadata = {
   title: {
-    default: "Academic Notes, PYQs & Cheat Sheets | CampusLoop Academics",
-    template: "%s | CampusLoop Academics",
+    default: "Campus Events, Hackathons & College Fests | CampusLoop",
+    template: "%s | CampusLoop Events",
   },
   description:
-    "Free semester exam question papers, verified professor notes, formula cheat sheets, and lab manuals shared by verified college students across India.",
+    "Discover hackathons, technical workshops, college cultural fests, coding competitions, and campus meetups across 1,350+ Indian universities. Register solo or in teams on CampusLoop.",
   openGraph: {
-    title: "CampusLoop Academics | College Notes & Exam PYQs",
+    title: "Campus Events, Hackathons & College Fests | CampusLoop",
     description:
-      "Free semester exam question papers, verified professor notes, formula cheat sheets, and lab manuals.",
-    url: "https://campusloop.space/app/academics",
+      "Join hackathons, tech bootcamps, and college fests with verified students from your campus and across India.",
+    url: "https://campusloop.space/app/events",
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
   },
 };
 
-export default async function AcademicsLayout({ children }: { children: React.ReactNode }) {
+export default async function EventsLayout({ children }: { children: React.ReactNode }) {
   const user = await getCachedAuthUser();
   const profile = user ? await getCachedUserProfile(user.id) : null;
 
-  // If user is authenticated and completed onboarding, render standard logged-in layout without rightbar
+  // ─── Authenticated User Layout (Full Screen, Left Navigation Drawer, ZERO Right Sidebar) ───
   if (profile?.onboardingCompleted) {
     const college = profile.institution;
     const viewerMode = await isViewerProfile(profile);
@@ -49,7 +49,7 @@ export default async function AcademicsLayout({ children }: { children: React.Re
               <div className="sticky top-0 z-30 flex items-center justify-center gap-2 border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-center text-[11px] font-semibold text-amber-600 dark:text-amber-400 backdrop-blur-md">
                 <span>
                   👀 You&apos;re browsing in <strong>Viewer Mode</strong> — sign up with your college email to
-                  post, vote, and chat.
+                  host events, register in teams, and earn Loop Points.
                 </span>
               </div>
             )}
@@ -61,13 +61,12 @@ export default async function AcademicsLayout({ children }: { children: React.Re
     );
   }
 
-  // ─── Guest / Public Visitor View (Zero Login Required to Browse & Download) ───
+  // ─── Guest / Public Visitor View (Zero Login Required to Discover Events) ───
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col antialiased selection:bg-indigo-500/20">
-      {/* Public Top Navbar */}
+    <div className="min-h-screen bg-background text-foreground flex flex-col antialiased selection:bg-primary/20">
+      {/* Public Top Header */}
       <header className="sticky top-0 z-50 border-b border-border/30 bg-background/90 backdrop-blur-xl select-none">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-          {/* Brand & Hub identifier */}
           <div className="flex items-center gap-3">
             <Link
               href="/app"
@@ -77,7 +76,7 @@ export default async function AcademicsLayout({ children }: { children: React.Re
               <ArrowLeft className="size-4" />
             </Link>
 
-            <Link href="/app/academics" className="flex items-center gap-2.5 group">
+            <Link href="/app/events" className="flex items-center gap-2.5 group">
               <img
                 src="/logo.png"
                 alt="CampusLoop"
@@ -85,33 +84,37 @@ export default async function AcademicsLayout({ children }: { children: React.Re
               />
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-black tracking-tight text-foreground group-hover:text-indigo-400 transition-colors">
+                  <span className="text-sm font-black tracking-tight text-foreground group-hover:text-primary transition-colors">
                     CampusLoop
                   </span>
-                  <span className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
-                    Academics
+                  <span className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-primary/15 text-primary border border-primary/30">
+                    Events
                   </span>
                 </div>
                 <span className="text-[10px] font-medium text-muted-foreground/80 hidden sm:inline">
-                  BIT Mesra Hub &amp; All-India Engineering Vault
+                  Hackathons, Fests &amp; Campus Meetups
                 </span>
               </div>
             </Link>
           </div>
 
-          {/* Right: Guest CTAs & Theme Toggle */}
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
 
             <Link
-              href="/handler/sign-in?returnTo=/app/academics"
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white shadow-xs transition-all active:scale-95 cursor-pointer"
+              href="/handler/sign-in?returnTo=/app/events/new"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-border/50 hover:bg-muted/50 transition-all cursor-pointer"
             >
-              <Zap className="size-3.5 fill-amber-400 text-amber-400" />
-              <span>Join Hub</span>
-              <span className="hidden sm:inline px-1.5 py-0.2 text-[9px] rounded-full bg-indigo-700/80 text-white font-mono">
-                +50 LP
-              </span>
+              <Plus className="size-3.5" />
+              <span>Host Event</span>
+            </Link>
+
+            <Link
+              href="/handler/sign-in?returnTo=/app/events"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black bg-primary hover:opacity-90 text-primary-foreground shadow-xs transition-all active:scale-95 cursor-pointer"
+            >
+              <Calendar className="size-3.5" />
+              <span>Sign In</span>
             </Link>
           </div>
         </div>
@@ -119,26 +122,6 @@ export default async function AcademicsLayout({ children }: { children: React.Re
 
       {/* Main Content Area */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 py-4">{children}</main>
-
-      {/* Bottom Sticky Guest Perk Callout on Mobile */}
-      <div className="sticky bottom-0 z-40 border-t border-indigo-500/20 bg-background/95 backdrop-blur-md p-2.5 sm:hidden">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="flex size-7 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 shrink-0">
-              <GraduationCap className="size-4" />
-            </span>
-            <p className="text-[11px] text-muted-foreground truncate">
-              Sign in to save notes to your vault &amp; earn 50 LP!
-            </p>
-          </div>
-          <Link
-            href="/handler/sign-in?returnTo=/app/academics"
-            className="px-3 py-1.5 rounded-full text-[11px] font-black bg-indigo-600 text-white shrink-0 shadow-xs"
-          >
-            Claim 50 LP
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }

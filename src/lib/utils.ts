@@ -6,14 +6,45 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Clean SVG fallback for users without a profile picture (no-image user silhouette).
+ */
+export const NO_IMAGE_AVATAR_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <rect width="100" height="100" rx="50" fill="#1e293b"/>
+  <circle cx="50" cy="38" r="18" fill="#64748b"/>
+  <path d="M22 84c0-15.464 12.536-28 28-28s28 12.536 28 28" fill="#64748b"/>
+</svg>
+`.trim())}`;
+
+/**
+ * Deterministically generates a random, clean Dicebear avatar URL based on a user seed.
+ */
+export function getRandomAvatarUrl(seed?: string | null): string {
+  const s = (seed || "Student").trim();
+  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s)}&backgroundColor=0284c7,2563eb,7c3aed,db2777,ea580c,059669,4f46e5&textColor=ffffff&fontWeight=800&fontSize=42`;
+}
+
+/**
+ * Returns a valid avatar URL for a user.
+ * Strips and replaces any Unsplash URLs with a random Dicebear avatar or no-image SVG.
+ */
 export function getAvatarUrl(
   avatarUrl?: string | null,
   username?: string | null,
   displayName?: string | null
 ): string {
-  if (avatarUrl && avatarUrl.trim().length > 0) return avatarUrl;
+  // If avatar exists and is NOT from unsplash, return it
+  if (
+    avatarUrl &&
+    avatarUrl.trim().length > 0 &&
+    !avatarUrl.includes("unsplash.com") &&
+    !avatarUrl.includes("images.unsplash.com")
+  ) {
+    return avatarUrl;
+  }
   const seed = (displayName || username || "Student").trim();
-  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(seed)}&backgroundColor=0284c7,2563eb,7c3aed,db2777,ea580c,059669,4f46e5&textColor=ffffff&fontWeight=800&fontSize=42`;
+  return getRandomAvatarUrl(seed);
 }
 
 export function formatTimeAgo(date: Date | string | null | undefined): string {

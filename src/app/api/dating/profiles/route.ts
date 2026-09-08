@@ -103,7 +103,12 @@ export async function GET(req: Request) {
       const fallbackSet = getDatingCandidatePhotoSet(cand.gender, cand.id || cand.username);
       const validPhotos = (cand.photos || []).filter((p) => !isDicebear(p));
       const candPhotos = validPhotos.length > 0 ? validPhotos : fallbackSet.photos;
-      const candAvatar = !isDicebear(cand.avatarUrl) ? cand.avatarUrl : fallbackSet.avatar;
+      const candAvatar =
+        cand.avatarUrl &&
+        !cand.avatarUrl.includes("unsplash.com") &&
+        !isDicebear(cand.avatarUrl)
+          ? cand.avatarUrl
+          : fallbackSet.avatar;
 
       return {
         id: cand.id,

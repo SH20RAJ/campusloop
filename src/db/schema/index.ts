@@ -1,4 +1,5 @@
 export * from "./academic-resources";
+export * from "./academic-playlists";
 export * from "./ai";
 export * from "./articles";
 export * from "./calls-and-analytics";

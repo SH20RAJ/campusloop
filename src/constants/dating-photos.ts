@@ -10,84 +10,84 @@ export interface CandidatePhotoSet {
 
 export const FEMALE_DATING_PHOTOS: CandidatePhotoSet[] = [
   {
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Aanya&backgroundColor=db2777&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Diya&backgroundColor=ec4899&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Ishita&backgroundColor=7c3aed&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1514315384763-ba401779410f?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Kavya&backgroundColor=8b5cf6&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Meera&backgroundColor=6366f1&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Nandini&backgroundColor=4f46e5&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Pooja&backgroundColor=0284c7&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Riya&backgroundColor=06b6d4&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Saanvi&backgroundColor=059669&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1548142813-c348350df52b?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1514315384763-ba401779410f?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Sneha&backgroundColor=10b981&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1514315384763-ba401779410f?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Tanvi&backgroundColor=ea580c&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1548142813-c348350df52b?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Zoya&backgroundColor=f59e0b&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1548142813-c348350df52b?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=85",
@@ -97,35 +97,35 @@ export const FEMALE_DATING_PHOTOS: CandidatePhotoSet[] = [
 
 export const MALE_DATING_PHOTOS: CandidatePhotoSet[] = [
   {
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Aarav&backgroundColor=2563eb&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Aditya&backgroundColor=3b82f6&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Ishaan&backgroundColor=0284c7&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Kabir&backgroundColor=4f46e5&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=900&q=85",
     ],
   },
   {
-    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=256&q=85",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=Rohan&backgroundColor=7c3aed&textColor=ffffff&fontWeight=800",
     photos: [
       "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=85",

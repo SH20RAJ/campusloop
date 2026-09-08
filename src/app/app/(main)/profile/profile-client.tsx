@@ -10,8 +10,10 @@ import {
   Edit3,
   Eye,
   Flame,
+  FolderPlus,
   Globe,
   GraduationCap,
+  Layers,
   Loader2,
   MessageSquare,
   Move,
@@ -28,12 +30,14 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { archivePost, deletePost } from "@/app/app/(main)/post/actions";
 import { ArticleCard } from "@/components/articles/article-card";
+import { AcademicPlaylistCard } from "@/components/academics/academic-playlist-card";
+import { AcademicCard } from "@/components/communities/academic-card";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
 import { MuteUserMenu } from "@/components/notifications/mute-user-menu";
@@ -102,13 +106,55 @@ export function ProfileClientView({
   isFollowedByViewer = false,
 }: ProfileClientViewProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialTabParam = searchParams?.get("tab");
+
   const [followers, setFollowers] = useState(followersCount);
-  const [activeTab, setActiveTab] = useState<"posts" | "articles" | "photos" | "clout" | "archived">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "articles" | "academics" | "photos" | "clout" | "archived">(
+    initialTabParam === "academics" || initialTabParam === "notes"
+      ? "academics"
+      : initialTabParam === "articles"
+        ? "articles"
+        : initialTabParam === "photos" || initialTabParam === "gallery"
+          ? "photos"
+          : initialTabParam === "clout" || initialTabParam === "perks"
+            ? "clout"
+            : "posts"
+  );
   const [archivedPosts, setArchivedPosts] = useState<FeedPost[]>([]);
   const [isLoadingArchived, setIsLoadingArchived] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showPhotoLightbox, setShowPhotoLightbox] = useState<string | null>(null);
   const [showQrModal, setShowQrModal] = useState(false);
+
+  // Sync tab with URL query parameter on navigation
+  useEffect(() => {
+    const tabParam = searchParams?.get("tab");
+    if (tabParam === "academics" || tabParam === "notes") {
+      setActiveTab("academics");
+    } else if (tabParam === "articles") {
+      setActiveTab("articles");
+    } else if (tabParam === "photos" || tabParam === "gallery") {
+      setActiveTab("photos");
+    } else if (tabParam === "clout" || tabParam === "perks") {
+      setActiveTab("clout");
+    } else if (tabParam === "archived") {
+      setActiveTab("archived");
+    }
+  }, [searchParams]);
+
+  function handleTabChange(tab: "posts" | "articles" | "academics" | "photos" | "clout" | "archived") {
+    setActiveTab(tab);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (tab === "posts") {
+        url.searchParams.delete("tab");
+      } else {
+        url.searchParams.set("tab", tab);
+      }
+      window.history.replaceState({}, "", url.toString());
+    }
+  }
 
   // Fetched unconditionally so the Articles tab shows a real count instead of
   // "(0)" until someone opens it. The payload excludes article bodies.
@@ -118,6 +164,20 @@ export function ProfileClientView({
     { dedupingInterval: 60000 }
   );
   const userArticles = userArticlesData?.articles || [];
+
+  // Fetch shared notes & study playlists
+  const { data: userAcademicsData, isLoading: isLoadingAcademics } = useSWR<{
+    resources: any[];
+    playlists: any[];
+    totalCount: number;
+  }>(
+    `/api/profile/${profile.username}/academics`,
+    fetcher,
+    { dedupingInterval: 30000 }
+  );
+  const userResources = userAcademicsData?.resources || [];
+  const userPlaylists = userAcademicsData?.playlists || [];
+  const userAcademicsCount = userAcademicsData?.totalCount || 0;
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
   const pfpInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -747,78 +807,93 @@ export function ProfileClientView({
         </div>
 
         {/* ─── Profile Navigation Underline Tabs (Twitter Style) ─── */}
-        <div className="flex border-b border-border/30 bg-background text-xs font-bold mt-2">
+        <div className="flex border-b border-border/30 bg-background text-xs font-bold mt-2 overflow-x-auto no-scrollbar">
           <button
             type="button"
-            onClick={() => setActiveTab("posts")}
+            onClick={() => handleTabChange("posts")}
             className={cn(
-              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold",
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold shrink-0 px-3",
               activeTab === "posts" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <span>Activity ({posts.length})</span>
             {activeTab === "posts" && (
-              <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
+              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
             )}
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveTab("articles")}
+            onClick={() => handleTabChange("academics")}
             className={cn(
-              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 px-3",
+              activeTab === "academics" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <FolderPlus className="size-3.5 text-indigo-400" />
+            <span>Shared Notes ({userAcademicsCount})</span>
+            {activeTab === "academics" && (
+              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange("articles")}
+            className={cn(
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 px-3",
               activeTab === "articles" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <BookOpen className="size-3.5" />
             <span>Articles ({userArticles.length})</span>
             {activeTab === "articles" && (
-              <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
+              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
             )}
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveTab("photos")}
+            onClick={() => handleTabChange("photos")}
             className={cn(
-              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 px-3",
               activeTab === "photos" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <Camera className="size-3.5" />
             <span>Gallery ({candidatePhotos.length})</span>
             {activeTab === "photos" && (
-              <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
+              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
             )}
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveTab("clout")}
+            onClick={() => handleTabChange("clout")}
             className={cn(
-              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold",
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold shrink-0 px-3",
               activeTab === "clout" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <span>LP Perks</span>
             {activeTab === "clout" && (
-              <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
+              <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
             )}
           </button>
 
           {isOwnProfile && (
             <button
               type="button"
-              onClick={() => setActiveTab("archived")}
+              onClick={() => handleTabChange("archived")}
               className={cn(
-                "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5",
+                "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 px-3",
                 activeTab === "archived" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Archive className="size-3.5" />
               <span>Archive ({archivedPosts.length})</span>
               {activeTab === "archived" && (
-                <span className="absolute bottom-0 inset-x-8 h-1 rounded-full bg-primary" />
+                <span className="absolute bottom-0 inset-x-4 h-1 rounded-full bg-primary" />
               )}
             </button>
           )}
@@ -911,6 +986,111 @@ export function ProfileClientView({
                     Write your first article
                   </Link>
                 )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ─── Shared Notes & Study Playlists Tab Content ─── */}
+        {activeTab === "academics" && (
+          <div className="p-4 space-y-6">
+            {/* Header banner if own profile */}
+            {isOwnProfile && (
+              <div className="rounded-3xl border border-indigo-500/30 bg-linear-to-r from-indigo-500/10 via-purple-500/5 to-card p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                <div className="space-y-0.5">
+                  <p className="text-xs font-black text-foreground">Your Academic Contributions</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    You earn +20 LP for sharing notes and +5 LP whenever classmates star your playlists.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Link
+                    href="/app/academics/playlists/new"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold border border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10 transition-colors shadow-xs cursor-pointer"
+                  >
+                    <FolderPlus className="size-3" />
+                    <span>New Stack</span>
+                  </Link>
+                  <Link
+                    href="/app/academics"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-black bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shadow-xs cursor-pointer"
+                  >
+                    <span>Upload Notes</span>
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Playlists Section */}
+            {userPlaylists.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Layers className="size-4 text-indigo-400" />
+                  <h3 className="text-xs font-black uppercase tracking-wider text-foreground">
+                    Study Playlists &amp; Bundles ({userPlaylists.length})
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {userPlaylists.map((pl: any) => (
+                    <AcademicPlaylistCard key={pl.id} playlist={pl} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Uploaded Resources Section */}
+            {userResources.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="size-4 text-primary" />
+                  <h3 className="text-xs font-black uppercase tracking-wider text-foreground">
+                    Uploaded Notes, PYQs &amp; Books ({userResources.length})
+                  </h3>
+                </div>
+                <div className="divide-y divide-border/30 rounded-2xl border border-border/50 bg-card overflow-hidden">
+                  {userResources.map((res: any) => (
+                    <AcademicCard key={res.id} item={res} currentUserId={currentUserId} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!isLoadingAcademics && userPlaylists.length === 0 && userResources.length === 0 && (
+              <div className="text-center py-16 border border-dashed rounded-3xl border-border bg-card text-muted-foreground text-xs font-semibold space-y-2 p-6">
+                <div className="size-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto">
+                  <FolderPlus className="size-6" />
+                </div>
+                <p className="font-bold text-foreground">No shared notes or study playlists yet.</p>
+                <p className="text-[11px] text-muted-foreground max-w-xs mx-auto">
+                  {isOwnProfile
+                    ? "Share lecture notes, question banks, or curate a study playlist for your batch!"
+                    : `@${profile.username} has not uploaded any study materials yet.`}
+                </p>
+                {isOwnProfile && (
+                  <div className="pt-2 flex items-center justify-center gap-2">
+                    <Link
+                      href="/app/academics/playlists/new"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-indigo-500/40 text-indigo-400 text-xs font-bold hover:bg-indigo-500/10 transition-colors shadow-xs cursor-pointer"
+                    >
+                      <FolderPlus className="size-3.5" />
+                      <span>Create Playlist</span>
+                    </Link>
+                    <Link
+                      href="/app/academics"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-colors shadow-xs cursor-pointer"
+                    >
+                      <span>Upload Notes</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isLoadingAcademics && (
+              <div className="py-12 flex flex-col items-center justify-center space-y-2 text-muted-foreground">
+                <Loader2 className="size-6 animate-spin text-indigo-400" />
+                <span className="text-xs font-medium">Loading academic vault materials...</span>
               </div>
             )}
           </div>

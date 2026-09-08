@@ -7,6 +7,7 @@ import { indexAcademicResourceVector } from "@/lib/qdrant/indexer";
 import { getPersonalizedAcademicFeed, searchAcademicResourcesVector } from "@/lib/recommendations/academic-recommendations";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { rejectViewerWrite } from "@/lib/viewer";
+import { validateResourceUrl } from "@/lib/academics/pdf-validator";
 
 export const dynamic = "force-dynamic";
 
@@ -238,6 +239,23 @@ export async function POST(req: Request) {
     if (!title?.trim() || !subjectCode?.trim() || !subjectName?.trim()) {
       return NextResponse.json(
         { error: "Title, Subject Code, and Subject Name are required" },
+        { status: 400 }
+      );
+    }
+
+    const targetUrl = fileUrl?.trim() || driveUrl?.trim();
+    if (!targetUrl) {
+      return NextResponse.json(
+        { error: "A valid PDF, Google Drive, or document link is required." },
+        { status: 400 }
+      );
+    }
+
+    // Active health check: verify URL is reachable and not returning 404 or 500
+    const check = await validateResourceUrl(targetUrl);
+    if (!check.isValid) {
+      return NextResponse.json(
+        { error: check.error || "The provided document URL cannot be opened (HTTP 404 or 500)." },
         { status: 400 }
       );
     }

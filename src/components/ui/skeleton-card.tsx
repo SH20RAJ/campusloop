@@ -74,6 +74,48 @@ export function FeedSkeleton() {
   );
 }
 
+// ──────── 3b. Confessions Feed Skeleton ────────
+
+export function ConfessionsFeedSkeleton() {
+  return (
+    <div className="divide-y divide-border/25 select-none animate-pulse">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="px-4 py-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="size-9 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+                <Skeleton className="size-5 rounded-full" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-3.5 w-28 rounded-full" />
+                  <Skeleton className="h-3 w-16 rounded-full" />
+                </div>
+                <Skeleton className="h-2.5 w-36 rounded-full" />
+              </div>
+            </div>
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </div>
+
+          <div className="space-y-2 pt-1 pl-11">
+            <Skeleton className="h-3.5 w-full rounded-md" />
+            <Skeleton className="h-3.5 w-4/5 rounded-md" />
+            <Skeleton className="h-3.5 w-2/3 rounded-md" />
+          </div>
+
+          <div className="flex items-center justify-between pl-11 pt-1">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-6 w-14 rounded-full" />
+              <Skeleton className="h-6 w-14 rounded-full" />
+            </div>
+            <Skeleton className="h-6 w-8 rounded-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ──────── 4. Infinite Scroll Loading Skeletons ────────
 
 export function FeedLoadingMoreSkeleton() {

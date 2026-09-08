@@ -21,4 +21,9 @@ fix ui ux issue of 1st image page like 2nd image , also scan all pages that is n
 also for each notes/collection of notes (notes listed under it, similar category) add option to open in ai agents like chatgpt/claude with best structured ui ux that will open the file in the ai agent with best prompt to teach and also contains the main link of the notes/collection and remove Campus AI Study Cram Assistant just add a line that something like will be lauched on campusloop academics soon.....
 
 ---
+also on mobile bottom bar instead of Match add https://campusloop.space/app/confessions link and always use Animated Icons also seed all category of confessions, dark secrets, jokes, long personal stories, and anything creative , also on https://campusloop.space/app/confessions keep default to Global, then campus,  also users can also share Anonymous articles, also on confession page, that will keep new audienc engagged also dont show anonymous persona @xyz on https://campusloop.space/app/profile also the bg image is removed like linkedin add it back.... 
 
+---
+
+
+add better algoritm and infinite scroll to confessions with skeleton loading and cleaner ui ux cutee

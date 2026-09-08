@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Heart, Repeat2 } from "lucide-react";
+import { Heart, Repeat2, VenetianMask } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -55,7 +55,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
   const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
-  const avatarFallback = post.isAnonymous ? "🙈" : (post.author?.displayName?.[0] ?? "S");
+  const avatarFallback = post.author?.displayName?.[0] ?? "S";
   const avatarUrl = post.isAnonymous
     ? ""
     : getAvatarUrl(post.author?.avatarUrl, post.author?.username ?? "student");
@@ -232,9 +232,9 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
               </Avatar>
             </Link>
           ) : (
-            <Avatar className="size-10 rounded-full border border-border/40 bg-muted">
-              <AvatarFallback className="font-bold text-xs text-muted-foreground">
-                {avatarFallback}
+            <Avatar className="size-10 rounded-full border border-purple-500/30 bg-purple-500/10">
+              <AvatarFallback className="bg-transparent flex items-center justify-center">
+                <VenetianMask className="size-5 text-purple-400" />
               </AvatarFallback>
             </Avatar>
           )}
@@ -252,10 +252,15 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
 
           {/* Content Body */}
           <div
-            className="text-[15px] leading-relaxed text-foreground font-normal break-words pt-1"
+            className="text-[15px] leading-relaxed text-foreground font-normal break-words pt-1 space-y-1.5"
             onClick={(e) => handleCardClick(e)}
             onDoubleClick={handleDoubleTap}
           >
+            {post.title && (
+              <h3 className="text-[16px] font-black text-foreground tracking-tight leading-snug">
+                {post.title}
+              </h3>
+            )}
             <RichText
               content={post.body}
               createdAt={post.createdAt}

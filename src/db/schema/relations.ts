@@ -1,5 +1,10 @@
 import { relations } from "drizzle-orm";
-import { academicResourceComments, academicResources, academicResourceVotes } from "./academic-resources";
+import {
+  academicResourceComments,
+  academicResources,
+  academicResourceVotes,
+  savedAcademicResources,
+} from "./academic-resources";
 import { academicPlaylists, academicPlaylistItems, academicPlaylistStars } from "./academic-playlists";
 import { aiConversations, aiFeedback, aiMessages, aiUsageEvents } from "./ai";
 import { articleComments, articleCommentVotes, articles, articleVotes } from "./articles";
@@ -379,6 +384,7 @@ export const academicResourcesRelations = relations(academicResources, ({ one, m
   }),
   comments: many(academicResourceComments),
   votes: many(academicResourceVotes),
+  saved: many(savedAcademicResources),
 }));
 
 export const academicResourceCommentsRelations = relations(academicResourceComments, ({ one }) => ({
@@ -399,6 +405,17 @@ export const academicResourceVotesRelations = relations(academicResourceVotes, (
   }),
   profile: one(userProfiles, {
     fields: [academicResourceVotes.profileId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const savedAcademicResourcesRelations = relations(savedAcademicResources, ({ one }) => ({
+  resource: one(academicResources, {
+    fields: [savedAcademicResources.resourceId],
+    references: [academicResources.id],
+  }),
+  profile: one(userProfiles, {
+    fields: [savedAcademicResources.profileId],
     references: [userProfiles.id],
   }),
 }));

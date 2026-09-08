@@ -1,4 +1,4 @@
-import { boolean, index, integer, jsonb, pgTable, text } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "./common";
 import { institutions } from "./institutions";
 import { userProfiles } from "./users";
@@ -76,9 +76,31 @@ export const academicResourceVotes = pgTable(
   (table) => [index("academic_votes_res_profile_idx").on(table.resourceId, table.profileId)]
 );
 
+export const savedAcademicResources = pgTable(
+  "saved_academic_resources",
+  {
+    id: id(),
+    profileId: text("profile_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    resourceId: text("resource_id")
+      .notNull()
+      .references(() => academicResources.id, { onDelete: "cascade" }),
+    semester: integer("semester").default(1).notNull(),
+    createdAt,
+  },
+  (table) => [
+    uniqueIndex("saved_academic_res_profile_res_idx").on(table.profileId, table.resourceId),
+    index("saved_academic_res_profile_idx").on(table.profileId),
+    index("saved_academic_res_sem_idx").on(table.semester),
+  ]
+);
+
 export type AcademicResource = typeof academicResources.$inferSelect;
 export type NewAcademicResource = typeof academicResources.$inferInsert;
 export type AcademicResourceComment = typeof academicResourceComments.$inferSelect;
 export type NewAcademicResourceComment = typeof academicResourceComments.$inferInsert;
 export type AcademicResourceVote = typeof academicResourceVotes.$inferSelect;
 export type NewAcademicResourceVote = typeof academicResourceVotes.$inferInsert;
+export type SavedAcademicResource = typeof savedAcademicResources.$inferSelect;
+export type NewSavedAcademicResource = typeof savedAcademicResources.$inferInsert;

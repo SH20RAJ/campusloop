@@ -7,14 +7,16 @@ export interface UserEventPayload {
   eventType:
     | "POST_VIEW"
     | "POST_DWELL"
+    | "POST_BOOKMARK"
     | "SEARCH"
     | "PROFILE_VISIT"
     | "STORY_VIEW"
     | "CHAT_CALL"
     | "COMMUNITY_JOIN"
     | "MARKETPLACE_VIEW"
-    | "RANDOM_LOOP_ENGAGE";
-  targetType?: "POST" | "USER" | "COLLEGE" | "COMMUNITY" | "SEARCH_QUERY" | "CALL";
+    | "RANDOM_LOOP_ENGAGE"
+    | "ACADEMIC_INTERACT";
+  targetType?: "POST" | "USER" | "COLLEGE" | "COMMUNITY" | "SEARCH_QUERY" | "CALL" | "ACADEMIC_RESOURCE";
   targetId?: string;
   metadata?: Record<string, any>;
   weight?: number;

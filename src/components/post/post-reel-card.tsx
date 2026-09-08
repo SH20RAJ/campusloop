@@ -596,24 +596,35 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           </Link>
 
           <div className="min-w-0 flex-1 leading-tight">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-bold text-sm sm:text-base text-foreground truncate">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="font-bold text-sm sm:text-base text-foreground truncate max-w-[150px] sm:max-w-[240px]">
                 {authorName}
               </span>
               {!post.isAnonymous && (
                 <BadgeCheck className="size-4 text-purple-400 fill-purple-400/20 shrink-0" />
               )}
-              <span className="text-xs text-muted-foreground/80 truncate">@{authorHandle}</span>
             </div>
 
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-              <span className="size-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20 shrink-0" />
-              <span className="truncate font-medium text-foreground/90">
-                {post.institution?.name?.split(",")[0] || "Birla Institute of Technology"}
+              {authorHandle && (
+                <span className="truncate max-w-[120px] text-muted-foreground/90 font-medium">
+                  @{authorHandle}
+                </span>
+              )}
+              <span className="text-muted-foreground/40 shrink-0">·</span>
+              <span className="text-muted-foreground/90 shrink-0 whitespace-nowrap font-medium">
+                {formatTimeAgo(new Date(post.createdAt))}
               </span>
-              <span>·</span>
-              <span>{formatTimeAgo(new Date(post.createdAt))}</span>
             </div>
+
+            {post.institution?.name && (
+              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/80 mt-0.5 min-w-0">
+                <span className="size-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20 shrink-0" />
+                <span className="truncate font-medium text-foreground/85 max-w-[200px]">
+                  {getCollegeShortName(post.institution)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -623,10 +634,10 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
             type="button"
             onClick={handleToggleFollowAuthor}
             className={cn(
-              "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0",
+              "px-3.5 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer shrink-0 shadow-xs",
               isFollowingAuthor
-                ? "bg-white/10 text-white/80 hover:bg-white/15"
-                : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_12px_rgba(168,85,247,0.35)]"
+                ? "bg-white/10 text-white/80 hover:bg-white/15 border border-white/20"
+                : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_12px_rgba(168,85,247,0.4)]"
             )}
           >
             {isFollowingAuthor ? "Following" : "Follow"}
@@ -634,8 +645,8 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         )}
       </div>
 
-      {/* ─── Main Content Body (Responsive to all lengths, scrollable if long, with pr-16 for side buttons) ─── */}
-      <div className="flex-1 min-h-0 flex flex-col justify-center overflow-y-auto no-scrollbar pr-14 sm:pr-16 space-y-3 sm:space-y-4 my-auto py-2">
+      {/* ─── Main Content Body (Natural top-aligned scroll, full reading without clipping) ─── */}
+      <div className="flex-1 min-h-0 flex flex-col justify-start overflow-y-auto no-scrollbar pr-14 sm:pr-16 space-y-3 sm:space-y-4 py-3">
         {headline && (
           <h2 className="text-lg sm:text-xl md:text-2xl font-black text-foreground tracking-tight leading-snug">
             {headline}
@@ -655,7 +666,6 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           >
             <RichText
               content={descriptionText}
-              maxHeight={340}
               createdAt={post.createdAt}
               collegeName={getCollegeShortName(post.institution)}
             />

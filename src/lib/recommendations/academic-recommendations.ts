@@ -1,6 +1,6 @@
 import { and, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { getDb } from "@/db";
-import { academicResources, academicResourceVotes } from "@/db/schema";
+import { academicResources, academicResourceVotes, savedAcademicResources } from "@/db/schema";
 import { qdrant } from "@/lib/qdrant/client";
 import { COLLECTIONS } from "@/lib/qdrant/collections";
 import { generateEmbedding } from "@/lib/qdrant/embeddings";
@@ -549,6 +549,7 @@ export async function getPersonalizedAcademicFeed(
   const upvotedResourceIds = new Set<string>();
   const engagedSubjectCodes = new Set<string>();
   const corequisiteCodes = new Set<string>();
+  const preferredResourceTypes = new Map<string, number>();
   let affinityTags: string[] = [];
 
   if (userId) {
@@ -558,6 +559,34 @@ export async function getPersonalizedAcademicFeed(
     } catch {}
 
     if (profile?.id) {
+      try {
+        // Fetch recent saved materials to extract preferred format and subjects
+        const savedList = await db.query.savedAcademicResources.findMany({
+          where: eq(savedAcademicResources.profileId, profile.id),
+          limit: 30,
+          with: {
+            resource: {
+              columns: {
+                resourceType: true,
+                subjectCode: true,
+              },
+            },
+          },
+        });
+
+        for (const s of savedList) {
+          if (s.resource?.resourceType) {
+            const t = s.resource.resourceType.toUpperCase();
+            preferredResourceTypes.set(t, (preferredResourceTypes.get(t) || 0) + 4);
+          }
+          if (s.resource?.subjectCode) {
+            engagedSubjectCodes.add(s.resource.subjectCode.toUpperCase());
+          }
+        }
+      } catch (err) {
+        console.warn("Could not retrieve user saved materials:", err);
+      }
+
       try {
         // Fetch up to 20 recent upvotes from academicResourceVotes
         const recentVotes = await db.query.academicResourceVotes.findMany({
@@ -570,6 +599,7 @@ export async function getPersonalizedAcademicFeed(
                 id: true,
                 subjectCode: true,
                 branch: true,
+                resourceType: true,
               },
             },
           },
@@ -577,6 +607,10 @@ export async function getPersonalizedAcademicFeed(
 
         for (const v of recentVotes) {
           if (v.resourceId) upvotedResourceIds.add(v.resourceId);
+          if (v.resource?.resourceType) {
+            const t = v.resource.resourceType.toUpperCase();
+            preferredResourceTypes.set(t, (preferredResourceTypes.get(t) || 0) + 2);
+          }
           if (v.resource?.subjectCode) {
             const code = v.resource.subjectCode.toUpperCase();
             engagedSubjectCodes.add(code);
@@ -613,7 +647,7 @@ export async function getPersonalizedAcademicFeed(
     // A. Campus Affinity (Same College syllabus)
     if (profile?.institutionId && item.institutionId === profile.institutionId) {
       score += 35;
-      if (!recommendationReason) recommendationReason = "Your Campus Syllabus 🏛️";
+      if (!recommendationReason) recommendationReason = "Your Campus Syllabus";
     }
 
     // B. Branch Relevance
@@ -627,7 +661,7 @@ export async function getPersonalizedAcademicFeed(
         (pBranch.includes("civil") && iBranch.includes("civil"))
       ) {
         score += 40;
-        if (!recommendationReason) recommendationReason = `Curated for ${item.branch} 🎯`;
+        if (!recommendationReason) recommendationReason = `Curated for ${item.branch}`;
       } else if (item.branch === "All") {
         score += 15;
       }
@@ -637,13 +671,28 @@ export async function getPersonalizedAcademicFeed(
     if (targetSems.length > 0) {
       if (targetSems.includes(item.semester)) {
         score += 35;
-        if (!recommendationReason) recommendationReason = `Semester ${item.semester} Core Subject 📚`;
+        if (!recommendationReason) recommendationReason = `Semester ${item.semester} Core Subject`;
       } else if (Math.abs(item.semester - (profile?.year ? profile.year * 2 : 1)) <= 1) {
         score += 12;
       }
     }
 
-    // D. User Interest & Knowledge Graph Relevance
+    // D. Material Type Affinity (Student study preference boost)
+    const typeWeight = preferredResourceTypes.get(item.resourceType.toUpperCase()) || 0;
+    if (typeWeight > 0) {
+      score += Math.min(30, typeWeight * 5);
+      if (!recommendationReason) {
+        const typeNames: Record<string, string> = {
+          PYQ: "Exam Prep (PYQs)",
+          CHEAT_SHEET: "Quick Revision Sheet",
+          NOTES: "Lecture Study Notes",
+          LAB_MANUAL: "Lab Practicals & Code",
+        };
+        recommendationReason = typeNames[item.resourceType.toUpperCase()] || "Your Preferred Format";
+      }
+    }
+
+    // E. User Interest & Knowledge Graph Relevance
     let interestMatches = 0;
     const itemText = `${item.title} ${item.subjectName} ${item.subjectCode} ${item.moduleOrChapter || ""}`.toLowerCase();
     for (const interest of userInterests) {
@@ -653,17 +702,17 @@ export async function getPersonalizedAcademicFeed(
     }
     if (interestMatches > 0) {
       score += Math.min(50, interestMatches * 20);
-      if (!recommendationReason) recommendationReason = "Matches Your Learning Interests 💡";
+      if (!recommendationReason) recommendationReason = "Matches Your Learning Interests";
     }
 
     // Corequisite boost from curriculum graph
     const itemCode = (item.subjectCode || "").toUpperCase();
     if (engagedSubjectCodes.has(itemCode)) {
       score += 30;
-      if (!recommendationReason) recommendationReason = `More for ${itemCode} 📑`;
+      if (!recommendationReason) recommendationReason = `More for ${itemCode}`;
     } else if (corequisiteCodes.has(itemCode)) {
       score += 25;
-      if (!recommendationReason) recommendationReason = "Corequisite / Prerequisite Match 🔗";
+      if (!recommendationReason) recommendationReason = "Corequisite / Prerequisite Match";
     }
 
     // E. Engagement Quality Factor (Upvotes, Downloads, Views, Verified)

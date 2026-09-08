@@ -315,7 +315,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   href={item.href}
                   prefetch={true}
                   className={cn(
-                    "group relative flex items-center gap-4 rounded-full px-4 py-3 text-sm font-semibold transition-colors cursor-pointer",
+                    "group relative flex items-center gap-3.5 rounded-full px-3.5 py-2 text-[13.5px] font-semibold transition-colors cursor-pointer",
                     isActive
                       ? "text-foreground font-black bg-muted/50"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -325,7 +325,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     <AnimateIcon animateOnHover animation="path">
                       <Icon
                         className={cn(
-                          "size-5.5 shrink-0 transition-transform duration-200 group-hover:scale-110",
+                          "size-5 shrink-0 transition-transform duration-200 group-hover:scale-110",
                           isActive
                             ? "text-foreground stroke-2"
                             : "text-muted-foreground group-hover:text-foreground stroke-2"
@@ -340,9 +340,14 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   </div>
 
                   <span className="truncate">{item.label}</span>
-                  {item.badge === "NEW" && !marketplaceSeen && (
-                    <span className="ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 uppercase tracking-wider">
-                      NEW
+                  {item.badge && (
+                    <span
+                      className={cn(
+                        "ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider",
+                        item.badgeColor || "bg-primary/15 text-primary border border-primary/30"
+                      )}
+                    >
+                      {item.badge}
                     </span>
                   )}
                 </Link>

@@ -1,5 +1,8 @@
+import { desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getDb } from "@/db";
+import { articles } from "@/db/schema";
 import { ArticlesHubClient } from "./articles-hub-client";
 
 export const metadata: Metadata = {
@@ -40,7 +43,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ArticlesPage() {
+export default async function ArticlesPage() {
+  const db = getDb();
+  let initialArticles: any[] = [];
+
+  try {
+    initialArticles = await db.query.articles.findMany({
+      where: eq(articles.status, "PUBLISHED"),
+      orderBy: [desc(articles.publishedAt)],
+      limit: 12,
+      columns: { content: false },
+      with: {
+        author: {
+          with: { institution: true },
+        },
+        institution: true,
+      },
+    });
+  } catch (err) {
+    console.error("Failed to load initial server articles:", err);
+  }
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -52,6 +75,16 @@ export default function ArticlesPage() {
       name: "CampusLoop",
       url: "https://campusloop.space",
       logo: "https://campusloop.space/logo.png",
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: initialArticles.map((art, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        url: `https://campusloop.space/a/${art.slug}`,
+        name: art.title,
+        description: art.excerpt || art.subtitle,
+      })),
     },
   };
 
@@ -72,7 +105,7 @@ export default function ArticlesPage() {
           </div>
         }
       >
-        <ArticlesHubClient />
+        <ArticlesHubClient initialArticles={initialArticles} />
       </Suspense>
     </>
   );

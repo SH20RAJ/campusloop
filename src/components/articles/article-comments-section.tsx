@@ -1,11 +1,12 @@
 "use client";
 
-import { CornerDownRight, Loader2, MessageSquare, Send, ShieldCheck, ThumbsUp, X } from "lucide-react";
+import { CornerDownRight, Loader2, LogIn, MessageSquare, Send, ShieldCheck, ThumbsUp, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -21,16 +22,21 @@ interface ArticleCommentsSectionProps {
   } | null;
 }
 
-export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleCommentsSectionProps) {
+export function ArticleCommentsSection({ articleSlug, currentProfile: propProfile }: ArticleCommentsSectionProps) {
+  const { profile: hookProfile } = useProfile();
+  const effectiveProfile = propProfile || hookProfile;
+
   const [commentText, setCommentText] = useState("");
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const encodedSlug = encodeURIComponent(articleSlug);
+
   const { data, isLoading, mutate } = useSWR<{
     comments: any[];
     totalCount: number;
-  }>(`/api/articles/${articleSlug}/comments`, fetcher, {
+  }>(`/api/articles/${encodedSlug}/comments`, fetcher, {
     revalidateOnFocus: true,
     dedupingInterval: 5000,
   });
@@ -42,7 +48,7 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
     const textToSend = parentId ? replyText.trim() : commentText.trim();
     if (!textToSend) return;
 
-    if (!currentProfile) {
+    if (!effectiveProfile) {
       toast.info("Please sign in to join the discussion.");
       return;
     }
@@ -52,7 +58,7 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
     haptics.medium();
 
     try {
-      const res = await fetch(`/api/articles/${articleSlug}/comments`, {
+      const res = await fetch(`/api/articles/${encodedSlug}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -66,7 +72,7 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
         throw new Error(errPayload.error || "Failed to post comment");
       }
 
-      toast.success(parentId ? "Reply posted! 💬" : "Comment added! 💬");
+      toast.success(parentId ? "Reply posted successfully" : "Comment posted (+5 LP)");
       if (parentId) {
         setReplyingToId(null);
         setReplyText("");
@@ -84,7 +90,7 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
   }
 
   async function handleVoteComment(commentId: string) {
-    if (!currentProfile) {
+    if (!effectiveProfile) {
       toast.info("Please sign in to upvote comments.");
       return;
     }
@@ -93,7 +99,7 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
     haptics.light();
 
     try {
-      const res = await fetch(`/api/articles/${articleSlug}/comments/${commentId}/vote`, { method: "POST" });
+      const res = await fetch(`/api/articles/${encodedSlug}/comments/${commentId}/vote`, { method: "POST" });
       if (!res.ok) throw new Error("Vote failed");
       mutate();
     } catch {
@@ -102,7 +108,7 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
   }
 
   return (
-    <section className="space-y-6 pt-10 border-t border-border/40">
+    <section id="discussion-comments" className="space-y-6 pt-10 border-t border-border/40 scroll-mt-20">
       {/* ─── Header ─── */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-black text-foreground tracking-tight flex items-center gap-2">
@@ -115,9 +121,9 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
       <div className="rounded-2xl border border-border/40 bg-card/60 p-4 space-y-3 shadow-xs">
         <div className="flex items-start gap-3">
           <Avatar className="size-8 shrink-0 border border-border/40">
-            <AvatarImage src={currentProfile?.avatarUrl || ""} />
+            <AvatarImage src={effectiveProfile?.avatarUrl || ""} />
             <AvatarFallback className="text-[10px] font-black bg-primary/10 text-primary">
-              {currentProfile?.username?.[0]?.toUpperCase() || "U"}
+              {effectiveProfile?.username?.[0]?.toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
 
@@ -125,11 +131,11 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
             <textarea
               rows={3}
               placeholder={
-                currentProfile
+                effectiveProfile
                   ? "Share your perspective, question, or experience on this article..."
                   : "Sign in to join the conversation..."
               }
-              disabled={!currentProfile || isSubmitting}
+              disabled={!effectiveProfile || isSubmitting}
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               className="w-full bg-transparent text-xs sm:text-sm font-medium text-foreground placeholder:text-muted-foreground outline-none resize-none leading-relaxed"
@@ -139,15 +145,25 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
 
         <div className="flex items-center justify-between pt-2 border-t border-border/20">
           <span className="text-[11px] text-muted-foreground">Be respectful &amp; insightful.</span>
-          <button
-            type="button"
-            disabled={!commentText.trim() || isSubmitting}
-            onClick={() => handleAddComment(null)}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 cursor-pointer shadow-xs"
-          >
-            {isSubmitting ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
-            <span>Comment</span>
-          </button>
+          {effectiveProfile ? (
+            <button
+              type="button"
+              disabled={!commentText.trim() || isSubmitting}
+              onClick={() => handleAddComment(null)}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 cursor-pointer shadow-xs"
+            >
+              {isSubmitting ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
+              <span>Comment</span>
+            </button>
+          ) : (
+            <Link
+              href="/handler/sign-in"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs"
+            >
+              <LogIn className="size-3.5" />
+              <span>Sign in to Comment</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -226,6 +242,10 @@ export function ArticleCommentsSection({ articleSlug, currentProfile }: ArticleC
                   <button
                     type="button"
                     onClick={() => {
+                      if (!effectiveProfile) {
+                        toast.info("Please sign in to reply to comments.");
+                        return;
+                      }
                       setReplyingToId((prev) => (prev === root.id ? null : root.id));
                       setReplyText("");
                     }}

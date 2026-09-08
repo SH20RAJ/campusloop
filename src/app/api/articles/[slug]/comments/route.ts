@@ -3,6 +3,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { articleComments, articleCommentVotes, articles, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { awardPoints } from "@/lib/gamification-server";
+import { createNotification } from "@/lib/notifications";
 
 interface RouteProps {
   params: Promise<{ slug: string }>;
@@ -11,6 +13,7 @@ interface RouteProps {
 export async function GET(req: NextRequest, { params }: RouteProps) {
   try {
     const { slug } = await params;
+    const cleanSlug = decodeURIComponent(slug);
     const db = getDb();
     const user = await hexclaveServerApp.getUser();
 
@@ -22,7 +25,12 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
     }
 
     const article = await db.query.articles.findFirst({
-      where: or(eq(articles.slug, slug), eq(articles.id, slug)),
+      where: or(
+        eq(articles.slug, cleanSlug),
+        eq(articles.id, cleanSlug),
+        eq(articles.slug, slug),
+        eq(articles.id, slug)
+      ),
     });
 
     if (!article) {
@@ -88,6 +96,7 @@ export async function GET(req: NextRequest, { params }: RouteProps) {
 export async function POST(req: NextRequest, { params }: RouteProps) {
   try {
     const { slug } = await params;
+    const cleanSlug = decodeURIComponent(slug);
     const user = await hexclaveServerApp.getUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -103,7 +112,12 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
     }
 
     const article = await db.query.articles.findFirst({
-      where: or(eq(articles.slug, slug), eq(articles.id, slug)),
+      where: or(
+        eq(articles.slug, cleanSlug),
+        eq(articles.id, cleanSlug),
+        eq(articles.slug, slug),
+        eq(articles.id, slug)
+      ),
     });
 
     if (!article) {
@@ -119,16 +133,13 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
     }
 
     const commentId = crypto.randomUUID();
-    const [inserted] = await db
-      .insert(articleComments)
-      .values({
-        id: commentId,
-        articleId: article.id,
-        authorId: profile.id,
-        parentId,
-        body: commentBody,
-      })
-      .returning();
+    await db.insert(articleComments).values({
+      id: commentId,
+      articleId: article.id,
+      authorId: profile.id,
+      parentId,
+      body: commentBody,
+    });
 
     const fullComment = await db.query.articleComments.findFirst({
       where: eq(articleComments.id, commentId),
@@ -138,6 +149,24 @@ export async function POST(req: NextRequest, { params }: RouteProps) {
         },
       },
     });
+
+    // Notify the article author if not commenting on one's own article
+    if (article.authorId !== profile.id) {
+      createNotification({
+        userId: article.authorId,
+        actorId: profile.id,
+        type: "COMMENT",
+        referenceId: article.slug,
+        previewText: `${profile.displayName || profile.username} commented: "${commentBody.slice(0, 100)}"`,
+      }).catch((err) => console.error("Article comment notification error:", err));
+    }
+
+    // Award LP to student for contributing an insightful comment (+5 LP)
+    awardPoints(profile.id, 5, "ARTICLE_COMMENT", {
+      referenceId: commentId,
+      actorId: profile.id,
+      bypassCaps: false,
+    }).catch((err) => console.error("Article comment LP award error:", err));
 
     return NextResponse.json({
       comment: {

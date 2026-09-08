@@ -135,7 +135,7 @@ export function ArticleReaderClient({
         method: "POST",
       });
       if (!res.ok) throw new Error();
-      toast.success(nextState ? `Followed @${article.author?.username} ✨` : "Unfollowed");
+      toast.success(nextState ? `Followed @${article.author?.username}` : "Unfollowed");
     } catch {
       setIsFollowing(!nextState);
       toast.error("Failed to update follow status");
@@ -259,7 +259,7 @@ export function ArticleReaderClient({
                 type="button"
                 onClick={() => {
                   navigator.clipboard.writeText(shortShareUrl);
-                  toast.success("Short link copied! 📋");
+                  toast.success("Short link copied to clipboard");
                 }}
                 className="p-2 rounded-full border border-border/50 bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 title="Copy share link"
@@ -372,12 +372,12 @@ export function ArticleReaderClient({
       </article>
 
       {/* ─── Sticky Bottom Floating Reading Bar ─── */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 rounded-full border border-border/50 bg-background/90 px-4 py-2 shadow-2xl backdrop-blur-2xl">
+      <div className="fixed bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1 sm:gap-1.5 rounded-full border border-border/50 bg-background/95 px-3.5 sm:px-4 py-2 shadow-2xl backdrop-blur-2xl max-w-[calc(100vw-2rem)]">
         <button
           type="button"
           onClick={() => handleVote(1)}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer active:scale-90",
+            "flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer active:scale-90",
             userVote === 1
               ? "bg-rose-500/15 text-rose-500 border border-rose-500/30"
               : "hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -390,7 +390,7 @@ export function ArticleReaderClient({
           <span>{upvotes}</span>
         </button>
 
-        <div className="h-4 w-px bg-border/40 mx-1" />
+        <div className="h-4 w-px bg-border/40 mx-0.5 sm:mx-1" />
 
         <button
           type="button"
@@ -398,7 +398,7 @@ export function ArticleReaderClient({
             const el = document.getElementById("discussion-comments");
             el?.scrollIntoView({ behavior: "smooth" });
           }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
         >
           <MessageSquare className="size-4" />
           <span>Discuss</span>
@@ -408,7 +408,7 @@ export function ArticleReaderClient({
           type="button"
           onClick={() => {
             setIsBookmarked(!isBookmarked);
-            toast.success(isBookmarked ? "Removed from reading list" : "Saved to reading list 🔖");
+            toast.success(isBookmarked ? "Removed from reading list" : "Saved to reading list");
           }}
           className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
           title="Save to reading list"

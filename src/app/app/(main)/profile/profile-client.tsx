@@ -482,17 +482,57 @@ export function ProfileClientView({
       </div>
 
       <main className="w-full max-w-2xl mx-auto border-x border-border/30 min-h-screen">
-        {/* ─── Profile Header Main Info (Clean Mobile-First Parity with Image 2) ─── */}
-        <div className="px-4 pt-4 pb-2 space-y-3.5">
-          {/* Avatar & User Info Row */}
-          <div className="flex items-start gap-3.5 sm:gap-4">
+        {/* ─── LinkedIn / Twitter Style Profile Cover Banner ─── */}
+        <div className="relative h-32 sm:h-44 w-full bg-linear-to-r from-purple-900/50 via-indigo-900/40 to-card overflow-hidden border-b border-border/20">
+          {profile.bannerUrl ? (
+            <img src={profile.bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-linear-to-tr from-purple-950/60 via-[#12111d] to-indigo-950/40 relative">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
+            </div>
+          )}
+
+          {/* Banner Edit / Camera Controls for Owner */}
+          {isOwnProfile && (
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
+              {profile.bannerUrl && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCropImageUrl(profile.bannerUrl || "");
+                    setCropMode("banner");
+                    setCropModalOpen(true);
+                  }}
+                  className="size-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-md"
+                  title="Reposition Banner"
+                >
+                  <Move className="size-3.5" />
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => bannerInputRef.current?.click()}
+                className="size-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-md"
+                title="Change Cover Banner"
+              >
+                <Camera className="size-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* ─── Profile Header Main Info ─── */}
+        <div className="px-4 pb-2 space-y-3.5">
+          {/* Avatar & User Info Row with LinkedIn-style negative margin overlap */}
+          <div className="flex items-start gap-3.5 sm:gap-4 -mt-10 sm:-mt-12 relative z-10">
             {/* Clickable Circular Profile Picture with Online Status */}
             <div className="relative shrink-0 group">
               <div
                 onClick={() => {
                   if (isOwnProfile) setShowAvatarMenu(true);
                 }}
-                className="relative size-18 sm:size-22 rounded-full border-2 border-border/40 overflow-hidden bg-background cursor-pointer group-hover:opacity-95 transition-opacity"
+                className="relative size-20 sm:size-24 rounded-full border-4 border-background overflow-hidden bg-background cursor-pointer group-hover:opacity-95 transition-opacity shadow-xl"
               >
                 <Avatar className="size-full">
                   <AvatarImage src={profile.avatarUrl || ""} className="object-cover size-full" />
@@ -510,13 +550,13 @@ export function ProfileClientView({
 
               {/* Online indicator badge at bottom right */}
               <span
-                className="absolute bottom-0.5 right-0.5 size-3.5 rounded-full bg-emerald-500 border-2 border-background ring-1 ring-emerald-400"
+                className="absolute bottom-1 right-1 size-4 rounded-full bg-emerald-500 border-2 border-background ring-1 ring-emerald-400"
                 title="Online on CampusLoop"
               />
             </div>
 
             {/* User Details Column */}
-            <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+            <div className="min-w-0 flex-1 space-y-1 pt-11 sm:pt-13">
               {/* Row 1: Name + Verified Check + Action Pill */}
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5 min-w-0">
@@ -565,20 +605,7 @@ export function ProfileClientView({
                 )}
               </div>
 
-              {/* Row 2: Anonymous Persona Badge (Private to Student) */}
-              {isOwnProfile && (
-                <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-950/40 border border-purple-700/40 text-purple-300 text-xs font-bold shadow-2xs">
-                    <VenetianMask className="size-3 text-purple-400" />
-                    <span>Anonymous Persona: @{profile.anonymousUsername || "shade"}</span>
-                  </div>
-                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                    <Info className="size-3 text-muted-foreground/70" /> Only visible to you
-                  </span>
-                </div>
-              )}
-
-              {/* Row 3: Bio */}
+              {/* Bio */}
               <p className="text-xs sm:text-[13px] text-foreground/90 font-normal leading-relaxed pt-0.5 whitespace-pre-wrap wrap-break-word">
                 {profile.bio ||
                   profile.headline ||

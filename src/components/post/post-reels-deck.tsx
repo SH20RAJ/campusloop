@@ -323,35 +323,7 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
       <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] bg-purple-600/10 blur-[140px] rounded-full -z-10" />
 
       {/* ─── Top Header & Subheader Tabs ─── */}
-      <header className="absolute top-0 inset-x-0 z-30 px-4 pt-2.5 pb-1 bg-gradient-to-b from-background/95 via-background/85 to-transparent backdrop-blur-md">
-        <div className="flex items-center justify-between gap-3">
-          {/* Left: Campus Community & Icon */}
-          <Link href="/app/colleges" className="flex items-center gap-2.5 group min-w-0">
-            <div className="size-10 rounded-full bg-purple-950/80 border border-purple-500/40 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.35)] shrink-0 group-hover:scale-105 transition-transform">
-              <Building2 className="size-5 text-purple-300" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-sm sm:text-base font-black text-foreground truncate tracking-tight leading-tight">
-                {campusName || "Birla Institute of Technology"}
-              </h1>
-              <p className="text-[11px] text-muted-foreground truncate font-medium flex items-center gap-1.5 mt-0.5">
-                <span className="inline-flex items-center gap-1">
-                  <Users className="size-3 text-purple-400" />
-                  <span>Campus Community</span>
-                </span>
-                <span>·</span>
-                <span>3.2K members</span>
-              </p>
-            </div>
-          </Link>
-
-          {/* Right: Glowing Loop # Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-950/70 border border-purple-500/40 text-purple-300 font-bold text-xs shadow-[0_0_15px_rgba(168,85,247,0.25)] shrink-0">
-            <Zap className="size-3.5 fill-purple-400 text-purple-400 animate-pulse" />
-            <span>Loop #{activeIndex + 1}</span>
-            <ChevronRight className="size-3.5 text-purple-400/80" />
-          </div>
-        </div>
+      <header className="absolute top-0 inset-x-0 z-30 px-4 pt-2.5 pb-1 bg-gradient-to-b from-background/95 via-background/85 to-transparent backdrop-blur-md"
 
         {/* Subheader Filter Tabs */}
         <div className="flex items-center justify-between gap-2 mt-3 border-b border-border/20 pb-0.5">

@@ -54,11 +54,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   CUSTOM: "Curated Stack",
 };
 
-export function AcademicPlaylistCard({
-  playlist,
-  onStarToggle,
-  className,
-}: AcademicPlaylistCardProps) {
+export function AcademicPlaylistCard({ playlist, onStarToggle, className }: AcademicPlaylistCardProps) {
   const router = useRouter();
   const [stars, setStars] = useState(playlist.starsCount);
   const [isStarred, setIsStarred] = useState(false);
@@ -108,8 +104,7 @@ export function AcademicPlaylistCard({
   }
 
   const categoryLabel = CATEGORY_LABELS[playlist.category] || "Study Playlist";
-  const gradient =
-    playlist.coverGradient || "from-indigo-600 via-purple-600 to-pink-600";
+  const gradient = playlist.coverGradient || "from-indigo-600 via-purple-600 to-pink-600";
 
   return (
     <Link
@@ -120,7 +115,12 @@ export function AcademicPlaylistCard({
       )}
     >
       {/* ─── Top Banner Gradient ─── */}
-      <div className={cn("h-24 w-full bg-linear-to-r p-3 flex flex-col justify-between relative overflow-hidden", gradient)}>
+      <div
+        className={cn(
+          "h-24 w-full bg-linear-to-r p-3 flex flex-col justify-between relative overflow-hidden",
+          gradient
+        )}
+      >
         <div className="absolute -right-6 -bottom-6 size-24 rounded-full bg-white/10 blur-xl pointer-events-none" />
         <div className="flex items-center justify-between z-10">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/40 text-white backdrop-blur-md border border-white/10 shadow-xs">

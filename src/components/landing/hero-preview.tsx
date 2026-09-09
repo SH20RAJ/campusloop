@@ -1,7 +1,25 @@
 "use client";
 
-import { BadgeCheck, Bike, CheckCircle2, Flame, Heart, Lock, MessageCircle, Repeat, Send, Zap } from "lucide-react";
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
+import {
+  BadgeCheck,
+  Bike,
+  CheckCircle2,
+  Flame,
+  Heart,
+  Lock,
+  MessageCircle,
+  Repeat,
+  Send,
+  Zap,
+} from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from "motion/react";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";

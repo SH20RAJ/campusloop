@@ -42,10 +42,7 @@ function parseUserAgent(userAgent?: string | null) {
   return { device, browser, os };
 }
 
-export async function GET(
-  req: Request,
-  props: { params: Promise<{ slug: string }> }
-) {
+export async function GET(req: Request, props: { params: Promise<{ slug: string }> }) {
   const { slug } = await props.params;
   const cleanSlug = (slug || "").trim().toLowerCase();
 

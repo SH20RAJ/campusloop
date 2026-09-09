@@ -44,22 +44,127 @@ export interface SimilarAcademicResourceItem {
 // Curriculum Knowledge Graph for automatic cross-semester and corequisite subject discovery
 const CURRICULUM_KNOWLEDGE_GRAPH: Record<string, string[]> = {
   // Computer Science & IT
-  CS305: ["FLAT", "CS304", "Theory of Computation", "Automata", "DSA", "CS201", "Grammar", "Parsing", "Lex", "AST", "Symbol Table", "Code Optimization"],
-  CS304: ["Compiler Design", "CS305", "Automata", "Context Free Grammar", "Pushdown Automata", "Turing Machine", "Discrete Mathematics", "DFA", "NFA"],
-  CS201: ["Algorithms", "Data Structures", "Trees", "Graphs", "Sorting", "Compiler Design", "Operating Systems", "CS304", "CS206", "DAA"],
-  CS303: ["Operating Systems", "Process Synchronization", "Semaphores", "Virtual Memory", "Computer Architecture", "Linux", "System Programming"],
-  CS301: ["DBMS", "Database Management", "SQL", "Normalization", "Relational Algebra", "Transactions", "Indexing", "B Trees"],
+  CS305: [
+    "FLAT",
+    "CS304",
+    "Theory of Computation",
+    "Automata",
+    "DSA",
+    "CS201",
+    "Grammar",
+    "Parsing",
+    "Lex",
+    "AST",
+    "Symbol Table",
+    "Code Optimization",
+  ],
+  CS304: [
+    "Compiler Design",
+    "CS305",
+    "Automata",
+    "Context Free Grammar",
+    "Pushdown Automata",
+    "Turing Machine",
+    "Discrete Mathematics",
+    "DFA",
+    "NFA",
+  ],
+  CS201: [
+    "Algorithms",
+    "Data Structures",
+    "Trees",
+    "Graphs",
+    "Sorting",
+    "Compiler Design",
+    "Operating Systems",
+    "CS304",
+    "CS206",
+    "DAA",
+  ],
+  CS303: [
+    "Operating Systems",
+    "Process Synchronization",
+    "Semaphores",
+    "Virtual Memory",
+    "Computer Architecture",
+    "Linux",
+    "System Programming",
+  ],
+  CS301: [
+    "DBMS",
+    "Database Management",
+    "SQL",
+    "Normalization",
+    "Relational Algebra",
+    "Transactions",
+    "Indexing",
+    "B Trees",
+  ],
   CS302: ["DBMS", "SQL", "Database Systems", "ER Diagrams", "Transactions", "Relational Algebra"],
   CS307: ["Computer Networks", "TCP IP", "Routing", "OSI Model", "Sockets", "HTTP", "Cryptography"],
-  CS401: ["Machine Learning", "Artificial Intelligence", "Deep Learning", "Neural Networks", "Gradient Descent", "Supervised Learning"],
+  CS401: [
+    "Machine Learning",
+    "Artificial Intelligence",
+    "Deep Learning",
+    "Neural Networks",
+    "Gradient Descent",
+    "Supervised Learning",
+  ],
   // Electronics & Electrical
-  EC201: ["Digital Electronics", "Logic Design", "Boolean Algebra", "K-Maps", "Flip Flops", "Registers", "Combinational Circuits"],
-  EC301: ["Analog Circuits", "BJT", "MOSFET", "Op-Amp", "Small Signal Analysis", "Amplifiers", "Multisim", "Differential Amplifier"],
-  EE101: ["Basic Electrical Engineering", "Electrical Science", "KCL", "KVL", "Thevenin", "Norton", "Transformers", "AC Circuits", "Phasors"],
+  EC201: [
+    "Digital Electronics",
+    "Logic Design",
+    "Boolean Algebra",
+    "K-Maps",
+    "Flip Flops",
+    "Registers",
+    "Combinational Circuits",
+  ],
+  EC301: [
+    "Analog Circuits",
+    "BJT",
+    "MOSFET",
+    "Op-Amp",
+    "Small Signal Analysis",
+    "Amplifiers",
+    "Multisim",
+    "Differential Amplifier",
+  ],
+  EE101: [
+    "Basic Electrical Engineering",
+    "Electrical Science",
+    "KCL",
+    "KVL",
+    "Thevenin",
+    "Norton",
+    "Transformers",
+    "AC Circuits",
+    "Phasors",
+  ],
   // Basic Sciences & Math
-  MA101: ["Engineering Mathematics I", "Calculus", "Linear Algebra", "Eigenvalues", "Eigenvectors", "Multivariable Calculus", "Sequences"],
-  MA102: ["Engineering Mathematics II", "Differential Equations", "Laplace Transform", "Fourier Series", "Complex Variables"],
-  MA24102: ["Mathematics II", "Vector Calculus", "Complex Integration", "Analytic Functions", "Residue Theorem"],
+  MA101: [
+    "Engineering Mathematics I",
+    "Calculus",
+    "Linear Algebra",
+    "Eigenvalues",
+    "Eigenvectors",
+    "Multivariable Calculus",
+    "Sequences",
+  ],
+  MA102: [
+    "Engineering Mathematics II",
+    "Differential Equations",
+    "Laplace Transform",
+    "Fourier Series",
+    "Complex Variables",
+  ],
+  MA24102: [
+    "Mathematics II",
+    "Vector Calculus",
+    "Complex Integration",
+    "Analytic Functions",
+    "Residue Theorem",
+  ],
   PH101: ["Engineering Physics", "Optics", "Lasers", "Quantum Mechanics", "Electromagnetism", "Interference"],
   CH101: ["Engineering Chemistry", "Thermodynamics", "Polymers", "Electrochemistry", "Spectroscopy"],
 };
@@ -333,29 +438,25 @@ export async function searchAcademicResourcesVector(
 
   try {
     const vector = await generateEmbedding(query);
-    const hits = await qdrant.search<AcademicResourceVectorPayload>(
-      COLLECTIONS.ACADEMIC_RESOURCES,
-      vector,
-      {
-        limit: limit * 2,
-        scoreThreshold: 0.12,
-      }
-    );
+    const hits = await qdrant.search<AcademicResourceVectorPayload>(COLLECTIONS.ACADEMIC_RESOURCES, vector, {
+      limit: limit * 2,
+      scoreThreshold: 0.12,
+    });
 
     if (hits.length > 0) {
       const pointIds = hits.map(
         (h) => (h.payload as any)?.resourceId || (h.payload as any)?.id || String(h.id)
       );
       const scoreMap = new Map(
-        hits.map((h) => [
-          (h.payload as any)?.resourceId || (h.payload as any)?.id || String(h.id),
-          h.score,
-        ])
+        hits.map((h) => [(h.payload as any)?.resourceId || (h.payload as any)?.id || String(h.id), h.score])
       );
 
       const conditions: any[] = [inArray(academicResources.id, pointIds)];
       if (options.branch && options.branch !== "All" && options.branch !== "all") {
-        const branchCond = or(eq(academicResources.branch, options.branch), eq(academicResources.branch, "All"));
+        const branchCond = or(
+          eq(academicResources.branch, options.branch),
+          eq(academicResources.branch, "All")
+        );
         if (branchCond) conditions.push(branchCond);
       }
       if (options.semester) {
@@ -429,9 +530,7 @@ export interface PersonalizedAcademicFeedOptions {
  * behavioral history, curriculum corequisites, and applies 30-min rotation jitter
  * and diversity interleaving to guarantee fresh and varied notes on every visit.
  */
-export async function getPersonalizedAcademicFeed(
-  options: PersonalizedAcademicFeedOptions
-): Promise<{
+export async function getPersonalizedAcademicFeed(options: PersonalizedAcademicFeedOptions): Promise<{
   items: any[];
   total: number;
   page: number;
@@ -628,9 +727,7 @@ export async function getPersonalizedAcademicFeed(
   }
 
   const userInterests = new Set<string>(
-    [...(profile?.interests || []), ...affinityTags]
-      .map((t) => t.toLowerCase().trim())
-      .filter(Boolean)
+    [...(profile?.interests || []), ...affinityTags].map((t) => t.toLowerCase().trim()).filter(Boolean)
   );
 
   const targetSems = profile?.year ? [profile.year * 2 - 1, profile.year * 2] : [];
@@ -694,7 +791,8 @@ export async function getPersonalizedAcademicFeed(
 
     // E. User Interest & Knowledge Graph Relevance
     let interestMatches = 0;
-    const itemText = `${item.title} ${item.subjectName} ${item.subjectCode} ${item.moduleOrChapter || ""}`.toLowerCase();
+    const itemText =
+      `${item.title} ${item.subjectName} ${item.subjectCode} ${item.moduleOrChapter || ""}`.toLowerCase();
     for (const interest of userInterests) {
       if (interest && itemText.includes(interest)) {
         interestMatches++;
@@ -791,4 +889,3 @@ export async function getPersonalizedAcademicFeed(
     totalPages,
   };
 }
-

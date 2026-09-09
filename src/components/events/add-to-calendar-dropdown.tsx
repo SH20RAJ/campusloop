@@ -2,11 +2,7 @@
 
 import { Calendar, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  type CalendarEvent,
-  downloadAppleCalendarIcs,
-  openGoogleCalendar,
-} from "@/lib/calendar";
+import { type CalendarEvent, downloadAppleCalendarIcs, openGoogleCalendar } from "@/lib/calendar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -17,11 +13,7 @@ interface AddToCalendarDropdownProps {
   className?: string;
 }
 
-export function AddToCalendarDropdown({
-  event,
-  variant = "button",
-  className,
-}: AddToCalendarDropdownProps) {
+export function AddToCalendarDropdown({ event, variant = "button", className }: AddToCalendarDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -80,7 +72,10 @@ export function AddToCalendarDropdown({
           <>
             <span>Add to Calendar</span>
             <ChevronDown
-              className={cn("size-3 text-muted-foreground transition-transform duration-200", isOpen && "rotate-180")}
+              className={cn(
+                "size-3 text-muted-foreground transition-transform duration-200",
+                isOpen && "rotate-180"
+              )}
             />
           </>
         )}

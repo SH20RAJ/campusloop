@@ -1,21 +1,13 @@
 import { asc, eq, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import {
-  academicPlaylists,
-  academicPlaylistItems,
-  academicResources,
-  userProfiles,
-} from "@/db/schema";
+import { academicPlaylistItems, academicPlaylists, academicResources, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: identifier } = await params;
     const db = getDb();
@@ -84,8 +76,7 @@ export async function GET(
     let isStarred = false;
     if (profile) {
       const star = await db.query.academicPlaylistStars.findFirst({
-        where: (stars, { and, eq }) =>
-          and(eq(stars.playlistId, playlist.id), eq(stars.userId, profile.id)),
+        where: (stars, { and, eq }) => and(eq(stars.playlistId, playlist.id), eq(stars.userId, profile.id)),
       });
       isStarred = Boolean(star);
     }
@@ -104,10 +95,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {
@@ -162,10 +150,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {

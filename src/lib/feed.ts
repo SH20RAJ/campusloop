@@ -629,7 +629,9 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
       votesCount = 1;
     }
     const rawCommentCount =
-      counts?.commentCount !== undefined && counts?.commentCount !== null ? Number(counts.commentCount) : undefined;
+      counts?.commentCount !== undefined && counts?.commentCount !== null
+        ? Number(counts.commentCount)
+        : undefined;
     const commentsCount =
       rawCommentCount !== undefined ? Math.max(rawCommentCount, commentsList.length) : commentsList.length;
 

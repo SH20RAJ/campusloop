@@ -2,7 +2,16 @@
 
 import type { LucideIcon } from "lucide-react";
 import { motion, useAnimationControls, useReducedMotion, type Variants } from "motion/react";
-import { type ComponentPropsWithoutRef, type ComponentType, forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import {
+  type ComponentPropsWithoutRef,
+  type ComponentType,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from "react";
 import { cn } from "@/lib/utils";
 
 export {
@@ -46,7 +55,6 @@ export {
   ShoppingBag as AnimateShoppingBag,
   ShoppingCart as AnimateShoppingCart,
   SlidersHorizontal as AnimateSlidersHorizontal,
-  Zap as AnimateZap,
   Star as AnimateStar,
   Store as AnimateStore,
   Sun as AnimateSun,
@@ -62,6 +70,7 @@ export {
   Volume2 as AnimateVolume2,
   VolumeX as AnimateVolumeX,
   X as AnimateX,
+  Zap as AnimateZap,
 } from "@animateicons/react/lucide";
 // Export direct high-performance animated SVG icons from @animateicons/react/lucide
 export {

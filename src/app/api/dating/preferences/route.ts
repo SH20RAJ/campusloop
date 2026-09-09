@@ -19,7 +19,12 @@ export type DatingPreferences = {
   isEnabled?: boolean;
 };
 
-const DEFAULTS: DatingPreferences = { gender: "DEFAULT", scope: "GLOBAL", sort: "COMPATIBILITY", isEnabled: true };
+const DEFAULTS: DatingPreferences = {
+  gender: "DEFAULT",
+  scope: "GLOBAL",
+  sort: "COMPATIBILITY",
+  isEnabled: true,
+};
 
 export async function GET() {
   try {

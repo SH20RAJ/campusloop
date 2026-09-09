@@ -1,12 +1,7 @@
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import {
-  academicPlaylists,
-  academicPlaylistItems,
-  institutions,
-  userProfiles,
-} from "@/db/schema";
+import { academicPlaylistItems, academicPlaylists, institutions, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { rejectViewerWrite } from "@/lib/viewer";
@@ -57,12 +52,7 @@ export async function GET(req: Request) {
     }
 
     if (branch && branch !== "all" && branch !== "All") {
-      conditions.push(
-        or(
-          eq(academicPlaylists.branch, branch),
-          eq(academicPlaylists.branch, "All")
-        )!
-      );
+      conditions.push(or(eq(academicPlaylists.branch, branch), eq(academicPlaylists.branch, "All"))!);
     }
 
     if (semesterStr && semesterStr !== "all" && semesterStr !== "0") {
@@ -134,10 +124,7 @@ export async function GET(req: Request) {
         .orderBy(orderBy)
         .limit(limit)
         .offset(offset),
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(academicPlaylists)
-        .where(whereClause),
+      db.select({ count: sql<number>`count(*)` }).from(academicPlaylists).where(whereClause),
     ]);
 
     const total = Number(totalCountResult[0]?.count || 0);

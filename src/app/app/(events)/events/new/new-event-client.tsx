@@ -1,6 +1,23 @@
 "use client";
 
-import { ArrowLeft, Calendar, Check, Globe, Image as ImageIcon, Link2, Loader2, Lock, MapPin, Save, Zap, Trash2, Trophy, Upload, Users, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  Check,
+  Globe,
+  Image as ImageIcon,
+  Link2,
+  Loader2,
+  Lock,
+  MapPin,
+  Save,
+  Trash2,
+  Trophy,
+  Upload,
+  Users,
+  X,
+  Zap,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";

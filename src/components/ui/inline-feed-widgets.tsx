@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, BookOpen, Clock, Flame, Gift, Hash, Heart, Zap, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Clock, Flame, Gift, Hash, Heart, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";

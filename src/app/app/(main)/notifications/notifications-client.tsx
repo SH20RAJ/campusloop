@@ -1,12 +1,36 @@
 "use client";
 
-import { AtSign, Bell, Compass, Eraser, Heart, Lock, MessageCircle, MoreHorizontal, ShieldCheck, Ticket, Trash2, Trophy, UserPlus, Zap } from "lucide-react";
+import {
+  AtSign,
+  Bell,
+  Compass,
+  Eraser,
+  Heart,
+  Lock,
+  MessageCircle,
+  MoreHorizontal,
+  ShieldCheck,
+  Ticket,
+  Trash2,
+  Trophy,
+  UserPlus,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PushNotificationToggle } from "@/components/notifications/push-notification-toggle";
-import { AnimateCheckCheck, AnimatedIcon, AnimateHeart, AnimateMessageCircle, AnimateRepeat2, AnimateSend, AnimateZap, AnimateUsers } from "@/components/ui/animated-icon";
+import {
+  AnimateCheckCheck,
+  AnimatedIcon,
+  AnimateHeart,
+  AnimateMessageCircle,
+  AnimateRepeat2,
+  AnimateSend,
+  AnimateUsers,
+  AnimateZap,
+} from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { type NotificationItem, type NotificationTab, useNotifications } from "@/hooks/use-notifications";

@@ -30,7 +30,9 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   }
 
   const authorName = post.isAnonymous ? "Anonymous Student" : post.author?.displayName || "Student";
-  const snippet = cleanSnippet(post.body, 150) || "Explore student yaps, confessions, and campus discussions on CampusLoop.";
+  const snippet =
+    cleanSnippet(post.body, 150) ||
+    "Explore student yaps, confessions, and campus discussions on CampusLoop.";
   const title = `${post.type === "CONFESSION" ? "Confession" : "Discussion"} by ${authorName} in ${post.institution?.name?.split(",")[0] || "Campus"}`;
   const url = `https://campusloop.space/app/post/${id}`;
 
@@ -196,7 +198,11 @@ export default async function PostDetailPage({ params }: PostPageProps) {
       id: `deck-academic-${res.id}`,
       resource: {
         id: res.id,
-        slug: slugifyAcademicResource({ id: res.id, subjectCode: res.subjectCode, title: res.title || res.subjectName || "" }),
+        slug: slugifyAcademicResource({
+          id: res.id,
+          subjectCode: res.subjectCode,
+          title: res.title || res.subjectName || "",
+        }),
         title: res.title,
         subjectCode: res.subjectCode,
         subjectName: res.subjectName,
@@ -268,15 +274,8 @@ export default async function PostDetailPage({ params }: PostPageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <PostReelsDeck
-        initialItems={initialItems}
-        currentUserId={profile?.id}
-        campusName={campusName}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <PostReelsDeck initialItems={initialItems} currentUserId={profile?.id} campusName={campusName} />
     </>
   );
 }

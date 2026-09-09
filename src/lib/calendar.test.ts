@@ -1,9 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import {
-  createGoogleCalendarUrl,
-  createIcsContent,
-  formatCalendarDate,
-} from "./calendar";
+import { createGoogleCalendarUrl, createIcsContent, formatCalendarDate } from "./calendar";
 
 describe("Calendar Integration Engine", () => {
   const sampleEvent = {

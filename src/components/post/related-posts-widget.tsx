@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, Zap, ThumbsUp } from "lucide-react";
+import { MessageSquare, ThumbsUp, Zap } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -54,9 +54,7 @@ export function RelatedPostsWidget({ postId, currentUserId, initialItems }: Rela
           <Zap className="size-3.5 text-primary" />
           <span>More like this</span>
         </h3>
-        <span className="text-[11px] font-medium text-muted-foreground/70">
-          From other campuses
-        </span>
+        <span className="text-[11px] font-medium text-muted-foreground/70">From other campuses</span>
       </div>
 
       <div className="divide-y divide-border/20">

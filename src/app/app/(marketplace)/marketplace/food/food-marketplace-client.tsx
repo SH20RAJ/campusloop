@@ -1,6 +1,27 @@
 "use client";
 
-import { ChevronRight, Clock, Coffee, Flame, GlassWater, History, Leaf, MapPin, Minus, Moon, Percent, Plus, Search, ShieldCheck, Soup, Sparkles, Star, Utensils, UtensilsCrossed, Zap } from "lucide-react";
+import {
+  ChevronRight,
+  Clock,
+  Coffee,
+  Flame,
+  GlassWater,
+  History,
+  Leaf,
+  MapPin,
+  Minus,
+  Moon,
+  Percent,
+  Plus,
+  Search,
+  ShieldCheck,
+  Soup,
+  Sparkles,
+  Star,
+  Utensils,
+  UtensilsCrossed,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";

@@ -12,7 +12,14 @@ export const metadata: Metadata = {
     description: "Find verified student PGs, apartments, shared flats, and roommates near college campus.",
     url: "https://campusloop.space/app/housing",
     siteName: "CampusLoop Housing",
-    images: [{ url: "https://campusloop.space/og-housing.png", width: 1536, height: 1024, alt: "CampusLoop Housing" }],
+    images: [
+      {
+        url: "https://campusloop.space/og-housing.png",
+        width: 1536,
+        height: 1024,
+        alt: "CampusLoop Housing",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

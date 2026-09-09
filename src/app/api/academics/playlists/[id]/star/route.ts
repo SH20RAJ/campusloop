@@ -1,21 +1,14 @@
 import { and, eq, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import {
-  academicPlaylists,
-  academicPlaylistStars,
-  userProfiles,
-} from "@/db/schema";
+import { academicPlaylistStars, academicPlaylists, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { awardPoints } from "@/lib/gamification-server";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {
@@ -56,10 +49,7 @@ export async function POST(
       await db
         .delete(academicPlaylistStars)
         .where(
-          and(
-            eq(academicPlaylistStars.playlistId, playlist.id),
-            eq(academicPlaylistStars.userId, profile.id)
-          )
+          and(eq(academicPlaylistStars.playlistId, playlist.id), eq(academicPlaylistStars.userId, profile.id))
         );
 
       const [updated] = await db

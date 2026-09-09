@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
-import { AddToCalendarDropdown } from "./add-to-calendar-dropdown";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
+import { AddToCalendarDropdown } from "./add-to-calendar-dropdown";
 
 export interface EventItem {
   id: string;
@@ -190,9 +190,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
               {event.title}
             </h3>
             {event.tagline && (
-              <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                {event.tagline}
-              </p>
+              <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">{event.tagline}</p>
             )}
           </div>
 
@@ -216,8 +214,8 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
                 {event.participationType === "TEAM"
                   ? "Team"
                   : event.participationType === "BOTH"
-                  ? "Solo/Team"
-                  : "Individual"}
+                    ? "Solo/Team"
+                    : "Individual"}
               </span>
             </div>
 
@@ -307,9 +305,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
           <div
             className={cn(
               "absolute bottom-2 left-2 right-2 rounded-lg px-2 py-0.5 text-[10px] font-black text-center backdrop-blur-md truncate",
-              isUrgentDeadline
-                ? "bg-red-500/90 text-white animate-pulse"
-                : "bg-black/75 text-amber-300"
+              isUrgentDeadline ? "bg-red-500/90 text-white animate-pulse" : "bg-black/75 text-amber-300"
             )}
           >
             {deadlineText}
@@ -322,9 +318,13 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
           {/* Club & Eligibility */}
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
             <span className="font-bold text-foreground">{event.clubName}</span>
-            <span aria-hidden className="opacity-40">·</span>
+            <span aria-hidden className="opacity-40">
+              ·
+            </span>
             <span className="capitalize font-semibold text-primary">{event.eventType.toLowerCase()}</span>
-            <span aria-hidden className="opacity-40">·</span>
+            <span aria-hidden className="opacity-40">
+              ·
+            </span>
             {isRestricted ? (
               <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
                 <School className="size-3" />
@@ -343,9 +343,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
           </h3>
 
           {event.tagline && (
-            <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-              {event.tagline}
-            </p>
+            <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{event.tagline}</p>
           )}
         </div>
 
@@ -360,7 +358,9 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
 
           <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-xs font-medium">
             <Calendar className="size-3" />
-            <span>{dateStr}, {timeStr}</span>
+            <span>
+              {dateStr}, {timeStr}
+            </span>
           </div>
 
           <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-xs font-medium">
@@ -369,8 +369,8 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
               {event.participationType === "TEAM"
                 ? "Team Event"
                 : event.participationType === "BOTH"
-                ? "Solo / Team"
-                : "Individual"}
+                  ? "Solo / Team"
+                  : "Individual"}
             </span>
           </div>
 

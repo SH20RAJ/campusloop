@@ -82,7 +82,9 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
 
   // Guest conversion modal
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authModalReason, setAuthModalReason] = useState<"SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI" | "DOWNLOAD_LIMIT">("SAVE");
+  const [authModalReason, setAuthModalReason] = useState<
+    "SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI" | "DOWNLOAD_LIMIT"
+  >("SAVE");
 
   const totalVotes = upvotes + downvotes;
   const reliability = totalVotes > 0 ? Math.round((upvotes / totalVotes) * 100) : 100;
@@ -189,7 +191,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
       ? `https://drive.google.com/drive/folders/${driveFolderMatch[1]}`
       : rawUrl;
 
-    const targetUrl = isDriveFolder ? cleanDriveFolderUrl : (resource.fileUrl || resource.driveUrl);
+    const targetUrl = isDriveFolder ? cleanDriveFolderUrl : resource.fileUrl || resource.driveUrl;
     if (targetUrl) {
       window.open(targetUrl, "_blank", "noopener,noreferrer");
       if (isDriveFolder) {
@@ -439,9 +441,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
             <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-muted text-foreground border border-border/50">
               {resource.subjectCode}
             </span>
-            <span className="text-xs font-semibold text-muted-foreground">
-              {resource.subjectName}
-            </span>
+            <span className="text-xs font-semibold text-muted-foreground">{resource.subjectName}</span>
             <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/25">
               {resource.resourceType.replace("_", " ")}
             </span>
@@ -539,7 +539,9 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
                 ? "bg-rose-600 hover:bg-rose-500 text-white"
                 : (resource.fileUrl || resource.driveUrl || "").toLowerCase().includes("sites.google.com")
                   ? "bg-sky-600 hover:bg-sky-500 text-white"
-                  : Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                  : (resource.fileUrl || resource.driveUrl || "").match(
+                        /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+                      )
                     ? "bg-amber-500 hover:bg-amber-600 text-neutral-950"
                     : "bg-primary text-primary-foreground hover:opacity-90"
             )}
@@ -548,7 +550,9 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
               <Play className="size-3.5 fill-current" />
             ) : (resource.fileUrl || resource.driveUrl || "").toLowerCase().includes("sites.google.com") ? (
               <Globe className="size-3.5" />
-            ) : Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i)) ? (
+            ) : (resource.fileUrl || resource.driveUrl || "").match(
+                /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+              ) ? (
               <FolderOpen className="size-3.5" />
             ) : (
               <Download className="size-3.5" />
@@ -558,7 +562,9 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
                 ? "Watch on YouTube"
                 : (resource.fileUrl || resource.driveUrl || "").toLowerCase().includes("sites.google.com")
                   ? "Open Course Portal"
-                  : Boolean((resource.fileUrl || resource.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                  : (resource.fileUrl || resource.driveUrl || "").match(
+                        /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+                      )
                     ? "Open Drive Folder"
                     : "Get Material"}
             </span>
@@ -590,9 +596,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
       </div>
 
       {/* ─── Guest Student Perks & Personal Vault Conversion ─── */}
-      {!currentUserId && (
-        <AcademicAuthBenefitsCard returnTo={`/app/academics/${resource.id}`} />
-      )}
+      {!currentUserId && <AcademicAuthBenefitsCard returnTo={`/app/academics/${resource.id}`} />}
 
       {/* ─── Study with AI Agents (ChatGPT & Claude) ─── */}
       <AcademicAiStudyBar
@@ -611,7 +615,8 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         <div className="flex items-center gap-2 min-w-0">
           <Sparkles className="size-4 text-indigo-400 shrink-0 animate-pulse" />
           <p className="truncate">
-            <strong className="text-foreground">Campus AI Study Cram Assistant</strong> will be launched on CampusLoop Academics soon...
+            <strong className="text-foreground">Campus AI Study Cram Assistant</strong> will be launched on
+            CampusLoop Academics soon...
           </p>
         </div>
         <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
@@ -762,9 +767,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
                       </span>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed pt-0.5">
-                      {c.body}
-                    </p>
+                    <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed pt-0.5">{c.body}</p>
                   </div>
                 </div>
               );

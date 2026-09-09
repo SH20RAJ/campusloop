@@ -136,7 +136,9 @@ export async function resolveAcademicResource(identifier: string) {
   // Search by potential subject code (e.g. CS301, BE24102, EE24101, or mapped code)
   const potentialCode =
     mappedSubjectCode ||
-    tokens.find((t) => /^[a-z]{2,5}\d{3,6}$/i.test(t) || (t.length >= 3 && t.length <= 8 && /\d/.test(t)))?.toUpperCase();
+    tokens
+      .find((t) => /^[a-z]{2,5}\d{3,6}$/i.test(t) || (t.length >= 3 && t.length <= 8 && /\d/.test(t)))
+      ?.toUpperCase();
 
   if (potentialCode) {
     const candidates = await db.query.academicResources.findMany({
@@ -169,7 +171,8 @@ export async function resolveAcademicResource(identifier: string) {
 
   // 3. Fallback: Search by keyword in title, ID, or subject name
   const meaningfulTokens = tokens.filter(
-    (t) => !["acad", "bitsyll", "bithub", "notes", "note", "01", "1", "2", "3", "collection", "all"].includes(t)
+    (t) =>
+      !["acad", "bitsyll", "bithub", "notes", "note", "01", "1", "2", "3", "collection", "all"].includes(t)
   );
 
   if (meaningfulTokens.length > 0) {

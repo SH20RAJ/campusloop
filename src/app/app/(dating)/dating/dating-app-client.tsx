@@ -1,6 +1,17 @@
 "use client";
 
-import { ArrowLeft, Camera, EyeOff, Globe, Heart, Lock, RotateCcw, ShieldCheck, SlidersHorizontal, Zap } from "lucide-react";
+import {
+  ArrowLeft,
+  Camera,
+  EyeOff,
+  Globe,
+  Heart,
+  Lock,
+  RotateCcw,
+  ShieldCheck,
+  SlidersHorizontal,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -191,9 +202,7 @@ export function DatingAppClient() {
             <Heart className="size-3.5" />
           </div>
           <div>
-            <h1 className="text-sm font-black tracking-tight text-foreground leading-tight">
-              Campus Match
-            </h1>
+            <h1 className="text-sm font-black tracking-tight text-foreground leading-tight">Campus Match</h1>
             <p className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1">
               <ShieldCheck className="size-3 text-primary" /> Safe Space
             </p>

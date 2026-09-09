@@ -94,7 +94,9 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const followCounts = await getFollowCounts(profile.id);
 
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-muted-foreground">Loading profile...</div>}>
+    <Suspense
+      fallback={<div className="p-8 text-center text-xs text-muted-foreground">Loading profile...</div>}
+    >
       <ProfileClientView
         profile={profile}
         formattedPosts={formattedPosts as FeedPost[]}

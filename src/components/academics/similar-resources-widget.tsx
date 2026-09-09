@@ -1,11 +1,11 @@
 "use client";
 
-import { ArrowRight, Zap, ThumbsUp } from "lucide-react";
+import { ArrowRight, ThumbsUp, Zap } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
+import { AcademicAiStudyBar } from "@/components/academics/academic-ai-study-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AcademicAiStudyBar } from "@/components/academics/academic-ai-study-bar";
 import { fetcher } from "@/lib/api";
 import { sounds } from "@/lib/sounds";
 import { getAvatarUrl } from "@/lib/utils";

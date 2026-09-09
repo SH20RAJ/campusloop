@@ -173,7 +173,11 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
           <div className="flex md:pl-64 min-h-screen max-w-full overflow-x-clip">
             <main className="flex-1 w-full min-w-0 max-w-2xl px-0 py-0 pb-28 md:pb-0 mx-auto min-h-screen border-r border-border/30 overflow-x-clip">
-              <Suspense fallback={<div className="p-8 text-center text-xs text-muted-foreground">Loading profile...</div>}>
+              <Suspense
+                fallback={
+                  <div className="p-8 text-center text-xs text-muted-foreground">Loading profile...</div>
+                }
+              >
                 <ProfileClientView
                   profile={profile}
                   formattedPosts={formattedPosts as FeedPost[]}
@@ -241,10 +245,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden pb-16 select-none">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {/* Top Floating Glass Header */}
       <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/80 px-6 backdrop-blur-xl">
         <Link href="/" className="flex items-center gap-2.5">

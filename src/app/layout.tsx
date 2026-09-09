@@ -1,7 +1,7 @@
 import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import type { Metadata, Viewport } from "next";
-import { Toaster } from "sonner";
 import { Suspense } from "react";
+import { Toaster } from "sonner";
 import { GoogleAnalyticsScripts, GoogleAnalyticsTracker } from "@/components/analytics/google-analytics";
 import { ReferralTracker } from "@/components/analytics/referral-tracker";
 import { SWRProvider } from "@/components/providers/swr-provider";
@@ -210,7 +210,8 @@ export default function RootLayout({
                   "@type": "SiteNavigationElement",
                   position: 3,
                   name: "Academic Study Vault & PYQs",
-                  description: "Free engineering notes, previous year question papers, formula cheat sheets, and lab manuals",
+                  description:
+                    "Free engineering notes, previous year question papers, formula cheat sheets, and lab manuals",
                   url: "https://campusloop.space/app/academics",
                 },
                 {

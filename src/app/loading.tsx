@@ -4,7 +4,7 @@ export default function Loading() {
       <div className="relative flex items-center justify-center">
         {/* Subtle glowing ambient halo */}
         <div className="absolute size-24 rounded-full bg-primary/20 blur-xl animate-pulse" />
-        
+
         {/* Centered CampusLoop Logo with smooth breathing effect */}
         <img
           src="/logo.png"

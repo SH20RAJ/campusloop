@@ -196,9 +196,7 @@ export function MarketplaceCard({ item, currentUserId, onDeleted }: MarketplaceC
                 >
                   {item.seller.displayName}
                 </Link>
-                {(item.seller.points || 0) >= 150 && (
-                  <ShieldCheck className="size-3.5 text-brand shrink-0" />
-                )}
+                {(item.seller.points || 0) >= 150 && <ShieldCheck className="size-3.5 text-brand shrink-0" />}
                 <span className="text-[11px] text-muted-foreground truncate">@{item.seller.username}</span>
                 <span className="text-[10px] text-muted-foreground/60">·</span>
                 <span className="text-[11px] text-muted-foreground/80 shrink-0">

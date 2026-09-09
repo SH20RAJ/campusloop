@@ -1,6 +1,6 @@
 /**
  * Academic Guest Download Limiter
- * 
+ *
  * Allows unauthenticated guests up to 5 free notes/PYQ downloads.
  * Once exceeded (download > 5), prompts the student to sign in or create an account
  * for unlimited downloads, verified solutions, and offline vault sync.

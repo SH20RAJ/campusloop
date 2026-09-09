@@ -1,8 +1,8 @@
 import { boolean, index, integer, jsonb, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+import { academicResources } from "./academic-resources";
 import { createdAt, id, updatedAt } from "./common";
 import { institutions } from "./institutions";
 import { userProfiles } from "./users";
-import { academicResources } from "./academic-resources";
 
 export const academicPlaylists = pgTable(
   "academic_playlists",
@@ -14,8 +14,7 @@ export const academicPlaylists = pgTable(
     creatorId: text("creator_id")
       .notNull()
       .references(() => userProfiles.id, { onDelete: "cascade" }),
-    institutionId: text("institution_id")
-      .references(() => institutions.id, { onDelete: "set null" }),
+    institutionId: text("institution_id").references(() => institutions.id, { onDelete: "set null" }),
     branch: text("branch").default("All").notNull(),
     semester: integer("semester"),
     category: text("category").default("SEMESTER_PACK").notNull(), // 'SEMESTER_PACK' | 'EXAM_PREP' | 'SUBJECT_BUNDLE' | 'GATE' | 'CUSTOM'

@@ -1,6 +1,16 @@
 "use client";
 
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ExternalLink, Image as ImageIcon, MapPin, X, ZoomIn } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ExternalLink,
+  Image as ImageIcon,
+  MapPin,
+  X,
+  ZoomIn,
+} from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";

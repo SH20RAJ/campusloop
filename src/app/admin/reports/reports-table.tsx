@@ -85,7 +85,9 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
           {initialReports.map((report) => (
             <tr key={report.id} className="border-b border-border hover:bg-muted/50">
               <td className="px-6 py-4 text-xs">
-                <span className="font-semibold text-foreground uppercase tracking-wider">{report.reason}</span>
+                <span className="font-semibold text-foreground uppercase tracking-wider">
+                  {report.reason}
+                </span>
                 {report.details && (
                   <p className="text-muted-foreground mt-1 max-w-[200px] truncate">{report.details}</p>
                 )}
@@ -96,13 +98,11 @@ export function ReportsTable({ initialReports }: { initialReports: ReportRow[] }
               <td className="px-6 py-4">
                 <div className="flex flex-col">
                   <span className="font-medium text-foreground flex items-center gap-1.5">
-                    {report.authorDisplayName ?? (
-                      revealed[report.postId]?.displayName ?? (
-                        <span className="inline-flex items-center gap-1">
-                          <VenetianMask className="size-3.5 text-purple-400" />
-                          <span>Anonymous</span>
-                        </span>
-                      )
+                    {report.authorDisplayName ?? revealed[report.postId]?.displayName ?? (
+                      <span className="inline-flex items-center gap-1">
+                        <VenetianMask className="size-3.5 text-purple-400" />
+                        <span>Anonymous</span>
+                      </span>
                     )}
                   </span>
                   <span className="text-xs text-muted-foreground">

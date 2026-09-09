@@ -122,16 +122,15 @@ export function CommunityHubStrip() {
             Community Maintained
           </span>
         </div>
-        <span className="text-[11px] font-bold text-muted-foreground">
-          6 Dedicated Student Services
-        </span>
+        <span className="text-[11px] font-bold text-muted-foreground">6 Dedicated Student Services</span>
       </div>
 
       {/* Community Disclaimer Notice */}
       <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/30 border border-border/40 text-[11px] text-muted-foreground">
         <Info className="size-3.5 shrink-0 text-primary" />
         <p className="leading-snug">
-          Maintained by the student community. CampusLoop provides direct access links to these peer-to-peer spaces.
+          Maintained by the student community. CampusLoop provides direct access links to these peer-to-peer
+          spaces.
         </p>
       </div>
 

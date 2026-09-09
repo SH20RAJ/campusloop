@@ -50,10 +50,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { archivePost, deletePost } from "@/app/app/(main)/post/actions";
-import { ArticleCard } from "@/components/articles/article-card";
 import { AcademicPlaylistCard } from "@/components/academics/academic-playlist-card";
-import { AcademicCard } from "@/components/communities/academic-card";
+import { ArticleCard } from "@/components/articles/article-card";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
+import { AcademicCard } from "@/components/communities/academic-card";
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
 import { MuteUserMenu } from "@/components/notifications/mute-user-menu";
 import { FollowButton } from "@/components/profile/follow-button";
@@ -125,7 +125,9 @@ export function ProfileClientView({
   const initialTabParam = searchParams?.get("tab");
 
   const [followers, setFollowers] = useState(followersCount);
-  const [activeTab, setActiveTab] = useState<"posts" | "articles" | "academics" | "photos" | "clout" | "archived">(
+  const [activeTab, setActiveTab] = useState<
+    "posts" | "articles" | "academics" | "photos" | "clout" | "archived"
+  >(
     initialTabParam === "academics" || initialTabParam === "notes"
       ? "academics"
       : initialTabParam === "articles"
@@ -185,11 +187,7 @@ export function ProfileClientView({
     resources: any[];
     playlists: any[];
     totalCount: number;
-  }>(
-    `/api/profile/${profile.username}/academics`,
-    fetcher,
-    { dedupingInterval: 30000 }
-  );
+  }>(`/api/profile/${profile.username}/academics`, fetcher, { dedupingInterval: 30000 });
   const userResources = userAcademicsData?.resources || [];
   const userPlaylists = userAcademicsData?.playlists || [];
   const userAcademicsCount = userAcademicsData?.totalCount || 0;
@@ -447,7 +445,9 @@ export function ProfileClientView({
                 <ShieldCheck className="size-3.5 text-purple-400 shrink-0" />
               </span>
             ) : (
-              <span className="text-blue-500 font-bold" title="Student">✓</span>
+              <span className="text-blue-500 font-bold" title="Student">
+                ✓
+              </span>
             )}
           </h1>
 
@@ -657,9 +657,7 @@ export function ProfileClientView({
             </div>
 
             <div className="min-w-0 flex-1 space-y-1">
-              <p className="text-sm font-bold text-foreground truncate">
-                {institutionName}
-              </p>
+              <p className="text-sm font-bold text-foreground truncate">{institutionName}</p>
 
               <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground font-medium">
                 <span>{profile.course || "B.Tech"}</span>
@@ -691,10 +689,16 @@ export function ProfileClientView({
               #{profile.course ? profile.course.replace(/[^a-zA-Z0-9]/g, "") : "BTech"}
             </span>
             <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-semibold text-muted-foreground">
-              #{profile.branch ? (slugifyBranch(profile.branch).toUpperCase().replace(/-/g, "").slice(0, 6)) : "CSE"}
+              #
+              {profile.branch
+                ? slugifyBranch(profile.branch).toUpperCase().replace(/-/g, "").slice(0, 6)
+                : "CSE"}
             </span>
             <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-semibold text-muted-foreground">
-              #{profile.institution?.slug ? profile.institution.slug.toUpperCase().replace(/-/g, "").slice(0, 10) : "BITSMesra"}
+              #
+              {profile.institution?.slug
+                ? profile.institution.slug.toUpperCase().replace(/-/g, "").slice(0, 10)
+                : "BITSMesra"}
             </span>
             {isOwnProfile && (
               <Link
@@ -727,7 +731,9 @@ export function ProfileClientView({
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-black text-foreground">{tier.tierName || "Gold Star"}</h4>
-                <span className="text-sm font-black text-purple-400">{points} / {tier.maxPoints + 1} LP</span>
+                <span className="text-sm font-black text-purple-400">
+                  {points} / {tier.maxPoints + 1} LP
+                </span>
               </div>
               <p className="text-xs text-muted-foreground">Keep contributing!</p>
             </div>
@@ -737,7 +743,9 @@ export function ProfileClientView({
           <div className="h-2.5 w-full rounded-full bg-muted/40 overflow-hidden">
             <div
               className="h-full rounded-full bg-linear-to-r from-purple-500 via-pink-500 to-amber-500 shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all duration-500"
-              style={{ width: `${Math.min(100, Math.max(10, Math.round((points / (tier.maxPoints + 1)) * 100)))}%` }}
+              style={{
+                width: `${Math.min(100, Math.max(10, Math.round((points / (tier.maxPoints + 1)) * 100)))}%`,
+              }}
             />
           </div>
 
@@ -746,7 +754,7 @@ export function ProfileClientView({
             <p className="text-xs font-medium text-muted-foreground">
               {points >= 1000
                 ? "Maximum Legend rank reached! 👑"
-                : `${Math.max(0, (tier.maxPoints + 1) - points)} LP needed to unlock next rank`}
+                : `${Math.max(0, tier.maxPoints + 1 - points)} LP needed to unlock next rank`}
             </p>
 
             <button

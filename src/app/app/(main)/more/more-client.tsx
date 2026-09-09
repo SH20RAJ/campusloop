@@ -117,7 +117,9 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
                   {BETA_HUB_ITEMS.length} Labs
                 </span>
               </div>
-              <p className="text-[10px] text-muted-foreground">Marketplace, Random Loop, Capsule &amp; Gaming</p>
+              <p className="text-[10px] text-muted-foreground">
+                Marketplace, Random Loop, Capsule &amp; Gaming
+              </p>
             </div>
           </div>
 

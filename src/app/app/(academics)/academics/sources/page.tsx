@@ -1,6 +1,6 @@
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { AcademicSourcesDirectory } from "@/components/academics/academic-sources-directory";
 
 export const metadata: Metadata = {
@@ -47,10 +47,7 @@ export default function AcademicSourcesPage() {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Top Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-muted-foreground">

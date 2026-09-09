@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Pin, Search, Zap, Trash2, TrendingUp, User } from "lucide-react";
+import { Loader2, Pin, Search, Trash2, TrendingUp, User, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";

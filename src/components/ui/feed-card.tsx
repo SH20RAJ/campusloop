@@ -261,11 +261,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
                 {post.title}
               </h3>
             )}
-            <RichText
-              content={post.body}
-              createdAt={post.createdAt}
-              collegeName={collegeDisplayName}
-            />
+            <RichText content={post.body} createdAt={post.createdAt} collegeName={collegeDisplayName} />
           </div>
 
           {/* Hashtags Row (matching Image 2) */}
@@ -289,26 +285,28 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
           )}
 
           {/* Embedded Original Quoted Post (only when user provided separate quote thoughts) */}
-          {post.repostOf && Boolean(post.repostComment) && post.body?.trim() !== post.repostOf.body?.trim() && (
-            <Link href={`/app/post/${post.repostOf.id}`} onClick={(e) => e.stopPropagation()}>
-              <div className="mt-2.5 rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors p-3 text-xs space-y-1">
-                <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
-                  <span className="font-bold text-foreground">
-                    @{post.repostOf.author?.username || "student"}
-                  </span>
-                  {post.repostOf.institution?.name && (
-                    <>
-                      <span>·</span>
-                      <span className="truncate text-[11px]">
-                        {getCollegeShortName(post.repostOf.institution)}
-                      </span>
-                    </>
-                  )}
+          {post.repostOf &&
+            Boolean(post.repostComment) &&
+            post.body?.trim() !== post.repostOf.body?.trim() && (
+              <Link href={`/app/post/${post.repostOf.id}`} onClick={(e) => e.stopPropagation()}>
+                <div className="mt-2.5 rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors p-3 text-xs space-y-1">
+                  <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
+                    <span className="font-bold text-foreground">
+                      @{post.repostOf.author?.username || "student"}
+                    </span>
+                    {post.repostOf.institution?.name && (
+                      <>
+                        <span>·</span>
+                        <span className="truncate text-[11px]">
+                          {getCollegeShortName(post.repostOf.institution)}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <p className="text-foreground/90 line-clamp-3 leading-relaxed">{post.repostOf.body}</p>
                 </div>
-                <p className="text-foreground/90 line-clamp-3 leading-relaxed">{post.repostOf.body}</p>
-              </div>
-            </Link>
-          )}
+              </Link>
+            )}
 
           {/* Poll Component */}
           {post.type === "POLL" && post.pollOptions && (
@@ -334,7 +332,9 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
                       <Heart className="size-2.5 fill-white text-white" />
                     </div>
                     <span className="font-semibold group-hover:underline">
-                      {effectiveVotesCount === 1 ? "1 person liked this" : `${effectiveVotesCount} people liked this`}
+                      {effectiveVotesCount === 1
+                        ? "1 person liked this"
+                        : `${effectiveVotesCount} people liked this`}
                     </span>
                   </div>
                 )}

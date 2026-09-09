@@ -1,7 +1,15 @@
 import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { academicResources, articles, communities, events, institutions, posts, userProfiles } from "@/db/schema";
+import {
+  academicResources,
+  articles,
+  communities,
+  events,
+  institutions,
+  posts,
+  userProfiles,
+} from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 

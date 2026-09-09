@@ -1,4 +1,4 @@
-import { and, eq, ne, notInArray, sql, type SQL } from "drizzle-orm";
+import { and, eq, ne, notInArray, type SQL, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
 import { getDb } from "@/db";
@@ -104,9 +104,7 @@ export async function GET(req: Request) {
       const validPhotos = (cand.photos || []).filter((p) => !isDicebear(p));
       const candPhotos = validPhotos.length > 0 ? validPhotos : fallbackSet.photos;
       const candAvatar =
-        cand.avatarUrl &&
-        !cand.avatarUrl.includes("unsplash.com") &&
-        !isDicebear(cand.avatarUrl)
+        cand.avatarUrl && !cand.avatarUrl.includes("unsplash.com") && !isDicebear(cand.avatarUrl)
           ? cand.avatarUrl
           : fallbackSet.avatar;
 

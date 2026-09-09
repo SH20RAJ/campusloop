@@ -1,6 +1,19 @@
 "use client";
 
-import { Building2, ChevronLeft, ChevronRight, Crown, Flame, Medal, Plus, School, Search, Zap, Trophy, X } from "lucide-react";
+import {
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+  Crown,
+  Flame,
+  Medal,
+  Plus,
+  School,
+  Search,
+  Trophy,
+  X,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

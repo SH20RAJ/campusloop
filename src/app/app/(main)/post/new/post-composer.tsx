@@ -2,7 +2,28 @@
 
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { AlertTriangle, ArrowLeft, BarChart3, Check, ChevronDown, FileText, Flame, Globe, HelpCircle, Loader2, Lock, Mic, School, Smile, Type, Users, VenetianMask, Video, X, Zap } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  BarChart3,
+  Check,
+  ChevronDown,
+  FileText,
+  Flame,
+  Globe,
+  HelpCircle,
+  Loader2,
+  Lock,
+  Mic,
+  School,
+  Smile,
+  Type,
+  Users,
+  VenetianMask,
+  Video,
+  X,
+  Zap,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -16,7 +37,11 @@ import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
 import { AnimateImage, AnimateZap } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
-import { detectMentionTrigger, MentionSuggestions, type TriggerContext } from "@/components/ui/mention-autocomplete";
+import {
+  detectMentionTrigger,
+  MentionSuggestions,
+  type TriggerContext,
+} from "@/components/ui/mention-autocomplete";
 import { StickerPickerModal } from "@/components/ui/sticker-picker-modal";
 import { useCommunities } from "@/hooks/use-communities";
 import type { FeedPost } from "@/hooks/use-feed";
@@ -275,15 +300,10 @@ export function PostComposer({
   useEffect(() => {
     if (!editor) return;
     const searchParamText =
-      typeof window !== "undefined"
-        ? new URLSearchParams(window.location.search).get("text")
-        : null;
+      typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("text") : null;
     let sessionDraft: string | null = null;
     try {
-      sessionDraft =
-        typeof window !== "undefined"
-          ? sessionStorage.getItem("campusloop_draft_post")
-          : null;
+      sessionDraft = typeof window !== "undefined" ? sessionStorage.getItem("campusloop_draft_post") : null;
     } catch {}
 
     const textToRestore = initialContent || searchParamText || sessionDraft;

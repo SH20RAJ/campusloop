@@ -121,15 +121,11 @@ export function BirthdayCard({ student, isToday = false }: BirthdayCardProps) {
         ) : (
           <div className="text-right space-y-0.5">
             {birthDateFormatted && (
-              <span className="text-xs font-bold text-foreground block">
-                {birthDateFormatted}
-              </span>
+              <span className="text-xs font-bold text-foreground block">{birthDateFormatted}</span>
             )}
             {student.daysUntil !== undefined && (
               <span className="text-[10px] text-muted-foreground block font-medium">
-                {student.daysUntil === 1
-                  ? "Tomorrow"
-                  : `In ${student.daysUntil} days`}
+                {student.daysUntil === 1 ? "Tomorrow" : `In ${student.daysUntil} days`}
               </span>
             )}
           </div>

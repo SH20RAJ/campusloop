@@ -18,7 +18,14 @@ export const metadata: Metadata = {
     description: "Read long-form campus stories and placement roadmaps written by verified seniors.",
     url: "https://campusloop.space/app/articles",
     siteName: "CampusLoop Editorial",
-    images: [{ url: "https://campusloop.space/og-articles.png", width: 1536, height: 1024, alt: "CampusLoop Editorial" }],
+    images: [
+      {
+        url: "https://campusloop.space/og-articles.png",
+        width: 1536,
+        height: 1024,
+        alt: "CampusLoop Editorial",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

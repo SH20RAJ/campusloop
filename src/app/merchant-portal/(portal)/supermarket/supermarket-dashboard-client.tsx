@@ -153,15 +153,21 @@ export function SupermarketDashboardClient() {
       {/* ─── Metric Highlights ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Today&apos;s Revenue</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Today&apos;s Revenue
+          </p>
           <p className="text-2xl font-black text-emerald-500">₹{stats.todayRevenue || 0}</p>
         </div>
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Orders Packed</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Orders Packed
+          </p>
           <p className="text-2xl font-black text-foreground">{stats.todayOrdersCount || 0}</p>
         </div>
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Total Mart SKUs</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Total Mart SKUs
+          </p>
           <p className="text-2xl font-black text-foreground">{products.length}</p>
         </div>
         <div className="p-4 rounded-2xl bg-card border border-border space-y-1 shadow-xs">
@@ -205,7 +211,9 @@ export function SupermarketDashboardClient() {
                     <div>
                       <span className="text-xs font-black text-foreground">Order #{order.orderNumber}</span>
                       <p className="text-[11px] text-muted-foreground">
-                        {order.deliveryAddress?.hostelName ? `${order.deliveryAddress.hostelName} · Room ${order.deliveryAddress.roomNumber}` : "Hostel Delivery"}
+                        {order.deliveryAddress?.hostelName
+                          ? `${order.deliveryAddress.hostelName} · Room ${order.deliveryAddress.roomNumber}`
+                          : "Hostel Delivery"}
                       </p>
                     </div>
 
@@ -216,7 +224,9 @@ export function SupermarketDashboardClient() {
 
                   {/* Item Checklist for Mart Picker */}
                   <div className="bg-muted/40 p-3 rounded-2xl border border-border/60 space-y-1.5 text-xs">
-                    <p className="text-[10px] font-black uppercase text-muted-foreground">Pick &amp; Bag Checklist:</p>
+                    <p className="text-[10px] font-black uppercase text-muted-foreground">
+                      Pick &amp; Bag Checklist:
+                    </p>
                     {(order.items || []).map((item: any) => (
                       <div key={item.id} className="flex items-center justify-between font-medium">
                         <span>

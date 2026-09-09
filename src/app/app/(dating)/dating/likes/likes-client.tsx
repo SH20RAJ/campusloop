@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Loader2, School, Zap, X } from "lucide-react";
+import { ArrowLeft, Loader2, School, X, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";

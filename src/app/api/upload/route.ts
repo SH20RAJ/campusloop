@@ -6,9 +6,7 @@ import { putR2Object } from "@/lib/r2";
 export const dynamic = "force-dynamic";
 
 const IMGBB_API_KEY =
-  process.env.NEXT_PUBLIC_IMGBB_API_KEY ||
-  process.env.IMGBB_API_KEY ||
-  "c0c864f0d9aadb0f7de371582b301397";
+  process.env.NEXT_PUBLIC_IMGBB_API_KEY || process.env.IMGBB_API_KEY || "c0c864f0d9aadb0f7de371582b301397";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +31,8 @@ export async function POST(req: NextRequest) {
     // Detect media category
     const isImage = mimeType.startsWith("image/");
     const isVideo = mimeType.startsWith("video/");
-    const isAudio = mimeType.startsWith("audio/") || originalName.endsWith(".m4a") || originalName.endsWith(".ogg");
+    const isAudio =
+      mimeType.startsWith("audio/") || originalName.endsWith(".m4a") || originalName.endsWith(".ogg");
     const isDoc =
       mimeType === "application/pdf" ||
       mimeType.includes("word") ||

@@ -1,25 +1,37 @@
 "use client";
 
-import { BookOpen, FolderPlus, Gift, Globe, LayoutGrid, List, Loader2, Plus, School, Sparkles, X } from "lucide-react";
+import {
+  BookOpen,
+  FolderPlus,
+  Gift,
+  Globe,
+  LayoutGrid,
+  List,
+  Loader2,
+  Plus,
+  School,
+  Search,
+  Sparkles,
+  X,
+} from "lucide-react";
+import { motion } from "motion/react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
-import { AcademicPlaylistCard } from "@/components/academics/academic-playlist-card";
-import { AcademicCard } from "@/components/communities/academic-card";
-import { AnimateBookOpen, AnimateCheck, AnimatedIcon, AnimatePlus, AnimateSearch, AnimateZap } from "@/components/ui/animated-icon";
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
 import { AcademicAuthBenefitsCard } from "@/components/academics/academic-auth-benefits-card";
 import { AcademicAuthModal } from "@/components/academics/academic-auth-modal";
-import { getGuestDownloadCount, GUEST_DOWNLOAD_LIMIT } from "@/lib/academic-download-limiter";
+import { AcademicPlaylistCard } from "@/components/academics/academic-playlist-card";
+import { AcademicCard } from "@/components/communities/academic-card";
+import { AnimateBookOpen, AnimatedIcon, AnimatePlus, AnimateSearch } from "@/components/ui/animated-icon";
+import { Skeleton } from "@/components/ui/skeleton";
+import { GUEST_DOWNLOAD_LIMIT, getGuestDownloadCount } from "@/lib/academic-download-limiter";
 import { trackAcademicSearch } from "@/lib/analytics/ga4";
+import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
 
 interface AcademicsClientProps {
   profileId: string | null;
@@ -67,6 +79,7 @@ const SEMESTERS = [
 ] as const;
 
 export function AcademicsClient({ profileId }: AcademicsClientProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const highlightId = searchParams.get("id");
 
@@ -77,6 +90,17 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   const [scope, setScope] = useState<"campus" | "global">("campus");
   const [sortBy, setSortBy] = useState<"for_you" | "latest" | "popular" | "downloads" | "views">("for_you");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sounds.tap();
+    haptics.light();
+    if (searchQuery.trim()) {
+      router.push(`/app/academics/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push("/app/academics/search");
+    }
+  };
 
   useEffect(() => {
     const q = searchParams.get("q");
@@ -95,7 +119,9 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   }, []);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authModalReason, setAuthModalReason] = useState<"SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI">("UPLOAD");
+  const [authModalReason, setAuthModalReason] = useState<"SAVE" | "VOTE" | "COMMENT" | "UPLOAD" | "AI">(
+    "UPLOAD"
+  );
   const [loadMoreNode, setLoadMoreNode] = useState<HTMLDivElement | null>(null);
   const [guestRemaining, setGuestRemaining] = useState<number>(GUEST_DOWNLOAD_LIMIT);
 
@@ -256,6 +282,19 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
             </div>
 
             <Link
+              href="/app/academics/search"
+              onClick={() => {
+                sounds.tap();
+                haptics.light();
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/40 bg-muted/30 hover:bg-muted/60 text-muted-foreground hover:text-foreground text-xs font-bold transition-all shadow-xs cursor-pointer"
+              title="Search Notes & PYQs"
+            >
+              <Search className="size-3.5" />
+              <span className="hidden sm:inline">Search</span>
+            </Link>
+
+            <Link
               href="/app/academics/playlists/new"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold transition-all shadow-xs"
               title="Create new Study Playlist"
@@ -280,28 +319,39 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
 
         {/* Omnibar Search Input */}
         <div className="relative">
-          <AnimatedIcon
-            icon={AnimateSearch}
-            animation="pop"
-            size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
-          />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by subject (CS201), topic, module, book, or PYQ..."
-            className="w-full h-9.5 rounded-full bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background pl-10 pr-9 text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all text-foreground"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 size-4.5 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
-            >
-              <X className="size-3" />
-            </button>
-          )}
+          <form onSubmit={handleSearchSubmit} className="relative w-full">
+            <AnimatedIcon
+              icon={AnimateSearch}
+              animation="pop"
+              size={16}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by subject (CS201), topic, module, book, or PYQ..."
+              className="w-full h-10 rounded-full bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background pl-10 pr-24 text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all text-foreground"
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="size-5 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                  title="Clear"
+                >
+                  <X className="size-3" />
+                </button>
+              )}
+              <button
+                type="submit"
+                className="px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[11px] font-bold hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs"
+              >
+                Search
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* ─── Sliding Tabs for Resource Types ─── */}
@@ -319,9 +369,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 }}
                 className={cn(
                   "relative pb-2.5 pt-1 px-3 text-xs font-bold transition-colors cursor-pointer shrink-0",
-                  isSelected
-                    ? "text-foreground font-black"
-                    : "text-muted-foreground hover:text-foreground"
+                  isSelected ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 <span>{type.label}</span>
@@ -430,9 +478,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
       {/* ─── Scrollable Page Body (Full Space & Organized) ─── */}
       <div className="space-y-4 pt-4">
         {/* Guest conversion banner if not logged in (Natural scroll, NOT sticky) */}
-        {!profileId && (
-          <AcademicAuthBenefitsCard returnTo="/app/academics" dismissible={true} />
-        )}
+        {!profileId && <AcademicAuthBenefitsCard returnTo="/app/academics" dismissible={true} />}
 
         {/* ─── Connected Sources & Archives Directory Quick Access ─── */}
         <div className="flex items-center justify-between gap-2">
@@ -475,7 +521,8 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                     Semester Survival Kits &amp; Exam Stacks
                   </h2>
                   <p className="text-xs text-muted-foreground max-w-md leading-relaxed">
-                    Complete handwritten notes, 5-year PYQs, and cheat sheets assembled into 1-click playlists for your batch.
+                    Complete handwritten notes, 5-year PYQs, and cheat sheets assembled into 1-click playlists
+                    for your batch.
                   </p>
                 </div>
 
@@ -507,7 +554,8 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                   <div className="space-y-1">
                     <h3 className="text-sm font-bold text-foreground">No study playlists found</h3>
                     <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                      Be the first in your branch or semester to create a study playlist and earn +50 Loop Points!
+                      Be the first in your branch or semester to create a study playlist and earn +50 Loop
+                      Points!
                     </p>
                   </div>
                   <Link

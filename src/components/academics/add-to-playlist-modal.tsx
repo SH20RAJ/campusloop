@@ -21,12 +21,7 @@ interface UserPlaylistSummary {
   itemsCount: number;
 }
 
-export function AddToPlaylistModal({
-  isOpen,
-  onClose,
-  resourceId,
-  resourceTitle,
-}: AddToPlaylistModalProps) {
+export function AddToPlaylistModal({ isOpen, onClose, resourceId, resourceTitle }: AddToPlaylistModalProps) {
   const [playlists, setPlaylists] = useState<UserPlaylistSummary[]>([]);
   const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -170,9 +165,7 @@ export function AddToPlaylistModal({
               <FolderPlus className="size-4" />
               <span>Save to Study Playlist</span>
             </div>
-            <h2 className="text-base font-black text-foreground mt-0.5 line-clamp-1">
-              {resourceTitle}
-            </h2>
+            <h2 className="text-base font-black text-foreground mt-0.5 line-clamp-1">{resourceTitle}</h2>
           </div>
           <button
             type="button"
@@ -248,7 +241,10 @@ export function AddToPlaylistModal({
 
             {/* Create New Playlist Inline Form */}
             {isCreatingNew ? (
-              <form onSubmit={handleCreateNew} className="p-3 rounded-2xl bg-muted/30 border border-border space-y-2.5">
+              <form
+                onSubmit={handleCreateNew}
+                className="p-3 rounded-2xl bg-muted/30 border border-border space-y-2.5"
+              >
                 <p className="text-xs font-bold text-foreground">Create New Study Stack</p>
                 <input
                   type="text"

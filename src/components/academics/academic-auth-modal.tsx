@@ -1,6 +1,16 @@
 "use client";
 
-import { Bookmark, ChevronRight, Download, GraduationCap, MessageSquare, Zap, ThumbsUp, UploadCloud, X } from "lucide-react";
+import {
+  Bookmark,
+  ChevronRight,
+  Download,
+  GraduationCap,
+  MessageSquare,
+  ThumbsUp,
+  UploadCloud,
+  X,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -58,7 +68,8 @@ export function AcademicAuthModal({
     },
     DOWNLOAD_LIMIT: {
       title: "Unlock Unlimited Free Downloads",
-      subtitle: "You've reached your 5 free guest downloads limit! Sign in or create a free account with your college email for unlimited downloads, verified solutions & offline sync.",
+      subtitle:
+        "You've reached your 5 free guest downloads limit! Sign in or create a free account with your college email for unlimited downloads, verified solutions & offline sync.",
       icon: Download,
       color: "text-rose-500",
       bg: "bg-rose-500/15",
@@ -84,7 +95,9 @@ export function AcademicAuthModal({
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className={`flex size-10 items-center justify-center rounded-2xl ${reasonText.bg} ${reasonText.color} border border-border/40 shadow-xs`}>
+              <span
+                className={`flex size-10 items-center justify-center rounded-2xl ${reasonText.bg} ${reasonText.color} border border-border/40 shadow-xs`}
+              >
                 <CurrentIcon className="size-5" />
               </span>
               <div>

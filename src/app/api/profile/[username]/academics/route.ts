@@ -1,19 +1,11 @@
 import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import {
-  academicPlaylists,
-  academicResources,
-  institutions,
-  userProfiles,
-} from "@/db/schema";
+import { academicPlaylists, academicResources, institutions, userProfiles } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ username: string }> }
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ username: string }> }) {
   try {
     const { username } = await params;
     const db = getDb();

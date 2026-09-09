@@ -1,6 +1,6 @@
 /**
  * PDF & Academic Resource URL Health Check & Verification Engine
- * 
+ *
  * Enforces pre-upload verification: checks that any submitted PDF, Drive document,
  * or academic URL is reachable, returns an HTTP success code (< 400),
  * and is not showing 404 or 500 errors.
@@ -94,7 +94,8 @@ export async function validateResourceUrl(rawUrl: string): Promise<ValidationRes
       return {
         isValid: false,
         status: 404,
-        error: "The provided document URL returned a 404 Not Found error. The file does not exist at this location.",
+        error:
+          "The provided document URL returned a 404 Not Found error. The file does not exist at this location.",
       };
     }
 
@@ -112,7 +113,8 @@ export async function validateResourceUrl(rawUrl: string): Promise<ValidationRes
         return {
           isValid: false,
           status: res.status,
-          error: "Google Drive access denied. Please ensure the file sharing setting is set to 'Anyone with the link can view'.",
+          error:
+            "Google Drive access denied. Please ensure the file sharing setting is set to 'Anyone with the link can view'.",
         };
       }
 

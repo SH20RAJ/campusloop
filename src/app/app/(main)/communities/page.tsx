@@ -11,8 +11,15 @@ import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const metadata: Metadata = {
   title: "Student Communities & Sub-Hubs",
-  description: "Browse interest groups, technical societies, and student-created communities across 1,350+ Indian colleges on CampusLoop.",
-  keywords: ["Student Communities", "College Sub-Hubs", "Campus Clubs", "Student Groups India", "Coding Clubs"],
+  description:
+    "Browse interest groups, technical societies, and student-created communities across 1,350+ Indian colleges on CampusLoop.",
+  keywords: [
+    "Student Communities",
+    "College Sub-Hubs",
+    "Campus Clubs",
+    "Student Groups India",
+    "Coding Clubs",
+  ],
   alternates: { canonical: "https://campusloop.space/app/communities" },
   openGraph: {
     title: "Student Communities & Sub-Hubs | CampusLoop",
@@ -79,15 +86,11 @@ export default async function CommunitiesPage() {
   const formattedPosts = rawCommunityPosts.map((post) => {
     const votesCount = (post.votes || []).reduce((acc, vote) => acc + vote.value, 0);
     const commentsCount = (post.comments || []).length;
-    const userVote = profile
-      ? (post.votes || []).find((v) => v.userId === profile.id)?.value || 0
-      : 0;
+    const userVote = profile ? (post.votes || []).find((v) => v.userId === profile.id)?.value || 0 : 0;
 
     const formattedPollOptions = post.pollOptions?.map((opt) => {
       const optVotesCount = (opt.votes || []).length;
-      const userVoted = profile
-        ? (opt.votes || []).some((v) => v.userId === profile.id)
-        : false;
+      const userVoted = profile ? (opt.votes || []).some((v) => v.userId === profile.id) : false;
       return { id: opt.id, text: opt.text, votesCount: optVotesCount, userVoted };
     });
 
@@ -112,7 +115,8 @@ export default async function CommunitiesPage() {
     "@type": "CollectionPage",
     name: "Student Communities & Campus Sub-Hubs",
     url: "https://campusloop.space/app/communities",
-    description: "Directory of student-created technical clubs, cultural societies, and special interest groups across Indian colleges.",
+    description:
+      "Directory of student-created technical clubs, cultural societies, and special interest groups across Indian colleges.",
     publisher: {
       "@type": "Organization",
       name: "CampusLoop",
@@ -123,10 +127,7 @@ export default async function CommunitiesPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <CommunitiesIndexClient
         initialCommunities={allCommunities as unknown as CommunityItem[]}
         initialPosts={formattedPosts}

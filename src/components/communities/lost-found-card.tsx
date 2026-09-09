@@ -91,9 +91,7 @@ export function LostFoundCard({ item, currentUserId }: LostFoundCardProps) {
               >
                 {item.author.displayName}
               </Link>
-              {(item.author.points || 0) >= 150 && (
-                <ShieldCheck className="size-3.5 text-brand shrink-0" />
-              )}
+              {(item.author.points || 0) >= 150 && <ShieldCheck className="size-3.5 text-brand shrink-0" />}
               <span className="text-[11px] text-muted-foreground truncate">@{item.author.username}</span>
               <span className="text-[10px] text-muted-foreground/60">·</span>
               <span className="text-[11px] text-muted-foreground/80 shrink-0">

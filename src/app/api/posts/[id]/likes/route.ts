@@ -75,9 +75,7 @@ export async function GET(req: Request, { params }: RouteParams) {
     const hasMore = rows.length > limit;
     const pagedRows = hasMore ? rows.slice(0, limit) : rows;
     const nextCursor =
-      hasMore && pagedRows.length > 0
-        ? pagedRows[pagedRows.length - 1].likedAt.toISOString()
-        : null;
+      hasMore && pagedRows.length > 0 ? pagedRows[pagedRows.length - 1].likedAt.toISOString() : null;
 
     // Check follows for viewer
     let followingSet = new Set<string>();
@@ -86,12 +84,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       const followRows = await db
         .select({ followingId: follows.followingId })
         .from(follows)
-        .where(
-          and(
-            eq(follows.followerId, viewerProfileId),
-            inArray(follows.followingId, targetIds)
-          )
-        );
+        .where(and(eq(follows.followerId, viewerProfileId), inArray(follows.followingId, targetIds)));
       followingSet = new Set(followRows.map((f) => f.followingId));
     }
 

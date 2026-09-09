@@ -54,7 +54,9 @@ export function DeckUserSuggestionsCard({ users, institutionName }: DeckUserSugg
             </div>
             <div>
               <h3 className="font-black text-sm text-foreground">Who to Follow on Campus</h3>
-              <p className="text-[11px] text-muted-foreground">{institutionName || "Active verified peers"}</p>
+              <p className="text-[11px] text-muted-foreground">
+                {institutionName || "Active verified peers"}
+              </p>
             </div>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/20">
@@ -74,10 +76,7 @@ export function DeckUserSuggestionsCard({ users, institutionName }: DeckUserSugg
                 key={user.id}
                 className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors"
               >
-                <Link
-                  href={`/@${user.username}`}
-                  className="flex items-center gap-3 min-w-0 flex-1 group"
-                >
+                <Link href={`/@${user.username}`} className="flex items-center gap-3 min-w-0 flex-1 group">
                   <Avatar className="size-11 border border-border/60 shrink-0">
                     <AvatarImage src={avatarUrl} alt={user.displayName} />
                     <AvatarFallback className="text-xs font-bold bg-muted text-foreground">

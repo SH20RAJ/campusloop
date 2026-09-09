@@ -17,11 +17,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { CuteAiMascot } from "@/components/academics/cute-ai-mascot";
-import {
-  buildAcademicStudyPrompt,
-  getChatGptStudyUrl,
-  getClaudeStudyUrl,
-} from "@/lib/academics/ai-prompts";
+import { buildAcademicStudyPrompt, getChatGptStudyUrl, getClaudeStudyUrl } from "@/lib/academics/ai-prompts";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -169,7 +165,8 @@ export function AcademicAiStudyBar({
               </div>
 
               <p className="text-xs text-purple-200/70 leading-relaxed max-w-sm">
-                Pre-loaded with verified syllabus, context, analogies, formula cheat sheets &amp; exam solutions.
+                Pre-loaded with verified syllabus, context, analogies, formula cheat sheets &amp; exam
+                solutions.
               </p>
             </div>
 
@@ -177,7 +174,9 @@ export function AcademicAiStudyBar({
             <div className="hidden xs:flex flex-col items-center shrink-0 -mt-2">
               <CuteAiMascot className="size-20 sm:size-24" />
               <span className="text-[9px] font-semibold text-purple-300/80 -mt-1 tracking-tight text-center">
-                Learn Smarter<br />Not Harder ♡
+                Learn Smarter
+                <br />
+                Not Harder ♡
               </span>
             </div>
           </div>
@@ -299,7 +298,9 @@ export function AcademicAiStudyBar({
           </div>
           <div className="min-w-0">
             <p className="text-xs font-black text-white truncate">Campus AI Study Cram Assistant</p>
-            <p className="text-[11px] text-muted-foreground truncate">Your 24/7 study buddy is almost here!</p>
+            <p className="text-[11px] text-muted-foreground truncate">
+              Your 24/7 study buddy is almost here!
+            </p>
           </div>
         </div>
 

@@ -1,10 +1,38 @@
 "use client";
 
-import { Ban, BookOpen, BriefcaseBusiness, ExternalLink, EyeOff, Flame, Heart, HeartHandshake, Layers, Megaphone, MessagesSquare, ShieldCheck, ShoppingBag, Zap, Split, Store, Ticket, TrendingUp, Trophy } from "lucide-react";
+import {
+  Ban,
+  BookOpen,
+  BriefcaseBusiness,
+  ExternalLink,
+  EyeOff,
+  Flame,
+  Heart,
+  HeartHandshake,
+  Layers,
+  Megaphone,
+  MessagesSquare,
+  ShieldCheck,
+  ShoppingBag,
+  Split,
+  Store,
+  Ticket,
+  TrendingUp,
+  Trophy,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Reveal } from "@/components/landing/reveal";
-import { CTABand, GradientText, MarketingFooter, MarketingHeader, Section, SectionHeading, StatCard } from "@/components/marketing/system";
+import {
+  CTABand,
+  GradientText,
+  MarketingFooter,
+  MarketingHeader,
+  Section,
+  SectionHeading,
+  StatCard,
+} from "@/components/marketing/system";
 
 const PAIN_POINTS = [
   {
@@ -277,7 +305,9 @@ export function PitchClient() {
                 Multipurpose Campus Match &amp; Secret Crush
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Unlike shallow dating apps, Campus Match is designed as a versatile, comfortable connection space for verified college students — softly bridging romance, friendship, and peer collaborations without public pressure or awkwardness.
+                Unlike shallow dating apps, Campus Match is designed as a versatile, comfortable connection
+                space for verified college students — softly bridging romance, friendship, and peer
+                collaborations without public pressure or awkwardness.
               </p>
 
               {/* Multipurpose Usage Dimensions */}
@@ -353,7 +383,10 @@ export function PitchClient() {
                 Stop Leaking Campus Lore to Global Instagram
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                College humor is hyper-local: the professor who gives 8:01 AM surprise quizzes, the boy doing aura -10,000 in front of the canteen, iconic batch tees, and 2 AM hostel wing lore. When posted to public social media, it gets zero context. On CampusLoop, it reaches the exact verified peer group that gets every single punchline.
+                College humor is hyper-local: the professor who gives 8:01 AM surprise quizzes, the boy doing
+                aura -10,000 in front of the canteen, iconic batch tees, and 2 AM hostel wing lore. When
+                posted to public social media, it gets zero context. On CampusLoop, it reaches the exact
+                verified peer group that gets every single punchline.
               </p>
 
               {/* Meme Dimensions Grid */}
@@ -401,7 +434,9 @@ export function PitchClient() {
               <div className="size-12 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto border border-amber-500/20 font-black text-lg">
                 ⚡
               </div>
-              <p className="text-xs font-black text-foreground">&ldquo;Popular senior dropped iced tea on dean&apos;s scooter&rdquo;</p>
+              <p className="text-xs font-black text-foreground">
+                &ldquo;Popular senior dropped iced tea on dean&apos;s scooter&rdquo;
+              </p>
               <div className="p-2.5 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-black">
                 Aura -50,000 · 842 Upvotes
               </div>

@@ -1,6 +1,22 @@
 "use client";
 
-import { ArrowUp, BookOpen, ExternalLink, Flame, Mic, MicOff, Radio, ShoppingBag, Zap, ThumbsDown, ThumbsUp, Volume2, VolumeX, Wand2, X } from "lucide-react";
+import {
+  ArrowUp,
+  BookOpen,
+  ExternalLink,
+  Flame,
+  Mic,
+  MicOff,
+  Radio,
+  ShoppingBag,
+  ThumbsDown,
+  ThumbsUp,
+  Volume2,
+  VolumeX,
+  Wand2,
+  X,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";

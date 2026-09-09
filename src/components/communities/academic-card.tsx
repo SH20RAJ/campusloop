@@ -1,6 +1,15 @@
 "use client";
 
-import { AlertTriangle, ArrowDown, ArrowUp, CheckCircle2, ExternalLink, Eye, FolderOpen, Target } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowDown,
+  ArrowUp,
+  CheckCircle2,
+  ExternalLink,
+  Eye,
+  FolderOpen,
+  Target,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -176,7 +185,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
       ? `https://drive.google.com/drive/folders/${driveFolderMatch[1]}`
       : rawUrl;
 
-    const targetUrl = isDriveFolder ? cleanDriveFolderUrl : (item.fileUrl || item.driveUrl);
+    const targetUrl = isDriveFolder ? cleanDriveFolderUrl : item.fileUrl || item.driveUrl;
     if (targetUrl) {
       window.open(targetUrl, "_blank", "noopener,noreferrer");
       if (isDriveFolder) {
@@ -337,9 +346,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
             </Link>
 
             {item.description && (
-              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                {item.description}
-              </p>
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{item.description}</p>
             )}
           </div>
 
@@ -405,16 +412,22 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
             onClick={handleDownload}
             className={cn(
               "flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95",
-              Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+              (item.fileUrl || item.driveUrl || "").match(
+                /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+              )
                 ? "bg-amber-500 hover:bg-amber-600 text-neutral-950 font-black"
                 : "bg-primary text-primary-foreground hover:opacity-90"
             )}
           >
-            {Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i)) ? (
+            {(item.fileUrl || item.driveUrl || "").match(
+              /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+            ) ? (
               <FolderOpen className="size-3 shrink-0" />
             ) : null}
             <span>
-              {Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+              {(item.fileUrl || item.driveUrl || "").match(
+                /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+              )
                 ? "Open Folder"
                 : "Preview"}
             </span>
@@ -463,13 +476,9 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
                   className="text-brand shrink-0"
                 />
               )}
-              <span className="text-xs text-muted-foreground truncate">
-                @{item.uploader.username}
-              </span>
+              <span className="text-xs text-muted-foreground truncate">@{item.uploader.username}</span>
               <span className="text-[11px] text-muted-foreground/60">·</span>
-              <span className="text-xs text-muted-foreground shrink-0">
-                {formatTimeAgo(item.createdAt)}
-              </span>
+              <span className="text-xs text-muted-foreground shrink-0">{formatTimeAgo(item.createdAt)}</span>
             </div>
 
             {/* Type & Share */}
@@ -606,16 +615,22 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
               onClick={handleDownload}
               className={cn(
                 "flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95",
-                Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                (item.fileUrl || item.driveUrl || "").match(
+                  /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+                )
                   ? "bg-amber-500 hover:bg-amber-600 text-neutral-950 font-black"
                   : "bg-primary text-primary-foreground hover:opacity-90"
               )}
             >
-              {Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i)) ? (
+              {(item.fileUrl || item.driveUrl || "").match(
+                /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+              ) ? (
                 <FolderOpen className="size-3 shrink-0" />
               ) : null}
               <span>
-                {Boolean((item.fileUrl || item.driveUrl || "").match(/(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i))
+                {(item.fileUrl || item.driveUrl || "").match(
+                  /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
+                )
                   ? "Open Folder"
                   : "Get"}
               </span>
@@ -629,10 +644,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
       {showComments && (
         <div className="mt-2.5 ml-0 sm:ml-11 border-l-2 border-border/25 pl-3 sm:pl-4 space-y-3">
           {/* Comment Composer */}
-          <form
-            onSubmit={handleSubmitComment}
-            className="flex flex-col gap-2 py-2 border-b border-border/20"
-          >
+          <form onSubmit={handleSubmitComment} className="flex flex-col gap-2 py-2 border-b border-border/20">
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground font-medium">Is this material accurate?</span>
               <div className="flex items-center gap-1">
@@ -695,10 +707,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
                   <div className="flex items-center justify-between text-[11px]">
                     <div className="flex items-center gap-1.5 font-bold text-foreground">
                       {c.author?.username ? (
-                        <Link
-                          href={`/@${c.author.username}?tab=academics`}
-                          className="hover:underline"
-                        >
+                        <Link href={`/@${c.author.username}?tab=academics`} className="hover:underline">
                           {c.author?.displayName || "Student"}
                         </Link>
                       ) : (
@@ -720,9 +729,7 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
                     <span
                       className={cn(
                         "text-[9px] font-black px-1.5 py-0.2 rounded-full inline-flex items-center gap-1",
-                        c.isHelpful
-                          ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-amber-500/15 text-amber-400"
+                        c.isHelpful ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
                       )}
                     >
                       {c.isHelpful ? (

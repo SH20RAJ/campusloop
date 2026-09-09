@@ -33,7 +33,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "1,350+ Indian Colleges & Universities Directory | CampusLoop",
-    description: "Explore campus feeds, verified student networks, and academic resources for 1,350+ Indian colleges.",
+    description:
+      "Explore campus feeds, verified student networks, and academic resources for 1,350+ Indian colleges.",
     images: ["https://campusloop.space/og-colleges.png"],
   },
   robots: { index: true, follow: true },

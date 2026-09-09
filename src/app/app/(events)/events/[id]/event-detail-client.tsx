@@ -1,6 +1,22 @@
 "use client";
 
-import { ArrowLeft, Bell, Calendar, Check, CheckCircle2, Download, ExternalLink, Gift, MapPin, QrCode, School, Share2, Zap, Trophy, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Bell,
+  Calendar,
+  Check,
+  CheckCircle2,
+  Download,
+  ExternalLink,
+  Gift,
+  MapPin,
+  QrCode,
+  School,
+  Share2,
+  Trophy,
+  Users,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { fetcher } from "@/lib/api";
-import { downloadAppleCalendarIcs, openGoogleCalendar, type CalendarEvent } from "@/lib/calendar";
+import { type CalendarEvent, downloadAppleCalendarIcs, openGoogleCalendar } from "@/lib/calendar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { getAvatarUrl } from "@/lib/utils";
@@ -529,10 +545,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                 <Zap className="size-4 text-primary" />
                 <span>Similar Campus Events</span>
               </h2>
-              <Link
-                href="/app/events"
-                className="text-xs font-bold text-primary hover:underline"
-              >
+              <Link href="/app/events" className="text-xs font-bold text-primary hover:underline">
                 View all
               </Link>
             </div>
@@ -561,7 +574,12 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                   )}
 
                   <div className="flex items-center justify-between pt-1 border-t border-border/20 text-[11px] text-muted-foreground">
-                    <span>{new Date(rel.startDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}</span>
+                    <span>
+                      {new Date(rel.startDate).toLocaleDateString("en-IN", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
                     <span className="font-bold text-foreground">{rel.entryFee || "Free"}</span>
                   </div>
                 </Link>
@@ -615,7 +633,8 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-foreground">Team Name *</label>
                     <span className="text-[10px] text-muted-foreground">
-                      Size: {1 + teammates.filter((t) => t.name.trim()).length} / {event.maxTeamSize || 4} members
+                      Size: {1 + teammates.filter((t) => t.name.trim()).length} / {event.maxTeamSize || 4}{" "}
+                      members
                     </span>
                   </div>
                   <Input
@@ -637,10 +656,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                       <button
                         type="button"
                         onClick={() =>
-                          setTeammates((prev) => [
-                            ...prev,
-                            { name: "", emailOrRoll: "", role: "Member" },
-                          ])
+                          setTeammates((prev) => [...prev, { name: "", emailOrRoll: "", role: "Member" }])
                         }
                         className="text-[11px] font-black text-primary hover:underline cursor-pointer"
                       >
@@ -661,9 +677,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                         {teammates.length > 1 && (
                           <button
                             type="button"
-                            onClick={() =>
-                              setTeammates((prev) => prev.filter((_, i) => i !== idx))
-                            }
+                            onClick={() => setTeammates((prev) => prev.filter((_, i) => i !== idx))}
                             className="text-red-500 hover:text-red-600 text-[10px] font-bold cursor-pointer"
                           >
                             Remove
@@ -677,9 +691,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                           value={tm.name}
                           onChange={(e) => {
                             const val = e.target.value;
-                            setTeammates((prev) =>
-                              prev.map((m, i) => (i === idx ? { ...m, name: val } : m))
-                            );
+                            setTeammates((prev) => prev.map((m, i) => (i === idx ? { ...m, name: val } : m)));
                           }}
                           className="h-8 rounded-lg text-xs"
                         />

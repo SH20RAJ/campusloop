@@ -1,6 +1,24 @@
 "use client";
 
-import { Check, ChevronRight, Clock, Cookie, History, Milk, Minus, PenTool, Percent, Plug, Plus, Search, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles, Zap } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  Clock,
+  Cookie,
+  History,
+  Milk,
+  Minus,
+  PenTool,
+  Percent,
+  Plug,
+  Plus,
+  Search,
+  ShieldCheck,
+  ShoppingBag,
+  ShoppingCart,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";

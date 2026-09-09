@@ -219,10 +219,7 @@ export async function POST(req: Request, { params }: RouteParams) {
           await db
             .delete(savedAcademicResources)
             .where(
-              and(
-                eq(savedAcademicResources.profileId, profile.id),
-                eq(savedAcademicResources.resourceId, id)
-              )
+              and(eq(savedAcademicResources.profileId, profile.id), eq(savedAcademicResources.resourceId, id))
             );
         }
       }

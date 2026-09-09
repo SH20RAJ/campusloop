@@ -2,8 +2,8 @@
 
 import {
   ArrowLeft,
-  BookOpen,
   Bookmark,
+  BookOpen,
   Check,
   CheckCircle2,
   Code2,
@@ -28,9 +28,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { uploadMediaFile } from "@/lib/upload";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
+import { uploadMediaFile } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 
 const RESOURCE_TYPES = [
@@ -293,7 +293,8 @@ export function UploadAcademicClient() {
           </h1>
 
           <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
-            Share verified question papers, lecture notes, formula cheat sheets, and lab manuals with college peers across India.
+            Share verified question papers, lecture notes, formula cheat sheets, and lab manuals with college
+            peers across India.
           </p>
         </div>
 
@@ -324,9 +325,7 @@ export function UploadAcademicClient() {
                     Select Material Category
                   </h2>
                 </div>
-                <span className="text-xs font-bold text-muted-foreground">
-                  {currentType.label}
-                </span>
+                <span className="text-xs font-bold text-muted-foreground">{currentType.label}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -599,7 +598,9 @@ export function UploadAcademicClient() {
                       <div className="flex flex-col items-center gap-2 py-4">
                         <Loader2 className="size-8 animate-spin text-primary" />
                         <p className="text-xs font-bold text-foreground">Uploading to Cloudflare R2...</p>
-                        <p className="text-[11px] text-muted-foreground">Encrypting &amp; indexing document</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          Encrypting &amp; indexing document
+                        </p>
                       </div>
                     ) : fileUrl ? (
                       <div className="flex flex-col items-center gap-2 py-2 text-center">
@@ -649,7 +650,8 @@ export function UploadAcademicClient() {
                     />
                   </div>
                   <p className="text-[11px] text-muted-foreground">
-                    Ensure link permission is set to <strong>&quot;Anyone with the link can view&quot;</strong>.
+                    Ensure link permission is set to{" "}
+                    <strong>&quot;Anyone with the link can view&quot;</strong>.
                   </p>
                 </div>
               )}
@@ -751,7 +753,12 @@ export function UploadAcademicClient() {
                   <span className="px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-400 font-mono text-[11px] font-black tracking-wider">
                     {subjectCode.trim() || "CS201"}
                   </span>
-                  <span className={cn("px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border", currentType.badgeColor)}>
+                  <span
+                    className={cn(
+                      "px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border",
+                      currentType.badgeColor
+                    )}
+                  >
                     {currentType.label}
                   </span>
                 </div>
@@ -768,7 +775,8 @@ export function UploadAcademicClient() {
 
                 {/* Description snippet */}
                 <p className="text-xs text-muted-foreground/90 line-clamp-2 leading-relaxed">
-                  {description.trim() || "Curated notes covering core examination topics and syllabus modules."}
+                  {description.trim() ||
+                    "Curated notes covering core examination topics and syllabus modules."}
                 </p>
 
                 {/* Meta details */}
@@ -816,7 +824,9 @@ export function UploadAcademicClient() {
                     >
                       {hasSubjectCode ? <Check className="size-2.5 stroke-[3]" /> : "•"}
                     </div>
-                    <span className={hasSubjectCode ? "text-foreground font-semibold" : "text-muted-foreground"}>
+                    <span
+                      className={hasSubjectCode ? "text-foreground font-semibold" : "text-muted-foreground"}
+                    >
                       Subject code entered
                     </span>
                   </div>
@@ -825,9 +835,7 @@ export function UploadAcademicClient() {
                     <div
                       className={cn(
                         "size-4 rounded-full flex items-center justify-center shrink-0 text-[10px]",
-                        hasTitle
-                          ? "bg-emerald-500/20 text-emerald-400"
-                          : "bg-muted text-muted-foreground"
+                        hasTitle ? "bg-emerald-500/20 text-emerald-400" : "bg-muted text-muted-foreground"
                       )}
                     >
                       {hasTitle ? <Check className="size-2.5 stroke-[3]" /> : "•"}
@@ -848,7 +856,9 @@ export function UploadAcademicClient() {
                     >
                       {hasFileOrLink ? <Check className="size-2.5 stroke-[3]" /> : "•"}
                     </div>
-                    <span className={hasFileOrLink ? "text-foreground font-semibold" : "text-muted-foreground"}>
+                    <span
+                      className={hasFileOrLink ? "text-foreground font-semibold" : "text-muted-foreground"}
+                    >
                       File or Drive link attached
                     </span>
                   </div>
@@ -878,7 +888,8 @@ export function UploadAcademicClient() {
               <div className="flex items-start gap-2 text-[11px] text-muted-foreground/80 leading-snug pt-1">
                 <ShieldCheck className="size-4 text-emerald-400 shrink-0 mt-0.5" />
                 <span>
-                  Resources are distributed under verified student fair-use for academic learning &amp; peer collaboration.
+                  Resources are distributed under verified student fair-use for academic learning &amp; peer
+                  collaboration.
                 </span>
               </div>
             </div>

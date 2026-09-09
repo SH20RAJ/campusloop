@@ -9,13 +9,15 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Clean SVG fallback for users without a profile picture (no-image user silhouette).
  */
-export const NO_IMAGE_AVATAR_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
+export const NO_IMAGE_AVATAR_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(
+  `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
   <rect width="100" height="100" rx="50" fill="#1e293b"/>
   <circle cx="50" cy="38" r="18" fill="#64748b"/>
   <path d="M22 84c0-15.464 12.536-28 28-28s28 12.536 28 28" fill="#64748b"/>
 </svg>
-`.trim())}`;
+`.trim()
+)}`;
 
 /**
  * Deterministically generates a random, clean Dicebear avatar URL based on a user seed.
@@ -58,32 +60,34 @@ export function formatTimeAgo(date: Date | string | null | undefined): string {
  */
 export function stripMarkdown(text?: string | null): string {
   if (!text) return "";
-  return text
-    // 1. Remove markdown images: ![alt](url) or ![alt][ref]
-    .replace(/!\[.*?\](?:\(.*?\)|\[.*?\])/g, "")
-    // 2. Remove HTML tags: <img ... />, <div>, etc.
-    .replace(/<[^>]*>/g, "")
-    // 3. Remove standalone image URLs (e.g. https://.../image.jpg)
-    .replace(/https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp|svg|bmp)(?:\?[^\s)]*)?/gi, "")
-    // 4. Remove fenced code blocks: ```...``` and inline code `...`
-    .replace(/```[\s\S]*?```/g, "")
-    .replace(/`([^`]+)`/g, "$1")
-    // 5. Convert markdown links: [label](url) -> label
-    .replace(/\[(.*?)\]\([^\)]*\)/g, "$1")
-    // 6. Remove headings, blockquotes, horizontal rules
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/^>\s+/gm, "")
-    .replace(/^(?:[-*_]\s*){3,}$/gm, "")
-    // 7. Remove bold, italic, strikethrough: **bold**, *italic*, ~~strike~~
-    .replace(/(\*\*|__)(.*?)\1/g, "$2")
-    .replace(/(\*|_)(.*?)\1/g, "$2")
-    .replace(/~~(.*?)~~/g, "$1")
-    // 8. Remove list bullets and ordered numbers: - item, 1. item
-    .replace(/^[\s*+-]+\s+/gm, "")
-    .replace(/^\d+\.\s+/gm, "")
-    // 9. Normalize multiple newlines and spaces into single space
-    .replace(/\s+/g, " ")
-    .trim();
+  return (
+    text
+      // 1. Remove markdown images: ![alt](url) or ![alt][ref]
+      .replace(/!\[.*?\](?:\(.*?\)|\[.*?\])/g, "")
+      // 2. Remove HTML tags: <img ... />, <div>, etc.
+      .replace(/<[^>]*>/g, "")
+      // 3. Remove standalone image URLs (e.g. https://.../image.jpg)
+      .replace(/https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp|svg|bmp)(?:\?[^\s)]*)?/gi, "")
+      // 4. Remove fenced code blocks: ```...``` and inline code `...`
+      .replace(/```[\s\S]*?```/g, "")
+      .replace(/`([^`]+)`/g, "$1")
+      // 5. Convert markdown links: [label](url) -> label
+      .replace(/\[(.*?)\]\([^)]*\)/g, "$1")
+      // 6. Remove headings, blockquotes, horizontal rules
+      .replace(/^#{1,6}\s+/gm, "")
+      .replace(/^>\s+/gm, "")
+      .replace(/^(?:[-*_]\s*){3,}$/gm, "")
+      // 7. Remove bold, italic, strikethrough: **bold**, *italic*, ~~strike~~
+      .replace(/(\*\*|__)(.*?)\1/g, "$2")
+      .replace(/(\*|_)(.*?)\1/g, "$2")
+      .replace(/~~(.*?)~~/g, "$1")
+      // 8. Remove list bullets and ordered numbers: - item, 1. item
+      .replace(/^[\s*+-]+\s+/gm, "")
+      .replace(/^\d+\.\s+/gm, "")
+      // 9. Normalize multiple newlines and spaces into single space
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 /**
@@ -105,7 +109,10 @@ export function getCollegeShortName(inst?: { name?: string | null } | null): str
   name = name.replace(/Birla Institute of Technology/gi, "BIT");
   name = name.replace(/Indian Institute of Technology/gi, "IIT");
   name = name.replace(/National Institute of Technology/gi, "NIT");
-  const parts = name.split(",").map((p) => p.trim()).filter(Boolean);
+  const parts = name
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean);
   if (parts.length > 1 && (parts[0] === "BIT" || parts[0] === "IIT" || parts[0] === "NIT")) {
     return `${parts[0]} ${parts[1]}`;
   }

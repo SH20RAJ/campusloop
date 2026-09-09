@@ -1,6 +1,27 @@
 "use client";
 
-import { ArrowRight, Check, CheckCircle, ChevronDown, Coins, Copy, ExternalLink, Flame, GraduationCap, Heart, Info, KeyRound, Lock, MessageSquare, Shield, ShieldAlert, ShieldCheck, Smartphone, Zap, XCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  CheckCircle,
+  ChevronDown,
+  Coins,
+  Copy,
+  ExternalLink,
+  Flame,
+  GraduationCap,
+  Heart,
+  Info,
+  KeyRound,
+  Lock,
+  MessageSquare,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  Smartphone,
+  XCircle,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import { useEffect, useState } from "react";

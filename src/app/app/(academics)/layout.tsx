@@ -1,4 +1,4 @@
-import { ArrowLeft, Eye, GraduationCap, Zap } from "lucide-react";
+import { ArrowLeft, Eye, GraduationCap, Search, Zap } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FirstVisitNotificationPrompt } from "@/components/notifications/first-visit-notification-prompt";
@@ -102,8 +102,17 @@ export default async function AcademicsLayout({ children }: { children: React.Re
             </Link>
           </div>
 
-          {/* Right: Guest CTAs & Theme Toggle */}
+          {/* Right: Search, Guest CTAs & Theme Toggle */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/app/academics/search"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/40 bg-muted/30 hover:bg-muted/60 text-muted-foreground hover:text-foreground text-xs font-semibold transition-all cursor-pointer"
+              title="Search Vault"
+            >
+              <Search className="size-3.5" />
+              <span className="hidden sm:inline">Search</span>
+            </Link>
+
             <ThemeToggle />
 
             <Link

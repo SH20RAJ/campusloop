@@ -716,7 +716,9 @@ export function DiscoverFeed() {
                       </div>
                       <div>
                         <h3 className="text-sm font-black text-foreground">Host a Campus Event 🎉</h3>
-                        <p className="text-[11px] text-muted-foreground">Club meets, hostel fests, hackathons &amp; LANs</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          Club meets, hostel fests, hackathons &amp; LANs
+                        </p>
                       </div>
                     </div>
                     <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
@@ -725,7 +727,8 @@ export function DiscoverFeed() {
                   </div>
 
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Organize your club meeting, wing tournament, branch orientation, or campus cultural night with verified student RSVPs, live headcount, and push reminders.
+                    Organize your club meeting, wing tournament, branch orientation, or campus cultural night
+                    with verified student RSVPs, live headcount, and push reminders.
                   </p>
 
                   <div className="flex items-center gap-2 pt-1 flex-wrap">
@@ -758,20 +761,37 @@ export function DiscoverFeed() {
                     </h3>
                     <p className="text-xs text-muted-foreground">Student interest groups &amp; sub-hubs</p>
                   </div>
-                  <Link
-                    href="/app/communities"
-                    className="text-xs font-bold text-primary hover:underline"
-                  >
+                  <Link href="/app/communities" className="text-xs font-bold text-primary hover:underline">
                     View all
                   </Link>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
                   {[
-                    { name: "Coding & Tech", icon: "💻", href: "/app/communities?category=TECH", desc: "Devs & CP" },
-                    { name: "Music & Arts", icon: "🎸", href: "/app/communities?category=MUSIC", desc: "Jams & bands" },
-                    { name: "Hostel Life", icon: "🏢", href: "/app/communities?category=HOSTEL", desc: "Wing banter" },
-                    { name: "Placement Prep", icon: "🎯", href: "/app/communities?category=CAREER", desc: "OA & interviews" },
+                    {
+                      name: "Coding & Tech",
+                      icon: "💻",
+                      href: "/app/communities?category=TECH",
+                      desc: "Devs & CP",
+                    },
+                    {
+                      name: "Music & Arts",
+                      icon: "🎸",
+                      href: "/app/communities?category=MUSIC",
+                      desc: "Jams & bands",
+                    },
+                    {
+                      name: "Hostel Life",
+                      icon: "🏢",
+                      href: "/app/communities?category=HOSTEL",
+                      desc: "Wing banter",
+                    },
+                    {
+                      name: "Placement Prep",
+                      icon: "🎯",
+                      href: "/app/communities?category=CAREER",
+                      desc: "OA & interviews",
+                    },
                     { name: "Esports Arena", icon: "🎮", href: "/app/gaming", desc: "Tournaments" },
                     { name: "Study Vault", icon: "📚", href: "/app/academics", desc: "Notes & PYQs" },
                   ].map((hub) => (
@@ -810,9 +830,7 @@ export function DiscoverFeed() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-pink-500 shrink-0 ml-2">
-                    Open Board →
-                  </span>
+                  <span className="text-xs font-bold text-pink-500 shrink-0 ml-2">Open Board →</span>
                 </Link>
               </div>
 

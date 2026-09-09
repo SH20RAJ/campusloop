@@ -1,6 +1,17 @@
 "use client";
 
-import { Bell, Check, Copy, ExternalLink, Loader2, MapPin, Phone, Power, Volume2, VolumeX } from "lucide-react";
+import {
+  Bell,
+  Check,
+  Copy,
+  ExternalLink,
+  Loader2,
+  MapPin,
+  Phone,
+  Power,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -161,9 +172,7 @@ export function MerchantDashboardClient() {
             type="button"
             onClick={() => {
               setAudioAlertsEnabled(!audioAlertsEnabled);
-              toast.info(
-                !audioAlertsEnabled ? "Order sound alerts enabled" : "Order sound alerts muted"
-              );
+              toast.info(!audioAlertsEnabled ? "Order sound alerts enabled" : "Order sound alerts muted");
             }}
             className={cn(
               "flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border",
@@ -310,7 +319,10 @@ export function MerchantDashboardClient() {
                     {order.deliveryAddress.hostelName && (
                       <p className="font-bold text-foreground inline-flex items-center gap-1">
                         <MapPin className="size-3.5 text-primary" />
-                        <span>Deliver to: {order.deliveryAddress.hostelName}, Room {order.deliveryAddress.roomNumber}</span>
+                        <span>
+                          Deliver to: {order.deliveryAddress.hostelName}, Room{" "}
+                          {order.deliveryAddress.roomNumber}
+                        </span>
                       </p>
                     )}
                     {order.deliveryAddress.phone && (

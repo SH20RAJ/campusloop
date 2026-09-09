@@ -89,9 +89,8 @@ export function EventsClient() {
   });
 
   const rawEvents = data?.events || [];
-  const events = modeFilter === "ALL"
-    ? rawEvents
-    : rawEvents.filter((e) => e.mode?.toUpperCase() === modeFilter);
+  const events =
+    modeFilter === "ALL" ? rawEvents : rawEvents.filter((e) => e.mode?.toUpperCase() === modeFilter);
 
   // Stats calculation
   const totalRegistered = rawEvents.reduce((acc, curr) => acc + (curr.attendeeCount || 0), 0);
@@ -419,8 +418,12 @@ export function EventsClient() {
 
                     <div className="flex items-center gap-3 shrink-0">
                       <div className="hidden sm:flex flex-col text-right text-xs">
-                        <span className="font-black text-foreground">{featured.attendeeCount} Registered</span>
-                        <span className="text-[10px] text-muted-foreground">{featured.entryFee || "Free Entry"}</span>
+                        <span className="font-black text-foreground">
+                          {featured.attendeeCount} Registered
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {featured.entryFee || "Free Entry"}
+                        </span>
                       </div>
                       <span className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-black group-hover:opacity-90 transition-opacity shadow-xs">
                         View &amp; Register →

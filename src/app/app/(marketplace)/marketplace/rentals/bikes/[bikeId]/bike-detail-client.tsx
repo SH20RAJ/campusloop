@@ -348,8 +348,8 @@ export function BikeDetailClient({ bikeId, profileId }: BikeDetailClientProps) {
             <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-400 font-medium leading-relaxed flex items-start gap-1.5">
               <Info className="size-3.5 shrink-0 mt-0.5" />
               <span>
-                <strong>Note:</strong> The ₹{bike.securityDeposit} security deposit is held safely during
-                your trip and refunded 100% directly upon returning the vehicle.
+                <strong>Note:</strong> The ₹{bike.securityDeposit} security deposit is held safely during your
+                trip and refunded 100% directly upon returning the vehicle.
               </span>
             </div>
 

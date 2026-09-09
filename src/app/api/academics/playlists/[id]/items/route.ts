@@ -1,20 +1,13 @@
 import { and, eq, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import {
-  academicPlaylists,
-  academicPlaylistItems,
-  userProfiles,
-} from "@/db/schema";
+import { academicPlaylistItems, academicPlaylists, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { rejectViewerWrite } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {
@@ -43,7 +36,10 @@ export async function POST(
     }
 
     if (playlist.creatorId !== profile.id && profile.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden: only playlist creator can modify items" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Forbidden: only playlist creator can modify items" },
+        { status: 403 }
+      );
     }
 
     const body = (await req.json()) as Record<string, any>;
@@ -94,10 +90,7 @@ export async function POST(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {
@@ -123,7 +116,10 @@ export async function DELETE(
     }
 
     if (playlist.creatorId !== profile.id && profile.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden: only playlist creator can remove items" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Forbidden: only playlist creator can remove items" },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(req.url);
@@ -136,7 +132,10 @@ export async function DELETE(
 
     const whereClause = itemId
       ? and(eq(academicPlaylistItems.id, itemId), eq(academicPlaylistItems.playlistId, playlist.id))
-      : and(eq(academicPlaylistItems.resourceId, resourceId!), eq(academicPlaylistItems.playlistId, playlist.id));
+      : and(
+          eq(academicPlaylistItems.resourceId, resourceId!),
+          eq(academicPlaylistItems.playlistId, playlist.id)
+        );
 
     const deleted = await db.delete(academicPlaylistItems).where(whereClause!).returning();
 

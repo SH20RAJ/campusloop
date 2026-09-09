@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, Flame, PenTool, Zap, Users } from "lucide-react";
+import { ArrowUpRight, Flame, PenTool, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

@@ -210,9 +210,7 @@ export function NewPlaylistClient() {
             <div className="flex items-center justify-between z-10">
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/40 text-white backdrop-blur-md border border-white/10">
                 <Layers className="size-3" />
-                <span>
-                  {CATEGORIES.find((c) => c.value === category)?.label.split(" ")[0] || "Pack"}
-                </span>
+                <span>{CATEGORIES.find((c) => c.value === category)?.label.split(" ")[0] || "Pack"}</span>
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-black/40 text-white backdrop-blur-md">
                 {selectedResources.length} Materials
@@ -267,9 +265,7 @@ export function NewPlaylistClient() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground">
-              Curator Notes / Exam Tips (Optional)
-            </label>
+            <label className="text-xs font-bold text-foreground">Curator Notes / Exam Tips (Optional)</label>
             <textarea
               placeholder="Advice for juniors or batchmates: which units to focus on, question predictions, etc."
               value={description}
@@ -376,9 +372,7 @@ export function NewPlaylistClient() {
                           {res.resourceType} • Sem {res.semester}
                         </span>
                       </div>
-                      <p className="text-xs font-bold text-foreground truncate mt-0.5">
-                        {res.title}
-                      </p>
+                      <p className="text-xs font-bold text-foreground truncate mt-0.5">{res.title}</p>
                     </div>
 
                     <button
@@ -469,7 +463,11 @@ export function NewPlaylistClient() {
             disabled={isSubmitting || !title.trim()}
             className="flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white shadow-md disabled:opacity-50 cursor-pointer transition-all active:scale-95"
           >
-            {isSubmitting ? <Loader2 className="size-3.5 animate-spin" /> : <FolderPlus className="size-3.5" />}
+            {isSubmitting ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <FolderPlus className="size-3.5" />
+            )}
             <span>Publish Study Playlist</span>
           </button>
         </div>

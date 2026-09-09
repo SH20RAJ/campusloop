@@ -1,8 +1,8 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { resolveAdminSession } from "@/app/admin/_lib/guard";
 import { getDb } from "@/db";
 import { linkClicks, shortLinks } from "@/db/schema";
-import { resolveAdminSession } from "@/app/admin/_lib/guard";
 
 export const dynamic = "force-dynamic";
 
@@ -57,7 +57,10 @@ export async function POST(req: Request) {
   try {
     const admin = await resolveAdminSession();
     const body = (await req.json()) as any;
-    let slug = (body.slug || "").trim().toLowerCase().replace(/[^a-z0-9-_]/g, "");
+    const slug = (body.slug || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-_]/g, "");
     let targetUrl = (body.targetUrl || "").trim();
     const title = (body.title || "").trim() || slug;
 

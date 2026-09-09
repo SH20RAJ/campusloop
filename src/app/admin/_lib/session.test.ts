@@ -2,11 +2,7 @@ import { describe, expect, it, mock } from "bun:test";
 
 mock.module("server-only", () => ({}));
 
-const {
-  createAdminSessionToken,
-  isValidAdminSessionToken,
-  verifyAdminPasskey,
-} = await import("./session");
+const { createAdminSessionToken, isValidAdminSessionToken, verifyAdminPasskey } = await import("./session");
 
 describe("Admin Passkey & Session Security", () => {
   it("verifies the configured admin passcode from .env (29092005)", () => {

@@ -1,6 +1,24 @@
 "use client";
 
-import { AlertCircle, ArrowLeft, Cake, Camera, Check, Image as ImageIcon, Loader2, Lock, Move, Plus, Save, ShieldCheck, Sparkles, Zap, User, VenetianMask, X } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Cake,
+  Camera,
+  Check,
+  Image as ImageIcon,
+  Loader2,
+  Lock,
+  Move,
+  Plus,
+  Save,
+  ShieldCheck,
+  Sparkles,
+  User,
+  VenetianMask,
+  X,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

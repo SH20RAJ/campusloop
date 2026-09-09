@@ -302,9 +302,7 @@ export function ConfessionComposerModal({
 
         {/* Footer & Submit */}
         <div className="flex items-center justify-between pt-2 border-t border-border/30">
-          <span className="text-[11px] text-muted-foreground font-medium">
-            {body.length} characters
-          </span>
+          <span className="text-[11px] text-muted-foreground font-medium">{body.length} characters</span>
 
           <div className="flex items-center gap-2">
             <button

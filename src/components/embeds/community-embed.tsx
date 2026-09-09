@@ -90,10 +90,11 @@ export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
 
     const description = isPlacements
       ? "Discussions, opportunities, resources and experiences for placements."
-      : found?.description || fallback?.description || "Connect, share advice, and explore campus opportunities.";
+      : found?.description ||
+        fallback?.description ||
+        "Connect, share advice, and explore campus opportunities.";
 
-    const membersCount =
-      found?.membersCount ?? found?.members?.length ?? fallback?.membersCount ?? 16;
+    const membersCount = found?.membersCount ?? found?.members?.length ?? fallback?.membersCount ?? 16;
 
     let tags = fallback?.tags;
     if (!tags) {
@@ -219,9 +220,7 @@ export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
             {community.name}
           </h3>
 
-          <p className="text-xs text-white/65 line-clamp-2 leading-relaxed">
-            {community.description}
-          </p>
+          <p className="text-xs text-white/65 line-clamp-2 leading-relaxed">{community.description}</p>
         </div>
       </div>
 
@@ -239,9 +238,7 @@ export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
               />
             ))}
           </div>
-          <span className="text-xs font-semibold text-white/85 truncate">
-            {memberCount} members
-          </span>
+          <span className="text-xs font-semibold text-white/85 truncate">{memberCount} members</span>
         </div>
 
         <div onClick={(e) => e.stopPropagation()} className="shrink-0">

@@ -44,10 +44,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       where: and(
         ne(events.id, currentEvent.id),
         visibilityCondition,
-        or(
-          eq(events.eventType, currentEvent.eventType),
-          eq(events.institutionId, currentEvent.institutionId)
-        )
+        or(eq(events.eventType, currentEvent.eventType), eq(events.institutionId, currentEvent.institutionId))
       ),
       orderBy: [desc(events.startDate)],
       limit: 4,

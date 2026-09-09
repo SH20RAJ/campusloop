@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, ImagePlus, Loader2, Package, Plus, Save, Zap, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, ImagePlus, Loader2, Package, Plus, Save, Trash2, X, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

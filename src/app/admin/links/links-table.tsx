@@ -155,15 +155,26 @@ export function AdminLinksClient() {
           <p className="text-2xl font-black text-foreground mt-1">{data?.totalLinks || 0}</p>
         </div>
         <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-2xs">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Clicks Recorded</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Clicks Recorded
+          </p>
           <p className="text-2xl font-black text-primary mt-1">{totalClicks}</p>
         </div>
         <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-2xs">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Devices Breakdown</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Devices Breakdown
+          </p>
           <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
             {deviceStats.map((d) => (
-              <span key={d.device || "other"} className="flex items-center gap-1 font-semibold text-foreground">
-                {d.device === "mobile" ? <Smartphone className="size-3.5 text-blue-500" /> : <Laptop className="size-3.5 text-emerald-500" />}
+              <span
+                key={d.device || "other"}
+                className="flex items-center gap-1 font-semibold text-foreground"
+              >
+                {d.device === "mobile" ? (
+                  <Smartphone className="size-3.5 text-blue-500" />
+                ) : (
+                  <Laptop className="size-3.5 text-emerald-500" />
+                )}
                 {d.count} {d.device}
               </span>
             ))}
@@ -254,7 +265,9 @@ export function AdminLinksClient() {
       {/* Recent Clicks & Referrals Feed */}
       <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-2xs">
         <div className="p-4 border-b border-border/40 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-foreground">Recent Traffic Logs (Referrals &amp; Short Links)</h2>
+          <h2 className="text-sm font-bold text-foreground">
+            Recent Traffic Logs (Referrals &amp; Short Links)
+          </h2>
           <span className="text-xs text-muted-foreground">{clicks.length} recent hits</span>
         </div>
 
@@ -277,18 +290,15 @@ export function AdminLinksClient() {
               <tbody className="divide-y divide-border/20">
                 {clicks.map((click) => (
                   <tr key={click.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="p-3 font-mono font-bold text-primary">
-                      {click.refCode || "direct"}
-                    </td>
+                    <td className="p-3 font-mono font-bold text-primary">{click.refCode || "direct"}</td>
                     <td className="p-3 text-foreground">
-                      <span className="capitalize">{click.device || "Desktop"}</span> · {click.browser || "Browser"} ({click.os || "OS"})
+                      <span className="capitalize">{click.device || "Desktop"}</span> ·{" "}
+                      {click.browser || "Browser"} ({click.os || "OS"})
                     </td>
                     <td className="p-3 max-w-[200px] truncate text-muted-foreground">
                       {click.referer || "Direct / App"}
                     </td>
-                    <td className="p-3 text-muted-foreground">
-                      {click.country || "IN"}
-                    </td>
+                    <td className="p-3 text-muted-foreground">{click.country || "IN"}</td>
                     <td className="p-3 text-muted-foreground whitespace-nowrap">
                       {formatTimeAgo(new Date(click.createdAt))}
                     </td>
@@ -306,12 +316,15 @@ export function AdminLinksClient() {
           <div className="relative w-full max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95">
             <h2 className="text-lg font-bold text-foreground">Create Short Link</h2>
             <p className="text-xs text-muted-foreground mt-1">
-              Links will be accessible at <code className="font-mono text-primary font-bold">campusloop.space/s/[slug]</code>
+              Links will be accessible at{" "}
+              <code className="font-mono text-primary font-bold">campusloop.space/s/[slug]</code>
             </p>
 
             <form onSubmit={handleCreate} className="space-y-4 mt-4">
               <div>
-                <label className="text-xs font-semibold text-muted-foreground">Campaign Title (Optional)</label>
+                <label className="text-xs font-semibold text-muted-foreground">
+                  Campaign Title (Optional)
+                </label>
                 <input
                   type="text"
                   placeholder="e.g. Raj LinkedIn Post"

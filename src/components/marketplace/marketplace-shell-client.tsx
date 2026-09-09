@@ -1,6 +1,21 @@
 "use client";
 
-import { ArrowLeft, Bike, Droplet, Grid, History, Home, Scissors, Search, Shirt, ShoppingBag, ShoppingCart, Zap, Store, UtensilsCrossed } from "lucide-react";
+import {
+  ArrowLeft,
+  Bike,
+  Droplet,
+  Grid,
+  History,
+  Home,
+  Scissors,
+  Search,
+  Shirt,
+  ShoppingBag,
+  ShoppingCart,
+  Store,
+  UtensilsCrossed,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

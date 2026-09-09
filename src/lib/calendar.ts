@@ -32,7 +32,11 @@ export function formatCalendarDate(dateInput: string | Date): string {
  */
 export function createGoogleCalendarUrl(event: CalendarEvent): string {
   const start = typeof event.startDate === "string" ? new Date(event.startDate) : event.startDate;
-  let end = event.endDate ? (typeof event.endDate === "string" ? new Date(event.endDate) : event.endDate) : null;
+  let end = event.endDate
+    ? typeof event.endDate === "string"
+      ? new Date(event.endDate)
+      : event.endDate
+    : null;
 
   // Fallback end date to start date + 2 hours if missing or before start
   if (!end || isNaN(end.getTime()) || end <= start) {
@@ -85,7 +89,11 @@ export function openGoogleCalendar(event: CalendarEvent): void {
  */
 export function createIcsContent(event: CalendarEvent): string {
   const start = typeof event.startDate === "string" ? new Date(event.startDate) : event.startDate;
-  let end = event.endDate ? (typeof event.endDate === "string" ? new Date(event.endDate) : event.endDate) : null;
+  let end = event.endDate
+    ? typeof event.endDate === "string"
+      ? new Date(event.endDate)
+      : event.endDate
+    : null;
 
   if (!end || isNaN(end.getTime()) || end <= start) {
     end = new Date(start.getTime() + 2 * 60 * 60 * 1000);

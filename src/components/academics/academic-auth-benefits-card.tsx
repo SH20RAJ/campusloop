@@ -92,7 +92,8 @@ export function AcademicAuthBenefitsCard({
             Supercharge Your Semester on CampusLoop
           </h3>
           <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-            Free direct downloads for everyone. Join with your student email to organize study stacks, save PYQs, and earn campus clout.
+            Free direct downloads for everyone. Join with your student email to organize study stacks, save
+            PYQs, and earn campus clout.
           </p>
         </div>
 

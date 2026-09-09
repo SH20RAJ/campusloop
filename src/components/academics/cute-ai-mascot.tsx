@@ -55,7 +55,16 @@ export function CuteAiMascot({ className = "w-28 h-28" }: { className?: string }
         <rect x="118" y="62" width="7" height="18" rx="3.5" fill="#A78BFA" />
 
         {/* Dark Screen Face */}
-        <rect x="50" y="52" width="60" height="42" rx="18" fill="url(#screenGrad)" stroke="#A78BFA" strokeWidth="1.5" />
+        <rect
+          x="50"
+          y="52"
+          width="60"
+          height="42"
+          rx="18"
+          fill="url(#screenGrad)"
+          stroke="#A78BFA"
+          strokeWidth="1.5"
+        />
 
         {/* Expressive Glowing Eyes */}
         <ellipse cx="66" cy="72" rx="6" ry="7.5" fill="url(#glowEye)" />
@@ -79,13 +88,25 @@ export function CuteAiMascot({ className = "w-28 h-28" }: { className?: string }
         {/* Center Button */}
         <circle cx="80" cy="32" r="3.5" fill="url(#tasselGrad)" />
         {/* Tassel */}
-        <path d="M80 32 Q108 34 116 48 L114 62" stroke="url(#tasselGrad)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        <path
+          d="M80 32 Q108 34 116 48 L114 62"
+          stroke="url(#tasselGrad)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+        />
         <circle cx="114" cy="63" r="3" fill="#F59E0B" />
 
         {/* Open Book in Hands */}
         {/* Left Page & Right Page */}
-        <path d="M46 122 Q63 118 80 123 Q97 118 114 122 L116 138 Q97 134 80 139 Q63 134 44 138 Z" fill="url(#bookCover)" />
-        <path d="M48 120 Q64 116 80 120 Q96 116 112 120 L110 134 Q96 130 80 134 Q64 130 50 134 Z" fill="url(#bookPages)" />
+        <path
+          d="M46 122 Q63 118 80 123 Q97 118 114 122 L116 138 Q97 134 80 139 Q63 134 44 138 Z"
+          fill="url(#bookCover)"
+        />
+        <path
+          d="M48 120 Q64 116 80 120 Q96 116 112 120 L110 134 Q96 130 80 134 Q64 130 50 134 Z"
+          fill="url(#bookPages)"
+        />
         {/* Center Book Seam */}
         <line x1="80" y1="120" x2="80" y2="135" stroke="#CBD5E1" strokeWidth="1.5" />
         {/* Page text lines */}

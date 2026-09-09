@@ -11,9 +11,9 @@ import {
   Play,
   Repeat2,
   Share2,
+  VenetianMask,
   Volume2,
   VolumeX,
-  VenetianMask,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -105,7 +105,11 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         const doubleNewlineIdx = rawBody.indexOf("\n\n");
         if (doubleNewlineIdx > 0 && doubleNewlineIdx <= 55) {
           const candidateTitle = rawBody.slice(0, doubleNewlineIdx).trim();
-          if (!candidateTitle.endsWith(".") && !candidateTitle.endsWith("?") && !candidateTitle.endsWith("!")) {
+          if (
+            !candidateTitle.endsWith(".") &&
+            !candidateTitle.endsWith("?") &&
+            !candidateTitle.endsWith("!")
+          ) {
             h = candidateTitle;
             desc = rawBody.slice(doubleNewlineIdx + 2).trim();
           }
@@ -122,11 +126,26 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
     if (uniqueTags.length === 0) {
       const lower = rawBody.toLowerCase();
-      if (lower.includes("exam") || lower.includes("mid-sem") || lower.includes("study") || lower.includes("productive")) {
+      if (
+        lower.includes("exam") ||
+        lower.includes("mid-sem") ||
+        lower.includes("study") ||
+        lower.includes("productive")
+      ) {
         uniqueTags.push("#Academics", "#Productivity", "#StudentLife");
-      } else if (lower.includes("crush") || lower.includes("dating") || lower.includes("love") || post.type === "CONFESSION") {
+      } else if (
+        lower.includes("crush") ||
+        lower.includes("dating") ||
+        lower.includes("love") ||
+        post.type === "CONFESSION"
+      ) {
         uniqueTags.push("#Confessions", "#CampusCrush", "#StudentLife");
-      } else if (lower.includes("mess") || lower.includes("food") || lower.includes("canteen") || lower.includes("hostel")) {
+      } else if (
+        lower.includes("mess") ||
+        lower.includes("food") ||
+        lower.includes("canteen") ||
+        lower.includes("hostel")
+      ) {
         uniqueTags.push("#HostelDiaries", "#CampusFood", "#StudentLife");
       } else {
         uniqueTags.push("#CampusLife", "#Discussion", "#StudentLife");
@@ -194,7 +213,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   const avatarFallback: React.ReactNode = post.isAnonymous ? (
     <VenetianMask className="size-4 text-purple-400" />
   ) : (
-    post.author?.displayName?.[0] ?? "S"
+    (post.author?.displayName?.[0] ?? "S")
   );
   const avatarUrl = post.isAnonymous
     ? ""
@@ -324,11 +343,14 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
               : "border-white/10 text-white/90 hover:text-white hover:bg-white/10"
           )}
         >
-          <Heart className={cn("size-5 sm:size-5.5", userVote === 1 ? "fill-rose-500 text-rose-500" : "text-rose-500 fill-rose-500/20")} />
+          <Heart
+            className={cn(
+              "size-5 sm:size-5.5",
+              userVote === 1 ? "fill-rose-500 text-rose-500" : "text-rose-500 fill-rose-500/20"
+            )}
+          />
         </button>
-        <span className="text-[11px] sm:text-xs font-bold text-white/80 tabular-nums">
-          {votesCount}
-        </span>
+        <span className="text-[11px] sm:text-xs font-bold text-white/80 tabular-nums">{votesCount}</span>
       </div>
 
       {/* 2. Comment */}
@@ -341,9 +363,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         >
           <MessageCircle className="size-5 sm:size-5.5" />
         </button>
-        <span className="text-[11px] sm:text-xs font-bold text-white/80 tabular-nums">
-          {commentsCount}
-        </span>
+        <span className="text-[11px] sm:text-xs font-bold text-white/80 tabular-nums">{commentsCount}</span>
       </div>
 
       {/* 3. Repost / Loop */}
@@ -412,7 +432,11 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         originalPostAuthorHandle={authorHandle}
         isReposting={isReposting}
       />
-      <ShareStoryModal isOpen={showShareStoryModal} onClose={() => setShowShareStoryModal(false)} post={post} />
+      <ShareStoryModal
+        isOpen={showShareStoryModal}
+        onClose={() => setShowShareStoryModal(false)}
+        post={post}
+      />
       <PostLikesModal postId={post.id} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
       <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
     </>
@@ -466,7 +490,11 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
                 className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center"
               >
                 <div className="size-16 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white">
-                  {isPlaying ? <Play className="size-7 fill-white ml-0.5" /> : <Pause className="size-7 fill-white" />}
+                  {isPlaying ? (
+                    <Play className="size-7 fill-white ml-0.5" />
+                  ) : (
+                    <Pause className="size-7 fill-white" />
+                  )}
                 </div>
               </motion.div>
             )}
@@ -517,9 +545,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
             {/* Caption */}
             {captionText && (
               <div className="text-xs text-white/90 leading-relaxed">
-                <p className={cn("transition-all", !isExpandedCaption && "line-clamp-2")}>
-                  {captionText}
-                </p>
+                <p className={cn("transition-all", !isExpandedCaption && "line-clamp-2")}>{captionText}</p>
                 {captionText.length > 90 && (
                   <button
                     type="button"

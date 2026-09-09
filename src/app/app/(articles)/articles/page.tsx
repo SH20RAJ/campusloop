@@ -38,7 +38,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "CampusLoop Editorial — Student Tech & Campus Journalism",
-    description: "Deep-dives, interview experiences, and campus guides written by verified university students.",
+    description:
+      "Deep-dives, interview experiences, and campus guides written by verified university students.",
     images: ["https://campusloop.space/og-articles.png"],
   },
 };

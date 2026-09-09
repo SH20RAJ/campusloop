@@ -7,9 +7,14 @@
  */
 
 import { eq, sql } from "drizzle-orm";
+import {
+  getCloutTier,
+  LP_ABUSE_PROTECTION,
+  type LpActionType,
+  VERIFIED_LP_THRESHOLD,
+} from "@/constants/gamification";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
-import { getCloutTier, LP_ABUSE_PROTECTION, VERIFIED_LP_THRESHOLD, type LpActionType } from "@/constants/gamification";
 import { createNotification } from "@/lib/notifications";
 
 // In-memory rate limiting and daily cap tracking across warm runtime instances

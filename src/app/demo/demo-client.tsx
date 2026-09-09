@@ -1,6 +1,23 @@
 "use client";
 
-import { ArrowRight, Award, Check, Compass, Copy, Heart, Hourglass, KeyRound, Mail, MessageSquare, Repeat2, School, Share2, ShieldCheck, ShoppingBag, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Award,
+  Check,
+  Compass,
+  Copy,
+  Heart,
+  Hourglass,
+  KeyRound,
+  Mail,
+  MessageSquare,
+  Repeat2,
+  School,
+  Share2,
+  ShieldCheck,
+  ShoppingBag,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";

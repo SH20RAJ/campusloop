@@ -2,9 +2,9 @@
 
 import {
   ArrowLeft,
-  BookOpen,
   Bookmark,
   BookmarkCheck,
+  BookOpen,
   CheckCircle2,
   ChevronRight,
   ExternalLink,
@@ -88,8 +88,7 @@ export function SavedMaterialsClient() {
   const filteredItems = useMemo(() => {
     return savedItems.filter((item) => {
       const matchSem =
-        selectedSemester === "ALL" ||
-        (item.savedSemester || item.semester) === selectedSemester;
+        selectedSemester === "ALL" || (item.savedSemester || item.semester) === selectedSemester;
       const matchType = selectedType === "ALL" || item.resourceType === selectedType;
       const matchQuery =
         !searchQuery.trim() ||
@@ -204,7 +203,8 @@ export function SavedMaterialsClient() {
           </h1>
 
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
-            Auto-organized cloud vault for all your course notes, PYQs, and cheat sheets. Study instantly on any device without filling phone storage.
+            Auto-organized cloud vault for all your course notes, PYQs, and cheat sheets. Study instantly on
+            any device without filling phone storage.
           </p>
         </div>
 
@@ -227,12 +227,11 @@ export function SavedMaterialsClient() {
             <span className="flex size-6 items-center justify-center rounded-lg bg-purple-500/20 text-purple-300 font-bold text-xs">
               <Zap className="size-3.5 text-amber-400 fill-amber-400" />
             </span>
-            <h3 className="text-sm font-black text-white">
-              1-Click Save Full Semester Pack
-            </h3>
+            <h3 className="text-sm font-black text-white">1-Click Save Full Semester Pack</h3>
           </div>
           <p className="text-xs text-purple-200/70 max-w-md leading-relaxed">
-            Need all study materials for your semester at once? Save the entire syllabus pack (Notes, PYQs, Formula Sheets) directly to your locker.
+            Need all study materials for your semester at once? Save the entire syllabus pack (Notes, PYQs,
+            Formula Sheets) directly to your locker.
           </p>
         </div>
 
@@ -247,11 +246,7 @@ export function SavedMaterialsClient() {
               className="px-2.5 py-1.5 rounded-xl border border-purple-500/40 bg-purple-900/40 hover:bg-purple-600 text-purple-200 hover:text-white text-xs font-bold transition-all cursor-pointer disabled:opacity-50 active:scale-95"
               title={`Save all materials for Semester ${sem}`}
             >
-              {savingPackSem === sem ? (
-                <Loader2 className="size-3 animate-spin mx-auto" />
-              ) : (
-                `+ Sem ${sem}`
-              )}
+              {savingPackSem === sem ? <Loader2 className="size-3 animate-spin mx-auto" /> : `+ Sem ${sem}`}
             </button>
           ))}
         </div>
@@ -360,9 +355,7 @@ export function SavedMaterialsClient() {
                   <span className="px-2.5 py-0.5 rounded-lg bg-primary/15 text-primary text-xs font-black uppercase tracking-wider">
                     {group.code}
                   </span>
-                  <h2 className="text-sm sm:text-base font-black text-foreground">
-                    {group.name}
-                  </h2>
+                  <h2 className="text-sm sm:text-base font-black text-foreground">{group.name}</h2>
                 </div>
 
                 <span className="text-[11px] font-bold text-muted-foreground">
@@ -435,7 +428,8 @@ export function SavedMaterialsClient() {
           <div className="space-y-1">
             <p className="text-sm font-black text-foreground">Your semester locker is empty</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Bookmark notes and PYQs directly while exploring the Academic Vault, or click any of the semester pack buttons above to save your entire semester syllabus in one go.
+              Bookmark notes and PYQs directly while exploring the Academic Vault, or click any of the
+              semester pack buttons above to save your entire semester syllabus in one go.
             </p>
           </div>
           <Link

@@ -11,9 +11,7 @@ interface DeckAcademicDropCardProps {
 }
 
 export function DeckAcademicDropCard({ resource }: DeckAcademicDropCardProps) {
-  const previewUrl = resource.slug
-    ? `/app/academics/${resource.slug}`
-    : `/app/academics`;
+  const previewUrl = resource.slug ? `/app/academics/${resource.slug}` : `/app/academics`;
 
   function handleDownload() {
     const downloadCheck = checkAndRecordDownload(false);
@@ -49,7 +47,9 @@ export function DeckAcademicDropCard({ resource }: DeckAcademicDropCardProps) {
             </div>
             <div>
               <h3 className="font-black text-sm text-foreground">Academic Vault Drop</h3>
-              <p className="text-[11px] text-muted-foreground">{resource.institutionName || "Campus Study Vault"}</p>
+              <p className="text-[11px] text-muted-foreground">
+                {resource.institutionName || "Campus Study Vault"}
+              </p>
             </div>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/20 uppercase">
@@ -73,7 +73,8 @@ export function DeckAcademicDropCard({ resource }: DeckAcademicDropCardProps) {
           </h4>
 
           <p className="text-xs text-muted-foreground line-clamp-2">
-            Subject: <strong className="text-foreground">{resource.subjectName}</strong>. Complete exam-ready materials, solutions, and lab references verified by campus seniors.
+            Subject: <strong className="text-foreground">{resource.subjectName}</strong>. Complete exam-ready
+            materials, solutions, and lab references verified by campus seniors.
           </p>
 
           <div className="flex items-center gap-2 text-[11px] text-muted-foreground pt-1">

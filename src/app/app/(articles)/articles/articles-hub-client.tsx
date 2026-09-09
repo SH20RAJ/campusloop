@@ -12,8 +12,8 @@ import {
   GraduationCap,
   Loader2,
   PenTool,
-  RotateCw,
   Rocket,
+  RotateCw,
   School,
   Search,
   Sparkles,
@@ -162,7 +162,7 @@ export function ArticlesHubClient({ initialArticles = [] }: ArticlesHubClientPro
     setTimeout(() => setIsRefreshing(false), 500);
   }
 
-  const displayArticles = articles.length > 0 ? articles : (data?.articles || []);
+  const displayArticles = articles.length > 0 ? articles : data?.articles || [];
 
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-6 select-none">

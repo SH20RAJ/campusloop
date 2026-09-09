@@ -1,6 +1,6 @@
 /**
  * CampusLoop GA4 Creative Analytics & Custom Properties Engine
- * 
+ *
  * Measurement ID: G-3546ZQ6HB1
  * Features:
  * - Dynamic Route & Single Page App (SPA) Pageview tracking with Content Grouping
@@ -42,7 +42,10 @@ export function gtagEvent(eventName: string, params: Record<string, any> = {}) {
     send_to: GA_MEASUREMENT_ID,
     timestamp: new Date().toISOString(),
     is_pwa: typeof window !== "undefined" && window.matchMedia("(display-mode: standalone)").matches,
-    theme: typeof document !== "undefined" && document.documentElement.classList.contains("dark") ? "dark" : "light",
+    theme:
+      typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+        ? "dark"
+        : "light",
     ...params,
   };
 
@@ -92,7 +95,12 @@ export function inferContentGroup(pathname: string): string {
   if (pathname.startsWith("/app/chat")) return "chat";
   if (pathname.startsWith("/app/marketplace")) return "marketplace";
   if (pathname.startsWith("/app/articles") || pathname.startsWith("/a/")) return "articles";
-  if (pathname.startsWith("/app/college") || pathname.startsWith("/colleges") || pathname.startsWith("/college/")) return "colleges";
+  if (
+    pathname.startsWith("/app/college") ||
+    pathname.startsWith("/colleges") ||
+    pathname.startsWith("/college/")
+  )
+    return "colleges";
   if (pathname.startsWith("/app/communities") || pathname.startsWith("/c/")) return "communities";
   if (pathname.startsWith("/app/post")) return "post_detail";
   if (pathname.startsWith("/app/profile") || pathname.startsWith("/@")) return "student_profile";
@@ -183,7 +191,11 @@ export function trackAcademicVote(resourceId: string, voteType: "UP" | "DOWN", s
   });
 }
 
-export function trackAcademicShare(resourceId: string, subjectCode?: string, method: "share_api" | "clipboard" = "clipboard") {
+export function trackAcademicShare(
+  resourceId: string,
+  subjectCode?: string,
+  method: "share_api" | "clipboard" = "clipboard"
+) {
   gtagEvent("share", {
     content_type: "academic_resource",
     item_id: resourceId,

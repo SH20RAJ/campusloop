@@ -1,11 +1,25 @@
 "use client";
 
-import { Calendar, CheckCircle2, Clock, MapPin, Phone, Rocket, Scissors, ShieldCheck, Zap, Star, Ticket, User, Users } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle2,
+  Clock,
+  MapPin,
+  Phone,
+  Rocket,
+  Scissors,
+  ShieldCheck,
+  Star,
+  Ticket,
+  User,
+  Users,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
-import { InstagramIcon } from "@/components/ui/social-icons";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InstagramIcon } from "@/components/ui/social-icons";
 import { fetcher } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";

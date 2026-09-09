@@ -113,7 +113,9 @@ export async function getRelatedPosts(
   // 3. Resilient Fallback: Query Postgres for content similarity across other authors and campuses
   try {
     // Extract key content terms (hashtags or significant words > 4 chars)
-    const hashtags = (basePost.body.match(/#[a-zA-Z0-9_]+/g) || []).map((t) => t.replace(/^#/, "").toLowerCase());
+    const hashtags = (basePost.body.match(/#[a-zA-Z0-9_]+/g) || []).map((t) =>
+      t.replace(/^#/, "").toLowerCase()
+    );
     const words = basePost.body
       .replace(/[^a-zA-Z0-9\s]/g, " ")
       .split(/\s+/)
@@ -196,10 +198,7 @@ export async function getRelatedPosts(
       existingIds.add(targetPostId);
 
       const generalRows = await db.query.posts.findMany({
-        where: and(
-          ...baseConditions,
-          notInArray(posts.id, Array.from(existingIds))
-        ),
+        where: and(...baseConditions, notInArray(posts.id, Array.from(existingIds))),
         orderBy: [desc(posts.createdAt)],
         limit: remainingLimit,
         with: {

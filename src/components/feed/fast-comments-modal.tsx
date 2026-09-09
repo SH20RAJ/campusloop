@@ -67,12 +67,7 @@ const fetcher = <T,>(url: string): Promise<T> =>
 
 const QUICK_REACTIONS = ["❤️", "🔥", "😂", "👏", "😮", "💯"];
 
-export function FastCommentsModal({
-  post,
-  isOpen,
-  onClose,
-  onCommentCountChange,
-}: FastCommentsModalProps) {
+export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange }: FastCommentsModalProps) {
   const { profile } = useProfile();
 
   const [commentText, setCommentText] = useState("");
@@ -339,22 +334,16 @@ export function FastCommentsModal({
     inputRef.current?.focus();
   };
 
-  const authorHandle = post.isAnonymous
-    ? post.pseudonym || "anonymous"
-    : post.author?.username || "student";
+  const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
 
   // Dynamic sorting (matching Image 2)
   const sortedComments = useMemo(() => {
     const list = [...(comments || [])];
     if (sortMode === "latest") {
-      return list.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
     if (sortMode === "oldest") {
-      return list.sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
+      return list.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     }
     // "best" (default): sort by likes/points
     return list.sort(
@@ -429,9 +418,7 @@ export function FastCommentsModal({
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="font-bold text-foreground truncate">@{authorHandle}</span>
-                  <span className="text-muted-foreground text-[11px]">
-                    {formatTimeAgo(post.createdAt)}
-                  </span>
+                  <span className="text-muted-foreground text-[11px]">{formatTimeAgo(post.createdAt)}</span>
                 </div>
                 <p className="text-xs text-foreground/90 leading-relaxed line-clamp-3 font-normal">
                   {post.body}
@@ -493,12 +480,8 @@ export function FastCommentsModal({
               ) : (
                 sortedComments.map((c) => {
                   const isAnon = c.isAnonymous;
-                  const cDisplayName = isAnon
-                    ? "Anonymous Student"
-                    : c.author?.displayName || "Student";
-                  const cHandle = isAnon
-                    ? c.pseudonym || "anonymous"
-                    : c.author?.username || "student";
+                  const cDisplayName = isAnon ? "Anonymous Student" : c.author?.displayName || "Student";
+                  const cHandle = isAnon ? c.pseudonym || "anonymous" : c.author?.username || "student";
                   const cAvatar = isAnon
                     ? ""
                     : getAvatarUrl(c.author?.avatarUrl, c.author?.username ?? "student");
@@ -526,9 +509,7 @@ export function FastCommentsModal({
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center justify-between gap-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-xs font-bold text-foreground truncate">
-                              {cDisplayName}
-                            </span>
+                            <span className="text-xs font-bold text-foreground truncate">{cDisplayName}</span>
                             {isCurrentUser && (
                               <span className="text-[10px] font-bold bg-purple-950/70 text-purple-300 border border-purple-500/30 px-1.5 py-0.2 rounded-md">
                                 You
@@ -571,10 +552,7 @@ export function FastCommentsModal({
                               )}
                             />
                             <span
-                              className={cn(
-                                "tabular-nums text-xs",
-                                isLiked && "text-rose-500 font-bold"
-                              )}
+                              className={cn("tabular-nums text-xs", isLiked && "text-rose-500 font-bold")}
                             >
                               {(c.author?.points || 0) + (isLiked ? 1 : 0) || (isLiked ? 1 : "")}
                             </span>

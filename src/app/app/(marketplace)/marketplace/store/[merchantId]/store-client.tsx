@@ -362,10 +362,7 @@ export function StoreClient({ merchantId, profileId }: StoreClientProps) {
             )}
           >
             <span
-              className={cn(
-                "size-1.5 rounded-full",
-                store.isOpen ? "bg-white animate-pulse" : "bg-white/70"
-              )}
+              className={cn("size-1.5 rounded-full", store.isOpen ? "bg-white animate-pulse" : "bg-white/70")}
             />
             <span>{store.isOpen ? "Open Now" : "Currently Closed"}</span>
           </span>

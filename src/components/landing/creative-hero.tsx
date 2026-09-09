@@ -773,7 +773,9 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                                   <span
                                     className={cn(
                                       "truncate",
-                                      isVoted ? "text-blue-600 dark:text-blue-400 font-bold" : "text-foreground"
+                                      isVoted
+                                        ? "text-blue-600 dark:text-blue-400 font-bold"
+                                        : "text-foreground"
                                     )}
                                   >
                                     {opt.text}
@@ -791,7 +793,10 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
 
                         <p className="text-xs text-muted-foreground pt-1 flex items-center gap-1.5 font-medium">
                           <span className="size-1.5 rounded-full bg-blue-500" />
-                          <span>{totalVotes} verified votes · {votedOptionId ? "Final results" : "Live campus poll"}</span>
+                          <span>
+                            {totalVotes} verified votes ·{" "}
+                            {votedOptionId ? "Final results" : "Live campus poll"}
+                          </span>
                         </p>
                       </motion.div>
                     )}
@@ -871,7 +876,9 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                               </div>
                               <span className="font-bold text-foreground text-sm">{campus.market.item}</span>
                             </div>
-                            <span className="text-base font-black text-emerald-600 dark:text-emerald-400">{campus.market.price}</span>
+                            <span className="text-base font-black text-emerald-600 dark:text-emerald-400">
+                              {campus.market.price}
+                            </span>
                           </div>
 
                           <p className="text-xs text-muted-foreground leading-relaxed">
@@ -880,7 +887,9 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
 
                           <div className="flex items-center justify-between pt-1.5 border-t border-border/40 text-xs text-muted-foreground font-medium">
                             <span>{campus.market.seller}</span>
-                            <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Campus handoff</span>
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                              Campus handoff
+                            </span>
                           </div>
                         </div>
 
@@ -928,7 +937,12 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         isReposted ? "text-emerald-500 font-bold" : "hover:text-emerald-500"
                       )}
                     >
-                      <div className={cn("p-1.5 rounded-full transition-colors", isReposted ? "bg-emerald-500/15" : "group-hover:bg-emerald-500/10")}>
+                      <div
+                        className={cn(
+                          "p-1.5 rounded-full transition-colors",
+                          isReposted ? "bg-emerald-500/15" : "group-hover:bg-emerald-500/10"
+                        )}
+                      >
                         <Repeat2 className={cn("size-4", isReposted && "text-emerald-500")} />
                       </div>
                       <span>{repostCount}</span>
@@ -943,8 +957,18 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         isLiked ? "text-rose-500 font-bold" : "hover:text-rose-500"
                       )}
                     >
-                      <div className={cn("p-1.5 rounded-full transition-colors", isLiked ? "bg-rose-500/15" : "group-hover:bg-rose-500/10")}>
-                        <Heart className={cn("size-4 transition-transform active:scale-125", isLiked && "fill-rose-500 text-rose-500")} />
+                      <div
+                        className={cn(
+                          "p-1.5 rounded-full transition-colors",
+                          isLiked ? "bg-rose-500/15" : "group-hover:bg-rose-500/10"
+                        )}
+                      >
+                        <Heart
+                          className={cn(
+                            "size-4 transition-transform active:scale-125",
+                            isLiked && "fill-rose-500 text-rose-500"
+                          )}
+                        />
                       </div>
                       <span>{likeCount}</span>
                     </button>
@@ -965,7 +989,9 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         aria-label="Bookmark post"
                         className={cn(
                           "p-1.5 rounded-full transition-colors cursor-pointer",
-                          isBookmarked ? "text-primary bg-primary/15" : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                          isBookmarked
+                            ? "text-primary bg-primary/15"
+                            : "text-muted-foreground hover:text-primary hover:bg-primary/10"
                         )}
                       >
                         <Bookmark className={cn("size-4", isBookmarked && "fill-primary text-primary")} />

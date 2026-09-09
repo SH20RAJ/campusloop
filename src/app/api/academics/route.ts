@@ -3,11 +3,14 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { academicResources, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { validateResourceUrl } from "@/lib/academics/pdf-validator";
 import { indexAcademicResourceVector } from "@/lib/qdrant/indexer";
-import { getPersonalizedAcademicFeed, searchAcademicResourcesVector } from "@/lib/recommendations/academic-recommendations";
+import {
+  getPersonalizedAcademicFeed,
+  searchAcademicResourcesVector,
+} from "@/lib/recommendations/academic-recommendations";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { rejectViewerWrite } from "@/lib/viewer";
-import { validateResourceUrl } from "@/lib/academics/pdf-validator";
 
 export const dynamic = "force-dynamic";
 
@@ -31,8 +34,8 @@ export async function GET(req: Request) {
     const limit = Math.min(Math.max(1, parseInt(searchParams.get("limit") || "20", 10)), 50);
     const offset = (page - 1) * limit;
 
-    // ✨ Run Personalized Behavioral Recommendation Algorithm when sort is "for_you"
-    if (sort === "for_you" || !sort) {
+    // ✨ Run Personalized Behavioral Recommendation Algorithm when sort is "for_you" (only if no explicit search)
+    if ((sort === "for_you" || (!sort && !searchQuery?.trim())) && !searchQuery?.trim()) {
       const sem = semesterStr && semesterStr !== "all" ? parseInt(semesterStr, 10) : undefined;
       const personalizedResult = await getPersonalizedAcademicFeed({
         userId: user?.id,
@@ -75,22 +78,63 @@ export async function GET(req: Request) {
       }
     }
 
-    // Search query
-    if (searchQuery?.trim()) {
-      const q = `%${searchQuery.trim()}%`;
-      conditions.push(
-        or(
-          ilike(academicResources.title, q),
-          ilike(academicResources.subjectCode, q),
-          ilike(academicResources.subjectName, q),
-          ilike(academicResources.moduleOrChapter, q),
-          ilike(academicResources.description, q)
-        )
-      );
+    // Search query with multi-term keyword matching & exact subject code boost
+    const rawClean = searchQuery?.trim() || "";
+    if (rawClean) {
+      const q = `%${rawClean}%`;
+      const words = rawClean
+        .split(/\s+/)
+        .map((w) => w.trim())
+        .filter((w) => w.length >= 2);
+
+      if (words.length > 1) {
+        const wordConditions = words.map((w) => {
+          const wLike = `%${w}%`;
+          return or(
+            ilike(academicResources.title, wLike),
+            ilike(academicResources.subjectCode, wLike),
+            ilike(academicResources.subjectName, wLike),
+            ilike(academicResources.moduleOrChapter, wLike),
+            ilike(academicResources.description, wLike)
+          );
+        });
+
+        conditions.push(
+          or(
+            ilike(academicResources.title, q),
+            ilike(academicResources.subjectCode, q),
+            ilike(academicResources.subjectName, q),
+            and(...wordConditions)
+          )
+        );
+      } else {
+        conditions.push(
+          or(
+            ilike(academicResources.title, q),
+            ilike(academicResources.subjectCode, q),
+            ilike(academicResources.subjectName, q),
+            ilike(academicResources.moduleOrChapter, q),
+            ilike(academicResources.description, q)
+          )
+        );
+      }
     }
 
-    let orderByClause = [desc(academicResources.createdAt)];
-    if (sort === "popular") {
+    let orderByClause: any[] = [desc(academicResources.createdAt)];
+    if ((sort === "relevance" || !sort) && rawClean) {
+      const relevanceScore = sql<number>`(CASE
+        WHEN LOWER(${academicResources.subjectCode}) = LOWER(${rawClean}) THEN 100
+        WHEN LOWER(${academicResources.subjectCode}) LIKE LOWER(${`${rawClean}%`}) THEN 80
+        WHEN LOWER(${academicResources.title}) ILIKE ${`%${rawClean}%`} THEN 50
+        WHEN LOWER(${academicResources.subjectName}) ILIKE ${`%${rawClean}%`} THEN 40
+        ELSE 10
+      END + (${academicResources.upvotesCount} * 0.5) + (CASE WHEN ${academicResources.isVerified} THEN 15 ELSE 0 END))`;
+      orderByClause = [
+        desc(relevanceScore),
+        desc(academicResources.upvotesCount),
+        desc(academicResources.createdAt),
+      ];
+    } else if (sort === "popular") {
       orderByClause = [desc(academicResources.upvotesCount), desc(academicResources.createdAt)];
     } else if (sort === "downloads") {
       orderByClause = [desc(academicResources.downloadsCount), desc(academicResources.createdAt)];
@@ -154,7 +198,8 @@ export async function GET(req: Request) {
           limit,
           branch: branch && branch !== "all" && branch !== "All" ? branch : undefined,
           semester: !isNaN(sem as number) ? sem : undefined,
-          resourceType: resourceType && resourceType !== "all" && resourceType !== "ALL" ? resourceType : undefined,
+          resourceType:
+            resourceType && resourceType !== "all" && resourceType !== "ALL" ? resourceType : undefined,
           institutionId: scope === "campus" && userInstitutionId ? userInstitutionId : undefined,
         });
         if (vMatches.length > 0) {

@@ -1,6 +1,16 @@
 "use client";
 
-import { CheckCircle2, ExternalLink, FileText, Globe, GraduationCap, Search, Sparkles, UploadCloud, Zap } from "lucide-react";
+import {
+  CheckCircle2,
+  ExternalLink,
+  FileText,
+  Globe,
+  GraduationCap,
+  Search,
+  Sparkles,
+  UploadCloud,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,7 +22,11 @@ export interface AcademicSource {
   id: string;
   name: string;
   university: string;
-  category: "Official University Archive" | "Curated Student Hub" | "National Repository" | "State Tech Board";
+  category:
+    | "Official University Archive"
+    | "Curated Student Hub"
+    | "National Repository"
+    | "State Tech Board";
   description: string;
   coverage: string;
   indexedCount: string;
@@ -30,7 +44,8 @@ export const VERIFIED_ACADEMIC_SOURCES: AcademicSource[] = [
     category: "Official University Archive",
     description:
       "Official repository of past examination question papers spanning 8+ years (Monsoon & Spring 2018–2025) across all 25 academic departments.",
-    coverage: "CSE, ECE, EEE, Mech, Civil, BioTech, Chemical, Architecture, HMCT, Management, Pharmacy & Basic Sciences",
+    coverage:
+      "CSE, ECE, EEE, Mech, Civil, BioTech, Chemical, Architecture, HMCT, Management, Pharmacy & Basic Sciences",
     indexedCount: "7,800+ Official PYQs",
     status: "ACTIVE_INDEXED",
     officialUrl: "https://bitmesra.ac.in/Other-Department-Pages/content/1/258/361",
@@ -210,8 +225,9 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
               Official University Archives &amp; Open Engineering Sources
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              CampusLoop continuously crawls, organizes, and verifies past examination papers and study notes from
-              India&apos;s leading engineering institutions. <strong>All materials are 100% free with direct downloads</strong>.
+              CampusLoop continuously crawls, organizes, and verifies past examination papers and study notes
+              from India&apos;s leading engineering institutions.{" "}
+              <strong>All materials are 100% free with direct downloads</strong>.
             </p>
           </div>
 

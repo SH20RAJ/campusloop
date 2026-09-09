@@ -1,6 +1,17 @@
 "use client";
 
-import { Calendar, Clock, MoreHorizontal, Plus, RotateCw, Search, ShieldCheck, Zap, Trophy, Users } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  MoreHorizontal,
+  Plus,
+  RotateCw,
+  Search,
+  ShieldCheck,
+  Trophy,
+  Users,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -154,7 +165,11 @@ export function RightSidebar() {
                       {ev.title}
                     </p>
                     <p className="text-[10px] font-bold text-red-500 pt-0.5">
-                      Deadline: {new Date(ev.registrationDeadline).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
+                      Deadline:{" "}
+                      {new Date(ev.registrationDeadline).toLocaleDateString("en-IN", {
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </p>
                   </Link>
                 ))}
@@ -203,113 +218,117 @@ export function RightSidebar() {
           {trends.length > 0 && (
             <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-1">
               <div className="px-1 pb-1">
-                <h3 className="text-[17px] font-black tracking-tight text-foreground">What&apos;s happening</h3>
+                <h3 className="text-[17px] font-black tracking-tight text-foreground">
+                  What&apos;s happening
+                </h3>
               </div>
 
-          <div className="divide-y divide-border/20">
-            {trends.map((trend) => (
-              <Link
-                key={trend.topic}
-                href={trend.href}
-                className="flex items-start justify-between px-2 py-2.5 hover:bg-muted/30 rounded-xl transition-colors group cursor-pointer"
-              >
-                <div className="space-y-0.5 min-w-0 flex-1">
-                  <p className="text-[11px] text-muted-foreground font-medium truncate">{trend.category}</p>
-                  <p className="text-[14px] font-bold text-foreground group-hover:underline truncate">
-                    {trend.topic}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground">{trend.formattedCount}</p>
-                </div>
-                <MoreHorizontal className="size-4 text-muted-foreground/50 group-hover:text-foreground shrink-0 mt-1" />
-              </Link>
-            ))}
-          </div>
-
-          <Link
-            href="/app/discover"
-            className="block px-2 pt-2 text-xs font-bold text-primary hover:underline transition-colors cursor-pointer"
-          >
-            Show more
-          </Link>
-        </section>
-      )}
-
-      {/* ─── COMPONENT 2: Who to follow (Classmates & Peers) ─── */}
-      {peers.length > 0 && (
-        <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-1">
-          <div className="px-1 pb-1 flex items-center justify-between">
-            <h3 className="text-[17px] font-black tracking-tight text-foreground">Who to follow</h3>
-            <button
-              type="button"
-              onClick={handleRefreshPeers}
-              disabled={isRefreshingPeers}
-              title="Shuffle suggestions"
-              className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer active:scale-95"
-            >
-              <RotateCw
-                className={cn(
-                  "size-3.5 transition-transform",
-                  isRefreshingPeers && "animate-spin text-primary"
-                )}
-              />
-            </button>
-          </div>
-
-          <div className="divide-y divide-border/20">
-            {peers.map((peer) => {
-              const isFollowed = Boolean(followedIds[peer.id]);
-              return (
-                <div
-                  key={peer.id}
-                  className="flex items-center justify-between gap-3 px-2 py-2.5 hover:bg-muted/30 rounded-xl transition-colors"
-                >
+              <div className="divide-y divide-border/20">
+                {trends.map((trend) => (
                   <Link
-                    href={`/@${peer.username}`}
-                    className="flex items-center gap-2.5 min-w-0 flex-1 group cursor-pointer"
+                    key={trend.topic}
+                    href={trend.href}
+                    className="flex items-start justify-between px-2 py-2.5 hover:bg-muted/30 rounded-xl transition-colors group cursor-pointer"
                   >
-                    <Avatar className="size-10 shrink-0 border border-border/30">
-                      <AvatarImage src={peer.avatarUrl || ""} />
-                      <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
-                        {peer.displayName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-black text-foreground truncate group-hover:underline flex items-center gap-1">
-                        <span>{peer.displayName}</span>
-                        {peer.points >= 150 && <ShieldCheck className="size-3.5 text-brand shrink-0" />}
+                    <div className="space-y-0.5 min-w-0 flex-1">
+                      <p className="text-[11px] text-muted-foreground font-medium truncate">
+                        {trend.category}
                       </p>
-                      <p className="text-[11px] text-muted-foreground truncate">@{peer.username}</p>
+                      <p className="text-[14px] font-bold text-foreground group-hover:underline truncate">
+                        {trend.topic}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">{trend.formattedCount}</p>
                     </div>
+                    <MoreHorizontal className="size-4 text-muted-foreground/50 group-hover:text-foreground shrink-0 mt-1" />
                   </Link>
+                ))}
+              </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleFollowToggle(peer)}
+              <Link
+                href="/app/discover"
+                className="block px-2 pt-2 text-xs font-bold text-primary hover:underline transition-colors cursor-pointer"
+              >
+                Show more
+              </Link>
+            </section>
+          )}
+
+          {/* ─── COMPONENT 2: Who to follow (Classmates & Peers) ─── */}
+          {peers.length > 0 && (
+            <section className="rounded-2xl border border-border/30 bg-card/60 p-3.5 space-y-1">
+              <div className="px-1 pb-1 flex items-center justify-between">
+                <h3 className="text-[17px] font-black tracking-tight text-foreground">Who to follow</h3>
+                <button
+                  type="button"
+                  onClick={handleRefreshPeers}
+                  disabled={isRefreshingPeers}
+                  title="Shuffle suggestions"
+                  className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer active:scale-95"
+                >
+                  <RotateCw
                     className={cn(
-                      "rounded-full px-4 py-1.5 text-xs font-black transition-all cursor-pointer shrink-0 active:scale-95",
-                      isFollowed
-                        ? "border border-border/60 bg-transparent text-foreground hover:border-destructive/40 hover:text-destructive"
-                        : "bg-foreground text-background hover:opacity-90"
+                      "size-3.5 transition-transform",
+                      isRefreshingPeers && "animate-spin text-primary"
                     )}
-                  >
-                    {isFollowed ? "Following" : "Follow"}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+                  />
+                </button>
+              </div>
 
-          <Link
-            href="/app/discover"
-            className="block px-2 pt-2 text-xs font-bold text-primary hover:underline transition-colors cursor-pointer"
-          >
-            Show more
-          </Link>
-        </section>
+              <div className="divide-y divide-border/20">
+                {peers.map((peer) => {
+                  const isFollowed = Boolean(followedIds[peer.id]);
+                  return (
+                    <div
+                      key={peer.id}
+                      className="flex items-center justify-between gap-3 px-2 py-2.5 hover:bg-muted/30 rounded-xl transition-colors"
+                    >
+                      <Link
+                        href={`/@${peer.username}`}
+                        className="flex items-center gap-2.5 min-w-0 flex-1 group cursor-pointer"
+                      >
+                        <Avatar className="size-10 shrink-0 border border-border/30">
+                          <AvatarImage src={peer.avatarUrl || ""} />
+                          <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
+                            {peer.displayName[0]}
+                          </AvatarFallback>
+                        </Avatar>
+
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-black text-foreground truncate group-hover:underline flex items-center gap-1">
+                            <span>{peer.displayName}</span>
+                            {peer.points >= 150 && <ShieldCheck className="size-3.5 text-brand shrink-0" />}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground truncate">@{peer.username}</p>
+                        </div>
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => handleFollowToggle(peer)}
+                        className={cn(
+                          "rounded-full px-4 py-1.5 text-xs font-black transition-all cursor-pointer shrink-0 active:scale-95",
+                          isFollowed
+                            ? "border border-border/60 bg-transparent text-foreground hover:border-destructive/40 hover:text-destructive"
+                            : "bg-foreground text-background hover:opacity-90"
+                        )}
+                      >
+                        {isFollowed ? "Following" : "Follow"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <Link
+                href="/app/discover"
+                className="block px-2 pt-2 text-xs font-bold text-primary hover:underline transition-colors cursor-pointer"
+              >
+                Show more
+              </Link>
+            </section>
+          )}
+        </>
       )}
-      </>
-    )}
 
       <hr className="border-border/30 my-3" />
 

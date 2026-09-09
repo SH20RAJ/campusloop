@@ -21,7 +21,9 @@ export const metadata: Metadata = {
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
-    images: [{ url: "https://campusloop.space/og-academics.png", width: 1536, height: 1024, alt: "Semester Locker" }],
+    images: [
+      { url: "https://campusloop.space/og-academics.png", width: 1536, height: 1024, alt: "Semester Locker" },
+    ],
   },
   robots: { index: true, follow: true },
 };

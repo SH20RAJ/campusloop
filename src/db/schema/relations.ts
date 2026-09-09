@@ -1,11 +1,11 @@
 import { relations } from "drizzle-orm";
+import { academicPlaylistItems, academicPlaylistStars, academicPlaylists } from "./academic-playlists";
 import {
   academicResourceComments,
   academicResources,
   academicResourceVotes,
   savedAcademicResources,
 } from "./academic-resources";
-import { academicPlaylists, academicPlaylistItems, academicPlaylistStars } from "./academic-playlists";
 import { aiConversations, aiFeedback, aiMessages, aiUsageEvents } from "./ai";
 import { articleComments, articleCommentVotes, articles, articleVotes } from "./articles";
 import { callSessions, userBehaviorEvents } from "./calls-and-analytics";

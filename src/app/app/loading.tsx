@@ -4,7 +4,7 @@ export default function AppLoading() {
       <div className="relative flex items-center justify-center">
         {/* Subtle glowing ambient halo */}
         <div className="absolute size-20 rounded-full bg-primary/20 blur-xl animate-pulse" />
-        
+
         {/* Centered CampusLoop Logo */}
         <img
           src="/logo.png"

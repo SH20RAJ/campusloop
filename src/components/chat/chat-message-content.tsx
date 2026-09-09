@@ -3,7 +3,6 @@
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import React, { useMemo } from "react";
-import { extractEmbedsFromText } from "@/lib/embeds";
 import { ArticleEmbed } from "@/components/embeds/article-embed";
 import { CommunityEmbed } from "@/components/embeds/community-embed";
 import { EventEmbed } from "@/components/embeds/event-embed";
@@ -11,6 +10,7 @@ import { LinkPreviewEmbed } from "@/components/embeds/link-preview-embed";
 import { SpotifyEmbed } from "@/components/embeds/spotify-embed";
 import { UserProfileEmbed } from "@/components/embeds/user-profile-embed";
 import { YouTubeEmbed } from "@/components/embeds/youtube-embed";
+import { extractEmbedsFromText } from "@/lib/embeds";
 
 interface ChatMessageContentProps {
   content: string;
@@ -144,9 +144,7 @@ export function ChatMessageContent({ content, isMe }: ChatMessageContentProps) {
 
             switch (embed.type) {
               case "internal_profile":
-                return embed.username ? (
-                  <UserProfileEmbed key={key} username={embed.username} />
-                ) : null;
+                return embed.username ? <UserProfileEmbed key={key} username={embed.username} /> : null;
 
               case "internal_event":
                 return embed.id ? <EventEmbed key={key} eventId={embed.id} /> : null;
@@ -158,9 +156,7 @@ export function ChatMessageContent({ content, isMe }: ChatMessageContentProps) {
                 return embed.slug ? <ArticleEmbed key={key} slug={embed.slug} /> : null;
 
               case "youtube":
-                return embed.id ? (
-                  <YouTubeEmbed key={key} videoId={embed.id} rawUrl={embed.rawUrl} />
-                ) : null;
+                return embed.id ? <YouTubeEmbed key={key} videoId={embed.id} rawUrl={embed.rawUrl} /> : null;
 
               case "spotify":
                 return embed.embedUrl ? <SpotifyEmbed key={key} embedUrl={embed.embedUrl} /> : null;

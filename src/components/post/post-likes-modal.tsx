@@ -196,9 +196,7 @@ export function PostLikesModal({ postId, isOpen, onClose, currentUserId }: PostL
               ))}
             </div>
           ) : error ? (
-            <div className="text-center py-16 text-xs text-destructive">
-              Could not load likes list.
-            </div>
+            <div className="text-center py-16 text-xs text-destructive">Could not load likes list.</div>
           ) : users.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center space-y-2">
               {debouncedQuery ? (
@@ -248,9 +246,7 @@ export function PostLikesModal({ postId, isOpen, onClose, currentUserId }: PostL
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-black text-foreground truncate group-hover:text-primary transition-colors flex items-center gap-1">
                           <span>{user.displayName}</span>
-                          {user.isVerified && (
-                            <ShieldCheck className="size-3.5 text-brand shrink-0" />
-                          )}
+                          {user.isVerified && <ShieldCheck className="size-3.5 text-brand shrink-0" />}
                         </p>
                         <p className="text-xs text-muted-foreground truncate font-medium">
                           @{user.username}
@@ -300,4 +296,3 @@ export function PostLikesModal({ postId, isOpen, onClose, currentUserId }: PostL
     </div>
   );
 }
-

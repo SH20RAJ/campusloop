@@ -22,7 +22,10 @@ interface ArticleCommentsSectionProps {
   } | null;
 }
 
-export function ArticleCommentsSection({ articleSlug, currentProfile: propProfile }: ArticleCommentsSectionProps) {
+export function ArticleCommentsSection({
+  articleSlug,
+  currentProfile: propProfile,
+}: ArticleCommentsSectionProps) {
   const { profile: hookProfile } = useProfile();
   const effectiveProfile = propProfile || hookProfile;
 

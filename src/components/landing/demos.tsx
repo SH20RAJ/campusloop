@@ -158,7 +158,8 @@ const PROFILES = [
     college: "SRCC, Delhi",
     bio: "Economics major. Will judge your playlist before your degree.",
     initials: "AD",
-    avatarUrl: "https://api.dicebear.com/7.x/initials/svg?seed=Aditi&backgroundColor=db2777&textColor=ffffff&fontWeight=800",
+    avatarUrl:
+      "https://api.dicebear.com/7.x/initials/svg?seed=Aditi&backgroundColor=db2777&textColor=ffffff&fontWeight=800",
   },
   {
     name: "Rohan, 21",
@@ -166,7 +167,8 @@ const PROFILES = [
     college: "IIT Delhi",
     bio: "Codes at 2am, plays football at 6. Pick your fighter.",
     initials: "RO",
-    avatarUrl: "https://api.dicebear.com/7.x/initials/svg?seed=Rohan&backgroundColor=2563eb&textColor=ffffff&fontWeight=800",
+    avatarUrl:
+      "https://api.dicebear.com/7.x/initials/svg?seed=Rohan&backgroundColor=2563eb&textColor=ffffff&fontWeight=800",
   },
   {
     name: "Meera, 19",
@@ -174,7 +176,8 @@ const PROFILES = [
     college: "Christ University",
     bio: "Design student. Here mostly for the fest gossip.",
     initials: "ME",
-    avatarUrl: "https://api.dicebear.com/7.x/initials/svg?seed=Meera&backgroundColor=7c3aed&textColor=ffffff&fontWeight=800",
+    avatarUrl:
+      "https://api.dicebear.com/7.x/initials/svg?seed=Meera&backgroundColor=7c3aed&textColor=ffffff&fontWeight=800",
   },
 ];
 

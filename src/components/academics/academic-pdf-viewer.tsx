@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Bot,
   Copy,
   Cpu,
   Download,
@@ -8,29 +9,24 @@ import {
   FileText,
   FolderArchive,
   FolderOpen,
+  Globe,
   LayoutGrid,
   List,
   Loader2,
   Maximize2,
   Minimize2,
   Moon,
+  Play,
   RotateCw,
+  Sparkles,
   Sun,
+  Video,
   ZoomIn,
   ZoomOut,
-  Play,
-  Video,
-  Globe,
-  Sparkles,
-  Bot,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import {
-  buildAcademicStudyPrompt,
-  getChatGptStudyUrl,
-  getClaudeStudyUrl,
-} from "@/lib/academics/ai-prompts";
+import { buildAcademicStudyPrompt, getChatGptStudyUrl, getClaudeStudyUrl } from "@/lib/academics/ai-prompts";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -76,7 +72,7 @@ export function AcademicPdfViewer({
   // YouTube Video & Playlist detection:
   const isYoutube = /(?:youtube\.com|youtu\.be)/i.test(rawUrl);
   const ytVideoMatch = rawUrl.match(
-    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
+    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/i
   );
   const ytPlaylistMatch = rawUrl.match(/[?&]list=([a-zA-Z0-9_-]+)/i);
   const ytVideoId = ytVideoMatch ? ytVideoMatch[1] : null;
@@ -106,9 +102,7 @@ export function AcademicPdfViewer({
     : rawUrl;
 
   // Google Drive File detection:
-  const driveFileMatch = rawUrl.match(
-    /(?:drive\.google\.com\/(?:file\/d\/|open\?id=))([a-zA-Z0-9_-]+)/i
-  );
+  const driveFileMatch = rawUrl.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=))([a-zA-Z0-9_-]+)/i);
   const driveFileId = driveFileMatch ? driveFileMatch[1] : null;
 
   const isMultisim = rawUrl.toLowerCase().endsWith(".ms14") || title.toLowerCase().includes("multisim");
@@ -315,8 +309,8 @@ export function AcademicPdfViewer({
           </span>
           <h3 className="text-base sm:lg font-black text-foreground">{title}</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Interactive circuit schematic &amp; simulation file for {subjectCode}. Compatible with NI
-            Multisim v14.0+. Directly download and simulate BJT, Op-Amp, and amplifier stages.
+            Interactive circuit schematic &amp; simulation file for {subjectCode}. Compatible with NI Multisim
+            v14.0+. Directly download and simulate BJT, Op-Amp, and amplifier stages.
           </p>
         </div>
 
@@ -494,7 +488,12 @@ export function AcademicPdfViewer({
                   : "Currently using Native View. Click to switch to Google Docs Viewer API"
               }
             >
-              <span className={cn("size-1.5 rounded-full inline-block", viewerEngine === "google" ? "bg-emerald-400" : "bg-indigo-400")} />
+              <span
+                className={cn(
+                  "size-1.5 rounded-full inline-block",
+                  viewerEngine === "google" ? "bg-emerald-400" : "bg-indigo-400"
+                )}
+              />
               <span>{viewerEngine === "google" ? "Cloud View" : "Native View"}</span>
             </button>
           )}
@@ -578,11 +577,7 @@ export function AcademicPdfViewer({
             onClick={() => {
               if (isYoutube || isGoogleSites || isGenericWebSite) {
                 window.open(rawUrl, "_blank", "noopener,noreferrer");
-                toast.success(
-                  isYoutube
-                    ? "Opening YouTube video!"
-                    : "Opening course portal in new tab!"
-                );
+                toast.success(isYoutube ? "Opening YouTube video!" : "Opening course portal in new tab!");
               } else {
                 handleDownloadClick();
               }
@@ -684,7 +679,9 @@ export function AcademicPdfViewer({
             </span>
             <div className="min-w-0 leading-tight">
               <p className="font-bold text-xs truncate">
-                {isGoogleSites ? "Official Campus Course Website / Professor Portal" : "External Web Resource"}
+                {isGoogleSites
+                  ? "Official Campus Course Website / Professor Portal"
+                  : "External Web Resource"}
               </p>
               <p className="text-[10px] text-muted-foreground truncate">
                 Live course website embed. If your college network blocks in-frame viewing, tap Open Portal.
@@ -791,7 +788,8 @@ export function AcademicPdfViewer({
               </span>
               <h3 className="text-base sm:text-lg font-black text-foreground">{title}</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                This study collection is hosted on Google Drive. Access all lecture modules, past year questions, and notes directly.
+                This study collection is hosted on Google Drive. Access all lecture modules, past year
+                questions, and notes directly.
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">

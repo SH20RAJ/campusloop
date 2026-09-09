@@ -137,9 +137,7 @@ export function ArticleEmbed({ slug }: ArticleEmbedProps) {
             <span className="text-[11px] font-bold text-foreground/80 truncate">
               {article.author.displayName}
             </span>
-            <span className="text-[10px] text-muted-foreground truncate">
-              @{article.author.username}
-            </span>
+            <span className="text-[10px] text-muted-foreground truncate">@{article.author.username}</span>
           </div>
 
           <div className="flex items-center gap-1 text-[11px] font-bold text-muted-foreground shrink-0">

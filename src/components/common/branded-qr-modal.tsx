@@ -1,6 +1,18 @@
 "use client";
 
-import { Check, Copy, Download, MessageCircle, Palette, QrCode, Share2, Smartphone, Zap, Square, X } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Download,
+  MessageCircle,
+  Palette,
+  QrCode,
+  Share2,
+  Smartphone,
+  Square,
+  X,
+  Zap,
+} from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -640,7 +652,11 @@ export function BrandedQrModal({
     ctx.fillStyle = t.canvasWatermark;
     ctx.font = "bold 20px Inter, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("📷 Scan with any phone camera  •  campusloop.space", cardMarginX + cardW / 2, cardMarginY + cardH - 34);
+    ctx.fillText(
+      "📷 Scan with any phone camera  •  campusloop.space",
+      cardMarginX + cardW / 2,
+      cardMarginY + cardH - 34
+    );
 
     return canvas;
   };
@@ -668,9 +684,7 @@ export function BrandedQrModal({
 
       sounds.ting();
       toast.success(
-        aspectRatio === "story"
-          ? "Story Poster (9:16) downloaded! 🎨"
-          : "Branded QR Card downloaded! 🎨"
+        aspectRatio === "story" ? "Story Poster (9:16) downloaded! 🎨" : "Branded QR Card downloaded! 🎨"
       );
     } catch (err) {
       console.error("Card export error:", err);
@@ -942,10 +956,7 @@ export function BrandedQrModal({
                 )}
               >
                 <span
-                  className={cn(
-                    "text-xs font-mono font-bold truncate max-w-[240px]",
-                    currentTheme.linkText
-                  )}
+                  className={cn("text-xs font-mono font-bold truncate max-w-[240px]", currentTheme.linkText)}
                 >
                   {displayUrl}
                 </span>
@@ -991,11 +1002,7 @@ export function BrandedQrModal({
                 disabled={isGeneratingImage || !qrDataUrl}
                 className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl border border-border/80 bg-card hover:bg-muted text-xs font-bold text-foreground transition-all cursor-pointer active:scale-95 shadow-2xs"
               >
-                {copiedImage ? (
-                  <Check className="size-4 text-emerald-500" />
-                ) : (
-                  <Copy className="size-4" />
-                )}
+                {copiedImage ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4" />}
                 <span>{copiedImage ? "Image Copied!" : "Copy Image"}</span>
               </button>
             </div>
@@ -1016,11 +1023,7 @@ export function BrandedQrModal({
                 onClick={handleCopyLink}
                 className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl border border-border/60 bg-card hover:bg-muted text-[11px] font-bold text-foreground transition-all cursor-pointer active:scale-95"
               >
-                {copied ? (
-                  <Check className="size-3.5 text-emerald-500" />
-                ) : (
-                  <Copy className="size-3.5" />
-                )}
+                {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
                 <span>{copied ? "Copied" : "Copy URL"}</span>
               </button>
 

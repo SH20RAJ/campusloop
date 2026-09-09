@@ -44,6 +44,8 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   const [commentsCount, setCommentsCount] = useState(post.commentsCount);
   const [isSaved, setIsSaved] = useState(Boolean(post.isSaved));
   const [isReposted, setIsReposted] = useState(false);
+  const [repostSpin, setRepostSpin] = useState(false);
+  const [showRepostBurst, setShowRepostBurst] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
 
   // Video Reel State (Image 3)
@@ -255,7 +257,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     setTimeout(() => setShowDoubleTapHeart(false), 850);
   }
 
-  // Repost handling
+  // Repost handling (modal / quote flow)
   async function handleExecuteRepost(isQuote: boolean) {
     sounds.tap();
     haptics.medium();
@@ -270,6 +272,30 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
       toast.error("Failed to repost.");
     } finally {
       setIsReposting(false);
+    }
+  }
+
+  // Instant repost (Instagram style): single tap fires immediately with a
+  // spin + center burst. Tapping again opens the quote modal for thoughts.
+  async function handleInstantRepost() {
+    if (isReposting) return;
+    if (isReposted) {
+      setShowRepostModal(true);
+      return;
+    }
+    setIsReposted(true);
+    setRepostSpin(true);
+    setShowRepostBurst(true);
+    sounds.ting();
+    haptics.repost();
+    setTimeout(() => setRepostSpin(false), 450);
+    setTimeout(() => setShowRepostBurst(false), 900);
+    try {
+      await repostPost(post.id);
+      toast.success("Reposted to your loop");
+    } catch {
+      setIsReposted(false);
+      toast.error("Failed to repost.");
     }
   }
 
@@ -366,22 +392,30 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         <span className="text-[11px] sm:text-xs font-bold text-white/80 tabular-nums">{commentsCount}</span>
       </div>
 
-      {/* 3. Repost / Loop */}
+      {/* 3. Repost / Loop (single tap = instant repost, tap again = quote) */}
       <div className="flex flex-col items-center gap-1">
         <button
           type="button"
-          onClick={() => setShowRepostModal(true)}
-          aria-label="Loop post"
+          onClick={handleInstantRepost}
+          aria-label={isReposted ? "Quoted repost" : "Loop post"}
           className={cn(
-            "size-11 sm:size-12 rounded-full border bg-black/40 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+            "size-11 sm:size-12 rounded-full border bg-black/40 backdrop-blur-xl flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-90 cursor-pointer",
             isReposted
               ? "border-emerald-500/40 text-emerald-500 bg-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
               : "border-white/10 text-white/90 hover:text-white hover:bg-white/10"
           )}
         >
-          <Repeat2 className={cn("size-5 sm:size-5.5", isReposted && "rotate-180")} />
+          <Repeat2
+            className={cn(
+              "size-5 sm:size-5.5 transition-transform duration-300 ease-out",
+              repostSpin && "rotate-180 scale-125",
+              isReposted && !repostSpin && "text-emerald-400"
+            )}
+          />
         </button>
-        <span className="text-[10px] font-bold text-white/60">Loop</span>
+        <span className={cn("text-[10px] font-bold", isReposted ? "text-emerald-400" : "text-white/60")}>
+          {isReposted ? "Looped" : "Loop"}
+        </span>
       </div>
 
       {/* 4. Bookmark */}
@@ -474,6 +508,23 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
               >
                 <div className="rounded-full bg-black/40 p-6 backdrop-blur-md">
                   <Heart className="size-20 fill-rose-500 text-rose-500 drop-shadow-lg animate-pulse" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Instant Repost Burst Animation */}
+          <AnimatePresence>
+            {showRepostBurst && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0, rotate: -90 }}
+                animate={{ scale: 1.25, opacity: 1, rotate: 0 }}
+                exit={{ scale: 1.7, opacity: 0, rotate: 90 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center"
+              >
+                <div className="rounded-full bg-emerald-500/25 border border-emerald-400/40 p-6 backdrop-blur-md shadow-[0_0_40px_rgba(16,185,129,0.5)]">
+                  <Repeat2 className="size-20 text-emerald-400 drop-shadow-lg" strokeWidth={2.25} />
                 </div>
               </motion.div>
             )}
@@ -602,6 +653,23 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           >
             <div className="rounded-full bg-black/40 p-6 backdrop-blur-md">
               <Heart className="size-20 fill-rose-500 text-rose-500 drop-shadow-lg animate-pulse" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Instant Repost Burst Animation */}
+      <AnimatePresence>
+        {showRepostBurst && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0, rotate: -90 }}
+            animate={{ scale: 1.25, opacity: 1, rotate: 0 }}
+            exit={{ scale: 1.7, opacity: 0, rotate: 90 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center"
+          >
+            <div className="rounded-full bg-emerald-500/25 border border-emerald-400/40 p-6 backdrop-blur-md shadow-[0_0_40px_rgba(16,185,129,0.5)]">
+              <Repeat2 className="size-20 text-emerald-400 drop-shadow-lg" strokeWidth={2.25} />
             </div>
           </motion.div>
         )}

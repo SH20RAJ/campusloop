@@ -252,6 +252,13 @@ export default function RootLayout({
                 {
                   "@type": "SiteNavigationElement",
                   position: 8,
+                  name: "Feature Docs",
+                  description: "Plain-English explainers for every CampusLoop feature",
+                  url: "https://campusloop.space/docs",
+                },
+                {
+                  "@type": "SiteNavigationElement",
+                  position: 9,
                   name: "About CampusLoop",
                   description: "Learn more about the verified student ecosystem",
                   url: "https://campusloop.space/about",

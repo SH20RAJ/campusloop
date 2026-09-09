@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
+import { getDocsSlugs } from "@/lib/docs-features";
 
 export async function GET() {
   const pages = [
     { url: "https://campusloop.space/", priority: "1.0", changefreq: "daily" },
+    { url: "https://campusloop.space/docs", priority: "0.9", changefreq: "weekly" },
+    ...getDocsSlugs().map((slug) => ({
+      url: `https://campusloop.space/docs/${slug}`,
+      priority: "0.8",
+      changefreq: "monthly",
+    })),
     { url: "https://campusloop.space/app/academics", priority: "1.0", changefreq: "daily" },
     { url: "https://campusloop.space/app/academics/sources", priority: "0.9", changefreq: "daily" },
     { url: "https://campusloop.space/colleges", priority: "0.9", changefreq: "daily" },

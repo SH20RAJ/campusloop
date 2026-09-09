@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, ChevronRight, Search, Users, Zap } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
@@ -323,8 +323,7 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
       <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] bg-purple-600/10 blur-[140px] rounded-full -z-10" />
 
       {/* ─── Top Header & Subheader Tabs ─── */}
-      <header className="absolute top-0 inset-x-0 z-30 px-4 pt-2.5 pb-1 bg-gradient-to-b from-background/95 via-background/85 to-transparent backdrop-blur-md"
-
+      <header className="absolute top-0 inset-x-0 z-30 px-4 pt-2.5 pb-1 bg-gradient-to-b from-background/95 via-background/85 to-transparent backdrop-blur-md">
         {/* Subheader Filter Tabs */}
         <div className="flex items-center justify-between gap-2 mt-3 border-b border-border/20 pb-0.5">
           <div className="flex items-center gap-5 sm:gap-6 text-xs sm:text-sm font-bold overflow-x-auto no-scrollbar py-0.5">

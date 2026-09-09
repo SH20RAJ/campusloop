@@ -87,10 +87,6 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // ─── Visual Viewport tracking for mobile virtual keyboard insets (Fixes Image 3 bug) ───
-  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
-  const [keyboardOffset, setKeyboardOffset] = useState(0);
-
   const scrollToBottom = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({
@@ -100,34 +96,12 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
     }
   };
 
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.visualViewport) return;
-
-    const vv = window.visualViewport;
-
-    function handleViewportChange() {
-      if (!vv) return;
-      const currentHeight = vv.height;
-      setViewportHeight(currentHeight);
-
-      // Calculates how much the mobile software keyboard is pushing up
-      const offset = Math.max(0, window.innerHeight - currentHeight - (vv.offsetTop || 0));
-      setKeyboardOffset(offset);
-
-      if (offset > 0 && scrollContainerRef.current) {
-        setTimeout(scrollToBottom, 80);
-      }
-    }
-
-    vv.addEventListener("resize", handleViewportChange);
-    vv.addEventListener("scroll", handleViewportChange);
-    handleViewportChange();
-
-    return () => {
-      vv.removeEventListener("resize", handleViewportChange);
-      vv.removeEventListener("scroll", handleViewportChange);
-    };
-  }, []);
+  // When the software keyboard opens, the layout viewport shrinks
+  // (interactiveWidget=resizes-content), so dvh units already track the visible
+  // area. Give the resize a beat, then keep the latest comments in view.
+  function handleComposerFocus() {
+    setTimeout(scrollToBottom, 320);
+  }
 
   async function handleUploadCommentFiles(files: File[]) {
     const validImageFiles = files.filter((f) => f.type.startsWith("image/"));
@@ -224,15 +198,25 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
     dedupingInterval: 4000,
   });
 
-  // Auto-focus input on open
+  // Auto-focus input on open (desktop only — on touch devices the keyboard
+  // opening immediately would cover the comments the user came to read).
+  // Escape closes the drawer.
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 180);
-    } else {
+    if (!isOpen) {
       setCommentText("");
       setReplyingTo(null);
+      return;
     }
-  }, [isOpen]);
+    const finePointer = typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches;
+    if (finePointer) {
+      setTimeout(() => inputRef.current?.focus(), 180);
+    }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
 
   const handleToggleLike = (commentId: string) => {
     sounds.tap();
@@ -368,18 +352,15 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
             onClick={onClose}
           />
 
-          {/* Modal / Bottom Drawer Container with Keyboard Inset & 100dvh flex column */}
+          {/* Modal / Bottom Drawer: dvh tracks the visible area above the
+              software keyboard (interactiveWidget=resizes-content), so the
+              composer stays pinned and visible with no manual offsets. */}
           <motion.div
             initial={{ y: "100%", opacity: 0.8 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 450, damping: 38 }}
-            style={{
-              maxHeight: viewportHeight ? `${Math.min(viewportHeight * 0.94, 760)}px` : "92dvh",
-              height: viewportHeight ? `${Math.min(viewportHeight * 0.94, 760)}px` : "88dvh",
-              paddingBottom: keyboardOffset > 0 ? `${keyboardOffset}px` : undefined,
-            }}
-            className="relative z-10 w-full sm:max-w-lg bg-[#0d0d16]/98 text-foreground rounded-t-[32px] sm:rounded-3xl border-t border-purple-500/25 sm:border sm:border-purple-500/30 shadow-2xl flex flex-col overflow-hidden"
+            className="relative z-10 flex h-[92dvh] max-h-[760px] w-full flex-col overflow-hidden rounded-t-[32px] border-t border-purple-500/25 bg-[#0d0d16]/98 text-foreground shadow-2xl sm:max-w-lg sm:rounded-3xl sm:border sm:border-purple-500/30"
             onClick={(e) => e.stopPropagation()}
           >
             {/* ─── Mobile Drag Indicator ─── */}
@@ -426,12 +407,17 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
               </div>
             </div>
 
-            {/* ─── Sort & Filter Bar (matching Image 2) ─── */}
+            {/* ─── Sort & Filter Bar ─── */}
             <div className="flex items-center justify-between px-4 py-2 shrink-0 border-b border-white/[0.06] text-xs">
               <div className="flex items-center gap-1.5 font-bold text-foreground">
-                <span>🔥</span>
-                <span>Top comments</span>
-                <ChevronDown className="size-3 text-muted-foreground" />
+                <span>{sortMode === "best" ? "🔥" : sortMode === "latest" ? "🕐" : "📜"}</span>
+                <span>
+                  {sortMode === "best"
+                    ? "Top comments"
+                    : sortMode === "latest"
+                      ? "Latest first"
+                      : "Oldest first"}
+                </span>
               </div>
               <div className="flex items-center gap-1.5 text-muted-foreground text-[11px]">
                 <span>Sort by</span>
@@ -453,7 +439,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
             {/* ─── Scrollable Comments List (flex-1 min-h-0 so composer stays visible above keyboard) ─── */}
             <div
               ref={scrollContainerRef}
-              className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-5 py-3 space-y-4 divide-y divide-white/[0.06] scroll-smooth"
+              className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 sm:px-5 py-3 divide-y divide-white/[0.06] scroll-smooth"
             >
               {isLoading ? (
                 <div className="space-y-4 pt-2">
@@ -534,7 +520,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                           </button>
                         </div>
 
-                        <div className="text-[13px] text-foreground/95 leading-relaxed break-words font-normal">
+                        <div className="text-[13px] text-foreground/95 leading-relaxed break-words font-normal select-text">
                           <RichText content={c.body} />
                         </div>
 
@@ -595,8 +581,8 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
               </button>
             </div>
 
-            {/* ─── Bottom Composer Bar (matching Image 2) ─── */}
-            <div className="p-3 sm:p-4 border-t border-white/[0.08] bg-[#0d0d16] shrink-0 space-y-2">
+            {/* ─── Bottom Composer Bar (safe-area aware, pinned above keyboard) ─── */}
+            <div className="p-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-white/[0.08] bg-[#0d0d16] shrink-0 space-y-2">
               {/* Replying Context Banner */}
               {replyingTo && (
                 <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/30 text-xs">
@@ -662,7 +648,9 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
-                    className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none"
+                    onFocus={handleComposerFocus}
+                    enterKeyHint="send"
+                    className="flex-1 bg-transparent text-base sm:text-xs text-foreground placeholder:text-muted-foreground/60 outline-none"
                     maxLength={500}
                   />
 

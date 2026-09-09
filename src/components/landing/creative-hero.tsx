@@ -482,10 +482,6 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
 
   return (
     <section className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 pt-24 pb-16 sm:pt-32 sm:pb-24 overflow-x-clip">
-      {/* ─── Ambient Radiant Multi-Color Campus Glow ─── */}
-      <div className="pointer-events-none absolute -top-28 left-1/2 -translate-x-1/2 w-[720px] h-[420px] bg-gradient-to-tr from-violet-500/20 via-rose-500/15 to-sky-500/15 blur-[120px] rounded-full -z-10" />
-      <div className="pointer-events-none absolute top-1/2 right-10 -translate-y-1/2 w-[350px] h-[350px] bg-gradient-to-bl from-amber-500/10 via-pink-500/10 to-indigo-500/15 blur-[100px] rounded-full -z-10" />
-
       <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
         {/* ──────── LEFT COLUMN: Rich Brand Typography with Vibrant Primary Color ──────── */}
         <div className="flex flex-col items-start text-left space-y-6 lg:col-span-6">
@@ -501,9 +497,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
           <h1 className="text-4xl sm:text-6xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-[1.05] text-foreground">
             Your campus.
             <br />
-            <span className="bg-gradient-to-r from-violet-500 via-fuchsia-500 to-indigo-500 bg-clip-text text-transparent drop-shadow-sm">
-              Verified &amp; unfiltered.
-            </span>
+            <span className="text-primary">Verified &amp; unfiltered.</span>
           </h1>
 
           {/* Subtitle */}
@@ -518,7 +512,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             {isAuthenticated ? (
               <Link
                 href="/app"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-gradient-to-r from-violet-600 via-primary to-indigo-600 hover:from-violet-500 hover:to-indigo-500 px-8 text-[15px] font-bold text-white shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all active:scale-98 cursor-pointer"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-primary hover:bg-primary/90 px-8 text-[15px] font-bold text-primary-foreground shadow-md shadow-primary/20 transition-all active:scale-98 cursor-pointer"
               >
                 <span>Enter Campus Feed</span>
                 <ArrowRight className="ml-2 size-4" />
@@ -526,7 +520,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             ) : (
               <Link
                 href="/handler/sign-up"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-gradient-to-r from-violet-600 via-primary to-indigo-600 hover:from-violet-500 hover:to-indigo-500 px-8 text-[15px] font-bold text-white shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all active:scale-98 cursor-pointer"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-primary hover:bg-primary/90 px-8 text-[15px] font-bold text-primary-foreground shadow-md shadow-primary/20 transition-all active:scale-98 cursor-pointer"
               >
                 <span>Get verified with college email</span>
                 <ArrowRight className="ml-2 size-4" />
@@ -555,18 +549,18 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             </p>
           )}
 
-          {/* Cheerful Colorful Trust Checklist */}
+          {/* Trust Checklist */}
           <div className="pt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              <Check className="size-3.5 text-emerald-500 shrink-0 stroke-[2.5]" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border/60">
+              <Check className="size-3.5 text-primary shrink-0 stroke-[2.5]" />
               <span>100% Student Verified</span>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-              <Check className="size-3.5 text-rose-500 shrink-0 stroke-[2.5]" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border/60">
+              <Check className="size-3.5 text-primary shrink-0 stroke-[2.5]" />
               <span>Zero-Doxxing Escrow</span>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
-              <Check className="size-3.5 text-sky-500 shrink-0 stroke-[2.5]" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border/60">
+              <Check className="size-3.5 text-primary shrink-0 stroke-[2.5]" />
               <span>No Outsiders</span>
             </div>
           </div>
@@ -613,22 +607,6 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             <div className="flex items-center border-b border-border/40 px-2 sm:px-4 bg-muted/10">
               {TABS.map((tab) => {
                 const isActive = activeTab === tab.id;
-                const tabColor =
-                  tab.id === "confession"
-                    ? "text-rose-500"
-                    : tab.id === "poll"
-                      ? "text-blue-500"
-                      : tab.id === "match"
-                        ? "text-pink-500"
-                        : "text-emerald-500";
-                const barColor =
-                  tab.id === "confession"
-                    ? "bg-rose-500"
-                    : tab.id === "poll"
-                      ? "bg-blue-500"
-                      : tab.id === "match"
-                        ? "bg-pink-500"
-                        : "bg-emerald-500";
 
                 return (
                   <button
@@ -641,14 +619,14 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                     }}
                     className={cn(
                       "flex-1 py-3 text-xs sm:text-sm font-semibold transition-all relative cursor-pointer text-center",
-                      isActive ? cn("font-bold", tabColor) : "text-muted-foreground hover:text-foreground"
+                      isActive ? "font-bold text-primary" : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <span>{tab.label}</span>
                     {isActive && (
                       <motion.div
                         layoutId="twitter-tab-indicator"
-                        className={cn("absolute bottom-0 inset-x-3 h-[3px] rounded-full shadow-sm", barColor)}
+                        className="absolute bottom-0 inset-x-3 h-[3px] rounded-full bg-primary shadow-sm"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
@@ -660,17 +638,11 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
             {/* ─── Tweet Post Body (Authentic Twitter Layout) ─── */}
             <div className="p-4 sm:p-5">
               <div className="flex items-start gap-3">
-                {/* Author Avatar (Twitter Circular Style with Vibrant Rings) */}
+                {/* Author Avatar (Circular with subtle ring) */}
                 <div
                   className={cn(
                     "size-10 rounded-full flex items-center justify-center shrink-0 text-sm font-black transition-all shadow-xs",
-                    activeTab === "confession"
-                      ? "bg-gradient-to-br from-rose-500/20 via-pink-500/15 to-orange-500/10 border border-rose-500/30 text-rose-500 ring-2 ring-rose-500/20"
-                      : activeTab === "poll"
-                        ? "bg-gradient-to-br from-blue-500/20 via-indigo-500/15 to-cyan-500/10 border border-blue-500/30 text-blue-500 ring-2 ring-blue-500/20"
-                        : activeTab === "match"
-                          ? "bg-gradient-to-br from-pink-500/20 via-purple-500/15 to-violet-500/10 border border-pink-500/30 text-pink-500 ring-2 ring-pink-500/20"
-                          : "bg-gradient-to-br from-emerald-500/20 via-teal-500/15 to-cyan-500/10 border border-emerald-500/30 text-emerald-500 ring-2 ring-emerald-500/20"
+                    "bg-muted border border-border text-foreground ring-2 ring-primary/15"
                   )}
                 >
                   {activeTab === "confession"
@@ -707,7 +679,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
 
                   {/* Campus Tag Pill */}
                   <div className="pt-0.5 pb-2">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-muted text-muted-foreground border border-border/60">
                       🏛️ {campus.name} Hub
                     </span>
                   </div>
@@ -727,7 +699,7 @@ export function CreativeHero({ isAuthenticated }: { isAuthenticated: boolean }) 
                         <p className="text-sm sm:text-[15px] leading-relaxed text-foreground font-normal">
                           {campus.confession.text}
                         </p>
-                        <p className="inline-block text-xs font-bold text-rose-500 dark:text-rose-400 hover:underline cursor-pointer bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20">
+                        <p className="inline-block text-xs font-bold text-primary hover:underline cursor-pointer bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
                           🔥 {campus.confession.topic}
                         </p>
                       </motion.div>

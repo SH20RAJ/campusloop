@@ -1,51 +1,67 @@
 "use client";
 
-import { ArrowRight, BookOpen, Clock, Flame, Gift, Hash, Heart, Users, Zap } from "lucide-react";
+import { ArrowRight, BookOpen, Clock, Flame, Gift, Hash, Users, Zap } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { JoinCommunityButton } from "@/app/app/(main)/communities/join-community-button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { Community } from "@/hooks/use-communities";
 import { fetcher } from "@/lib/api";
 import type { TrendingHashtag } from "@/lib/trending-hashtags";
-import { cn } from "@/lib/utils";
 
-// ──────── 1. Suggested Communities Widget (Twitter / X Timeline Style) ────────
-
-const SUGGESTED_COMMUNITIES = [
-  {
-    id: "comm_music",
-    name: "Music Jams & Dhwani",
-    slug: "music-jams",
-    members: 17,
-    desc: "Acoustic jams, Bitotsav battle of bands, and indie chords 🎸",
-  },
-  {
-    id: "comm_coding",
-    name: "Coders Club & Hackers",
-    slug: "coders-club",
-    members: 18,
-    desc: "LeetCode daily grinds, system design & HackBIT squads 💻",
-  },
-  {
-    id: "comm_placements",
-    name: "Placement & Career Prep",
-    slug: "placement-prep",
-    members: 15,
-    desc: "Mock interviews, coding test patterns & alumni referrals 💼",
-  },
-];
+// ──────── 1. Suggested Communities Widget (Dynamic Timeline Feed) ────────
 
 export function InlineCommunitiesWidget() {
-  const [joined, setJoined] = useState<Record<string, boolean>>({});
+  const { data: allCommunities, isLoading } = useSWR<Community[]>(
+    "/api/communities?limit=10&sort=popular",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: true,
+      dedupingInterval: 20000,
+    }
+  );
 
-  function toggleJoin(id: string, name: string) {
-    setJoined((prev) => {
-      const nextState = !prev[id];
-      if (nextState) {
-        toast.success(`Joined c/${name}! 🚀`);
-      }
-      return { ...prev, [id]: nextState };
-    });
+  const suggestedCommunities = useMemo(() => {
+    if (!allCommunities || allCommunities.length === 0) return [];
+    // Prioritize active campus communities the student has not yet joined
+    const unjoined = allCommunities.filter((c) => !c.isMember);
+    const pool = unjoined.length > 0 ? unjoined : allCommunities;
+    return pool.slice(0, 3);
+  }, [allCommunities]);
+
+  if (isLoading && (!allCommunities || allCommunities.length === 0)) {
+    return (
+      <div className="py-2.5 px-4 space-y-3 select-none animate-pulse">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="size-4 rounded-full bg-muted/60" />
+            <div className="h-4 w-36 rounded-md bg-muted/60" />
+          </div>
+          <div className="h-3 w-16 rounded-md bg-muted/40" />
+        </div>
+        <div className="divide-y divide-border/20">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center justify-between gap-3 py-2.5 px-1">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="size-10 rounded-full bg-muted/60 shrink-0" />
+                <div className="space-y-1.5 flex-1 min-w-0">
+                  <div className="h-3.5 w-32 rounded bg-muted/60" />
+                  <div className="h-2.5 w-24 rounded bg-muted/40" />
+                </div>
+              </div>
+              <div className="h-7 w-16 rounded-full bg-muted/50 shrink-0" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (suggestedCommunities.length === 0) {
+    return null;
   }
 
   return (
@@ -65,46 +81,49 @@ export function InlineCommunitiesWidget() {
         </Link>
       </div>
 
-      {/* Communities Stack */}
+      {/* Dynamic Communities Stack */}
       <div className="divide-y divide-border/25">
-        {SUGGESTED_COMMUNITIES.map((comm) => (
-          <div
-            key={comm.id}
-            className="flex items-center justify-between gap-3 py-2.5 hover:bg-muted/20 transition-colors rounded-xl px-1"
-          >
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-xs shrink-0">
-                c/{comm.slug[0].toUpperCase()}
+        {suggestedCommunities.map((comm) => {
+          const displaySlug = comm.slug || comm.name.toLowerCase().replace(/\s+/g, "-");
+          const memberCount = comm.membersCount ?? comm.memberCount ?? comm.members?.length ?? 0;
+          const initialLetter = (displaySlug[0] || comm.name[0] || "C").toUpperCase();
+
+          return (
+            <div
+              key={comm.id}
+              className="flex items-center justify-between gap-3 py-2.5 hover:bg-muted/20 transition-colors rounded-xl px-1"
+            >
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <Avatar className="size-10 rounded-full border border-primary/20 shrink-0">
+                  {comm.avatarUrl && <AvatarImage src={comm.avatarUrl} alt={comm.name} />}
+                  <AvatarFallback className="bg-primary/10 text-primary font-black text-xs">
+                    c/{initialLetter}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/app/communities/${comm.id}`}
+                    className="font-bold text-sm text-foreground hover:underline truncate block"
+                  >
+                    {comm.name}
+                  </Link>
+                  <p className="text-xs text-muted-foreground truncate">
+                    <span className="font-medium">c/{displaySlug}</span> · {memberCount}{" "}
+                    {memberCount === 1 ? "member" : "members"}
+                  </p>
+                  {comm.description && (
+                    <p className="text-[11px] text-muted-foreground/80 truncate">{comm.description}</p>
+                  )}
+                </div>
               </div>
 
-              <div className="min-w-0 flex-1">
-                <Link
-                  href={`/app/communities/${comm.id}`}
-                  className="font-bold text-sm text-foreground hover:underline truncate block"
-                >
-                  {comm.name}
-                </Link>
-                <p className="text-xs text-muted-foreground truncate">
-                  <span className="font-medium">c/{comm.slug}</span> · {comm.members} members
-                </p>
-                <p className="text-[11px] text-muted-foreground/80 truncate">{comm.desc}</p>
+              <div className="shrink-0">
+                <JoinCommunityButton communityId={comm.id} initialIsMember={Boolean(comm.isMember)} />
               </div>
             </div>
-
-            <button
-              type="button"
-              onClick={() => toggleJoin(comm.id, comm.slug)}
-              className={cn(
-                "rounded-full px-4 py-1 text-xs font-black transition-all cursor-pointer shrink-0 shadow-2xs",
-                joined[comm.id]
-                  ? "border border-border/70 text-muted-foreground hover:border-destructive hover:text-destructive hover:bg-destructive/10"
-                  : "bg-foreground text-background hover:opacity-90 active:scale-95"
-              )}
-            >
-              {joined[comm.id] ? "Joined" : "Join"}
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -134,7 +153,7 @@ export function InlineDatingWidget() {
       </div>
 
       <Link
-        href="/app/matching"
+        href="/app/dating"
         className="shrink-0 self-start sm:self-center px-4 py-1.5 rounded-full bg-primary hover:bg-primary/95 text-primary-foreground font-black text-xs transition-all shadow-2xs active:scale-95 cursor-pointer"
       >
         Explore Match
@@ -146,9 +165,14 @@ export function InlineDatingWidget() {
 // ──────── 3. Trending Hashtags Widget ────────
 
 export function InlineHashtagsWidget() {
-  const { data } = useSWR<{ trending: TrendingHashtag[] }>("/api/hashtags/trending?limit=4", fetcher, {
-    dedupingInterval: 30000,
-  });
+  const { data, isLoading } = useSWR<{ trending: TrendingHashtag[] }>(
+    "/api/hashtags/trending?limit=4",
+    fetcher,
+    {
+      revalidateIfStale: true,
+      dedupingInterval: 30000,
+    }
+  );
 
   const tags =
     data?.trending && data.trending.length > 0
@@ -156,12 +180,27 @@ export function InlineHashtagsWidget() {
           tag: t.tag.replace(/^#/, ""),
           count: t.formattedCount,
         }))
-      : [
-          { tag: "HostelLife", count: "62 posts" },
-          { tag: "BITMesra", count: "39 posts" },
-          { tag: "Confession", count: "36 posts" },
-          { tag: "CampusHelp", count: "25 posts" },
-        ];
+      : [];
+
+  if (isLoading && tags.length === 0) {
+    return (
+      <div className="py-2.5 px-4 space-y-2 select-none animate-pulse">
+        <div className="flex items-center justify-between">
+          <div className="h-4 w-36 rounded bg-muted/60" />
+          <div className="h-3 w-12 rounded bg-muted/40" />
+        </div>
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-14 rounded-xl bg-muted/30 border border-border/30" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (tags.length === 0) {
+    return null;
+  }
 
   return (
     <div className="py-2.5 px-4 space-y-2 select-none">
@@ -200,7 +239,7 @@ export function InlineReferralWidget() {
   function handleCopy() {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText("https://campusloop.space/handler/sign-up");
-      toast.success("CampusLoop invite link copied! 🚀");
+      toast.success("CampusLoop invite link copied to clipboard");
     }
   }
 
@@ -245,7 +284,7 @@ export function InlineArticlesWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpen className="size-4 text-primary" />
-          <h3 className="text-[15px] font-black text-foreground tracking-tight">Articles & Long Reads</h3>
+          <h3 className="text-[15px] font-black text-foreground tracking-tight">Articles &amp; Long Reads</h3>
         </div>
         <Link
           href="/app/articles"

@@ -23,43 +23,11 @@ interface Community {
   icon: string | null;
   avatarUrl?: string | null;
   membersCount?: number;
+  memberCount?: number;
   members?: any[];
   category?: string;
   tags?: string[];
 }
-
-const DEFAULT_AVATARS = [
-  "https://api.dicebear.com/7.x/initials/svg?seed=Priya&backgroundColor=db2777&textColor=ffffff&fontWeight=800",
-  "https://api.dicebear.com/7.x/initials/svg?seed=Kabir&backgroundColor=2563eb&textColor=ffffff&fontWeight=800",
-  "https://api.dicebear.com/7.x/initials/svg?seed=Aarav&backgroundColor=7c3aed&textColor=ffffff&fontWeight=800",
-];
-
-const KNOWN_COMMUNITIES: Record<string, Partial<Community> & { tags?: string[] }> = {
-  comm_placements: {
-    id: "comm_placements",
-    name: "Placement & Internships",
-    slug: "comm_placements",
-    description: "Discussions, opportunities, resources and experiences for placements.",
-    membersCount: 16,
-    tags: ["#Placements", "#Internships", "#Career"],
-  },
-  comm_coding: {
-    id: "comm_coding",
-    name: "Coders Club & Hackers",
-    slug: "coders-club",
-    description: "LeetCode daily grinds, system design & HackBIT squads 💻",
-    membersCount: 18,
-    tags: ["#Coding", "#Tech", "#Hackathons"],
-  },
-  comm_music: {
-    id: "comm_music",
-    name: "Campus Jams & Music Society",
-    slug: "campus-jams",
-    description: "Acoustic jams, Bitotsav battle of bands, and indie chords 🎸",
-    membersCount: 14,
-    tags: ["#Music", "#Bands", "#Jamming"],
-  },
-};
 
 export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
   const router = useRouter();
@@ -69,59 +37,36 @@ export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
   });
 
   const community = useMemo(() => {
+    if (!communitiesList || communitiesList.length === 0) return null;
     const clean = slugOrId.toLowerCase().replace(/^c\//, "");
-    const found = communitiesList?.find(
+    const found = communitiesList.find(
       (c) =>
         c.id === slugOrId ||
         c.id === clean ||
+        (c.slug && c.slug.toLowerCase() === clean) ||
         c.name.toLowerCase().replace(/\s+/g, "-") === clean ||
-        c.name.toLowerCase() === clean ||
-        c.id.includes(clean)
+        c.name.toLowerCase() === clean
     );
-    const fallback = KNOWN_COMMUNITIES[clean] || KNOWN_COMMUNITIES[slugOrId];
 
-    if (!found && !fallback) return null;
+    if (!found) return null;
 
-    const isPlacements = clean === "comm_placements" || slugOrId === "comm_placements";
-
-    const name = isPlacements
-      ? "Placement & Internships"
-      : found?.name || fallback?.name || "Campus Community";
-
-    const description = isPlacements
-      ? "Discussions, opportunities, resources and experiences for placements."
-      : found?.description ||
-        fallback?.description ||
-        "Connect, share advice, and explore campus opportunities.";
-
-    const membersCount = found?.membersCount ?? found?.members?.length ?? fallback?.membersCount ?? 16;
-
-    let tags = fallback?.tags;
-    if (!tags) {
-      if (isPlacements || name.toLowerCase().includes("placement")) {
-        tags = ["#Placements", "#Internships", "#Career"];
-      } else if (name.toLowerCase().includes("code") || name.toLowerCase().includes("tech")) {
-        tags = ["#Coding", "#Tech", "#Projects"];
-      } else {
-        const words = name.split(/\s+/).slice(0, 3);
-        tags = words.map((w) => `#${w.replace(/[^a-zA-Z0-9]/g, "")}`).filter((t) => t.length > 2);
-      }
-    }
+    const words = found.name.split(/\s+/).slice(0, 3);
+    const tags = words.map((w) => `#${w.replace(/[^a-zA-Z0-9]/g, "")}`).filter((t) => t.length > 2);
 
     return {
-      id: found?.id || fallback?.id || slugOrId,
-      name,
-      slug: found?.slug || fallback?.slug || clean,
-      description,
-      icon: found?.icon || fallback?.icon || null,
-      avatarUrl: found?.avatarUrl || fallback?.avatarUrl || null,
-      membersCount,
-      members: found?.members || fallback?.members || [],
+      id: found.id,
+      name: found.name,
+      slug: found.slug || found.name.toLowerCase().replace(/\s+/g, "-"),
+      description: found.description || "Connect, share advice, and explore campus opportunities.",
+      icon: (found as any).icon || null,
+      avatarUrl: found.avatarUrl || null,
+      membersCount: found.membersCount ?? found.memberCount ?? found.members?.length ?? 0,
+      members: found.members || [],
       tags,
     };
   }, [communitiesList, slugOrId]);
 
-  if (isLoading && !KNOWN_COMMUNITIES[slugOrId.replace(/^c\//, "")]) {
+  if (isLoading && !community) {
     return (
       <div className="mt-3.5 p-4 rounded-3xl border border-purple-500/20 bg-[#12111d]/60 animate-pulse space-y-3">
         <div className="flex items-center gap-3">
@@ -153,7 +98,7 @@ export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
       });
     } else {
       navigator.clipboard.writeText(url);
-      toast.success("Community link copied to clipboard 📋");
+      toast.success("Community link copied to clipboard");
     }
   }
 
@@ -166,16 +111,14 @@ export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
     router.push(`/app/communities/${community?.id}`);
   }
 
-  const memberCount = community.membersCount ?? 16;
+  const memberCount = community.membersCount ?? community.members?.length ?? 0;
   const avatars =
     community.members && community.members.length > 0
       ? community.members
           .map((m: any) => m.user?.avatarUrl || m.avatarUrl)
           .filter(Boolean)
           .slice(0, 3)
-      : DEFAULT_AVATARS;
-
-  const displayAvatars = avatars.length > 0 ? avatars : DEFAULT_AVATARS;
+      : [];
 
   return (
     <div
@@ -227,18 +170,26 @@ export function CommunityEmbed({ slugOrId }: CommunityEmbedProps) {
       {/* Middle Row: Member Avatars + Count & Join Button */}
       <div className="flex items-center justify-between gap-3 pt-0.5">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="flex items-center -space-x-2 shrink-0">
-            {displayAvatars.map((src, i) => (
-              <img
-                key={i}
-                src={src}
-                alt="Member avatar"
-                className="size-6 sm:size-6.5 rounded-full border-2 border-[#12111d] object-cover ring-1 ring-white/10"
-                loading="lazy"
-              />
-            ))}
-          </div>
-          <span className="text-xs font-semibold text-white/85 truncate">{memberCount} members</span>
+          {avatars.length > 0 ? (
+            <div className="flex items-center -space-x-2 shrink-0">
+              {avatars.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt="Member avatar"
+                  className="size-6 sm:size-6.5 rounded-full border-2 border-[#12111d] object-cover ring-1 ring-white/10"
+                  loading="lazy"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="size-6 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-300 shrink-0">
+              <Users className="size-3" />
+            </div>
+          )}
+          <span className="text-xs font-semibold text-white/85 truncate">
+            {memberCount} {memberCount === 1 ? "member" : "members"}
+          </span>
         </div>
 
         <div onClick={(e) => e.stopPropagation()} className="shrink-0">

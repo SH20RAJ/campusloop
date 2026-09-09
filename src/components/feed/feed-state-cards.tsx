@@ -24,19 +24,19 @@ export function FeedCaughtUpCard() {
         <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mx-auto">
           <Zap className="size-5" />
         </div>
-        <h4 className="text-xs font-bold text-foreground">You&apos;ve caught up on all posts! 🎉</h4>
+        <h4 className="text-xs font-bold text-foreground">You&apos;ve caught up on all posts</h4>
         <p className="text-[11px] text-muted-foreground max-w-xs mx-auto leading-relaxed">
           Want more campus activity? Explore 1,350+ Indian colleges or swipe on student dating profiles.
         </p>
         <div className="flex items-center justify-center gap-2 pt-1">
           <Link
-            href="/colleges"
+            href="/app/colleges"
             className="px-3.5 py-1.5 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
           >
             Campus Directory
           </Link>
           <Link
-            href="/app/matching"
+            href="/app/dating"
             className="px-3.5 py-1.5 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
           >
             Campus Match

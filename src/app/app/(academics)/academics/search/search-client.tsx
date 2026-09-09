@@ -120,7 +120,6 @@ export function AcademicsSearchClient({
   initialSort,
   initialScope = "global",
 }: AcademicsSearchClientProps) {
-  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Search input state (immediate for typing)

@@ -402,7 +402,10 @@ export function SavedMaterialsClient() {
                       <AcademicAiStudyBar
                         title={item.title}
                         subjectCode={item.subjectCode}
-                        materialUrl={item.fileUrl || item.driveUrl || ""}
+                        materialUrl={
+                          item.fileUrl || item.driveUrl || `https://campusloop.space/app/academics/${item.id}`
+                        }
+                        pageUrl={`https://campusloop.space/app/academics/${item.id}`}
                         compact={true}
                       />
 

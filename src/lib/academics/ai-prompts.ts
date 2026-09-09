@@ -18,26 +18,38 @@ export interface AcademicResourcePromptContext {
 export function buildAcademicStudyPrompt(ctx: AcademicResourcePromptContext): string {
   const code = ctx.subjectCode || ctx.courseCode || "General Academic";
   const college = ctx.collegeName ? ` at ${ctx.collegeName}` : "";
+  const pageLink = ctx.pageUrl || ctx.materialUrl;
+  const directMaterialLink = ctx.materialUrl && ctx.materialUrl !== pageLink ? ctx.materialUrl : null;
 
   return [
-    `You are an elite university professor and private academic tutor specializing in ${code}.`,
-    `I am preparing for my semester examinations and studying this verified course material:`,
+    `You are an elite university professor, academic researcher, and private exam tutor specializing in ${code}${college}.`,
+    `I am preparing for my college semester examinations and studying this verified syllabus material:`,
     ``,
-    `📚 COURSE DETAILS:`,
-    `• Subject / Code: ${code}`,
-    `• Topic: ${ctx.title}`,
-    ctx.department ? `• Branch / Discipline: ${ctx.department}` : null,
+    `📚 VERIFIED COURSE & RESOURCE CONTEXT:`,
+    `• Subject / Course Code: ${code}`,
+    `• Topic / Title: ${ctx.title}`,
+    ctx.department ? `• Department / Branch: ${ctx.department}` : null,
     ctx.semester ? `• Semester: ${ctx.semester}` : null,
-    ctx.description ? `• Overview: ${ctx.description}` : null,
-    `• Direct Material Link: ${ctx.materialUrl}`,
-    ctx.pageUrl ? `• Verified CampusLoop Link: ${ctx.pageUrl}` : null,
+    ctx.collegeName ? `• University / College: ${ctx.collegeName}` : null,
+    ctx.description ? `• Syllabus Overview: ${ctx.description}` : null,
+    `• Material URL: ${pageLink}`,
+    `• Verified CampusLoop Course Page: ${pageLink}`,
+    directMaterialLink ? `• Direct Cloud Storage / Document Link: ${directMaterialLink}` : null,
     ``,
-    `🎯 YOUR TUTORING OBJECTIVES (Please structure your response clearly):`,
-    `1. 🧠 INTUITIVE BREAKDOWN: Explain the foundational concepts of this topic with simple, high-impact real-world analogies.`,
-    `2. 📐 KEY FORMULAS & THEOREMS: List every essential formula, definition, theorem, and derivation with variable explanations and SI units.`,
-    `3. 📝 5 HIGH-YIELD EXAM QUESTIONS: Provide 5 representative semester exam questions (ranging from numerical problems to conceptual derivations) with detailed step-by-step model solutions.`,
-    `4. ⚡ 15-MINUTE EXAM CRAM CHEAT SHEET: Give me a concise, bulleted revision summary to memorize right before entering the exam hall.`,
-    `5. 💡 COMMON PITFALLS & EXAM TRICKS: Point out the typical mistakes students make in this subject during midsems and endsems, and how to avoid them.`,
+    `🤖 AI AGENT WEB BROWSING & DATA EXTRACTION INSTRUCTIONS:`,
+    `Please fetch and browse the verified CampusLoop resource page at:`,
+    `${pageLink}`,
+    `Extract the full syllabus breakdown, questions, formulas, module units, peer annotations, and exam pattern to answer my study requests with complete accuracy.`,
+    directMaterialLink
+      ? `You may also consult the direct document at ${directMaterialLink} if needed.`
+      : null,
+    ``,
+    `🎯 YOUR COMPREHENSIVE TUTORING OBJECTIVES (Structure your response clearly):`,
+    `1. 🧠 INTUITIVE CONCEPT BREAKDOWN: Explain the foundational concepts of this topic with simple, high-impact real-world engineering analogies.`,
+    `2. 📐 COMPLETE FORMULA & THEOREM BANK: List every essential formula, definition, governing law, theorem, and derivation with variable explanations and SI units.`,
+    `3. 📝 5 HIGH-YIELD EXAM QUESTIONS WITH DETAILED SOLUTIONS: Provide 5 representative university examination questions (including numerical problems with complete working, conceptual derivations, and short-answer viva questions) with step-by-step model solutions.`,
+    `4. ⚡ 15-MINUTE LAST-MINUTE EXAM CRAM CHEAT SHEET: Give me a concise, bulleted revision summary to memorize right before entering the examination hall.`,
+    `5. 💡 COMMON EXAM TRAPS & PROFESSOR SECRETS: Point out the typical mistakes students make in this subject during midsems and endsems, and how to score full marks.`,
     ``,
     `Begin by introducing the topic and teaching Module 1 in a clear, friendly, and rigorous manner.`,
   ]

@@ -501,6 +501,7 @@ export function PlaylistDetailClient({ slugOrId }: { slugOrId: string }) {
                   title={currentItem.resource.title}
                   subjectCode={currentItem.resource.subjectCode}
                   resourceType={currentItem.resource.resourceType}
+                  pageUrl={`https://campusloop.space/app/academics/${(currentItem.resource as any).slug || currentItem.resource.id}`}
                 />
 
                 {/* Bottom Navigation Player Controls */}

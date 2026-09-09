@@ -41,6 +41,7 @@ interface AcademicPdfViewerProps {
   semester?: number | string;
   onDownload?: () => void;
   className?: string;
+  pageUrl?: string;
 }
 
 export function AcademicPdfViewer({
@@ -53,6 +54,7 @@ export function AcademicPdfViewer({
   semester,
   onDownload,
   className,
+  pageUrl,
 }: AcademicPdfViewerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -110,6 +112,8 @@ export function AcademicPdfViewer({
   const isOfficeDoc = /\.(docx?|pptx?|xlsx?)$/i.test(rawUrl);
 
   // AI Study URLs
+  const effectivePageUrl = pageUrl || (typeof window !== "undefined" ? window.location.href : undefined);
+
   const aiPrompt = useMemo(
     () =>
       buildAcademicStudyPrompt({
@@ -117,9 +121,10 @@ export function AcademicPdfViewer({
         subjectCode,
         department,
         semester,
-        materialUrl: rawUrl,
+        materialUrl: rawUrl || effectivePageUrl || "",
+        pageUrl: effectivePageUrl,
       }),
-    [title, subjectCode, department, semester, rawUrl]
+    [title, subjectCode, department, semester, rawUrl, effectivePageUrl]
   );
   const chatGptUrl = useMemo(() => getChatGptStudyUrl(aiPrompt), [aiPrompt]);
   const claudeUrl = useMemo(() => getClaudeStudyUrl(aiPrompt), [aiPrompt]);

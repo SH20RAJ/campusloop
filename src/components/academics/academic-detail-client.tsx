@@ -58,10 +58,17 @@ import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
 interface AcademicDetailClientProps {
   initialResource: any;
   currentUserId?: string | null;
+  canonicalUrl?: string;
 }
 
-export function AcademicDetailClient({ initialResource, currentUserId }: AcademicDetailClientProps) {
+export function AcademicDetailClient({
+  initialResource,
+  currentUserId,
+  canonicalUrl,
+}: AcademicDetailClientProps) {
   const [resource] = useState(initialResource);
+  const effectivePageUrl =
+    canonicalUrl || `https://campusloop.space/app/academics/${initialResource.slug || initialResource.id}`;
   const [upvotes, setUpvotes] = useState(initialResource.upvotesCount || 0);
   const [downvotes, setDownvotes] = useState(initialResource.downvotesCount || 0);
   const [downloads, setDownloads] = useState(initialResource.downloadsCount || 0);
@@ -592,6 +599,7 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
           department={resource.branch || undefined}
           semester={resource.semester || undefined}
           onDownload={handleDownload}
+          pageUrl={effectivePageUrl}
         />
       </div>
 
@@ -606,7 +614,8 @@ export function AcademicDetailClient({ initialResource, currentUserId }: Academi
         department={resource.branch || undefined}
         semester={resource.semester || undefined}
         description={resource.description || undefined}
-        materialUrl={resource.driveUrl || resource.fileUrl || ""}
+        materialUrl={effectivePageUrl}
+        pageUrl={effectivePageUrl}
         collegeName={resource.institution?.name}
       />
 

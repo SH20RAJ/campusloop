@@ -12,7 +12,6 @@ import {
   Sliders,
 } from "lucide-react";
 import {
-  AnimateBellRing,
   AnimateBookmark,
   AnimateBookOpen,
   AnimateCompass,
@@ -21,7 +20,6 @@ import {
   AnimateHeart,
   AnimateHouse,
   AnimateLock,
-  AnimateMessageSquare,
   AnimatePlus,
   AnimateSearch,
   AnimateShieldCheck,
@@ -48,8 +46,6 @@ export interface NavGroup {
 export const DESKTOP_NAV_ITEMS: NavItem[] = [
   { icon: AnimateHouse, href: "/app", label: "Home" },
   { icon: AnimateCompass, href: "/app/discover", label: "Explore" },
-  { icon: AnimateBellRing, href: "/app/notifications", label: "Notifications" },
-  { icon: AnimateMessageSquare, href: "/app/chat", label: "Messages" },
   {
     icon: AnimateGraduationCap,
     href: "/app/academics",
@@ -68,7 +64,7 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
     href: "/app/events",
     label: "Events",
   },
-  { icon: AnimateHeart, href: "/app/matching", label: "Match" },
+  { icon: AnimateHeart, href: "/app/dating", label: "Match" },
   { icon: AnimateUser, href: "/app/profile", label: "Profile" },
   { icon: MoreHorizontal, href: "/app/more", label: "More" },
 ];

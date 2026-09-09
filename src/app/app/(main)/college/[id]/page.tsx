@@ -165,7 +165,8 @@ export default async function MainCollegePage({ params }: PageProps) {
   });
   const trendingTags = Array.from(hashtagSet).slice(0, 8);
   if (trendingTags.length === 0) {
-    trendingTags.push("BITOTSAV", "AskSeniors", "Placements2026", "SharmaJi", "HostelLife", "CanteenDebate");
+    const rawCode = (college.slug || college.name.split(" ")[0] || "Campus").replace(/[^a-zA-Z0-9]/g, "");
+    trendingTags.push(`${rawCode}Life`, `${rawCode}Buzz`, "AskSeniors", "Placements", "CampusLife");
   }
 
   // Fetch competitor campuses in the same state

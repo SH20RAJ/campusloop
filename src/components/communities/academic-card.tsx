@@ -4,11 +4,18 @@ import {
   AlertTriangle,
   ArrowDown,
   ArrowUp,
+  BookMarked,
+  BookOpen,
   CheckCircle2,
   ExternalLink,
   Eye,
+  FileText,
+  FlaskConical,
   FolderOpen,
+  GraduationCap,
+  Presentation,
   Target,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -70,6 +77,75 @@ interface AcademicCardProps {
   isHighlighted?: boolean;
   variant?: "row" | "grid";
 }
+
+const RESOURCE_ACCENTS: Record<
+  string,
+  {
+    label: string;
+    gradient: string;
+    pillBg: string;
+    pillText: string;
+    borderGlow: string;
+    Icon: any;
+  }
+> = {
+  PYQ: {
+    label: "PYQ Exam Paper",
+    gradient: "from-amber-500/20 via-orange-500/10 to-transparent",
+    pillBg: "bg-amber-500/15 border-amber-500/30",
+    pillText: "text-amber-400",
+    borderGlow: "group-hover:border-amber-500/40 group-hover:shadow-amber-500/10",
+    Icon: GraduationCap,
+  },
+  NOTES: {
+    label: "Lecture Notes",
+    gradient: "from-indigo-500/20 via-blue-500/10 to-transparent",
+    pillBg: "bg-indigo-500/15 border-indigo-500/30",
+    pillText: "text-indigo-400",
+    borderGlow: "group-hover:border-indigo-500/40 group-hover:shadow-indigo-500/10",
+    Icon: FileText,
+  },
+  CHEAT_SHEET: {
+    label: "Cheat Sheet",
+    gradient: "from-emerald-500/20 via-teal-500/10 to-transparent",
+    pillBg: "bg-emerald-500/15 border-emerald-500/30",
+    pillText: "text-emerald-400",
+    borderGlow: "group-hover:border-emerald-500/40 group-hover:shadow-emerald-500/10",
+    Icon: Zap,
+  },
+  BOOK: {
+    label: "Textbook",
+    gradient: "from-purple-500/20 via-violet-500/10 to-transparent",
+    pillBg: "bg-purple-500/15 border-purple-500/30",
+    pillText: "text-purple-400",
+    borderGlow: "group-hover:border-purple-500/40 group-hover:shadow-purple-500/10",
+    Icon: BookMarked,
+  },
+  MODULE: {
+    label: "Unit Module",
+    gradient: "from-sky-500/20 via-cyan-500/10 to-transparent",
+    pillBg: "bg-sky-500/15 border-sky-500/30",
+    pillText: "text-sky-400",
+    borderGlow: "group-hover:border-sky-500/40 group-hover:shadow-sky-500/10",
+    Icon: BookOpen,
+  },
+  LAB_MANUAL: {
+    label: "Lab Manual",
+    gradient: "from-rose-500/20 via-pink-500/10 to-transparent",
+    pillBg: "bg-rose-500/15 border-rose-500/30",
+    pillText: "text-rose-400",
+    borderGlow: "group-hover:border-rose-500/40 group-hover:shadow-rose-500/10",
+    Icon: FlaskConical,
+  },
+  PPT: {
+    label: "Slides",
+    gradient: "from-amber-500/20 via-yellow-500/10 to-transparent",
+    pillBg: "bg-yellow-500/15 border-yellow-500/30",
+    pillText: "text-yellow-400",
+    borderGlow: "group-hover:border-yellow-500/40 group-hover:shadow-yellow-500/10",
+    Icon: Presentation,
+  },
+};
 
 export function AcademicCard({ item, currentUserId, isHighlighted, variant = "row" }: AcademicCardProps) {
   const [upvotes, setUpvotes] = useState(item.upvotesCount || 0);
@@ -277,105 +353,142 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
   }
 
   if (variant === "grid") {
+    const accent = RESOURCE_ACCENTS[item.resourceType] || {
+      label: item.resourceType.replace("_", " "),
+      gradient: "from-primary/20 via-primary/5 to-transparent",
+      pillBg: "bg-primary/15 border-primary/30",
+      pillText: "text-primary",
+      borderGlow: "group-hover:border-primary/40 group-hover:shadow-primary/5",
+      Icon: FileText,
+    };
+    const TypeIcon = accent.Icon;
+
     return (
       <article
         id={`academic-${item.id}`}
         className={cn(
-          "rounded-3xl border border-border/40 bg-card/60 p-4 sm:p-5 flex flex-col justify-between hover:border-border/80 hover:shadow-lg transition-all duration-200 select-none group relative overflow-hidden backdrop-blur-xs",
+          "rounded-3xl border border-border/40 bg-card/75 hover:bg-card flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 select-none group relative overflow-hidden backdrop-blur-md",
+          accent.borderGlow,
           isHighlighted && "border-primary/50 ring-2 ring-primary/20 bg-primary/5"
         )}
       >
-        <div className="space-y-3">
-          {/* Header Row: Author & Badges */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <Link href={`/@${item.uploader.username}?tab=academics`} className="shrink-0">
-                <Avatar className="size-8 rounded-full border border-border/50 hover:opacity-90 transition-opacity">
-                  <AvatarImage src={avatar} />
-                  <AvatarFallback className="text-[10px] font-bold">
-                    {item.uploader.displayName[0] || "U"}
-                  </AvatarFallback>
-                </Avatar>
-              </Link>
-              <div className="min-w-0 leading-tight">
-                <Link
-                  href={`/@${item.uploader.username}?tab=academics`}
-                  className="text-xs font-bold text-foreground hover:underline truncate block"
-                >
-                  {item.uploader.displayName}
-                </Link>
-                <span className="text-[10px] text-muted-foreground truncate block">
-                  @{item.uploader.username}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                {item.resourceType.replace("_", " ")}
-              </span>
-              <button
-                type="button"
-                onClick={handleShare}
-                className="size-7 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
-                title="Share link"
-              >
-                <AnimatedIcon icon={AnimateShare} animation="pop" size={12} />
-              </button>
-            </div>
+        {/* Top Visual Document Banner */}
+        <div
+          className={cn(
+            "relative px-4 pt-3.5 pb-3 border-b border-border/20 bg-linear-to-r flex items-center justify-between gap-2",
+            accent.gradient
+          )}
+        >
+          {/* Subject Code Badge */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="font-mono font-black text-xs px-2.5 py-1 rounded-xl bg-background/90 border border-border/40 text-foreground shadow-xs group-hover:border-primary/50 transition-colors shrink-0">
+              {item.subjectCode}
+            </span>
+            <span className="text-[11px] font-medium text-muted-foreground truncate hidden sm:inline">
+              {item.subjectName}
+            </span>
           </div>
 
-          {/* Subject info & Title */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <span className="font-mono font-bold text-primary px-1.5 py-0.2 rounded-md bg-primary/10">
-                {item.subjectCode}
+          {/* Type Pill & Share Action */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border shadow-xs",
+                accent.pillBg,
+                accent.pillText
+              )}
+            >
+              <TypeIcon className="size-3" />
+              <span>{accent.label}</span>
+            </span>
+            <button
+              type="button"
+              onClick={handleShare}
+              className="size-6.5 rounded-full hover:bg-background/80 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+              title="Share link"
+            >
+              <AnimatedIcon icon={AnimateShare} animation="pop" size={12} />
+            </button>
+          </div>
+        </div>
+
+        {/* Card Content Body */}
+        <div className="p-4 sm:p-5 space-y-3 flex-1 flex flex-col justify-between">
+          <div className="space-y-2.5">
+            {/* Author / Uploader Info */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Link href={`/@${item.uploader.username}?tab=academics`} className="shrink-0">
+                  <Avatar className="size-7 rounded-full border border-border/50 hover:opacity-90 transition-opacity">
+                    <AvatarImage src={avatar} />
+                    <AvatarFallback className="text-[9px] font-bold">
+                      {item.uploader.displayName[0] || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
+                <div className="min-w-0 leading-tight">
+                  <Link
+                    href={`/@${item.uploader.username}?tab=academics`}
+                    className="text-xs font-bold text-foreground hover:underline truncate block"
+                  >
+                    {item.uploader.displayName}
+                  </Link>
+                  <span className="text-[10px] text-muted-foreground truncate block">
+                    @{item.uploader.username}
+                  </span>
+                </div>
+              </div>
+
+              {/* Verified Badge */}
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
+                <CheckCircle2 className="size-3 shrink-0" />
+                <span>{reliability}% Verified</span>
               </span>
-              <span>·</span>
-              <span className="truncate font-medium">{item.subjectName}</span>
             </div>
 
+            {/* Title */}
             <Link
               href={`/app/academics/${item.id}`}
               onClick={() => sounds.tap()}
-              className="block group/title"
+              className="block group/title pt-0.5"
             >
-              <h3 className="text-sm sm:text-[15px] font-bold text-foreground group-hover/title:text-primary transition-colors leading-snug line-clamp-2">
+              <h3 className="text-sm sm:text-[15px] font-extrabold text-foreground group-hover/title:text-primary transition-colors leading-snug line-clamp-2">
                 {item.title}
               </h3>
             </Link>
 
+            {/* Description Snippet */}
             {item.description && (
               <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{item.description}</p>
             )}
           </div>
 
-          {/* Tags & Context */}
-          <div className="flex items-center gap-2 text-[10px] text-muted-foreground flex-wrap pt-0.5">
-            <span className="px-2 py-0.5 rounded-full bg-muted/60 font-semibold">Sem {item.semester}</span>
-            <span className="px-2 py-0.5 rounded-full bg-muted/60 font-semibold">{item.branch}</span>
+          {/* Metadata Badges (Sem, Branch, Module) */}
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground flex-wrap pt-1">
+            <span className="px-2 py-0.5 rounded-lg bg-muted/60 font-semibold border border-border/30">
+              Sem {item.semester}
+            </span>
+            <span className="px-2 py-0.5 rounded-lg bg-muted/60 font-semibold border border-border/30 truncate max-w-[140px]">
+              {item.branch}
+            </span>
             {item.moduleOrChapter && (
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20">
+              <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20 truncate max-w-[130px]">
                 {item.moduleOrChapter}
               </span>
             )}
-            <span className="ml-auto text-emerald-500 font-bold inline-flex items-center gap-1">
-              <Target className="size-3 shrink-0" />
-              <span>{reliability}% Verified</span>
-            </span>
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="pt-3 mt-3 border-t border-border/30 flex items-center justify-between text-xs text-muted-foreground">
-          {/* Upvotes */}
+        {/* Footer Actions Row */}
+        <div className="px-4 sm:px-5 py-3 border-t border-border/20 bg-muted/15 flex items-center justify-between text-xs text-muted-foreground">
+          {/* Voting */}
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => handleVote("UP")}
               className={cn(
-                "flex items-center gap-1 hover:text-primary transition-colors cursor-pointer group/vote",
-                userVote === "UP" && "text-primary font-bold"
+                "flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-muted/50 hover:text-primary transition-colors cursor-pointer group/vote",
+                userVote === "UP" && "text-primary font-bold bg-primary/10"
               )}
               title="Upvote"
             >
@@ -386,8 +499,8 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
               type="button"
               onClick={() => handleVote("DOWN")}
               className={cn(
-                "p-1 hover:text-rose-400 transition-colors cursor-pointer",
-                userVote === "DOWN" && "text-rose-400"
+                "p-1 rounded-lg hover:bg-muted/50 hover:text-rose-400 transition-colors cursor-pointer",
+                userVote === "DOWN" && "text-rose-400 bg-rose-500/10"
               )}
               title="Downvote errata"
             >
@@ -395,12 +508,13 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
             </button>
           </div>
 
-          <div className="flex items-center gap-3 text-[11px]">
-            <span className="flex items-center gap-1 opacity-70" title="Views">
+          {/* Views & Downloads */}
+          <div className="flex items-center gap-2.5 text-[11px]">
+            <span className="flex items-center gap-1 opacity-75" title="Views">
               <Eye className="size-3" />
               <span>{views}</span>
             </span>
-            <span className="flex items-center gap-1 opacity-70" title="Downloads">
+            <span className="flex items-center gap-1 opacity-75" title="Downloads">
               <AnimatedIcon icon={AnimateDownload} animation="nudge-up" size={11} />
               <span>{downloads}</span>
             </span>
@@ -411,27 +525,28 @@ export function AcademicCard({ item, currentUserId, isHighlighted, variant = "ro
             type="button"
             onClick={handleDownload}
             className={cn(
-              "flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95",
+              "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95",
               (item.fileUrl || item.driveUrl || "").match(
                 /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
               )
-                ? "bg-amber-500 hover:bg-amber-600 text-neutral-950 font-black"
-                : "bg-primary text-primary-foreground hover:opacity-90"
+                ? "bg-amber-500 hover:bg-amber-600 text-neutral-950 font-black shadow-amber-500/20"
+                : "bg-linear-to-r from-primary to-indigo-600 hover:opacity-95 text-primary-foreground shadow-primary/20"
             )}
           >
             {(item.fileUrl || item.driveUrl || "").match(
               /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
             ) ? (
-              <FolderOpen className="size-3 shrink-0" />
-            ) : null}
+              <FolderOpen className="size-3.5 shrink-0" />
+            ) : (
+              <ExternalLink className="size-3 shrink-0" />
+            )}
             <span>
               {(item.fileUrl || item.driveUrl || "").match(
                 /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
               )
                 ? "Open Folder"
-                : "Preview"}
+                : "Preview PDF"}
             </span>
-            <ExternalLink className="size-2.5 opacity-80" />
           </button>
         </div>
       </article>

@@ -7,28 +7,23 @@ import {
   Menu,
   MoreHorizontal,
   School,
-  ShieldCheck,
   Sliders,
   UserCircle,
-  VenetianMask,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { CampusUnlockedModal } from "@/components/preview/campus-unlocked-modal";
 import { DreamCampusesModal } from "@/components/preview/dream-campuses-modal";
 import {
   AnimateBellRing,
-  AnimateDownload,
   AnimatedIcon,
   AnimateMessageSquare,
   AnimatePlus,
   AnimateShieldCheck,
   AnimateSlidersHorizontal,
-  AnimateZap,
 } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BrandLogo } from "@/components/ui/brand-logo";
@@ -43,99 +38,6 @@ import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-
-function FeedAnonymityQuickToggle({ initialMode }: { initialMode?: string }) {
-  const [feedMode, setFeedMode] = useState<"ALL" | "NON_ANONYMOUS">("ALL");
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("campusloop_feed_visibility") as "ALL" | "NON_ANONYMOUS" | null;
-      if (saved) {
-        setFeedMode(saved);
-      } else if (initialMode === "NON_ANONYMOUS") {
-        setFeedMode("NON_ANONYMOUS");
-      }
-    } catch {}
-
-    function handleSync(e: CustomEvent<string>) {
-      if (e.detail === "ALL" || e.detail === "NON_ANONYMOUS") {
-        setFeedMode(e.detail);
-      }
-    }
-
-    window.addEventListener("campusloop_feed_visibility_change" as any, handleSync as any);
-    return () => window.removeEventListener("campusloop_feed_visibility_change" as any, handleSync as any);
-  }, [initialMode]);
-
-  function handleToggle() {
-    sounds.tap();
-    haptics.light();
-    const nextMode = feedMode === "ALL" ? "NON_ANONYMOUS" : "ALL";
-    setFeedMode(nextMode);
-
-    try {
-      localStorage.setItem("campusloop_feed_visibility", nextMode);
-      window.dispatchEvent(new CustomEvent("campusloop_feed_visibility_change", { detail: nextMode }));
-      fetch("/api/profile/me", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ feedVisibility: nextMode }),
-      }).catch(() => {});
-    } catch {}
-
-    if (nextMode === "ALL") {
-      toast.success("Anon Mode: Enabled (Showing all posts & confessions)");
-    } else {
-      toast.success("Anon Mode: Disabled (Public only, hiding confessions)");
-    }
-  }
-
-  const isAnonEnabled = feedMode === "ALL";
-
-  return (
-    <button
-      type="button"
-      onClick={handleToggle}
-      className="w-full flex items-center justify-between p-2.5 rounded-2xl border border-border/50 bg-card hover:bg-muted/40 transition-colors cursor-pointer select-none shadow-2xs group"
-      title={
-        isAnonEnabled
-          ? "Anon Mode is ON. Showing confessions & anonymous posts. Click to turn off."
-          : "Anon Mode is OFF. Only public posts visible. Click to turn on."
-      }
-    >
-      <div className="flex items-center gap-2.5 min-w-0">
-        <div
-          className={cn(
-            "flex size-7 items-center justify-center rounded-xl transition-colors shrink-0",
-            isAnonEnabled ? "bg-foreground/10 text-foreground" : "bg-muted text-muted-foreground"
-          )}
-        >
-          {isAnonEnabled ? <VenetianMask className="size-4" /> : <ShieldCheck className="size-4" />}
-        </div>
-        <div className="text-left min-w-0">
-          <p className="text-xs font-bold text-foreground truncate leading-tight">Anon Mode</p>
-          <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
-            {isAnonEnabled ? "On · Includes confessions" : "Off · Public only"}
-          </p>
-        </div>
-      </div>
-
-      <div
-        className={cn(
-          "w-8 h-4.5 rounded-full transition-colors flex items-center p-0.5 shrink-0 border border-border/30",
-          isAnonEnabled ? "bg-foreground justify-end" : "bg-muted justify-start"
-        )}
-      >
-        <div
-          className={cn(
-            "size-3.5 rounded-full transition-transform shadow-xs",
-            isAnonEnabled ? "bg-background" : "bg-muted-foreground/60"
-          )}
-        />
-      </div>
-    </button>
-  );
-}
 
 interface NavigationProps {
   profile?: UserProfile;
@@ -279,13 +181,68 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
           </header>
         )}
 
-      {/* ─── Desktop Twitter/X Style Sidebar ─── */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border/30 bg-background py-4 px-3 md:flex md:flex-col justify-between overflow-y-auto select-none">
-        <div className="space-y-4">
-          {/* Logo */}
-          <div className="px-3 py-1 flex items-center justify-between">
+      {/* ─── Desktop Clean Sidebar ─── */}
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border/30 bg-background/95 backdrop-blur-md py-4 px-3 md:flex md:flex-col justify-between overflow-y-auto select-none">
+        <div className="space-y-3">
+          {/* Top Bar: Brand Logo & Quick Action Icons (Chat & Notifications) */}
+          <div className="px-2.5 py-1 flex items-center justify-between">
             <BrandLogo href="/app" size="md" />
-            {collegeName && (
+
+            {/* Quick Action Utility Icons: Direct Messages & Notifications */}
+            <div className="flex items-center gap-1">
+              <Link
+                href="/app/chat"
+                prefetch={true}
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                }}
+                className={cn(
+                  "relative flex size-9 items-center justify-center rounded-full transition-all cursor-pointer",
+                  pathname.startsWith("/app/chat")
+                    ? "bg-foreground text-background shadow-xs font-bold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                )}
+                title="Direct Messages"
+                aria-label="Direct Messages"
+              >
+                <AnimatedIcon icon={AnimateMessageSquare} animation="pop" size={18} />
+              </Link>
+
+              <Link
+                href="/app/notifications"
+                prefetch={true}
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                }}
+                className={cn(
+                  "relative flex size-9 items-center justify-center rounded-full transition-all cursor-pointer",
+                  pathname.startsWith("/app/notifications")
+                    ? "bg-foreground text-background shadow-xs font-bold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                )}
+                title="Notifications"
+                aria-label="Notifications"
+              >
+                <AnimatedIcon
+                  icon={AnimateBellRing}
+                  animation="bell"
+                  size={18}
+                  playKey={unreadNotificationsCount}
+                />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 min-w-4 h-4 px-1 rounded-full bg-brand text-white text-[10px] font-black flex items-center justify-center border-2 border-background shadow-xs animate-in zoom-in-50 duration-200">
+                    {unreadNotificationsCount > 99 ? "99+" : unreadNotificationsCount}
+                  </span>
+                )}
+              </Link>
+            </div>
+          </div>
+
+          {/* College Campus Hub Pill */}
+          {collegeName && (
+            <div className="px-2.5">
               <Link
                 href="/app/colleges"
                 onClick={(e) => {
@@ -293,21 +250,21 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   sounds.tap();
                   haptics.light();
                 }}
-                className="text-[10px] font-bold text-muted-foreground bg-muted/60 hover:bg-muted hover:text-foreground px-2 py-0.5 rounded-full truncate max-w-[95px] transition-colors cursor-pointer"
-                title={`College: ${collegeName} — Click to view College Hubs`}
+                className="group flex items-center gap-1.5 w-full text-[11px] font-semibold text-muted-foreground hover:text-foreground bg-muted/40 hover:bg-muted/70 px-2.5 py-1.5 rounded-xl transition-all cursor-pointer border border-border/20 hover:border-border/50"
+                title={`Campus Hub: ${collegeName} — Click to switch or explore colleges`}
               >
-                {collegeName.split(" ")[0]}
+                <School className="size-3.5 shrink-0 text-primary group-hover:scale-110 transition-transform" />
+                <span className="truncate">{collegeName}</span>
               </Link>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Primary Navigation Links */}
-          <nav className="space-y-1">
+          <nav className="space-y-1 pt-1">
             {desktopNavItems.map((item) => {
               const isActive =
                 pathname === item.href || (item.href !== "/app" && pathname.startsWith(item.href));
               const Icon = item.icon;
-              const isNotifications = item.href === "/app/notifications";
 
               return (
                 <Link
@@ -315,10 +272,10 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   href={item.href}
                   prefetch={true}
                   className={cn(
-                    "group relative flex items-center gap-3.5 rounded-full px-3.5 py-2 text-[13.5px] font-semibold transition-colors cursor-pointer",
+                    "group relative flex items-center gap-3.5 rounded-full px-3.5 py-2.5 text-[14px] font-semibold transition-all cursor-pointer",
                     isActive
-                      ? "text-foreground font-black bg-muted/50"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                      ? "text-foreground font-black bg-muted/70 shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
                   )}
                 >
                   <div className="relative">
@@ -332,11 +289,6 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                         )}
                       />
                     </AnimateIcon>
-                    {isNotifications && unreadNotificationsCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-brand text-white text-[10px] font-black flex items-center justify-center border-2 border-background shadow-xs">
-                        {unreadNotificationsCount > 99 ? "99+" : unreadNotificationsCount}
-                      </span>
-                    )}
                   </div>
 
                   <span className="truncate">{item.label}</span>
@@ -384,14 +336,13 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
               </div>
             </div>
           ) : (
-            <div className="pt-2 px-1 space-y-2">
+            <div className="pt-2 px-1">
               <Link href="/app/post/new" className="block">
                 <Button className="w-full h-11 bg-foreground text-background hover:opacity-90 font-black rounded-full text-sm cursor-pointer border-none shadow-sm transition-all flex items-center justify-center gap-2">
                   <AnimatedIcon icon={AnimatePlus} animation="pop" size={18} strokeWidth={2.5} />
                   <span>Post</span>
                 </Button>
               </Link>
-              <FeedAnonymityQuickToggle initialMode={profile?.feedVisibility} />
             </div>
           )}
         </div>
@@ -666,11 +617,6 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     );
                   })}
                 </nav>
-
-                {/* Anonymity Quick Switcher in Mobile Drawer */}
-                <div className="pt-2">
-                  <FeedAnonymityQuickToggle initialMode={profile?.feedVisibility} />
-                </div>
 
                 {/* Secondary Quick Links */}
                 <div className="pt-3 border-t border-border/30 space-y-1">

@@ -1,20 +1,27 @@
 "use client";
 
 import {
+  BookMarked,
   BookOpen,
+  FileText,
+  FlaskConical,
   FolderPlus,
   Gift,
   Globe,
+  GraduationCap,
+  Layers,
   LayoutGrid,
   List,
   Loader2,
   Plus,
+  Presentation,
+  RotateCcw,
   School,
   Search,
   Sparkles,
   X,
+  Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -38,15 +45,54 @@ interface AcademicsClientProps {
 }
 
 const RESOURCE_TYPES = [
-  { id: "all", label: "All Types" },
-  { id: "PLAYLISTS", label: "Study Playlists" },
-  { id: "NOTES", label: "Lecture Notes" },
-  { id: "MODULE", label: "Module / Unit" },
-  { id: "BOOK", label: "Whole Book" },
-  { id: "PPT", label: "PPT / Slides" },
-  { id: "PYQ", label: "PYQs & Papers" },
-  { id: "CHEAT_SHEET", label: "Cheat Sheets" },
-  { id: "LAB_MANUAL", label: "Lab Manuals" },
+  { id: "all", label: "All Vault", icon: Layers },
+  { id: "PYQ", label: "PYQs & Papers", icon: GraduationCap, badge: "Hot" },
+  { id: "NOTES", label: "Lecture Notes", icon: FileText },
+  { id: "CHEAT_SHEET", label: "Cheat Sheets", icon: Zap, badge: "Fast" },
+  { id: "PLAYLISTS", label: "Study Playlists", icon: BookOpen },
+  { id: "BOOK", label: "Whole Books", icon: BookMarked },
+  { id: "MODULE", label: "Unit Modules", icon: BookOpen },
+  { id: "PPT", label: "PPT / Slides", icon: Presentation },
+  { id: "LAB_MANUAL", label: "Lab Manuals", icon: FlaskConical },
+] as const;
+
+const TRENDING_SEARCH_CHIPS = [
+  {
+    label: "CS201 DSA Endsem 2024",
+    query: "CS201",
+    icon: Zap,
+    color: "text-amber-400 bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/15",
+  },
+  {
+    label: "OS Topper Notes",
+    query: "CS303 Operating Systems",
+    icon: Sparkles,
+    color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/30 hover:bg-indigo-500/15",
+  },
+  {
+    label: "AKTU Quantum Series",
+    query: "AKTU Quantum",
+    icon: BookMarked,
+    color: "text-purple-400 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/15",
+  },
+  {
+    label: "Engineering Maths MA101",
+    query: "MA101",
+    icon: Sparkles,
+    color: "text-sky-400 bg-sky-500/10 border-sky-500/30 hover:bg-sky-500/15",
+  },
+  {
+    label: "EC201 Digital Logic",
+    query: "EC201",
+    icon: Zap,
+    color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/15",
+  },
+  {
+    label: "PPS Programming Viva",
+    query: "PPS",
+    icon: Sparkles,
+    color: "text-rose-400 bg-rose-500/10 border-rose-500/30 hover:bg-rose-500/15",
+  },
 ] as const;
 
 const BRANCHES = [
@@ -227,22 +273,35 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col min-h-screen select-none pb-28 px-3 sm:px-6 lg:px-8 bg-background">
-      {/* ─── Compact Sticky Header: Search & Navigation ─── */}
-      <header className="sticky top-0 z-40 flex flex-col gap-2.5 border-b border-border/30 bg-background/90 pt-3 pb-2 backdrop-blur-xl -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8">
+      {/* ─── Elevated Header with Glowing Command Center ─── */}
+      <header className="sticky top-0 z-40 flex flex-col gap-3 border-b border-border/30 bg-background/95 pt-3.5 pb-2.5 backdrop-blur-xl -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8 shadow-xs">
+        {/* Top bar: Brand, Live Count, View Toggle & Action Buttons */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <h1 className="text-base sm:text-lg font-black text-foreground tracking-tight flex items-center gap-2 shrink-0">
-              <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={19} className="text-primary" />
-              <span>Academic Vault</span>
-            </h1>
-            <span className="text-xs text-muted-foreground font-medium truncate hidden sm:inline">
-              {totalCount > 0 ? `· ${totalCount.toLocaleString()} resources` : "· Notes, Books & PYQs"}
-            </span>
+            <div className="size-8 rounded-2xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center text-primary shadow-xs shrink-0">
+              <AnimatedIcon icon={AnimateBookOpen} animation="pop" size={17} />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="text-base sm:text-lg font-black text-foreground tracking-tight">
+                  Academic Vault
+                </h1>
+                <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
+                  <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>1,350+ Hubs</span>
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground font-medium truncate hidden sm:block">
+                {totalCount > 0
+                  ? `${totalCount.toLocaleString()} verified notes, PYQs & formula sheets`
+                  : "Verified notes, PYQs & formula sheets"}
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             {/* View Mode Switcher (Grid / List) */}
-            <div className="hidden sm:flex items-center rounded-full bg-muted/50 p-0.5 border border-border/40 text-muted-foreground">
+            <div className="hidden sm:flex items-center rounded-full bg-muted/40 p-0.5 border border-border/40 text-muted-foreground">
               <button
                 type="button"
                 onClick={() => {
@@ -288,15 +347,15 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 haptics.light();
               }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/40 bg-muted/30 hover:bg-muted/60 text-muted-foreground hover:text-foreground text-xs font-bold transition-all shadow-xs cursor-pointer"
-              title="Search Notes & PYQs"
+              title="Search Vault"
             >
-              <Search className="size-3.5" />
+              <Search className="size-3.5 text-primary" />
               <span className="hidden sm:inline">Search</span>
             </Link>
 
             <Link
               href="/app/academics/playlists/new"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold transition-all shadow-xs cursor-pointer"
               title="Create new Study Playlist"
             >
               <FolderPlus className="size-3.5" />
@@ -309,7 +368,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 sounds.tap();
                 haptics.light();
               }}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-linear-to-r from-primary to-indigo-600 text-primary-foreground text-xs font-black hover:opacity-95 active:scale-95 transition-all shadow-md shadow-primary/20 cursor-pointer"
             >
               <AnimatedIcon icon={AnimatePlus} animation="pop" size={13} />
               <span>Upload Notes</span>
@@ -317,28 +376,28 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
           </div>
         </div>
 
-        {/* Omnibar Search Input */}
+        {/* ─── Raycast-Style Floating Omnibar ─── */}
         <div className="relative">
           <form onSubmit={handleSearchSubmit} className="relative w-full">
             <AnimatedIcon
               icon={AnimateSearch}
               animation="pop"
-              size={16}
+              size={17}
               className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
             />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by subject (CS201), topic, module, book, or PYQ..."
-              className="w-full h-10 rounded-full bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background pl-10 pr-24 text-xs font-medium placeholder:text-muted-foreground/60 outline-none transition-all text-foreground"
+              placeholder="Search by subject code (CS201), topic, AKTU quantum, or PYQ 2024..."
+              className="w-full h-11 rounded-2xl bg-muted/40 border border-border/50 focus:border-primary/60 focus:bg-background focus:ring-4 focus:ring-primary/10 pl-10.5 pr-24 text-xs sm:text-sm font-medium placeholder:text-muted-foreground/60 outline-none transition-all text-foreground shadow-xs"
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="size-5 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="size-6 rounded-full bg-muted/80 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
                   title="Clear"
                 >
                   <X className="size-3" />
@@ -346,7 +405,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
               )}
               <button
                 type="submit"
-                className="px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[11px] font-bold hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs"
+                className="px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs"
               >
                 Search
               </button>
@@ -354,10 +413,40 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
           </form>
         </div>
 
-        {/* ─── Sliding Tabs for Resource Types ─── */}
-        <div className="flex border-b border-border/25 overflow-x-auto no-scrollbar pt-0.5">
+        {/* ─── Trending Quick-Tap Carousel Directly Below Search ─── */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
+          <span className="text-[10px] uppercase font-black tracking-wider text-muted-foreground/80 shrink-0 flex items-center gap-1 mr-0.5">
+            <Sparkles className="size-3 text-amber-500" />
+            <span>Trending:</span>
+          </span>
+          {TRENDING_SEARCH_CHIPS.map((chip) => {
+            const ChipIcon = chip.icon;
+            return (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setSearchQuery(chip.query);
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all hover:scale-102 active:scale-95 cursor-pointer shrink-0 shadow-2xs",
+                  chip.color
+                )}
+              >
+                <ChipIcon className="size-3 shrink-0" />
+                <span>{chip.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ─── Tactile Segmented Tabs for Resource Types ─── */}
+        <div className="flex border-b border-border/25 overflow-x-auto no-scrollbar pt-1 pb-1 gap-1">
           {RESOURCE_TYPES.map((type) => {
             const isSelected = selectedType === type.id;
+            const Icon = type.icon;
             return (
               <button
                 key={type.id}
@@ -368,27 +457,35 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                   setSelectedType(type.id);
                 }}
                 className={cn(
-                  "relative pb-2.5 pt-1 px-3 text-xs font-bold transition-colors cursor-pointer shrink-0",
-                  isSelected ? "text-foreground font-black" : "text-muted-foreground hover:text-foreground"
+                  "relative px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 inline-flex items-center gap-1.5",
+                  isSelected
+                    ? "bg-primary text-primary-foreground font-black shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
                 )}
               >
+                <Icon
+                  className={cn("size-3.5", isSelected ? "text-primary-foreground" : "text-muted-foreground")}
+                />
                 <span>{type.label}</span>
-                {isSelected && (
-                  <motion.div
-                    layoutId="academic-tab-indicator"
-                    className="absolute -bottom-px left-0 right-0 h-0.5 bg-foreground rounded-full"
-                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                  />
+                {"badge" in type && (
+                  <span
+                    className={cn(
+                      "text-[9px] font-black uppercase px-1 py-0.2 rounded-full",
+                      isSelected ? "bg-white/20 text-white" : "bg-primary/15 text-primary"
+                    )}
+                  >
+                    {type.badge}
+                  </span>
                 )}
               </button>
             );
           })}
         </div>
 
-        {/* ─── Secondary Filter Strip (Campus/India, Branch, Semester, Sort) ─── */}
-        <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar pb-1 pt-0.5">
+        {/* ─── Secondary Filter Ribbon (Scope, Branch, Semester, Sort) ─── */}
+        <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar pb-0.5 pt-0.5">
           {/* Scope Selector */}
-          <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
+          <div className="flex items-center rounded-full bg-muted/50 p-0.5 border border-border/40 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -396,13 +493,13 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 setScope("campus");
               }}
               className={cn(
-                "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5",
+                "px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5",
                 scope === "campus"
-                  ? "bg-foreground text-background shadow-xs font-black"
+                  ? "bg-background text-foreground shadow-xs font-black"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <School className="size-3 shrink-0" />
+              <School className="size-3 text-amber-500 shrink-0" />
               <span>My Campus</span>
             </button>
             <button
@@ -412,13 +509,13 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 setScope("global");
               }}
               className={cn(
-                "px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5",
+                "px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5",
                 scope === "global"
-                  ? "bg-foreground text-background shadow-xs font-black"
+                  ? "bg-background text-foreground shadow-xs font-black"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Globe className="size-3 shrink-0" />
+              <Globe className="size-3 text-sky-500 shrink-0" />
               <span>All Colleges</span>
             </button>
           </div>
@@ -431,7 +528,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 sounds.tap();
                 setSelectedBranch(e.target.value);
               }}
-              className="h-7.5 rounded-full bg-muted/40 border border-border/40 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
+              className="h-8 rounded-full bg-muted/40 border border-border/40 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
             >
               {BRANCHES.map((b) => (
                 <option key={b} value={b}>
@@ -447,7 +544,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 sounds.tap();
                 setSelectedSemester(e.target.value);
               }}
-              className="h-7.5 rounded-full bg-muted/40 border border-border/40 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
+              className="h-8 rounded-full bg-muted/40 border border-border/40 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground outline-none cursor-pointer"
             >
               {SEMESTERS.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -463,7 +560,7 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 sounds.tap();
                 setSortBy(e.target.value as any);
               }}
-              className="h-7.5 rounded-full bg-primary/10 border border-primary/25 px-2.5 text-[11px] font-bold text-primary hover:bg-primary/15 outline-none cursor-pointer"
+              className="h-8 rounded-full bg-primary/10 border border-primary/25 px-2.5 text-[11px] font-bold text-primary hover:bg-primary/15 outline-none cursor-pointer"
             >
               <option value="for_you">For You (Recommended)</option>
               <option value="latest">Latest</option>
@@ -471,36 +568,75 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
               <option value="downloads">Most Downloaded</option>
               <option value="views">Most Viewed</option>
             </select>
+
+            {/* Reset Filters button if non-default */}
+            {(selectedBranch !== "All" ||
+              selectedSemester !== "all" ||
+              sortBy !== "for_you" ||
+              scope !== "campus" ||
+              searchQuery) && (
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  setSelectedBranch("All");
+                  setSelectedSemester("all");
+                  setSortBy("for_you");
+                  setScope("campus");
+                  setSearchQuery("");
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/60 hover:bg-muted text-[11px] font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer shrink-0"
+                title="Reset all filters"
+              >
+                <RotateCcw className="size-3" />
+                <span>Reset</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
 
       {/* ─── Scrollable Page Body (Full Space & Organized) ─── */}
       <div className="space-y-4 pt-4">
-        {/* Guest conversion banner if not logged in (Natural scroll, NOT sticky) */}
+        {/* Guest conversion banner if not logged in */}
         {!profileId && <AcademicAuthBenefitsCard returnTo="/app/academics" dismissible={true} />}
 
-        {/* ─── Connected Sources & Archives Directory Quick Access ─── */}
+        {/* ─── Connected Sources & Archives Directory Ribbon ─── */}
         <div className="flex items-center justify-between gap-2">
           <Link
             href="/app/academics/sources"
-            className="flex-1 flex items-center justify-between gap-2 px-3.5 py-2 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/20 text-indigo-400 text-xs font-bold transition-all group"
+            className="flex-1 flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-linear-to-r from-indigo-500/10 via-purple-500/5 to-card hover:from-indigo-500/15 hover:via-purple-500/10 border border-indigo-500/25 hover:border-indigo-500/40 text-foreground transition-all shadow-xs group"
           >
-            <div className="flex items-center gap-2">
-              <Globe className="size-3.5 text-indigo-400 group-hover:rotate-12 transition-transform" />
-              <span>Partner University Archives (BIT Mesra, AKTU, VTU)</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="size-7 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Globe className="size-3.5" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-black text-foreground">
+                    Connected University Repositories
+                  </span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                    Official Hubs
+                  </span>
+                </div>
+                <p className="text-[10px] text-muted-foreground truncate">
+                  BIT Mesra Exam Vault • AKTU Quantum Series • VTU Belagavi Archives
+                </p>
+              </div>
             </div>
-            <span className="text-[10px] uppercase tracking-wider font-black px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
-              10 Sources &rarr;
-            </span>
+            <div className="flex items-center gap-1 text-xs font-bold text-indigo-400 group-hover:translate-x-0.5 transition-transform shrink-0">
+              <span className="hidden sm:inline">10 Verified Sources</span>
+              <span>&rarr;</span>
+            </div>
           </Link>
 
           {!profileId && (
             <div
-              className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold shrink-0"
+              className="flex items-center gap-1.5 px-3 py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold shrink-0"
               title="Guests enjoy 5 free downloads before sign-in is requested"
             >
-              <Gift className="size-3 text-amber-500" />
+              <Gift className="size-3.5 text-amber-500" />
               <span>{guestRemaining}/5 Free</span>
             </div>
           )}

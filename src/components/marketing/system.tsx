@@ -17,9 +17,12 @@ export function BrandMark({ size = "md" }: { size?: "sm" | "md" }) {
   return <BrandLogo size={size} href="/" />;
 }
 
+export const NOTEBOOK_URL = "https://notebook.campusloop.space/";
+
 const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/overview", label: "Overview" },
+  { href: "/products", label: "Products" },
   { href: "/pitch", label: "Pitch" },
   { href: "/safety", label: "Safety" },
 ];
@@ -64,10 +67,12 @@ export function MarketingHeader({ isAuthenticated = false }: { isAuthenticated?:
   );
 }
 
-const FOOTER_COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
+const FOOTER_COLUMNS: { title: string; links: { href: string; label: string; external?: boolean }[] }[] = [
   {
     title: "Product",
     links: [
+      { href: "/products", label: "All Products" },
+      { href: NOTEBOOK_URL, label: "Notebook — Free JupyterLab", external: true },
       { href: "/overview", label: "Platform Overview" },
       { href: "/demo", label: "Testing & Demo Access" },
       { href: "/colleges", label: "College Directory" },
@@ -146,16 +151,29 @@ export function MarketingFooter() {
           <nav key={col.title} className="space-y-3">
             <p className="text-xs font-bold uppercase tracking-wider text-foreground">{col.title}</p>
             <ul className="space-y-2">
-              {col.links.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {col.links.map((link) =>
+                link.external ? (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ) : (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                )
+              )}
             </ul>
           </nav>
         ))}

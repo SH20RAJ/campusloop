@@ -143,9 +143,9 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
 
               <Link href="/app" className="flex items-center gap-2">
                 <img src="/logo.png" alt="CampusLoop" className="size-7 object-contain" />
-                <span className="text-sm font-black tracking-tight text-foreground">
+                {/* <span className="text-sm font-black tracking-tight text-foreground">
                   Campus<span className="text-primary font-black">Loop</span>
-                </span>
+                </span> */}
               </Link>
             </div>
 
@@ -241,7 +241,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
           </div>
 
           {/* College Campus Hub Pill */}
-          {collegeName && (
+          {/* {collegeName && (
             <div className="px-2.5">
               <Link
                 href="/app/colleges"
@@ -257,7 +257,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                 <span className="truncate">{collegeName}</span>
               </Link>
             </div>
-          )}
+          )} */}
 
           {/* Primary Navigation Links */}
           <nav className="space-y-1 pt-1">

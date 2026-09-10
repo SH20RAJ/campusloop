@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { ProductsClient } from "@/components/products/products-client";
 import { CTABand, MarketingFooter, MarketingHeader, SectionHeading } from "@/components/marketing/system";
+import { ProductsClient } from "@/components/products/products-client";
 import { NOTEBOOK_URL, PRODUCTS } from "@/constants/products";
 import { hexclaveServerApp } from "@/hexclave/server";
 

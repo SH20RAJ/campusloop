@@ -2,8 +2,8 @@
 
 import { ArrowRight, ArrowUpRight, Check, FlaskConical, LayoutGrid } from "lucide-react";
 import Link from "next/link";
-import { NOTEBOOK_URL, PRODUCTS } from "@/constants/products";
 import { buttonVariants } from "@/components/ui/button";
+import { NOTEBOOK_URL, PRODUCTS } from "@/constants/products";
 import { cn } from "@/lib/utils";
 
 const PRODUCT_ICONS: Record<string, typeof FlaskConical> = {
@@ -40,9 +40,7 @@ export function ProductsClient() {
 
               <h2 className="mt-4 text-xl font-bold tracking-tight">{product.name}</h2>
               <p className="mt-0.5 text-sm font-semibold text-primary">{product.tagline}</p>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {product.description}
-              </p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{product.description}</p>
 
               <ul className="mt-4 space-y-2">
                 {product.highlights.map((highlight) => (
@@ -53,9 +51,7 @@ export function ProductsClient() {
                 ))}
               </ul>
 
-              <p className="mt-4 text-xs font-medium text-muted-foreground">
-                Built for: {product.audience}
-              </p>
+              <p className="mt-4 text-xs font-medium text-muted-foreground">Built for: {product.audience}</p>
 
               <div className="mt-5 flex flex-wrap items-center gap-2 pt-1">
                 {product.external ? (
@@ -69,10 +65,7 @@ export function ProductsClient() {
                     <ArrowUpRight className="size-3.5" />
                   </a>
                 ) : (
-                  <Link
-                    href={product.href}
-                    className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}
-                  >
+                  <Link href={product.href} className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}>
                     Explore the app
                     <ArrowRight className="size-3.5" />
                   </Link>
@@ -91,8 +84,7 @@ export function ProductsClient() {
       <div className="rounded-2xl border border-border/70 bg-muted/30 p-6 text-center">
         <h2 className="text-lg font-bold">More student tools are on the way.</h2>
         <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-          Notebook is the first standalone product outside the main app. New drops will appear here
-          first.
+          Notebook is the first standalone product outside the main app. New drops will appear here first.
         </p>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
           <Link href="/about" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>

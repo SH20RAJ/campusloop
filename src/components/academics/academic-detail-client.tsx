@@ -318,7 +318,7 @@ export function AcademicDetailClient({
   }
 
   return (
-    <div className="min-h-screen pb-24 text-foreground select-none max-w-4xl mx-auto px-3 sm:px-6 pt-3 space-y-6">
+    <div className="min-h-screen pb-24 text-foreground select-none max-w-2xl mx-auto border-x border-border/40 bg-background px-4 pt-3 space-y-5">
       {/* ─── Breadcrumb & Top Bar ─── */}
       <div className="flex items-center justify-between gap-2 border-b border-border/25 pb-3">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0 overflow-hidden">
@@ -355,7 +355,7 @@ export function AcademicDetailClient({
               toast.success(isSaved ? "Removed from Study Vault" : "Saved to Study Vault");
             }}
             className={cn(
-              "flex size-8 items-center justify-center rounded-full border transition-all cursor-pointer",
+              "flex size-8.5 items-center justify-center rounded-full border transition-all cursor-pointer",
               isSaved
                 ? "bg-amber-500/15 text-amber-500 border-amber-500/30"
                 : "border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -368,7 +368,7 @@ export function AcademicDetailClient({
           <button
             type="button"
             onClick={handleShare}
-            className="flex size-8 items-center justify-center rounded-full border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
+            className="flex size-8.5 items-center justify-center rounded-full border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
             title="Share note link"
           >
             <Share2 className="size-3.5" />
@@ -403,42 +403,6 @@ export function AcademicDetailClient({
                 @{resource.uploader?.username} · {resource.institution?.name?.split(",")[0] || "Campus"}
               </p>
             </div>
-          </div>
-
-          {/* Save & Share action buttons */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                if (!currentUserId) {
-                  setAuthModalReason("SAVE");
-                  setIsAuthModalOpen(true);
-                  return;
-                }
-                sounds.tap();
-                haptics.light();
-                setIsSaved(!isSaved);
-                toast.success(isSaved ? "Removed from Study Vault" : "Saved to Study Vault");
-              }}
-              className={cn(
-                "flex size-8.5 items-center justify-center rounded-full border transition-all cursor-pointer",
-                isSaved
-                  ? "bg-amber-500/15 text-amber-500 border-amber-500/30"
-                  : "border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground"
-              )}
-              title="Save to Study Vault"
-            >
-              <Bookmark className={cn("size-4", isSaved && "fill-current")} />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleShare}
-              className="flex size-8.5 items-center justify-center rounded-full border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
-              title="Share note link"
-            >
-              <Share2 className="size-4" />
-            </button>
           </div>
         </div>
 
@@ -618,20 +582,6 @@ export function AcademicDetailClient({
         pageUrl={effectivePageUrl}
         collegeName={resource.institution?.name}
       />
-
-      {/* ─── Campus AI Study Cram Assistant Coming Soon Banner ─── */}
-      <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 text-xs text-muted-foreground">
-        <div className="flex items-center gap-2 min-w-0">
-          <Sparkles className="size-4 text-indigo-400 shrink-0 animate-pulse" />
-          <p className="truncate">
-            <strong className="text-foreground">Campus AI Study Cram Assistant</strong> will be launched on
-            CampusLoop Academics soon...
-          </p>
-        </div>
-        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
-          Coming Soon
-        </span>
-      </div>
 
       {/* ─── Vector Similarity Recommendation Shelf ─── */}
       <SimilarResourcesWidget resourceId={resource.id} subjectCode={resource.subjectCode} />

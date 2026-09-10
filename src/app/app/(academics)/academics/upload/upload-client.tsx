@@ -285,17 +285,12 @@ export function UploadAcademicClient() {
             <span className="text-foreground">Upload Studio</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
             <span>Publish Study Materials</span>
-            <span className="flex size-7 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
-              <UploadCloud className="size-4" />
+            <span className="flex size-6.5 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+              <UploadCloud className="size-3.5" />
             </span>
           </h1>
-
-          <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
-            Share verified question papers, lecture notes, formula cheat sheets, and lab manuals with college
-            peers across India.
-          </p>
         </div>
 
         {/* Clout Reward Badge */}

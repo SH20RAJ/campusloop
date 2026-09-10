@@ -189,7 +189,6 @@ export default function CollegesClient() {
         <div className="flex items-center justify-between gap-2 px-4 py-3.5">
           <div className="min-w-0">
             <h1 className="text-lg font-black tracking-tight text-foreground">Colleges</h1>
-            <p className="truncate text-[13px] text-muted-foreground">Campus hubs across India</p>
           </div>
 
           <button

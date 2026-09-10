@@ -117,9 +117,6 @@ export function CreateCommunityClient() {
           </div>
           <div>
             <h1 className="text-xl font-black text-foreground">Create a Campus Community</h1>
-            <p className="text-xs text-muted-foreground">
-              Build an interest club, branch group, or discussion hub for your campus.
-            </p>
           </div>
         </div>
 

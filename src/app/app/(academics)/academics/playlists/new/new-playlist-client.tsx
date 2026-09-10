@@ -154,32 +154,27 @@ export function NewPlaylistClient() {
   }
 
   return (
-    <div className="min-h-screen pb-24 max-w-3xl mx-auto px-4 py-6 space-y-6">
+    <div className="min-h-screen pb-24 max-w-2xl mx-auto border-x border-border/40 bg-background px-4 py-4 space-y-5 select-none">
       {/* ─── Header ─── */}
-      <div className="flex items-center justify-between border-b border-border/40 pb-4">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between border-b border-border/40 pb-3">
+        <div className="flex items-center gap-2.5">
           <Link
             href="/app/academics"
-            className="p-2 rounded-full border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="flex size-8.5 items-center justify-center rounded-full border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             <ArrowLeft className="size-4" />
           </Link>
-          <div>
-            <h1 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
-              <span>Create Study Playlist</span>
-              <Sparkles className="size-4 text-indigo-400" />
-            </h1>
-            <p className="text-xs text-muted-foreground">
-              Bundle handwritten notes, 5-year PYQs, and cheat sheets for your batch
-            </p>
-          </div>
+          <h1 className="text-base sm:text-lg font-black text-foreground tracking-tight flex items-center gap-1.5">
+            <span>Create Study Playlist</span>
+            <Sparkles className="size-3.5 text-primary" />
+          </h1>
         </div>
 
         <button
           type="button"
           onClick={handleSubmit}
           disabled={isSubmitting || !title.trim()}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white shadow-md disabled:opacity-50 cursor-pointer transition-all active:scale-95"
+          className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-primary hover:opacity-90 text-primary-foreground shadow-xs disabled:opacity-50 cursor-pointer transition-all active:scale-95"
         >
           {isSubmitting ? (
             <>
@@ -195,54 +190,53 @@ export function NewPlaylistClient() {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* ─── Live Preview Banner ─── */}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* ─── Compact Live Preview Banner ─── */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-            Theme &amp; Cover Preview
-          </label>
           <div
             className={cn(
-              "h-28 sm:h-32 w-full rounded-3xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-linear-to-r shadow-md transition-all duration-300",
+              "h-24 sm:h-28 w-full rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between relative overflow-hidden bg-linear-to-r shadow-xs transition-all duration-300",
               coverGradient
             )}
           >
             <div className="flex items-center justify-between z-10">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/40 text-white backdrop-blur-md border border-white/10">
-                <Layers className="size-3" />
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/40 text-white backdrop-blur-md border border-white/10">
+                <Layers className="size-2.5" />
                 <span>{CATEGORIES.find((c) => c.value === category)?.label.split(" ")[0] || "Pack"}</span>
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-black/40 text-white backdrop-blur-md">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/40 text-white backdrop-blur-md">
                 {selectedResources.length} Materials
               </span>
             </div>
 
             <div className="z-10 text-white">
-              <h3 className="font-black text-base sm:text-lg line-clamp-1 drop-shadow-xs">
+              <h3 className="font-black text-sm sm:text-base line-clamp-1 drop-shadow-xs">
                 {title.trim() || "Untitled Study Playlist"}
               </h3>
-              <p className="text-xs text-white/80 font-medium">
+              <p className="text-[11px] text-white/80 font-medium">
                 {branch} • {semester === "all" ? "All Semesters" : `Semester ${semester}`}
               </p>
             </div>
           </div>
 
-          {/* Gradient selector pills */}
-          <div className="flex items-center gap-2 pt-1 overflow-x-auto pb-1">
+          {/* Sleek Circular Color Swatches */}
+          <div className="flex items-center gap-2 pt-0.5 overflow-x-auto pb-1">
+            <span className="text-[11px] font-bold text-muted-foreground mr-1">Theme:</span>
             {GRADIENTS.map((g) => (
               <button
                 key={g.value}
                 type="button"
                 onClick={() => setCoverGradient(g.value)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0",
+                  "size-7 rounded-full bg-linear-to-r transition-all cursor-pointer shrink-0 flex items-center justify-center",
+                  g.value,
                   coverGradient === g.value
-                    ? "border-indigo-500 bg-indigo-500/15 text-foreground ring-1 ring-indigo-500"
-                    : "border-border/60 hover:bg-muted text-muted-foreground"
+                    ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-110"
+                    : "opacity-80 hover:opacity-100 hover:scale-105"
                 )}
+                title={g.label}
               >
-                <div className={cn("size-3 rounded-full bg-linear-to-r", g.value)} />
-                <span className="text-[11px]">{g.label}</span>
+                {coverGradient === g.value && <Check className="size-3 text-white stroke-3" />}
               </button>
             ))}
           </div>

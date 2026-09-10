@@ -168,8 +168,7 @@ export default function RootLayout({
               name: "CampusLoop",
               alternateName: ["Campus Loop", "CampusLoop App", "CampusLoop Space"],
               url: "https://campusloop.space",
-              description:
-                "The verified student-only campus social network and marketplace for 1,350+ Indian colleges.",
+              description: "The verified student network and social layer for Indian college campuses.",
               inLanguage: "en-IN",
               potentialAction: {
                 "@type": "SearchAction",
@@ -218,7 +217,7 @@ export default function RootLayout({
                   "@type": "SiteNavigationElement",
                   position: 4,
                   name: "College Directory",
-                  description: "1,350+ verified Indian college hubs and university networks",
+                  description: "Directory of verified Indian college hubs and campus networks",
                   url: "https://campusloop.space/app/colleges",
                 },
                 {

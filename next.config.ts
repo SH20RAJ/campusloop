@@ -109,6 +109,14 @@ const nextConfig: NextConfig = {
             key: "X-Content-Type-Options",
             value: "nosniff",
           },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
         ],
       },
     ];
@@ -118,6 +126,21 @@ const nextConfig: NextConfig = {
       {
         source: "/c/:id",
         destination: "/app/communities/:id",
+        permanent: true,
+      },
+      {
+        source: "/notifications",
+        destination: "/app/notifications",
+        permanent: true,
+      },
+      {
+        source: "/feed",
+        destination: "/app",
+        permanent: true,
+      },
+      {
+        source: "/chat",
+        destination: "/chats",
         permanent: true,
       },
     ];

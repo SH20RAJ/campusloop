@@ -1,10 +1,16 @@
 "use client";
 
 import {
+  ArrowUpRight,
+  BookOpen,
   Building2,
   ChevronRight,
   Compass,
+  Download,
+  FileText,
+  Flame,
   GraduationCap,
+  Library,
   Loader2,
   MessageSquare,
   Search,
@@ -12,6 +18,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   Store,
+  ThumbsUp,
   User,
   Users,
   UtensilsCrossed,
@@ -47,7 +54,7 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(initialQuery || searchParams.get("q") || "");
   const [activeTab, setActiveTab] = useState<
-    "all" | "colleges" | "stores" | "posts" | "communities" | "users"
+    "all" | "academics" | "colleges" | "stores" | "posts" | "communities" | "users"
   >("all");
   const [, startTransition] = useTransition();
 
@@ -57,6 +64,8 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
     users: any[];
     communities: any[];
     merchants?: any[];
+    academics?: any[];
+    playlists?: any[];
   }>(searchQuery.trim() ? `/api/search?q=${encodeURIComponent(searchQuery.trim())}` : null, fetcher, {
     dedupingInterval: 5000,
     keepPreviousData: true,
@@ -67,8 +76,17 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
   const users = data?.users || [];
   const communities = data?.communities || [];
   const merchants = data?.merchants || [];
+  const academics = data?.academics || [];
+  const playlists = data?.playlists || [];
 
-  const totalResults = posts.length + colleges.length + users.length + communities.length + merchants.length;
+  const totalResults =
+    posts.length +
+    colleges.length +
+    users.length +
+    communities.length +
+    merchants.length +
+    academics.length +
+    playlists.length;
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -94,7 +112,7 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
     haptics.light();
     const fullUrl = typeof window !== "undefined" ? `${window.location.origin}${url}` : url;
     navigator.clipboard.writeText(fullUrl);
-    toast.success(`${label} link copied to clipboard! 📋`);
+    toast.success(`${label} link copied to clipboard!`);
   }
 
   return (
@@ -145,6 +163,7 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-border/20">
             {[
               { id: "all", label: `All (${totalResults})` },
+              { id: "academics", label: `Academics (${academics.length + playlists.length})` },
               { id: "colleges", label: `Colleges (${colleges.length})` },
               { id: "stores", label: `Stores (${merchants.length})` },
               { id: "posts", label: `Threads (${posts.length})` },
@@ -293,7 +312,183 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
           </section>
         )}
 
-        {/* ─── 2. Colleges & Campus Hubs Section ─── */}
+        {/* ─── 2. Academics & Study Vault Section ─── */}
+        {(activeTab === "all" || activeTab === "academics") &&
+          (academics.length > 0 || playlists.length > 0) && (
+            <section className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <BookOpen className="size-3.5 text-indigo-400" />
+                  <span>Academics &amp; Study Vault ({academics.length + playlists.length})</span>
+                </h2>
+                {activeTab === "all" && academics.length + playlists.length > 3 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sounds.tap();
+                      haptics.light();
+                      setActiveTab("academics");
+                    }}
+                    className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>View All ({academics.length + playlists.length})</span>
+                    <ChevronRight className="size-3" />
+                  </button>
+                )}
+              </div>
+
+              {/* Study Playlists matches if any */}
+              {playlists.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                    <Library className="size-3 text-indigo-400" />
+                    <span>Curated Study Stacks</span>
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {playlists.map((pl: any) => (
+                      <Link
+                        key={pl.id}
+                        href={`/app/academics/playlists/${pl.slug}`}
+                        className="p-3.5 rounded-2xl border border-border/50 bg-card hover:border-indigo-500/40 hover:bg-card/90 transition-all shadow-xs space-y-2 block group"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/20">
+                            {pl.category?.replace("_", " ") || "Stack"}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-semibold">
+                            ★ {pl.starsCount || 0}
+                          </span>
+                        </div>
+                        <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                          {pl.title}
+                        </h4>
+                        {pl.description && (
+                          <p className="text-[11px] text-muted-foreground line-clamp-1">{pl.description}</p>
+                        )}
+                        <div className="pt-1.5 border-t border-border/30 flex items-center justify-between text-[10px] text-muted-foreground">
+                          <span>{pl.itemsCount || 0} materials</span>
+                          <span className="text-primary font-bold inline-flex items-center gap-0.5">
+                            Study <ArrowUpRight className="size-2.5" />
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Uploaded Materials & Notes */}
+              {academics.length > 0 && (
+                <div className="space-y-2">
+                  {playlists.length > 0 && (
+                    <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                      <FileText className="size-3 text-primary" />
+                      <span>Notes, Papers &amp; PYQs</span>
+                    </span>
+                  )}
+                  <div className="divide-y divide-border/20 rounded-2xl border border-border/50 bg-card overflow-hidden shadow-xs">
+                    {(activeTab === "all" ? academics.slice(0, 4) : academics).map((res: any) => (
+                      <Link
+                        key={res.id}
+                        href={`/app/academics/${res.slug || res.id}`}
+                        className="p-3.5 hover:bg-muted/30 transition-all flex items-center justify-between gap-3 group"
+                      >
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground flex-wrap">
+                            <span className="font-mono font-bold text-foreground/90 bg-muted/60 px-1.5 py-0.5 rounded">
+                              {res.subjectCode}
+                            </span>
+                            <span className="font-bold text-indigo-400 uppercase tracking-wider">
+                              {res.resourceType}
+                            </span>
+                            <span>·</span>
+                            <span>Sem {res.semester}</span>
+                            {res.branch && (
+                              <>
+                                <span>·</span>
+                                <span className="truncate max-w-[120px]">{res.branch}</span>
+                              </>
+                            )}
+                            {res.institution?.name && (
+                              <>
+                                <span>·</span>
+                                <span className="truncate max-w-[140px]">
+                                  {res.institution.name.split(" ")[0]}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                          <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                            {res.title}
+                          </h4>
+                          {res.subjectName && res.subjectName !== res.title && (
+                            <p className="text-[11px] text-muted-foreground/80 truncate font-medium">
+                              {res.subjectName}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-semibold shrink-0">
+                          <span className="flex items-center gap-1 bg-muted/40 px-2 py-1 rounded-lg">
+                            <Download className="size-3 text-muted-foreground" />
+                            <span>{res.downloadsCount || 0}</span>
+                          </span>
+                          <span className="flex items-center gap-1 bg-muted/40 px-2 py-1 rounded-lg">
+                            <ThumbsUp className="size-3 text-muted-foreground" />
+                            <span>{res.upvotesCount || 0}</span>
+                          </span>
+                          <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground transition-transform group-hover:translate-x-0.5" />
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Link to Dedicated Academics Search Hub */}
+              <div className="pt-1 flex items-center justify-between px-1">
+                <p className="text-[11px] text-muted-foreground">Looking for more university resources?</p>
+                <Link
+                  href={`/app/academics/search?q=${encodeURIComponent(searchQuery)}`}
+                  className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
+                >
+                  <span>Academics Hub Search</span>
+                  <ArrowUpRight className="size-3" />
+                </Link>
+              </div>
+            </section>
+          )}
+
+        {/* Dedicated Academics Tab Empty State */}
+        {activeTab === "academics" && academics.length === 0 && playlists.length === 0 && (
+          <div className="text-center py-16 space-y-3">
+            <div className="size-12 mx-auto rounded-2xl bg-muted/60 flex items-center justify-center text-muted-foreground">
+              <BookOpen className="size-6 text-indigo-400" />
+            </div>
+            <h2 className="text-sm font-black text-foreground">
+              No study materials found for &ldquo;{searchQuery}&rdquo;
+            </h2>
+            <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+              Try searching by subject code (e.g. CS301, AM204) or browse playlists in the Academics Hub.
+            </p>
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <Link
+                href="/app/academics/search"
+                className="px-4 py-2 rounded-full bg-foreground text-background text-xs font-black"
+              >
+                Academics Hub Search
+              </Link>
+              <Link
+                href="/app/academics/upload"
+                className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-black"
+              >
+                Upload Notes (+20 LP)
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* ─── 3. Colleges & Campus Hubs Section ─── */}
         {(activeTab === "all" || activeTab === "colleges") && colleges.length > 0 && (
           <section className="space-y-3">
             <div className="flex items-center justify-between">
@@ -349,7 +544,8 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
                       href="/app/confessions"
                       className="text-[11px] font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 bg-muted px-2.5 py-1 rounded-lg"
                     >
-                      <span>🎭 Confessions</span>
+                      <Flame className="size-3 text-rose-400" />
+                      <span>Confessions</span>
                     </Link>
 
                     <Link
@@ -383,7 +579,7 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
           </section>
         )}
 
-        {/* ─── 3. Student Communities Section ─── */}
+        {/* ─── 4. Student Communities Section ─── */}
         {(activeTab === "all" || activeTab === "communities") && communities.length > 0 && (
           <section className="space-y-3">
             <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
@@ -429,7 +625,8 @@ export function SearchClient({ initialQuery = "" }: { initialQuery?: string }) {
                       href={`/app/communities/${community.id}`}
                       className="text-[11px] font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 bg-muted px-2.5 py-1 rounded-lg"
                     >
-                      <span>🧵 Discussions</span>
+                      <MessageSquare className="size-3" />
+                      <span>Discussions</span>
                     </Link>
 
                     <button

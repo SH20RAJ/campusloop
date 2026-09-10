@@ -1,7 +1,16 @@
 import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { comments, communities, institutions, merchants, posts, userProfiles } from "@/db/schema";
+import {
+  academicPlaylists,
+  academicResources,
+  comments,
+  communities,
+  institutions,
+  merchants,
+  posts,
+  userProfiles,
+} from "@/db/schema";
 import { formatApiFeedPosts } from "@/lib/feed";
 
 export async function GET(request: Request) {
@@ -17,6 +26,8 @@ export async function GET(request: Request) {
         users: [],
         communities: [],
         merchants: [],
+        academics: [],
+        playlists: [],
       });
     }
 
@@ -91,12 +102,43 @@ export async function GET(request: Request) {
       limit: 10,
     });
 
+    // 6. Search Academic Resources (Notes, PYQs, Slides, Cheat Sheets)
+    const foundAcademics = await db.query.academicResources.findMany({
+      where: or(
+        ilike(academicResources.title, searchPattern),
+        ilike(academicResources.subjectName, searchPattern),
+        ilike(academicResources.subjectCode, searchPattern),
+        ilike(academicResources.description, searchPattern)
+      ),
+      limit: 15,
+      orderBy: [desc(academicResources.createdAt)],
+      with: {
+        institution: true,
+        uploader: true,
+      },
+    });
+
+    // 7. Search Academic Study Playlists & Stacks
+    const foundPlaylists = await db.query.academicPlaylists.findMany({
+      where: or(
+        ilike(academicPlaylists.title, searchPattern),
+        ilike(academicPlaylists.description, searchPattern)
+      ),
+      limit: 8,
+      orderBy: [desc(academicPlaylists.createdAt)],
+      with: {
+        creator: true,
+      },
+    });
+
     return NextResponse.json({
       posts: formattedPosts,
       colleges: foundColleges,
       users: foundUsers,
       communities: foundCommunities,
       merchants: foundMerchants,
+      academics: foundAcademics,
+      playlists: foundPlaylists,
     });
   } catch (error) {
     console.error("Global search error:", error);

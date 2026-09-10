@@ -1,7 +1,6 @@
 "use client";
 
-import { Flame } from "lucide-react";
-import Link from "next/link";
+import { Flame, Zap } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -212,7 +211,7 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
     sounds.ting();
     haptics.success();
     optimisticAddPost(optimisticPost);
-    toast.success("Post published! 🎉");
+    toast.success("Post published!");
 
     try {
       const res = await fetch("/api/posts", {
@@ -321,24 +320,59 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
                 {profile?.displayName?.[0] || "U"}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1 flex flex-col gap-2">
-              <textarea
-                rows={quickText ? 2 : 1}
-                placeholder="What is happening on campus?!"
-                value={quickText}
-                onChange={(e) => setQuickText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                    e.preventDefault();
-                    handleQuickPost(e);
-                  }
-                }}
-                className="w-full bg-transparent text-[15px] placeholder:text-muted-foreground/70 font-normal outline-none resize-none pt-2"
-              />
+
+            <div className="flex-1 min-w-0 flex flex-col gap-2">
+              {/* Row 1: Textarea + Always-visible Post Button */}
+              <div className="flex items-start gap-2 w-full min-w-0">
+                <textarea
+                  rows={quickText ? 2 : 1}
+                  placeholder="What is happening on campus?!"
+                  value={quickText}
+                  onChange={(e) => setQuickText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                      e.preventDefault();
+                      handleQuickPost(e);
+                    }
+                  }}
+                  className="flex-1 min-w-0 bg-transparent text-[15px] placeholder:text-muted-foreground/70 font-normal outline-none resize-none pt-1.5"
+                />
+
+                <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+                  <button
+                    type={quickText.trim() ? "submit" : "button"}
+                    onClick={(e) => {
+                      if (!quickText.trim()) {
+                        e.preventDefault();
+                        router.push("/app/post/new");
+                      }
+                    }}
+                    disabled={isQuickPosting}
+                    className={cn(
+                      "px-4 py-1.5 rounded-full text-xs font-black transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0",
+                      quickText.trim()
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/25 shadow-sm"
+                        : "bg-muted hover:bg-muted/80 text-foreground"
+                    )}
+                    title={quickText.trim() ? "Post now" : "Create a post"}
+                  >
+                    {isQuickPosting ? (
+                      <>
+                        <span className="size-3 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                        <span>Posting...</span>
+                      </>
+                    ) : (
+                      "Post"
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Row 2: Sub-toolbar shown when user has started typing */}
               {quickText && (
-                <div className="space-y-2 pt-1 border-t border-border/20">
+                <div className="space-y-2 pt-1 border-t border-border/20 w-full min-w-0">
                   {trendingTags.length > 0 && (
-                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full">
                       <span className="text-[10px] font-black text-muted-foreground uppercase shrink-0 flex items-center gap-0.5">
                         <Flame className="size-2.5 text-primary" />
                       </span>
@@ -354,63 +388,36 @@ export function FeedClient({ forcedType }: { forcedType?: string }) {
                       ))}
                     </div>
                   )}
-                  <div className="flex items-center justify-between pt-0.5">
-                    <Link
-                      href={
-                        quickText.trim()
-                          ? `/app/post/new?text=${encodeURIComponent(quickText.trim())}`
-                          : "/app/post/new"
-                      }
+
+                  <div className="flex items-center justify-between gap-2 pt-0.5 w-full min-w-0">
+                    <button
+                      type="button"
                       onClick={() => {
                         if (quickText.trim()) {
                           try {
                             sessionStorage.setItem("campusloop_draft_post", quickText.trim());
                           } catch {}
                         }
+                        router.push(
+                          quickText.trim()
+                            ? `/app/post/new?text=${encodeURIComponent(quickText.trim())}`
+                            : "/app/post/new"
+                        );
                       }}
-                      className="text-xs text-primary font-bold hover:underline cursor-pointer flex items-center gap-1.5 transition-colors group"
+                      className="text-xs text-primary font-bold hover:underline cursor-pointer flex items-center gap-1.5 transition-colors min-w-0 truncate text-left"
                     >
-                      <span>Open full editor (poll, photos, confession)</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/20 group-hover:bg-primary/20">
-                        Draft saved ⚡
+                      <span className="truncate">Open full editor (poll, photos, confession)</span>
+                      <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/20 shrink-0">
+                        <Zap className="size-2.5" />
+                        <span>Draft saved</span>
                       </span>
-                    </Link>
-                    <span className="text-[11px] text-muted-foreground/80 font-mono font-medium">
+                    </button>
+                    <span className="text-[11px] text-muted-foreground/80 font-mono font-medium shrink-0">
                       {quickText.length}/2000
                     </span>
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Permanent Top-Right Post Button (Never vanishes on mobile or desktop) */}
-            <div className="flex items-center gap-1.5 shrink-0 pt-1">
-              <button
-                type={quickText.trim() ? "submit" : "button"}
-                onClick={(e) => {
-                  if (!quickText.trim()) {
-                    e.preventDefault();
-                    router.push("/app/post/new");
-                  }
-                }}
-                disabled={isQuickPosting}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-xs font-black transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95",
-                  quickText.trim()
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/25 shadow-sm"
-                    : "bg-muted hover:bg-muted/80 text-foreground"
-                )}
-                title={quickText.trim() ? "Post now" : "Create a post"}
-              >
-                {isQuickPosting ? (
-                  <>
-                    <span className="size-3 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                    <span>Posting...</span>
-                  </>
-                ) : (
-                  "Post"
-                )}
-              </button>
             </div>
           </div>
         </form>

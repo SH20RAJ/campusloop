@@ -17,31 +17,25 @@ import {
   Flame,
   FolderPlus,
   Gamepad2,
-  Globe,
   GraduationCap,
-  Info,
   Landmark,
   Laptop,
   Layers,
   Loader2,
   MapPin,
   MessageSquare,
-  MoreHorizontal,
   MoreVertical,
   Move,
   PenTool,
   Plus,
   QrCode,
   Rocket,
-  School,
   Share2,
-  Shield,
   ShieldCheck,
   Star,
   Trash2,
   TrendingUp,
   Trophy,
-  VenetianMask,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -55,7 +49,6 @@ import { ArticleCard } from "@/components/articles/article-card";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { AcademicCard } from "@/components/communities/academic-card";
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
-import { MuteUserMenu } from "@/components/notifications/mute-user-menu";
 import { FollowButton } from "@/components/profile/follow-button";
 import { ProfileHighlights } from "@/components/profile/profile-highlights";
 import { ProfileSocialLinks } from "@/components/profile/profile-social-links";
@@ -776,6 +769,72 @@ export function ProfileClientView({
           </div>
         </div>
 
+        {/* ─── Shared Notes & Study Materials Overview Card ─── */}
+        {(userResources.length > 0 || userPlaylists.length > 0) && (
+          <div className="mx-4 my-2.5 rounded-2xl border border-border/40 bg-[#0d0d16]/80 p-4 space-y-3 shadow-xs">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <FolderPlus className="size-4 text-indigo-400" /> Shared Notes &amp; Study Materials (
+                {userAcademicsCount})
+              </h3>
+              <button
+                type="button"
+                onClick={() => handleTabChange("academics")}
+                className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <span>View All</span>
+                <ArrowUpRight className="size-3" />
+              </button>
+            </div>
+
+            {/* Quick Playlists preview if any */}
+            {userPlaylists.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {userPlaylists.slice(0, 2).map((pl: any) => (
+                  <Link
+                    key={pl.id}
+                    href={`/app/academics/playlists/${pl.slug}`}
+                    className="p-2.5 rounded-xl border border-border/40 bg-white/5 hover:bg-white/10 transition-colors block"
+                  >
+                    <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-400">
+                      {pl.category?.replace("_", " ") || "Stack"}
+                    </span>
+                    <h4 className="text-xs font-bold text-foreground truncate mt-1">{pl.title}</h4>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {pl.itemsCount || 0} materials · ★ {pl.starsCount || 0}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Quick Notes preview */}
+            {userResources.length > 0 && (
+              <div className="divide-y divide-border/20 rounded-xl border border-border/30 bg-white/5 overflow-hidden">
+                {userResources.slice(0, 3).map((res: any) => (
+                  <Link
+                    key={res.id}
+                    href={`/app/academics/${res.id}`}
+                    className="flex items-center justify-between p-2.5 hover:bg-white/5 transition-colors gap-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground font-semibold">
+                        <span className="font-mono text-foreground/80">{res.subjectCode}</span>
+                        <span>·</span>
+                        <span className="text-indigo-400 uppercase">{res.resourceType}</span>
+                        <span>·</span>
+                        <span>Sem {res.semester}</span>
+                      </div>
+                      <h4 className="text-xs font-bold text-foreground truncate">{res.title}</h4>
+                    </div>
+                    <ArrowUpRight className="size-3.5 text-muted-foreground/60 shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ─── Profile Navigation Underline Tabs (Exact Parity with Image 2) ─── */}
         <div className="flex border-b border-border/30 bg-background text-xs font-bold mt-2 overflow-x-auto no-scrollbar">
           <button
@@ -802,6 +861,20 @@ export function ProfileClientView({
           >
             <span>Articles ({userArticles.length})</span>
             {activeTab === "articles" && (
+              <span className="absolute bottom-0 inset-x-3 h-0.5 rounded-full bg-purple-500" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange("academics")}
+            className={cn(
+              "flex-1 py-3 text-center relative transition-colors cursor-pointer text-xs font-bold inline-flex items-center justify-center gap-1.5 shrink-0 px-3",
+              activeTab === "academics" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <span>Notes ({userAcademicsCount})</span>
+            {activeTab === "academics" && (
               <span className="absolute bottom-0 inset-x-3 h-0.5 rounded-full bg-purple-500" />
             )}
           </button>

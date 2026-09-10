@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { SocialLinksEditor } from "@/components/profile/social-links-editor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
 import { SearchableSelect } from "@/components/ui/searchable-select";
@@ -30,6 +31,7 @@ import { isUsernameBlocking, UsernameStatusHint } from "@/components/ui/username
 import { getBranchOptionsForDegree } from "@/constants";
 import { useProfile } from "@/hooks/use-profile";
 import { useUsernameAvailability } from "@/hooks/use-username-availability";
+import type { SocialLinks } from "@/lib/social-links";
 import { uploadImageToImgBB } from "@/lib/upload";
 import { getAvatarUrl } from "@/lib/utils";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
@@ -66,6 +68,7 @@ export function EditProfileClient() {
   const [anonUsername, setAnonUsername] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>({ platforms: {}, custom: [] });
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -106,6 +109,11 @@ export function EditProfileClient() {
       setAnonUsername(profile.anonymousUsername || "");
       setPhotos(profile.photos || []);
       setInterests(profile.interests || []);
+      const stored = profile.socialLinks;
+      setSocialLinks({
+        platforms: { ...(stored?.platforms ?? {}) },
+        custom: [...(stored?.custom ?? [])],
+      });
     }
   }, [profile]);
 
@@ -230,6 +238,7 @@ export function EditProfileClient() {
           bannerUrl,
           photos,
           interests,
+          socialLinks,
           anonymousUsername: anonUsername ? anonUsername.trim().toLowerCase().replace(/^@/, "") : null,
         }),
       });
@@ -744,6 +753,9 @@ export function EditProfileClient() {
             </select>
           </div>
         </div>
+
+        {/* ─── Links & Socials (Coding, Socials, Channels, Portfolio) ─── */}
+        <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
 
         {/* ─── Bio & Campus Interests ─── */}
         <div className="space-y-4 rounded-2xl border border-border/60 bg-background p-5 shadow-xs">

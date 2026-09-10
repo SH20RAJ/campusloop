@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { fetcher, updateProfile as updateProfileApi } from "@/lib/api";
+import type { SocialLinks } from "@/lib/social-links";
 
 export interface UserProfileData {
   id: string;
@@ -26,6 +27,7 @@ export interface UserProfileData {
   anonymousUsername?: string | null;
   feedVisibility?: string;
   onboardingCompleted?: boolean;
+  socialLinks?: SocialLinks | null;
 
   institutionId?: string | null;
   institution?: {

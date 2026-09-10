@@ -58,6 +58,7 @@ import { SecretCrushButton } from "@/components/dating/secret-crush-button";
 import { MuteUserMenu } from "@/components/notifications/mute-user-menu";
 import { FollowButton } from "@/components/profile/follow-button";
 import { ProfileHighlights } from "@/components/profile/profile-highlights";
+import { ProfileSocialLinks } from "@/components/profile/profile-social-links";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
@@ -91,6 +92,10 @@ interface ProfileClientViewProps {
     photos?: string[] | null;
     interests?: string[] | null;
     referralCount?: number | null;
+    socialLinks?: {
+      platforms?: Record<string, string>;
+      custom?: { label: string; url: string }[];
+    } | null;
 
     createdAt?: Date | string | null;
     institution?: {
@@ -611,6 +616,9 @@ export function ProfileClientView({
                   profile.headline ||
                   "Building, learning, and exploring.\nBigger dreams, better code."}
               </p>
+
+              {/* Social / Coding / Portfolio Links */}
+              <ProfileSocialLinks links={profile.socialLinks} />
             </div>
           </div>
 

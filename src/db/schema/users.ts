@@ -58,6 +58,15 @@ export const userProfiles = pgTable(
     anonymousUsername: text("anonymous_username"),
     feedVisibility: text("feed_visibility").default("ALL").notNull(),
     /**
+     * Student social / coding / creative / professional links.
+     * Shape: { platforms: Record<platformKey, username|url>, custom: [{label, url}] }
+     * Catalogued in src/lib/social-links.ts — keys are whitelisted there.
+     */
+    socialLinks: jsonb("social_links")
+      .$type<{ platforms?: Record<string, string>; custom?: { label: string; url: string }[] }>()
+      .default(sql`'{"platforms":{},"custom":[]}'::jsonb`)
+      .notNull(),
+    /**
      * Heartbeat timestamp driving presence. "Online" is derived from this
      * being recent rather than stored as a boolean, so a closed tab, a lost
      * connection or a crashed worker all decay to offline on their own —

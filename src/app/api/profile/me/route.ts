@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { sanitizeSocialLinks } from "@/lib/social-links";
 import { validateDisplayName, validateUsername } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
@@ -66,6 +67,7 @@ export async function PATCH(req: Request) {
       interests?: string[];
       anonymousUsername?: string | null;
       feedVisibility?: string;
+      socialLinks?: unknown;
     };
 
     const updateData: Partial<typeof userProfiles.$inferInsert> = {};
@@ -165,6 +167,9 @@ export async function PATCH(req: Request) {
     }
     if (body.interests !== undefined && Array.isArray(body.interests)) {
       updateData.interests = body.interests;
+    }
+    if (body.socialLinks !== undefined) {
+      updateData.socialLinks = sanitizeSocialLinks(body.socialLinks);
     }
 
     const [updated] = await db

@@ -157,9 +157,13 @@ export function ArticleEditorClient({ initialArticle, isEditing = false }: Artic
     if (!file) return;
     setIsUploadingInline(true);
     haptics.light();
-    const toastId = toast.loading("Uploading image...");
+    const toastId = toast.loading("Optimizing & uploading image...");
     try {
-      const { displayUrl } = await uploadImageToImgBB(file);
+      const { displayUrl } = await uploadImageToImgBB(file, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading image... ${progress.percent}%`, { id: toastId });
+        }
+      });
       const textarea = textareaRef.current;
       const snippet = `\n\n![${file.name.replace(/\.[^.]+$/, "")}](${displayUrl})\n\n`;
       if (textarea) {
@@ -179,14 +183,24 @@ export function ArticleEditorClient({ initialArticle, isEditing = false }: Artic
 
   async function handleCoverUpload(file: File) {
     if (!file) return;
+    const prevCover = coverImageUrl;
+    const localPreview = URL.createObjectURL(file);
+    // Optimistic update: show cover immediately
+    setCoverImageUrl(localPreview);
     setIsUploadingCover(true);
     haptics.light();
-    const toastId = toast.loading("Uploading cover...");
+    const toastId = toast.loading("Optimizing & uploading cover...");
+
     try {
-      const { displayUrl } = await uploadImageToImgBB(file);
+      const { displayUrl } = await uploadImageToImgBB(file, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading cover... ${progress.percent}%`, { id: toastId });
+        }
+      });
       setCoverImageUrl(displayUrl);
       toast.success("Cover image set", { id: toastId });
     } catch (err) {
+      setCoverImageUrl(prevCover);
       toast.error(err instanceof Error ? err.message : "Cover upload failed", { id: toastId });
     } finally {
       setIsUploadingCover(false);

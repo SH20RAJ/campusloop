@@ -229,13 +229,23 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
 
     sounds.pop();
     haptics.light();
+    const prevMedia = mediaUrl;
+    const localPreview = URL.createObjectURL(file);
+    // Optimistic update: show story image immediately
+    setMediaUrl(localPreview);
     setIsUploadingImage(true);
+
     try {
-      toast.loading("Uploading your photo...", { id: "story-img" });
-      const res = await uploadImageToImgBB(file);
+      toast.loading("Optimizing & uploading photo...", { id: "story-img" });
+      const res = await uploadImageToImgBB(file, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading photo... ${progress.percent}%`, { id: "story-img" });
+        }
+      });
       setMediaUrl(res.displayUrl || res.url);
       toast.success("Photo added 📸", { id: "story-img" });
     } catch (err) {
+      setMediaUrl(prevMedia);
       toast.error(err instanceof Error ? err.message : "Failed to upload image", { id: "story-img" });
     } finally {
       setIsUploadingImage(false);

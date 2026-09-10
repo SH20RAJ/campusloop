@@ -79,13 +79,23 @@ export function PostComments({ postId, postAuthorId, postAuthorHandle }: PostCom
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const prevImage = commentImage;
+    const localUrl = URL.createObjectURL(file);
+    // Optimistic preview
+    setCommentImage(localUrl);
     setIsUploadingImage(true);
+
     try {
-      toast.loading("Uploading photo...", { id: "cmt-upload" });
-      const res = await uploadImageToImgBB(file);
+      toast.loading("Optimizing & uploading photo...", { id: "cmt-upload" });
+      const res = await uploadImageToImgBB(file, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading photo... ${progress.percent}%`, { id: "cmt-upload" });
+        }
+      });
       setCommentImage(res.displayUrl || res.url);
       toast.success("Photo attached! 📸", { id: "cmt-upload" });
     } catch (err) {
+      setCommentImage(prevImage);
       toast.error(err instanceof Error ? err.message : "Image upload failed", { id: "cmt-upload" });
     } finally {
       setIsUploadingImage(false);
@@ -102,13 +112,22 @@ export function PostComments({ postId, postAuthorId, postAuthorHandle }: PostCom
     const directImageFile = files.find((f) => f.type.startsWith("image/"));
     if (directImageFile) {
       e.preventDefault();
+      const prevImage = commentImage;
+      const localUrl = URL.createObjectURL(directImageFile);
+      setCommentImage(localUrl);
       setIsUploadingImage(true);
+
       try {
-        toast.loading("Uploading pasted image...", { id: "cmt-upload" });
-        const res = await uploadImageToImgBB(directImageFile);
+        toast.loading("Optimizing & uploading photo...", { id: "cmt-upload" });
+        const res = await uploadImageToImgBB(directImageFile, (progress) => {
+          if (progress.percent > 0 && progress.percent < 100) {
+            toast.loading(`Uploading photo... ${progress.percent}%`, { id: "cmt-upload" });
+          }
+        });
         setCommentImage(res.displayUrl || res.url);
         toast.success("Photo attached! 📸", { id: "cmt-upload" });
       } catch (err) {
+        setCommentImage(prevImage);
         toast.error(err instanceof Error ? err.message : "Image upload failed", { id: "cmt-upload" });
       } finally {
         setIsUploadingImage(false);
@@ -123,13 +142,22 @@ export function PostComments({ postId, postAuthorId, postAuthorHandle }: PostCom
         e.preventDefault();
         const file = item.getAsFile();
         if (file) {
+          const prevImage = commentImage;
+          const localUrl = URL.createObjectURL(file);
+          setCommentImage(localUrl);
           setIsUploadingImage(true);
+
           try {
-            toast.loading("Uploading pasted image...", { id: "cmt-upload" });
-            const res = await uploadImageToImgBB(file);
+            toast.loading("Optimizing & uploading photo...", { id: "cmt-upload" });
+            const res = await uploadImageToImgBB(file, (progress) => {
+              if (progress.percent > 0 && progress.percent < 100) {
+                toast.loading(`Uploading photo... ${progress.percent}%`, { id: "cmt-upload" });
+              }
+            });
             setCommentImage(res.displayUrl || res.url);
             toast.success("Photo attached! 📸", { id: "cmt-upload" });
           } catch (err) {
+            setCommentImage(prevImage);
             toast.error(err instanceof Error ? err.message : "Image upload failed", { id: "cmt-upload" });
           } finally {
             setIsUploadingImage(false);

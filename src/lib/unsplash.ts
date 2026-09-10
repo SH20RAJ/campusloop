@@ -118,7 +118,7 @@ export async function searchUnsplashPhotos({
   const accessKey =
     process.env.UNSPLASH_ACCESS_KEY ||
     process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY ||
-    "2Z7F-gbDEWPIAS1B55pQbGEZR-r6kipGjamr9GtY798";
+    "";
 
   if (!accessKey) {
     return {
@@ -212,7 +212,9 @@ export async function trackUnsplashDownload(downloadLocation: string): Promise<v
   const accessKey =
     process.env.UNSPLASH_ACCESS_KEY ||
     process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY ||
-    "2Z7F-gbDEWPIAS1B55pQbGEZR-r6kipGjamr9GtY798";
+    "";
+
+  if (!accessKey) return;
 
   try {
     const url = new URL(downloadLocation);

@@ -192,17 +192,23 @@ export function ImageCropModal({ isOpen, onClose, imageUrl, mode, onCropComplete
   /** Uploads the picked image untouched, for people who don't want a crop. */
   async function handleUseOriginal() {
     setIsUploadingOriginal(true);
-    toast.loading("Uploading your photo...", { id: "crop-upload" });
+    toast.loading("Optimizing & uploading photo...", { id: "crop-upload" });
 
     try {
       const file = await sourceAsFile(`${mode}_original_${Date.now()}`);
-      const uploaded = await uploadImageToImgBB(file);
+      const uploaded = await uploadImageToImgBB(file, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading photo... ${progress.percent}%`, { id: "crop-upload" });
+        }
+      });
       toast.success("Photo updated!", { id: "crop-upload" });
       onCropComplete(uploaded.displayUrl || uploaded.url);
       onClose();
     } catch (err) {
       console.error("Original upload error:", err);
-      toast.error("Upload failed. Please try again.", { id: "crop-upload" });
+      toast.error(err instanceof Error ? err.message : "Upload failed. Please try again.", {
+        id: "crop-upload",
+      });
     } finally {
       setIsUploadingOriginal(false);
     }
@@ -255,15 +261,21 @@ export function ImageCropModal({ isOpen, onClose, imageUrl, mode, onCropComplete
 
       const file = new File([blob], `cropped_${mode}_${Date.now()}.jpg`, { type: "image/jpeg" });
 
-      toast.loading("Saving your photo...", { id: "crop-upload" });
-      const uploaded = await uploadImageToImgBB(file);
+      toast.loading("Saving photo...", { id: "crop-upload" });
+      const uploaded = await uploadImageToImgBB(file, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Saving photo... ${progress.percent}%`, { id: "crop-upload" });
+        }
+      });
 
       toast.success("Photo updated!", { id: "crop-upload" });
       onCropComplete(uploaded.displayUrl || uploaded.url);
       onClose();
     } catch (err) {
       console.error("Crop error:", err);
-      toast.error("Could not save the crop. Please try again.", { id: "crop-upload" });
+      toast.error(err instanceof Error ? err.message : "Could not save the crop. Please try again.", {
+        id: "crop-upload",
+      });
     } finally {
       setIsProcessing(false);
     }

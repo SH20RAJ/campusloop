@@ -14,6 +14,11 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       return new NextResponse("File key required", { status: 400 });
     }
 
+    // Prevent path traversal attacks
+    if (keyParts.some((part) => part.includes("..") || part.includes("\0"))) {
+      return new NextResponse("Invalid file path", { status: 400 });
+    }
+
     const key = keyParts.join("/");
     const rangeHeader = req.headers.get("range");
 
@@ -23,7 +28,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     }
 
     const headers = new Headers();
-    headers.set("Content-Type", obj.contentType);
+    headers.set("Content-Type", obj.contentType || "application/octet-stream");
+    headers.set("X-Content-Type-Options", "nosniff");
     headers.set("Accept-Ranges", "bytes");
     headers.set("Cache-Control", "public, max-age=31536000, immutable");
 
@@ -46,7 +52,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       headers,
     });
   } catch (error) {
-    console.error("R2 file stream error:", error);
+    console.error("Storage file stream error:", error);
     return new NextResponse("Failed to stream file", { status: 500 });
   }
 }

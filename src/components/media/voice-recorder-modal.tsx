@@ -67,9 +67,18 @@ export function VoiceRecorderModal({ isOpen, onClose, onAudioRecorded }: VoiceRe
     try {
       sounds.tap();
       haptics.medium();
-      toast.loading("Uploading voice note to Cloudflare R2...", { id: "voice-upload" });
+      toast.loading("Saving voice note...", { id: "voice-upload" });
 
-      const res = await uploadMediaFile(audioBlob, "audio", `voice_memo_${Date.now()}.webm`);
+      const res = await uploadMediaFile(
+        audioBlob,
+        "audio",
+        `voice_memo_${Date.now()}.webm`,
+        (progress) => {
+          if (progress.percent > 0 && progress.percent < 100) {
+            toast.loading(`Saving voice note... ${progress.percent}%`, { id: "voice-upload" });
+          }
+        }
+      );
       toast.success("Voice note attached! 🎙️", { id: "voice-upload" });
       onAudioRecorded(res.url, recordingTime || 1);
       clearRecording();

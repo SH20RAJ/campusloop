@@ -143,16 +143,40 @@ export function PostComposer({
     const validImageFiles = files.filter((f) => f.type.startsWith("image/"));
     if (validImageFiles.length === 0) return;
 
+    // Optimistic update: show local image previews immediately
+    const optimisticPairs = validImageFiles.map((file) => ({
+      file,
+      localUrl: URL.createObjectURL(file),
+    }));
+
+    setUploadedImages((prev) => [...prev, ...optimisticPairs.map((p) => p.localUrl)]);
     setIsUploadingMedia(true);
+
     try {
       toast.loading(
-        validImageFiles.length > 1 ? `Uploading ${validImageFiles.length} photos...` : "Uploading photo...",
+        validImageFiles.length > 1
+          ? `Optimizing & uploading ${validImageFiles.length} photos...`
+          : "Uploading photo...",
         { id: "img-upload" }
       );
-      for (const file of validImageFiles) {
-        const uploaded = await uploadImageToImgBB(file);
-        setUploadedImages((prev) => [...prev, uploaded.displayUrl || uploaded.url]);
+
+      for (const pair of optimisticPairs) {
+        try {
+          const uploaded = await uploadImageToImgBB(pair.file, (progress) => {
+            if (progress.percent > 0 && progress.percent < 100) {
+              toast.loading(`Uploading photo... ${progress.percent}%`, { id: "img-upload" });
+            }
+          });
+          const finalUrl = uploaded.displayUrl || uploaded.url;
+          // Swap optimistic local preview with the permanent remote URL
+          setUploadedImages((prev) => prev.map((url) => (url === pair.localUrl ? finalUrl : url)));
+        } catch (uploadErr) {
+          // Revert this specific optimistic image if upload fails
+          setUploadedImages((prev) => prev.filter((url) => url !== pair.localUrl));
+          throw uploadErr;
+        }
       }
+
       sounds.pop();
       haptics.success();
       toast.success(validImageFiles.length > 1 ? "Photos attached 📸" : "Photo attached 📸", {
@@ -176,10 +200,24 @@ export function PostComposer({
 
     setIsUploadingMedia(true);
     try {
-      toast.loading("Uploading video clip to Cloudflare R2...", { id: "video-upload" });
+      toast.loading("Uploading video...", { id: "video-upload" });
       for (const file of validVideos) {
-        const res = await uploadMediaFile(file, "video");
-        setUploadedVideos((prev) => [...prev, res.url]);
+        const localPreview = URL.createObjectURL(file);
+        // Optimistically show video
+        setUploadedVideos((prev) => [...prev, localPreview]);
+
+        try {
+          const res = await uploadMediaFile(file, "video", file.name, (progress) => {
+            if (progress.percent > 0 && progress.percent < 100) {
+              toast.loading(`Uploading video... ${progress.percent}%`, { id: "video-upload" });
+            }
+          });
+          // Swap local preview with remote URL
+          setUploadedVideos((prev) => prev.map((u) => (u === localPreview ? res.url : u)));
+        } catch (vidErr) {
+          setUploadedVideos((prev) => prev.filter((u) => u !== localPreview));
+          throw vidErr;
+        }
       }
       sounds.pop();
       haptics.success();
@@ -199,9 +237,13 @@ export function PostComposer({
 
     setIsUploadingMedia(true);
     try {
-      toast.loading("Uploading study notes / PDF to Cloudflare R2...", { id: "doc-upload" });
+      toast.loading("Uploading document...", { id: "doc-upload" });
       for (const file of files) {
-        const res = await uploadMediaFile(file, "document");
+        const res = await uploadMediaFile(file, "document", file.name, (progress) => {
+          if (progress.percent > 0 && progress.percent < 100) {
+            toast.loading(`Uploading document... ${progress.percent}%`, { id: "doc-upload" });
+          }
+        });
         setUploadedDocs((prev) => [...prev, { url: res.url, name: file.name, size: file.size }]);
       }
       sounds.pop();

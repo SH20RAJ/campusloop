@@ -176,14 +176,23 @@ export function EditProfileClient() {
       return;
     }
 
+    const localUrl = URL.createObjectURL(file);
+    // Optimistic update: show photo thumbnail immediately
+    setPhotos((prev) => [...prev, localUrl]);
     setIsUploadingDatingPhoto(true);
+
     try {
-      toast.loading("Uploading dating photo...", { id: "dating-photo" });
-      const res = await uploadImageToImgBB(file);
+      toast.loading("Optimizing & uploading photo...", { id: "dating-photo" });
+      const res = await uploadImageToImgBB(file, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading photo... ${progress.percent}%`, { id: "dating-photo" });
+        }
+      });
       const newUrl = res.displayUrl || res.url;
-      setPhotos((prev) => [...prev, newUrl]);
+      setPhotos((prev) => prev.map((u) => (u === localUrl ? newUrl : u)));
       toast.success("Photo added to dating gallery!", { id: "dating-photo" });
     } catch (err) {
+      setPhotos((prev) => prev.filter((u) => u !== localUrl));
       toast.error(err instanceof Error ? err.message : "Upload failed", { id: "dating-photo" });
     } finally {
       setIsUploadingDatingPhoto(false);

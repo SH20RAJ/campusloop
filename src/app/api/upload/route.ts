@@ -5,14 +5,37 @@ import { putR2Object } from "@/lib/r2";
 
 export const dynamic = "force-dynamic";
 
-const IMGBB_API_KEY =
-  process.env.NEXT_PUBLIC_IMGBB_API_KEY || process.env.IMGBB_API_KEY || "c0c864f0d9aadb0f7de371582b301397";
+const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMGBB_API_KEY || process.env.IMGBB_API_KEY || "";
+
+// Whitelist of dangerous file extensions to reject immediately
+const DISALLOWED_EXTENSIONS = new Set([
+  "exe",
+  "bat",
+  "cmd",
+  "sh",
+  "bin",
+  "php",
+  "phtml",
+  "cgi",
+  "pl",
+  "html",
+  "htm",
+  "js",
+  "mjs",
+  "ts",
+  "py",
+  "rb",
+  "dll",
+  "so",
+  "app",
+  "jar",
+]);
 
 export async function POST(req: NextRequest) {
   try {
     const user = await hexclaveServerApp.getUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Please sign in to upload files" }, { status: 401 });
     }
 
     const formData = await req.formData();
@@ -23,8 +46,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const mimeType = file.type || "application/octet-stream";
     const originalName = file.name || "upload";
+    const mimeType = file.type || "application/octet-stream";
+    const fileExt = originalName.includes(".") ? (originalName.split(".").pop() || "").toLowerCase() : "";
+
+    // Reject dangerous executable scripts and files
+    if (DISALLOWED_EXTENSIONS.has(fileExt)) {
+      return NextResponse.json(
+        { error: "This file type cannot be uploaded for security reasons." },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const size = bytes.byteLength;
 
@@ -37,19 +70,29 @@ export async function POST(req: NextRequest) {
       mimeType === "application/pdf" ||
       mimeType.includes("word") ||
       mimeType.includes("officedocument") ||
+      mimeType.includes("presentation") ||
+      mimeType.includes("powerpoint") ||
       mimeType === "application/zip" ||
       originalName.endsWith(".pdf") ||
-      originalName.endsWith(".docx");
+      originalName.endsWith(".docx") ||
+      originalName.endsWith(".pptx");
 
     const today = new Date().toISOString().slice(0, 10);
-    const fileExt = originalName.includes(".") ? originalName.split(".").pop() || "" : "";
     const safeExt = fileExt ? `.${fileExt}` : "";
     const randomId = randomUUID();
+    const safeUserId = user.id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-    // ─── 1. Image Upload (ImgBB Primary, R2 Automatic Fallback) ───
+    // ─── 1. Image Upload ───
     if (isImage || category === "image") {
-      // 15MB limit check for ImgBB
-      if (size <= 15 * 1024 * 1024) {
+      if (size > 15 * 1024 * 1024) {
+        return NextResponse.json(
+          { error: "Image exceeds 15MB limit. Please choose a smaller photo." },
+          { status: 400 }
+        );
+      }
+
+      // Try primary image host if configured
+      if (IMGBB_API_KEY) {
         try {
           const imgbbFormData = new FormData();
           imgbbFormData.append("image", file);
@@ -78,16 +121,14 @@ export async function POST(req: NextRequest) {
               provider: "imgbb",
             });
           }
-        } catch (imgbbErr) {
-          console.warn("[ImgBB upload failed, falling back to Cloudflare R2]:", imgbbErr);
-        }
+        } catch {}
       }
 
-      // R2 Fallback for Images
-      const key = `images/${today}/${randomId}${safeExt || ".webp"}`;
+      // Resilient secure server storage
+      const key = `images/${safeUserId}/${today}/${randomId}${safeExt || ".jpg"}`;
       const r2Result = await putR2Object(key, bytes, mimeType, {
         uploadedBy: user.id,
-        originalName,
+        originalName: originalName.slice(0, 100),
       });
 
       return NextResponse.json({
@@ -101,16 +142,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ─── 2. Video Upload (Cloudflare R2, up to 100MB) ───
+    // ─── 2. Video Upload ───
     if (isVideo || category === "video") {
-      if (size > 100 * 1024 * 1024) {
-        return NextResponse.json({ error: "Video exceeds 100MB limit" }, { status: 400 });
+      if (size > 75 * 1024 * 1024) {
+        return NextResponse.json(
+          { error: "Video exceeds 75MB limit. Please select a shorter video." },
+          { status: 400 }
+        );
       }
 
-      const key = `videos/${today}/${randomId}${safeExt || ".mp4"}`;
+      const key = `videos/${safeUserId}/${today}/${randomId}${safeExt || ".mp4"}`;
       const r2Result = await putR2Object(key, bytes, mimeType || "video/mp4", {
         uploadedBy: user.id,
-        originalName,
+        originalName: originalName.slice(0, 100),
       });
 
       return NextResponse.json({
@@ -122,16 +166,16 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ─── 3. Audio & Voice Notes (Cloudflare R2, up to 35MB) ───
+    // ─── 3. Audio & Voice Notes ───
     if (isAudio || category === "audio") {
-      if (size > 35 * 1024 * 1024) {
-        return NextResponse.json({ error: "Audio exceeds 35MB limit" }, { status: 400 });
+      if (size > 30 * 1024 * 1024) {
+        return NextResponse.json({ error: "Audio exceeds 30MB limit." }, { status: 400 });
       }
 
-      const key = `audio/${today}/${randomId}${safeExt || ".webm"}`;
+      const key = `audio/${safeUserId}/${today}/${randomId}${safeExt || ".webm"}`;
       const r2Result = await putR2Object(key, bytes, mimeType || "audio/webm", {
         uploadedBy: user.id,
-        originalName,
+        originalName: originalName.slice(0, 100),
       });
 
       return NextResponse.json({
@@ -143,21 +187,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ─── 4. Documents & Study Notes PDFs (Cloudflare R2, up to 60MB) ───
+    // ─── 4. Documents & Study Notes ───
     if (isDoc || category === "document") {
-      if (size > 60 * 1024 * 1024) {
-        return NextResponse.json({ error: "Document exceeds 60MB limit" }, { status: 400 });
+      if (size > 50 * 1024 * 1024) {
+        return NextResponse.json({ error: "Document exceeds 50MB limit." }, { status: 400 });
       }
 
-      const cleanFilename = originalName.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const key = `documents/${today}/${randomId}_${cleanFilename}`;
+      const cleanFilename = originalName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80);
+      const key = `documents/${safeUserId}/${today}/${randomId}_${cleanFilename}`;
       const r2Result = await putR2Object(
         key,
         bytes,
         mimeType || (originalName.endsWith(".pdf") ? "application/pdf" : "application/octet-stream"),
         {
           uploadedBy: user.id,
-          originalName,
+          originalName: originalName.slice(0, 100),
         }
       );
 
@@ -170,11 +214,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Default Generic R2 Upload
-    const key = `files/${today}/${randomId}${safeExt}`;
+    // Default Generic File Upload
+    if (size > 30 * 1024 * 1024) {
+      return NextResponse.json({ error: "File exceeds 30MB limit." }, { status: 400 });
+    }
+
+    const key = `files/${safeUserId}/${today}/${randomId}${safeExt}`;
     const r2Result = await putR2Object(key, bytes, mimeType, {
       uploadedBy: user.id,
-      originalName,
+      originalName: originalName.slice(0, 100),
     });
 
     return NextResponse.json({

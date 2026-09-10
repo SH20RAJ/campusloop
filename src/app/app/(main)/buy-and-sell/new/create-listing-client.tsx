@@ -77,18 +77,26 @@ export function CreateListingClient({ profileId }: CreateListingClientProps) {
       return;
     }
 
+    const file = files[0];
+    const localUrl = URL.createObjectURL(file);
+    // Optimistic update: show listing photo immediately
+    setImages((prev) => [...prev, localUrl]);
     setIsUploadingImage(true);
     sounds.pop();
     haptics.light();
 
     try {
-      toast.loading("Uploading listing photo...", { id: "upload-img" });
-      const file = files[0];
-      const res = await uploadImageToImgBB(file);
+      toast.loading("Optimizing & uploading photo...", { id: "upload-img" });
+      const res = await uploadImageToImgBB(file, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading photo... ${progress.percent}%`, { id: "upload-img" });
+        }
+      });
       const url = res.displayUrl || res.url;
-      setImages((prev) => [...prev, url]);
+      setImages((prev) => prev.map((u) => (u === localUrl ? url : u)));
       toast.success("Photo attached! 📸", { id: "upload-img" });
     } catch (err) {
+      setImages((prev) => prev.filter((u) => u !== localUrl));
       toast.error(err instanceof Error ? err.message : "Failed to upload photo", { id: "upload-img" });
     } finally {
       setIsUploadingImage(false);

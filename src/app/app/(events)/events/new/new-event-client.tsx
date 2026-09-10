@@ -426,14 +426,25 @@ export function NewEventClient() {
 
   async function handleBannerUpload(file: File) {
     if (!file) return;
+    const previousBanner = bannerUrl;
+    const localPreview = URL.createObjectURL(file);
+    // Optimistic update: show banner immediately
+    setBannerUrl(localPreview);
     setIsUploadingBanner(true);
     haptics.light();
-    const toastId = toast.loading("Uploading high-res banner...");
+    const toastId = toast.loading("Optimizing & uploading banner...");
+
     try {
-      const { displayUrl } = await uploadImageToImgBB(file);
+      const { displayUrl } = await uploadImageToImgBB(file, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading banner... ${progress.percent}%`, { id: toastId });
+        }
+      });
       setBannerUrl(displayUrl);
       toast.success("Banner uploaded successfully", { id: toastId });
     } catch (err) {
+      // Revert to previous banner on error
+      setBannerUrl(previousBanner);
       toast.error(err instanceof Error ? err.message : "Banner upload failed", { id: toastId });
     } finally {
       setIsUploadingBanner(false);

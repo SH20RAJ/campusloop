@@ -119,6 +119,7 @@ export function UploadAcademicClient() {
   const [fileSize, setFileSize] = useState<number | null>(null);
   const [driveUrl, setDriveUrl] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Auto-generate title helper
@@ -137,27 +138,30 @@ export function UploadAcademicClient() {
     setTitle(generated);
   }
 
-  // Handle direct file upload via Cloudflare R2
+  // Handle direct file upload with live progress tracking
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 100 * 1024 * 1024) {
-      toast.error("File exceeds maximum allowed size of 100MB");
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("File exceeds maximum allowed size of 50MB");
       return;
     }
 
     setIsUploading(true);
+    setUploadPercent(0);
     sounds.tap();
     haptics.medium();
 
     try {
-      const res = await uploadMediaFile(file);
+      const res = await uploadMediaFile(file, "document", file.name, (progress) => {
+        setUploadPercent(progress.percent);
+      });
       if (res?.url) {
         setFileUrl(res.url);
         setFileName(file.name);
         setFileSize(file.size);
-        toast.success(`Uploaded "${file.name}" to Cloudflare Storage!`);
+        toast.success(`Uploaded "${file.name}" successfully!`);
 
         // If title is empty, prefill from filename
         if (!title.trim()) {
@@ -167,8 +171,8 @@ export function UploadAcademicClient() {
       } else {
         toast.error("Direct upload failed. Try providing a Google Drive link.");
       }
-    } catch {
-      toast.error("Upload error. Check network connection.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload error. Check network connection.");
     } finally {
       setIsUploading(false);
     }
@@ -545,7 +549,7 @@ export function UploadAcademicClient() {
                     )}
                   >
                     <UploadCloud className="size-3" />
-                    <span>Direct File (R2)</span>
+                    <span>Direct File Upload</span>
                   </button>
                   <button
                     type="button"
@@ -586,9 +590,17 @@ export function UploadAcademicClient() {
                     {isUploading ? (
                       <div className="flex flex-col items-center gap-2 py-4">
                         <Loader2 className="size-8 animate-spin text-primary" />
-                        <p className="text-xs font-bold text-foreground">Uploading to Cloudflare R2...</p>
+                        <p className="text-xs font-bold text-foreground">
+                          Uploading document... {uploadPercent}%
+                        </p>
+                        <div className="w-48 h-1.5 bg-muted rounded-full overflow-hidden mt-1">
+                          <div
+                            className="h-full bg-primary rounded-full transition-all duration-200"
+                            style={{ width: `${uploadPercent}%` }}
+                          />
+                        </div>
                         <p className="text-[11px] text-muted-foreground">
-                          Encrypting &amp; indexing document
+                          Processing &amp; indexing resource
                         </p>
                       </div>
                     ) : fileUrl ? (

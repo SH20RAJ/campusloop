@@ -575,8 +575,12 @@ export function MessengerPane({
     if (!file || !conversationId) return;
     setIsUploadingMedia(true);
     try {
-      toast.loading("Uploading video to Cloudflare R2...", { id: "chat-video" });
-      const res = await uploadMediaFile(file, "video");
+      toast.loading("Uploading video...", { id: "chat-video" });
+      const res = await uploadMediaFile(file, "video", file.name, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading video... ${progress.percent}%`, { id: "chat-video" });
+        }
+      });
       await sendMessage(`![video:${file.name}](${res.url})`);
       toast.success("Video sent! 🎥", { id: "chat-video" });
     } catch (err) {
@@ -591,8 +595,12 @@ export function MessengerPane({
     if (!file || !conversationId) return;
     setIsUploadingMedia(true);
     try {
-      toast.loading("Uploading document to Cloudflare R2...", { id: "chat-doc" });
-      const res = await uploadMediaFile(file, "document");
+      toast.loading("Uploading document...", { id: "chat-doc" });
+      const res = await uploadMediaFile(file, "document", file.name, (progress) => {
+        if (progress.percent > 0 && progress.percent < 100) {
+          toast.loading(`Uploading document... ${progress.percent}%`, { id: "chat-doc" });
+        }
+      });
       await sendMessage(`![document:${file.name}:${file.size}](${res.url})`);
       toast.success("Document sent! 📄", { id: "chat-doc" });
     } catch (err) {

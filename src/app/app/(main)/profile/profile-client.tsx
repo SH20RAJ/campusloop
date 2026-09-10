@@ -199,6 +199,11 @@ export function ProfileClientView({
   const [cropImageUrl, setCropImageUrl] = useState("");
   const [cropMode, setCropMode] = useState<"avatar" | "banner">("avatar");
   const [showUnsplashBannerPicker, setShowUnsplashBannerPicker] = useState(false);
+  const [optimisticBannerUrl, setOptimisticBannerUrl] = useState<string | null>(null);
+  const [optimisticAvatarUrl, setOptimisticAvatarUrl] = useState<string | null>(null);
+
+  const currentBannerUrl = optimisticBannerUrl ?? profile.bannerUrl;
+  const currentAvatarUrl = optimisticAvatarUrl ?? profile.avatarUrl;
 
   const loadArchivedPosts = useCallback(async () => {
     if (!isOwnProfile) return;
@@ -371,6 +376,8 @@ export function ProfileClientView({
 
   async function handleCropCompleted(croppedUrl: string) {
     if (cropMode === "banner") {
+      const prev = optimisticBannerUrl;
+      setOptimisticBannerUrl(croppedUrl);
       try {
         await fetch("/api/profile/me", {
           method: "PATCH",
@@ -380,9 +387,13 @@ export function ProfileClientView({
         toast.success("Cover banner updated! 🎨");
         router.refresh();
       } catch (e) {
+        setOptimisticBannerUrl(prev);
+        toast.error("Failed to update cover banner");
         console.error(e);
       }
     } else {
+      const prev = optimisticAvatarUrl;
+      setOptimisticAvatarUrl(croppedUrl);
       try {
         await fetch("/api/profile/me", {
           method: "PATCH",
@@ -392,12 +403,16 @@ export function ProfileClientView({
         toast.success("Profile photo updated! 📸");
         router.refresh();
       } catch (e) {
+        setOptimisticAvatarUrl(prev);
+        toast.error("Failed to update profile photo");
         console.error(e);
       }
     }
   }
 
   async function handleSelectUnsplashBanner(photoUrl: string) {
+    const prev = optimisticBannerUrl;
+    setOptimisticBannerUrl(photoUrl);
     try {
       const res = await fetch("/api/profile/me", {
         method: "PATCH",
@@ -408,6 +423,7 @@ export function ProfileClientView({
       toast.success("Profile cover updated from Unsplash! 🎨");
       router.refresh();
     } catch (e) {
+      setOptimisticBannerUrl(prev);
       toast.error("Failed to update profile cover");
       console.error(e);
     }
@@ -501,8 +517,8 @@ export function ProfileClientView({
       <main className="w-full max-w-2xl mx-auto border-x border-border/30 min-h-screen">
         {/* ─── LinkedIn / Twitter Style Profile Cover Banner ─── */}
         <div className="relative h-32 sm:h-44 w-full bg-linear-to-r from-purple-900/50 via-indigo-900/40 to-card overflow-hidden border-b border-border/20">
-          {profile.bannerUrl ? (
-            <img src={profile.bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
+          {currentBannerUrl ? (
+            <img src={currentBannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-linear-to-tr from-purple-950/60 via-[#12111d] to-indigo-950/40 relative">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
@@ -522,11 +538,11 @@ export function ProfileClientView({
                 <span className="hidden sm:inline">Unsplash</span>
               </button>
 
-              {profile.bannerUrl && (
+              {currentBannerUrl && (
                 <button
                   type="button"
                   onClick={() => {
-                    setCropImageUrl(profile.bannerUrl || "");
+                    setCropImageUrl(currentBannerUrl || "");
                     setCropMode("banner");
                     setCropModalOpen(true);
                   }}
@@ -562,7 +578,7 @@ export function ProfileClientView({
                 className="relative size-20 sm:size-24 rounded-full border-4 border-background overflow-hidden bg-background cursor-pointer group-hover:opacity-95 transition-opacity shadow-xl"
               >
                 <Avatar className="size-full">
-                  <AvatarImage src={profile.avatarUrl || ""} className="object-cover size-full" />
+                  <AvatarImage src={currentAvatarUrl || ""} className="object-cover size-full" />
                   <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary">
                     {profile.displayName[0]?.toUpperCase()}
                   </AvatarFallback>

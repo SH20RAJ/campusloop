@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { UnsplashImagePicker } from "@/components/common/unsplash-image-picker";
 import { SocialLinksEditor } from "@/components/profile/social-links-editor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ImageCropModal } from "@/components/ui/image-crop-modal";
@@ -78,6 +79,7 @@ export function EditProfileClient() {
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropImageUrl, setCropImageUrl] = useState("");
   const [cropMode, setCropMode] = useState<"avatar" | "banner">("avatar");
+  const [showUnsplashBannerPicker, setShowUnsplashBannerPicker] = useState(false);
 
   const pfpInputRef = useRef<HTMLInputElement | null>(null);
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
@@ -335,26 +337,36 @@ export function EditProfileClient() {
               <div className="absolute inset-0 bg-grid-pattern opacity-30" />
             )}
 
-            <div className="absolute top-3 right-3 flex items-center gap-2">
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 sm:gap-2">
+              <button
+                type="button"
+                onClick={() => setShowUnsplashBannerPicker(true)}
+                className="py-1.5 px-2.5 sm:px-3 rounded-xl bg-black/60 hover:bg-black/80 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md"
+                title="Choose Cover from Unsplash"
+              >
+                <Sparkles className="size-3.5 text-primary" />
+                <span>Unsplash</span>
+              </button>
+
               {bannerUrl && (
                 <button
                   type="button"
                   onClick={() => handleOpenCropForCurrent("banner")}
-                  className="py-1.5 px-3 rounded-xl bg-black/60 hover:bg-black/80 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md"
+                  className="py-1.5 px-2.5 sm:px-3 rounded-xl bg-black/60 hover:bg-black/80 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md"
                   title="Reposition / Crop Banner"
                 >
                   <Move className="size-3.5" />
-                  <span>Reposition</span>
+                  <span className="hidden sm:inline">Reposition</span>
                 </button>
               )}
 
               <button
                 type="button"
                 onClick={() => bannerInputRef.current?.click()}
-                className="py-1.5 px-3 rounded-xl bg-black/70 hover:bg-black/85 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md"
+                className="py-1.5 px-2.5 sm:px-3 rounded-xl bg-black/70 hover:bg-black/85 text-white text-xs font-bold flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md"
               >
                 <Camera className="size-3.5" />
-                <span>{bannerUrl ? "Change" : "Upload Banner"}</span>
+                <span>{bannerUrl ? "Upload" : "Upload Banner"}</span>
               </button>
             </div>
           </div>
@@ -813,6 +825,18 @@ export function EditProfileClient() {
           {isSaving ? "Saving changes..." : "Save Profile & Dating Photos"}
         </button>
       </form>
+
+      {/* Unsplash Profile Cover Picker */}
+      <UnsplashImagePicker
+        isOpen={showUnsplashBannerPicker}
+        onClose={() => setShowUnsplashBannerPicker(false)}
+        onSelect={(photo) => {
+          setBannerUrl(photo.url);
+          toast.success(`Selected cover by ${photo.photographerName}`);
+        }}
+        defaultQuery="campus aesthetic"
+        title="Choose Profile Cover from Unsplash"
+      />
     </div>
   );
 }

@@ -32,6 +32,7 @@ import {
   Rocket,
   Share2,
   ShieldCheck,
+  Sparkles,
   Star,
   Trash2,
   TrendingUp,
@@ -47,6 +48,7 @@ import { archivePost, deletePost } from "@/app/app/(main)/post/actions";
 import { AcademicPlaylistCard } from "@/components/academics/academic-playlist-card";
 import { ArticleCard } from "@/components/articles/article-card";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
+import { UnsplashImagePicker } from "@/components/common/unsplash-image-picker";
 import { AcademicCard } from "@/components/communities/academic-card";
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
 import { FollowButton } from "@/components/profile/follow-button";
@@ -196,6 +198,7 @@ export function ProfileClientView({
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropImageUrl, setCropImageUrl] = useState("");
   const [cropMode, setCropMode] = useState<"avatar" | "banner">("avatar");
+  const [showUnsplashBannerPicker, setShowUnsplashBannerPicker] = useState(false);
 
   const loadArchivedPosts = useCallback(async () => {
     if (!isOwnProfile) return;
@@ -394,6 +397,22 @@ export function ProfileClientView({
     }
   }
 
+  async function handleSelectUnsplashBanner(photoUrl: string) {
+    try {
+      const res = await fetch("/api/profile/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bannerUrl: photoUrl }),
+      });
+      if (!res.ok) throw new Error("Failed to update cover banner");
+      toast.success("Profile cover updated from Unsplash! 🎨");
+      router.refresh();
+    } catch (e) {
+      toast.error("Failed to update profile cover");
+      console.error(e);
+    }
+  }
+
   return (
     <div className="min-h-screen pb-28 text-foreground select-none touch-manipulation">
       {/* Image Crop & Resize Modal */}
@@ -493,6 +512,16 @@ export function ProfileClientView({
           {/* Banner Edit / Camera Controls for Owner */}
           {isOwnProfile && (
             <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
+              <button
+                type="button"
+                onClick={() => setShowUnsplashBannerPicker(true)}
+                className="h-8 px-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center gap-1.5 backdrop-blur-md transition-all cursor-pointer shadow-md text-xs font-bold"
+                title="Choose Cover from Unsplash"
+              >
+                <Sparkles className="size-3.5 text-primary" />
+                <span className="hidden sm:inline">Unsplash</span>
+              </button>
+
               {profile.bannerUrl && (
                 <button
                   type="button"
@@ -1374,6 +1403,17 @@ export function ProfileClientView({
         shortUrl={`https://campusloop.space/@${profile.username}`}
         avatarUrl={profile.avatarUrl}
         category="profile"
+      />
+
+      {/* Unsplash Profile Cover Picker */}
+      <UnsplashImagePicker
+        isOpen={showUnsplashBannerPicker}
+        onClose={() => setShowUnsplashBannerPicker(false)}
+        onSelect={(photo) => {
+          void handleSelectUnsplashBanner(photo.url);
+        }}
+        defaultQuery="campus aesthetic"
+        title="Choose Profile Cover from Unsplash"
       />
     </div>
   );

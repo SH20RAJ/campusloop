@@ -15,9 +15,10 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { pingUnsplashDownload, useUnsplashSearch } from "@/hooks/use-unsplash";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import type { UnsplashPhoto } from "@/lib/unsplash";
@@ -61,44 +62,14 @@ export function UnsplashImagePicker({
 }: UnsplashImagePickerProps) {
   const [query, setQuery] = useState(defaultQuery);
   const [activeTopic, setActiveTopic] = useState<string>(defaultQuery);
-  const [photos, setPhotos] = useState<UnsplashPhoto[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
 
-  // Fetch photos when modal opens or query changes
-  useEffect(() => {
-    if (!isOpen) return;
-
-    let isMounted = true;
-    async function loadPhotos(searchQuery: string) {
-      setIsLoading(true);
-      try {
-        const res = await fetch(
-          `/api/unsplash/search?q=${encodeURIComponent(searchQuery)}&orientation=${orientation}&per_page=16`
-        );
-        if (!res.ok) throw new Error("Search failed");
-        const data = (await res.json()) as { photos?: UnsplashPhoto[] };
-        if (isMounted) {
-          setPhotos(data.photos || []);
-        }
-      } catch (err) {
-        console.error("Failed to load Unsplash photos:", err);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    const timer = setTimeout(() => {
-      void loadPhotos(query || "campus");
-    }, 250);
-
-    return () => {
-      isMounted = false;
-      clearTimeout(timer);
-    };
-  }, [isOpen, query, orientation]);
+  const { photos, isLoading } = useUnsplashSearch({
+    query: query || "campus",
+    orientation,
+    perPage: 16,
+    enabled: isOpen,
+  });
 
   function handleTopicClick(topic: string) {
     sounds.tap();
@@ -112,13 +83,9 @@ export function UnsplashImagePicker({
     haptics.medium();
     setSelectedPhotoId(photo.id);
 
-    // Track download ping as required by Unsplash TOS
+    // Track download ping per Unsplash API terms
     if (photo.downloadLocation) {
-      void fetch("/api/unsplash/track-download", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ downloadLocation: photo.downloadLocation }),
-      });
+      void pingUnsplashDownload(photo.downloadLocation);
     }
 
     onSelect({

@@ -7,6 +7,7 @@ import {
   Briefcase,
   Building2,
   Calendar,
+  Camera,
   Check,
   CheckCircle2,
   Clock,
@@ -44,6 +45,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 import { MarkdownEditor } from "@/components/common/markdown-editor";
+import { UnsplashImagePicker } from "@/components/common/unsplash-image-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { haptics } from "@/lib/haptics";
@@ -248,6 +250,7 @@ export function NewEventClient() {
   const [clubName, setClubName] = useState("");
   const [description, setDescription] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
+  const [showUnsplashPicker, setShowUnsplashPicker] = useState(false);
   const [eventType, setEventType] = useState("HACKATHON");
   const [mode, setMode] = useState("OFFLINE");
   const [venue, setVenue] = useState("");
@@ -833,9 +836,19 @@ export function NewEventClient() {
                 )}
               </div>
 
-              {/* Curated Presets */}
+              {/* Curated Presets & Unsplash */}
               <div>
-                <label className="text-xs font-bold text-foreground">Quick Campus Presets</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-foreground">Quick Campus Presets</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowUnsplashPicker(true)}
+                    className="inline-flex items-center gap-1.5 text-xs font-black text-primary hover:underline cursor-pointer"
+                  >
+                    <Camera className="size-3.5" />
+                    <span>Search Unsplash</span>
+                  </button>
+                </div>
                 <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {PRESET_BANNERS.map((preset) => (
                     <button
@@ -869,35 +882,45 @@ export function NewEventClient() {
               {/* Custom Upload or URL */}
               <div className="flex flex-col gap-2 sm:flex-row">
                 <Input
-                  placeholder="Paste direct image link (Unsplash, ImgBB, etc.)"
+                  placeholder="Paste direct image link, or pick from Unsplash / upload →"
                   value={bannerUrl}
                   onChange={(e) => setBannerUrl(e.target.value)}
                   className="h-10 rounded-2xl text-xs bg-background flex-1"
                 />
-                <button
-                  type="button"
-                  disabled={isUploadingBanner}
-                  onClick={() => bannerInputRef.current?.click()}
-                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl border border-border/50 bg-muted/40 px-4 text-xs font-black text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0 disabled:opacity-50"
-                >
-                  {isUploadingBanner ? (
-                    <Loader2 className="size-3.5 animate-spin" />
-                  ) : (
-                    <Upload className="size-3.5" />
-                  )}
-                  <span>Upload Image</span>
-                </button>
-                <input
-                  ref={bannerInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void handleBannerUpload(file);
-                  }}
-                />
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setShowUnsplashPicker(true)}
+                    className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl border border-primary/30 bg-primary/10 px-3.5 text-xs font-black text-primary hover:bg-primary/20 transition-colors cursor-pointer"
+                  >
+                    <Camera className="size-3.5" />
+                    <span>Unsplash</span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isUploadingBanner}
+                    onClick={() => bannerInputRef.current?.click()}
+                    className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl border border-border/50 bg-muted/40 px-3.5 text-xs font-black text-foreground hover:bg-muted transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {isUploadingBanner ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="size-3.5" />
+                    )}
+                    <span>Upload</span>
+                  </button>
+                </div>
               </div>
+              <input
+                ref={bannerInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void handleBannerUpload(file);
+                }}
+              />
             </div>
 
             {/* ── 3. Format, Venue & Virtual Links ─────────────────────────── */}
@@ -1698,6 +1721,18 @@ export function NewEventClient() {
           </aside>
         </div>
       </div>
+
+      {/* Unsplash Cover Picker Modal */}
+      <UnsplashImagePicker
+        isOpen={showUnsplashPicker}
+        onClose={() => setShowUnsplashPicker(false)}
+        onSelect={(photo) => {
+          setBannerUrl(photo.url);
+          toast.success(`Selected banner by ${photo.photographerName}`);
+        }}
+        defaultQuery={eventType ? eventType.toLowerCase() : "hackathon"}
+        title="Choose Event Banner from Unsplash"
+      />
     </div>
   );
 }

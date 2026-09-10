@@ -4,6 +4,7 @@ import {
   AlignCenter,
   AlignLeft,
   AlignRight,
+  Camera,
   ImagePlus,
   Loader2,
   MapPin,
@@ -20,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
+import { UnsplashImagePicker } from "@/components/common/unsplash-image-picker";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -124,6 +126,7 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
 
   const [storyText, setStoryText] = useState("");
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+  const [showUnsplashPicker, setShowUnsplashPicker] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [gradIndex, setGradIndex] = useState(0);
   const [fontIndex, setFontIndex] = useState(0);
@@ -456,6 +459,16 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
               ) : (
                 <ImagePlus className="size-4" />
               )}
+            </button>
+
+            {/* Unsplash Photo Search */}
+            <button
+              type="button"
+              onClick={() => setShowUnsplashPicker(true)}
+              className="size-8 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors cursor-pointer active:scale-90"
+              title="Search Unsplash Background Photos"
+            >
+              <Camera className="size-4" />
             </button>
           </div>
         </div>
@@ -825,6 +838,18 @@ export function StoryCreator({ profile }: StoryCreatorProps) {
           </button>
         </div>
       </div>
+      {/* Unsplash Background Photo Picker */}
+      <UnsplashImagePicker
+        isOpen={showUnsplashPicker}
+        onClose={() => setShowUnsplashPicker(false)}
+        onSelect={(photo) => {
+          setMediaUrl(photo.url);
+          toast.success(`Selected background by ${photo.photographerName}`);
+        }}
+        orientation="portrait"
+        defaultQuery="campus aesthetic"
+        title="Choose Story Background from Unsplash"
+      />
     </div>
   );
 }

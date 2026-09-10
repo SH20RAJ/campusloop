@@ -4,6 +4,7 @@ import confetti from "canvas-confetti";
 import {
   ArrowLeft,
   Bold,
+  Camera,
   ChevronDown,
   ChevronUp,
   Code,
@@ -31,6 +32,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { BrandedQrModal } from "@/components/common/branded-qr-modal";
 import { MarkdownContent } from "@/components/common/markdown-content";
+import { UnsplashImagePicker } from "@/components/common/unsplash-image-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { haptics } from "@/lib/haptics";
@@ -93,6 +95,7 @@ export function ArticleEditorClient({ initialArticle, isEditing = false }: Artic
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [publishedSlug, setPublishedSlug] = useState<string | null>(null);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [showUnsplashPicker, setShowUnsplashPicker] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const inlineImageInputRef = useRef<HTMLInputElement | null>(null);
@@ -415,26 +418,36 @@ export function ArticleEditorClient({ initialArticle, isEditing = false }: Artic
                         </button>
                       )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Input
-                        placeholder="Paste image link, or upload →"
+                        placeholder="Paste image link, or pick from Unsplash / upload →"
                         value={coverImageUrl}
                         onChange={(e) => setCoverImageUrl(e.target.value)}
-                        className="rounded-xl text-xs h-9 bg-background"
+                        className="rounded-xl text-xs h-9 bg-background flex-1"
                       />
-                      <button
-                        type="button"
-                        disabled={isUploadingCover}
-                        onClick={() => coverImageInputRef.current?.click()}
-                        className="shrink-0 flex items-center gap-1.5 px-3 rounded-xl bg-primary text-primary-foreground text-xs font-black cursor-pointer hover:opacity-90 active:scale-95 transition-opacity disabled:opacity-60"
-                      >
-                        {isUploadingCover ? (
-                          <Loader2 className="size-3.5 animate-spin" />
-                        ) : (
-                          <Upload className="size-3.5" />
-                        )}
-                        <span className="hidden sm:inline">Upload</span>
-                      </button>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setShowUnsplashPicker(true)}
+                          className="flex items-center gap-1.5 px-3 h-9 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-black cursor-pointer hover:bg-primary/20 active:scale-95 transition-all"
+                        >
+                          <Camera className="size-3.5" />
+                          <span>Unsplash</span>
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isUploadingCover}
+                          onClick={() => coverImageInputRef.current?.click()}
+                          className="flex items-center gap-1.5 px-3 h-9 rounded-xl bg-primary text-primary-foreground text-xs font-black cursor-pointer hover:opacity-90 active:scale-95 transition-opacity disabled:opacity-60"
+                        >
+                          {isUploadingCover ? (
+                            <Loader2 className="size-3.5 animate-spin" />
+                          ) : (
+                            <Upload className="size-3.5" />
+                          )}
+                          <span className="hidden sm:inline">Upload</span>
+                        </button>
+                      </div>
                       <input
                         ref={coverImageInputRef}
                         type="file"
@@ -740,6 +753,17 @@ export function ArticleEditorClient({ initialArticle, isEditing = false }: Artic
           category="article"
         />
       )}
+      {/* Unsplash Cover Picker Modal */}
+      <UnsplashImagePicker
+        isOpen={showUnsplashPicker}
+        onClose={() => setShowUnsplashPicker(false)}
+        onSelect={(photo) => {
+          setCoverImageUrl(photo.url);
+          toast.success(`Selected cover photo by ${photo.photographerName}`);
+        }}
+        defaultQuery={category ? category.toLowerCase() : "technology"}
+        title="Choose Article Cover from Unsplash"
+      />
     </div>
   );
 }

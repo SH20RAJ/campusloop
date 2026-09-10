@@ -1,40 +1,71 @@
-import { Compass, Home, Search } from "lucide-react";
 import Link from "next/link";
+import { NotFoundSearch } from "@/components/marketing/not-found-search";
+import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
+import { buttonVariants } from "@/components/ui/button";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { cn } from "@/lib/utils";
 
-export default function NotFound() {
+const ESCAPE_LINKS = [
+  { href: "/app", label: "Feed" },
+  { href: "/colleges", label: "Colleges" },
+  { href: "/products", label: "Products" },
+  { href: "/contact", label: "Contact" },
+];
+
+export default async function NotFound() {
+  const user = await hexclaveServerApp.getUser();
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-6 py-16 text-center">
-      <div className="flex size-16 items-center justify-center rounded-3xl bg-primary/10 text-primary">
-        <Compass className="size-8" />
-      </div>
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <MarketingHeader isAuthenticated={!!user} />
 
-      <div className="space-y-2">
-        <p className="text-5xl font-black tracking-tight text-foreground">404</p>
-        <h1 className="text-lg font-black tracking-tight text-foreground">
-          This corner of campus doesn&apos;t exist
-        </h1>
-        <p className="mx-auto max-w-sm text-sm text-muted-foreground leading-relaxed">
-          The page may have been deleted, or the link might be wrong. The rest of CampusLoop is still right
-          here.
-        </p>
-      </div>
+      <main className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-6 py-28 text-center">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_45%_at_50%_38%,var(--color-primary)/8%,transparent_70%)]"
+        />
+        <div className="relative flex w-full max-w-md flex-col items-center">
+          <p className="rounded-full border border-border/70 bg-muted/50 px-3.5 py-1.5 font-mono text-xs font-semibold text-muted-foreground">
+            404
+          </p>
+          <h1 className="mt-5 text-4xl font-bold tracking-tight text-balance md:text-5xl">
+            This page isn&apos;t on the map
+          </h1>
+          <p className="mt-3 text-base leading-relaxed text-pretty text-muted-foreground">
+            The link is wrong or the page was removed. Search for what you meant, or head back to your feed.
+          </p>
 
-      <div className="flex flex-wrap items-center justify-center gap-2.5">
-        <Link
-          href="/app"
-          className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-5 text-xs font-black text-primary-foreground shadow-md transition-all hover:bg-primary/95 active:scale-95"
-        >
-          <Home className="size-4" />
-          Back to feed
-        </Link>
-        <Link
-          href="/app/search"
-          className="inline-flex h-10 items-center gap-2 rounded-full border border-border bg-card px-5 text-xs font-black text-foreground transition-all hover:bg-muted active:scale-95"
-        >
-          <Search className="size-4" />
-          Search campus
-        </Link>
-      </div>
-    </main>
+          <div className="mt-8 w-full">
+            <NotFoundSearch />
+          </div>
+
+          <Link
+            href={user ? "/app" : "/handler/sign-up"}
+            className={cn(buttonVariants({ size: "lg" }), "mt-4 w-full sm:w-auto")}
+          >
+            {user ? "Back to feed" : "Get verified"}
+          </Link>
+
+          <nav
+            aria-label="Popular destinations"
+            className="mt-8 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-sm"
+          >
+            {ESCAPE_LINKS.map((link, i) => (
+              <span key={link.href} className="flex items-center gap-1.5">
+                {i > 0 && <span className="text-muted-foreground/40">·</span>}
+                <Link
+                  href={link.href}
+                  className="font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {link.label}
+                </Link>
+              </span>
+            ))}
+          </nav>
+        </div>
+      </main>
+
+      <MarketingFooter />
+    </div>
   );
 }

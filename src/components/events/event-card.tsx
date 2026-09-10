@@ -126,11 +126,11 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
     return (
       <Link
         href={`/app/events/${event.slug || event.id}`}
-        className="group relative flex flex-col justify-between rounded-3xl border border-border/40 bg-card/75 hover:bg-muted/30 p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:-translate-y-0.5 overflow-hidden"
+        className="group relative flex flex-col justify-between rounded-2xl sm:rounded-3xl border border-border/40 bg-card/75 hover:bg-muted/30 p-3 sm:p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5 overflow-hidden"
       >
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {/* Banner with Mode & Deadline */}
-          <div className="relative aspect-16/9 w-full overflow-hidden rounded-2xl bg-muted/40">
+          <div className="relative aspect-16/9 w-full overflow-hidden rounded-xl sm:rounded-2xl bg-muted/40">
             {event.bannerUrl ? (
               <img
                 src={event.bannerUrl}
@@ -145,19 +145,19 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
             )}
 
             {/* Mode Tag */}
-            <div className="absolute top-2.5 left-2.5 rounded-full bg-black/75 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-black text-white uppercase tracking-wider shadow-xs">
+            <div className="absolute top-2 left-2 rounded-md bg-black/75 backdrop-blur-md px-2 py-0.5 text-[10px] font-black text-white uppercase tracking-wider shadow-xs">
               {event.mode}
             </div>
 
             {/* Event Type */}
-            <div className="absolute top-2.5 right-2.5 rounded-full bg-primary/90 text-primary-foreground backdrop-blur-md px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-xs">
+            <div className="absolute top-2 right-2 rounded-md bg-primary/90 text-primary-foreground backdrop-blur-md px-2 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-xs">
               {event.eventType}
             </div>
 
             {deadlineText && (
               <div
                 className={cn(
-                  "absolute bottom-2.5 left-2.5 right-2.5 rounded-xl px-2.5 py-1 text-[11px] font-black text-center backdrop-blur-md truncate shadow-xs",
+                  "absolute bottom-2 left-2 right-2 rounded-lg px-2 py-0.5 text-[10px] sm:text-[11px] font-black text-center backdrop-blur-md truncate shadow-xs",
                   isUrgentDeadline
                     ? "bg-red-500/90 text-white animate-pulse"
                     : "bg-black/80 text-amber-300 border border-amber-500/30"
@@ -170,14 +170,16 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
 
           {/* Club & Eligibility */}
           <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-            <span className="font-bold text-foreground truncate">{event.clubName}</span>
+            <span className="font-bold text-foreground truncate text-[11px] sm:text-xs">
+              {event.clubName}
+            </span>
             {isRestricted ? (
-              <span className="inline-flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 font-semibold shrink-0">
+              <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] text-amber-600 dark:text-amber-400 font-semibold shrink-0">
                 <School className="size-3" />
                 Campus
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground shrink-0">
+              <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-muted-foreground shrink-0">
                 <Globe className="size-3" />
                 All India
               </span>
@@ -186,29 +188,31 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
 
           {/* Title & Tagline */}
           <div className="space-y-1">
-            <h3 className="text-base font-black leading-tight text-foreground transition-colors group-hover:text-primary line-clamp-2">
+            <h3 className="text-sm sm:text-base font-black leading-snug text-foreground transition-colors group-hover:text-primary line-clamp-2">
               {event.title}
             </h3>
             {event.tagline && (
-              <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">{event.tagline}</p>
+              <p className="line-clamp-1 sm:line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                {event.tagline}
+              </p>
             )}
           </div>
 
           {/* Badges / Perks */}
-          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
             {event.prizesDescription && (
-              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-black">
-                <Trophy className="size-3.5 shrink-0" />
-                <span className="truncate max-w-[170px]">{event.prizesDescription}</span>
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-[11px] font-black">
+                <Trophy className="size-3 shrink-0" />
+                <span className="truncate max-w-[150px]">{event.prizesDescription}</span>
               </div>
             )}
 
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[11px] font-medium">
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[10px] sm:text-[11px] font-medium">
               <Calendar className="size-3" />
               <span>{dateStr}</span>
             </div>
 
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[11px] font-medium">
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[10px] sm:text-[11px] font-medium">
               <Users className="size-3" />
               <span>
                 {event.participationType === "TEAM"
@@ -219,20 +223,20 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
               </span>
             </div>
 
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-primary/10 text-primary text-[11px] font-black">
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-primary/10 text-primary text-[10px] sm:text-[11px] font-black">
               <span>+{event.loopPointsReward || 25} LP</span>
             </div>
           </div>
         </div>
 
         {/* Footer info & Actions */}
-        <div className="mt-4 flex items-center justify-between gap-2 border-t border-border/30 pt-3">
+        <div className="mt-3 sm:mt-4 flex items-center justify-between gap-2 border-t border-border/30 pt-2.5 sm:pt-3">
           <div className="flex flex-col text-xs">
             <span className="font-black text-foreground">{event.entryFee || "Free"}</span>
-            <span className="text-[10px] text-muted-foreground">{attendeeCount} registered</span>
+            <span className="text-[10px] text-muted-foreground">{attendeeCount} enrolled</span>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <AddToCalendarDropdown
               event={{
                 id: event.id,
@@ -253,7 +257,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
               onClick={event.participationType === "TEAM" ? undefined : handleQuickRegister}
               disabled={isMutating || isRegistered}
               className={cn(
-                "flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-xs font-black transition-all active:scale-95",
+                "flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 sm:px-3.5 text-xs font-black transition-all active:scale-95",
                 isRegistered
                   ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                   : "bg-primary text-primary-foreground hover:opacity-90 shadow-2xs"
@@ -279,10 +283,10 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
   return (
     <Link
       href={`/app/events/${event.slug || event.id}`}
-      className="group relative flex flex-col sm:flex-row gap-4 p-4 rounded-2xl border border-border/40 bg-card/60 hover:bg-muted/30 transition-all hover:border-border/80 hover:shadow-sm"
+      className="group relative flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border border-border/40 bg-card/60 hover:bg-muted/30 transition-all hover:border-border/80 hover:shadow-xs"
     >
-      {/* Thumbnail with Mode & Prize Badge */}
-      <div className="relative aspect-16/9 sm:aspect-square sm:size-32 w-full sm:w-auto shrink-0 overflow-hidden rounded-xl bg-muted/40">
+      {/* Compact Thumbnail with Mode Badge */}
+      <div className="relative size-22 sm:size-30 shrink-0 overflow-hidden rounded-xl bg-muted/40 aspect-square">
         {event.bannerUrl ? (
           <img
             src={event.bannerUrl}
@@ -292,19 +296,19 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-muted/60">
-            <Calendar className="size-8 text-muted-foreground/60" />
+            <Calendar className="size-6 sm:size-8 text-muted-foreground/60" />
           </div>
         )}
 
         {/* Mode Tag */}
-        <div className="absolute top-2 left-2 rounded-full bg-black/70 backdrop-blur-md px-2 py-0.5 text-[10px] font-black text-white uppercase tracking-wider">
+        <div className="absolute top-1.5 left-1.5 rounded-md bg-black/75 backdrop-blur-md px-1.5 py-0.2 text-[9px] sm:text-[10px] font-black text-white uppercase tracking-wider">
           {event.mode}
         </div>
 
         {deadlineText && (
           <div
             className={cn(
-              "absolute bottom-2 left-2 right-2 rounded-lg px-2 py-0.5 text-[10px] font-black text-center backdrop-blur-md truncate",
+              "absolute bottom-1.5 left-1.5 right-1.5 rounded-md px-1.5 py-0.2 text-[9px] font-black text-center backdrop-blur-md truncate",
               isUrgentDeadline ? "bg-red-500/90 text-white animate-pulse" : "bg-black/75 text-amber-300"
             )}
           >
@@ -313,11 +317,13 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
         )}
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col justify-between gap-2">
+      <div className="flex min-w-0 flex-1 flex-col justify-between gap-1.5 sm:gap-2 self-stretch">
         <div>
           {/* Club & Eligibility */}
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-            <span className="font-bold text-foreground">{event.clubName}</span>
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] text-muted-foreground">
+            <span className="font-bold text-foreground truncate max-w-[140px] sm:max-w-none">
+              {event.clubName}
+            </span>
             <span aria-hidden className="opacity-40">
               ·
             </span>
@@ -326,44 +332,44 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
               ·
             </span>
             {isRestricted ? (
-              <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
-                <School className="size-3" />
-                Campus exclusive
+              <span className="inline-flex items-center gap-0.5 text-amber-600 dark:text-amber-400 font-medium">
+                <School className="size-2.5" />
+                Campus
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 font-medium">
-                <Globe className="size-3" />
+              <span className="inline-flex items-center gap-0.5 font-medium">
+                <Globe className="size-2.5" />
                 All India
               </span>
             )}
           </div>
 
-          <h3 className="mt-1 text-base font-black leading-tight text-foreground transition-colors group-hover:text-primary">
+          <h3 className="mt-0.5 text-sm sm:text-base font-black leading-snug text-foreground transition-colors group-hover:text-primary line-clamp-2">
             {event.title}
           </h3>
 
           {event.tagline && (
-            <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{event.tagline}</p>
+            <p className="mt-0.5 line-clamp-1 text-xs leading-relaxed text-muted-foreground">
+              {event.tagline}
+            </p>
           )}
         </div>
 
-        {/* Highlight Stats / Badges (Unstop Style) */}
-        <div className="flex flex-wrap items-center gap-2 pt-1">
+        {/* Badges */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
           {event.prizesDescription && (
-            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-black">
-              <Trophy className="size-3.5 shrink-0" />
-              <span className="truncate max-w-[200px]">{event.prizesDescription}</span>
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] sm:text-[11px] font-black">
+              <Trophy className="size-3 shrink-0" />
+              <span className="truncate max-w-[150px] sm:max-w-[200px]">{event.prizesDescription}</span>
             </div>
           )}
 
-          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-xs font-medium">
-            <Calendar className="size-3" />
-            <span>
-              {dateStr}, {timeStr}
-            </span>
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[10px] sm:text-[11px] font-medium">
+            <Calendar className="size-2.5 sm:size-3" />
+            <span>{dateStr}</span>
           </div>
 
-          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-xs font-medium">
+          <div className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-xs font-medium">
             <Users className="size-3" />
             <span>
               {event.participationType === "TEAM"
@@ -374,21 +380,20 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-primary/10 text-primary text-xs font-black">
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-primary/10 text-primary text-[10px] sm:text-xs font-black">
             <span>+{event.loopPointsReward || 25} LP</span>
           </div>
         </div>
 
         {/* Footer info & Actions */}
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-2.5 border-t border-border/30 pt-2">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">{attendeeCount}</span>
-            <span>registered</span>
-            <span aria-hidden>·</span>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/20 pt-2 mt-auto">
+          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground">
             <span className="font-bold text-foreground">{event.entryFee || "Free"}</span>
+            <span aria-hidden>·</span>
+            <span className="text-[10px] sm:text-[11px]">{attendeeCount} enrolled</span>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <AddToCalendarDropdown
               event={{
                 id: event.id,
@@ -409,7 +414,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
               onClick={event.participationType === "TEAM" ? undefined : handleQuickRegister}
               disabled={isMutating || isRegistered}
               className={cn(
-                "flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-4 text-xs font-black transition-all active:scale-95",
+                "flex h-7.5 sm:h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 sm:px-4 text-xs font-black transition-all active:scale-95",
                 isRegistered
                   ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                   : "bg-primary text-primary-foreground hover:opacity-90 shadow-2xs"
@@ -417,13 +422,13 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
             >
               {isRegistered ? (
                 <>
-                  <Check className="size-3.5" />
+                  <Check className="size-3" />
                   Registered
                 </>
               ) : event.participationType === "TEAM" ? (
-                "View & Form Team"
+                "Form Team"
               ) : (
-                "Register Now"
+                "Register"
               )}
             </button>
           </div>

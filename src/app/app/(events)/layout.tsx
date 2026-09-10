@@ -139,7 +139,7 @@ export default async function EventsLayout({ children }: { children: React.React
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 py-4">{children}</main>
+      <main className="flex-1 w-full min-w-0">{children}</main>
     </div>
   );
 }

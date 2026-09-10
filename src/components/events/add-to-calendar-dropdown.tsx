@@ -58,11 +58,11 @@ export function AddToCalendarDropdown({ event, variant = "button", className }: 
         aria-expanded={isOpen}
         aria-label="Add event to calendar"
         className={cn(
-          "inline-flex items-center gap-1.5 transition-all cursor-pointer select-none active:scale-95",
+          "inline-flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer select-none active:scale-95",
           variant === "button" &&
-            "h-8 px-3 rounded-full text-xs font-bold border border-border/40 bg-muted/40 hover:bg-muted/70 text-foreground shadow-2xs",
+            "h-7.5 sm:h-8 px-2 sm:px-3 rounded-full text-xs font-bold border border-border/40 bg-muted/40 hover:bg-muted/70 text-foreground shadow-2xs",
           variant === "pill" &&
-            "h-9 px-4 rounded-xl text-xs font-black border border-border/40 bg-card hover:bg-muted/40 text-foreground shadow-xs",
+            "h-9 px-3 sm:px-4 rounded-xl text-xs font-black border border-border/40 bg-card hover:bg-muted/40 text-foreground shadow-xs",
           variant === "minimal" &&
             "size-8 rounded-full border border-border/40 bg-background/80 hover:bg-muted text-muted-foreground hover:text-foreground items-center justify-center p-0"
         )}
@@ -70,7 +70,7 @@ export function AddToCalendarDropdown({ event, variant = "button", className }: 
         <Calendar className="size-3.5 text-primary shrink-0" />
         {variant !== "minimal" && (
           <>
-            <span>Add to Calendar</span>
+            <span className="hidden sm:inline">Add to Calendar</span>
             <ChevronDown
               className={cn(
                 "size-3 text-muted-foreground transition-transform duration-200",

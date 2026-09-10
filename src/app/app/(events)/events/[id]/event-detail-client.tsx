@@ -6,7 +6,6 @@ import {
   Calendar,
   Check,
   CheckCircle2,
-  Download,
   ExternalLink,
   Gift,
   MapPin,
@@ -201,12 +200,12 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
   }
 
   return (
-    <div className="min-h-screen pb-28 border-x border-border/40 bg-background">
+    <div className="mx-auto max-w-3xl min-h-screen pb-28 border-x border-border/40 bg-background">
       {/* Top Bar */}
-      <div className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border/40 px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border/40 px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+          className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
         >
           <ArrowLeft className="size-4" />
           <span>Back</span>
@@ -217,18 +216,18 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
             size="sm"
             variant="outline"
             onClick={() => setShowQrModal(true)}
-            className="h-8 px-3 rounded-full text-xs font-bold gap-1.5 cursor-pointer bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
+            className="h-8 px-2.5 sm:px-3 rounded-full text-xs font-bold gap-1.5 cursor-pointer bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
             title="Cute QR Code Share Card"
           >
             <QrCode className="size-3.5" />
-            <span>QR Code</span>
+            <span className="hidden sm:inline">QR Code</span>
           </Button>
 
           <Button
             size="sm"
             variant="outline"
             onClick={handleShare}
-            className="h-8 px-3 rounded-full text-xs font-bold gap-1.5 cursor-pointer"
+            className="h-8 px-2.5 sm:px-3 rounded-full text-xs font-bold gap-1.5 cursor-pointer"
           >
             <Share2 className="size-3.5" />
             <span>Share</span>
@@ -237,7 +236,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
       </div>
 
       {/* Event Banner */}
-      <div className="relative aspect-21/9 md:aspect-3/1 w-full overflow-hidden bg-muted/40">
+      <div className="relative aspect-16/9 sm:aspect-21/9 md:aspect-3/1 w-full overflow-hidden bg-muted/40">
         {event.bannerUrl ? (
           <img src={event.bannerUrl} alt={event.title} className="h-full w-full object-cover" />
         ) : (
@@ -247,37 +246,39 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
         )}
         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-transparent" />
 
-        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3 text-white">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="rounded-lg bg-black/75 px-2.5 py-0.5 text-xs font-black uppercase tracking-wider backdrop-blur-md">
+        <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex items-end justify-between gap-2.5 text-white">
+          <div className="space-y-1 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="rounded-md sm:rounded-lg bg-black/75 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-black uppercase tracking-wider backdrop-blur-md">
                 {event.eventType}
               </span>
-              <span className="rounded-lg bg-primary/90 px-2.5 py-0.5 text-xs font-black uppercase text-primary-foreground backdrop-blur-md">
+              <span className="rounded-md sm:rounded-lg bg-primary/90 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-black uppercase text-primary-foreground backdrop-blur-md">
                 {event.mode}
               </span>
             </div>
-            <p className="text-xs font-bold text-primary-foreground/90 uppercase tracking-wide">
+            <p className="text-[11px] sm:text-xs font-bold text-primary-foreground/90 uppercase tracking-wide truncate">
               {event.clubName}
             </p>
           </div>
 
           <div className="text-right shrink-0">
-            <span className="rounded-xl bg-black/70 px-3 py-1.5 text-xs font-black backdrop-blur-md text-white">
+            <span className="rounded-lg sm:rounded-xl bg-black/70 px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-black backdrop-blur-md text-white">
               {event.entryFee || "Free"}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="p-4 md:p-6 space-y-6">
+      <div className="p-3.5 sm:p-5 md:p-6 space-y-5 sm:space-y-6">
         {/* Title & Tagline */}
-        <div className="space-y-2">
-          <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight">
+        <div className="space-y-1.5 sm:space-y-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight">
             {event.title}
           </h1>
           {event.tagline && (
-            <p className="text-sm font-medium text-muted-foreground leading-relaxed">{event.tagline}</p>
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground leading-relaxed">
+              {event.tagline}
+            </p>
           )}
         </div>
 
@@ -305,11 +306,11 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
               {event.isRegistered ? (
                 <Button
                   disabled
-                  className="h-10 px-5 rounded-full font-black text-xs bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 gap-1.5"
+                  className="h-10 px-5 rounded-full font-black text-xs bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 gap-1.5 flex-1 sm:flex-initial justify-center"
                 >
                   <Check className="size-4" />
                   <span>Registered</span>
@@ -320,7 +321,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                     haptics.medium();
                     setShowRegModal(true);
                   }}
-                  className="h-10 px-6 rounded-full font-black text-xs bg-primary text-primary-foreground hover:opacity-90 shadow-md cursor-pointer"
+                  className="h-10 px-6 rounded-full font-black text-xs bg-primary text-primary-foreground hover:opacity-90 shadow-md cursor-pointer flex-1 sm:flex-initial justify-center"
                 >
                   Register Now
                 </Button>
@@ -331,7 +332,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
                 size="sm"
                 onClick={handleToggleReminder}
                 disabled={isTogglingReminder}
-                className={`h-10 px-3.5 rounded-full text-xs font-bold gap-1.5 cursor-pointer ${
+                className={`h-10 px-3.5 rounded-full text-xs font-bold gap-1.5 cursor-pointer shrink-0 ${
                   event.reminderSet
                     ? "bg-primary/10 text-primary border-primary/30"
                     : "text-muted-foreground hover:text-foreground"
@@ -391,7 +392,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
         </div>
 
         {/* Date, Time, Venue, Eligibility Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
           <div className="p-3.5 rounded-2xl border border-border/40 bg-card flex items-start gap-3">
             <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
               <Calendar className="size-5" />
@@ -591,7 +592,7 @@ export function EventDetailClient({ eventId }: EventDetailClientProps) {
 
       {/* Registration Modal */}
       <Dialog open={showRegModal} onOpenChange={setShowRegModal}>
-        <DialogContent className="max-w-md rounded-3xl p-6">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md max-h-[90vh] overflow-y-auto rounded-2xl sm:rounded-3xl p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-lg font-black flex items-center gap-2">
               <Calendar className="size-5 text-primary" />

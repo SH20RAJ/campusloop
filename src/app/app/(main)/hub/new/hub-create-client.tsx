@@ -228,12 +228,9 @@ export function HubCreateClient({ initialType = "lost_found", profileId }: HubCr
           >
             <ArrowLeft className="size-4.5" />
           </button>
-          <div>
-            <h1 className="text-base font-black tracking-tight text-foreground">
-              New {activeCategory.label} Listing
-            </h1>
-            <p className="text-xs text-muted-foreground">Post to verified college peers</p>
-          </div>
+          <h1 className="text-base font-black tracking-tight text-foreground">
+            New {activeCategory.label} Listing
+          </h1>
         </div>
 
         <button

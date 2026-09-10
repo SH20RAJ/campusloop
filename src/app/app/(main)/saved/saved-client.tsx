@@ -75,17 +75,12 @@ export function SavedClient() {
             <div className="size-9 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
               <Bookmark className="size-4.5 fill-amber-500 stroke-amber-500" />
             </div>
-            <div>
-              <h1 className="text-base font-black tracking-tight text-foreground flex items-center gap-2">
-                Saved Posts Vault
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-muted text-muted-foreground">
-                  {posts.length} {posts.length === 1 ? "Save" : "Saves"}
-                </span>
-              </h1>
-              <p className="text-[11px] text-muted-foreground font-medium">
-                Your private archive • Persists permanently across Campus Preview and Student Mode
-              </p>
-            </div>
+            <h1 className="text-base font-black tracking-tight text-foreground flex items-center gap-2">
+              Saved Posts Vault
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-muted text-muted-foreground">
+                {posts.length} {posts.length === 1 ? "Save" : "Saves"}
+              </span>
+            </h1>
           </div>
         </div>
 

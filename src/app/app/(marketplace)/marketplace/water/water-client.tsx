@@ -60,23 +60,19 @@ export function WaterMarketplaceClient({
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 pb-28 select-none">
       {/* ─── Hero Banner ─── */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-cyan-600 via-teal-600 to-blue-600 p-6 sm:p-8 text-white shadow-lg">
-        <div className="relative z-10 max-w-lg space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider">
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-cyan-600 via-teal-600 to-blue-600 p-4 sm:p-6 text-white shadow-md">
+        <div className="relative z-10 max-w-lg space-y-1.5">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-black uppercase tracking-wider">
             <Droplet className="size-3.5 fill-cyan-300 text-cyan-300" />
             <span>Pure RO Chilled Drinking Water</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-tight">
             20L Water Can Delivery to Hostel Rooms
           </h1>
-          <p className="text-xs sm:text-sm text-white/90 font-medium">
-            Never lug heavy 20-litre water jars up hostel stairs again. 1-tap room floor delivery in 20–25
-            mins across {collegeName}.
-          </p>
         </div>
 
-        <div className="absolute right-4 -bottom-6 opacity-20 pointer-events-none">
-          <Droplet className="size-48" />
+        <div className="absolute right-4 -bottom-4 opacity-20 pointer-events-none">
+          <Droplet className="size-32 sm:size-40" />
         </div>
       </div>
 

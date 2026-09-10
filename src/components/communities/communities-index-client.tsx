@@ -158,14 +158,9 @@ export function CommunitiesIndexClient({
       {/* ─── Sticky Twitter/X Header ─── */}
       <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xl border-b border-border/30">
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="space-y-0.5">
-            <h1 className="text-base sm:text-lg font-black tracking-tight text-foreground flex items-center gap-1.5">
-              <span>Campus Communities</span>
-            </h1>
-            <p className="text-[11px] text-muted-foreground font-medium">
-              Student sub-hubs, tech clubs, interest groups & discussions
-            </p>
-          </div>
+          <h1 className="text-base sm:text-lg font-black tracking-tight text-foreground">
+            Campus Communities
+          </h1>
 
           <Link
             href="/app/communities/new"
@@ -274,40 +269,37 @@ export function CommunitiesIndexClient({
               return (
                 <div
                   key={c.id}
-                  className="rounded-2xl border border-border/40 bg-card p-4 hover:border-border/80 transition-all space-y-3 group shadow-2xs"
+                  className="rounded-2xl border border-border/40 bg-card p-4 hover:border-border/80 transition-all space-y-2.5 group shadow-2xs"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <Link
                       href={`/app/communities/${c.id}`}
                       className="flex items-start gap-3 min-w-0 flex-1 cursor-pointer"
                     >
-                      <Avatar className="size-12 rounded-2xl border border-border/50 shrink-0 ring-2 ring-border/20">
+                      <Avatar className="size-11 rounded-2xl border border-border/50 shrink-0 ring-2 ring-border/20">
                         <AvatarImage src={avatar} />
                         <AvatarFallback className="text-xs font-black bg-muted">{c.name[0]}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors truncate">
-                            c/{c.name}
-                          </h3>
+                        <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors truncate">
+                          c/{c.name}
+                        </h3>
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           {c.privacy === "PRIVATE" ? (
-                            <span className="flex items-center gap-0.5 text-[10px] font-bold text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded-md shrink-0">
+                            <span className="flex items-center gap-0.5 text-[10px] font-bold text-amber-500 bg-amber-500/10 px-1.5 py-0.2 rounded-md shrink-0">
                               <Lock className="size-2.5" />
                               <span>Private</span>
                             </span>
                           ) : (
-                            <span className="flex items-center gap-0.5 text-[10px] font-bold text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md shrink-0">
+                            <span className="flex items-center gap-0.5 text-[10px] font-bold text-muted-foreground bg-muted/60 px-1.5 py-0.2 rounded-md shrink-0">
                               <Globe className="size-2.5" />
                               <span>Public</span>
                             </span>
                           )}
-                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0">
+                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.2 rounded-full shrink-0">
                             {c.category}
                           </span>
                         </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                          {c.description || "Student-created campus community and discussion space."}
-                        </p>
                       </div>
                     </Link>
 
@@ -316,6 +308,12 @@ export function CommunitiesIndexClient({
                       <JoinCommunityButton communityId={c.id} initialIsMember={isMember} />
                     </div>
                   </div>
+
+                  {c.description && (
+                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                      {c.description}
+                    </p>
+                  )}
 
                   <div className="flex items-center justify-between pt-2 border-t border-border/20 text-xs text-muted-foreground">
                     <div className="flex items-center gap-3">
@@ -439,21 +437,16 @@ export function CommunitiesIndexClient({
                       <AvatarImage src={avatar} />
                       <AvatarFallback className="text-xs font-black bg-muted">{c.name[0]}</AvatarFallback>
                     </Avatar>
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <h3 className="text-xs sm:text-sm font-black text-foreground group-hover:text-primary transition-colors truncate">
-                          c/{c.name}
-                        </h3>
-                        <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.2 rounded-md">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors truncate">
+                        c/{c.name}
+                      </h3>
+                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                        <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.2 rounded-md shrink-0">
                           {c.category}
                         </span>
+                        <span className="font-semibold text-[11px]">{c.members.length} members</span>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {c.description || "Campus student sub-hub"}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground/80 font-semibold">
-                        {c.members.length} members
-                      </p>
                     </div>
                   </Link>
 

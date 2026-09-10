@@ -37,12 +37,7 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
           >
             <ArrowLeft className="size-4.5" />
           </button>
-          <div>
-            <h1 className="text-base font-black text-foreground tracking-tight">More on CampusLoop</h1>
-            <p className="text-[11px] text-muted-foreground font-medium">
-              Explore campus directories, utilities, communities &amp; socials
-            </p>
-          </div>
+          <h1 className="text-base font-black text-foreground tracking-tight">More on CampusLoop</h1>
         </div>
       </div>
 

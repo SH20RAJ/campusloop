@@ -173,14 +173,9 @@ export function CreateListingClient({ profileId }: CreateListingClientProps) {
           >
             <ArrowLeft className="size-4.5" />
           </button>
-          <div>
-            <h1 className="text-base font-black text-foreground tracking-tight leading-none">
-              Sell Campus Gear
-            </h1>
-            <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
-              List items for batchmates on your campus
-            </p>
-          </div>
+          <h1 className="text-base font-black text-foreground tracking-tight leading-none">
+            Sell Campus Gear
+          </h1>
         </div>
       </header>
 

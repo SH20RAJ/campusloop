@@ -159,15 +159,10 @@ export function BirthdaysClient() {
           >
             <ArrowLeft className="size-4" />
           </button>
-          <div>
-            <h1 className="text-base font-black tracking-tight text-foreground flex items-center gap-1.5">
-              <span>Campus Birthdays</span>
-              <span className="size-1.5 rounded-full bg-pink-500" />
-            </h1>
-            <p className="text-[10px] text-muted-foreground font-semibold">
-              Today&apos;s campus celebrations &amp; student DOB
-            </p>
-          </div>
+          <h1 className="text-base font-black tracking-tight text-foreground flex items-center gap-1.5">
+            <span>Campus Birthdays</span>
+            <span className="size-1.5 rounded-full bg-pink-500" />
+          </h1>
         </div>
 
         {/* Scope Pill Toggle */}

@@ -49,23 +49,18 @@ export function CapsuleClient({ initialCapsules, profileId }: CapsuleClientProps
       {/* Sticky Header */}
       <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xl border-b border-border/30 px-4 py-3.5 space-y-3">
         <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <h1 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
-              <Hourglass className="size-5 text-amber-500" />
-              <span>Campus Time Capsule</span>
-            </h1>
-            <p className="text-[11px] text-muted-foreground font-medium">
-              Batch memory vaults locked until convocation & landmark campus dates
-            </p>
-          </div>
+          <h1 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+            <Hourglass className="size-5 text-amber-500" />
+            <span>Campus Time Capsule</span>
+          </h1>
         </div>
 
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-0.5">
           {[
             { id: "ALL", label: "All Capsules" },
-            { id: "SEALED", label: "Sealed Vaults ⏳" },
-            { id: "UNLOCKED", label: "Unlocked Museum 🔓" },
+            { id: "SEALED", label: "Sealed Vaults" },
+            { id: "UNLOCKED", label: "Unlocked Museum" },
             { id: "CONVOCATION", label: "Convocation" },
             { id: "BATCH_MEMORIES", label: "Batch Memories" },
             { id: "PREDICTIONS", label: "Predictions" },

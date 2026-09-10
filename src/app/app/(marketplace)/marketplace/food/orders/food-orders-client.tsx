@@ -38,13 +38,10 @@ export function FoodOrdersClient() {
           >
             <ArrowLeft className="size-4.5" />
           </Link>
-          <div>
-            <h1 className="text-lg font-black text-foreground tracking-tight flex items-center gap-2">
-              <UtensilsCrossed className="size-4.5 text-rose-500" />
-              <span>Food &amp; Canteen Orders</span>
-            </h1>
-            <p className="text-xs text-muted-foreground">Live kitchen and hostel delivery status</p>
-          </div>
+          <h1 className="text-lg font-black text-foreground tracking-tight flex items-center gap-2">
+            <UtensilsCrossed className="size-4.5 text-rose-500" />
+            <span>Food &amp; Canteen Orders</span>
+          </h1>
         </div>
 
         <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-xl">

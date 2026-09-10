@@ -109,23 +109,19 @@ export function FoodMarketplaceClient({ profileId, collegeName = "Campus Hub" }:
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 pb-20">
       {/* ─── Zomato-Style Header Banner ─── */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-rose-600 via-rose-500 to-amber-500 p-6 sm:p-8 text-white shadow-lg">
-        <div className="relative z-10 max-w-lg space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider">
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-rose-600 via-rose-500 to-amber-500 p-4 sm:p-6 text-white shadow-md">
+        <div className="relative z-10 max-w-lg space-y-1.5">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-black uppercase tracking-wider">
             <Flame className="size-3.5 fill-white" />
             <span>Hostel Express Delivery</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-            Craving Night Mess or Canteen Chow?
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-tight">
+            Campus Night Mess & Canteens
           </h1>
-          <p className="text-xs sm:text-sm text-white/90 font-medium">
-            Hot momos, butter paneer rolls, and midnight cold coffee delivered in 15–20 mins inside{" "}
-            {collegeName}.
-          </p>
         </div>
 
-        <div className="absolute right-3 -bottom-6 opacity-20 sm:opacity-30 pointer-events-none">
-          <UtensilsCrossed className="size-48" />
+        <div className="absolute right-3 -bottom-4 opacity-20 sm:opacity-30 pointer-events-none">
+          <UtensilsCrossed className="size-32 sm:size-40" />
         </div>
       </div>
 

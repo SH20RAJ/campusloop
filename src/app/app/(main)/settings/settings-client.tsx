@@ -124,15 +124,10 @@ export function SettingsClient({ profile }: SettingsClientProps) {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen pb-24 text-foreground">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/90 px-4 py-4 backdrop-blur-xl border-b border-border flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-black tracking-tight flex items-center gap-2 text-foreground">
-            <Sliders className="h-5 w-5 text-primary" /> Settings & Account
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Manage your campus identity, preferences, & privacy.
-          </p>
-        </div>
+      <header className="sticky top-0 z-40 bg-background/90 px-4 py-3.5 backdrop-blur-xl border-b border-border flex items-center justify-between">
+        <h1 className="text-lg font-black tracking-tight flex items-center gap-2 text-foreground">
+          <Sliders className="h-5 w-5 text-primary" /> Settings & Account
+        </h1>
       </header>
 
       <div className="px-4 py-6 space-y-6">

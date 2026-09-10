@@ -86,23 +86,19 @@ export function SupermarketMarketplaceClient({
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 pb-28">
       {/* ─── Flipkart/Blinkit Style Banner ─── */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-6 sm:p-8 text-white shadow-lg">
-        <div className="relative z-10 max-w-lg space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider">
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-4 sm:p-6 text-white shadow-md">
+        <div className="relative z-10 max-w-lg space-y-1.5">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-black uppercase tracking-wider">
             <Zap className="size-3.5 fill-yellow-300 text-yellow-300" />
             <span>15-Min Hostel Flash Delivery</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-tight">
             Campus Supermarket &amp; Daily Mart
           </h1>
-          <p className="text-xs sm:text-sm text-white/90 font-medium">
-            Exam notebooks, pens, midnight Maggi, chilled Amul Kool, laundry detergents &amp; personal care
-            delivered to your door.
-          </p>
         </div>
 
-        <div className="absolute right-4 -bottom-6 opacity-20 pointer-events-none">
-          <ShoppingBag className="size-48" />
+        <div className="absolute right-4 -bottom-4 opacity-20 pointer-events-none">
+          <ShoppingBag className="size-32 sm:size-40" />
         </div>
       </div>
 

@@ -6,32 +6,18 @@ import {
   ArrowLeft,
   ArrowUp,
   Bookmark,
-  Bot,
-  Check,
   CheckCircle2,
   ChevronRight,
   Download,
   ExternalLink,
-  Eye,
-  FileCheck,
-  FileText,
-  Flame,
   FolderOpen,
   FolderPlus,
   Globe,
-  Loader2,
-  MessageSquare,
   Play,
-  QrCode,
   Share2,
   ShieldCheck,
-  Sparkles,
   Target,
-  ThumbsUp,
-  TrendingUp,
-  Zap,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

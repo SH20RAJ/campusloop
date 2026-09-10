@@ -193,17 +193,12 @@ export function BuyAndSellClient({ profileId }: BuyAndSellClientProps) {
             >
               <ArrowLeft className="size-4.5" />
             </button>
-            <div>
-              <h1 className="text-base font-black text-foreground tracking-tight flex items-center gap-1.5 leading-none">
-                <span>Buy & Sell Hub</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
-                  Verified
-                </span>
-              </h1>
-              <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
-                Peer-to-peer campus marketplace & hostel trades
-              </p>
-            </div>
+            <h1 className="text-base font-black text-foreground tracking-tight flex items-center gap-1.5 leading-none">
+              <span>Buy & Sell Hub</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                Verified
+              </span>
+            </h1>
           </div>
 
           <Link

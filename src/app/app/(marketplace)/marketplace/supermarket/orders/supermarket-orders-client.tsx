@@ -40,13 +40,10 @@ export function SupermarketOrdersClient() {
           >
             <ArrowLeft className="size-4.5" />
           </Link>
-          <div>
-            <h1 className="text-lg font-black text-foreground tracking-tight flex items-center gap-2">
-              <ShoppingBag className="size-4.5 text-amber-500" />
-              <span>Supermarket &amp; Mart Orders</span>
-            </h1>
-            <p className="text-xs text-muted-foreground">Hostel grocery &amp; stationery delivery tracking</p>
-          </div>
+          <h1 className="text-lg font-black text-foreground tracking-tight flex items-center gap-2">
+            <ShoppingBag className="size-4.5 text-amber-500" />
+            <span>Supermarket &amp; Mart Orders</span>
+          </h1>
         </div>
 
         <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-xl">

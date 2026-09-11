@@ -19,11 +19,24 @@ export function BrandMark({ size = "md" }: { size?: "sm" | "md" }) {
 
 export const NOTEBOOK_URL = "https://notebook.campusloop.space/";
 
+export {
+  LandingBadge,
+  LandingCard,
+  LandingContainer,
+  LandingSection,
+  LandingSectionHeader,
+  type LandingBadgeProps,
+  type LandingCardProps,
+  type LandingContainerProps,
+  type LandingSectionHeaderProps,
+  type LandingSectionProps,
+} from "@/components/landing/landing-design-system";
+
 const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/overview", label: "Overview" },
   { href: "/products", label: "Products" },
-  { href: "/pitch", label: "Pitch" },
+  { href: "/colleges", label: "Colleges" },
   { href: "/safety", label: "Safety" },
 ];
 
@@ -84,7 +97,7 @@ const FOOTER_COLUMNS: { title: string; links: { href: string; label: string; ext
     title: "Company",
     links: [
       { href: "/about", label: "About Us" },
-      { href: "/pitch", label: "Investor Pitch" },
+      { href: "/colleges", label: "Campus Hubs" },
       { href: "/contact", label: "Contact" },
     ],
   },

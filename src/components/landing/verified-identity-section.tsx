@@ -2,214 +2,150 @@
 
 import { Lock, MailCheck, ShieldCheck, UserCheck, Users } from "lucide-react";
 import { useState } from "react";
+import {
+  LandingContainer,
+  LandingSection,
+  LandingSectionHeader,
+} from "@/components/landing/landing-design-system";
 import { Reveal } from "@/components/landing/reveal";
+import { VERIFIED_IDENTITY_CONTENT } from "@/constants/landing";
 
 const PHONE_RE = /\b\d{10}\b/g;
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 
+const STEP_ICONS = [MailCheck, UserCheck, Users, ShieldCheck];
+
 export function VerifiedIdentitySection() {
   const [inputText, setInputText] = useState(
-    "Lost my calculator near CAT Hall. Call 9876543210 or mail senior@bitmesra.ac.in!"
+    VERIFIED_IDENTITY_CONTENT.privacyDemo.inputDefault
   );
 
   const hadPii = Boolean(inputText.match(PHONE_RE) || inputText.match(EMAIL_RE));
 
   return (
-    <section className="border-t border-border/40 py-20 sm:py-28 px-4 sm:px-6 bg-background">
-      <div className="mx-auto w-full max-w-6xl space-y-12">
+    <LandingSection bg="default">
+      <LandingContainer>
         {/* Section Heading */}
-        <Reveal className="space-y-3">
-          <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1D9BF0]">
-            {"IDENTITY_ARCHITECTURE // ACCOUNTABLE_ANONYMITY"}
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.12]">
-            Verified at the door.
-            <br />
-            <span className="text-[#1D9BF0]">Anonymous when you need it.</span>
-          </h2>
-          <p className="max-w-2xl text-base text-muted-foreground leading-relaxed">
-            Most social apps force an all-or-nothing choice between complete surveillance and toxic anonymity.
-            CampusLoop combines institutional student verification with cryptographic privacy.
-          </p>
-        </Reveal>
+        <LandingSectionHeader
+          eyebrow={VERIFIED_IDENTITY_CONTENT.eyebrow}
+          headlineMain={VERIFIED_IDENTITY_CONTENT.headlineMain}
+          headlineHighlight={VERIFIED_IDENTITY_CONTENT.headlineHighlight}
+          description={VERIFIED_IDENTITY_CONTENT.description}
+        />
 
-        {/* 4-Step Verification Protocol Architecture */}
+        {/* 4-Step Verification Flow */}
         <Reveal delay={0.08}>
           <div className="rounded-2xl border border-border/40 bg-card p-6 sm:p-8 space-y-8">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-4">
               <span className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
-                Cryptographic Identity Pipeline
+                How Privacy Works on CampusLoop
               </span>
               <span className="font-mono text-[11px] text-[#1D9BF0] font-bold">
-                OTP → ENROLLMENT_CHECK → ISOLATED_RADIUS → AES_SEAL
+                One-Time OTP · Campus-Isolated · AES-Vault Sealed
               </span>
             </div>
 
             {/* Steps Flow Grid */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {/* Step 1 */}
-              <div className="rounded-xl border border-border/40 bg-muted/20 p-4 space-y-2.5">
-                <div className="flex size-9 items-center justify-center rounded-lg bg-[#1D9BF0]/10 text-[#1D9BF0] border border-[#1D9BF0]/20">
-                  <MailCheck className="size-4.5" />
-                </div>
-                <div className="font-bold text-sm text-foreground">01. College Email</div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Institutional address (.ac.in / .edu.in) verified with a single-use OTP.
-                </p>
-                <span className="inline-block font-mono text-[10px] text-emerald-500 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                  Gatekept at Entry
-                </span>
-              </div>
-
-              {/* Step 2 */}
-              <div className="rounded-xl border border-border/40 bg-muted/20 p-4 space-y-2.5">
-                <div className="flex size-9 items-center justify-center rounded-lg bg-[#1D9BF0]/10 text-[#1D9BF0] border border-[#1D9BF0]/20">
-                  <UserCheck className="size-4.5" />
-                </div>
-                <div className="font-bold text-sm text-foreground">02. Verified Hub</div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Mapped exclusively to your campus radius. Zero outsiders or bots.
-                </p>
-                <span className="inline-block font-mono text-[10px] text-[#1D9BF0] font-bold bg-[#1D9BF0]/10 px-2 py-0.5 rounded-full">
-                  Zero Outsiders
-                </span>
-              </div>
-
-              {/* Step 3 */}
-              <div className="rounded-xl border border-[#1D9BF0]/30 bg-[#1D9BF0]/5 p-4 space-y-2.5">
-                <div className="flex size-9 items-center justify-center rounded-lg bg-[#1D9BF0]/15 text-[#1D9BF0] border border-[#1D9BF0]/30">
-                  <Users className="size-4.5" />
-                </div>
-                <div className="font-bold text-sm text-foreground">03. Dual Persona</div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Toggle between Real Profile (Clubs &amp; Match) or Anonymous (Confessions &amp; Polls).
-                </p>
-                <span className="inline-block font-mono text-[10px] text-[#1D9BF0] font-bold bg-[#1D9BF0]/15 px-2 py-0.5 rounded-full">
-                  Contextual Switcher
-                </span>
-              </div>
-
-              {/* Step 4 */}
-              <div className="rounded-xl border border-border/40 bg-muted/20 p-4 space-y-2.5">
-                <div className="flex size-9 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                  <ShieldCheck className="size-4.5" />
-                </div>
-                <div className="font-bold text-sm text-foreground">04. Safety Escrow</div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Peers never see author identity. Abusive actors face real strikes and campus bans.
-                </p>
-                <span className="inline-block font-mono text-[10px] text-purple-400 font-bold bg-purple-500/10 px-2 py-0.5 rounded-full">
-                  Accountable Shield
-                </span>
-              </div>
-            </div>
-
-            {/* Interactive Privacy Shield Sandbox */}
-            <div className="pt-2 border-t border-border/40">
-              <div className="rounded-xl border border-border/60 bg-muted/10 p-4 sm:p-5 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Lock className="size-4 text-[#1D9BF0]" />
-                    <span className="font-mono text-xs font-bold text-foreground">
-                      PRIVACY SHIELD // REAL-TIME PII &amp; DOXXING PROTECTION
-                    </span>
-                  </div>
-                  {hadPii ? (
-                    <span className="font-mono text-[10px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                      <ShieldCheck className="size-3 text-amber-500" />
-                      <span>Contact Details Flagged</span>
-                    </span>
-                  ) : (
-                    <span className="font-mono text-[10px] font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                      <ShieldCheck className="size-3 text-emerald-500" />
-                      <span>Zero Personal Contact Leaks</span>
-                    </span>
-                  )}
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="pii-input"
-                      className="font-mono text-[10px] font-semibold text-muted-foreground uppercase flex items-center justify-between"
-                    >
-                      <span>Draft Post Content (Try editing)</span>
-                      <span className="text-[9px] text-muted-foreground/80">Keystroke validation</span>
-                    </label>
-                    <textarea
-                      id="pii-input"
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                      rows={3}
-                      className="w-full bg-background border border-border/60 rounded-lg p-2.5 text-xs text-foreground font-mono focus:border-[#1D9BF0] outline-none resize-none leading-relaxed"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <span className="font-mono text-[10px] font-semibold text-muted-foreground uppercase block">
-                      Campus Timeline Protection Engine
-                    </span>
-                    <div className="w-full bg-background/60 border border-border/40 rounded-lg p-3 text-xs font-mono space-y-2 min-h-[74px]">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Phone Detector:</span>
-                        <span className={inputText.match(PHONE_RE) ? "text-amber-500 font-bold" : "text-emerald-500"}>
-                          {inputText.match(PHONE_RE) ? "FLAGGED (Blocked from publishing)" : "PASSED (Clean)"}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Email Detector:</span>
-                        <span className={inputText.match(EMAIL_RE) ? "text-amber-500 font-bold" : "text-emerald-500"}>
-                          {inputText.match(EMAIL_RE) ? "FLAGGED (Blocked from publishing)" : "PASSED (Clean)"}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between border-t border-border/30 pt-1.5 text-[11px]">
-                        <span className="text-muted-foreground">Anonymity Storage:</span>
-                        <span className="text-[#1D9BF0] font-bold">author_id = NULL (Untrackable)</span>
-                      </div>
+              {VERIFIED_IDENTITY_CONTENT.steps.map((step, idx) => {
+                const Icon = STEP_ICONS[idx % STEP_ICONS.length];
+                return (
+                  <div key={step.number} className="rounded-xl border border-border/40 bg-muted/20 p-4 space-y-2.5">
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-[#1D9BF0]/10 text-[#1D9BF0] border border-[#1D9BF0]/20">
+                      <Icon className="size-4.5" />
+                    </div>
+                    <div className="font-bold text-sm text-foreground">
+                      {step.number}. {step.title}
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {step.desc}
+                    </p>
+                    <div className="pt-2 text-[10px] font-mono font-semibold text-[#1D9BF0] uppercase tracking-wider">
+                      {step.tag}
                     </div>
                   </div>
+                );
+              })}
+            </div>
+
+            {/* Interactive Client-Side Privacy Shield */}
+            <div className="rounded-xl border border-border/60 bg-muted/30 p-5 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Lock className="size-4 text-[#1D9BF0]" />
+                  <span className="font-mono text-xs font-bold text-foreground uppercase tracking-wider">
+                    {VERIFIED_IDENTITY_CONTENT.privacyDemo.title}
+                  </span>
+                </div>
+                {hadPii ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/15 border border-destructive/30 px-3 py-0.5 text-[11px] font-mono font-bold text-destructive">
+                    <span className="size-1.5 rounded-full bg-destructive animate-ping" />
+                    {VERIFIED_IDENTITY_CONTENT.privacyDemo.flaggedBadge}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-0.5 text-[11px] font-mono font-bold text-emerald-500">
+                    <span className="size-1.5 rounded-full bg-emerald-500" />
+                    {VERIFIED_IDENTITY_CONTENT.privacyDemo.cleanBadge}
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="pii-simulation-input"
+                  className="block text-xs font-semibold text-muted-foreground"
+                >
+                  {VERIFIED_IDENTITY_CONTENT.privacyDemo.inputLabel}
+                </label>
+                <textarea
+                  id="pii-simulation-input"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  rows={2}
+                  className="w-full resize-none rounded-xl border border-border/60 bg-background p-3 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-[#1D9BF0] focus:outline-none transition-colors"
+                />
+              </div>
+
+              {/* Real-Time Detection Logs */}
+              <div className="grid gap-2 sm:grid-cols-3 rounded-lg border border-border/40 bg-background/80 p-3 text-xs font-mono">
+                <div>
+                  <span className="text-muted-foreground">Phone check: </span>
+                  <span className={inputText.match(PHONE_RE) ? "text-destructive font-bold" : "text-emerald-500 font-bold"}>
+                    {inputText.match(PHONE_RE) ? "FLAGGED (Blocked)" : "Clean"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Email check: </span>
+                  <span className={inputText.match(EMAIL_RE) ? "text-destructive font-bold" : "text-emerald-500 font-bold"}>
+                    {inputText.match(EMAIL_RE) ? "FLAGGED (Blocked)" : "Clean"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Peer visibility: </span>
+                  <span className="text-emerald-500 font-bold">Untrackable</span>
                 </div>
               </div>
             </div>
 
-            {/* Three Pillar Guarantees */}
-            <div className="grid gap-6 md:grid-cols-3 pt-2 border-t border-border/40">
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-black text-[#1D9BF0]">01</span>
-                  <h4 className="font-bold text-sm text-foreground">One-Time Verification</h4>
+            {/* 3 Core Identity Pillars */}
+            <div className="grid gap-4 sm:grid-cols-3 pt-2">
+              {VERIFIED_IDENTITY_CONTENT.pillars.map((pillar) => (
+                <div key={pillar.number} className="space-y-1.5">
+                  <div className="font-mono text-xs font-bold text-[#1D9BF0]">
+                    {pillar.number}
+                  </div>
+                  <h4 className="text-sm font-bold text-foreground">
+                    {pillar.title}
+                  </h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {pillar.desc}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Verify once with your student domain for uninterrupted access. No recurring daily checks or
-                  annoying re-logins.
-                </p>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-black text-[#1D9BF0]">02</span>
-                  <h4 className="font-bold text-sm text-foreground">Zero Author Foreign Keys</h4>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Anonymous posts store no user ID relation in the database timeline row. No SQL query can
-                  join the post back to you.
-                </p>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-black text-[#1D9BF0]">03</span>
-                  <h4 className="font-bold text-sm text-foreground">Safety System Accountability</h4>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Peers never see your identity, but the platform safety system guarantees bad actors and
-                  harassers face real campus strikes.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </Reveal>
-      </div>
-    </section>
+      </LandingContainer>
+    </LandingSection>
   );
 }

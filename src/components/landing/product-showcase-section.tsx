@@ -16,6 +16,11 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
+import {
+  LandingContainer,
+  LandingSection,
+  LandingSectionHeader,
+} from "@/components/landing/landing-design-system";
 import { Reveal } from "@/components/landing/reveal";
 import {
   AnimateHeart,
@@ -24,140 +29,45 @@ import {
   AnimateShoppingBag,
   AnimateUsers,
 } from "@/components/ui/animated-icon";
+import { PRODUCT_SHOWCASE_CONTENT } from "@/constants/landing";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
 type PillarId = "social" | "people" | "utility" | "communities" | "messaging";
 
-interface Pillar {
-  id: PillarId;
-  label: string;
-  IconComponent: React.ComponentType<{ className?: string }>;
-  tagline: string;
-  heading: string;
-  summary: string;
-  specs: { label: string; value: string }[];
-  invariants: string[];
-}
-
-const PILLARS: Pillar[] = [
-  {
-    id: "social",
-    label: "Campus Social",
-    IconComponent: AnimateRepeat2,
-    tagline: "TIMELINE // CONFESSIONS & POLLS",
-    heading: "Accountable Anonymity. Real Campus Pulse.",
-    summary:
-      "Share candid confessions safely behind one-way pseudonyms, settle late-night hostel debates with verified student polls, and vote on trending campus issues.",
-    specs: [
-      { label: "Scope", value: "Campus-Isolated" },
-      { label: "Anonymity", value: "AES-Vault Sealed" },
-      { label: "Verification", value: "College Email Required" },
-    ],
-    invariants: [
-      "Zero author foreign-key joins in anonymous mode",
-      "One verified student = one ungameable poll vote",
-      "Campus radius default with zero cross-college noise",
-    ],
-  },
-  {
-    id: "people",
-    label: "Match & Classmates",
-    IconComponent: AnimateHeart,
-    tagline: "CONNECTION // VERIFIED STUDENTS",
-    heading: "Find Study Partners, Co-founders & Crushes.",
-    summary:
-      "Connect with fellow students for hackathons, gym sessions, or dating. Every profile is tied to an active institutional email — zero catfishing, zero outsiders.",
-    specs: [
-      { label: "Pool", value: "100% Verified Students" },
-      { label: "Privacy", value: "Mutual-Match Unlock" },
-      { label: "Crush Escrow", value: "5 Zero-Doxxing Slots" },
-    ],
-    invariants: [
-      "No cold unsolicited messaging without mutual opt-in",
-      "Secret crush vault reveals only on bidirectional declaration",
-      "Filter by batch, branch, campus radius, or all India",
-    ],
-  },
-  {
-    id: "utility",
-    label: "Campus Utility",
-    IconComponent: AnimateShoppingBag,
-    tagline: "EXCHANGE // NOTES & MARKETPLACE",
-    heading: "Peer Marketplace, Solved PYQs & Lost Items.",
-    summary:
-      "Buy and sell second-hand mountain bikes, drafters, and coolers in ₹. Download senior-verified semester notes and report lost student IDs.",
-    specs: [
-      { label: "Trading", value: "Hostel Peer-to-Peer" },
-      { label: "Currency", value: "Direct Student INR" },
-      { label: "Academics", value: "Verified Senior Notes" },
-    ],
-    invariants: [
-      "Every buyer and seller verified via university email",
-      "Pickups coordinated at known campus landmarks",
-      "Academic notes searchable by subject, branch, and semester",
-    ],
-  },
-  {
-    id: "communities",
-    label: "Communities & Clubs",
-    IconComponent: AnimateUsers,
-    tagline: "ORGANIZATION // SUB-HUBS & SOCIETIES",
-    heading: "Student Clubs & Hostel Circles with Dedicated Feeds.",
-    summary:
-      "Stop drowning in 40 unread WhatsApp groups. Student societies, robotics clubs, and hostel wings get structured feeds, event RSVPs, and member roles.",
-    specs: [
-      { label: "Structure", value: "Isolated Sub-Hubs" },
-      { label: "Roles", value: "Leads, Core & Members" },
-      { label: "Events", value: "Live RSVP Calendar" },
-    ],
-    invariants: [
-      "Dedicated announcement feeds that never get buried",
-      "Join controls configured by student admins",
-      "Discoverable directory across your campus and beyond",
-    ],
-  },
-  {
-    id: "messaging",
-    label: "Direct Chat",
-    IconComponent: AnimateMessageCircle,
-    tagline: "COMMUNICATION // SECURE MESSAGING",
-    heading: "Private P2P Conversations. Zero Phone Numbers.",
-    summary:
-      "Message batchmates and project partners securely without sharing personal WhatsApp numbers. Fast, private, and gated by institutional enrollment.",
-    specs: [
-      { label: "Identity", value: "Campus Handle" },
-      { label: "Privacy", value: "No Phone Exposure" },
-      { label: "Calling", value: "WebRTC Peer-to-Peer" },
-    ],
-    invariants: [
-      "Keep personal numbers safe from strangers and seniors",
-      "One-tap block and report controls on every thread",
-      "Media plane runs P2P between student browsers",
-    ],
-  },
-];
+const PILLAR_ICONS: Record<PillarId, React.ComponentType<{ className?: string }>> = {
+  social: AnimateRepeat2,
+  people: AnimateHeart,
+  utility: AnimateShoppingBag,
+  communities: AnimateUsers,
+  messaging: AnimateMessageCircle,
+};
 
 export function ProductShowcaseSection() {
   const [activeId, setActiveId] = useState<PillarId>("social");
-  const activePillar = PILLARS.find((p) => p.id === activeId) || PILLARS[0];
 
   // Interactive Micro-artifact states
-  const [socialLiked, setSocialLiked] = useState(false);
-  const [socialLikes, setSocialLikes] = useState(48);
-  const [socialReposted, setSocialReposted] = useState(false);
-  const [socialReposts, setSocialReposts] = useState(12);
   const [socialVoted, setSocialVoted] = useState(false);
   const [socialAgreeVotes, setSocialAgreeVotes] = useState(142);
+  const [socialLiked, setSocialLiked] = useState(false);
+  const [socialLikes, setSocialLikes] = useState(89);
+  const [socialReposted, setSocialReposted] = useState(false);
+  const [socialReposts, setSocialReposts] = useState(19);
 
   const [connectedState, setConnectedState] = useState(false);
   const [rsvpState, setRsvpState] = useState(false);
+
   const [chatInput, setChatInput] = useState("");
-  const [chatMessages, setChatMessages] = useState([
-    { from: "peer", text: "Hey! Do you have the Unit 3 Compiler Design lecture slides?" },
-    { from: "me", text: "Yes, just uploaded them to the Campus Notes vault. Check the link!" },
+  const [chatMessages, setChatMessages] = useState<Array<{ from: "them" | "me"; text: string }>>([
+    { from: "them", text: "Hey! Are you also in the Distributed Systems lab with Prof. Sharma?" },
+    { from: "me", text: "Yes! Looking for a partner for the final project submission." },
+    { from: "them", text: "Awesome, let's team up. Sent you the GitHub repo link." },
   ]);
+
+  const activePillar =
+    PRODUCT_SHOWCASE_CONTENT.pillars.find((p) => p.id === activeId) ??
+    PRODUCT_SHOWCASE_CONTENT.pillars[0];
 
   function handleSelect(id: PillarId) {
     sounds.tap();
@@ -165,15 +75,23 @@ export function ProductShowcaseSection() {
     setActiveId(id);
   }
 
+  function handleAgreeVote() {
+    if (socialVoted) return;
+    sounds.pop();
+    haptics.light();
+    setSocialVoted(true);
+    setSocialAgreeVotes((v) => v + 1);
+  }
+
   function handleLike() {
     sounds.pop();
     haptics.light();
     if (socialLiked) {
       setSocialLiked(false);
-      setSocialLikes((n) => n - 1);
+      setSocialLikes((l) => l - 1);
     } else {
       setSocialLiked(true);
-      setSocialLikes((n) => n + 1);
+      setSocialLikes((l) => l + 1);
     }
   }
 
@@ -182,19 +100,11 @@ export function ProductShowcaseSection() {
     haptics.light();
     if (socialReposted) {
       setSocialReposted(false);
-      setSocialReposts((n) => n - 1);
+      setSocialReposts((r) => r - 1);
     } else {
       setSocialReposted(true);
-      setSocialReposts((n) => n + 1);
+      setSocialReposts((r) => r + 1);
     }
-  }
-
-  function handleAgreeVote() {
-    if (socialVoted) return;
-    sounds.pop();
-    haptics.light();
-    setSocialVoted(true);
-    setSocialAgreeVotes((n) => n + 1);
   }
 
   function handleConnect() {
@@ -219,37 +129,27 @@ export function ProductShowcaseSection() {
   }
 
   return (
-    <section className="border-t border-border/40 bg-background py-20 sm:py-28 px-4 sm:px-6">
-      <div className="mx-auto w-full max-w-6xl space-y-12">
-        {/* Section Header (Twitter/Grok Minimalist Hierarchy) */}
-        <Reveal className="space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1D9BF0]">
-              {"SYSTEM_ARCHITECTURE // MODULAR CAMPUS ENGINE"}
-            </span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.12]">
-            Everything your campus already does.
-            <br />
-            <span className="text-muted-foreground font-semibold">Verified in one timeline.</span>
-          </h2>
-          <p className="max-w-2xl text-base text-muted-foreground leading-relaxed">
-            One verified student identity unlocks every layer of university life — social expression,
-            classmate discovery, academic sharing, and student trade.
-          </p>
-        </Reveal>
+    <LandingSection bg="default">
+      <LandingContainer>
+        {/* Section Header */}
+        <LandingSectionHeader
+          eyebrow={PRODUCT_SHOWCASE_CONTENT.eyebrow}
+          headlineMain={PRODUCT_SHOWCASE_CONTENT.headlineMain}
+          headlineSub={PRODUCT_SHOWCASE_CONTENT.headlineSub}
+          description={PRODUCT_SHOWCASE_CONTENT.description}
+        />
 
-        {/* Twitter / Grok Flat Tab Navigation */}
+        {/* Tab Navigation */}
         <Reveal delay={0.05}>
           <div className="relative flex items-center gap-1 sm:gap-2 overflow-x-auto border-b border-border/40 pb-px no-scrollbar">
-            {PILLARS.map((p) => {
-              const Icon = p.IconComponent;
+            {PRODUCT_SHOWCASE_CONTENT.pillars.map((p) => {
+              const Icon = PILLAR_ICONS[p.id as PillarId] ?? AnimateRepeat2;
               const isSelected = p.id === activeId;
               return (
                 <button
                   key={p.id}
                   type="button"
-                  onClick={() => handleSelect(p.id)}
+                  onClick={() => handleSelect(p.id as PillarId)}
                   className={cn(
                     "relative flex items-center gap-2 px-4 py-3.5 text-xs sm:text-sm font-bold transition-colors cursor-pointer select-none shrink-0",
                     isSelected
@@ -272,10 +172,10 @@ export function ProductShowcaseSection() {
           </div>
         </Reveal>
 
-        {/* Split-Pane Showcase (Grok Spec Left + Timeline Artifact Right) */}
+        {/* Split-Pane Showcase (Spec Left + Interactive Artifact Right) */}
         <Reveal delay={0.1}>
           <div className="grid items-start gap-8 lg:grid-cols-12 rounded-2xl border border-border/40 bg-card p-6 sm:p-8">
-            {/* Left Column: Feature Specifications & Architectural Invariants */}
+            {/* Left Column: Feature Specifications & Highlights */}
             <div className="lg:col-span-6 space-y-6">
               <div className="space-y-2">
                 <span className="font-mono text-[11px] font-bold tracking-wider text-[#1D9BF0] uppercase">
@@ -304,13 +204,13 @@ export function ProductShowcaseSection() {
                 ))}
               </div>
 
-              {/* Architectural Invariants */}
+              {/* What You Get Highlights */}
               <div className="space-y-2.5 pt-2 border-t border-border/40">
                 <span className="font-mono text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                  Guaranteed System Invariants
+                  What you get
                 </span>
                 <ul className="space-y-2">
-                  {activePillar.invariants.map((item) => (
+                  {activePillar.benefits.map((item) => (
                     <li
                       key={item}
                       className="flex items-start gap-2 text-xs leading-relaxed text-foreground/90"
@@ -324,20 +224,10 @@ export function ProductShowcaseSection() {
 
               <div className="pt-2">
                 <Link
-                  href={`/docs/${
-                    activePillar.id === "social"
-                      ? "campus-feed"
-                      : activePillar.id === "people"
-                        ? "campus-match"
-                        : activePillar.id === "utility"
-                          ? "marketplace"
-                          : activePillar.id === "communities"
-                            ? "communities"
-                            : "verification-safety"
-                  }`}
+                  href="/colleges"
                   className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[#1D9BF0] hover:underline"
                 >
-                  <span>Read technical architecture docs</span>
+                  <span>Explore campus hubs across India</span>
                   <ArrowRight className="size-3" />
                 </Link>
               </div>
@@ -364,7 +254,7 @@ export function ProductShowcaseSection() {
                           </div>
                           <span className="text-[11px] font-mono text-muted-foreground flex items-center gap-1">
                             <GraduationCap className="size-3 text-[#1D9BF0]" />
-                            <span>BIT Mesra · Campus Confession</span>
+                            <span>Campus Hub · Anonymous Confession</span>
                           </span>
                         </div>
                       </div>
@@ -402,7 +292,7 @@ export function ProductShowcaseSection() {
                       </button>
                     </div>
 
-                    {/* Twitter-Standard Interaction Row */}
+                    {/* Interaction Row */}
                     <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs text-muted-foreground">
                       <button
                         type="button"
@@ -456,7 +346,7 @@ export function ProductShowcaseSection() {
                             <span className="font-mono text-xs text-muted-foreground">@aman_cse</span>
                           </div>
                           <span className="text-[11px] font-mono text-muted-foreground">
-                            BIT Mesra · CSE &apos;26
+                            B.Tech CSE &apos;26 · Verified Student
                           </span>
                         </div>
                       </div>
@@ -518,7 +408,7 @@ export function ProductShowcaseSection() {
                         Hero Octane 21-Speed Mountain Bike
                       </h4>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        Dual disc brakes, Shimano gears, front suspension. Handover at Hostel 12 or IC ground.
+                        Dual disc brakes, Shimano gears, front suspension. Handover at Hostel 12 or campus lawn.
                         Moving out after 8th semester.
                       </p>
                     </div>
@@ -534,7 +424,7 @@ export function ProductShowcaseSection() {
 
                     <div className="flex items-center justify-between pt-1 border-t border-border/40">
                       <span className="text-[11px] font-mono text-muted-foreground">
-                        Escrow ID: CL-TRD-8821
+                        Campus Trade Escrow
                       </span>
                       <button
                         type="button"
@@ -560,7 +450,7 @@ export function ProductShowcaseSection() {
                           <BadgeCheck className="size-4 text-[#1D9BF0]" />
                         </h4>
                         <span className="font-mono text-xs text-muted-foreground">
-                          Official Campus Technical Chapter · BIT Mesra
+                          Official Campus Technical Chapter
                         </span>
                       </div>
                       <span className="font-mono text-xs text-[#1D9BF0] font-bold bg-[#1D9BF0]/10 px-2.5 py-1 rounded-full border border-[#1D9BF0]/20">
@@ -574,7 +464,7 @@ export function ProductShowcaseSection() {
                         <span>Pinned by Chapter Lead:</span>
                       </div>
                       <p className="text-muted-foreground leading-relaxed">
-                        AI Hackathon orientation meetups this Friday at 6 PM in CAT Hall. Starter repositories
+                        AI Hackathon orientation meetups this Friday at 6 PM in Main Auditorium. Starter repositories
                         dispatched to all verified members!
                       </p>
                     </div>
@@ -610,7 +500,7 @@ export function ProductShowcaseSection() {
                       </div>
                       <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
                         <Shield className="size-3 text-emerald-500" />
-                        <span>E2E Campus Encrypted</span>
+                        <span>Private Campus Chat</span>
                       </div>
                     </div>
 
@@ -653,7 +543,7 @@ export function ProductShowcaseSection() {
             </div>
           </div>
         </Reveal>
-      </div>
-    </section>
+      </LandingContainer>
+    </LandingSection>
   );
 }

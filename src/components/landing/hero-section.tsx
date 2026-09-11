@@ -3,6 +3,7 @@
 import { ArrowRight, Check, Compass, Eye, MessageCircle, Repeat2, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { HERO_CONTENT } from "@/constants/landing";
 import { AnimateHeart, AnimateShieldCheck } from "@/components/ui/animated-icon";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -63,27 +64,26 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
       <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-14">
         {/* ──────── LEFT COLUMN: Positioning, Headline & Direct CTAs ──────── */}
         <div className="flex flex-col items-start text-left space-y-6 lg:col-span-7">
-          {/* Eyebrow & Pilot Status */}
+          {/* Eyebrow & Campus Network Status */}
           <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3.5 py-1 text-xs font-semibold text-foreground">
             <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
             <span className="font-mono text-[#1D9BF0] font-bold uppercase tracking-wider text-[11px]">
-              VERIFIED CAMPUS TIMELINE
+              {HERO_CONTENT.badge}
             </span>
             <span className="text-muted-foreground/40 hidden sm:inline">•</span>
-            <span className="text-foreground/80 font-mono text-[11px]">Founded at BIT Mesra · 1,350+ Campus Hubs</span>
+            <span className="text-foreground/80 font-mono text-[11px]">{HERO_CONTENT.campusCount}</span>
           </div>
 
           {/* Core H1 */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-foreground">
-            Your campus,
+            {HERO_CONTENT.headlineMain}
             <br />
-            <span className="text-[#1D9BF0]">finally on its own network.</span>
+            <span className="text-[#1D9BF0]">{HERO_CONTENT.headlineHighlight}</span>
           </h1>
 
           {/* Subheading */}
           <p className="max-w-xl text-base sm:text-lg leading-relaxed text-muted-foreground font-normal">
-            CampusLoop is a verified student network where you can speak anonymously, connect with classmates,
-            discover campus life, and find your people — without random outsiders.
+            {HERO_CONTENT.subheadline}
           </p>
 
           {/* Primary Action Buttons */}
@@ -93,7 +93,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
                 href="/app"
                 className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-[#1D9BF0] hover:bg-[#1D9BF0]/90 px-8 text-[15px] font-bold text-white shadow-lg shadow-[#1D9BF0]/20 transition-all active:scale-98 cursor-pointer"
               >
-                <span>Enter Campus Feed</span>
+                <span>{HERO_CONTENT.ctaPrimaryAuthenticated}</span>
                 <ArrowRight className="ml-2 size-4" />
               </Link>
             ) : (
@@ -101,7 +101,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
                 href="/handler/sign-up"
                 className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-[#1D9BF0] hover:bg-[#1D9BF0]/90 px-8 text-[15px] font-bold text-white shadow-lg shadow-[#1D9BF0]/20 transition-all active:scale-98 cursor-pointer"
               >
-                <span>Get verified with college email</span>
+                <span>{HERO_CONTENT.ctaPrimary}</span>
                 <ArrowRight className="ml-2 size-4" />
               </Link>
             )}
@@ -111,24 +111,21 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
               className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full border border-border/60 bg-card hover:bg-muted hover:border-border px-6 text-[15px] font-bold text-foreground transition-all active:scale-98 cursor-pointer"
             >
               <Compass className="mr-2 size-4 text-[#1D9BF0]" />
-              <span>Explore a campus</span>
+              <span>{HERO_CONTENT.ctaSecondary}</span>
             </Link>
           </div>
 
           {/* Trust Strip */}
           <div className="pt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/60 text-foreground/90 border border-border/40">
-              <Check className="size-3.5 text-emerald-500 shrink-0 stroke-[2.5]" />
-              <span>College-email verified</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/60 text-foreground/90 border border-border/40">
-              <Check className="size-3.5 text-emerald-500 shrink-0 stroke-[2.5]" />
-              <span>Anonymous mode</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/60 text-foreground/90 border border-border/40">
-              <Check className="size-3.5 text-emerald-500 shrink-0 stroke-[2.5]" />
-              <span>Free for students</span>
-            </div>
+            {HERO_CONTENT.trustPoints.map((point) => (
+              <div
+                key={point}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/60 text-foreground/90 border border-border/40"
+              >
+                <Check className="size-3.5 text-emerald-500 shrink-0 stroke-[2.5]" />
+                <span>{point}</span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -143,16 +140,16 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-sm text-foreground">BIT Mesra Campus Hub</span>
+                    <span className="font-bold text-sm text-foreground">{HERO_CONTENT.preview.hubTitle}</span>
                     <span className="size-1.5 rounded-full bg-emerald-500" />
                   </div>
                   <span className="font-mono text-[11px] text-muted-foreground">
-                    bitmesra.ac.in · 100% Verified
+                    {HERO_CONTENT.preview.hubSubtitle}
                   </span>
                 </div>
               </div>
               <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#1D9BF0]/10 text-[#1D9BF0] border border-[#1D9BF0]/20">
-                PILOT LIVE
+                {HERO_CONTENT.preview.statusBadge}
               </span>
             </div>
 
@@ -165,24 +162,23 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
                   </div>
                   <div>
                     <div className="flex items-center gap-1">
-                      <span className="font-bold text-xs text-foreground">Anonymous Student</span>
-                      <span className="font-mono text-[11px] text-muted-foreground">@anon_hostel</span>
+                      <span className="font-bold text-xs text-foreground">{HERO_CONTENT.preview.postAuthor}</span>
+                      <span className="font-mono text-[11px] text-muted-foreground">{HERO_CONTENT.preview.postHandle}</span>
                       <span className="text-muted-foreground/50 text-xs">·</span>
-                      <span className="font-mono text-[11px] text-muted-foreground">2h</span>
+                      <span className="font-mono text-[11px] text-muted-foreground">{HERO_CONTENT.preview.postTime}</span>
                     </div>
                     <span className="text-[10px] font-mono text-muted-foreground">
-                      Hostel 11 · Confessions
+                      Hostel · Confessions
                     </span>
                   </div>
                 </div>
                 <span className="font-mono text-[10px] font-bold text-[#1D9BF0] bg-[#1D9BF0]/10 px-2 py-0.5 rounded-full">
-                  #campus-pulse
+                  {HERO_CONTENT.preview.postTag}
                 </span>
               </div>
 
               <p className="text-xs sm:text-sm text-foreground leading-relaxed font-normal">
-                The IC ground winter fog at 1 AM with cutting chai hits completely different than any cafe in
-                Ranchi. Midsem prep is stressful, but this campus makes it memorable.
+                {HERO_CONTENT.preview.postContent}
               </p>
 
               {/* Twitter Interaction Row with Signature Colors */}
@@ -226,13 +222,13 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
             {/* Live Canteen Poll Micro-Artifact */}
             <div className="rounded-xl border border-border/60 bg-muted/20 p-3.5 space-y-2.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-foreground">Live Canteen Poll</span>
+                <span className="font-bold text-foreground">{HERO_CONTENT.preview.pollTitle}</span>
                 <span className="font-mono text-[11px] text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full font-bold">
-                  Active
+                  {HERO_CONTENT.preview.pollStatus}
                 </span>
               </div>
               <p className="text-xs text-foreground/90 font-medium">
-                Best late-night Maggi &amp; chai spot right now?
+                {HERO_CONTENT.preview.pollQuestion}
               </p>
 
               <div className="space-y-1.5 pt-0.5">
@@ -246,7 +242,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
                       : "bg-background border-border/60 hover:border-[#1D9BF0]/50 text-foreground"
                   )}
                 >
-                  <span>Nescafe Booth near R&amp;D</span>
+                  <span>{HERO_CONTENT.preview.pollOptions.option1.name}</span>
                   <span className="font-mono font-bold text-[#1D9BF0]">
                     {hasVoted ? `${votes.nescafe}%` : "Vote"}
                   </span>
@@ -262,7 +258,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
                       : "bg-background border-border/60 hover:border-[#1D9BF0]/50 text-foreground"
                   )}
                 >
-                  <span>Back Gate Night Counter</span>
+                  <span>{HERO_CONTENT.preview.pollOptions.option2.name}</span>
                   <span className="font-mono font-bold text-muted-foreground">
                     {hasVoted ? `${votes.backgate}%` : "Vote"}
                   </span>
@@ -274,7 +270,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
             <div className="pt-0.5 text-center">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground">
                 <Sparkles className="size-3 text-[#1D9BF0]" />
-                <span>One verified student account · Zero outsiders</span>
+                <span>{HERO_CONTENT.preview.footerReassurance}</span>
               </span>
             </div>
           </div>

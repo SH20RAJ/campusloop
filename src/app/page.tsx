@@ -5,7 +5,6 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { LandingFAQSection } from "@/components/landing/landing-faq-section";
 import { ProductShowcaseSection } from "@/components/landing/product-showcase-section";
-import { TractionSection } from "@/components/landing/traction-section";
 import { VerifiedIdentitySection } from "@/components/landing/verified-identity-section";
 import { ViewerModeSection } from "@/components/landing/viewer-mode-section";
 import { WhyVerifiedSection } from "@/components/landing/why-verified-section";
@@ -26,7 +25,7 @@ export const metadata: Metadata = {
     "college confessions",
     "campus communities",
     "student marketplace",
-    "BIT Mesra",
+    "college campus hub",
     "Indian universities",
     "campus discussions",
     "peer notes",
@@ -156,10 +155,7 @@ export default async function LandingPage() {
         {/* 07. Why Verified? (Comparison Table) */}
         <WhyVerifiedSection />
 
-        {/* 08. Honest Pilot Traction & Campus Expansion */}
-        <TractionSection />
-
-        {/* 09. Frequently Asked Questions */}
+        {/* 08. Frequently Asked Questions */}
         <LandingFAQSection />
 
         {/* 10. Final Call to Action */}

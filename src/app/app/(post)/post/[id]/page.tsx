@@ -235,39 +235,74 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   const campusName = rawPost.institution?.name?.split(",")[0] || "Campus";
   const postTitle = `${rawPost.type === "CONFESSION" ? "Confession" : "Discussion"} in ${campusName}`;
 
+  const postUrl = `https://campusloop.space/app/post/${rawPost.id}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "DiscussionForumPosting",
-    headline: postTitle,
-    text: rawPost.body,
-    datePublished: rawPost.createdAt.toISOString(),
-    url: `https://campusloop.space/app/post/${rawPost.id}`,
-    author: rawPost.isAnonymous
-      ? {
-          "@type": "Person",
-          name: "Anonymous Student",
-        }
-      : {
-          "@type": "Person",
-          name: rawPost.author?.displayName || "Student",
-          url: rawPost.author?.username ? `https://campusloop.space/@${rawPost.author.username}` : undefined,
-        },
-    publisher: {
-      "@type": "Organization",
-      name: "CampusLoop",
-      url: "https://campusloop.space",
-      logo: "https://campusloop.space/logo.png",
-    },
-    interactionStatistic: [
+    "@graph": [
       {
-        "@type": "InteractionCounter",
-        interactionType: "https://schema.org/LikeAction",
-        userInteractionCount: votesCount,
+        "@type": "DiscussionForumPosting",
+        headline: postTitle,
+        text: rawPost.body,
+        datePublished: rawPost.createdAt.toISOString(),
+        url: postUrl,
+        image: "https://campusloop.space/og-image.png",
+        author: rawPost.isAnonymous
+          ? {
+              "@type": "Person",
+              name: "Anonymous Student",
+            }
+          : {
+              "@type": "Person",
+              name: rawPost.author?.displayName || "Student",
+              url: rawPost.author?.username ? `https://campusloop.space/@${rawPost.author.username}` : undefined,
+            },
+        publisher: {
+          "@type": "Organization",
+          name: "CampusLoop",
+          url: "https://campusloop.space",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://campusloop.space/logo.png",
+          },
+        },
+        interactionStatistic: [
+          {
+            "@type": "InteractionCounter",
+            interactionType: "https://schema.org/LikeAction",
+            userInteractionCount: votesCount,
+          },
+          {
+            "@type": "InteractionCounter",
+            interactionType: "https://schema.org/CommentAction",
+            userInteractionCount: commentsCount,
+          },
+        ],
       },
       {
-        "@type": "InteractionCounter",
-        interactionType: "https://schema.org/CommentAction",
-        userInteractionCount: commentsCount,
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://campusloop.space/app",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: rawPost.institution?.name ? campusName : "Colleges",
+            item: rawPost.institution
+              ? `https://campusloop.space/app/college/${rawPost.institution.slug || rawPost.institution.id}`
+              : "https://campusloop.space/app/colleges",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: postTitle,
+            item: postUrl,
+          },
+        ],
       },
     ],
   };

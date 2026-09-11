@@ -13,6 +13,9 @@ export async function GET() {
     <loc>https://campusloop.space/sitemaps/posts.xml</loc>
   </sitemap>
   <sitemap>
+    <loc>https://campusloop.space/sitemaps/reels.xml</loc>
+  </sitemap>
+  <sitemap>
     <loc>https://campusloop.space/sitemaps/communities.xml</loc>
   </sitemap>
   <sitemap>

@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = `${college.name} Campus Hub | CampusLoop`;
   const description = `Connect with verified students at ${college.name} (${college.district || college.state || "India"}). Confessions, clubs, campus Q&A, and live feed.`;
-  const url = `https://campusloop.space/college/${college.slug || college.id}`;
+  const url = `https://campusloop.space/app/college/${college.slug || college.id}`;
 
   return {
     title,
@@ -67,6 +67,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+const HASHTAG_REGEX = /#[a-zA-Z0-9_]+/g;
+
 export default async function MainCollegePage({ params }: PageProps) {
   const { id } = await params;
   const user = await getCachedAuthUser();
@@ -91,22 +93,33 @@ export default async function MainCollegePage({ params }: PageProps) {
     notFound();
   }
 
-  // Fetch posts from this college
-  const collegePosts = await db.query.posts.findMany({
-    where: eq(posts.institutionId, college.id),
-    orderBy: [desc(posts.createdAt)],
-    limit: 30,
-    with: {
-      author: true,
-      institution: true,
-      community: true,
-      votes: true,
-      comments: true,
-      pollOptions: {
-        with: { votes: true },
+  // Fetch posts and competitor campuses in parallel for optimal TTFB
+  const [collegePosts, rawRelatedColleges] = await Promise.all([
+    db.query.posts.findMany({
+      where: eq(posts.institutionId, college.id),
+      orderBy: [desc(posts.createdAt)],
+      limit: 30,
+      with: {
+        author: true,
+        institution: true,
+        community: true,
+        votes: true,
+        comments: true,
+        pollOptions: {
+          with: { votes: true },
+        },
       },
-    },
-  });
+    }),
+    college.state
+      ? db.query.institutions.findMany({
+          where: eq(institutions.state, college.state),
+          limit: 6,
+          with: {
+            profiles: true,
+          },
+        })
+      : Promise.resolve([]),
+  ]);
 
   const formattedPosts: FeedPost[] = collegePosts.map((post) => {
     const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
@@ -158,7 +171,7 @@ export default async function MainCollegePage({ params }: PageProps) {
   // Extract hashtags from posts
   const hashtagSet = new Set<string>();
   collegePosts.forEach((p) => {
-    const matches = p.body.match(/#[a-zA-Z0-9_]+/g);
+    const matches = p.body.match(HASHTAG_REGEX);
     if (matches) {
       matches.forEach((tag) => hashtagSet.add(tag.slice(1)));
     }
@@ -168,17 +181,6 @@ export default async function MainCollegePage({ params }: PageProps) {
     const rawCode = (college.slug || college.name.split(" ")[0] || "Campus").replace(/[^a-zA-Z0-9]/g, "");
     trendingTags.push(`${rawCode}Life`, `${rawCode}Buzz`, "AskSeniors", "Placements", "CampusLife");
   }
-
-  // Fetch competitor campuses in the same state
-  const rawRelatedColleges = college.state
-    ? await db.query.institutions.findMany({
-        where: eq(institutions.state, college.state),
-        limit: 6,
-        with: {
-          profiles: true,
-        },
-      })
-    : [];
 
   const relatedColleges = rawRelatedColleges
     .filter((c) => c.id !== college.id)
@@ -197,26 +199,54 @@ export default async function MainCollegePage({ params }: PageProps) {
     }));
 
   const isEnrolledHere = Boolean(profile && profile.institutionId === college.id);
+  const canonicalCollegeUrl = `https://campusloop.space/app/college/${college.slug || college.id}`;
 
   return (
     <>
-      {/* EducationalOrganization JSON-LD Schema */}
+      {/* EducationalOrganization and Breadcrumbs JSON-LD Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "EducationalOrganization",
-            name: college.name,
-            url: college.website || `https://campusloop.space/college/${college.slug || college.id}`,
-            address: {
-              "@type": "PostalAddress",
-              addressLocality: college.district || undefined,
-              addressRegion: college.state || "India",
-              addressCountry: "IN",
-            },
-            identifier: college.aisheCode || undefined,
-            foundingDate: college.yearOfEstablishment ? String(college.yearOfEstablishment) : undefined,
+            "@graph": [
+              {
+                "@type": "EducationalOrganization",
+                name: college.name,
+                url: college.website || canonicalCollegeUrl,
+                address: {
+                  "@type": "PostalAddress",
+                  addressLocality: college.district || undefined,
+                  addressRegion: college.state || "India",
+                  addressCountry: "IN",
+                },
+                identifier: college.aisheCode || undefined,
+                foundingDate: college.yearOfEstablishment ? String(college.yearOfEstablishment) : undefined,
+              },
+              {
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  {
+                    "@type": "ListItem",
+                    position: 1,
+                    name: "Home",
+                    item: "https://campusloop.space/app",
+                  },
+                  {
+                    "@type": "ListItem",
+                    position: 2,
+                    name: "Colleges",
+                    item: "https://campusloop.space/app/colleges",
+                  },
+                  {
+                    "@type": "ListItem",
+                    position: 3,
+                    name: college.name,
+                    item: canonicalCollegeUrl,
+                  },
+                ],
+              },
+            ],
           }),
         }}
       />

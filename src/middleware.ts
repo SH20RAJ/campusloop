@@ -17,10 +17,7 @@ import { type NextRequest, NextResponse } from "next/server";
  * behaviour we already had.
  */
 
-/** Ordered longest-prefix-first so `/app/colleges` is not caught by `/app/college`. */
 const PUBLIC_MIRRORS: Array<{ gated: string; publicPath: string }> = [
-  { gated: "/app/colleges", publicPath: "/colleges" },
-  { gated: "/app/college/", publicPath: "/college/" },
   { gated: "/app/articles/", publicPath: "/a/" },
   { gated: "/app/events/", publicPath: "/e/" },
 ];
@@ -59,5 +56,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/app/college/:path*", "/app/colleges", "/app/articles/:path*", "/app/events/:path*"],
+  matcher: ["/app/articles/:path*", "/app/events/:path*"],
 };

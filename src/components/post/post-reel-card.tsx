@@ -16,24 +16,49 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
-import { PostLikesModal } from "@/components/post/post-likes-modal";
-import { PreviewLockedModal } from "@/components/preview/preview-locked-modal";
 import type { UserCapability } from "@/lib/capabilities";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PollCard } from "@/components/ui/poll-card";
-import { ReportDialog } from "@/components/ui/report-dialog";
 import { RichText } from "@/components/ui/rich-text";
-import { ShareStoryModal } from "@/components/ui/share-story-modal";
 import type { FeedPost } from "@/hooks/use-feed";
 import { repostPost, voteOnPost } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cleanSnippet, cn, formatTimeAgo, getAvatarUrl, getCollegeShortName } from "@/lib/utils";
+
+// Dynamically import heavy modals to keep the reels bundle ultra-lightweight
+const FeedCardRepostModal = dynamic(
+  () => import("@/components/feed/feed-card-repost-modal").then((m) => m.FeedCardRepostModal),
+  { ssr: false }
+);
+const PostLikesModal = dynamic(
+  () => import("@/components/post/post-likes-modal").then((m) => m.PostLikesModal),
+  { ssr: false }
+);
+const PreviewLockedModal = dynamic(
+  () => import("@/components/preview/preview-locked-modal").then((m) => m.PreviewLockedModal),
+  { ssr: false }
+);
+const ReportDialog = dynamic(
+  () => import("@/components/ui/report-dialog").then((m) => m.ReportDialog),
+  { ssr: false }
+);
+const ShareStoryModal = dynamic(
+  () => import("@/components/ui/share-story-modal").then((m) => m.ShareStoryModal),
+  { ssr: false }
+);
+
+// Hoisted regular expressions to avoid repeated compilation on every render
+const MD_VIDEO_REGEX = /!\[.*?\]\(((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)(?:\.(?:mp4|webm|mov|ogg)[^\s)]*|[^\s)]*videos[^\s)]*))\)/i;
+const R2_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']*)?\/api\/files\/r2\/videos\/[^\s<>"']+)/i;
+const RAW_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']+|\/api\/files\/r2\/[^\s<>"']+)\.(?:mp4|webm|mov|ogg)[^\s<>"']*)/i;
+const REGEX_ESCAPE_PATTERN = /[.*+?^${}()|[\]\\]/g;
+const HASHTAG_EXTRACTION_REGEX = /#([a-zA-Z0-9_-]+)/g;
 
 interface PostReelCardProps {
   post: FeedPost;
@@ -74,16 +99,13 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   // Extract direct video URL if present in body
   const videoUrl = useMemo(() => {
     if (!post.body) return null;
-    // Markdown video tag ![...](url.mp4)
-    const mdMatch = post.body.match(/!\[.*?\]\(((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)(?:\.(?:mp4|webm|mov|ogg)[^\s)]*|[^\s)]*videos[^\s)]*))\)/i);
+    const mdMatch = post.body.match(MD_VIDEO_REGEX);
     if (mdMatch) return mdMatch[1];
 
-    // Direct R2 video route match
-    const r2Match = post.body.match(/((?:https?:\/\/[^\s<>"']*)?\/api\/files\/r2\/videos\/[^\s<>"']+)/i);
+    const r2Match = post.body.match(R2_VIDEO_REGEX);
     if (r2Match) return r2Match[1];
 
-    // Raw video URL
-    const rawMatch = post.body.match(/((?:https?:\/\/[^\s<>"']+|\/api\/files\/r2\/[^\s<>"']+)\.(?:mp4|webm|mov|ogg)[^\s<>"']*)/i);
+    const rawMatch = post.body.match(RAW_VIDEO_REGEX);
     if (rawMatch) return rawMatch[1];
 
     return null;
@@ -92,8 +114,10 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   // Clean body text by stripping raw video URL for caption display
   const captionText = useMemo(() => {
     if (!videoUrl) return post.body;
+    const escapedVideoUrl = videoUrl.replace(REGEX_ESCAPE_PATTERN, "\\$&");
+    const mdPattern = new RegExp(`!\\[.*?\\]\\(${escapedVideoUrl}\\)`, "gi");
     return post.body
-      .replace(new RegExp(`!\\[.*?\\]\\(${videoUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)`, "gi"), "")
+      .replace(mdPattern, "")
       .replace(videoUrl, "")
       .trim();
   }, [post.body, videoUrl]);
@@ -134,7 +158,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     const cleanedDesc = desc.replace(/(\n\s*(?:#[\w-]+\s*)+)$/g, "").trim();
 
     // Extract hashtags from body
-    const rawFoundTags = (rawBody.match(/#([a-zA-Z0-9_-]+)/g) || []).map((t) => t.trim());
+    const rawFoundTags = (rawBody.match(HASHTAG_EXTRACTION_REGEX) || []).map((t) => t.trim());
     const uniqueTags = Array.from(new Set(rawFoundTags));
 
     if (uniqueTags.length === 0) {
@@ -605,30 +629,40 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
   const renderModals = () => (
     <>
-      <FeedCardRepostModal
-        isOpen={showRepostModal}
-        onClose={() => setShowRepostModal(false)}
-        quoteThoughts={quoteThoughts}
-        setQuoteThoughts={setQuoteThoughts}
-        onExecuteRepost={handleExecuteRepost}
-        originalPostAuthorHandle={authorHandle}
-        isReposting={isReposting}
-      />
-      <ShareStoryModal
-        isOpen={showShareStoryModal}
-        onClose={() => setShowShareStoryModal(false)}
-        post={post}
-      />
-      <PostLikesModal postId={post.id} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
-      <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
-      <PreviewLockedModal
-        isOpen={showLockedModal}
-        onClose={() => setShowLockedModal(false)}
-        onOpenUpgrade={() => {
-          window.location.href = `/handler/sign-in?returnTo=${encodeURIComponent(window.location.pathname)}`;
-        }}
-        capability={lockedCapability}
-      />
+      {showRepostModal && (
+        <FeedCardRepostModal
+          isOpen={showRepostModal}
+          onClose={() => setShowRepostModal(false)}
+          quoteThoughts={quoteThoughts}
+          setQuoteThoughts={setQuoteThoughts}
+          onExecuteRepost={handleExecuteRepost}
+          originalPostAuthorHandle={authorHandle}
+          isReposting={isReposting}
+        />
+      )}
+      {showShareStoryModal && (
+        <ShareStoryModal
+          isOpen={showShareStoryModal}
+          onClose={() => setShowShareStoryModal(false)}
+          post={post}
+        />
+      )}
+      {showLikesModal && (
+        <PostLikesModal postId={post.id} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
+      )}
+      {showReport && (
+        <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
+      )}
+      {showLockedModal && (
+        <PreviewLockedModal
+          isOpen={showLockedModal}
+          onClose={() => setShowLockedModal(false)}
+          onOpenUpgrade={() => {
+            window.location.href = `/handler/sign-in?returnTo=${encodeURIComponent(window.location.pathname)}`;
+          }}
+          capability={lockedCapability}
+        />
+      )}
     </>
   );
 

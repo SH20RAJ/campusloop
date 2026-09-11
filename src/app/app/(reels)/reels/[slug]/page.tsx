@@ -14,6 +14,9 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+const MD_IMAGE_REGEX = /!\[.*?\]\(.*?\)/g;
+const URL_CLEAN_REGEX = /https?:\/\/\S+/g;
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const db = getDb();
@@ -37,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = target.title ? `${target.title} · Campus Reel` : "Campus Reel · Student Video | CampusLoop";
-  const cleanBody = target.body.replace(/!\[.*?\]\(.*?\)/g, "").replace(/https?:\/\/\S+/g, "").trim();
+  const cleanBody = target.body.replace(MD_IMAGE_REGEX, "").replace(URL_CLEAN_REGEX, "").trim();
   const description = cleanBody.slice(0, 160) || "Watch verified student campus reels on CampusLoop.";
   const url = `https://campusloop.space/app/reels/${target.id}`;
 
@@ -119,14 +122,17 @@ export default async function SingleReelPage({ params }: PageProps) {
 
   const collegeName = profile?.institution?.name ? profile.institution.name.split(",")[0] : undefined;
 
-  // JSON-LD Structured Data for SEO
+  // JSON-LD Structured Data for SEO (meets Google Search Console VideoObject specifications)
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "VideoObject",
     name: formattedTarget.title || "Campus Reel",
-    description: formattedTarget.body.slice(0, 160),
+    description: formattedTarget.body.slice(0, 160) || "Campus reel video on CampusLoop",
     uploadDate: formattedTarget.createdAt,
     contentUrl: `https://campusloop.space/app/reels/${formattedTarget.id}`,
+    thumbnailUrl: [
+      formattedTarget.author?.avatarUrl || "https://campusloop.space/og-image.png",
+    ],
   };
 
   return (

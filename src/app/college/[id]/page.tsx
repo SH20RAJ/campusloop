@@ -1,4 +1,10 @@
-import MainCollegePage, { generateMetadata } from "../../app/(main)/college/[id]/page";
+import { redirect } from "next/navigation";
 
-export { generateMetadata };
-export default MainCollegePage;
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function CollegeLegacyRedirectPage({ params }: PageProps) {
+  const { id } = await params;
+  redirect(`/app/college/${id}`);
+}

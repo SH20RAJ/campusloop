@@ -29,26 +29,21 @@ export const metadata: Metadata = {
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const user = await getCachedAuthUser();
+  const profile = user ? await getCachedUserProfile(user.id) : null;
 
-  if (!user) {
-    redirect("/handler/sign-in");
-  }
-
-  const profile = await getCachedUserProfile(user.id);
-
-  if (!profile?.onboardingCompleted) {
+  if (user && !profile?.onboardingCompleted) {
     redirect("/app/onboarding");
   }
 
-  const college = profile.institution;
-  const viewerMode = await isViewerProfile(profile);
+  const college = profile?.institution;
+  const viewerMode = profile ? await isViewerProfile(profile) : true;
 
   return (
     <div className="relative min-h-screen bg-background">
       <Navigation
-        profile={profile}
-        collegeName={viewerMode ? "Viewer Mode" : (college?.name ?? "Your College")}
-        isAdmin={profile.role === "ADMIN"}
+        profile={profile || undefined}
+        collegeName={viewerMode ? "Viewer Mode" : (college?.name ?? "Campus")}
+        isAdmin={profile?.role === "ADMIN"}
         isViewer={viewerMode}
       />
 

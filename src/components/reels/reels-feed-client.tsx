@@ -24,16 +24,35 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
-import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
-import { PostLikesModal } from "@/components/post/post-likes-modal";
 import { AnimatedIcon, AnimateVideo } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PresenceDot } from "@/components/ui/presence-dot";
 import type { FeedPost } from "@/hooks/use-feed";
+
+// Dynamically import heavy modals to avoid blocking initial render
+const FastCommentsModal = dynamic(
+  () => import("@/components/feed/fast-comments-modal").then((m) => m.FastCommentsModal),
+  { ssr: false }
+);
+const FeedCardRepostModal = dynamic(
+  () => import("@/components/feed/feed-card-repost-modal").then((m) => m.FeedCardRepostModal),
+  { ssr: false }
+);
+const PostLikesModal = dynamic(
+  () => import("@/components/post/post-likes-modal").then((m) => m.PostLikesModal),
+  { ssr: false }
+);
+
+// Hoisted regular expressions to prevent repeated allocations in reel slides
+const HASHTAG_REGEX = /#[a-zA-Z0-9_]+/g;
+const MD_VIDEO_REGEX = /!\[.*?\]\(((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)(?:\.(?:mp4|webm|mov|ogg)[^\s)]*|[^\s)]*videos[^\s)]*))\)/i;
+const R2_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']*)?\/api\/files\/r2\/videos\/[^\s<>"']+)/i;
+const RAW_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']+|\/api\/files\/r2\/[^\s<>"']+)\.(?:mp4|webm|mov|ogg)[^\s<>"']*)/i;
+const REGEX_ESCAPE_PATTERN = /[.*+?^${}()|[\]\\]/g;
 import {
   fetcher,
   repostPost,
@@ -436,7 +455,7 @@ function SingleReelItem({
 
   // Extract hashtags from caption for affinity tracking
   const hashtags = useMemo(() => {
-    const matches = post.body.match(/#[a-zA-Z0-9_]+/g);
+    const matches = post.body.match(HASHTAG_REGEX);
     return matches ? matches.map((t) => t.slice(1)) : [];
   }, [post.body]);
 
@@ -448,17 +467,13 @@ function SingleReelItem({
     }
 
     if (!post.body) return null;
-    const mdMatch = post.body.match(
-      /!\[.*?\]\(((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)(?:\.(?:mp4|webm|mov|ogg)[^\s)]*|[^\s)]*videos[^\s)]*))\)/i
-    );
+    const mdMatch = post.body.match(MD_VIDEO_REGEX);
     if (mdMatch) return mdMatch[1];
 
-    const r2Match = post.body.match(/((?:https?:\/\/[^\s<>"']*)?\/api\/files\/r2\/videos\/[^\s<>"']+)/i);
+    const r2Match = post.body.match(R2_VIDEO_REGEX);
     if (r2Match) return r2Match[1];
 
-    const rawMatch = post.body.match(
-      /((?:https?:\/\/[^\s<>"']+|\/api\/files\/r2\/[^\s<>"']+)\.(?:mp4|webm|mov|ogg)[^\s<>"']*)/i
-    );
+    const rawMatch = post.body.match(RAW_VIDEO_REGEX);
     if (rawMatch) return rawMatch[1];
 
     return null;
@@ -467,8 +482,10 @@ function SingleReelItem({
   // Clean caption text
   const cleanCaption = useMemo(() => {
     if (!videoUrl) return post.body;
+    const escapedVideoUrl = videoUrl.replace(REGEX_ESCAPE_PATTERN, "\\$&");
+    const mdPattern = new RegExp(`!\\[.*?\\]\\(${escapedVideoUrl}\\)`, "gi");
     return post.body
-      .replace(new RegExp(`!\\[.*?\\]\\(${videoUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)`, "gi"), "")
+      .replace(mdPattern, "")
       .replace(videoUrl, "")
       .trim();
   }, [post.body, videoUrl]);

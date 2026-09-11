@@ -1,4 +1,5 @@
-import CollegesPage, { metadata } from "../app/(main)/colleges/page";
+import { redirect } from "next/navigation";
 
-export { metadata };
-export default CollegesPage;
+export default function CollegesLegacyRedirectPage() {
+  redirect("/app/colleges");
+}

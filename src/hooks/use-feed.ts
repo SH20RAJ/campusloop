@@ -19,6 +19,35 @@ export type TopCommentPreview = {
   } | null;
 };
 
+export type ExternalPostMedia = {
+  id: string;
+  mediaType: "IMAGE" | "VIDEO" | "GIF" | "LINK";
+  mediaUrl: string;
+  previewUrl?: string | null;
+  thumbnailUrl?: string | null;
+  hlsUrl?: string | null;
+  dashUrl?: string | null;
+  width?: number | null;
+  height?: number | null;
+  duration?: number | null;
+  isGif: boolean;
+  position: number;
+};
+
+export type ExternalPostInfo = {
+  id: string;
+  source: "reddit" | "twitter" | "youtube";
+  externalId: string;
+  subreddit: string | null;
+  externalAuthor: string | null;
+  permalink: string;
+  canonicalUrl: string;
+  score: number;
+  commentCount: number;
+  contentType: "TEXT" | "IMAGE" | "VIDEO" | "GIF" | "GALLERY" | "LINK" | "OTHER";
+  media: ExternalPostMedia[];
+};
+
 export type FeedPost = Post & {
   // Stripped to null by the server for anonymous posts.
   author: UserProfile | null;
@@ -38,6 +67,7 @@ export type FeedPost = Post & {
   hasVotedPoll?: boolean;
   totalPollVotes?: number;
   isSaved?: boolean;
+  externalPost?: ExternalPostInfo | null;
 };
 
 const feedFetcher = async <T>(url: string): Promise<T> => {

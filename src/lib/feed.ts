@@ -1,7 +1,8 @@
 import { and, asc, desc, eq, inArray, or, type SQL, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { comments, follows, institutions, posts, reports, userProfiles, votes } from "@/db/schema";
+import { comments, externalPosts, follows, institutions, posts, reports, userProfiles, votes } from "@/db/schema";
+import type { ExternalPostInfo } from "@/hooks/use-feed";
 import {
   type ActiveBoost,
   applicableBoosts,
@@ -32,7 +33,13 @@ export type FeedPost = {
 
 export type FeedFilter = "trending" | "latest" | "confessions" | "polls" | "questions";
 
-const published = and(eq(posts.status, "PUBLISHED"), eq(posts.isSeeded, false));
+const published = and(
+  eq(posts.status, "PUBLISHED"),
+  or(
+    eq(posts.isSeeded, false),
+    sql`EXISTS (SELECT 1 FROM ${externalPosts} WHERE ${externalPosts.postId} = ${posts.id})`
+  )
+);
 const commentCountSql = sql<number>`coalesce((select count(*)::int from ${comments} where ${comments.postId} = "posts"."id" and ${comments.status} = 'PUBLISHED'), 0)`;
 const voteScoreSql = sql<number>`coalesce((select sum(${votes.value})::int from ${votes} where ${votes.postId} = "posts"."id"), 0)`;
 const reportCountSql = sql<number>`coalesce((select count(*)::int from ${reports} where ${reports.targetType} = 'POST' and ${reports.targetId} = "posts"."id"), 0)`;
@@ -588,6 +595,52 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
     new Set(rawFeed.map((p) => p.repostOfId).filter((id): id is string => Boolean(id)))
   );
 
+  const postIds = rawFeed.map((p) => p.id);
+  const externalPostsMap = new Map<string, ExternalPostInfo>();
+
+  if (postIds.length > 0) {
+    try {
+      const extPosts = await db.query.externalPosts.findMany({
+        where: inArray(externalPosts.postId, postIds),
+        with: {
+          media: {
+            orderBy: (media, { asc }) => [asc(media.position)],
+          },
+        },
+      });
+      for (const ep of extPosts) {
+        externalPostsMap.set(ep.postId, {
+          id: ep.id,
+          source: ep.source,
+          externalId: ep.externalId,
+          subreddit: ep.subreddit,
+          externalAuthor: ep.externalAuthor,
+          permalink: ep.permalink,
+          canonicalUrl: ep.canonicalUrl,
+          score: ep.score,
+          commentCount: ep.commentCount,
+          contentType: ep.contentType,
+          media: ep.media.map((m) => ({
+            id: m.id,
+            mediaType: m.mediaType,
+            mediaUrl: m.mediaUrl,
+            previewUrl: m.previewUrl,
+            thumbnailUrl: m.thumbnailUrl,
+            hlsUrl: m.hlsUrl,
+            dashUrl: m.dashUrl,
+            width: m.width,
+            height: m.height,
+            duration: m.duration,
+            isGif: m.isGif,
+            position: m.position,
+          })),
+        });
+      }
+    } catch (e) {
+      console.error("Error fetching external posts:", e);
+    }
+  }
+
   const repostedPostsMap = new Map<string, HydratedFeedPost>();
   if (repostOfIds.length > 0) {
     try {
@@ -693,6 +746,7 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
 
     return {
       ...stripAuthorForAnonymity(post),
+      externalPost: externalPostsMap.get(post.id) || null,
       repostOf: safeRepostOf,
       votesCount,
       commentsCount,

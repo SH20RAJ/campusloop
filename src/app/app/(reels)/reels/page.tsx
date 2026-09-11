@@ -1,7 +1,7 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import type { Metadata } from "next";
 import { ReelsFeedClient } from "@/components/reels/reels-feed-client";
-import { posts } from "@/db/schema";
+import { externalPosts, posts } from "@/db/schema";
 import type { FeedPost } from "@/hooks/use-feed";
 import { formatApiFeedPosts, resolveFeedPage } from "@/lib/feed";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
@@ -43,12 +43,15 @@ export default async function ReelsPage() {
   const user = await getCachedAuthUser();
   const profile = user ? await getCachedUserProfile(user.id) : null;
 
-  // Query only published video posts
-  const videoCondition = sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%')`;
+  // Query only published video posts (including external Reddit videos)
+  const videoCondition = sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%' OR EXISTS (SELECT 1 FROM external_media em JOIN external_posts ep ON em.external_post_id = ep.id WHERE ep.post_id = ${posts.id} AND em.media_type = 'VIDEO'))`;
 
   const conditions = [
     eq(posts.status, "PUBLISHED"),
-    eq(posts.isSeeded, false),
+    or(
+      eq(posts.isSeeded, false),
+      sql`EXISTS (SELECT 1 FROM ${externalPosts} WHERE ${externalPosts.postId} = ${posts.id})`
+    )!,
     videoCondition,
   ];
 

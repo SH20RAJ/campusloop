@@ -37,6 +37,7 @@ import {
 import { communities, communityMembers } from "./communities";
 import { secretCrushes, swipes } from "./dating";
 import { eventRegistrations, events } from "./events";
+import { externalMedia, externalPosts } from "./external-content";
 import { gamingLobbies } from "./gaming";
 import { housingListings } from "./housing";
 import { institutionDomains, institutions } from "./institutions";
@@ -131,6 +132,25 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
     relationName: "post_reposts",
   }),
   savedBy: many(savedPosts),
+  externalPost: one(externalPosts, {
+    fields: [posts.id],
+    references: [externalPosts.postId],
+  }),
+}));
+
+export const externalPostsRelations = relations(externalPosts, ({ one, many }) => ({
+  post: one(posts, {
+    fields: [externalPosts.postId],
+    references: [posts.id],
+  }),
+  media: many(externalMedia),
+}));
+
+export const externalMediaRelations = relations(externalMedia, ({ one }) => ({
+  externalPost: one(externalPosts, {
+    fields: [externalMedia.externalPostId],
+    references: [externalPosts.id],
+  }),
 }));
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({

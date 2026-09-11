@@ -9,6 +9,7 @@ export * from "./common";
 export * from "./communities";
 export * from "./dating";
 export * from "./events";
+export * from "./external-content";
 export * from "./feed-boosts";
 export * from "./gaming";
 export * from "./housing";

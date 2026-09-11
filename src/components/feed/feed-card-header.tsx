@@ -13,6 +13,7 @@ import {
   AnimateTrash2,
 } from "@/components/ui/animated-icon";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { RedditAttribution } from "@/components/reddit/reddit-attribution";
 import type { FeedPost } from "@/hooks/use-feed";
 import { formatTimeAgo, getCollegeShortName } from "@/lib/utils";
 
@@ -53,14 +54,23 @@ export function FeedCardHeader({
     }
   }
 
-  const authorName = post.isAnonymous
-    ? post.pseudonym
-      ? `🫣 @${post.pseudonym}`
-      : "🫣 Anonymous"
-    : post.author?.displayName || "Student";
-  const authorHandle = post.isAnonymous ? null : `@${post.author?.username || "student"}`;
+  const isExternalReddit = Boolean(post.externalPost && post.externalPost.source === "reddit");
+  const authorName = isExternalReddit
+    ? `u/${post.externalPost?.externalAuthor || "reddit"}`
+    : post.isAnonymous
+      ? post.pseudonym
+        ? `🫣 @${post.pseudonym}`
+        : "🫣 Anonymous"
+      : post.author?.displayName || "Student";
+  const authorHandle = isExternalReddit
+    ? `r/${post.externalPost?.subreddit}`
+    : post.isAnonymous
+      ? null
+      : `@${post.author?.username || "student"}`;
   const isVerified = Boolean(
-    !post.isAnonymous && ((post.author?.points || 0) >= 150 || post.author?.role === "ADMIN")
+    !post.isAnonymous &&
+      !isExternalReddit &&
+      ((post.author?.points || 0) >= 150 || post.author?.role === "ADMIN")
   );
 
   const institutionDisplayName = getCollegeShortName(post.institution) || null;
@@ -70,7 +80,17 @@ export function FeedCardHeader({
       {/* Primary Author & Time Row */}
       <div className="flex items-center justify-between gap-2 min-w-0">
         <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
-          {!post.isAnonymous ? (
+          {isExternalReddit ? (
+            <a
+              href={post.externalPost?.canonicalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="font-bold text-[14px] sm:text-[15px] text-foreground hover:text-orange-500 hover:underline truncate max-w-[130px] sm:max-w-[200px] shrink-0 sm:shrink"
+            >
+              {authorName}
+            </a>
+          ) : !post.isAnonymous ? (
             <Link
               href={`/@${post.author?.username || "student"}`}
               onClick={(e) => e.stopPropagation()}
@@ -115,8 +135,11 @@ export function FeedCardHeader({
           )}
         </div>
 
-        {/* Right Actions: Confession/Meme Pill & More Menu */}
+        {/* Right Actions: Confession/Meme Pill, Reddit Attribution & More Menu */}
         <div className="flex items-center gap-1 shrink-0">
+          {post.externalPost && (
+            <RedditAttribution externalPost={post.externalPost} variant="subtle" />
+          )}
           {post.type === "CONFESSION" && (
             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
               Confession

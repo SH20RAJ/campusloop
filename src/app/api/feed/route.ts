@@ -1,7 +1,7 @@
-import { eq, inArray, type SQL, sql } from "drizzle-orm";
+import { eq, inArray, or, type SQL, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { posts, userProfiles } from "@/db/schema";
+import { externalPosts, posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { formatApiFeedPosts, normalizeApiFeedSort, resolveFeedPage } from "@/lib/feed";
 import { isViewerProfile } from "@/lib/viewer";
@@ -47,7 +47,13 @@ export async function GET(req: Request) {
     }
 
     const isViewer = institutionId ? await isViewerProfile({ institutionId }) : false;
-    const conditions: SQL[] = [eq(posts.status, "PUBLISHED"), eq(posts.isSeeded, false)];
+    const conditions: SQL[] = [
+      eq(posts.status, "PUBLISHED"),
+      or(
+        eq(posts.isSeeded, false),
+        sql`EXISTS (SELECT 1 FROM ${externalPosts} WHERE ${externalPosts.postId} = ${posts.id})`
+      )!,
+    ];
 
     if (scope === "CAMPUS") {
       if (isViewer && targetInstitutionIds.length > 0) {
@@ -60,7 +66,7 @@ export async function GET(req: Request) {
     const isReels = sort === "reels" || type === "reels" || type === "REEL" || searchParams.get("videoOnly") === "true";
     if (isReels) {
       conditions.push(
-        sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%')`
+        sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%' OR EXISTS (SELECT 1 FROM external_media em JOIN external_posts ep ON em.external_post_id = ep.id WHERE ep.post_id = ${posts.id} AND em.media_type = 'VIDEO'))`
       );
     }
 

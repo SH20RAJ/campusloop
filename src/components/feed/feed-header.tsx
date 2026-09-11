@@ -1,6 +1,6 @@
 "use client";
 
-import { Flame, Globe, ListFilter, RotateCw, School, Search } from "lucide-react";
+import { Film, Flame, Globe, ListFilter, RotateCw, School, Search } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -110,35 +110,51 @@ export function FeedHeader({
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 flex-1">
           {SORT_TABS.map((s) => {
             const isCurrent = sort === s.id;
-            return (
-              <div key={s.id} className="flex items-center">
-                <button
-                  type="button"
-                  onClick={() => onSortChange(s.id)}
-                  className={cn(
-                    "relative px-4 py-3 font-bold transition-colors cursor-pointer shrink-0 text-[14px]",
-                    isCurrent
-                      ? "text-foreground font-black"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg"
-                  )}
+            if (s.id === "confessions") {
+              return (
+                <Link
+                  key={s.id}
+                  href="/app/confessions"
+                  className="relative px-3.5 py-3 font-bold transition-colors cursor-pointer shrink-0 text-[14px] text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg flex items-center gap-1.5 group"
                 >
-                  <span>{s.label}</span>
-                  {isCurrent && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-10 rounded-full bg-primary shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
-                  )}
-                </button>
+                  <span className="group-hover:text-foreground">{s.label}</span>
+                  <Flame className="size-3.5 text-amber-500 fill-amber-500 shrink-0" />
+                </Link>
+              );
+            }
 
-                {/* Confessions Quick Tab Link immediately after For You */}
-                {s.id === "for_you" && (
-                  <Link
-                    href="/app/confessions"
-                    className="relative px-3.5 py-3 font-bold transition-colors cursor-pointer shrink-0 text-[14px] text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg flex items-center gap-1.5 group"
-                  >
-                    <span className="group-hover:text-foreground">Confessions</span>
-                    <Flame className="size-3.5 text-amber-500 fill-amber-500 shrink-0" />
-                  </Link>
+            if (s.id === "reels") {
+              return (
+                <Link
+                  key={s.id}
+                  href="/app/reels"
+                  className="relative px-3.5 py-3 font-bold transition-colors cursor-pointer shrink-0 text-[14px] text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg flex items-center gap-1.5 group"
+                >
+                  <span className="group-hover:text-foreground">{s.label}</span>
+                  <span className="flex items-center justify-center size-4 rounded-full bg-rose-500/15 text-rose-500 border border-rose-500/30 text-[9px] font-black">
+                    <Film className="size-2.5" />
+                  </span>
+                </Link>
+              );
+            }
+
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => onSortChange(s.id)}
+                className={cn(
+                  "relative px-4 py-3 font-bold transition-colors cursor-pointer shrink-0 text-[14px]",
+                  isCurrent
+                    ? "text-foreground font-black"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg"
                 )}
-              </div>
+              >
+                <span>{s.label}</span>
+                {isCurrent && (
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-10 rounded-full bg-primary shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+                )}
+              </button>
             );
           })}
         </div>

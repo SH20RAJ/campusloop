@@ -57,9 +57,16 @@ export async function GET(req: Request) {
       }
     }
 
+    const isReels = sort === "reels" || type === "reels" || type === "REEL" || searchParams.get("videoOnly") === "true";
+    if (isReels) {
+      conditions.push(
+        sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%')`
+      );
+    }
+
     if (sort === "memes" || (type && (type === "MEME" || type === "memes"))) {
       conditions.push(eq(posts.type, "MEME"));
-    } else if (type && type !== "ALL" && type !== "all") {
+    } else if (type && type !== "ALL" && type !== "all" && !isReels) {
       conditions.push(eq(posts.type, type as (typeof posts.type.enumValues)[number]));
     }
 

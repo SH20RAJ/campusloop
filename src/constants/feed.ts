@@ -1,5 +1,7 @@
 export const FEED_SORT_TABS = [
   { id: "for_you", label: "For you" },
+  { id: "confessions", label: "Confessions" },
+  { id: "reels", label: "Reels" },
   { id: "memes", label: "Memes" },
   { id: "trending", label: "Trending" },
   { id: "latest", label: "Latest" },

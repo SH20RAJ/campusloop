@@ -184,6 +184,7 @@ export async function getVisibleProfilePosts(profileId: string) {
 
 export type ApiFeedSort =
   | "for_you"
+  | "reels"
   | "latest"
   | "trending"
   | "viral"
@@ -339,6 +340,7 @@ function getForYouScoreSql(
 export function normalizeApiFeedSort(value?: string | null): ApiFeedSort {
   if (
     value === "for_you" ||
+    value === "reels" ||
     value === "latest" ||
     value === "trending" ||
     value === "viral" ||
@@ -396,6 +398,9 @@ export function getFeedOrderBy(
     boostSql ? (sql<number>`(${score} * ${boostSql})` as SQL<number>) : score;
 
   switch (sort) {
+    case "reels":
+      orderClauses.push(desc(weighted(getViralScoreSql(viewerProfileId))));
+      break;
     case "top_voted":
       orderClauses.push(desc(weighted(voteScoreSql)));
       break;

@@ -117,6 +117,63 @@ const AUTHENTIC_CAMPUS_REELS = [
       { text: "Thermodynamics needs divine intervention anyways, good spot", hoursAgo: 8 },
     ],
   },
+  {
+    title: "Campus Lawn Sunny Afternoon Study Break",
+    videoUrl: "https://cdn.pixabay.com/video/2020/04/08/35449-407130915_large.mp4",
+    body: `Taking advantage of the spring sunshine before the afternoon lab starts 🌿☀️\n\nCampus looks unreal today. Highly recommend ditching the library for 30 minutes to get some vitamin D.\n\n![Campus Lawn Vibes](https://cdn.pixabay.com/video/2020/04/08/35449-407130915_large.mp4)\nhttps://cdn.pixabay.com/video/2020/04/08/35449-407130915_large.mp4\n\n#CampusVibes #SpringSeason #CollegeDiaries #PeacefulMoments`,
+    type: "NORMAL" as const,
+    isAnonymous: false,
+    scope: "CAMPUS" as const,
+    hoursAgo: 24,
+    upvotesCount: 480,
+    comments: [
+      { text: "The main lawn is the best part of this university hands down", hoursAgo: 22 },
+      { text: "Saw the music club practicing there earlier today!", hoursAgo: 20 },
+    ],
+  },
+  {
+    title: "Amphitheater Open Mic & Acoustic Jam",
+    videoUrl: "https://cdn.pixabay.com/video/2020/02/22/32708-394004598_large.mp4",
+    body: `Unplanned acoustic jam session at the college amphitheater after classes 🎸✨\n\nSomeone brought a guitar, 50 people gathered around, and we sang 2000s Bollywood songs until the guards showed up with torches.\n\nPure college magic.\n\n![Amphitheater Vibes](https://cdn.pixabay.com/video/2020/02/22/32708-394004598_large.mp4)\nhttps://cdn.pixabay.com/video/2020/02/22/32708-394004598_large.mp4\n\n#CampusAcoustics #CollegeJam #AmphitheaterChronicles #HostelLife`,
+    type: "NORMAL" as const,
+    isAnonymous: false,
+    scope: "GLOBAL" as const,
+    hoursAgo: 28,
+    upvotesCount: 920,
+    comments: [
+      { text: "This is what people mean when they say college is the best 4 years", hoursAgo: 26 },
+      { text: "The guy on the cajon was going insane lol", hoursAgo: 23 },
+    ],
+  },
+  {
+    title: "First Placement Offer Reaction",
+    videoUrl: "https://cdn.pixabay.com/video/2023/07/31/174008-850361316_large.mp4",
+    body: `WHEN THE PLACEMENT PORTAL STATUS TURNS GREEN 🟢🎉\n\nAfter 400 LeetCode problems, 8 rejection emails, and 3 rounds of DSA grilling, the offer letter finally arrived in my inbox at 11:30 PM!\n\nCalled mom immediately. Best phone call of my life.\n\n![Placement Celebration](https://cdn.pixabay.com/video/2023/07/31/174008-850361316_large.mp4)\nhttps://cdn.pixabay.com/video/2023/07/31/174008-850361316_large.mp4\n\n#Placed #BTechPlaced #DreamCompany #HardWorkPaysOff`,
+    type: "NORMAL" as const,
+    isAnonymous: false,
+    scope: "CAMPUS" as const,
+    hoursAgo: 32,
+    upvotesCount: 1450,
+    comments: [
+      { text: "MASSIVE CONGRATS BRO!! You deserved every bit of it 🙏", hoursAgo: 30 },
+      { text: "Party kahan hai bhai? Canteen samosa bill on you!", hoursAgo: 28 },
+      { text: "400 LeetCode problems is serious dedication, well done", hoursAgo: 24 },
+    ],
+  },
+  {
+    title: "Rainy Evening Walk to Canteen",
+    videoUrl: "https://cdn.pixabay.com/video/2023/06/27/169029-840229967_large.mp4",
+    body: `Monsoon clouds over campus + cutting chai at the back-gate tapri ☕️🌧️\n\nCampus walks in the rain hit different when you have zero pending assignments (for now).\n\n![Rainy Campus Walk](https://cdn.pixabay.com/video/2023/06/27/169029-840229967_large.mp4)\nhttps://cdn.pixabay.com/video/2023/06/27/169029-840229967_large.mp4\n\n#MonsoonVibes #CampusRains #CuttingChai #HostelLife`,
+    type: "NORMAL" as const,
+    isAnonymous: false,
+    scope: "CAMPUS" as const,
+    hoursAgo: 36,
+    upvotesCount: 760,
+    comments: [
+      { text: "Rain + ginger tea at tapri is a spiritual experience in hostel", hoursAgo: 34 },
+      { text: "Waterlogging near hostel 3 was swimming pool level today though 😂", hoursAgo: 31 },
+    ],
+  },
 ];
 
 interface ScrapedRedditItem {
@@ -296,12 +353,67 @@ async function main() {
           onboardingCompleted: true,
           role: "STUDENT",
           status: "ACTIVE",
-          loopPoints: 450 + Math.floor(Math.random() * 800),
+          points: 450 + Math.floor(Math.random() * 800),
           avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${persona.username}`,
         })
         .returning();
       allProfiles.push(newProfile);
       console.log(`  + Created student persona @${persona.username} (${inst.name})`);
+    }
+  }
+
+  // 3b. Ensure all authentic campus video reels are seeded
+  console.log("🎥 Step 1b: Ensuring all authentic campus reels are seeded...");
+  for (let r = 0; r < AUTHENTIC_CAMPUS_REELS.length; r++) {
+    const reel = AUTHENTIC_CAMPUS_REELS[r];
+    const existing = await db
+      .select({ id: posts.id })
+      .from(posts)
+      .where(eq(posts.title, reel.title))
+      .limit(1);
+
+    if (existing.length === 0) {
+      const author = allProfiles[r % allProfiles.length];
+      const targetInst = reel.scope === "CAMPUS" ? primaryCollege : allInstitutions[r % allInstitutions.length];
+      const postCreatedAt = new Date(Date.now() - reel.hoursAgo * 60 * 60 * 1000);
+      const postId = crypto.randomUUID();
+
+      await db.insert(posts).values({
+        id: postId,
+        authorId: author.id,
+        institutionId: targetInst.id,
+        title: reel.title,
+        body: reel.body,
+        type: reel.type,
+        isAnonymous: reel.isAnonymous,
+        pseudonym: reel.pseudonym || null,
+        scope: reel.scope,
+        createdAt: postCreatedAt,
+        updatedAt: postCreatedAt,
+      });
+
+      for (let c = 0; c < reel.comments.length; c++) {
+        const commenter = allProfiles[(r + c + 1) % allProfiles.length];
+        const commentCreatedAt = new Date(postCreatedAt.getTime() + (c + 1) * 20 * 60 * 1000);
+        await db.insert(comments).values({
+          id: crypto.randomUUID(),
+          postId,
+          authorId: commenter.id,
+          body: reel.comments[c].text,
+          createdAt: commentCreatedAt,
+          updatedAt: commentCreatedAt,
+        });
+      }
+
+      await db.insert(votes).values({
+        id: crypto.randomUUID(),
+        postId,
+        userId: allProfiles[(r + 1) % allProfiles.length].id,
+        value: 1,
+        createdAt: postCreatedAt,
+      });
+
+      console.log(`  ✓ Seeded reel: "${reel.title}" by @${author.username}`);
     }
   }
 
@@ -340,8 +452,6 @@ async function main() {
       isAnonymous: item.type === "CONFESSION" || i % 4 === 0,
       pseudonym: item.type === "CONFESSION" || i % 4 === 0 ? `Campus_${item.subreddit}_${i + 1}` : null,
       scope: i % 2 === 0 ? "GLOBAL" : "CAMPUS",
-      upvotesCount,
-      commentsCount: 3,
       createdAt: postCreatedAt,
       updatedAt: postCreatedAt,
     });
@@ -367,9 +477,6 @@ async function main() {
         postId,
         authorId: commenter.id,
         body: text,
-        upvotesCount: Math.floor(Math.random() * 45) + 5,
-        isAnonymous: c === 1,
-        pseudonym: c === 1 ? "Fellow Student" : null,
         createdAt: commentCreatedAt,
         updatedAt: commentCreatedAt,
       });

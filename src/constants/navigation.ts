@@ -27,6 +27,7 @@ import {
   AnimateShoppingBag,
   AnimateUser,
   AnimateUsers,
+  AnimateVideo,
   AnimateZap,
 } from "@/components/ui/animated-icon";
 
@@ -59,6 +60,13 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
     label: "Confessions",
     badge: "HOT",
     badgeColor: "bg-rose-500/15 text-rose-400 border border-rose-500/30",
+  },
+  {
+    icon: AnimateVideo,
+    href: "/app/reels",
+    label: "Reels",
+    badge: "NEW",
+    badgeColor: "bg-purple-500/15 text-purple-400 border border-purple-500/30",
   },
   {
     icon: AnimateCalendar,

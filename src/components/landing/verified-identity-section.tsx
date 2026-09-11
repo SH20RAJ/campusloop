@@ -1,128 +1,188 @@
-import { MailCheck, ShieldCheck, UserCheck, Users } from "lucide-react";
+"use client";
+
+import { Lock, MailCheck, ShieldCheck, UserCheck, Users } from "lucide-react";
+import { useState } from "react";
 import { Reveal } from "@/components/landing/reveal";
 
+const PHONE_RE = /\b\d{10}\b/g;
+const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+
 export function VerifiedIdentitySection() {
+  const [inputText, setInputText] = useState(
+    "Lost my calculator near CAT Hall. Call 9876543210 or mail senior@bitmesra.ac.in!"
+  );
+
+  const scrubbedText = inputText.replace(PHONE_RE, "[PHONE_REDACTED]").replace(EMAIL_RE, "[EMAIL_REDACTED]");
+  const hadPii = scrubbedText !== inputText;
+
   return (
-    <section className="border-t border-border/60 py-24 px-4 sm:px-6 bg-background">
-      <div className="mx-auto w-full max-w-6xl space-y-16">
+    <section className="border-t border-border/40 py-20 sm:py-28 px-4 sm:px-6 bg-background">
+      <div className="mx-auto w-full max-w-6xl space-y-12">
         {/* Section Heading */}
-        <Reveal className="max-w-2xl space-y-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary">The Core Differentiator</p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.15]">
+        <Reveal className="space-y-3">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1D9BF0]">
+            {"IDENTITY_ARCHITECTURE // ACCOUNTABLE_ANONYMITY"}
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.12]">
             Verified at the door.
             <br />
-            <span className="text-primary">Anonymous when you need it.</span>
+            <span className="text-[#1D9BF0]">Anonymous when you need it.</span>
           </h2>
-          <p className="text-base text-muted-foreground leading-relaxed">
+          <p className="max-w-2xl text-base text-muted-foreground leading-relaxed">
             Most social apps force an all-or-nothing choice between complete surveillance and toxic anonymity.
-            CampusLoop combines institutional student verification with context-aware privacy.
+            CampusLoop combines institutional student verification with cryptographic privacy.
           </p>
         </Reveal>
 
-        {/* Visual Architecture Diagram */}
-        <Reveal delay={0.1}>
-          <div className="rounded-3xl border border-border/80 bg-card p-6 sm:p-10 shadow-lg space-y-8">
-            <div className="text-center max-w-lg mx-auto space-y-2">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
-                CampusLoop Privacy &amp; Trust Model
+        {/* 4-Step Verification Protocol Architecture */}
+        <Reveal delay={0.08}>
+          <div className="rounded-2xl border border-border/40 bg-card p-6 sm:p-8 space-y-8">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-4">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
+                Cryptographic Identity Pipeline
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-foreground">
-                Anonymous to the campus. Accountable to the safety system.
-              </h3>
+              <span className="font-mono text-[11px] text-[#1D9BF0] font-bold">
+                OTP → ENROLLMENT_CHECK → ISOLATED_RADIUS → AES_SEAL
+              </span>
             </div>
 
-            {/* Architecture Steps Flow */}
-            <div className="grid gap-4 md:grid-cols-4 items-center">
+            {/* Steps Flow Grid */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {/* Step 1 */}
-              <div className="rounded-2xl border border-border/60 bg-muted/30 p-5 text-center space-y-2.5">
-                <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
-                  <MailCheck className="size-5" />
+              <div className="rounded-xl border border-border/40 bg-muted/20 p-4 space-y-2.5">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-[#1D9BF0]/10 text-[#1D9BF0] border border-[#1D9BF0]/20">
+                  <MailCheck className="size-4.5" />
                 </div>
-                <div className="font-bold text-sm text-foreground">College Email</div>
+                <div className="font-bold text-sm text-foreground">01. College Email</div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Institutional address (.ac.in / .edu.in) verified via OTP
+                  Institutional address (.ac.in / .edu.in) verified with a single-use OTP.
                 </p>
-                <span className="inline-block text-[10px] font-mono text-emerald-500 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                <span className="inline-block font-mono text-[10px] text-emerald-500 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full">
                   Gatekept at Entry
                 </span>
               </div>
 
               {/* Step 2 */}
-              <div className="rounded-2xl border border-border/60 bg-muted/30 p-5 text-center space-y-2.5">
-                <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                  <UserCheck className="size-5" />
+              <div className="rounded-xl border border-border/40 bg-muted/20 p-4 space-y-2.5">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-[#1D9BF0]/10 text-[#1D9BF0] border border-[#1D9BF0]/20">
+                  <UserCheck className="size-4.5" />
                 </div>
-                <div className="font-bold text-sm text-foreground">Verified Student</div>
+                <div className="font-bold text-sm text-foreground">02. Verified Hub</div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Assigned exclusively to your registered campus community
+                  Mapped exclusively to your campus radius. Zero outsiders or bots.
                 </p>
-                <span className="inline-block text-[10px] font-mono text-blue-500 font-bold bg-blue-500/10 px-2 py-0.5 rounded-full">
+                <span className="inline-block font-mono text-[10px] text-[#1D9BF0] font-bold bg-[#1D9BF0]/10 px-2 py-0.5 rounded-full">
                   Zero Outsiders
                 </span>
               </div>
 
-              {/* Step 3: Dual Identity Choice */}
-              <div className="rounded-2xl border-2 border-primary/40 bg-primary/5 p-5 text-center space-y-2.5 shadow-sm">
-                <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-primary/15 text-primary border border-primary/30">
-                  <Users className="size-5" />
+              {/* Step 3 */}
+              <div className="rounded-xl border border-[#1D9BF0]/30 bg-[#1D9BF0]/5 p-4 space-y-2.5">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-[#1D9BF0]/15 text-[#1D9BF0] border border-[#1D9BF0]/30">
+                  <Users className="size-4.5" />
                 </div>
-                <div className="font-bold text-sm text-foreground">Contextual Identity</div>
-                <div className="space-y-1 text-xs">
-                  <div className="font-semibold text-foreground">Real Name (Clubs &amp; Match)</div>
-                  <div className="text-muted-foreground">or Anonymous (Confessions &amp; Polls)</div>
-                </div>
-                <span className="inline-block text-[10px] font-mono text-primary font-bold bg-primary/15 px-2 py-0.5 rounded-full">
-                  Student Switcher
+                <div className="font-bold text-sm text-foreground">03. Dual Persona</div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Toggle between Real Profile (Clubs &amp; Match) or Anonymous (Confessions &amp; Polls).
+                </p>
+                <span className="inline-block font-mono text-[10px] text-[#1D9BF0] font-bold bg-[#1D9BF0]/15 px-2 py-0.5 rounded-full">
+                  Contextual Switcher
                 </span>
               </div>
 
-              {/* Step 4: Safety Vault */}
-              <div className="rounded-2xl border border-border/60 bg-muted/30 p-5 text-center space-y-2.5">
-                <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-purple-500/10 text-purple-500 border border-purple-500/20">
-                  <ShieldCheck className="size-5" />
+              {/* Step 4 */}
+              <div className="rounded-xl border border-border/40 bg-muted/20 p-4 space-y-2.5">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  <ShieldCheck className="size-4.5" />
                 </div>
-                <div className="font-bold text-sm text-foreground">Safety Vault</div>
+                <div className="font-bold text-sm text-foreground">04. Safety Escrow</div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Harassment or illegal activity traces to account strike, not public exposure
+                  Peers never see author identity. Abusive actors face real strikes and campus bans.
                 </p>
-                <span className="inline-block text-[10px] font-mono text-purple-500 font-bold bg-purple-500/10 px-2 py-0.5 rounded-full">
-                  Accountable Safety
+                <span className="inline-block font-mono text-[10px] text-purple-400 font-bold bg-purple-500/10 px-2 py-0.5 rounded-full">
+                  Accountable Shield
                 </span>
               </div>
             </div>
 
-            {/* 3 Detail Cards */}
-            <div className="grid gap-6 md:grid-cols-3 pt-6 border-t border-border/50">
-              <div className="space-y-2">
+            {/* Interactive Micro-Artifact: Live PII-Scrubber Sandbox */}
+            <div className="pt-2 border-t border-border/40">
+              <div className="rounded-xl border border-border/60 bg-muted/10 p-4 sm:p-5 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Lock className="size-4 text-[#1D9BF0]" />
+                    <span className="font-mono text-xs font-bold text-foreground">
+                      LIVE ARTIFACT: AUTOMATIC CLIENT-SIDE PII SCRUBBER
+                    </span>
+                  </div>
+                  {hadPii && (
+                    <span className="font-mono text-[10px] font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                      ✓ PII Intercepted &amp; Neutralized
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="pii-input"
+                      className="font-mono text-[10px] font-semibold text-muted-foreground uppercase"
+                    >
+                      Raw Student Input (Try editing)
+                    </label>
+                    <textarea
+                      id="pii-input"
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      rows={2}
+                      className="w-full bg-background border border-border/60 rounded-lg p-2.5 text-xs text-foreground font-mono focus:border-[#1D9BF0] outline-none resize-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <span className="font-mono text-[10px] font-semibold text-muted-foreground uppercase">
+                      Sealed Post Payload (What reaches peers)
+                    </span>
+                    <div className="w-full bg-background/50 border border-border/40 rounded-lg p-2.5 text-xs font-mono text-foreground/90 min-h-[58px]">
+                      {scrubbedText}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Three Pillar Guarantees */}
+            <div className="grid gap-6 md:grid-cols-3 pt-2 border-t border-border/40">
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-black text-primary">01</span>
-                  <h4 className="font-bold text-sm text-foreground">Verify once at the door</h4>
+                  <span className="font-mono text-xs font-black text-[#1D9BF0]">01</span>
+                  <h4 className="font-bold text-sm text-foreground">One-Time Verification</h4>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  One-time verification through your college domain grants lifetime student access. No
-                  recurring passwords or cumbersome daily checks.
+                  Verify once with your student domain for uninterrupted access. No recurring daily checks or
+                  annoying re-logins.
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-black text-primary">02</span>
-                  <h4 className="font-bold text-sm text-foreground">Choose your persona</h4>
+                  <span className="font-mono text-xs font-black text-[#1D9BF0]">02</span>
+                  <h4 className="font-bold text-sm text-foreground">Zero Author Foreign Keys</h4>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Toggle seamlessly between your real student profile for clubs, study groups, and
-                  matchmaking, and an anonymous avatar for candid feedback and confessions.
+                  Anonymous posts store no user ID relation in the database timeline row. No SQL query can
+                  join the post back to you.
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-black text-primary">03</span>
-                  <h4 className="font-bold text-sm text-foreground">Stay mutually accountable</h4>
+                  <span className="font-mono text-xs font-black text-[#1D9BF0]">03</span>
+                  <h4 className="font-bold text-sm text-foreground">Safety System Accountability</h4>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Peers never see who wrote an anonymous post, but the platform safety system ensures abusive
-                  bad actors face real campus bans, keeping discussions clean.
+                  Peers never see your identity, but the platform safety system guarantees bad actors and
+                  harassers face real campus strikes.
                 </p>
               </div>
             </div>

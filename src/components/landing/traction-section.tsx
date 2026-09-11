@@ -4,21 +4,21 @@ import { Reveal } from "@/components/landing/reveal";
 
 const ROADMAP = [
   {
-    phase: "Phase 1 (Active)",
+    phase: "PHASE 01 (ACTIVE)",
     status: "Live Pilot",
     title: "BIT Mesra Campus Density",
-    desc: "Achieving deep network density at our pilot university — validating anonymous confessions, canteen polls, and student trade.",
+    desc: "Validating deep student retention at our pilot university — anonymous confessions, canteen polls, and campus peer trade.",
     current: true,
   },
   {
-    phase: "Phase 2",
+    phase: "PHASE 02",
     status: "Next",
     title: "Ranchi Regional Cluster",
     desc: "Expanding to technical & medical universities across Ranchi to enable inter-college sports, fests, and local student hubs.",
     current: false,
   },
   {
-    phase: "Phase 3",
+    phase: "PHASE 03",
     status: "Upcoming",
     title: "All-India Expansion",
     desc: "Progressively opening hubs for student domains nationwide, prioritized by verified student waitlist requests.",
@@ -28,56 +28,58 @@ const ROADMAP = [
 
 export function TractionSection() {
   return (
-    <section className="border-t border-border/60 bg-muted/20 py-24 px-4 sm:px-6">
-      <div className="mx-auto w-full max-w-6xl space-y-16">
+    <section className="border-t border-border/40 bg-muted/10 py-20 sm:py-28 px-4 sm:px-6">
+      <div className="mx-auto w-full max-w-6xl space-y-12">
         {/* Section Heading */}
-        <Reveal className="max-w-2xl space-y-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary">Honest Pilot Traction</p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.15]">
+        <Reveal className="space-y-3">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1D9BF0]">
+            {"TRACTION_METRICS // PILOT_VALIDATION"}
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.12]">
             Built at BIT Mesra.
             <br />
             <span className="text-muted-foreground font-semibold">Growing campus by campus.</span>
           </h2>
-          <p className="text-base text-muted-foreground leading-relaxed">
+          <p className="max-w-2xl text-base text-muted-foreground leading-relaxed">
             We are building CampusLoop thoughtfully with students on the ground, focusing on authentic campus
             culture and retention before scaling nationwide.
           </p>
         </Reveal>
 
         {/* 3 Real Traction Metric Cards */}
-        <div className="grid gap-6 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-3">
           <Reveal delay={0.05}>
-            <div className="rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-sm space-y-3">
-              <span className="text-xs font-mono font-bold uppercase text-primary tracking-wider">
-                Pilot Density
+            <div className="rounded-2xl border border-border/40 bg-card p-6 space-y-3">
+              <span className="font-mono text-[11px] font-bold uppercase text-[#1D9BF0] tracking-wider">
+                PILOT_DENSITY
               </span>
-              <div className="font-heading text-4xl sm:text-5xl font-black text-foreground">&lt; 100</div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              <div className="font-mono text-4xl sm:text-5xl font-black text-foreground">&lt; 100</div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 Verified students onboarded organically at BIT Mesra during our initial closed alpha.
               </p>
             </div>
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div className="rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-sm space-y-3">
-              <span className="text-xs font-mono font-bold uppercase text-blue-500 tracking-wider">
-                Inbound Demand
+            <div className="rounded-2xl border border-border/40 bg-card p-6 space-y-3">
+              <span className="font-mono text-[11px] font-bold uppercase text-blue-500 tracking-wider">
+                INBOUND_DEMAND
               </span>
-              <div className="font-heading text-4xl sm:text-5xl font-black text-foreground">10+</div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              <div className="font-mono text-4xl sm:text-5xl font-black text-foreground">10+</div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 College email domains requesting dedicated campus hubs across India.
               </p>
             </div>
           </Reveal>
 
           <Reveal delay={0.15}>
-            <div className="rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-sm space-y-3">
-              <span className="text-xs font-mono font-bold uppercase text-emerald-500 tracking-wider">
-                Pure Word-of-Mouth
+            <div className="rounded-2xl border border-border/40 bg-card p-6 space-y-3">
+              <span className="font-mono text-[11px] font-bold uppercase text-emerald-500 tracking-wider">
+                ORGANIC_ACQUISITION
               </span>
-              <div className="font-heading text-4xl sm:text-5xl font-black text-foreground">₹0</div>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Spent on paid marketing or influencer ads. Grown purely via campus hostel WhatsApp circles.
+              <div className="font-mono text-4xl sm:text-5xl font-black text-foreground">₹0</div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Spent on paid marketing or ads. Grown 100% via word of mouth and hostel WhatsApp circles.
               </p>
             </div>
           </Reveal>
@@ -85,25 +87,29 @@ export function TractionSection() {
 
         {/* Expansion Roadmap */}
         <Reveal delay={0.2}>
-          <div className="rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="rounded-2xl border border-border/40 bg-card p-6 sm:p-8 space-y-6">
             <div className="flex items-center gap-2">
-              <Milestone className="size-5 text-primary" />
-              <h3 className="font-heading text-lg font-bold text-foreground">Phased Campus Rollout Plan</h3>
+              <Milestone className="size-4.5 text-[#1D9BF0]" />
+              <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-foreground">
+                Phased Campus Rollout Plan
+              </h3>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-3">
               {ROADMAP.map((item) => (
                 <div
                   key={item.phase}
-                  className={`rounded-2xl p-5 border space-y-2.5 ${
-                    item.current ? "border-primary/40 bg-primary/5" : "border-border/60 bg-muted/20"
+                  className={`rounded-xl p-4 border space-y-2 ${
+                    item.current ? "border-[#1D9BF0]/40 bg-[#1D9BF0]/5" : "border-border/40 bg-muted/10"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-foreground">{item.phase}</span>
+                    <span className="font-mono text-[11px] font-bold text-foreground">{item.phase}</span>
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        item.current ? "bg-emerald-500/10 text-emerald-500" : "bg-muted text-muted-foreground"
+                      className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        item.current
+                          ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                          : "bg-muted text-muted-foreground border border-border/40"
                       }`}
                     >
                       {item.status}
@@ -115,10 +121,10 @@ export function TractionSection() {
               ))}
             </div>
 
-            <div className="pt-2 text-center sm:text-left">
+            <div className="pt-1 text-center sm:text-left">
               <Link
                 href="/colleges"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline"
+                className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[#1D9BF0] hover:underline"
               >
                 <span>Request your college hub for the next rollout phase</span>
                 <ArrowUpRight className="size-3.5" />

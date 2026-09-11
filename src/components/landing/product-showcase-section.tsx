@@ -1,134 +1,248 @@
 "use client";
 
-import { Heart, MessageCircle, Repeat2, ShoppingBag, Sparkles, Users } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Check,
+  Eye,
+  MessageCircle,
+  Pin,
+  Repeat2,
+  Send,
+  Shield,
+  ShieldCheck,
+} from "lucide-react";
+import { motion } from "motion/react";
+import Link from "next/link";
 import { useState } from "react";
 import { Reveal } from "@/components/landing/reveal";
+import {
+  AnimateHeart,
+  AnimateMessageCircle,
+  AnimateRepeat2,
+  AnimateShoppingBag,
+  AnimateUsers,
+} from "@/components/ui/animated-icon";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
-const PILLARS = [
+type PillarId = "social" | "people" | "utility" | "communities" | "messaging";
+
+interface Pillar {
+  id: PillarId;
+  label: string;
+  IconComponent: React.ComponentType<{ className?: string }>;
+  tagline: string;
+  heading: string;
+  summary: string;
+  specs: { label: string; value: string }[];
+  invariants: string[];
+}
+
+const PILLARS: Pillar[] = [
   {
     id: "social",
     label: "Campus Social",
-    icon: Repeat2,
-    heading: "Confessions, Polls, and Campus Pulse",
+    IconComponent: AnimateRepeat2,
+    tagline: "TIMELINE // CONFESSIONS & POLLS",
+    heading: "Accountable Anonymity. Real Campus Pulse.",
     summary:
-      "Share candid confessions safely, settle late-night mess debates with live polls, and vote on trending student issues.",
-    tags: ["#anonymous-confession", "#canteen-debates", "#midsem-memes"],
-    preview: {
-      type: "feed",
-      author: "Hostel 3 Anonymous",
-      time: "25m ago",
-      badge: "Confession",
-      badgeColor: "text-purple-400 bg-purple-500/10 border-purple-500/20",
-      content:
-        "Petition to turn the library 3rd floor into a 24/7 silent study lounge with bean bags during endsem week. Who is signing this with me?",
-      votes: "142 agree",
-      comments: "38 replies",
-    },
+      "Share candid confessions safely behind one-way pseudonyms, settle late-night hostel debates with verified student polls, and vote on trending campus issues.",
+    specs: [
+      { label: "Scope", value: "Campus-Isolated" },
+      { label: "Anonymity", value: "AES-Vault Sealed" },
+      { label: "Verification", value: "College Email Required" },
+    ],
+    invariants: [
+      "Zero author foreign-key joins in anonymous mode",
+      "One verified student = one ungameable poll vote",
+      "Campus radius default with zero cross-college noise",
+    ],
   },
   {
     id: "people",
     label: "Match & Classmates",
-    icon: Heart,
-    heading: "Find Study Partners, Co-founders & Friends",
+    IconComponent: AnimateHeart,
+    tagline: "CONNECTION // VERIFIED STUDENTS",
+    heading: "Find Study Partners, Co-founders & Crushes.",
     summary:
-      "Not just dating. Connect with verified students on campus looking for hackathon teammates, gym buddies, or fellow indie rock fans.",
-    tags: ["Study Partners", "Hackathon Teammates", "18+ Opt-in"],
-    preview: {
-      type: "match",
-      name: "Aman K.",
-      meta: "BIT Mesra · CSE '26",
-      bio: "Building an agentic compiler for our final year project. Looking for a study partner for Distributed Systems & weekend badminton 🏸",
-      interests: ["System Design", "Badminton", "Rust"],
-      compatibility: "94% shared campus interests",
-    },
+      "Connect with fellow students for hackathons, gym sessions, or dating. Every profile is tied to an active institutional email — zero catfishing, zero outsiders.",
+    specs: [
+      { label: "Pool", value: "100% Verified Students" },
+      { label: "Privacy", value: "Mutual-Match Unlock" },
+      { label: "Crush Escrow", value: "5 Zero-Doxxing Slots" },
+    ],
+    invariants: [
+      "No cold unsolicited messaging without mutual opt-in",
+      "Secret crush vault reveals only on bidirectional declaration",
+      "Filter by batch, branch, campus radius, or all India",
+    ],
   },
   {
     id: "utility",
     label: "Campus Utility",
-    icon: ShoppingBag,
-    heading: "Buy & Sell, Notes & Lost & Found",
+    IconComponent: AnimateShoppingBag,
+    tagline: "EXCHANGE // NOTES & MARKETPLACE",
+    heading: "Peer Marketplace, Solved PYQs & Lost Items.",
     summary:
-      "A trusted marketplace exclusively for students. Buy second-hand coolers and cycles in ₹, find lost student IDs, and share semester PYQ notes.",
-    tags: ["Cycles & Drafters", "Semester PYQs", "Lost IDs"],
-    preview: {
-      type: "market",
-      item: "Hero Octane 21-Speed Mountain Bike",
-      price: "₹2,800",
-      seller: "Verified Senior (Hostel 12)",
-      desc: "Fully tuned gears, dual mudguards, bottle holder included. Perfect for cycling to IC ground classes.",
-      badge: "Verified Student Seller",
-    },
+      "Buy and sell second-hand mountain bikes, drafters, and coolers in ₹. Download senior-verified semester notes and report lost student IDs.",
+    specs: [
+      { label: "Trading", value: "Hostel Peer-to-Peer" },
+      { label: "Currency", value: "Direct Student INR" },
+      { label: "Academics", value: "Verified Senior Notes" },
+    ],
+    invariants: [
+      "Every buyer and seller verified via university email",
+      "Pickups coordinated at known campus landmarks",
+      "Academic notes searchable by subject, branch, and semester",
+    ],
   },
   {
     id: "communities",
     label: "Communities & Clubs",
-    icon: Users,
-    heading: "Student-Led Clubs & Hostel Circles",
+    IconComponent: AnimateUsers,
+    tagline: "ORGANIZATION // SUB-HUBS & SOCIETIES",
+    heading: "Student Clubs & Hostel Circles with Dedicated Feeds.",
     summary:
-      "Join official campus societies, coding clubs, gaming guilds, or create private discussion groups for your hostel floor.",
-    tags: ["Robotics Club", "EDC E-Cell", "Hostel 10 Common Room"],
-    preview: {
-      type: "community",
-      title: "Google Developer Student Club (GDSC)",
-      members: "310 verified students",
-      pinned: "Hackathon orientation meetups this Friday at 6 PM in CAT Hall.",
-      recent: "Shared starter repo for AI hackathon track 🚀",
-    },
+      "Stop drowning in 40 unread WhatsApp groups. Student societies, robotics clubs, and hostel wings get structured feeds, event RSVPs, and member roles.",
+    specs: [
+      { label: "Structure", value: "Isolated Sub-Hubs" },
+      { label: "Roles", value: "Leads, Core & Members" },
+      { label: "Events", value: "Live RSVP Calendar" },
+    ],
+    invariants: [
+      "Dedicated announcement feeds that never get buried",
+      "Join controls configured by student admins",
+      "Discoverable directory across your campus and beyond",
+    ],
   },
   {
     id: "messaging",
     label: "Direct Chat",
-    icon: MessageCircle,
-    heading: "Private Conversations With Verified Peers",
+    IconComponent: AnimateMessageCircle,
+    tagline: "COMMUNICATION // SECURE MESSAGING",
+    heading: "Private P2P Conversations. Zero Phone Numbers.",
     summary:
-      "Continue conversations off the public feed. Message classmates securely without sharing phone numbers or personal WhatsApp accounts.",
-    tags: ["End-to-End Privacy", "No Phone Required", "Verified Identities"],
-    preview: {
-      type: "chat",
-      contact: "Rohan S. (Verified Classmate)",
-      msg1: "Hey! Do you have the Unit 3 Compiler Design lecture slides?",
-      msg2: "Yes, just uploaded them to the Campus Notes vault. Check the link!",
-    },
+      "Message batchmates and project partners securely without sharing personal WhatsApp numbers. Fast, private, and gated by institutional enrollment.",
+    specs: [
+      { label: "Identity", value: "Campus Handle" },
+      { label: "Privacy", value: "No Phone Exposure" },
+      { label: "Calling", value: "WebRTC Peer-to-Peer" },
+    ],
+    invariants: [
+      "Keep personal numbers safe from strangers and seniors",
+      "One-tap block and report controls on every thread",
+      "Media plane runs P2P between student browsers",
+    ],
   },
 ];
 
 export function ProductShowcaseSection() {
-  const [activeId, setActiveId] = useState("social");
+  const [activeId, setActiveId] = useState<PillarId>("social");
   const activePillar = PILLARS.find((p) => p.id === activeId) || PILLARS[0];
 
-  function handleSelect(id: string) {
+  // Interactive Micro-artifact states
+  const [socialLiked, setSocialLiked] = useState(false);
+  const [socialLikes, setSocialLikes] = useState(48);
+  const [socialReposted, setSocialReposted] = useState(false);
+  const [socialReposts, setSocialReposts] = useState(12);
+  const [socialVoted, setSocialVoted] = useState(false);
+  const [socialAgreeVotes, setSocialAgreeVotes] = useState(142);
+
+  const [connectedState, setConnectedState] = useState(false);
+  const [rsvpState, setRsvpState] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [chatMessages, setChatMessages] = useState([
+    { from: "peer", text: "Hey! Do you have the Unit 3 Compiler Design lecture slides?" },
+    { from: "me", text: "Yes, just uploaded them to the Campus Notes vault. Check the link!" },
+  ]);
+
+  function handleSelect(id: PillarId) {
     sounds.tap();
     haptics.light();
     setActiveId(id);
   }
 
+  function handleLike() {
+    sounds.pop();
+    haptics.light();
+    if (socialLiked) {
+      setSocialLiked(false);
+      setSocialLikes((n) => n - 1);
+    } else {
+      setSocialLiked(true);
+      setSocialLikes((n) => n + 1);
+    }
+  }
+
+  function handleRepost() {
+    sounds.pop();
+    haptics.light();
+    if (socialReposted) {
+      setSocialReposted(false);
+      setSocialReposts((n) => n - 1);
+    } else {
+      setSocialReposted(true);
+      setSocialReposts((n) => n + 1);
+    }
+  }
+
+  function handleAgreeVote() {
+    if (socialVoted) return;
+    sounds.pop();
+    haptics.light();
+    setSocialVoted(true);
+    setSocialAgreeVotes((n) => n + 1);
+  }
+
+  function handleConnect() {
+    sounds.pop();
+    haptics.medium();
+    setConnectedState((prev) => !prev);
+  }
+
+  function handleRsvp() {
+    sounds.pop();
+    haptics.light();
+    setRsvpState((prev) => !prev);
+  }
+
+  function handleSendChat(e: React.FormEvent) {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    sounds.send();
+    haptics.light();
+    setChatMessages((prev) => [...prev, { from: "me", text: chatInput.trim() }]);
+    setChatInput("");
+  }
+
   return (
-    <section className="border-t border-border/60 bg-background py-24 px-4 sm:px-6">
-      <div className="mx-auto w-full max-w-6xl space-y-14">
-        {/* Section Heading */}
-        <Reveal className="max-w-2xl space-y-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-primary">
-            Modular Campus Architecture
-          </p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.15]">
+    <section className="border-t border-border/40 bg-background py-20 sm:py-28 px-4 sm:px-6">
+      <div className="mx-auto w-full max-w-6xl space-y-12">
+        {/* Section Header (Twitter/Grok Minimalist Hierarchy) */}
+        <Reveal className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1D9BF0]">
+              {"SYSTEM_ARCHITECTURE // MODULAR CAMPUS ENGINE"}
+            </span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.12]">
             Everything your campus already does.
             <br />
-            <span className="text-primary">Now in one loop.</span>
+            <span className="text-muted-foreground font-semibold">Verified in one timeline.</span>
           </h2>
-          <p className="text-base text-muted-foreground leading-relaxed">
-            One verified student identity unlocks every aspect of university life — social expression, meeting
-            people, academic sharing, and campus trade.
+          <p className="max-w-2xl text-base text-muted-foreground leading-relaxed">
+            One verified student identity unlocks every layer of university life — social expression,
+            classmate discovery, academic sharing, and student trade.
           </p>
         </Reveal>
 
-        {/* Interactive Tab Switcher */}
+        {/* Twitter / Grok Flat Tab Navigation */}
         <Reveal delay={0.05}>
-          <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-muted/60 border border-border/60 max-w-3xl">
+          <div className="relative flex items-center gap-1 sm:gap-2 overflow-x-auto border-b border-border/40 pb-px no-scrollbar">
             {PILLARS.map((p) => {
-              const Icon = p.icon;
+              const Icon = p.IconComponent;
               const isSelected = p.id === activeId;
               return (
                 <button
@@ -136,150 +250,401 @@ export function ProductShowcaseSection() {
                   type="button"
                   onClick={() => handleSelect(p.id)}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer select-none",
+                    "relative flex items-center gap-2 px-4 py-3.5 text-xs sm:text-sm font-bold transition-colors cursor-pointer select-none shrink-0",
                     isSelected
-                      ? "bg-foreground text-background shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-t-lg"
                   )}
                 >
-                  <Icon className="size-4" />
+                  <Icon className={cn("size-4", isSelected ? "text-[#1D9BF0]" : "text-muted-foreground")} />
                   <span>{p.label}</span>
+                  {isSelected && (
+                    <motion.div
+                      layoutId="showcase-tab-indicator"
+                      className="absolute bottom-0 left-0 right-0 h-1 rounded-full bg-[#1D9BF0]"
+                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                    />
+                  )}
                 </button>
               );
             })}
           </div>
         </Reveal>
 
-        {/* Selected Pillar Content & Visual Showcase */}
+        {/* Split-Pane Showcase (Grok Spec Left + Timeline Artifact Right) */}
         <Reveal delay={0.1}>
-          <div className="grid items-center gap-10 lg:grid-cols-12 rounded-3xl border border-border/80 bg-card p-6 sm:p-10 shadow-md">
-            {/* Left Pillar Description */}
-            <div className="lg:col-span-6 space-y-5">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-bold uppercase tracking-wider">
-                <Sparkles className="size-3.5" />
-                <span>{activePillar.label}</span>
+          <div className="grid items-start gap-8 lg:grid-cols-12 rounded-2xl border border-border/40 bg-card p-6 sm:p-8">
+            {/* Left Column: Feature Specifications & Architectural Invariants */}
+            <div className="lg:col-span-6 space-y-6">
+              <div className="space-y-2">
+                <span className="font-mono text-[11px] font-bold tracking-wider text-[#1D9BF0] uppercase">
+                  {activePillar.tagline}
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
+                  {activePillar.heading}
+                </h3>
+                <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
+                  {activePillar.summary}
+                </p>
               </div>
 
-              <h3 className="text-2xl sm:text-3xl font-black text-foreground">{activePillar.heading}</h3>
-
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                {activePillar.summary}
-              </p>
-
-              <div className="flex flex-wrap gap-2 pt-2">
-                {activePillar.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs font-mono font-semibold px-3 py-1 rounded-full bg-muted/80 text-foreground/80 border border-border/60"
+              {/* Specs Grid */}
+              <div className="grid grid-cols-3 gap-2.5 pt-1">
+                {activePillar.specs.map((spec) => (
+                  <div
+                    key={spec.label}
+                    className="rounded-xl border border-border/40 bg-muted/20 p-3 space-y-1"
                   >
-                    {tag}
-                  </span>
+                    <span className="block font-mono text-[10px] font-semibold text-muted-foreground uppercase">
+                      {spec.label}
+                    </span>
+                    <span className="block font-bold text-xs text-foreground truncate">{spec.value}</span>
+                  </div>
                 ))}
+              </div>
+
+              {/* Architectural Invariants */}
+              <div className="space-y-2.5 pt-2 border-t border-border/40">
+                <span className="font-mono text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Guaranteed System Invariants
+                </span>
+                <ul className="space-y-2">
+                  {activePillar.invariants.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start gap-2 text-xs leading-relaxed text-foreground/90"
+                    >
+                      <Check className="size-3.5 text-emerald-500 shrink-0 mt-0.5" strokeWidth={2.5} />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="pt-2">
+                <Link
+                  href={`/docs/${
+                    activePillar.id === "social"
+                      ? "campus-feed"
+                      : activePillar.id === "people"
+                        ? "campus-match"
+                        : activePillar.id === "utility"
+                          ? "marketplace"
+                          : activePillar.id === "communities"
+                            ? "communities"
+                            : "verification-safety"
+                  }`}
+                  className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[#1D9BF0] hover:underline"
+                >
+                  <span>Read technical architecture docs</span>
+                  <ArrowRight className="size-3" />
+                </Link>
               </div>
             </div>
 
-            {/* Right Product UI Card Preview */}
+            {/* Right Column: Live Interactive Micro-Artifact */}
             <div className="lg:col-span-6">
-              <div className="rounded-2xl border border-border bg-muted/30 p-5 sm:p-6 space-y-4 shadow-inner">
-                {activePillar.preview.type === "feed" && (
-                  <div className="space-y-3">
+              <div className="rounded-xl border border-border/60 bg-background p-5 sm:p-6 shadow-inner space-y-4">
+                {/* 1. CAMPUS SOCIAL ARTIFACT */}
+                {activePillar.id === "social" && (
+                  <div className="space-y-4">
+                    {/* Post Header */}
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-foreground">{activePillar.preview.author}</span>
-                      <span
-                        className={cn(
-                          "text-[10px] font-bold px-2 py-0.5 rounded-full border",
-                          activePillar.preview.badgeColor
-                        )}
-                      >
-                        {activePillar.preview.badge}
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex size-9 items-center justify-center rounded-full bg-purple-500/15 text-purple-400 font-black text-xs border border-purple-500/30">
+                          <ShieldCheck className="size-4 text-purple-400" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-sm text-foreground">Hostel 3 Resident</span>
+                            <span className="font-mono text-xs text-muted-foreground">@anon_h3</span>
+                            <span className="text-muted-foreground/50">·</span>
+                            <span className="font-mono text-xs text-muted-foreground">25m</span>
+                          </div>
+                          <span className="text-[11px] font-mono text-muted-foreground">
+                            🏫 BIT Mesra · Campus Confession
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-400">
+                        CONFESSION
                       </span>
                     </div>
-                    <p className="text-sm text-foreground/90 leading-relaxed font-medium">
-                      &quot;{activePillar.preview.content}&quot;
+
+                    {/* Post Body */}
+                    <p className="text-sm leading-relaxed text-foreground font-normal">
+                      Petition to turn the library 3rd floor into a 24/7 silent study lounge with bean bags
+                      during endsem week. Who is signing this with me?
                     </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border/40">
-                      <span>{activePillar.preview.votes}</span>
-                      <span>{activePillar.preview.comments}</span>
+
+                    {/* Interactive Poll / Vote Box */}
+                    <div className="rounded-xl border border-border/50 bg-muted/20 p-3 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-foreground">Student Consensus</span>
+                        <span className="font-mono text-muted-foreground">{socialAgreeVotes} votes</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAgreeVote}
+                        className={cn(
+                          "w-full text-left p-2.5 rounded-lg border text-xs font-semibold flex items-center justify-between transition-all cursor-pointer",
+                          socialVoted
+                            ? "bg-[#1D9BF0]/10 border-[#1D9BF0]/40 text-foreground"
+                            : "bg-background border-border/60 hover:border-[#1D9BF0]/50 text-foreground"
+                        )}
+                      >
+                        <span>Yes, we urgently need this for endsems</span>
+                        <span className="font-mono font-bold text-[#1D9BF0]">
+                          {socialVoted ? "92%" : "Vote"}
+                        </span>
+                      </button>
+                    </div>
+
+                    {/* Twitter-Standard Interaction Row */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs text-muted-foreground">
+                      <button
+                        type="button"
+                        className="flex items-center gap-1.5 hover:text-[#1D9BF0] transition-colors cursor-pointer group"
+                      >
+                        <MessageCircle className="size-4 group-hover:scale-110 transition-transform" />
+                        <span className="font-mono text-xs">38</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleRepost}
+                        className={cn(
+                          "flex items-center gap-1.5 transition-colors cursor-pointer group",
+                          socialReposted ? "text-emerald-500" : "hover:text-emerald-500"
+                        )}
+                      >
+                        <Repeat2 className="size-4 group-hover:scale-110 transition-transform" />
+                        <span className="font-mono text-xs">{socialReposts}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleLike}
+                        className={cn(
+                          "flex items-center gap-1.5 transition-colors cursor-pointer group",
+                          socialLiked ? "text-rose-500" : "hover:text-rose-500"
+                        )}
+                      >
+                        <AnimateHeart className="size-4 group-hover:scale-110 transition-transform" />
+                        <span className="font-mono text-xs">{socialLikes}</span>
+                      </button>
+                      <div className="flex items-center gap-1.5 hover:text-[#1D9BF0] transition-colors cursor-pointer">
+                        <Eye className="size-4" />
+                        <span className="font-mono text-xs">1.4K</span>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {activePillar.preview.type === "match" && (
-                  <div className="space-y-3">
+                {/* 2. MATCH & CLASSMATES ARTIFACT */}
+                {activePillar.id === "people" && (
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-bold text-sm text-foreground">{activePillar.preview.name}</h4>
-                        <span className="text-xs text-muted-foreground">{activePillar.preview.meta}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="size-11 rounded-full bg-linear-to-tr from-primary to-accent flex items-center justify-center font-bold text-white text-sm shadow-sm">
+                          AK
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-sm text-foreground">Aman Kumar</span>
+                            <BadgeCheck className="size-4 text-[#1D9BF0]" />
+                            <span className="font-mono text-xs text-muted-foreground">@aman_cse</span>
+                          </div>
+                          <span className="text-[11px] font-mono text-muted-foreground">
+                            BIT Mesra · CSE &apos;26
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                        Classmate Match
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-rose-500/30 bg-rose-500/10 text-rose-400">
+                        CLASSMATE MATCH
                       </span>
                     </div>
+
                     <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">
-                      {activePillar.preview.bio}
+                      Building a distributed compiler for our final year capstone. Looking for a study partner
+                      for Distributed Systems &amp; weekend badminton at IC Ground 🏸
                     </p>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {activePillar.preview.interests?.map((item) => (
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {["System Design", "Rust", "Badminton", "Hackathons"].map((item) => (
                         <span
                           key={item}
-                          className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-muted text-foreground"
+                          className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-md bg-muted/60 text-foreground border border-border/40"
                         >
                           {item}
                         </span>
                       ))}
                     </div>
-                    <div className="text-[11px] font-mono text-emerald-500 font-semibold pt-1">
-                      ✓ {activePillar.preview.compatibility}
-                    </div>
-                  </div>
-                )}
 
-                {activePillar.preview.type === "market" && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                        {activePillar.preview.badge}
-                      </span>
-                      <span className="font-mono text-base font-black text-foreground">
-                        {activePillar.preview.price}
-                      </span>
-                    </div>
-                    <h4 className="font-bold text-sm text-foreground">{activePillar.preview.item}</h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {activePillar.preview.desc}
-                    </p>
-                    <div className="text-[11px] font-mono text-muted-foreground pt-1">
-                      Seller: {activePillar.preview.seller}
-                    </div>
-                  </div>
-                )}
-
-                {activePillar.preview.type === "communities" && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-sm text-foreground">{activePillar.preview.title}</h4>
-                      <span className="text-xs text-primary font-mono">{activePillar.preview.members}</span>
-                    </div>
-                    <div className="rounded-xl bg-background/80 p-3 border border-border/60 text-xs text-foreground/90">
-                      📌 <strong className="text-foreground">Pinned:</strong> {activePillar.preview.pinned}
-                    </div>
-                    <p className="text-xs text-muted-foreground">{activePillar.preview.recent}</p>
-                  </div>
-                )}
-
-                {activePillar.preview.type === "chat" && (
-                  <div className="space-y-3">
-                    <div className="text-xs font-bold text-foreground border-b border-border/40 pb-2">
-                      {activePillar.preview.contact}
-                    </div>
-                    <div className="space-y-2">
-                      <div className="max-w-[85%] rounded-2xl bg-muted p-2.5 text-xs text-foreground">
-                        {activePillar.preview.msg1}
+                    <div className="flex items-center justify-between pt-3 border-t border-border/40">
+                      <div className="font-mono text-xs font-semibold text-emerald-500 flex items-center gap-1">
+                        <Check className="size-3.5" />
+                        <span>94% shared campus interests</span>
                       </div>
-                      <div className="ml-auto max-w-[85%] rounded-2xl bg-primary text-primary-foreground p-2.5 text-xs font-medium">
-                        {activePillar.preview.msg2}
+                      <button
+                        type="button"
+                        onClick={handleConnect}
+                        className={cn(
+                          "px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer",
+                          connectedState
+                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/30"
+                            : "bg-[#1D9BF0] text-white hover:bg-[#1D9BF0]/90 shadow-sm"
+                        )}
+                      >
+                        {connectedState ? "Request Sent ✓" : "Connect"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. CAMPUS UTILITY ARTIFACT */}
+                {activePillar.id === "utility" && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                        <BadgeCheck className="size-3 text-emerald-500" />
+                        <span>Verified Student Seller</span>
+                      </span>
+                      <span className="font-mono text-lg font-black text-foreground">₹2,800</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-sm text-foreground">
+                        Hero Octane 21-Speed Mountain Bike
+                      </h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Dual disc brakes, Shimano gears, front suspension. Handover at Hostel 12 or IC ground.
+                        Moving out after 8th semester.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-muted-foreground bg-muted/20 p-2.5 rounded-xl border border-border/40">
+                      <div>
+                        Seller: <strong className="text-foreground">Siddharth (H12)</strong>
+                      </div>
+                      <div>
+                        Condition: <strong className="text-foreground">Excellent</strong>
                       </div>
                     </div>
+
+                    <div className="flex items-center justify-between pt-1 border-t border-border/40">
+                      <span className="text-[11px] font-mono text-muted-foreground">
+                        Escrow ID: CL-TRD-8821
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sounds.tap();
+                          haptics.light();
+                        }}
+                        className="px-3.5 py-1.5 rounded-full bg-foreground text-background text-xs font-bold hover:bg-foreground/90 transition-all cursor-pointer"
+                      >
+                        Chat with Senior
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. COMMUNITIES & CLUBS ARTIFACT */}
+                {activePillar.id === "communities" && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
+                          <span>Google Developer Student Club (GDSC)</span>
+                          <BadgeCheck className="size-4 text-[#1D9BF0]" />
+                        </h4>
+                        <span className="font-mono text-xs text-muted-foreground">
+                          Official Campus Technical Chapter · BIT Mesra
+                        </span>
+                      </div>
+                      <span className="font-mono text-xs text-[#1D9BF0] font-bold bg-[#1D9BF0]/10 px-2.5 py-1 rounded-full border border-[#1D9BF0]/20">
+                        310 Members
+                      </span>
+                    </div>
+
+                    <div className="rounded-xl bg-muted/30 border border-border/60 p-3 space-y-1 text-xs">
+                      <div className="flex items-center gap-1.5 font-bold text-foreground">
+                        <Pin className="size-3.5 text-amber-500 rotate-45" />
+                        <span>Pinned by Chapter Lead:</span>
+                      </div>
+                      <p className="text-muted-foreground leading-relaxed">
+                        AI Hackathon orientation meetups this Friday at 6 PM in CAT Hall. Starter repositories
+                        dispatched to all verified members!
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs">
+                      <span className="font-mono text-muted-foreground">Next Event: Friday 6:00 PM</span>
+                      <button
+                        type="button"
+                        onClick={handleRsvp}
+                        className={cn(
+                          "px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer",
+                          rsvpState
+                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/30"
+                            : "bg-[#1D9BF0] text-white hover:bg-[#1D9BF0]/90 shadow-sm"
+                        )}
+                      >
+                        {rsvpState ? "RSVP Confirmed ✓" : "RSVP to Event"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. DIRECT CHAT ARTIFACT */}
+                {activePillar.id === "messaging" && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between border-b border-border/40 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="size-2 rounded-full bg-emerald-500" />
+                        <span className="font-bold text-xs text-foreground">Rohan S.</span>
+                        <span className="text-[11px] font-mono text-muted-foreground">
+                          (Verified Classmate)
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+                        <Shield className="size-3 text-emerald-500" />
+                        <span>E2E Campus Encrypted</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 min-h-[120px] max-h-[140px] overflow-y-auto no-scrollbar">
+                      {chatMessages.map((msg, i) => (
+                        <div
+                          key={`${msg.from}-${i}`}
+                          className={cn(
+                            "max-w-[85%] rounded-xl p-2.5 text-xs",
+                            msg.from === "me"
+                              ? "ml-auto bg-[#1D9BF0] text-white font-medium rounded-br-none"
+                              : "bg-muted/60 text-foreground border border-border/40 rounded-bl-none"
+                          )}
+                        >
+                          {msg.text}
+                        </div>
+                      ))}
+                    </div>
+
+                    <form
+                      onSubmit={handleSendChat}
+                      className="flex items-center gap-2 pt-2 border-t border-border/40"
+                    >
+                      <input
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        placeholder="Reply via verified messenger..."
+                        className="flex-1 bg-muted/30 border border-border/50 rounded-full px-3.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-[#1D9BF0]"
+                      />
+                      <button
+                        type="submit"
+                        className="size-8 rounded-full bg-[#1D9BF0] text-white flex items-center justify-center shrink-0 hover:bg-[#1D9BF0]/90 transition-colors cursor-pointer"
+                      >
+                        <Send className="size-3.5" />
+                      </button>
+                    </form>
                   </div>
                 )}
               </div>

@@ -33,6 +33,7 @@ import {
   Trophy,
   X,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -41,8 +42,6 @@ import useSWR from "swr";
 import { archivePost, deletePost } from "@/app/app/(main)/post/actions";
 import { AcademicPlaylistCard } from "@/components/academics/academic-playlist-card";
 import { ArticleCard } from "@/components/articles/article-card";
-import { BrandedQrModal } from "@/components/common/branded-qr-modal";
-import { UnsplashImagePicker } from "@/components/common/unsplash-image-picker";
 import { AcademicCard } from "@/components/communities/academic-card";
 import { SecretCrushButton } from "@/components/dating/secret-crush-button";
 import { FollowButton } from "@/components/profile/follow-button";
@@ -50,8 +49,21 @@ import { ProfileHighlights } from "@/components/profile/profile-highlights";
 import { ProfileSocialLinks } from "@/components/profile/profile-social-links";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeedCard } from "@/components/ui/feed-card";
-import { ImageCropModal } from "@/components/ui/image-crop-modal";
 import { getBranchIcon, slugifyBranch } from "@/constants";
+
+const BrandedQrModal = dynamic(
+  () => import("@/components/common/branded-qr-modal").then((m) => m.BrandedQrModal),
+  { ssr: false }
+);
+const UnsplashImagePicker = dynamic(
+  () => import("@/components/common/unsplash-image-picker").then((m) => m.UnsplashImagePicker),
+  { ssr: false }
+);
+const ImageCropModal = dynamic(
+  () => import("@/components/ui/image-crop-modal").then((m) => m.ImageCropModal),
+  { ssr: false }
+);
+
 import type { FeedPost } from "@/hooks/use-feed";
 import { fetcher } from "@/lib/api";
 import { getCloutTier } from "@/lib/gamification";

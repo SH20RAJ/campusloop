@@ -42,7 +42,7 @@ export function BrandLogo({ className, size = "md", showWordmark = true, href = 
   const content = (
     <div className={cn("inline-flex items-center gap-2.5 select-none group", className)}>
       <BrandLogoIcon size={size} />
-      {showWordmark && (
+      {/* {showWordmark && (
         <span
           className={cn(
             "font-black tracking-tight text-foreground transition-colors group-hover:text-primary leading-none",
@@ -54,7 +54,7 @@ export function BrandLogo({ className, size = "md", showWordmark = true, href = 
         >
           Campus<span className="text-primary font-black">Loop</span>
         </span>
-      )}
+      )} */}
     </div>
   );
 

@@ -161,10 +161,10 @@ async function harvestAuthenticReels(targetCount = 4200): Promise<HarvestedReel[
           const permalink = String(item.permalink || `/r/${sub}/comments/${externalId}`);
           const createdUtc = Number(item.created_utc) || Date.now() / 1000;
 
-          // Valid direct Reddit video CDN streams
-          const videoUrl = `https://v.redd.it/${videoId}/CMAF_270.mp4`;
+          // Valid direct Reddit video CDN streams (720p HD + HLS with sound)
+          const videoUrl = `https://v.redd.it/${videoId}/CMAF_720.mp4`;
           const hlsUrl = `https://v.redd.it/${videoId}/HLSPlaylist.m3u8`;
-          const dashUrl = `https://v.redd.it/${videoId}/DASH_480.mp4?source=fallback`;
+          const dashUrl = `https://v.redd.it/${videoId}/DASH_720.mp4?source=fallback`;
 
           harvested.push({
             externalId,

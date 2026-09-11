@@ -1,8 +1,10 @@
 "use client";
 
+import Hls from "hls.js";
 import { AlertCircle, ExternalLink, Loader2, Play } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExternalPostInfo, ExternalPostMedia } from "@/hooks/use-feed";
+import { extractVideoStreamInfo } from "@/lib/video/stream-helper";
 
 interface RedditVideoProps {
   media: ExternalPostMedia;
@@ -23,8 +25,74 @@ export function RedditVideo({
   const [isLoading, setIsLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const streamInfo = useMemo(() => {
+    return extractVideoStreamInfo(media.mediaUrl, [media]);
+  }, [media]);
+
+  const hlsUrl = streamInfo?.hlsUrl || media.hlsUrl;
+  const videoUrl = streamInfo?.hdVideoUrl || media.mediaUrl;
+
   const aspectRatio = media.width && media.height ? `${media.width} / ${media.height}` : "16 / 9";
   const isVertical = Boolean(media.height && media.width && media.height > media.width);
+
+  // Attach HLS stream or native HLS/MP4 fallback
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let hls: Hls | null = null;
+    setHasError(false);
+    setIsLoading(true);
+
+    if (hlsUrl && Hls.isSupported()) {
+      hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+        backBufferLength: 30,
+        capLevelToPlayerSize: false,
+      });
+      hls.autoLevelCapping = -1;
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        if (hls && hls.levels && hls.levels.length > 0) {
+          hls.currentLevel = hls.levels.length - 1;
+        }
+        setIsLoading(false);
+      });
+
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data.fatal) {
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              hls?.startLoad();
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              hls?.recoverMediaError();
+              break;
+            default:
+              hls?.destroy();
+              hls = null;
+              video.src = videoUrl;
+              break;
+          }
+        }
+      });
+    } else if (hlsUrl && video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = hlsUrl;
+      setIsLoading(false);
+    } else {
+      video.src = videoUrl;
+      setIsLoading(false);
+    }
+
+    return () => {
+      if (hls) {
+        hls.destroy();
+      }
+    };
+  }, [hlsUrl, videoUrl]);
 
   // Pause playback when scrolled out of view
   useEffect(() => {
@@ -102,7 +170,6 @@ export function RedditVideo({
 
       <video
         ref={videoRef}
-        src={media.mediaUrl}
         poster={media.thumbnailUrl || media.previewUrl || undefined}
         controls
         playsInline

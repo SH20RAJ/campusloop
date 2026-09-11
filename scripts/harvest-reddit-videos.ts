@@ -81,10 +81,10 @@ export async function harvestRedditVideos(targetCount = 4200): Promise<Harvested
           const permalink = String(p.permalink || `/r/${sub}/comments/${externalId}`);
           const createdUtc = Number(p.created_utc) || Date.now() / 1000;
 
-          // Use valid CMAF and HLS streams from Reddit CDN
-          const videoUrl = `https://v.redd.it/${videoId}/CMAF_270.mp4`;
+          // Use valid CMAF and HLS streams from Reddit CDN (720p HD + HLS with sound)
+          const videoUrl = `https://v.redd.it/${videoId}/CMAF_720.mp4`;
           const hlsUrl = `https://v.redd.it/${videoId}/HLSPlaylist.m3u8`;
-          const dashUrl = `https://v.redd.it/${videoId}/DASH_480.mp4?source=fallback`;
+          const dashUrl = `https://v.redd.it/${videoId}/DASH_720.mp4?source=fallback`;
 
           results.push({
             externalId,

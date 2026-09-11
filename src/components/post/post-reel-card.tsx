@@ -30,6 +30,8 @@ import { repostPost, voteOnPost } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cleanSnippet, cn, formatTimeAgo, getAvatarUrl, getCollegeShortName } from "@/lib/utils";
+import { extractVideoStreamInfo } from "@/lib/video/stream-helper";
+import { useHlsVideo } from "@/hooks/use-hls-video";
 
 // Dynamically import heavy modals to keep the reels bundle ultra-lightweight
 const FeedCardRepostModal = dynamic(
@@ -79,7 +81,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
   // Video Reel State (Image 3)
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
   const [showPlayPauseRipple, setShowPlayPauseRipple] = useState(false);
@@ -96,8 +98,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   const [showLockedModal, setShowLockedModal] = useState(false);
   const [lockedCapability, setLockedCapability] = useState<UserCapability>("LIKE_POST");
 
-  // Extract direct video URL if present in body
-  const videoUrl = useMemo(() => {
+  // Extract direct video URL if present in body or external media
+  const rawVideoUrl = useMemo(() => {
+    if (post.externalPost?.media && post.externalPost.media.length > 0) {
+      const vidMedia = post.externalPost.media.find((m) => m.mediaType === "VIDEO");
+      if (vidMedia?.mediaUrl) return vidMedia.mediaUrl;
+    }
     if (!post.body) return null;
     const mdMatch = post.body.match(MD_VIDEO_REGEX);
     if (mdMatch) return mdMatch[1];
@@ -109,18 +115,34 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     if (rawMatch) return rawMatch[1];
 
     return null;
-  }, [post.body]);
+  }, [post.body, post.externalPost]);
+
+  const streamInfo = useMemo(() => {
+    return extractVideoStreamInfo(rawVideoUrl, post.externalPost?.media);
+  }, [rawVideoUrl, post.externalPost]);
+
+  const videoUrl = streamInfo?.hdVideoUrl || rawVideoUrl;
+
+  const { isPlaying, isLoading, usingHls, togglePlay } = useHlsVideo({
+    videoRef,
+    audioRef,
+    hlsUrl: streamInfo?.hlsUrl,
+    videoUrl: streamInfo?.hdVideoUrl || rawVideoUrl,
+    audioUrl: streamInfo?.audioUrl,
+    isActive,
+    isMuted,
+    loop: true,
+  });
 
   // Clean body text by stripping raw video URL for caption display
   const captionText = useMemo(() => {
-    if (!videoUrl) return post.body;
-    const escapedVideoUrl = videoUrl.replace(REGEX_ESCAPE_PATTERN, "\\$&");
-    const mdPattern = new RegExp(`!\\[.*?\\]\\(${escapedVideoUrl}\\)`, "gi");
+    if (!post.body) return "";
     return post.body
-      .replace(mdPattern, "")
-      .replace(videoUrl, "")
+      .replace(/!\[.*?\]\(https?:\/\/[^\s)]+\)/gi, "")
+      .replace(/https?:\/\/v\.redd\.it\/[^\s]+/gi, "")
+      .replace(/https?:\/\/[^\s]+\.(?:mp4|webm|mov|m3u8)[^\s]*/gi, "")
       .trim();
-  }, [post.body, videoUrl]);
+  }, [post.body]);
 
   // Split content into clean headline & body description and extract tags without duplication
   const { headline, descriptionText, tags } = useMemo(() => {
@@ -199,18 +221,6 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     setIsSaved(Boolean(post.isSaved));
   }, [post.userVote, post.votesCount, post.commentsCount, post.isSaved]);
 
-  // Video Autoplay & Pause when card is active/inactive
-  useEffect(() => {
-    if (!videoRef.current || !videoUrl) return;
-    if (isActive) {
-      videoRef.current.play().catch(() => {});
-      setIsPlaying(true);
-    } else {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    }
-  }, [isActive, videoUrl]);
-
   // Video time update progress
   function handleTimeUpdate() {
     if (!videoRef.current) return;
@@ -222,24 +232,17 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   // Toggle Video Play / Pause on tap
   function handleTogglePlay(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current.play();
-      setIsPlaying(true);
-    } else {
-      videoRef.current.pause();
-      setIsPlaying(false);
+    if (isMuted) {
+      setIsMuted(false);
     }
+    togglePlay();
     setShowPlayPauseRipple(true);
     setTimeout(() => setShowPlayPauseRipple(false), 600);
   }
 
   function handleToggleMute(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!videoRef.current) return;
-    const nextMuted = !isMuted;
-    videoRef.current.muted = nextMuted;
-    setIsMuted(nextMuted);
+    setIsMuted((prev) => !prev);
     sounds.tap();
   }
 
@@ -675,16 +678,24 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           onClick={handleTogglePlay}
           className="relative w-full h-full sm:max-w-[420px] sm:max-h-[calc(100vh-140px)] sm:rounded-3xl overflow-hidden bg-black flex items-center justify-center cursor-pointer select-none"
         >
-          {/* 9:16 Video Player */}
+          {/* 9:16 Video Player & Audio Stream */}
           <video
             ref={videoRef}
-            src={videoUrl}
             loop
             playsInline
-            muted={isMuted}
             onTimeUpdate={handleTimeUpdate}
             className="w-full h-full object-cover"
           />
+          {streamInfo?.audioUrl && !usingHls && (
+            <audio
+              ref={audioRef}
+              src={streamInfo.audioUrl}
+              preload="auto"
+              loop
+              playsInline
+              className="hidden"
+            />
+          )}
 
           {/* Double Tap Heart Animation */}
           <AnimatePresence>

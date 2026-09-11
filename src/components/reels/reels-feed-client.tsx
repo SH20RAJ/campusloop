@@ -65,6 +65,8 @@ import { haptics } from "@/lib/haptics";
 import { isOnline } from "@/lib/presence";
 import { sounds } from "@/lib/sounds";
 import { cn, formatTimeAgo, getAvatarUrl, getCollegeShortName } from "@/lib/utils";
+import { extractVideoStreamInfo } from "@/lib/video/stream-helper";
+import { useHlsVideo } from "@/hooks/use-hls-video";
 
 interface ReelsFeedClientProps {
   initialPosts: FeedPost[];
@@ -75,7 +77,27 @@ interface ReelsFeedClientProps {
 export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: ReelsFeedClientProps) {
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("campusloop_reels_muted");
+      if (saved !== null) {
+        return saved === "true";
+      }
+    }
+    return false;
+  });
+
+  const toggleMute = useCallback(() => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("campusloop_reels_muted", String(next));
+        } catch {}
+      }
+      return next;
+    });
+  }, []);
   const [selectedPostForComments, setSelectedPostForComments] = useState<FeedPost | null>(null);
   const [selectedPostForRepost, setSelectedPostForRepost] = useState<FeedPost | null>(null);
   const [selectedPostForLikes, setSelectedPostForLikes] = useState<FeedPost | null>(null);
@@ -335,7 +357,7 @@ function recordLocalSeenId(id: string) {
           <button
             type="button"
             onClick={() => {
-              setIsMuted((prev) => !prev);
+              toggleMute();
               haptics.light();
             }}
             className="flex size-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white transition-all active:scale-95 cursor-pointer"
@@ -361,7 +383,7 @@ function recordLocalSeenId(id: string) {
             post={post}
             isActive={idx === activeIndex}
             isMuted={isMuted}
-            onToggleMute={() => setIsMuted((prev) => !prev)}
+            onToggleMute={toggleMute}
             onOpenComments={() => setSelectedPostForComments(post)}
             onOpenRepost={() => setSelectedPostForRepost(post)}
             onOpenLikes={() => setSelectedPostForLikes(post)}
@@ -461,7 +483,7 @@ function SingleReelItem({
   currentUserId,
 }: SingleReelItemProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [progress, setProgress] = useState(0);
   const [showPlayIcon, setShowPlayIcon] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
@@ -486,8 +508,8 @@ function SingleReelItem({
     return matches ? matches.map((t) => t.slice(1)) : [];
   }, [post.body]);
 
-  // Extract video URL (markdown, direct URL, or external media reference)
-  const videoUrl = useMemo(() => {
+  // Extract raw video URL (markdown, direct URL, or external media reference)
+  const rawVideoUrl = useMemo(() => {
     if (post.externalPost?.media && post.externalPost.media.length > 0) {
       const vidMedia = post.externalPost.media.find((m) => m.mediaType === "VIDEO");
       if (vidMedia?.mediaUrl) return vidMedia.mediaUrl;
@@ -506,47 +528,34 @@ function SingleReelItem({
     return null;
   }, [post.body, post.externalPost]);
 
+  // High quality streaming & audio stream resolution
+  const streamInfo = useMemo(() => {
+    return extractVideoStreamInfo(rawVideoUrl, post.externalPost?.media);
+  }, [rawVideoUrl, post.externalPost]);
+
+  const videoUrl = streamInfo?.hdVideoUrl || rawVideoUrl;
+
+  // Integrated HLS & Synchronized Audio Engine
+  const { isPlaying, isLoading, usingHls, togglePlay } = useHlsVideo({
+    videoRef,
+    audioRef,
+    hlsUrl: streamInfo?.hlsUrl,
+    videoUrl: streamInfo?.hdVideoUrl || rawVideoUrl,
+    audioUrl: streamInfo?.audioUrl,
+    isActive,
+    isMuted,
+    loop: true,
+  });
+
   // Clean caption text
   const cleanCaption = useMemo(() => {
-    if (!videoUrl) return post.body;
-    const escapedVideoUrl = videoUrl.replace(REGEX_ESCAPE_PATTERN, "\\$&");
-    const mdPattern = new RegExp(`!\\[.*?\\]\\(${escapedVideoUrl}\\)`, "gi");
+    if (!post.body) return "";
     return post.body
-      .replace(mdPattern, "")
-      .replace(videoUrl, "")
+      .replace(/!\[.*?\]\(https?:\/\/[^\s)]+\)/gi, "")
+      .replace(/https?:\/\/v\.redd\.it\/[^\s]+/gi, "")
+      .replace(/https?:\/\/[^\s]+\.(?:mp4|webm|mov|m3u8)[^\s]*/gi, "")
       .trim();
-  }, [post.body, videoUrl]);
-
-  // Autoplay / pause control based on slide visibility
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (isActive) {
-      video.currentTime = 0;
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => setIsPlaying(true))
-          .catch(() => {
-            // Autoplay with sound restricted by browser; fallback to muted
-            video.muted = true;
-            video.play().catch(() => {});
-            setIsPlaying(true);
-          });
-      }
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
-  }, [isActive]);
-
-  // Sync muted state
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = isMuted;
-    }
-  }, [isMuted]);
+  }, [post.body]);
 
   // Telemetry: Watch time & loop tracking
   const handleVideoEnded = useCallback(() => {
@@ -616,25 +625,18 @@ function SingleReelItem({
 
   // Toggle play/pause
   function handleTogglePlay() {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (video.paused) {
-      video.play();
-      setIsPlaying(true);
-      setShowPlayIcon(true);
-      setTimeout(() => setShowPlayIcon(false), 500);
-    } else {
-      video.pause();
-      setIsPlaying(false);
-      setShowPlayIcon(true);
-      setTimeout(() => setShowPlayIcon(false), 500);
-    }
+    togglePlay();
+    setShowPlayIcon(true);
+    setTimeout(() => setShowPlayIcon(false), 500);
     haptics.light();
   }
 
   // Video tap with 260ms debounce to separate single-tap toggle from double-tap like
   function handleVideoTap() {
+    // If currently muted, tapping anywhere on the video immediately enables sound!
+    if (isMuted) {
+      onToggleMute();
+    }
     const now = Date.now();
     const diff = now - lastTapTimeRef.current;
 
@@ -831,19 +833,30 @@ function SingleReelItem({
 
       {/* Centered 9:16 Reel Container */}
       <div className="relative w-full max-w-[430px] h-full sm:h-[94dvh] sm:rounded-2xl sm:my-auto overflow-hidden bg-zinc-950 flex items-center justify-center shadow-2xl border sm:border-white/10">
-        {/* Video Element */}
+        {/* Video Element & Companion Audio Fallback */}
         {videoUrl ? (
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            playsInline
-            loop
-            preload="metadata"
-            onTimeUpdate={handleTimeUpdate}
-            onEnded={handleVideoEnded}
-            onClick={handleVideoTap}
-            className="w-full h-full object-cover cursor-pointer"
-          />
+          <>
+            <video
+              ref={videoRef}
+              playsInline
+              loop
+              preload="auto"
+              onTimeUpdate={handleTimeUpdate}
+              onEnded={handleVideoEnded}
+              onClick={handleVideoTap}
+              className="w-full h-full object-cover cursor-pointer"
+            />
+            {streamInfo?.audioUrl && !usingHls && (
+              <audio
+                ref={audioRef}
+                src={streamInfo.audioUrl}
+                preload="auto"
+                loop
+                playsInline
+                className="hidden"
+              />
+            )}
+          </>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white/50 p-6 text-center">
             <AnimateVideo className="size-12 mb-3 text-white/30" />

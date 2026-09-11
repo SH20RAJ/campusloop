@@ -197,7 +197,7 @@ export function SavedMaterialsClient() {
 
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground flex items-center gap-2.5">
             <span>Saved Semester Locker</span>
-            <span className="flex size-7 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30">
+            <span className="flex size-7 items-center justify-center rounded-xl bg-muted text-foreground border border-border/40">
               <BookmarkCheck className="size-4" />
             </span>
           </h1>
@@ -210,8 +210,8 @@ export function SavedMaterialsClient() {
 
         {/* Locker Stats Badge */}
         <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto">
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-purple-950/40 border border-purple-500/30 text-purple-300">
-            <HardDrive className="size-4 text-purple-400 shrink-0" />
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-muted/40 border border-border/40 text-foreground">
+            <HardDrive className="size-4 text-muted-foreground shrink-0" />
             <div className="text-left">
               <p className="text-xs font-black">{savedItems.length} Materials Saved</p>
               <p className="text-[10px] text-muted-foreground">0 MB phone storage used</p>
@@ -221,15 +221,15 @@ export function SavedMaterialsClient() {
       </div>
 
       {/* ─── 1-Click "Save Semester Pack" Banner ─── */}
-      <div className="rounded-3xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-purple-950/40 p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="rounded-2xl border border-border/40 bg-card/60 p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="flex size-6 items-center justify-center rounded-lg bg-purple-500/20 text-purple-300 font-bold text-xs">
-              <Zap className="size-3.5 text-amber-400 fill-amber-400" />
+            <span className="flex size-6 items-center justify-center rounded-lg bg-muted border border-border/40 text-foreground font-bold text-xs">
+              <Zap className="size-3.5 text-foreground" />
             </span>
-            <h3 className="text-sm font-black text-white">1-Click Save Full Semester Pack</h3>
+            <h3 className="text-sm font-black text-foreground">1-Click Save Full Semester Pack</h3>
           </div>
-          <p className="text-xs text-purple-200/70 max-w-md leading-relaxed">
+          <p className="text-xs text-muted-foreground max-w-md leading-relaxed">
             Need all study materials for your semester at once? Save the entire syllabus pack (Notes, PYQs,
             Formula Sheets) directly to your locker.
           </p>
@@ -243,7 +243,7 @@ export function SavedMaterialsClient() {
               type="button"
               disabled={savingPackSem !== null}
               onClick={() => handleSaveSemesterPack(sem)}
-              className="px-2.5 py-1.5 rounded-xl border border-purple-500/40 bg-purple-900/40 hover:bg-purple-600 text-purple-200 hover:text-white text-xs font-bold transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+              className="px-2.5 py-1.5 rounded-xl border border-border/40 bg-muted/30 hover:bg-muted text-foreground text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 active:scale-95"
               title={`Save all materials for Semester ${sem}`}
             >
               {savingPackSem === sem ? <Loader2 className="size-3 animate-spin mx-auto" /> : `+ Sem ${sem}`}
@@ -321,7 +321,7 @@ export function SavedMaterialsClient() {
                 className={cn(
                   "px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border shrink-0",
                   isSelected
-                    ? "bg-purple-500/20 text-purple-300 border-purple-500/50 shadow-xs"
+                    ? "bg-foreground text-background border-foreground shadow-2xs"
                     : "bg-muted/20 text-muted-foreground border-border/40 hover:text-foreground"
                 )}
               >
@@ -372,7 +372,7 @@ export function SavedMaterialsClient() {
                   >
                     <div className="space-y-1">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/40 uppercase">
                           {item.resourceType}
                         </span>
 
@@ -425,7 +425,7 @@ export function SavedMaterialsClient() {
         </div>
       ) : (
         <div className="py-20 text-center space-y-4 max-w-sm mx-auto">
-          <div className="flex size-14 items-center justify-center rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 mx-auto">
+          <div className="flex size-14 items-center justify-center rounded-full bg-muted text-muted-foreground border border-border/40 mx-auto">
             <Bookmark className="size-6" />
           </div>
           <div className="space-y-1">

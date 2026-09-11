@@ -87,48 +87,46 @@ export function AcademicAuthModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md p-0 overflow-hidden border-indigo-500/30 bg-card rounded-3xl shadow-2xl">
-        <div className="relative p-6 space-y-5">
-          {/* Top glow */}
-          <div className="absolute -top-12 -right-12 size-36 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
-
+      <DialogContent className="max-w-md p-0 overflow-hidden border border-border/40 bg-card rounded-2xl shadow-xl">
+        <div className="p-6 space-y-5">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span
-                className={`flex size-10 items-center justify-center rounded-2xl ${reasonText.bg} ${reasonText.color} border border-border/40 shadow-xs`}
+                className="flex size-10 items-center justify-center rounded-xl bg-muted text-foreground border border-border/40 shadow-xs"
               >
-                <CurrentIcon className="size-5" />
+                <CurrentIcon className="size-5 text-foreground" />
               </span>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-indigo-400">
-                  Student Verification
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  CampusLoop Academic Vault
                 </span>
-                <h3 className="text-base font-black text-foreground">{reasonText.title}</h3>
+                <h2 className="text-sm font-black text-foreground">{reasonText.title}</h2>
               </div>
             </div>
           </div>
 
+          {/* Body */}
           <p className="text-xs text-muted-foreground leading-relaxed">{reasonText.subtitle}</p>
 
-          {/* Benefits List */}
-          <div className="space-y-2 rounded-2xl bg-muted/30 p-3.5 border border-border/40 text-xs">
-            <div className="flex items-center gap-2 text-foreground font-semibold">
-              <span className="flex size-5 items-center justify-center rounded-md bg-amber-500/15 text-amber-500 shrink-0">
-                <Zap className="size-3 fill-current" />
+          {/* Perks list */}
+          <div className="space-y-2.5 p-3.5 rounded-xl bg-muted/20 border border-border/40 text-xs">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="flex size-5 items-center justify-center rounded-md bg-muted text-foreground border border-border/40 shrink-0 font-bold text-[10px]">
+                ⚡
               </span>
               <span>Instant +50 Loop Points (LP) Welcome Bonus</span>
             </div>
 
             <div className="flex items-center gap-2 text-muted-foreground">
-              <span className="flex size-5 items-center justify-center rounded-md bg-indigo-500/15 text-indigo-400 shrink-0">
+              <span className="flex size-5 items-center justify-center rounded-md bg-muted text-foreground border border-border/40 shrink-0">
                 <Bookmark className="size-3" />
               </span>
               <span>Offline mobile sync across all 8 semesters</span>
             </div>
 
             <div className="flex items-center gap-2 text-muted-foreground">
-              <span className="flex size-5 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400 shrink-0">
+              <span className="flex size-5 items-center justify-center rounded-md bg-muted text-foreground border border-border/40 shrink-0">
                 <GraduationCap className="size-3" />
               </span>
               <span>Verified Student Badge &amp; College Hub Access</span>
@@ -144,7 +142,7 @@ export function AcademicAuthModal({
                 trackAuthModalCta(actionReason, "sign_in");
                 onClose();
               }}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-foreground text-background hover:opacity-90 font-bold text-xs shadow-2xs transition-all active:scale-95 cursor-pointer"
             >
               <span>Sign In with College Email</span>
               <ChevronRight className="size-4" />

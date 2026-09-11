@@ -399,11 +399,11 @@ export function AcademicDetailClient({
               {resource.subjectCode}
             </span>
             <span className="text-xs font-semibold text-muted-foreground">{resource.subjectName}</span>
-            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/25">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-muted/70 text-foreground border border-border/40">
               {resource.resourceType.replace("_", " ")}
             </span>
             {resource.moduleOrChapter && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-muted/70 text-foreground border border-border/40">
                 {resource.moduleOrChapter}
               </span>
             )}
@@ -428,8 +428,8 @@ export function AcademicDetailClient({
           </div>
         </div>
 
-        {/* ─── Twitter Metrics Bar (Hairline divided) ─── */}
-        <div className="border-y border-border/25 py-3 my-2 flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
+        {/* ─── Metrics Bar (Hairline divided) ─── */}
+        <div className="border-y border-border/25 py-2.5 my-2 flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
           <span>
             <strong className="text-foreground font-black tabular-nums">{upvotes}</strong> Helpful
           </span>
@@ -439,69 +439,58 @@ export function AcademicDetailClient({
           <span>
             <strong className="text-foreground font-black tabular-nums">{downloads}</strong> Downloads
           </span>
-          <span className="ml-auto font-bold text-emerald-400 inline-flex items-center gap-1">
-            <Target className="size-3 shrink-0" />
-            <span>{reliability}% Verified Accuracy</span>
+          <span className="ml-auto font-medium text-foreground/80 inline-flex items-center gap-1">
+            <Target className="size-3 shrink-0 text-muted-foreground" />
+            <span>{reliability}% Accuracy</span>
           </span>
         </div>
 
-        {/* ─── Twitter Action Bar ─── */}
-        <div className="flex items-center justify-between pb-3 border-b border-border/25 text-xs">
-          <div className="flex items-center gap-2">
+        {/* ─── Action Bar ─── */}
+        <div className="flex items-center justify-between pb-3 border-b border-border/25 text-xs flex-wrap gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={() => handleVote("UP")}
               className={cn(
-                "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer border",
                 userVote === "UP"
-                  ? "bg-primary/20 text-primary font-black shadow-xs"
-                  : "hover:text-foreground hover:bg-muted text-muted-foreground"
+                  ? "bg-foreground text-background border-foreground font-black shadow-xs"
+                  : "border-border/40 hover:text-foreground hover:bg-muted text-muted-foreground"
               )}
             >
-              <ArrowUp className={cn("size-4", userVote === "UP" && "stroke-3")} />
-              <span className="tabular-nums">{upvotes} Upvote</span>
+              <ArrowUp className={cn("size-3.5", userVote === "UP" && "stroke-3")} />
+              <span className="tabular-nums">{upvotes}</span>
             </button>
 
             <button
               type="button"
               onClick={() => handleVote("DOWN")}
               className={cn(
-                "flex items-center gap-1 px-2.5 py-1.5 rounded-full font-bold transition-all cursor-pointer",
+                "flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-bold transition-all cursor-pointer border",
                 userVote === "DOWN"
-                  ? "bg-rose-500/20 text-rose-400 font-black"
-                  : "hover:text-foreground hover:bg-muted text-muted-foreground"
+                  ? "bg-muted text-foreground border-foreground font-black"
+                  : "border-border/40 hover:text-foreground hover:bg-muted text-muted-foreground"
               )}
               title="Report outdated / incorrect"
             >
-              <ArrowDown className="size-4" />
+              <ArrowDown className="size-3.5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsAddToPlaylistOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-border/40 hover:bg-muted text-foreground active:scale-95 transition-all cursor-pointer"
+              title="Save to Study Playlist"
+            >
+              <FolderPlus className="size-3.5" />
+              <span className="hidden sm:inline">Playlist</span>
             </button>
           </div>
 
           <button
             type="button"
-            onClick={() => setIsAddToPlaylistOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10 active:scale-95 transition-all cursor-pointer shadow-xs"
-            title="Save to Study Playlist"
-          >
-            <FolderPlus className="size-3.5" />
-            <span className="hidden sm:inline">Add to Playlist</span>
-          </button>
-
-          <button
-            type="button"
             onClick={handleDownload}
-            className={cn(
-              "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black shadow-xs cursor-pointer transition-all active:scale-95",
-              /(?:youtube\.com|youtu\.be)/i.test(resource.fileUrl || resource.driveUrl || "")
-                ? "bg-rose-600 hover:bg-rose-500 text-white"
-                : (resource.fileUrl || resource.driveUrl || "").toLowerCase().includes("sites.google.com")
-                  ? "bg-sky-600 hover:bg-sky-500 text-white"
-                  : (resource.fileUrl || resource.driveUrl || "").match(
-                        /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
-                      )
-                    ? "bg-amber-500 hover:bg-amber-600 text-neutral-950"
-                    : "bg-primary text-primary-foreground hover:opacity-90"
-            )}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black bg-foreground text-background hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-xs ml-auto"
           >
             {/(?:youtube\.com|youtu\.be)/i.test(resource.fileUrl || resource.driveUrl || "") ? (
               <Play className="size-3.5 fill-current" />
@@ -518,14 +507,14 @@ export function AcademicDetailClient({
               {/(?:youtube\.com|youtu\.be)/i.test(resource.fileUrl || resource.driveUrl || "")
                 ? "Watch on YouTube"
                 : (resource.fileUrl || resource.driveUrl || "").toLowerCase().includes("sites.google.com")
-                  ? "Open Course Portal"
+                  ? "Open Portal"
                   : (resource.fileUrl || resource.driveUrl || "").match(
                         /(?:drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?)?folders\/|embeddedfolderview\?id=)([a-zA-Z0-9_-]+)/i
                       )
-                    ? "Open Drive Folder"
+                    ? "Open Folder"
                     : "Get Material"}
             </span>
-            <ExternalLink className="size-2.5 opacity-80" />
+            <ExternalLink className="size-2.5 opacity-70" />
           </button>
         </div>
       </div>

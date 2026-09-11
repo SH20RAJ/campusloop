@@ -74,22 +74,17 @@ export function SimilarResourcesWidget({ resourceId, subjectCode }: SimilarResou
 
   return (
     <section className="space-y-3.5 pt-6 border-t border-border/25">
-      {/* ─── Header with AI Vector badge ─── */}
+      {/* ─── Header ─── */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="flex size-6 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
-            <Zap className="size-3.5 animate-pulse" />
-          </span>
-          <div>
-            <h3 className="text-sm font-black text-foreground tracking-tight">
-              Similar Notes &amp; Related PYQs
-            </h3>
-            <p className="text-[11px] text-muted-foreground">
-              Discovered via Qdrant semantic vector search &amp; syllabus matching
-            </p>
-          </div>
+        <div>
+          <h3 className="text-sm font-black text-foreground tracking-tight">
+            Similar Notes &amp; Related PYQs
+          </h3>
+          <p className="text-[11px] text-muted-foreground">
+            Discovered via semantic syllabus matching
+          </p>
         </div>
-        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/40">
           {similarList.length} Related
         </span>
       </div>

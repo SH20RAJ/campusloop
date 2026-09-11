@@ -11,11 +11,11 @@ import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
 const GRADIENTS = [
-  { label: "Cosmic Indigo", value: "from-indigo-600 via-purple-600 to-pink-600" },
-  { label: "Emerald Matrix", value: "from-emerald-600 via-teal-600 to-cyan-600" },
-  { label: "Sunset Fire", value: "from-amber-600 via-orange-600 to-rose-600" },
-  { label: "Deep Navy", value: "from-blue-600 via-indigo-700 to-slate-900" },
-  { label: "Amethyst Rose", value: "from-fuchsia-600 via-pink-600 to-rose-500" },
+  { label: "Obsidian Slate", value: "from-neutral-900 via-neutral-800 to-neutral-900" },
+  { label: "Midnight Steel", value: "from-slate-900 via-zinc-900 to-neutral-900" },
+  { label: "Deep Indigo", value: "from-slate-950 via-indigo-950/60 to-neutral-900" },
+  { label: "Dark Emerald", value: "from-neutral-950 via-emerald-950/50 to-neutral-900" },
+  { label: "Deep Charcoal", value: "from-zinc-900 via-stone-900 to-neutral-950" },
 ];
 
 const CATEGORIES = [

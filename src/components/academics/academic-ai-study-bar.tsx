@@ -3,20 +3,13 @@
 import {
   Check,
   ChevronDown,
-  ChevronRight,
   ChevronUp,
   Copy,
   ExternalLink,
-  FileCode,
-  FileText,
-  GraduationCap,
-  Layers,
-  Lightbulb,
   Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CuteAiMascot } from "@/components/academics/cute-ai-mascot";
 import { buildAcademicStudyPrompt, getChatGptStudyUrl, getClaudeStudyUrl } from "@/lib/academics/ai-prompts";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -138,177 +131,90 @@ export function AcademicAiStudyBar({
     );
   }
 
-  // ─── FULL IMAGE 3 TARGET SPECIFICATION UI/UX ───
+  // ─── MINIMAL PROFESSIONAL STUDY WITH AI UI ───
   return (
-    <div className={cn("space-y-3 select-none", className)}>
-      {/* ─── Top Master Card: Study with AI Agents (Matching Image 3) ─── */}
-      <div className="relative overflow-hidden rounded-3xl border border-purple-500/30 bg-gradient-to-b from-[#180d2e] via-[#120a22] to-[#0d0718] p-4 sm:p-5 shadow-2xl">
-        {/* Glow accent */}
-        <div className="pointer-events-none absolute -right-8 -top-8 size-44 rounded-full bg-purple-600/20 blur-3xl" />
-
-        <div className="relative z-10 space-y-4">
-          {/* Header Row: Title & Mascot */}
-          <div className="flex items-start justify-between gap-3">
-            <div className="space-y-1.5 flex-1 min-w-0">
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <div className="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)] shrink-0">
-                  <Sparkles className="size-5 text-white" />
-                </div>
-                <div className="flex items-center gap-2 flex-wrap min-w-0">
-                  <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
-                    Study with AI Agents
-                  </h2>
-                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/35 uppercase tracking-wider">
-                    Instant Tutor
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs text-purple-200/70 leading-relaxed max-w-sm">
-                Pre-loaded with verified syllabus, context, analogies, formula cheat sheets &amp; exam
-                solutions.
-              </p>
-            </div>
-
-            {/* Mascot Visual on Right (Matching Image 3) */}
-            <div className="hidden xs:flex flex-col items-center shrink-0 -mt-2">
-              <CuteAiMascot className="size-20 sm:size-24" />
-              <span className="text-[9px] font-semibold text-purple-300/80 -mt-1 tracking-tight text-center">
-                Learn Smarter
-                <br />
-                Not Harder ♡
-              </span>
-            </div>
-          </div>
-
-          {/* Action Buttons: Green ChatGPT & Orange Claude (Matching Image 3) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            <button
-              type="button"
-              onClick={() => handleOpenAi(chatGptUrl, "ChatGPT")}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
-            >
-              <ChatGptIcon className="size-4 shrink-0" />
-              <span>Teach Me on ChatGPT</span>
-              <ExternalLink className="size-3.5 opacity-80 shrink-0" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleOpenAi(claudeUrl, "Claude")}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-orange-500/20 active:scale-95 transition-all cursor-pointer"
-            >
-              <ClaudeIcon className="size-4 shrink-0" />
-              <span>Teach Me on Claude</span>
-              <ExternalLink className="size-3.5 opacity-80 shrink-0" />
-            </button>
-          </div>
-
-          {/* Bottom Bar: Example Prompt Toggle & Copy Master Prompt (Matching Image 3) */}
-          <div className="flex items-center justify-between gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => setShowPromptPreview(!showPromptPreview)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-purple-200/80 hover:text-white bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/20 transition-all cursor-pointer"
-            >
-              <span>{showPromptPreview ? "Hide Example Prompt" : "View Example Prompt"}</span>
-              {showPromptPreview ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
-            </button>
-
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all cursor-pointer active:scale-95"
-            >
-              {copied ? (
-                <>
-                  <Check className="size-3.5 text-emerald-400" />
-                  <span className="text-emerald-400">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="size-3.5 text-purple-300" />
-                  <span>Copy Master Prompt</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Expandable Prompt Preview Drawer */}
-          {showPromptPreview && (
-            <div className="relative mt-2 p-3.5 rounded-2xl bg-black/70 border border-purple-500/30 text-[11px] font-mono text-purple-200 leading-relaxed max-h-44 overflow-y-auto whitespace-pre-wrap select-all">
-              {prompt}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ─── 4-Grid of Cute Feature Cards (Directly Below AI Card in Image 3) ─── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        {/* Card 1: Syllabus Based */}
-        <div className="rounded-2xl border border-purple-500/30 bg-gradient-to-b from-purple-950/70 to-[#120a22] p-3.5 flex flex-col justify-between space-y-3 shadow-md hover:border-purple-500/50 transition-all">
-          <div className="flex size-8 items-center justify-center rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30">
-            <FileText className="size-4" />
-          </div>
-          <div>
-            <p className="text-xs font-black text-white">Syllabus</p>
-            <p className="text-xs font-black text-white">Based</p>
-          </div>
-        </div>
-
-        {/* Card 2: Formula Cheat Sheets */}
-        <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-b from-sky-950/70 to-[#081528] p-3.5 flex flex-col justify-between space-y-3 shadow-md hover:border-sky-500/50 transition-all">
-          <div className="flex size-8 items-center justify-center rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/30">
-            <Layers className="size-4" />
-          </div>
-          <div>
-            <p className="text-xs font-black text-white">Formula</p>
-            <p className="text-xs font-black text-white">Cheat Sheets</p>
-          </div>
-        </div>
-
-        {/* Card 3: PYQs & Solutions */}
-        <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/70 to-[#071f18] p-3.5 flex flex-col justify-between space-y-3 shadow-md hover:border-emerald-500/50 transition-all">
-          <div className="flex size-8 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            <GraduationCap className="size-4" />
-          </div>
-          <div>
-            <p className="text-xs font-black text-white">PYQs &amp;</p>
-            <p className="text-xs font-black text-white">Solutions</p>
-          </div>
-        </div>
-
-        {/* Card 4: Concept Explainers */}
-        <div className="rounded-2xl border border-rose-500/30 bg-gradient-to-b from-rose-950/70 to-[#220a15] p-3.5 flex flex-col justify-between space-y-3 shadow-md hover:border-rose-500/50 transition-all">
-          <div className="flex size-8 items-center justify-center rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30">
-            <Lightbulb className="size-4" />
-          </div>
-          <div>
-            <p className="text-xs font-black text-white">Concept</p>
-            <p className="text-xs font-black text-white">Explainers</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ─── Campus AI Study Cram Assistant Banner (Matching Image 3) ─── */}
-      <div className="rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-purple-950/40 p-3.5 flex items-center justify-between gap-3 shadow-md">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="flex size-7 items-center justify-center rounded-lg bg-purple-500/20 text-purple-400 shrink-0">
-            <Sparkles className="size-3.5" />
+    <div className={cn("rounded-2xl border border-border/40 bg-card/40 p-4 sm:p-5 space-y-3.5 select-none", className)}>
+      {/* Header Row */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-muted border border-border/50 text-foreground shrink-0">
+            <Sparkles className="size-4 sm:size-4.5" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-black text-white truncate">Campus AI Study Cram Assistant</p>
-            <p className="text-[11px] text-muted-foreground truncate">
-              Your 24/7 study buddy is almost here!
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm sm:text-base font-black text-foreground tracking-tight">
+                Study with AI Agents
+              </h2>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/50">
+                Context-Ready
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+              Pre-loaded with {subjectCode} syllabus, formula cheat sheets &amp; exam solutions.
             </p>
           </div>
         </div>
-
-        <div className="flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-[10px] font-black uppercase tracking-wider text-purple-300">
-          <span>COMING SOON</span>
-          <ChevronRight className="size-3" />
-        </div>
       </div>
+
+      {/* Action Buttons: Minimal High-Contrast Buttons */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+        <button
+          type="button"
+          onClick={() => handleOpenAi(chatGptUrl, "ChatGPT")}
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-foreground text-background font-bold text-xs sm:text-sm hover:opacity-90 active:scale-98 transition-all cursor-pointer shadow-xs"
+        >
+          <ChatGptIcon className="size-4 shrink-0" />
+          <span>Study on ChatGPT</span>
+          <ExternalLink className="size-3 opacity-70 shrink-0" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleOpenAi(claudeUrl, "Claude")}
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-muted hover:bg-muted/80 text-foreground border border-border/50 font-bold text-xs sm:text-sm active:scale-98 transition-all cursor-pointer"
+        >
+          <ClaudeIcon className="size-4 shrink-0" />
+          <span>Study on Claude</span>
+          <ExternalLink className="size-3 opacity-70 shrink-0" />
+        </button>
+      </div>
+
+      {/* Bottom Actions: Prompt Preview & Copy Prompt */}
+      <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/20 text-xs">
+        <button
+          type="button"
+          onClick={() => setShowPromptPreview(!showPromptPreview)}
+          className="inline-flex items-center gap-1.5 py-1 text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer"
+        >
+          <span>{showPromptPreview ? "Hide study prompt" : "View study prompt"}</span>
+          {showPromptPreview ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          {copied ? (
+            <>
+              <Check className="size-3.5 text-emerald-400" />
+              <span className="text-emerald-400">Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy className="size-3.5" />
+              <span>Copy Prompt</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Expandable Prompt Preview */}
+      {showPromptPreview && (
+        <div className="relative p-3 rounded-xl bg-muted/40 border border-border/40 text-[11px] font-mono text-muted-foreground leading-relaxed max-h-40 overflow-y-auto whitespace-pre-wrap select-all">
+          {prompt}
+        </div>
+      )}
     </div>
   );
 }

@@ -104,7 +104,7 @@ export function AcademicPlaylistCard({ playlist, onStarToggle, className }: Acad
   }
 
   const categoryLabel = CATEGORY_LABELS[playlist.category] || "Study Playlist";
-  const gradient = playlist.coverGradient || "from-indigo-600 via-purple-600 to-pink-600";
+  const gradient = playlist.coverGradient || "from-neutral-900 via-neutral-800 to-neutral-900";
 
   return (
     <Link

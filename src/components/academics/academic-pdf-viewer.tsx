@@ -358,18 +358,7 @@ export function AcademicPdfViewer({
       <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 bg-muted/40 border-b border-border/40 backdrop-blur-md shrink-0 flex-wrap">
         {/* Left: Document info & badges */}
         <div className="flex items-center gap-2 min-w-0">
-          <span
-            className={cn(
-              "flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider shrink-0",
-              isYoutube
-                ? "bg-rose-500/15 text-rose-400 border border-rose-500/30"
-                : isGoogleSites || isGenericWebSite
-                  ? "bg-sky-500/15 text-sky-400 border border-sky-500/30"
-                  : isDriveFolder
-                    ? "bg-amber-500/15 text-amber-500 border border-amber-500/30"
-                    : "bg-indigo-500/15 text-indigo-400 border border-indigo-500/25"
-            )}
-          >
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 bg-muted text-foreground border border-border/50">
             {isYoutube ? (
               <Play className="size-3 fill-current" />
             ) : isGoogleSites || isGenericWebSite ? (
@@ -382,20 +371,20 @@ export function AcademicPdfViewer({
             <span>
               {isYoutube
                 ? isYoutubePlaylist
-                  ? "YouTube Playlist"
-                  : "YouTube Video"
+                  ? "Playlist"
+                  : "Video"
                 : isGoogleSites
-                  ? "Course Website"
+                  ? "Portal"
                   : isGenericWebSite
-                    ? "Web Portal"
+                    ? "Web"
                     : isDriveFolder
-                      ? "Drive Collection"
+                      ? "Drive"
                       : isGoogleDrive
-                        ? "Drive PDF"
-                        : "PDF Doc"}
+                        ? "PDF"
+                        : "PDF"}
             </span>
           </span>
-          <span className="text-xs font-bold text-foreground truncate max-w-[200px] sm:max-w-xs">
+          <span className="text-xs font-bold text-foreground truncate max-w-[140px] sm:max-w-xs">
             {title}
           </span>
         </div>
@@ -410,8 +399,8 @@ export function AcademicPdfViewer({
               haptics.medium();
               window.open(chatGptUrl, "_blank", "noopener,noreferrer");
             }}
-            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all cursor-pointer"
-            title="Teach me this syllabus on ChatGPT"
+            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-muted/60 hover:bg-muted text-foreground border border-border/40 transition-all cursor-pointer"
+            title="Study this syllabus on ChatGPT"
           >
             <Bot className="size-3" />
             <span>ChatGPT</span>
@@ -424,8 +413,8 @@ export function AcademicPdfViewer({
               haptics.medium();
               window.open(claudeUrl, "_blank", "noopener,noreferrer");
             }}
-            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all cursor-pointer"
-            title="Teach me this syllabus on Claude"
+            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-muted/60 hover:bg-muted text-foreground border border-border/40 transition-all cursor-pointer"
+            title="Study this syllabus on Claude"
           >
             <Sparkles className="size-3" />
             <span>Claude</span>

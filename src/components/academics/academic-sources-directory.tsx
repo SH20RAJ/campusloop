@@ -209,15 +209,14 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
   return (
     <div className="space-y-6 pt-2 select-none">
       {/* Promotion & Ingestion Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/40 via-background to-purple-950/20 p-5 sm:p-6 shadow-xl">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 size-48 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-card/60 p-4 sm:p-6 shadow-2xs">
         <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
-              <span className="flex size-7 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+              <span className="flex size-7 items-center justify-center rounded-xl bg-muted text-foreground border border-border/40">
                 <Globe className="size-4" />
               </span>
-              <span className="text-xs font-black uppercase tracking-wider text-indigo-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Connected Academic Knowledge Vault
               </span>
             </div>
@@ -227,7 +226,7 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
               CampusLoop continuously crawls, organizes, and verifies past examination papers and study notes
               from India&apos;s leading engineering institutions.{" "}
-              <strong>All materials are 100% free with direct downloads</strong>.
+              <strong className="text-foreground">All materials are 100% free with direct downloads</strong>.
             </p>
           </div>
 
@@ -240,11 +239,11 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
                   gtagEvent("academic_source_submit_clicked", { source: "banner" });
                   onOpenUploadModal();
                 }}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-foreground text-background hover:opacity-90 font-bold text-xs shadow-2xs transition-all active:scale-95 cursor-pointer"
               >
                 <UploadCloud className="size-4" />
                 <span>Submit Missing Source / Notes</span>
-                <span className="px-1.5 py-0.2 rounded-full bg-indigo-700 text-[10px] font-mono">+20 LP</span>
+                <span className="px-1.5 py-0.5 rounded-full bg-background/20 text-[10px] font-mono">+20 LP</span>
               </button>
             )}
           </div>
@@ -268,9 +267,9 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
             <strong className="text-foreground font-mono">2018–2025</strong>
           </div>
           <div className="flex items-center gap-2">
-            <span className="flex size-2 rounded-full bg-indigo-400" />
+            <span className="flex size-2 rounded-full bg-foreground" />
             <span className="text-muted-foreground">Direct Download:</span>
-            <strong className="text-indigo-400 font-mono">100% Free</strong>
+            <strong className="text-foreground font-mono">100% Free</strong>
           </div>
         </div>
       </div>
@@ -305,7 +304,7 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
             placeholder="Search university or portal..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-muted/40 border border-border/40 text-xs focus:outline-hidden focus:border-indigo-500/50"
+            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-muted/40 border border-border/40 text-xs focus:outline-hidden focus:border-primary"
           />
         </div>
       </div>
@@ -315,7 +314,7 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
         {filteredSources.map((source) => (
           <div
             key={source.id}
-            className="group relative flex flex-col justify-between rounded-3xl border border-border/50 bg-card p-5 hover:border-indigo-500/40 hover:shadow-lg transition-all"
+            className="group relative flex flex-col justify-between rounded-2xl border border-border/40 bg-card/60 p-5 hover:border-border transition-all shadow-2xs"
           >
             <div className="space-y-3">
               {/* Header Badge */}
@@ -324,7 +323,7 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
                     {source.category}
                   </span>
-                  <h3 className="text-base font-black text-foreground mt-1 group-hover:text-indigo-400 transition-colors">
+                  <h3 className="text-base font-black text-foreground mt-1 group-hover:text-primary transition-colors">
                     {source.name}
                   </h3>
                   <p className="text-xs font-semibold text-muted-foreground/90">{source.university}</p>
@@ -344,7 +343,7 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
                 {source.highlights.map((h, i) => (
                   <span
                     key={i}
-                    className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-foreground border border-border/40"
                   >
                     {h}
                   </span>
@@ -369,7 +368,7 @@ export function AcademicSourcesDirectory({ onOpenUploadModal }: AcademicSourcesD
                     action: "browse_internal",
                   });
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600/15 hover:bg-indigo-600 text-indigo-400 hover:text-white font-bold text-xs transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-foreground text-background hover:opacity-90 font-bold text-xs transition-all cursor-pointer shadow-2xs"
               >
                 <FileText className="size-3.5" />
                 <span>Browse Materials</span>

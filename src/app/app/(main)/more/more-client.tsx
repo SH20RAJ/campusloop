@@ -1,6 +1,17 @@
 "use client";
 
-import { ArrowLeft, ChevronDown, ChevronRight, ExternalLink, Shield, Sparkles, Zap } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  ChevronDown,
+  ChevronRight,
+  ExternalLink,
+  Flame,
+  FlaskConical,
+  Shield,
+  Sliders,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,23 +20,51 @@ import { InstagramIcon, LinkedinIcon, XIcon } from "@/components/ui/social-icons
 import { BETA_HUB_ITEMS, MORE_HUB_SECTIONS } from "@/constants/navigation";
 import { SOCIAL_LINKS } from "@/constants/socials";
 import { useProfile } from "@/hooks/use-profile";
+import { haptics } from "@/lib/haptics";
+import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
 interface MoreClientProps {
   isAdmin?: boolean;
 }
 
+function getCategoryIcon(groupName: string) {
+  switch (groupName) {
+    case "Campus Living & Utilities":
+      return Building2;
+    case "Social, Discovery & Fun":
+      return Flame;
+    case "Account & Trust":
+      return Sliders;
+    default:
+      return Sparkles;
+  }
+}
+
 export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
   const router = useRouter();
   const { profile } = useProfile();
   const isAdmin = propIsAdmin ?? profile?.role === "ADMIN";
-  const [isBetaOpen, setIsBetaOpen] = useState(false);
+
+  // Accordion state for space-saving mobile-first navigation
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    beta: false,
+    "Campus Living & Utilities": false,
+    "Social, Discovery & Fun": false,
+    "Account & Trust": false,
+  });
+
+  const toggleSection = (key: string) => {
+    sounds.tap();
+    haptics.light();
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const coreHubsSection = MORE_HUB_SECTIONS.find((s) => s.group === "Core Campus Hubs");
   const otherSections = MORE_HUB_SECTIONS.filter((s) => s.group !== "Core Campus Hubs");
 
   return (
-    <div className="min-h-screen pb-24 text-foreground select-none max-w-2xl mx-auto px-4 pt-3 space-y-6">
+    <div className="min-h-screen pb-24 text-foreground select-none max-w-2xl mx-auto px-4 pt-3 space-y-5">
       {/* ─── Sticky Minimal Top Bar ─── */}
       <div className="sticky top-0 z-30 flex items-center justify-between h-14 bg-background/85 backdrop-blur-xl border-b border-border/30 -mx-4 px-4">
         <div className="flex items-center gap-3">
@@ -43,7 +82,7 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
 
       {/* ─── ⚡ CORE CAMPUS HUBS (Featured 2x2 Grid) ─── */}
       {coreHubsSection && (
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <Sparkles className="size-3 text-primary" />
@@ -58,18 +97,18 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="flex flex-col justify-between p-4 rounded-3xl border border-border/50 bg-card/60 hover:bg-muted/40 hover:border-border transition-all group cursor-pointer shadow-xs relative overflow-hidden"
+                  className="flex flex-col justify-between p-4 rounded-2xl border border-border/40 bg-card/60 hover:bg-muted/40 hover:border-border transition-all group cursor-pointer shadow-2xs relative overflow-hidden"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20 shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
-                      <AnimatedIcon icon={Icon} animation="pop" size={22} />
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
+                      <AnimatedIcon icon={Icon} animation="pop" size={20} />
                     </div>
 
                     {item.badge && (
                       <span
                         className={cn(
-                          "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0",
-                          item.badgeColor || "bg-muted text-muted-foreground border-border/50"
+                          "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0",
+                          item.badgeColor || "bg-muted text-muted-foreground border-border/40"
                         )}
                       >
                         {item.badge}
@@ -93,46 +132,46 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
       )}
 
       {/* ─── 🧪 BETA & EXPERIMENTAL HUBS ACCORDION (Space Saving) ─── */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <button
           type="button"
-          onClick={() => setIsBetaOpen((prev) => !prev)}
-          className="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-3xl border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-colors cursor-pointer shadow-xs select-none group"
+          onClick={() => toggleSection("beta")}
+          className="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-border/40 bg-card/60 hover:bg-muted/40 transition-colors cursor-pointer shadow-2xs select-none group"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="flex size-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 shrink-0">
-              <Zap className="size-4" />
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-muted border border-border/40 text-foreground shrink-0 group-hover:scale-105 transition-transform">
+              <FlaskConical className="size-4" />
             </div>
-            <div className="text-left">
+            <div className="text-left min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+                <span className="text-sm font-bold text-foreground truncate">
                   Beta &amp; Experimental Hubs
                 </span>
-                <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border/40 shrink-0">
                   {BETA_HUB_ITEMS.length} Labs
                 </span>
               </div>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground truncate">
                 Marketplace, Random Loop, Capsule &amp; Gaming
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-bold text-amber-400/80 group-hover:text-amber-300 transition-colors">
-              {isBetaOpen ? "Collapse" : "Expand"}
+          <div className="flex items-center gap-2 shrink-0 ml-2">
+            <span className="text-[11px] font-semibold text-muted-foreground group-hover:text-foreground transition-colors hidden xs:inline">
+              {openSections.beta ? "Collapse" : "Expand"}
             </span>
             <ChevronDown
               className={cn(
-                "size-4 text-amber-400 transition-transform duration-200",
-                isBetaOpen && "rotate-180"
+                "size-4 text-muted-foreground transition-transform duration-200 group-hover:text-foreground",
+                openSections.beta && "rotate-180"
               )}
             />
           </div>
         </button>
 
-        {isBetaOpen && (
-          <div className="rounded-3xl border border-border/50 bg-card/60 divide-y divide-border/20 overflow-hidden shadow-xs animate-in fade-in slide-in-from-top-2 duration-200">
+        {openSections.beta && (
+          <div className="rounded-2xl border border-border/40 bg-card/40 divide-y divide-border/20 overflow-hidden shadow-2xs animate-in fade-in slide-in-from-top-2 duration-200">
             {BETA_HUB_ITEMS.map((item) => {
               const Icon = item.icon;
               return (
@@ -142,7 +181,7 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
                   className="flex items-center justify-between p-3.5 sm:p-4 hover:bg-muted/30 transition-colors group cursor-pointer"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="flex size-10 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-105 transition-transform shrink-0">
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-muted/60 text-foreground group-hover:scale-105 transition-transform shrink-0">
                       <AnimatedIcon icon={Icon} animation="pop" size={18} />
                     </div>
 
@@ -154,8 +193,8 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
                         {item.badge && (
                           <span
                             className={cn(
-                              "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0",
-                              item.badgeColor || "bg-muted text-muted-foreground border-border/50"
+                              "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0",
+                              item.badgeColor || "bg-muted text-muted-foreground border-border/40"
                             )}
                           >
                             {item.badge}
@@ -176,57 +215,98 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
         )}
       </div>
 
-      {/* ─── GROUPED SECTIONS (No duplicates) ─── */}
-      <div className="space-y-6">
-        {otherSections.map((section) => (
-          <div key={section.group} className="space-y-2">
-            <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground px-1">
-              {section.group}
-            </h2>
+      {/* ─── CATEGORY ACCORDIONS (Space Saving & High Usability) ─── */}
+      <div className="space-y-3">
+        {otherSections.map((section) => {
+          const isOpen = Boolean(openSections[section.group]);
+          const CatIcon = getCategoryIcon(section.group);
 
-            <div className="rounded-3xl border border-border/50 bg-card/60 divide-y divide-border/20 overflow-hidden shadow-xs">
-              {section.items.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="flex items-center justify-between p-3.5 sm:p-4 hover:bg-muted/30 transition-colors group cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="flex size-10 items-center justify-center rounded-2xl bg-muted/60 text-foreground group-hover:scale-105 transition-transform shrink-0">
-                        <AnimatedIcon icon={Icon} animation="pop" size={18} />
-                      </div>
-
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                            {item.label}
-                          </p>
-                          {item.badge && (
-                            <span
-                              className={cn(
-                                "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0",
-                                item.badgeColor || "bg-muted text-muted-foreground border-border/50"
-                              )}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
-                        </div>
-                        {item.desc && (
-                          <p className="text-xs text-muted-foreground truncate mt-0.5">{item.desc}</p>
-                        )}
-                      </div>
+          return (
+            <div key={section.group} className="space-y-1.5">
+              <button
+                type="button"
+                onClick={() => toggleSection(section.group)}
+                className="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-border/40 bg-card/60 hover:bg-muted/40 transition-colors cursor-pointer shadow-2xs select-none group"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex size-9 items-center justify-center rounded-xl bg-muted border border-border/40 text-foreground shrink-0 group-hover:scale-105 transition-transform">
+                    <CatIcon className="size-4" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-foreground truncate">
+                        {section.group}
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border/40 shrink-0">
+                        {section.items.length}
+                      </span>
                     </div>
+                    <p className="text-[11px] text-muted-foreground truncate">
+                      {section.items.map((i) => i.label).slice(0, 3).join(" · ")}
+                    </p>
+                  </div>
+                </div>
 
-                    <ChevronRight className="size-4 text-muted-foreground/50 group-hover:text-foreground group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-                  </Link>
-                );
-              })}
+                <div className="flex items-center gap-2 shrink-0 ml-2">
+                  <span className="text-[11px] font-semibold text-muted-foreground group-hover:text-foreground transition-colors hidden xs:inline">
+                    {isOpen ? "Collapse" : "Expand"}
+                  </span>
+                  <ChevronDown
+                    className={cn(
+                      "size-4 text-muted-foreground transition-transform duration-200 group-hover:text-foreground",
+                      isOpen && "rotate-180"
+                    )}
+                  />
+                </div>
+              </button>
+
+              {isOpen && (
+                <div className="rounded-2xl border border-border/40 bg-card/40 divide-y divide-border/20 overflow-hidden shadow-2xs animate-in fade-in slide-in-from-top-2 duration-200">
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center justify-between p-3.5 sm:p-4 hover:bg-muted/30 transition-colors group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className="flex size-9 items-center justify-center rounded-xl bg-muted/60 text-foreground group-hover:scale-105 transition-transform shrink-0">
+                            <AnimatedIcon icon={Icon} animation="pop" size={18} />
+                          </div>
+
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                                {item.label}
+                              </p>
+                              {item.badge && (
+                                <span
+                                  className={cn(
+                                    "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0",
+                                    item.badgeColor || "bg-muted text-muted-foreground border-border/40"
+                                  )}
+                                >
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            {item.desc && (
+                              <p className="text-xs text-muted-foreground truncate mt-0.5">{item.desc}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        <ChevronRight className="size-4 text-muted-foreground/50 group-hover:text-foreground group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
+      </div>
 
         {/* ─── Admin Moderation Console ─── */}
         {isAdmin && (
@@ -300,6 +380,5 @@ export function MoreClient({ isAdmin: propIsAdmin }: MoreClientProps) {
           </div>
         </div>
       </div>
-    </div>
   );
 }

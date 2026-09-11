@@ -52,23 +52,20 @@ export function AcademicAuthBenefitsCard({
   return (
     <div
       className={cn(
-        "rounded-3xl border border-indigo-500/25 bg-linear-to-br from-indigo-500/10 via-card/90 to-card p-4 sm:p-5 shadow-sm relative overflow-hidden backdrop-blur-md transition-all duration-300",
+        "rounded-2xl border border-border/40 bg-card/40 p-4 sm:p-5 shadow-xs relative overflow-hidden backdrop-blur-md transition-all space-y-3",
         className
       )}
     >
-      {/* Subtle ambient light */}
-      <div className="absolute -top-12 -right-12 size-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
       {/* Header Row: Badge, Perks title & Close Button */}
-      <div className="flex items-center justify-between gap-2 pb-1">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 text-[11px] font-black uppercase tracking-wider">
+          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-muted text-foreground border border-border/50 text-[11px] font-bold">
             <GraduationCap className="size-3.5" />
-            <span>Student Perks</span>
+            <span>Student Account</span>
           </div>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-500 border border-amber-500/30 flex items-center gap-1">
-            <Zap className="size-3 fill-current" />
-            <span>+50 LP Welcome Bonus</span>
+          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-muted/60 text-muted-foreground border border-border/40 flex items-center gap-1">
+            <Zap className="size-3 text-amber-400" />
+            <span>+50 LP Bonus</span>
           </span>
         </div>
 
@@ -76,7 +73,7 @@ export function AcademicAuthBenefitsCard({
           <button
             type="button"
             onClick={handleDismiss}
-            className="size-7 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-all cursor-pointer shrink-0"
+            className="size-7 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-all cursor-pointer shrink-0"
             title="Dismiss banner"
             aria-label="Dismiss banner"
           >
@@ -86,43 +83,42 @@ export function AcademicAuthBenefitsCard({
       </div>
 
       {/* Main Pitch & CTA Row */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-0.5">
         <div className="space-y-1 min-w-0 flex-1">
           <h3 className="text-sm sm:text-base font-black text-foreground tracking-tight leading-snug">
-            Supercharge Your Semester on CampusLoop
+            Save PYQs and organize your study stack
           </h3>
-          <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-            Free direct downloads for everyone. Join with your student email to organize study stacks, save
-            PYQs, and earn campus clout.
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Free downloads for everyone. Sign in with your college email for unlimited downloads and personal study vaults.
           </p>
         </div>
 
         <Link
           href={signInUrl}
           onClick={() => sounds.tap()}
-          className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all active:scale-95 shrink-0 cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black bg-foreground text-background hover:opacity-90 transition-all active:scale-95 shrink-0 cursor-pointer shadow-xs"
         >
-          <span>Claim 50 LP &amp; Unlock Vault</span>
+          <span>Claim 50 LP &amp; Sign In</span>
           <ChevronRight className="size-3.5" />
         </Link>
       </div>
 
       {/* Compact Perks Micro-Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-border/25 text-xs font-semibold">
-        <div className="flex items-center gap-2 p-2 rounded-xl bg-muted/30 border border-border/40">
-          <Bookmark className="size-3.5 text-amber-400 shrink-0" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-border/20 text-xs font-medium">
+        <div className="flex items-center gap-2 p-2 rounded-xl bg-muted/20 border border-border/30">
+          <Bookmark className="size-3 text-muted-foreground shrink-0" />
           <span className="truncate text-[11px] text-foreground/90">Personal Vault</span>
         </div>
-        <div className="flex items-center gap-2 p-2 rounded-xl bg-muted/30 border border-border/40">
-          <MessageSquare className="size-3.5 text-indigo-400 shrink-0" />
-          <span className="truncate text-[11px] text-foreground/90">Ask Seniors &amp; Doubts</span>
+        <div className="flex items-center gap-2 p-2 rounded-xl bg-muted/20 border border-border/30">
+          <MessageSquare className="size-3 text-muted-foreground shrink-0" />
+          <span className="truncate text-[11px] text-foreground/90">Senior Doubts</span>
         </div>
-        <div className="flex items-center gap-2 p-2 rounded-xl bg-muted/30 border border-border/40">
-          <Zap className="size-3.5 text-purple-400 shrink-0" />
-          <span className="truncate text-[11px] text-foreground/90">15-Min AI Cram</span>
+        <div className="flex items-center gap-2 p-2 rounded-xl bg-muted/20 border border-border/30">
+          <Zap className="size-3 text-muted-foreground shrink-0" />
+          <span className="truncate text-[11px] text-foreground/90">AI Study Tutor</span>
         </div>
-        <div className="flex items-center gap-2 p-2 rounded-xl bg-muted/30 border border-border/40">
-          <ShieldCheck className="size-3.5 text-emerald-400 shrink-0" />
+        <div className="flex items-center gap-2 p-2 rounded-xl bg-muted/20 border border-border/30">
+          <ShieldCheck className="size-3 text-muted-foreground shrink-0" />
           <span className="truncate text-[11px] text-foreground/90">Verified Clout</span>
         </div>
       </div>

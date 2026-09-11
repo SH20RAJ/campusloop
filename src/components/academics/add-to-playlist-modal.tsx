@@ -179,7 +179,7 @@ export function AddToPlaylistModal({ isOpen, onClose, resourceId, resourceTitle 
         {/* Content */}
         {isLoading ? (
           <div className="py-8 flex flex-col items-center justify-center space-y-2 text-muted-foreground">
-            <Loader2 className="size-6 animate-spin text-indigo-400" />
+            <Loader2 className="size-6 animate-spin text-foreground" />
             <span className="text-xs font-medium">Loading your study stacks...</span>
           </div>
         ) : (
@@ -199,7 +199,7 @@ export function AddToPlaylistModal({ isOpen, onClose, resourceId, resourceTitle 
                       className={cn(
                         "w-full flex items-center justify-between p-3 rounded-2xl border text-left transition-all cursor-pointer",
                         isChecked
-                          ? "bg-indigo-500/10 border-indigo-500/40 text-foreground"
+                          ? "bg-muted border-foreground/30 text-foreground"
                           : "border-border/60 hover:bg-muted/60 text-muted-foreground hover:text-foreground"
                       )}
                     >
@@ -214,7 +214,7 @@ export function AddToPlaylistModal({ isOpen, onClose, resourceId, resourceTitle 
                         className={cn(
                           "size-5 rounded-md flex items-center justify-center border transition-all shrink-0",
                           isChecked
-                            ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
+                            ? "bg-foreground border-foreground text-background shadow-xs"
                             : "border-border/80"
                         )}
                       >
@@ -252,7 +252,7 @@ export function AddToPlaylistModal({ isOpen, onClose, resourceId, resourceTitle 
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   autoFocus
-                  className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border focus:outline-hidden focus:border-indigo-500 font-medium"
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border focus:outline-hidden focus:border-primary font-medium"
                 />
                 <div className="flex items-center justify-end gap-2 pt-1">
                   <button
@@ -265,7 +265,7 @@ export function AddToPlaylistModal({ isOpen, onClose, resourceId, resourceTitle 
                   <button
                     type="submit"
                     disabled={!newTitle.trim() || isCreating}
-                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-50 cursor-pointer shadow-xs"
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-foreground text-background hover:opacity-90 disabled:opacity-50 cursor-pointer shadow-xs"
                   >
                     {isCreating ? <Loader2 className="size-3 animate-spin" /> : <Plus className="size-3" />}
                     <span>Create &amp; Add</span>
@@ -276,7 +276,7 @@ export function AddToPlaylistModal({ isOpen, onClose, resourceId, resourceTitle 
               <button
                 type="button"
                 onClick={() => setIsCreatingNew(true)}
-                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-2xl border border-dashed border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/5 text-xs font-bold transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-2xl border border-dashed border-border text-foreground hover:bg-muted/40 text-xs font-bold transition-all cursor-pointer"
               >
                 <Plus className="size-3.5" />
                 <span>Create New Playlist</span>

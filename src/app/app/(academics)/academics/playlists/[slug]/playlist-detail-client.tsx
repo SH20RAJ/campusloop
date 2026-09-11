@@ -241,7 +241,7 @@ export function PlaylistDetailClient({ slugOrId }: { slugOrId: string }) {
       <div
         className={cn(
           "w-full rounded-3xl p-4 sm:p-6 bg-linear-to-r relative overflow-hidden shadow-lg space-y-4 text-white",
-          playlist.coverGradient || "from-indigo-600 via-purple-600 to-pink-600"
+          playlist.coverGradient || "from-neutral-900 via-neutral-800 to-neutral-900 border border-border/40"
         )}
       >
         <div className="flex items-center justify-between gap-2 flex-wrap">

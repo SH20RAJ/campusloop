@@ -5,6 +5,7 @@ import {
   BadgeCheck,
   Check,
   Eye,
+  GraduationCap,
   MessageCircle,
   Pin,
   Repeat2,
@@ -361,8 +362,9 @@ export function ProductShowcaseSection() {
                             <span className="text-muted-foreground/50">·</span>
                             <span className="font-mono text-xs text-muted-foreground">25m</span>
                           </div>
-                          <span className="text-[11px] font-mono text-muted-foreground">
-                            🏫 BIT Mesra · Campus Confession
+                          <span className="text-[11px] font-mono text-muted-foreground flex items-center gap-1">
+                            <GraduationCap className="size-3 text-[#1D9BF0]" />
+                            <span>BIT Mesra · Campus Confession</span>
                           </span>
                         </div>
                       </div>
@@ -465,7 +467,7 @@ export function ProductShowcaseSection() {
 
                     <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">
                       Building a distributed compiler for our final year capstone. Looking for a study partner
-                      for Distributed Systems &amp; weekend badminton at IC Ground 🏸
+                      for Distributed Systems &amp; weekend badminton at IC Ground.
                     </p>
 
                     <div className="flex flex-wrap gap-1.5">

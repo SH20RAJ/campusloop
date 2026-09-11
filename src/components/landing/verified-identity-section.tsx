@@ -12,8 +12,7 @@ export function VerifiedIdentitySection() {
     "Lost my calculator near CAT Hall. Call 9876543210 or mail senior@bitmesra.ac.in!"
   );
 
-  const scrubbedText = inputText.replace(PHONE_RE, "[PHONE_REDACTED]").replace(EMAIL_RE, "[EMAIL_REDACTED]");
-  const hadPii = scrubbedText !== inputText;
+  const hadPii = Boolean(inputText.match(PHONE_RE) || inputText.match(EMAIL_RE));
 
   return (
     <section className="border-t border-border/40 py-20 sm:py-28 px-4 sm:px-6 bg-background">
@@ -105,19 +104,25 @@ export function VerifiedIdentitySection() {
               </div>
             </div>
 
-            {/* Interactive Micro-Artifact: Live PII-Scrubber Sandbox */}
+            {/* Interactive Privacy Shield Sandbox */}
             <div className="pt-2 border-t border-border/40">
               <div className="rounded-xl border border-border/60 bg-muted/10 p-4 sm:p-5 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Lock className="size-4 text-[#1D9BF0]" />
                     <span className="font-mono text-xs font-bold text-foreground">
-                      LIVE ARTIFACT: AUTOMATIC CLIENT-SIDE PII SCRUBBER
+                      PRIVACY SHIELD // REAL-TIME PII &amp; DOXXING PROTECTION
                     </span>
                   </div>
-                  {hadPii && (
-                    <span className="font-mono text-[10px] font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                      ✓ PII Intercepted &amp; Neutralized
+                  {hadPii ? (
+                    <span className="font-mono text-[10px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                      <ShieldCheck className="size-3 text-amber-500" />
+                      <span>Contact Details Flagged</span>
+                    </span>
+                  ) : (
+                    <span className="font-mono text-[10px] font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                      <ShieldCheck className="size-3 text-emerald-500" />
+                      <span>Zero Personal Contact Leaks</span>
                     </span>
                   )}
                 </div>
@@ -126,25 +131,41 @@ export function VerifiedIdentitySection() {
                   <div className="space-y-1.5">
                     <label
                       htmlFor="pii-input"
-                      className="font-mono text-[10px] font-semibold text-muted-foreground uppercase"
+                      className="font-mono text-[10px] font-semibold text-muted-foreground uppercase flex items-center justify-between"
                     >
-                      Raw Student Input (Try editing)
+                      <span>Draft Post Content (Try editing)</span>
+                      <span className="text-[9px] text-muted-foreground/80">Keystroke validation</span>
                     </label>
                     <textarea
                       id="pii-input"
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
-                      rows={2}
-                      className="w-full bg-background border border-border/60 rounded-lg p-2.5 text-xs text-foreground font-mono focus:border-[#1D9BF0] outline-none resize-none"
+                      rows={3}
+                      className="w-full bg-background border border-border/60 rounded-lg p-2.5 text-xs text-foreground font-mono focus:border-[#1D9BF0] outline-none resize-none leading-relaxed"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <span className="font-mono text-[10px] font-semibold text-muted-foreground uppercase">
-                      Sealed Post Payload (What reaches peers)
+                    <span className="font-mono text-[10px] font-semibold text-muted-foreground uppercase block">
+                      Campus Timeline Protection Engine
                     </span>
-                    <div className="w-full bg-background/50 border border-border/40 rounded-lg p-2.5 text-xs font-mono text-foreground/90 min-h-[58px]">
-                      {scrubbedText}
+                    <div className="w-full bg-background/60 border border-border/40 rounded-lg p-3 text-xs font-mono space-y-2 min-h-[74px]">
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Phone Detector:</span>
+                        <span className={inputText.match(PHONE_RE) ? "text-amber-500 font-bold" : "text-emerald-500"}>
+                          {inputText.match(PHONE_RE) ? "FLAGGED (Blocked from publishing)" : "PASSED (Clean)"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Email Detector:</span>
+                        <span className={inputText.match(EMAIL_RE) ? "text-amber-500 font-bold" : "text-emerald-500"}>
+                          {inputText.match(EMAIL_RE) ? "FLAGGED (Blocked from publishing)" : "PASSED (Clean)"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-border/30 pt-1.5 text-[11px]">
+                        <span className="text-muted-foreground">Anonymity Storage:</span>
+                        <span className="text-[#1D9BF0] font-bold">author_id = NULL (Untrackable)</span>
+                      </div>
                     </div>
                   </div>
                 </div>

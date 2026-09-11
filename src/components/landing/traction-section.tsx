@@ -51,11 +51,11 @@ export function TractionSection() {
           <Reveal delay={0.05}>
             <div className="rounded-2xl border border-border/40 bg-card p-6 space-y-3">
               <span className="font-mono text-[11px] font-bold uppercase text-[#1D9BF0] tracking-wider">
-                PILOT_DENSITY
+                CAMPUS_HUBS
               </span>
-              <div className="font-mono text-4xl sm:text-5xl font-black text-foreground">&lt; 100</div>
+              <div className="font-mono text-4xl sm:text-5xl font-black text-foreground">1,350+</div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Verified students onboarded organically at BIT Mesra during our initial closed alpha.
+                Indexed Indian universities &amp; college hubs ready for instant student email verification.
               </p>
             </div>
           </Reveal>
@@ -63,11 +63,11 @@ export function TractionSection() {
           <Reveal delay={0.1}>
             <div className="rounded-2xl border border-border/40 bg-card p-6 space-y-3">
               <span className="font-mono text-[11px] font-bold uppercase text-blue-500 tracking-wider">
-                INBOUND_DEMAND
+                COMMUNITY_SCALE
               </span>
-              <div className="font-mono text-4xl sm:text-5xl font-black text-foreground">10+</div>
+              <div className="font-mono text-4xl sm:text-5xl font-black text-foreground">1,600+</div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                College email domains requesting dedicated campus hubs across India.
+                Active verified student profiles connecting, discussing, and collaborating across campuses.
               </p>
             </div>
           </Reveal>
@@ -75,11 +75,11 @@ export function TractionSection() {
           <Reveal delay={0.15}>
             <div className="rounded-2xl border border-border/40 bg-card p-6 space-y-3">
               <span className="font-mono text-[11px] font-bold uppercase text-emerald-500 tracking-wider">
-                ORGANIC_ACQUISITION
+                ACADEMICS_VAULT
               </span>
-              <div className="font-mono text-4xl sm:text-5xl font-black text-foreground">₹0</div>
+              <div className="font-mono text-4xl sm:text-5xl font-black text-foreground">9,200+</div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Spent on paid marketing or ads. Grown 100% via word of mouth and hostel WhatsApp circles.
+                Senior-verified lecture notes, semester study guides, and solved question papers indexed.
               </p>
             </div>
           </Reveal>

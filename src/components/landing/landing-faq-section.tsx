@@ -22,7 +22,7 @@ const FAQS = [
   },
   {
     q: "What if my college domain isn't recognized yet?",
-    a: "We are currently live in pilot testing at BIT Mesra and progressively activating new university hubs based on student demand. You can submit your college domain through our directory request form and our team verifies the registrar domain within 24 hours.",
+    a: "CampusLoop has indexed over 1,350+ Indian universities and colleges (IITs, NITs, BITS, DU, state technical universities, and deemed institutions). If your college domain isn't activated yet, you can submit it through our directory request form and we verify the registrar domain within 24 hours.",
   },
   {
     q: "Is CampusLoop free for college students?",

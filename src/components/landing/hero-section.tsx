@@ -70,7 +70,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
               VERIFIED CAMPUS TIMELINE
             </span>
             <span className="text-muted-foreground/40 hidden sm:inline">•</span>
-            <span className="text-foreground/80 font-mono text-[11px]">Active pilot at BIT Mesra</span>
+            <span className="text-foreground/80 font-mono text-[11px]">Founded at BIT Mesra · 1,350+ Campus Hubs</span>
           </div>
 
           {/* Core H1 */}
@@ -274,7 +274,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
             <div className="pt-0.5 text-center">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground">
                 <Sparkles className="size-3 text-[#1D9BF0]" />
-                <span>One verified account · Verified BIT Mesra students only</span>
+                <span>One verified student account · Zero outsiders</span>
               </span>
             </div>
           </div>

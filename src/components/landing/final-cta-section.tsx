@@ -59,7 +59,7 @@ export function FinalCTASection({ isAuthenticated }: FinalCTASectionProps) {
 
             {/* Credible Footer Attribution */}
             <div className="pt-4 border-t border-border/40 font-mono text-xs text-muted-foreground">
-              <span>Active pilot at BIT Mesra · Ranchi, Jharkhand, India</span>
+              <span>Founded at BIT Mesra · Built for 1,350+ campuses across India</span>
             </div>
           </div>
         </Reveal>

@@ -273,7 +273,7 @@ Located in [`src/lib/user-behavior.ts`](campusloop/src/lib/user-behavior.ts) and
 - **Real-Time Feed & Discover Boosting**: Dynamic weighting of user dwell time, clicks, search queries, and friend interactions to supercharge For You feed recommendations.
 
 ### 5.9 Campus Time Capsule & Batch Legacy Vault
-Located in [`src/components/landing/time-capsule-showcase.tsx`](campusloop/src/components/landing/time-capsule-showcase.tsx) and [`src/app/app/(main)/capsule/`](campusloop/src/app/app/(main)/capsule/):
+Located in [`src/app/app/(main)/capsule/`](campusloop/src/app/app/(main)/capsule/):
 - **Cryptographic Batch Lock**: Sealed letters, predictions, and confessions locked until graduation day.
 - **Live Countdown Timer**: Real-time ticker counting down days, hours, and minutes to convocation.
 - **Unlocked Museum Wall**: Public batch archive rendered after timer expiry.

@@ -1,8 +1,75 @@
 "use client";
 
-import { CheckCircle2, MailCheck, School, Sparkles } from "lucide-react";
-import { VerifyDemo } from "@/components/landing/demos";
+import { CheckCircle2, MailCheck, School, ShieldAlert, ShieldCheck, Sparkles } from "lucide-react";
+import { useState } from "react";
 import { Reveal } from "@/components/landing/reveal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const ACADEMIC_DOMAIN = /\.(edu|ac\.in|edu\.in|ac\.uk|edu\.au|edu\.sg|ac\.nz)$/;
+
+function DomainChecker() {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle" | "ok" | "no">("idle");
+  const domain = email.trim().split("@")[1]?.toLowerCase() ?? "";
+
+  function check() {
+    if (!domain) return;
+    setState(ACADEMIC_DOMAIN.test(domain) ? "ok" : "no");
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="flex-1 space-y-1.5">
+          <label htmlFor="verify-email-input" className="sr-only">
+            College email
+          </label>
+          <Input
+            id="verify-email-input"
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setState("idle");
+            }}
+            onKeyDown={(e) => e.key === "Enter" && check()}
+            placeholder="you@iitd.ac.in"
+            className="bg-background"
+          />
+        </div>
+        <Button onClick={check} className="gap-1.5 cursor-pointer">
+          <MailCheck className="size-4" />
+          Check domain
+        </Button>
+      </div>
+
+      <div aria-live="polite" className="flex h-5 items-center gap-1.5 text-xs">
+        {state === "ok" && (
+          <>
+            <ShieldCheck className="size-3.5 text-emerald-500" />
+            <span className="font-medium text-emerald-500">
+              {domain} is a recognized campus domain. You can sign up with your college email to verify.
+            </span>
+          </>
+        )}
+        {state === "no" && (
+          <>
+            <ShieldAlert className="size-3.5 text-amber-500" />
+            <span className="font-medium text-amber-500">
+              We do not recognize that domain yet. Use your official college-issued email or request a hub.
+            </span>
+          </>
+        )}
+        {state === "idle" && (
+          <span className="text-muted-foreground">
+            Live domain check. Official student verification requires single-use OTP confirmation.
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const STEPS = [
   {
@@ -94,12 +161,11 @@ export function HowItWorksSection() {
             </div>
 
             <div className="pt-2 text-left">
-              <VerifyDemo />
+              <DomainChecker />
             </div>
 
             <p className="font-mono text-[11px] text-muted-foreground pt-1">
-              Active pilot testing with students at <strong className="text-foreground">BIT Mesra</strong> and
-              rolling out to verified Indian universities.
+              Founded at <strong className="text-foreground">BIT Mesra</strong> and indexed across 1,350+ verified Indian university domains.
             </p>
           </div>
         </Reveal>

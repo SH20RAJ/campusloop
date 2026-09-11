@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const db = getDb();
-    const videoCondition = sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%')`;
+    const videoCondition = sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%' OR EXISTS (SELECT 1 FROM external_media em JOIN external_posts ep ON em.external_post_id = ep.id WHERE ep.post_id = ${posts.id} AND em.media_type = 'VIDEO'))`;
 
     const list = await db.query.posts.findMany({
       columns: {
@@ -18,7 +18,7 @@ export async function GET() {
       },
       where: and(eq(posts.status, "PUBLISHED"), videoCondition),
       orderBy: [desc(posts.createdAt)],
-      limit: 2000,
+      limit: 5000,
     });
 
     const rootUrl = `

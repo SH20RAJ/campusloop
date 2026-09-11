@@ -108,11 +108,36 @@ export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: Re
     [posts.length]
   );
 
-  // Sync URL shallowly with active reel slug/id on scroll
+const SEEN_STORAGE_KEY = "campusloop_seen_reels_v2";
+
+function getLocalSeenIds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(SEEN_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function recordLocalSeenId(id: string) {
+  if (typeof window === "undefined" || !id) return;
+  try {
+    const cleanId = id.split("-cycle-")[0];
+    const current = getLocalSeenIds();
+    if (!current.includes(cleanId)) {
+      const updated = [cleanId, ...current].slice(0, 1000);
+      localStorage.setItem(SEEN_STORAGE_KEY, JSON.stringify(updated));
+    }
+  } catch {}
+}
+
+  // Sync URL shallowly with active reel slug/id on scroll and track seen state
   useEffect(() => {
     const activeReel = posts[activeIndex];
     if (activeReel) {
       const activeSlug = activeReel.id.split("-cycle-")[0];
+      recordLocalSeenId(activeSlug);
       const targetUrl = `/app/reels/${activeSlug}`;
       if (typeof window !== "undefined" && window.location.pathname !== targetUrl) {
         window.history.replaceState(null, "", targetUrl);
@@ -120,35 +145,37 @@ export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: Re
     }
   }, [activeIndex, posts]);
 
-  // Preload more video reels with strict excludeIds deduplication & infinite cycle fallback
+  // Preload more video reels with strict excludeIds deduplication & persistent seen filtering
   const loadMoreReels = useCallback(async () => {
     if (isLoadingMore) return;
     setIsLoadingMore(true);
     try {
       const nextPage = page + 1;
-      const loadedIds = posts.map((p) => p.id.split("-cycle-")[0]).slice(-40);
-      const excludeParam = loadedIds.length > 0 ? `&excludeIds=${encodeURIComponent(loadedIds.join(","))}` : "";
+      const localSeen = getLocalSeenIds();
+      const inMemorySeen = posts.map((p) => p.id.split("-cycle-")[0]);
+      const combinedExclude = Array.from(new Set([...localSeen, ...inMemorySeen])).slice(0, 150);
+      const excludeParam =
+        combinedExclude.length > 0 ? `&excludeIds=${encodeURIComponent(combinedExclude.join(","))}` : "";
       const data = await fetcher<FeedPost[] | { posts: FeedPost[] }>(
-        `/api/feed?sort=reels&page=${nextPage}&limit=10&scope=GLOBAL${excludeParam}`
+        `/api/feed?sort=reels&page=${nextPage}&limit=12&scope=GLOBAL${excludeParam}`
       );
       const rawPosts: FeedPost[] = Array.isArray(data) ? data : data?.posts || [];
 
       setPosts((prev) => {
-        const seen = new Set(prev.map((p) => p.id.split("-cycle-")[0]));
-        const fresh = rawPosts.filter((p) => !seen.has(p.id));
+        const existingIds = new Set(prev.map((p) => p.id.split("-cycle-")[0]));
+        const localSeenSet = new Set(localSeen);
+        // Strict deduplication: filter out any reels already in state or marked seen
+        const fresh = rawPosts.filter((p) => !existingIds.has(p.id) && !localSeenSet.has(p.id));
 
         if (fresh.length > 0) {
           return [...prev, ...fresh];
         }
-
-        // If no more unviewed video reels remain in the catalog, seamlessly cycle so feed is truly infinite
-        if (prev.length > 0) {
-          const cycled = prev.slice(0, 10).map((p, idx) => ({
-            ...p,
-            id: `${p.id.split("-cycle-")[0]}-cycle-${Date.now()}-${idx}`,
-          }));
-          return [...prev, ...cycled];
+        // Fallback if client has already seen many: only append items not currently in view
+        const unseenInSession = rawPosts.filter((p) => !existingIds.has(p.id));
+        if (unseenInSession.length > 0) {
+          return [...prev, ...unseenInSession];
         }
+        // Never cycle duplicates to the user
         return prev;
       });
       setPage(nextPage);

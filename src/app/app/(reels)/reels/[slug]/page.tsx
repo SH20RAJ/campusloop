@@ -6,6 +6,7 @@ import { getDb } from "@/db";
 import { externalPosts, posts } from "@/db/schema";
 import type { FeedPost } from "@/hooks/use-feed";
 import { formatApiFeedPosts, resolveFeedPage } from "@/lib/feed";
+import { applyReelDiversityFilter, getViewerSeenReelIds } from "@/lib/reels/algorithm";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const dynamic = "force-dynamic";
@@ -23,26 +24,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const target = await db.query.posts.findFirst({
     where: and(
+      eq(posts.id, slug),
       eq(posts.status, "PUBLISHED"),
-      eq(posts.id, slug)
+      or(
+        eq(posts.isSeeded, false),
+        sql`EXISTS (SELECT 1 FROM ${externalPosts} WHERE ${externalPosts.postId} = ${posts.id})`
+      )
     ),
-    with: {
-      institution: true,
-      author: true,
-    },
   });
 
   if (!target) {
     return {
-      title: "Campus Reel · Student Videos | CampusLoop",
-      description: "Watch authentic student campus reels, vibes, and moments.",
+      title: "Reel Not Found | CampusLoop",
+      description: "The requested campus reel could not be found.",
     };
   }
 
-  const title = target.title ? `${target.title} · Campus Reel` : "Campus Reel · Student Video | CampusLoop";
-  const cleanBody = target.body.replace(MD_IMAGE_REGEX, "").replace(URL_CLEAN_REGEX, "").trim();
-  const description = cleanBody.slice(0, 160) || "Watch verified student campus reels on CampusLoop.";
-  const url = `https://campusloop.space/app/reels/${target.id}`;
+  const cleanBody = target.body
+    .replace(MD_IMAGE_REGEX, "")
+    .replace(URL_CLEAN_REGEX, "")
+    .trim();
+
+  const title = target.title
+    ? `${target.title} · Campus Reel | CampusLoop`
+    : `Campus Reel: "${cleanBody.slice(0, 48)}..." | CampusLoop`;
+
+  const description =
+    cleanBody.slice(0, 150) ||
+    "Watch authentic campus reels, late night hostel vibes, hackathons, and student moments on CampusLoop.";
+
+  const url = `https://campusloop.space/app/reels/${slug}`;
 
   return {
     title,
@@ -55,7 +66,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url,
       siteName: "CampusLoop Reels",
-      type: "video.other",
       images: [
         {
           url: "https://campusloop.space/og-image.png",
@@ -108,16 +118,37 @@ export default async function SingleReelPage({ params }: PageProps) {
     not(eq(posts.id, rawTarget[0].id)),
   ];
 
+  let seenIds: string[] = [rawTarget[0].id];
+  if (profile?.id) {
+    const viewerSeen = await getViewerSeenReelIds(profile.id, 500);
+    seenIds = Array.from(new Set([...seenIds, ...viewerSeen]));
+    conditions.push(
+      sql`NOT EXISTS (
+        SELECT 1 FROM user_behavior_events
+        WHERE user_id = ${profile.id}
+          AND target_id = ${posts.id}
+          AND event_type IN ('REEL_WATCH', 'REEL_LOOP', 'REEL_SKIP')
+      )`
+    );
+    const safeIds = seenIds.filter((id) => /^[a-zA-Z0-9_-]+$/.test(id)).slice(0, 300);
+    if (safeIds.length > 0) {
+      conditions.push(sql`${posts.id} NOT IN (${sql.join(safeIds.map((eid) => sql`${eid}`), sql`, `)})`);
+    }
+  }
+
   const rawRemaining = await resolveFeedPage({
     conditions,
     sort: "reels",
     limit: 24,
     offset: 0,
     userInstitutionId: null,
+    seenIds,
     viewerProfileId: profile?.id,
   });
 
-  const formattedRemaining = (await formatApiFeedPosts(rawRemaining, profile?.id)) as unknown as FeedPost[];
+  const formattedRemaining = applyReelDiversityFilter(
+    (await formatApiFeedPosts(rawRemaining, profile?.id)) as unknown as FeedPost[]
+  );
   const allPosts = [formattedTarget, ...formattedRemaining];
 
   const collegeName = profile?.institution?.name ? profile.institution.name.split(",")[0] : undefined;

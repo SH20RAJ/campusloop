@@ -39,8 +39,8 @@ describe("Addictive Reels Recommendation Engine", () => {
       { randomJitter: false }
     );
 
-    // Completion bonus is +25
-    expect(completedScore - incompleteScore).toBe(25);
+    // Completion bonus is +30
+    expect(completedScore - incompleteScore).toBe(30);
   });
 
   it("applies strong personal affinity boost when reel tags match user interests", () => {
@@ -90,8 +90,8 @@ describe("Addictive Reels Recommendation Engine", () => {
     const scoreOther = calculateReelScore(baseReel, otherCollegeCtx);
     const scoreHome = calculateReelScore(baseReel, homeCollegeCtx);
 
-    // Campus bonus awards +25
-    expect(scoreHome - scoreOther).toBe(25);
+    // Campus bonus awards +35
+    expect(scoreHome - scoreOther).toBe(35);
   });
 
   it("demotes seen reels heavily to prevent stale repetition", () => {
@@ -101,7 +101,7 @@ describe("Addictive Reels Recommendation Engine", () => {
     };
 
     const score = calculateReelScore(baseReel, ctx);
-    expect(score).toBe(-250);
+    expect(score).toBe(-100000);
   });
 
   it("accurately reranks a list of candidate reels in order of maximum addictiveness", () => {

@@ -4,6 +4,7 @@ import { ReelsFeedClient } from "@/components/reels/reels-feed-client";
 import { externalPosts, posts } from "@/db/schema";
 import type { FeedPost } from "@/hooks/use-feed";
 import { formatApiFeedPosts, resolveFeedPage } from "@/lib/feed";
+import { applyReelDiversityFilter, getViewerSeenReelIds } from "@/lib/reels/algorithm";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const dynamic = "force-dynamic";
@@ -55,16 +56,38 @@ export default async function ReelsPage() {
     videoCondition,
   ];
 
+  let seenIds: string[] = [];
+  if (profile?.id) {
+    seenIds = await getViewerSeenReelIds(profile.id, 500);
+    conditions.push(
+      sql`NOT EXISTS (
+        SELECT 1 FROM user_behavior_events
+        WHERE user_id = ${profile.id}
+          AND target_id = ${posts.id}
+          AND event_type IN ('REEL_WATCH', 'REEL_LOOP', 'REEL_SKIP')
+      )`
+    );
+    if (seenIds.length > 0) {
+      const safeIds = seenIds.filter((id) => /^[a-zA-Z0-9_-]+$/.test(id)).slice(0, 300);
+      if (safeIds.length > 0) {
+        conditions.push(sql`${posts.id} NOT IN (${sql.join(safeIds.map((eid) => sql`${eid}`), sql`, `)})`);
+      }
+    }
+  }
+
   const rawFeed = await resolveFeedPage({
     conditions,
     sort: "reels",
     limit: 25,
     offset: 0,
     userInstitutionId: null,
+    seenIds,
     viewerProfileId: profile?.id,
   });
 
-  const formattedPosts = (await formatApiFeedPosts(rawFeed, profile?.id)) as unknown as FeedPost[];
+  const formattedPosts = applyReelDiversityFilter(
+    (await formatApiFeedPosts(rawFeed, profile?.id)) as unknown as FeedPost[]
+  );
   const collegeName = profile?.institution?.name ? profile.institution.name.split(",")[0] : undefined;
 
   // JSON-LD Structured Data for SEO

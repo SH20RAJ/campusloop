@@ -4,6 +4,7 @@ import { getDb } from "@/db";
 import { externalPosts, posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { formatApiFeedPosts, normalizeApiFeedSort, resolveFeedPage } from "@/lib/feed";
+import { applyReelDiversityFilter, getViewerSeenReelIds } from "@/lib/reels/algorithm";
 import { isViewerProfile } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
@@ -71,15 +72,45 @@ export async function GET(req: Request) {
     }
 
     const excludeIdsParam = searchParams.get("excludeIds");
+    const seenIdsParam = searchParams.get("seenIds") || req.headers.get("x-seen-ids");
+
+    let combinedSeenIds: string[] = [];
     if (excludeIdsParam) {
-      const cleanExcludeIds = excludeIdsParam
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
-        .slice(0, 100);
-      if (cleanExcludeIds.length > 0) {
-        conditions.push(sql`${posts.id} NOT IN (${sql.join(cleanExcludeIds.map((eid) => sql`${eid}`), sql`, `)})`);
-      }
+      combinedSeenIds.push(
+        ...excludeIdsParam
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
+      );
+    }
+    if (seenIdsParam) {
+      combinedSeenIds.push(
+        ...seenIdsParam
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
+      );
+    }
+
+    if (isReels && profileId) {
+      const viewerSeen = await getViewerSeenReelIds(profileId, 500);
+      combinedSeenIds.push(...viewerSeen);
+      conditions.push(
+        sql`NOT EXISTS (
+          SELECT 1 FROM user_behavior_events
+          WHERE user_id = ${profileId}
+            AND target_id = ${posts.id}
+            AND event_type IN ('REEL_WATCH', 'REEL_LOOP', 'REEL_SKIP')
+        )`
+      );
+    }
+
+    const uniqueSeenIds = Array.from(new Set(combinedSeenIds))
+      .filter((id) => /^[a-zA-Z0-9_-]+$/.test(id))
+      .slice(0, 500);
+
+    if (uniqueSeenIds.length > 0) {
+      conditions.push(sql`${posts.id} NOT IN (${sql.join(uniqueSeenIds.map((eid) => sql`${eid}`), sql`, `)})`);
     }
 
     if (sort === "memes" || (type && (type === "MEME" || type === "memes"))) {
@@ -112,13 +143,6 @@ export async function GET(req: Request) {
 
     const authorId = searchParams.get("authorId");
     const authorUsername = searchParams.get("authorUsername");
-    const seenIdsParam = searchParams.get("seenIds") || req.headers.get("x-seen-ids");
-    const seenIds = seenIdsParam
-      ? seenIdsParam
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : undefined;
 
     if (authorId) {
       conditions.push(eq(posts.authorId, authorId));
@@ -139,10 +163,13 @@ export async function GET(req: Request) {
       limit,
       offset,
       userInstitutionId: scope === "GLOBAL" ? null : institutionId,
-      seenIds,
+      seenIds: uniqueSeenIds,
       viewerProfileId: profileId,
     });
-    const feed = await formatApiFeedPosts(rawFeed, profileId);
+    let feed = await formatApiFeedPosts(rawFeed, profileId);
+    if (isReels) {
+      feed = applyReelDiversityFilter(feed);
+    }
 
     return NextResponse.json(feed);
   } catch (error) {

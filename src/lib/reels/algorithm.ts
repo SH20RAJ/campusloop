@@ -31,24 +31,54 @@ export async function getViewerReelAffinities(
 }
 
 /**
- * Fetch recently seen reels from Redis for instant deduplication
+ * Fetch recently seen reels from Redis & DB for absolute deduplication across sessions
  */
 export async function getViewerSeenReelIds(
   viewerProfileId?: string | null,
-  limit: number = 50
+  limit: number = 500
 ): Promise<string[]> {
   if (!viewerProfileId) return [];
 
+  const seenIds = new Set<string>();
+
+  // 1. Fast Redis query (sub-5ms)
   try {
     const redis = getRedis();
-    if (!redis) return [];
-    const seen = await redis.zrange<string[]>(`user:${viewerProfileId}:seen_reels`, 0, limit - 1, {
-      rev: true,
-    });
-    return Array.isArray(seen) ? seen : [];
-  } catch {
-    return [];
+    if (redis) {
+      const redisSeen = await redis.zrange<string[]>(`user:${viewerProfileId}:seen_reels`, 0, limit - 1, {
+        rev: true,
+      });
+      if (Array.isArray(redisSeen)) {
+        for (const id of redisSeen) {
+          if (typeof id === "string" && id.trim()) seenIds.add(id.trim());
+        }
+      }
+    }
+  } catch {}
+
+  // 2. Fallback / supplement with durable Postgres user_behavior_events
+  if (seenIds.size < limit) {
+    try {
+      const { getDb } = await import("@/db");
+      const { userBehaviorEvents } = await import("@/db/schema");
+      const { and, desc, eq, inArray } = await import("drizzle-orm");
+      const db = getDb();
+      const events = await db.query.userBehaviorEvents.findMany({
+        where: and(
+          eq(userBehaviorEvents.userId, viewerProfileId),
+          inArray(userBehaviorEvents.eventType, ["REEL_WATCH", "REEL_LOOP", "REEL_SKIP", "POST_DWELL"])
+        ),
+        columns: { targetId: true },
+        orderBy: [desc(userBehaviorEvents.createdAt)],
+        limit: Math.max(0, limit - seenIds.size),
+      });
+      for (const ev of events) {
+        if (ev.targetId) seenIds.add(ev.targetId);
+      }
+    } catch {}
   }
+
+  return Array.from(seenIds);
 }
 
 /**
@@ -87,15 +117,17 @@ export function getAddictiveReelsScoreSql(
 
   // 1. Core Short-Video Behavioral Score:
   // Loops are 3.5x more predictive of addiction than simple views.
+  // 1. Core Short-Video Behavioral Score:
+  // Loops and rewatches are the #1 predictive indicator of addictive short-form content.
   const videoBehaviorScoreSql = sql<number>`(
-    (${loopCountSql} * 35.0)
-    + (${completionCountSql} * 20.0)
-    - (${skipCountSql} * 18.0)
+    (${loopCountSql} * 45.0)
+    + (${completionCountSql} * 25.0)
+    - (${skipCountSql} * 35.0)
   )`;
 
   // 2. Engagement Velocity & Acceleration Derivative
   const viralVelocitySql = sql<number>`(
-    ((${recentVoteScoreSql} * 4.5 + ${recentCommentCountSql} * 5.5 + 2.0) / power(${hoursSinceSql} + 0.5, 1.22))
+    ((${recentVoteScoreSql} * 5.0 + ${recentCommentCountSql} * 6.0 + 2.0) / power(${hoursSinceSql} + 0.5, 1.25))
     + (ln(greatest(1.0, ${totalVoteScoreSql} * 2.0 + ${totalCommentCountSql} * 2.5 + 1.0)) * 15.0)
   )`;
 
@@ -135,7 +167,7 @@ export function getAddictiveReelsScoreSql(
 
   // 5. Same Campus Community Boost
   const campusBonusSql = userInstitutionId
-    ? sql<number>`(case when "posts"."institution_id" = ${userInstitutionId} then 25.0 else 0.0 end)`
+    ? sql<number>`(case when "posts"."institution_id" = ${userInstitutionId} then 35.0 else 0.0 end)`
     : sql<number>`0.0`;
 
   // 6. Stochastic Exploration (Epsilon-Greedy Bandit):
@@ -143,18 +175,27 @@ export function getAddictiveReelsScoreSql(
   const hashSeedSql = sql<number>`(abs(('x' || substr(md5("posts"."id" || to_char(now(), 'YYYY-MM-DD-HH24')), 1, 8))::bit(32)::int % 100) / 100.0)`;
   const explorationBanditSql = sql<number>`(case when ${hoursSinceSql} < 36.0 then (${hashSeedSql} * 26.0) else (${hashSeedSql} * 5.0) end)`;
 
-  // 7. Seen Deduplication Penalty (crucial for short video feeds)
+  // 7. Strict Seen Deduplication Penalty (crucial: -100,000 prevents ANY seen reel from surfacing)
   const safeSeenIds = seenIds
-    .slice(0, 150)
+    .slice(0, 300)
     .filter((id): id is string => typeof id === "string" && /^[a-zA-Z0-9_-]+$/.test(id));
 
-  const seenPenaltySql =
+  const seenInListSql =
     safeSeenIds.length > 0
       ? sql<number>`(case when "posts"."id" in (${sql.join(
           safeSeenIds.map((id) => sql`${id}`),
           sql`, `
-        )}) then -250.0 else 0.0 end)`
+        )}) then -100000.0 else 0.0 end)`
       : sql<number>`0.0`;
+
+  const seenInHistorySql = viewerProfileId
+    ? sql<number>`(case when exists (
+        select 1 from ${userBehaviorEvents}
+        where ${userBehaviorEvents.targetId} = "posts"."id"
+          and ${userBehaviorEvents.userId} = ${viewerProfileId}
+          and ${userBehaviorEvents.eventType} in ('REEL_WATCH', 'REEL_LOOP', 'REEL_SKIP')
+      ) then -100000.0 else 0.0 end)`
+    : sql<number>`0.0`;
 
   // 8. Own Post Demotion (users rarely want their own reels on their swipe feed)
   const ownPostPenaltySql = viewerProfileId
@@ -168,7 +209,8 @@ export function getAddictiveReelsScoreSql(
     + ${interestAffinitySql}
     + ${campusBonusSql}
     + ${explorationBanditSql}
-    + ${seenPenaltySql}
+    + ${seenInListSql}
+    + ${seenInHistorySql}
     + ${ownPostPenaltySql}
   )`;
 }
@@ -206,7 +248,7 @@ export function calculateReelScore(
 ): number {
   const seenSet = ctx.seenPostIds instanceof Set ? ctx.seenPostIds : new Set(ctx.seenPostIds || []);
   if (seenSet.has(reel.id)) {
-    return -250;
+    return -100000;
   }
 
   const now = Date.now();
@@ -215,13 +257,13 @@ export function calculateReelScore(
 
   let score = 0;
 
-  // 1. Rewatches & Loop metric
+  // 1. Rewatches & Loop metric (highest addictive weight)
   const loops = Math.min(reel.loopCount || 0, 5);
-  score += loops * 35;
+  score += loops * 45;
 
-  // 2. Completion rate
+  // 2. Completion rate vs skips
   if ((reel.completionRate || 0) >= 0.85) {
-    score += 25;
+    score += 30;
   }
 
   // 3. Engagement signals
@@ -248,12 +290,12 @@ export function calculateReelScore(
 
   // 7. Same college bonus
   if (ctx.userInstitutionId && reel.institutionId === ctx.userInstitutionId) {
-    score += 25;
+    score += 35;
   }
 
   // 8. Own post penalty
   if (ctx.viewerProfileId && reel.authorId === ctx.viewerProfileId) {
-    score -= 100;
+    score -= 150;
   }
 
   // 9. Stochastic Exploration (Bandit)
@@ -271,9 +313,53 @@ export function rerankReels<T extends ReelCandidate>(
   reels: T[],
   ctx: ViewerReelContext = {}
 ): T[] {
-  return [...reels].sort((a, b) => {
+  const ranked = [...reels].sort((a, b) => {
     const scoreA = calculateReelScore(a, ctx);
     const scoreB = calculateReelScore(b, ctx);
     return scoreB - scoreA;
   });
+  return applyReelDiversityFilter(ranked);
+}
+
+/**
+ * Post-processing anti-fatigue diversity filter.
+ * Prevents clustering:
+ * 1. Never shows two consecutive reels from the same author.
+ * 2. Never shows more than two consecutive reels from the same institution.
+ * Intelligently interleaves items without dropping them.
+ */
+export function applyReelDiversityFilter<T extends { authorId?: string | null; institutionId?: string | null }>(
+  items: T[]
+): T[] {
+  if (items.length <= 2) return items;
+
+  const result: T[] = [];
+  const pool = [...items];
+
+  while (pool.length > 0) {
+    let candidateIndex = 0;
+    const last1 = result[result.length - 1];
+    const last2 = result[result.length - 2];
+
+    for (let i = 0; i < pool.length; i++) {
+      const candidate = pool[i];
+      const sameAuthorAsLast = last1?.authorId && candidate.authorId && last1.authorId === candidate.authorId;
+      const sameInstAsLastTwo =
+        last1?.institutionId &&
+        last2?.institutionId &&
+        candidate.institutionId &&
+        last1.institutionId === candidate.institutionId &&
+        last2.institutionId === candidate.institutionId;
+
+      if (!sameAuthorAsLast && !sameInstAsLastTwo) {
+        candidateIndex = i;
+        break;
+      }
+    }
+
+    const [selected] = pool.splice(candidateIndex, 1);
+    result.push(selected);
+  }
+
+  return result;
 }

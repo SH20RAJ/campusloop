@@ -224,7 +224,7 @@ export function ProductShowcaseSection() {
 
               <div className="pt-2">
                 <Link
-                  href="/colleges"
+                  href="/app/colleges"
                   className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[#1D9BF0] hover:underline"
                 >
                   <span>Explore campus hubs across India</span>

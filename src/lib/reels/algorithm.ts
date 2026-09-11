@@ -139,8 +139,9 @@ export function getAddictiveReelsScoreSql(
     : sql<number>`0.0`;
 
   // 6. Stochastic Exploration (Epsilon-Greedy Bandit):
-  // 15-20% burst on high-potential fresh reels (< 36 hours) to give emerging creators a breakout shot
-  const explorationBanditSql = sql<number>`(case when ${hoursSinceSql} < 36.0 then (random() * 26.0) else (random() * 5.0) end)`;
+  // Deterministic hour-bucketed hash prevents pagination order shuffling and duplicate reels
+  const hashSeedSql = sql<number>`(abs(('x' || substr(md5("posts"."id" || to_char(now(), 'YYYY-MM-DD-HH24')), 1, 8))::bit(32)::int % 100) / 100.0)`;
+  const explorationBanditSql = sql<number>`(case when ${hoursSinceSql} < 36.0 then (${hashSeedSql} * 26.0) else (${hashSeedSql} * 5.0) end)`;
 
   // 7. Seen Deduplication Penalty (crucial for short video feeds)
   const safeSeenIds = seenIds

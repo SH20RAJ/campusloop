@@ -29,6 +29,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
+import { PostLikesModal } from "@/components/post/post-likes-modal";
 import { AnimatedIcon, AnimateVideo } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PresenceDot } from "@/components/ui/presence-dot";
@@ -58,6 +59,7 @@ export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: Re
   const [isMuted, setIsMuted] = useState(true);
   const [selectedPostForComments, setSelectedPostForComments] = useState<FeedPost | null>(null);
   const [selectedPostForRepost, setSelectedPostForRepost] = useState<FeedPost | null>(null);
+  const [selectedPostForLikes, setSelectedPostForLikes] = useState<FeedPost | null>(null);
   const [quoteThoughts, setQuoteThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
   const [page, setPage] = useState(1);
@@ -87,30 +89,56 @@ export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: Re
     [posts.length]
   );
 
-  // Preload more video reels as user approaches the end
+  // Sync URL shallowly with active reel slug/id on scroll
+  useEffect(() => {
+    const activeReel = posts[activeIndex];
+    if (activeReel) {
+      const activeSlug = activeReel.id.split("-cycle-")[0];
+      const targetUrl = `/app/reels/${activeSlug}`;
+      if (typeof window !== "undefined" && window.location.pathname !== targetUrl) {
+        window.history.replaceState(null, "", targetUrl);
+      }
+    }
+  }, [activeIndex, posts]);
+
+  // Preload more video reels with strict excludeIds deduplication & infinite cycle fallback
   const loadMoreReels = useCallback(async () => {
     if (isLoadingMore) return;
     setIsLoadingMore(true);
     try {
       const nextPage = page + 1;
+      const loadedIds = posts.map((p) => p.id.split("-cycle-")[0]).slice(-40);
+      const excludeParam = loadedIds.length > 0 ? `&excludeIds=${encodeURIComponent(loadedIds.join(","))}` : "";
       const data = await fetcher<FeedPost[] | { posts: FeedPost[] }>(
-        `/api/feed?sort=reels&page=${nextPage}&limit=10&scope=GLOBAL`
+        `/api/feed?sort=reels&page=${nextPage}&limit=10&scope=GLOBAL${excludeParam}`
       );
       const rawPosts: FeedPost[] = Array.isArray(data) ? data : data?.posts || [];
-      if (rawPosts.length > 0) {
-        setPosts((prev) => {
-          const seen = new Set(prev.map((p) => p.id));
-          const fresh = rawPosts.filter((p) => !seen.has(p.id));
+
+      setPosts((prev) => {
+        const seen = new Set(prev.map((p) => p.id.split("-cycle-")[0]));
+        const fresh = rawPosts.filter((p) => !seen.has(p.id));
+
+        if (fresh.length > 0) {
           return [...prev, ...fresh];
-        });
-        setPage(nextPage);
-      }
+        }
+
+        // If no more unviewed video reels remain in the catalog, seamlessly cycle so feed is truly infinite
+        if (prev.length > 0) {
+          const cycled = prev.slice(0, 10).map((p, idx) => ({
+            ...p,
+            id: `${p.id.split("-cycle-")[0]}-cycle-${Date.now()}-${idx}`,
+          }));
+          return [...prev, ...cycled];
+        }
+        return prev;
+      });
+      setPage(nextPage);
     } catch {
       // Ignore network errors
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, page]);
+  }, [isLoadingMore, page, posts]);
 
   useEffect(() => {
     if (activeIndex >= posts.length - 2) {
@@ -290,6 +318,7 @@ export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: Re
             onToggleMute={() => setIsMuted((prev) => !prev)}
             onOpenComments={() => setSelectedPostForComments(post)}
             onOpenRepost={() => setSelectedPostForRepost(post)}
+            onOpenLikes={() => setSelectedPostForLikes(post)}
             currentUserId={currentUserId}
           />
         ))}
@@ -346,6 +375,16 @@ export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: Re
           originalPostAuthorHandle={repostAuthorHandle}
         />
       )}
+
+      {/* Post Likes Modal */}
+      {selectedPostForLikes && (
+        <PostLikesModal
+          postId={selectedPostForLikes.id.split("-cycle-")[0]}
+          isOpen={Boolean(selectedPostForLikes)}
+          onClose={() => setSelectedPostForLikes(null)}
+          currentUserId={currentUserId}
+        />
+      )}
     </div>
   );
 }
@@ -361,6 +400,7 @@ interface SingleReelItemProps {
   onToggleMute: () => void;
   onOpenComments: () => void;
   onOpenRepost: () => void;
+  onOpenLikes: () => void;
   currentUserId?: string;
 }
 
@@ -371,6 +411,7 @@ function SingleReelItem({
   onToggleMute,
   onOpenComments,
   onOpenRepost,
+  onOpenLikes,
   currentUserId,
 }: SingleReelItemProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -826,29 +867,39 @@ function SingleReelItem({
         {/* Right Action Bar (Instagram style) */}
         <div className="absolute right-3 bottom-20 z-30 flex flex-col items-center gap-5 pointer-events-auto">
           {/* Like / Upvote */}
-          <button
-            type="button"
-            onClick={handleLikeClick}
-            className="flex flex-col items-center gap-1 group cursor-pointer"
-            aria-label={userVote === 1 ? "Unlike" : "Like"}
-          >
-            <div
-              className={cn(
-                "flex size-11 items-center justify-center rounded-full backdrop-blur-md transition-transform active:scale-80",
-                userVote === 1 ? "bg-rose-500/20 text-rose-500" : "bg-black/40 text-white hover:bg-black/60"
-              )}
+          <div className="flex flex-col items-center gap-1 group">
+            <button
+              type="button"
+              onClick={handleLikeClick}
+              className="flex size-11 items-center justify-center rounded-full backdrop-blur-md transition-transform active:scale-80 cursor-pointer"
+              aria-label={userVote === 1 ? "Unlike" : "Like"}
             >
-              <Heart
+              <div
                 className={cn(
-                  "size-6 transition-all",
-                  userVote === 1 && "fill-rose-500 text-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]"
+                  "flex size-full items-center justify-center rounded-full transition-colors",
+                  userVote === 1 ? "bg-rose-500/20 text-rose-500" : "bg-black/40 text-white hover:bg-black/60"
                 )}
-              />
-            </div>
-            <span className="text-[12px] font-bold text-white drop-shadow-md">
-              {votesCount > 0 ? votesCount.toLocaleString() : "Like"}
-            </span>
-          </button>
+              >
+                <Heart
+                  className={cn(
+                    "size-6 transition-all",
+                    userVote === 1 && "fill-rose-500 text-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]"
+                  )}
+                />
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenLikes();
+              }}
+              className="text-[12px] font-bold text-white drop-shadow-md hover:underline cursor-pointer transition-transform active:scale-95"
+              title="See who liked this reel"
+            >
+              {votesCount > 0 ? votesCount.toLocaleString() : "0"}
+            </button>
+          </div>
 
           {/* Comments */}
           <button

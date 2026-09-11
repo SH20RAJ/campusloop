@@ -50,7 +50,7 @@ export function FinalCTASection({ isAuthenticated }: FinalCTASectionProps) {
               )}
 
               <Link
-                href="/colleges"
+                href="/app/colleges"
                 className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full border border-border/60 bg-muted/40 hover:bg-muted px-6 text-sm sm:text-base font-bold text-foreground transition-all active:scale-98 cursor-pointer"
               >
                 <Compass className="mr-2 size-4 text-[#1D9BF0]" />

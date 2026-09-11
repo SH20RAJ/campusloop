@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import CollegesClient from "./colleges-client";
 
 export const metadata: Metadata = {
@@ -13,11 +14,11 @@ export const metadata: Metadata = {
     "Campus Directory",
     "Verified Student Communities",
   ],
-  alternates: { canonical: "https://campusloop.space/colleges" },
+  alternates: { canonical: "https://campusloop.space/app/colleges" },
   openGraph: {
     title: "Campus Directory & Colleges",
     description: "Browse and search over 1,350+ verified colleges in India on CampusLoop.",
-    url: "https://campusloop.space/colleges",
+    url: "https://campusloop.space/app/colleges",
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
@@ -45,7 +46,7 @@ export default function CollegesPage() {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Indian College Directory & Campus Hubs",
-    url: "https://campusloop.space/colleges",
+    url: "https://campusloop.space/app/colleges",
     description: "Directory of 1,350+ accredited Indian universities and colleges on the CampusLoop network.",
     publisher: {
       "@type": "Organization",
@@ -58,7 +59,9 @@ export default function CollegesPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <CollegesClient />
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <CollegesClient />
+      </Suspense>
     </>
   );
 }

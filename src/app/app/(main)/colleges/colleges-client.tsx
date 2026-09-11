@@ -4,9 +4,7 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
-  Crown,
   Flame,
-  Medal,
   Plus,
   School,
   Search,
@@ -14,10 +12,14 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AddCollegeModal } from "@/components/colleges/add-college-modal";
+import {
+  AllIndiaCollegePodium,
+  type LeaderboardCollegeItem,
+} from "@/components/colleges/all-india-college-podium";
 import { CollegeHubRow, type CollegeItem } from "@/components/colleges/college-hub-row";
 import { fetcher } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -47,21 +49,28 @@ const POPULAR_STATES = [
 ];
 
 export default function CollegesClient() {
-  const [activeTab, setActiveTab] = useState<"directory" | "leaderboard">("directory");
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("ALL");
-  const [selectedState, setSelectedState] = useState("ALL");
-  const [page, setPage] = useState(1);
+  const searchParams = useSearchParams();
+
+  // Initialize state from URL params
+  const initialTab = searchParams.get("tab") === "leaderboard" ? "leaderboard" : "directory";
+  const initialSearch = searchParams.get("q") || "";
+  const initialCategory = searchParams.get("category") || "ALL";
+  const initialState = searchParams.get("state") || "ALL";
+  const initialPage = parseInt(searchParams.get("page") || "1", 10) || 1;
+
+  const [activeTab, setActiveTab] = useState<"directory" | "leaderboard">(initialTab);
+  const [search, setSearch] = useState(initialSearch);
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [selectedState, setSelectedState] = useState(initialState);
+  const [page, setPage] = useState(initialPage);
   const [limit] = useState(25);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [colleges, setColleges] = useState<CollegeItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Leaderboard state
-  const [leaderboard, setLeaderboard] = useState<
-    (CollegeItem & { points: number; studentCount: number; postCount: number; rank: number })[]
-  >([]);
+  // Leaderboard state (fetched unconditionally for instant podium display)
+  const [leaderboard, setLeaderboard] = useState<LeaderboardCollegeItem[]>([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -71,6 +80,30 @@ export default function CollegesClient() {
   const [newCollegeWebsite, setNewCollegeWebsite] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // Synchronize state with URL parameters
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (activeTab !== "directory") params.set("tab", activeTab);
+    if (search.trim()) params.set("q", search.trim());
+    if (selectedCategory !== "ALL") params.set("category", selectedCategory);
+    if (selectedState !== "ALL") params.set("state", selectedState);
+    if (page > 1) params.set("page", String(page));
+
+    const query = params.toString();
+    const newUrl = query ? `/app/colleges?${query}` : "/app/colleges";
+
+    if (typeof window !== "undefined" && window.location.pathname + window.location.search !== newUrl) {
+      window.history.replaceState(null, "", newUrl);
+    }
+  }, [activeTab, search, selectedCategory, selectedState, page]);
+
+  // Fetch Directory Colleges
   useEffect(() => {
     let ignore = false;
     async function fetchColleges() {
@@ -108,7 +141,7 @@ export default function CollegesClient() {
     };
   }, [search, selectedState, selectedCategory, page, limit]);
 
-  // Fetch real-time leaderboard data
+  // Fetch real-time leaderboard data unconditionally (for direct podium display)
   useEffect(() => {
     let ignore = false;
     async function fetchLeaderboard() {
@@ -120,12 +153,7 @@ export default function CollegesClient() {
         if (selectedCategory !== "ALL") url.searchParams.set("category", selectedCategory);
 
         const data = await fetcher<{
-          leaderboard: (CollegeItem & {
-            points: number;
-            studentCount: number;
-            postCount: number;
-            rank: number;
-          })[];
+          leaderboard: LeaderboardCollegeItem[];
         }>(url.toString());
         if (!ignore && data.leaderboard) {
           setLeaderboard(data.leaderboard);
@@ -137,13 +165,11 @@ export default function CollegesClient() {
       }
     }
 
-    if (activeTab === "leaderboard") {
-      fetchLeaderboard();
-    }
+    fetchLeaderboard();
     return () => {
       ignore = true;
     };
-  }, [activeTab, selectedState, selectedCategory]);
+  }, [selectedState, selectedCategory]);
 
   async function handleAddCollege(e: React.FormEvent) {
     e.preventDefault();
@@ -164,7 +190,7 @@ export default function CollegesClient() {
 
       if (!res.ok) throw new Error("Failed to add college");
 
-      toast.success("Campus Hub request submitted! (+50 LP reward credited) 🚀");
+      toast.success("Campus Hub request submitted! (+50 LP reward credited)");
       setShowAddModal(false);
       setNewCollegeName("");
       setNewCollegeState("");
@@ -210,7 +236,10 @@ export default function CollegesClient() {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setPage(1);
+                }}
                 className={cn(
                   "relative flex-1 cursor-pointer py-3 text-[14px] font-bold transition-colors",
                   isActive
@@ -228,9 +257,18 @@ export default function CollegesClient() {
         </div>
       </header>
 
-      {/* ─── Directory ─── */}
+      {/* ─── Directory Tab ─── */}
       {activeTab === "directory" && (
         <>
+          {/* Direct Top 3 Podium: Immediately rendered when on default directory view */}
+          {!search.trim() && page === 1 && (
+            <AllIndiaCollegePodium
+              leaderboard={leaderboard}
+              loading={leaderboardLoading}
+              compact={true}
+            />
+          )}
+
           {/* Search */}
           <div className="border-b border-border/30 px-4 py-3">
             <div className="relative">
@@ -460,7 +498,7 @@ export default function CollegesClient() {
         </>
       )}
 
-      {/* ─── Leaderboard ─── */}
+      {/* ─── Leaderboard Tab ─── */}
       {activeTab === "leaderboard" && (
         <div className="space-y-4 pt-2">
           {/* Filters for Leaderboard */}
@@ -473,7 +511,10 @@ export default function CollegesClient() {
                   <button
                     key={cat.id}
                     type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
+                    onClick={() => {
+                      setSelectedCategory(cat.id);
+                      setPage(1);
+                    }}
                     className={cn(
                       "flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold transition-all",
                       isSelected
@@ -493,7 +534,10 @@ export default function CollegesClient() {
                 <button
                   key={st}
                   type="button"
-                  onClick={() => setSelectedState(st)}
+                  onClick={() => {
+                    setSelectedState(st);
+                    setPage(1);
+                  }}
                   className={cn(
                     "shrink-0 cursor-pointer whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-bold transition-all",
                     selectedState === st
@@ -507,25 +551,23 @@ export default function CollegesClient() {
             </div>
           </div>
 
+          {/* Top 3 Podium Component */}
+          <AllIndiaCollegePodium
+            leaderboard={leaderboard}
+            loading={leaderboardLoading}
+          />
+
           {leaderboardLoading ? (
-            <div className="space-y-4 px-4 py-6">
-              {/* Podium Skeleton */}
-              <div className="grid grid-cols-3 gap-3 items-end max-w-md mx-auto pt-8">
-                <div className="h-40 rounded-2xl bg-muted/40 animate-pulse" />
-                <div className="h-52 rounded-2xl bg-muted/60 animate-pulse" />
-                <div className="h-36 rounded-2xl bg-muted/30 animate-pulse" />
-              </div>
-              <div className="divide-y divide-border/20 pt-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="flex animate-pulse items-center gap-3.5 py-3">
-                    <div className="size-11 rounded-full bg-muted/60" />
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-3.5 w-1/2 rounded bg-muted/60" />
-                      <div className="h-2.5 w-1/4 rounded bg-muted/40" />
-                    </div>
+            <div className="divide-y divide-border/20 px-4 pt-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex animate-pulse items-center gap-3.5 py-3">
+                  <div className="size-11 rounded-full bg-muted/60" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3.5 w-1/2 rounded bg-muted/60" />
+                    <div className="h-2.5 w-1/4 rounded bg-muted/40" />
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           ) : leaderboard.length === 0 ? (
             <div className="px-4 py-16 text-center">
@@ -536,181 +578,41 @@ export default function CollegesClient() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {/* ─── Top 3 Podium ─── */}
-              {leaderboard.length >= 3 && (
-                <div className="mx-4 overflow-hidden rounded-3xl border border-amber-500/20 bg-linear-to-b from-amber-500/10 via-card to-card p-5 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-500">
-                        <Crown className="size-4" />
-                        <span>All-India Campus Podium</span>
-                      </div>
-                      <p className="text-[12px] text-muted-foreground">
-                        Top campuses ranked by active discourse, student invites & verified clout.
-                      </p>
-                    </div>
-                    <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                      <Zap className="size-3" /> Season 1 Live
-                    </span>
-                  </div>
-
-                  {/* 3-Pillar Podium */}
-                  <div className="grid grid-cols-3 gap-2 sm:gap-4 items-end pt-6 max-w-lg mx-auto">
-                    {/* Rank 2 - Silver */}
-                    {leaderboard[1] && (
-                      <Link
-                        href={`/app/college/${leaderboard[1].slug || leaderboard[1].id}`}
-                        className="group flex flex-col items-center cursor-pointer transition-transform hover:-translate-y-1"
-                      >
-                        <div className="relative mb-2">
-                          <div className="size-14 sm:size-16 rounded-full border-2 border-slate-300 shadow-md overflow-hidden bg-muted/20 flex items-center justify-center p-1">
-                            {leaderboard[1].logoUrl ? (
-                              <img
-                                src={leaderboard[1].logoUrl}
-                                alt={leaderboard[1].name}
-                                referrerPolicy="no-referrer"
-                                className="size-full object-contain"
-                              />
-                            ) : (
-                              <span className="text-xs font-black text-slate-500">
-                                {leaderboard[1].name.slice(0, 2).toUpperCase()}
-                              </span>
-                            )}
-                          </div>
-                          <span className="absolute -top-1 -right-1 size-5 rounded-full bg-slate-300 text-slate-900 flex items-center justify-center font-black text-[10px] shadow-xs">
-                            2
-                          </span>
-                        </div>
-                        <p className="text-xs font-bold text-foreground text-center truncate w-full group-hover:text-primary">
-                          {leaderboard[1].name.split(",")[0]}
-                        </p>
-                        <span className="text-[11px] font-black text-slate-600 dark:text-slate-300">
-                          {leaderboard[1].points.toLocaleString("en-IN")} LP
-                        </span>
-                        <div className="w-full mt-2 h-20 rounded-t-xl bg-linear-to-t from-slate-500/20 to-slate-400/30 border-t border-x border-slate-300/40 flex flex-col items-center justify-center text-[10px] font-bold text-muted-foreground">
-                          <Medal className="size-4 text-slate-400 mb-0.5" />
-                          <span>Silver</span>
-                        </div>
-                      </Link>
-                    )}
-
-                    {/* Rank 1 - Gold */}
-                    {leaderboard[0] && (
-                      <Link
-                        href={`/app/college/${leaderboard[0].slug || leaderboard[0].id}`}
-                        className="group flex flex-col items-center cursor-pointer transition-transform hover:-translate-y-1.5"
-                      >
-                        <Crown className="size-6 text-amber-500 animate-bounce mb-1" />
-                        <div className="relative mb-2">
-                          <div className="size-18 sm:size-20 rounded-full border-3 border-amber-400 shadow-xl overflow-hidden bg-muted/20 flex items-center justify-center p-1.5 ring-4 ring-amber-400/20">
-                            {leaderboard[0].logoUrl ? (
-                              <img
-                                src={leaderboard[0].logoUrl}
-                                alt={leaderboard[0].name}
-                                referrerPolicy="no-referrer"
-                                className="size-full object-contain"
-                              />
-                            ) : (
-                              <span className="text-sm font-black text-amber-500">
-                                {leaderboard[0].name.slice(0, 2).toUpperCase()}
-                              </span>
-                            )}
-                          </div>
-                          <span className="absolute -top-1 -right-1 size-6 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center font-black text-xs shadow-md">
-                            1
-                          </span>
-                        </div>
-                        <p className="text-[13px] font-black text-foreground text-center truncate w-full group-hover:text-primary">
-                          {leaderboard[0].name.split(",")[0]}
-                        </p>
-                        <span className="text-xs font-black text-amber-500">
-                          {leaderboard[0].points.toLocaleString("en-IN")} LP
-                        </span>
-                        <div className="w-full mt-2 h-28 rounded-t-xl bg-linear-to-t from-amber-500/25 to-amber-400/40 border-t border-x border-amber-400/50 flex flex-col items-center justify-center text-xs font-black text-amber-600 dark:text-amber-300">
-                          <Trophy className="size-5 text-amber-500 mb-1" />
-                          <span>Champion</span>
-                        </div>
-                      </Link>
-                    )}
-
-                    {/* Rank 3 - Bronze */}
-                    {leaderboard[2] && (
-                      <Link
-                        href={`/app/college/${leaderboard[2].slug || leaderboard[2].id}`}
-                        className="group flex flex-col items-center cursor-pointer transition-transform hover:-translate-y-1"
-                      >
-                        <div className="relative mb-2">
-                          <div className="size-14 sm:size-16 rounded-full border-2 border-amber-700/60 shadow-md overflow-hidden bg-muted/20 flex items-center justify-center p-1">
-                            {leaderboard[2].logoUrl ? (
-                              <img
-                                src={leaderboard[2].logoUrl}
-                                alt={leaderboard[2].name}
-                                referrerPolicy="no-referrer"
-                                className="size-full object-contain"
-                              />
-                            ) : (
-                              <span className="text-xs font-black text-amber-700">
-                                {leaderboard[2].name.slice(0, 2).toUpperCase()}
-                              </span>
-                            )}
-                          </div>
-                          <span className="absolute -top-1 -right-1 size-5 rounded-full bg-amber-700 text-white flex items-center justify-center font-black text-[10px] shadow-xs">
-                            3
-                          </span>
-                        </div>
-                        <p className="text-xs font-bold text-foreground text-center truncate w-full group-hover:text-primary">
-                          {leaderboard[2].name.split(",")[0]}
-                        </p>
-                        <span className="text-[11px] font-black text-amber-700 dark:text-amber-400">
-                          {leaderboard[2].points.toLocaleString("en-IN")} LP
-                        </span>
-                        <div className="w-full mt-2 h-16 rounded-t-xl bg-linear-to-t from-amber-800/20 to-amber-700/30 border-t border-x border-amber-700/40 flex flex-col items-center justify-center text-[10px] font-bold text-muted-foreground">
-                          <Medal className="size-4 text-amber-700 mb-0.5" />
-                          <span>Bronze</span>
-                        </div>
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Ranks 4 and above */}
-              <div className="divide-y divide-border/30 pt-2">
-                <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground flex items-center justify-between">
-                  <span>Campuses {leaderboard.length >= 3 ? `4–${leaderboard.length}` : "Standings"}</span>
-                  <span>Clout & Engagement</span>
-                </div>
-
-                {(leaderboard.length >= 3 ? leaderboard.slice(3) : leaderboard).map((col) => (
-                  <CollegeHubRow
-                    key={col.id}
-                    rank={col.rank}
-                    college={{
-                      id: col.id,
-                      slug: col.slug,
-                      name: col.name,
-                      state: col.state,
-                      district: col.district,
-                      website: col.website,
-                      yearOfEstablishment: col.yearOfEstablishment,
-                      aisheCode: "",
-                      logoUrl: col.logoUrl,
-                      nirfRank: col.nirfRank,
-                    }}
-                    trailing={
-                      <div className="text-right">
-                        <span className="block text-[13px] font-black text-primary tabular-nums">
-                          {col.points.toLocaleString("en-IN")} LP
-                        </span>
-                        <span className="text-[11px] text-muted-foreground">
-                          {col.studentCount} verified {col.studentCount === 1 ? "student" : "students"}
-                        </span>
-                      </div>
-                    }
-                  />
-                ))}
+            /* Ranks 4 and above */
+            <div className="divide-y divide-border/30 pt-2">
+              <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground flex items-center justify-between">
+                <span>Campuses {leaderboard.length >= 3 ? `4–${leaderboard.length}` : "Standings"}</span>
+                <span>Clout & Engagement</span>
               </div>
+
+              {(leaderboard.length >= 3 ? leaderboard.slice(3) : leaderboard).map((col) => (
+                <CollegeHubRow
+                  key={col.id}
+                  rank={col.rank}
+                  college={{
+                    id: col.id,
+                    slug: col.slug,
+                    name: col.name,
+                    state: col.state,
+                    district: col.district,
+                    website: col.website,
+                    yearOfEstablishment: col.yearOfEstablishment,
+                    aisheCode: "",
+                    logoUrl: col.logoUrl,
+                    nirfRank: col.nirfRank,
+                  }}
+                  trailing={
+                    <div className="text-right">
+                      <span className="block text-[13px] font-black text-primary tabular-nums">
+                        {col.points.toLocaleString("en-IN")} LP
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        {col.studentCount} verified {col.studentCount === 1 ? "student" : "students"}
+                      </span>
+                    </div>
+                  }
+                />
+              ))}
             </div>
           )}
         </div>

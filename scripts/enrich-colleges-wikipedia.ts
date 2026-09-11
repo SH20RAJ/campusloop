@@ -100,6 +100,12 @@ interface WikipediaSummary {
   content_urls?: { desktop?: { page?: string } };
 }
 
+const EDU_KEYWORDS =
+  /\b(university|college|institute|faculty|campus|higher education|polytechnic|academy|school of|autonomous|deemed|vidyapeeth|vishwavidyalaya|iit|nit|iiit|iim)\b/i;
+
+const NON_EDU_KEYWORDS =
+  /\b(actress|actor|politician|cricketer|minister|mla|mp|film|cinema|album|song|carbine|rifle|chakra|river|dynasty)\b/i;
+
 async function fetchWikipediaForCollege(name: string): Promise<WikipediaSummary | null> {
   try {
     // Clean name for Wikipedia search
@@ -110,16 +116,26 @@ async function fetchWikipediaForCollege(name: string): Promise<WikipediaSummary 
       .trim();
 
     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
-      cleanSearch
-    )}&format=json&utf8=1&srlimit=1`;
+      `${cleanSearch} university OR ${cleanSearch} college OR ${cleanSearch} institute`
+    )}&format=json&utf8=1&srlimit=3`;
 
     const searchRes = await fetch(searchUrl, {
       headers: { "User-Agent": "CampusLoopBot/1.0 (https://campusloop.space; contact@campusloop.space)" },
     });
 
     if (!searchRes.ok) return null;
-    const searchData = (await searchRes.json()) as { query?: { search?: Array<{ title: string }> } };
-    const bestTitle = searchData.query?.search?.[0]?.title;
+    const searchData = (await searchRes.json()) as { query?: { search?: Array<{ title: string; snippet?: string }> } };
+    const results = searchData.query?.search || [];
+    if (results.length === 0) return null;
+
+    let bestTitle: string | null = null;
+    for (const item of results) {
+      const text = `${item.title} ${item.snippet || ""}`.toLowerCase();
+      if (EDU_KEYWORDS.test(text) && !NON_EDU_KEYWORDS.test(text)) {
+        bestTitle = item.title;
+        break;
+      }
+    }
 
     if (!bestTitle) return null;
 
@@ -129,7 +145,14 @@ async function fetchWikipediaForCollege(name: string): Promise<WikipediaSummary 
     });
 
     if (!summaryRes.ok) return null;
-    return (await summaryRes.json()) as WikipediaSummary;
+    const summaryData = (await summaryRes.json()) as WikipediaSummary;
+    const text = `${summaryData.title || ""} ${summaryData.description || ""} ${summaryData.extract || ""}`.toLowerCase();
+
+    if (!EDU_KEYWORDS.test(text) || NON_EDU_KEYWORDS.test(text)) {
+      return null;
+    }
+
+    return summaryData;
   } catch {
     return null;
   }

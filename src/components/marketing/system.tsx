@@ -36,7 +36,7 @@ const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/overview", label: "Overview" },
   { href: "/products", label: "Products" },
-  { href: "/colleges", label: "Colleges" },
+  { href: "/app/colleges", label: "Colleges" },
   { href: "/safety", label: "Safety" },
 ];
 
@@ -88,7 +88,7 @@ const FOOTER_COLUMNS: { title: string; links: { href: string; label: string; ext
       { href: NOTEBOOK_URL, label: "Notebook — Free JupyterLab", external: true },
       { href: "/overview", label: "Platform Overview" },
       { href: "/demo", label: "Testing & Demo Access" },
-      { href: "/colleges", label: "College Directory" },
+      { href: "/app/colleges", label: "College Directory" },
       { href: "/handler/sign-up", label: "Join CampusLoop" },
     ],
   },
@@ -97,7 +97,7 @@ const FOOTER_COLUMNS: { title: string; links: { href: string; label: string; ext
     title: "Company",
     links: [
       { href: "/about", label: "About Us" },
-      { href: "/colleges", label: "Campus Hubs" },
+      { href: "/app/colleges", label: "Campus Hubs" },
       { href: "/contact", label: "Contact" },
     ],
   },

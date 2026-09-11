@@ -1,6 +1,6 @@
 /**
  * External College Data Enrichment Helper
- * Fetches verified public information from Wikipedia REST API & NIRF data
+ * Fetches verified public information from Wikipedia REST API with strict educational classification.
  */
 
 export interface EnrichedCollegeData {
@@ -13,43 +13,57 @@ export interface EnrichedCollegeData {
   coordinates?: { lat: number; lon: number };
 }
 
+const EDU_KEYWORDS =
+  /\b(university|college|institute|faculty|campus|higher education|polytechnic|academy|school of|autonomous|deemed|vidyapeeth|vishwavidyalaya|iit|nit|iiit|iim)\b/i;
+
+const NON_EDU_KEYWORDS =
+  /\b(actress|actor|politician|cricketer|minister|mla|mp|film|cinema|album|song|carbine|rifle|chakra|river|dynasty)\b/i;
+
 export async function fetchCollegeWikipediaSummary(collegeName: string): Promise<EnrichedCollegeData | null> {
   try {
-    // Clean up college name for Wikipedia search (remove common noise words if needed)
+    // Clean up college name for Wikipedia search
     const cleanQuery = collegeName
       .replace(/\(.*?\)/g, "")
       .replace(/,.*$/, "")
+      .replace(/\b(Pvt|Ltd|Govt|Autonomous|Deemed)\b/gi, "")
       .trim();
 
-    // 1. First attempt direct summary lookup
-    const directUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanQuery)}`;
-    let res = await fetch(directUrl, {
-      headers: { "User-Agent": "CampusLoop/1.0 (https://campusloop.space; team@campusloop.space)" },
+    // Search specifically with educational context
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
+      `${cleanQuery} university OR ${cleanQuery} college OR ${cleanQuery} institute`
+    )}&format=json&utf8=1&srlimit=3`;
+
+    const searchRes = await fetch(searchUrl, {
+      headers: { "User-Agent": "CampusLoopBot/1.0 (https://campusloop.space; contact@campusloop.space)" },
+    });
+
+    if (!searchRes.ok) return null;
+    const searchJson = (await searchRes.json()) as {
+      query?: { search?: { title: string; snippet?: string }[] };
+    };
+
+    const results = searchJson.query?.search || [];
+    if (results.length === 0) return null;
+
+    // Pick the first result that is actually about an educational institution
+    let bestTitle: string | null = null;
+    for (const item of results) {
+      const text = `${item.title} ${item.snippet || ""}`.toLowerCase();
+      if (EDU_KEYWORDS.test(text) && !NON_EDU_KEYWORDS.test(text)) {
+        bestTitle = item.title;
+        break;
+      }
+    }
+
+    if (!bestTitle) return null;
+
+    const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(bestTitle)}`;
+    const res = await fetch(summaryUrl, {
+      headers: { "User-Agent": "CampusLoopBot/1.0 (https://campusloop.space; contact@campusloop.space)" },
       next: { revalidate: 86400 },
     });
 
-    // 2. If direct title lookup fails (404), use Wikipedia Search API to find closest match
-    if (!res.ok) {
-      const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
-        cleanQuery
-      )}&format=json&origin=*`;
-      const searchRes = await fetch(searchUrl);
-      if (!searchRes.ok) return null;
-      const searchJson = (await searchRes.json()) as {
-        query?: { search?: { title: string }[] };
-      };
-      const firstResult = searchJson.query?.search?.[0];
-      if (!firstResult?.title) return null;
-
-      res = await fetch(
-        `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(firstResult.title)}`,
-        {
-          headers: { "User-Agent": "CampusLoop/1.0 (https://campusloop.space)" },
-          next: { revalidate: 86400 },
-        }
-      );
-      if (!res.ok) return null;
-    }
+    if (!res.ok) return null;
 
     const data = (await res.json()) as {
       title?: string;
@@ -61,10 +75,17 @@ export async function fetchCollegeWikipediaSummary(collegeName: string): Promise
       coordinates?: { lat: number; lon: number };
     };
 
-    if (!data.title || (!data.extract && !data.description)) return null;
+    const extract = data.extract || "";
+    const desc = data.description || "";
+    const combined = `${data.title} ${desc} ${extract}`.toLowerCase();
+
+    // Strict validation: must be an educational institution
+    if (!EDU_KEYWORDS.test(combined) || NON_EDU_KEYWORDS.test(combined)) {
+      return null;
+    }
 
     return {
-      title: data.title,
+      title: data.title || bestTitle,
       description: data.description,
       extract: data.extract,
       thumbnailUrl: data.thumbnail?.source,

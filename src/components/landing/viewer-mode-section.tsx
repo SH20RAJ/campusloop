@@ -68,7 +68,7 @@ export function ViewerModeSection() {
               </div>
 
               <Link
-                href="/colleges"
+                href="/app/colleges"
                 className="inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background hover:bg-foreground/90 px-5 text-xs font-bold transition-all shadow-xs active:scale-98 cursor-pointer"
               >
                 <span>{VIEWER_MODE_CONTENT.callout.cta}</span>

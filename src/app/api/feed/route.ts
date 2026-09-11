@@ -70,6 +70,18 @@ export async function GET(req: Request) {
       );
     }
 
+    const excludeIdsParam = searchParams.get("excludeIds");
+    if (excludeIdsParam) {
+      const cleanExcludeIds = excludeIdsParam
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
+        .slice(0, 100);
+      if (cleanExcludeIds.length > 0) {
+        conditions.push(sql`${posts.id} NOT IN (${sql.join(cleanExcludeIds.map((eid) => sql`${eid}`), sql`, `)})`);
+      }
+    }
+
     if (sort === "memes" || (type && (type === "MEME" || type === "memes"))) {
       conditions.push(eq(posts.type, "MEME"));
     } else if (type && type !== "ALL" && type !== "all" && !isReels) {

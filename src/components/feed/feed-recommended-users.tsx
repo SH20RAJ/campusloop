@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight, Sparkles, Zap } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
 import { FollowButton } from "@/components/profile/follow-button";
@@ -15,7 +15,7 @@ interface FeedRecommendedUsersProps {
 
 export function FeedRecommendedUsers({ className }: FeedRecommendedUsersProps) {
   const { data, isLoading } = useSWR<{ users: RecommendedUser[] }>(
-    "/api/profile/recommended?limit=5",
+    "/api/profile/recommended?limit=8",
     fetcher,
     {
       revalidateOnFocus: false,
@@ -27,7 +27,7 @@ export function FeedRecommendedUsers({ className }: FeedRecommendedUsersProps) {
 
   if (isLoading && users.length === 0) {
     return (
-      <div className={cn("p-4 space-y-3 select-none", className)}>
+      <div className={cn("p-4 space-y-3 select-none overflow-hidden max-w-full", className)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="size-4 rounded-full bg-muted/65 shimmer-effect" />
@@ -35,11 +35,11 @@ export function FeedRecommendedUsers({ className }: FeedRecommendedUsersProps) {
           </div>
           <div className="h-3 w-16 rounded-md bg-muted/50 shimmer-effect" />
         </div>
-        <div className="flex gap-3 overflow-x-auto no-scrollbar py-1">
+        <div className="flex gap-3 overflow-x-auto no-scrollbar py-1 -mx-4 px-4 snap-x">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="w-44 shrink-0 rounded-2xl border border-border/40 bg-card p-3 space-y-2.5 shadow-2xs"
+              className="w-44 shrink-0 snap-start rounded-2xl border border-border/40 bg-card p-3 space-y-2.5 shadow-2xs"
             >
               <div className="flex items-center gap-2.5">
                 <div className="size-10 rounded-full bg-muted/65 shimmer-effect shrink-0" />
@@ -62,7 +62,7 @@ export function FeedRecommendedUsers({ className }: FeedRecommendedUsersProps) {
   }
 
   return (
-    <div className={cn("py-3.5 px-4 space-y-3 select-none", className)}>
+    <div className={cn("py-3.5 px-4 space-y-3 select-none overflow-hidden max-w-full", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -76,20 +76,21 @@ export function FeedRecommendedUsers({ className }: FeedRecommendedUsersProps) {
           </div>
         </div>
         <Link
-          href="/app/colleges"
-          className="text-xs font-bold text-primary hover:underline flex items-center gap-0.5"
+          href="/app/dating"
+          className="text-xs font-bold text-primary hover:underline flex items-center gap-1 transition-colors"
+          title="Explore student vibe matches"
         >
-          Explore
+          <span>Meet peers</span>
           <ArrowRight className="size-3" />
         </Link>
       </div>
 
       {/* Horizontal Carousel of Recommended Students */}
-      <div className="flex gap-3 overflow-x-auto no-scrollbar py-1 scroll-smooth">
+      <div className="flex gap-3 overflow-x-auto no-scrollbar py-1 scroll-smooth snap-x snap-mandatory -mx-4 px-4 touch-pan-x">
         {users.map((user) => (
           <div
             key={user.id}
-            className="w-48 shrink-0 flex flex-col justify-between rounded-2xl border border-border/50 bg-card/80 p-3.5 shadow-2xs hover:border-border transition-all group"
+            className="w-44 sm:w-48 snap-start shrink-0 flex flex-col justify-between rounded-2xl border border-border/50 bg-card/90 p-3.5 shadow-2xs hover:border-border transition-all group"
           >
             {/* Top Row: Avatar & Match Badge */}
             <div className="space-y-2">

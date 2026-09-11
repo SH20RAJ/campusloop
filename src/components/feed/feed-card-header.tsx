@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, Copy, Edit3, Flag, Link2, MoreHorizontal, School } from "lucide-react";
+import { Archive, Copy, Edit3, ExternalLink, Flag, Link2, MoreHorizontal, School } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -55,21 +55,18 @@ export function FeedCardHeader({
   }
 
   const isExternalReddit = Boolean(post.externalPost && post.externalPost.source === "reddit");
-  const authorName = isExternalReddit
-    ? `u/${post.externalPost?.externalAuthor || "reddit"}`
-    : post.isAnonymous
-      ? post.pseudonym
-        ? `🫣 @${post.pseudonym}`
-        : "🫣 Anonymous"
-      : post.author?.displayName || "Student";
-  const authorHandle = isExternalReddit
-    ? `r/${post.externalPost?.subreddit}`
-    : post.isAnonymous
-      ? null
-      : `@${post.author?.username || "student"}`;
+  const authorName = post.isAnonymous
+    ? post.pseudonym
+      ? `@${post.pseudonym}`
+      : "Anonymous Student"
+    : post.author?.displayName || (isExternalReddit ? `r/${post.externalPost?.subreddit || "reddit"}` : "Student");
+  const authorHandle = post.isAnonymous
+    ? null
+    : post.author?.username
+      ? `@${post.author.username}`
+      : null;
   const isVerified = Boolean(
     !post.isAnonymous &&
-      !isExternalReddit &&
       ((post.author?.points || 0) >= 150 || post.author?.role === "ADMIN")
   );
 
@@ -80,26 +77,26 @@ export function FeedCardHeader({
       {/* Primary Author & Time Row */}
       <div className="flex items-center justify-between gap-2 min-w-0">
         <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
-          {isExternalReddit ? (
+          {!post.isAnonymous && post.author?.username ? (
+            <Link
+              href={`/@${post.author.username}`}
+              onClick={(e) => e.stopPropagation()}
+              className="font-bold text-[14px] sm:text-[15px] text-foreground hover:underline truncate max-w-[140px] sm:max-w-[210px] shrink-0 sm:shrink"
+            >
+              {authorName}
+            </Link>
+          ) : !post.isAnonymous && isExternalReddit ? (
             <a
               href={post.externalPost?.canonicalUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="font-bold text-[14px] sm:text-[15px] text-foreground hover:text-orange-500 hover:underline truncate max-w-[130px] sm:max-w-[200px] shrink-0 sm:shrink"
+              className="font-bold text-[14px] sm:text-[15px] text-foreground hover:text-orange-500 hover:underline truncate max-w-[140px] sm:max-w-[210px] shrink-0 sm:shrink"
             >
               {authorName}
             </a>
-          ) : !post.isAnonymous ? (
-            <Link
-              href={`/@${post.author?.username || "student"}`}
-              onClick={(e) => e.stopPropagation()}
-              className="font-bold text-[14px] sm:text-[15px] text-foreground hover:underline truncate max-w-[130px] sm:max-w-[200px] shrink-0 sm:shrink"
-            >
-              {authorName}
-            </Link>
           ) : (
-            <span className="font-bold text-[14px] sm:text-[15px] text-foreground truncate max-w-[130px] sm:max-w-[200px] shrink-0 sm:shrink">
+            <span className="font-bold text-[14px] sm:text-[15px] text-foreground truncate max-w-[140px] sm:max-w-[210px] shrink-0 sm:shrink">
               {authorName}
             </span>
           )}
@@ -117,6 +114,20 @@ export function FeedCardHeader({
             <span className="text-muted-foreground text-xs sm:text-[13px] truncate max-w-[90px] sm:max-w-[130px] shrink-0 sm:shrink">
               {authorHandle}
             </span>
+          )}
+
+          {isExternalReddit && (
+            <a
+              href={post.externalPost?.canonicalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-[10px] font-bold shrink-0 transition-colors"
+              title={`From r/${post.externalPost?.subreddit || "reddit"}`}
+            >
+              <span>r/{post.externalPost?.subreddit}</span>
+              <ExternalLink className="size-2.5 opacity-70" />
+            </a>
           )}
 
           <span className="text-muted-foreground/40 text-xs shrink-0">·</span>

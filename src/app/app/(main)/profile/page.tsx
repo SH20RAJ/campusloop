@@ -1,11 +1,11 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getDb } from "@/db";
-import { posts, userProfiles } from "@/db/schema";
+import { externalPosts, posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import type { FeedPost } from "@/hooks/use-feed";
+import type { ExternalPostInfo, FeedPost } from "@/hooks/use-feed";
 import { getFollowCounts } from "@/lib/follows";
 import { ProfileClientView } from "./profile-client";
 
@@ -63,6 +63,52 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
     },
   });
 
+  // Hydrate external posts info (media, reddit syndication)
+  const postIds = userPosts.map((p) => p.id);
+  const externalPostsMap = new Map<string, ExternalPostInfo>();
+  if (postIds.length > 0) {
+    try {
+      const extPosts = await db.query.externalPosts.findMany({
+        where: inArray(externalPosts.postId, postIds),
+        with: {
+          media: {
+            orderBy: (media, { asc }) => [asc(media.position)],
+          },
+        },
+      });
+      for (const ep of extPosts) {
+        externalPostsMap.set(ep.postId, {
+          id: ep.id,
+          source: ep.source,
+          externalId: ep.externalId,
+          subreddit: ep.subreddit,
+          externalAuthor: ep.externalAuthor,
+          permalink: ep.permalink,
+          canonicalUrl: ep.canonicalUrl,
+          score: ep.score,
+          commentCount: ep.commentCount,
+          contentType: ep.contentType,
+          media: ep.media.map((m) => ({
+            id: m.id,
+            mediaType: m.mediaType,
+            mediaUrl: m.mediaUrl,
+            previewUrl: m.previewUrl,
+            thumbnailUrl: m.thumbnailUrl,
+            hlsUrl: m.hlsUrl,
+            dashUrl: m.dashUrl,
+            width: m.width,
+            height: m.height,
+            duration: m.duration,
+            isGif: m.isGif,
+            position: m.position,
+          })),
+        });
+      }
+    } catch {
+      // Graceful fallback if external_posts query fails
+    }
+  }
+
   // Format posts to match FeedPost type required by FeedCard
   const formattedPosts = userPosts.map((post) => {
     const votesCount = post.votes.reduce((acc, vote) => acc + vote.value, 0);
@@ -80,6 +126,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
 
     return {
       ...post,
+      externalPost: externalPostsMap.get(post.id) || null,
       votesCount,
       commentsCount,
       userVote,

@@ -727,16 +727,12 @@ function SingleReelItem({
     : post.externalPost?.canonicalUrl || null;
   const authorName = post.isAnonymous
     ? post.pseudonym || "Anonymous Student"
-    : isExternalReddit
-      ? post.externalPost?.externalAuthor || "Reddit Creator"
-      : post.author?.displayName || post.author?.username || "Student";
+    : post.author?.displayName || (isExternalReddit ? `r/${post.externalPost?.subreddit || "reddit"}` : "Student");
   const authorHandle = post.isAnonymous
     ? "anonymous"
-    : isExternalReddit
-      ? post.externalPost?.subreddit || "reddit"
-      : post.author?.username || "campusloop";
+    : post.author?.username || (isExternalReddit ? post.externalPost?.subreddit || "reddit" : "campusloop");
   const collegeTag = getCollegeShortName(post.institution);
-  const authorIsOnline = !post.isAnonymous && !isExternalReddit && isOnline(post.author?.lastSeenAt);
+  const authorIsOnline = !post.isAnonymous && isOnline(post.author?.lastSeenAt);
 
   return (
     <div className="h-[100dvh] w-full snap-start relative flex items-center justify-center bg-black overflow-hidden">
@@ -936,15 +932,7 @@ function SingleReelItem({
           {/* Creator Profile Row */}
           <div className="flex items-center gap-2.5 mb-2.5">
             <Link
-              href={
-                post.isAnonymous
-                  ? "#"
-                  : isExternalReddit && redditPermalink
-                    ? redditPermalink
-                    : `/@${authorHandle}`
-              }
-              target={isExternalReddit ? "_blank" : undefined}
-              rel={isExternalReddit ? "noopener noreferrer" : undefined}
+              href={post.isAnonymous ? "#" : `/@${authorHandle}`}
               onClick={(e) => {
                 e.stopPropagation();
                 if (post.isAnonymous) {
@@ -973,15 +961,7 @@ function SingleReelItem({
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <Link
-                  href={
-                    post.isAnonymous
-                      ? "#"
-                      : isExternalReddit && redditPermalink
-                        ? redditPermalink
-                        : `/@${authorHandle}`
-                  }
-                  target={isExternalReddit ? "_blank" : undefined}
-                  rel={isExternalReddit ? "noopener noreferrer" : undefined}
+                  href={post.isAnonymous ? "#" : `/@${authorHandle}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (post.isAnonymous) {
@@ -992,9 +972,21 @@ function SingleReelItem({
                   className="font-bold text-sm text-white hover:underline truncate flex items-center gap-1"
                 >
                   <span>{authorName}</span>
-                  {isExternalReddit && <ExternalLink className="size-3 text-white/60" />}
                 </Link>
-                {!post.isAnonymous && !isExternalReddit && (
+                {isExternalReddit && (
+                  <a
+                    href={redditPermalink || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[10px] font-bold hover:bg-orange-500/30 transition-colors shrink-0"
+                    title={`From r/${post.externalPost?.subreddit || "reddit"}`}
+                  >
+                    <span>r/{post.externalPost?.subreddit}</span>
+                    <ExternalLink className="size-2.5 opacity-80" />
+                  </a>
+                )}
+                {!post.isAnonymous && (
                   <BadgeCheck className="size-4 text-emerald-400 fill-emerald-400/20 shrink-0" />
                 )}
                 {collegeTag && (
@@ -1012,13 +1004,11 @@ function SingleReelItem({
 
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="text-[11px] text-white/60">
-                  {isExternalReddit ? `r/${post.externalPost?.subreddit || "reddit"}` : `@${authorHandle}`} ·{" "}
-                  {formatTimeAgo(post.createdAt)}
+                  @{authorHandle} · {formatTimeAgo(post.createdAt)}
                 </span>
 
                 {/* Follow Creator Button */}
                 {!post.isAnonymous &&
-                  !isExternalReddit &&
                   currentUserId &&
                   post.author &&
                   post.author.id !== currentUserId && (

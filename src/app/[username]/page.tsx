@@ -1,5 +1,5 @@
-import { and, desc, eq } from "drizzle-orm";
-import { ArrowUpRight, BadgeCheck, Download, FolderPlus, Lock, School, ThumbsUp } from "lucide-react";
+import { and, desc, eq, inArray } from "drizzle-orm";
+import { ArrowUpRight, BadgeCheck, Download, FolderPlus, Lock, MessageSquare, School, ThumbsUp } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,9 +11,9 @@ import { Navigation } from "@/components/ui/navigation";
 import { RightSidebar } from "@/components/ui/right-sidebar";
 import { getBranchIcon } from "@/constants";
 import { getDb } from "@/db";
-import { academicPlaylists, academicResources, institutions, posts, userProfiles } from "@/db/schema";
+import { academicPlaylists, academicResources, externalPosts, institutions, posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import type { FeedPost } from "@/hooks/use-feed";
+import type { ExternalPostInfo, FeedPost } from "@/hooks/use-feed";
 import { getFollowCounts, getFollowState } from "@/lib/follows";
 import { ProfileClientView } from "../app/(main)/profile/profile-client";
 
@@ -119,6 +119,52 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
     },
   });
 
+  // Hydrate external posts info (media, reddit syndication)
+  const postIds = userPosts.map((p) => p.id);
+  const externalPostsMap = new Map<string, ExternalPostInfo>();
+  if (postIds.length > 0) {
+    try {
+      const extPosts = await db.query.externalPosts.findMany({
+        where: inArray(externalPosts.postId, postIds),
+        with: {
+          media: {
+            orderBy: (media, { asc }) => [asc(media.position)],
+          },
+        },
+      });
+      for (const ep of extPosts) {
+        externalPostsMap.set(ep.postId, {
+          id: ep.id,
+          source: ep.source,
+          externalId: ep.externalId,
+          subreddit: ep.subreddit,
+          externalAuthor: ep.externalAuthor,
+          permalink: ep.permalink,
+          canonicalUrl: ep.canonicalUrl,
+          score: ep.score,
+          commentCount: ep.commentCount,
+          contentType: ep.contentType,
+          media: ep.media.map((m) => ({
+            id: m.id,
+            mediaType: m.mediaType,
+            mediaUrl: m.mediaUrl,
+            previewUrl: m.previewUrl,
+            thumbnailUrl: m.thumbnailUrl,
+            hlsUrl: m.hlsUrl,
+            dashUrl: m.dashUrl,
+            width: m.width,
+            height: m.height,
+            duration: m.duration,
+            isGif: m.isGif,
+            position: m.position,
+          })),
+        });
+      }
+    } catch {
+      // Graceful fallback if external_posts query fails
+    }
+  }
+
   // If user is authenticated, render with sidebar layout
   if (user) {
     const currentProfile = await db.query.userProfiles.findFirst({
@@ -145,6 +191,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
         return {
           ...post,
+          externalPost: externalPostsMap.get(post.id) || null,
           votesCount,
           commentsCount,
           userVote,
@@ -480,6 +527,54 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Recent Campus Posts & Discussions */}
+          {userPosts.length > 0 && (
+            <div className="rounded-2xl border border-border/40 bg-card/40 p-5 shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <MessageSquare className="size-4 text-[#1D9BF0]" /> Recent Posts &amp; Activity ({userPosts.length})
+                </h3>
+              </div>
+              <div className="divide-y divide-border/20 rounded-xl border border-border/30 overflow-hidden">
+                {userPosts.slice(0, 5).map((p) => {
+                  const votesTotal = p.votes.reduce((acc, v) => acc + v.value, 0);
+                  const ep = externalPostsMap.get(p.id);
+                  return (
+                    <Link
+                      key={p.id}
+                      href={`/app/post/${p.id}`}
+                      className="block p-3.5 hover:bg-muted/30 transition-colors space-y-1"
+                    >
+                      <div className="flex items-center gap-2">
+                        {ep?.subreddit && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                            r/{ep.subreddit}
+                          </span>
+                        )}
+                        {p.title && (
+                          <h4 className="text-xs font-bold text-foreground line-clamp-1">{p.title}</h4>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                        {p.body}
+                      </p>
+                      <div className="flex items-center gap-3 text-[10px] text-muted-foreground pt-1 font-medium">
+                        <span className="flex items-center gap-1 text-emerald-400 font-bold">
+                          <ThumbsUp className="size-3" />
+                          <span>{votesTotal} upvotes</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageSquare className="size-3" />
+                          <span>{p.comments.length} comments</span>
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           )}
 

@@ -1,4 +1,4 @@
-import { boolean, index, integer, jsonb, pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "./common";
 import { posts } from "./posts";
 
@@ -40,7 +40,7 @@ export const externalPosts = pgTable(
     score: integer("score").default(0).notNull(),
     commentCount: integer("comment_count").default(0).notNull(),
     externalCreatedAt: text("external_created_at"),
-    importedAt: createdAt,
+    importedAt: timestamp("imported_at", { withTimezone: true }).defaultNow().notNull(),
     relevanceScore: integer("relevance_score").default(0).notNull(),
     contentType: externalContentTypeEnum("content_type").default("TEXT").notNull(),
     sourceMetadata: jsonb("source_metadata").$type<Record<string, unknown>>(),

@@ -7,6 +7,7 @@ import { batchFindExistingRedditIds, isRedditPostDuplicate } from "./dedupe";
 import { normalizeRedditPost } from "./normalize";
 import { calculateRedditRelevance } from "./relevance";
 import { findRedditSource, getActiveRedditSources } from "./sources";
+import { getOrCreateSubredditProfile } from "./subreddit-accounts";
 import type { IngestOptions, IngestSummary, NormalizedRedditMedia, SubredditSourceConfig } from "./types";
 
 /**
@@ -174,11 +175,24 @@ export async function ingestRedditContent(options: IngestOptions = {}): Promise<
         const postId = randomUUID();
         const externalPostId = randomUUID();
 
+        // Resolve or create dedicated subreddit UserProfile
+        let authorId: string | null = null;
+        try {
+          const subredditProfile = await getOrCreateSubredditProfile(
+            db,
+            normalized.subreddit,
+            defaultInstitutionId
+          );
+          authorId = subredditProfile.id;
+        } catch (profileErr) {
+          console.warn("[reddit_ingest_warn] Failed to resolve subreddit profile, falling back:", profileErr);
+        }
+
         // A. Insert into posts table
         await db.insert(posts).values({
           id: postId,
-          authorId: null,
-          pseudonym: `u/${normalized.redditAuthor}`,
+          authorId,
+          pseudonym: authorId ? null : `u/${normalized.redditAuthor}`,
           institutionId: defaultInstitutionId,
           type: normalized.postType,
           scope: "GLOBAL",

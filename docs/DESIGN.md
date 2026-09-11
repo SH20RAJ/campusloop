@@ -104,3 +104,53 @@ A standard CampusLoop post follows this exact layout:
 - **Views (`📊`)**: Hover `text-primary bg-primary/10`
 - **Bookmark (`🔖`)**: Hover `text-primary bg-primary/10`
 - **Share (`↗`)**: Hover `text-primary bg-primary/10`
+
+---
+
+## 👤 Profile Page Architecture (Twitter / X Specification)
+
+A student profile on CampusLoop represents their verified campus identity. It must look exceptionally clean, credible, and shareable — strictly following Twitter/X profile architecture.
+
+### 1. Cover Banner & Avatar
+- **Cover Banner**: 3:1 aspect ratio (`h-36 sm:h-48 w-full`). Subtle dark canvas (`#16181C` or dark mesh), zero gaudy purple/indigo gradients.
+- **Avatar**: `size-24 sm:size-28` circular avatar overlapping banner with 4px background ring (`border-background`). Verified students carry a blue `#1D9BF0` `BadgeCheck` icon.
+- **Online Indicator**: Subtle emerald dot (`size-3.5 bg-emerald-500 ring-2 ring-background`).
+
+### 2. Action Toolbar (Right Aligned)
+- **Follow Button**: Twitter-standard high-contrast pill:
+  - *Not Following*: `bg-foreground text-background font-bold text-xs rounded-full px-5 py-2 hover:opacity-90`
+  - *Following*: `border border-border/80 bg-card text-foreground font-bold text-xs rounded-full px-5 py-2 hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive`
+- **Direct Message**: Circular icon button (`size-9 rounded-full border border-border/60 hover:bg-muted/50`).
+- **Secret Crush**: Subtle rose/neutral pill (`rounded-full border border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/10 text-rose-400 font-bold text-xs px-3.5 py-1.5`).
+- **Share Profile**: Pill or icon button that triggers the branded QR card modal or copies profile link with haptics.
+- **Edit Profile** (Owner only): Clean pill button (`rounded-full border border-border/80 hover:bg-muted/40 font-bold text-xs px-4 py-1.5`).
+
+### 3. Identity & Academic Metadata
+- **Name & Verified Badge**: `text-xl sm:text-2xl font-black text-foreground` + `BadgeCheck` in `#1D9BF0`.
+- **Handle**: `@username` in `font-mono text-sm text-muted-foreground`.
+- **Bio**: Natural line height (`text-sm leading-relaxed text-foreground/90 font-normal`).
+- **Metadata Flex Row**:
+  - `School`: University Name (`Birla Institute of Technology, Mesra`)
+  - `GraduationCap`: Degree & Branch (`B.Tech · Electronics & Communication '26`)
+  - `MapPin`: City, State (`Ranchi, Jharkhand`)
+  - `Calendar`: Join Date (`Joined September 2024`)
+- **Follow Stats**: **12** Following · **48** Followers · **150** LP Clout.
+
+### 4. 🚫 Strict Anti-Pattern: No "Joker" Rainbow Palette Spam
+- **NEVER** render clashing multi-colored badge clusters (e.g. amber + teal + purple + rose + emerald tags). It looks like amateur clip-art.
+- **ALWAYS** use monochromatic / subtle neutral tokens for interest tags:
+  ```tsx
+  <span className="px-3 py-1 rounded-full bg-muted/40 text-muted-foreground border border-border/40 hover:text-foreground hover:border-border text-xs font-medium transition-colors">
+    Tech & Coding
+  </span>
+  ```
+- **NO Fake Glowing Emoji Circles**: Do not render default story highlights with raw emojis (`🏛️`, `💻`) and neon purple glow rings. If highlights exist, render clean hairline story bubbles.
+
+### 5. Clout & Reputation Card
+- Single-tone progress bar with `#1D9BF0` or emerald fill on `bg-muted/40` track. **NO rainbow gradients**.
+- Clean level and tier badges with earned student points.
+
+### 6. Timeline Tabs
+- Flat tabs: `Posts`, `Articles`, `Academics`, `Media`, `Clout`.
+- Active tab indicator: 4px `#1D9BF0` pill underline centered below text.
+

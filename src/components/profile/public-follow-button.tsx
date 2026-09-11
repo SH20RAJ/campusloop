@@ -58,7 +58,7 @@ export function PublicFollowButton({
       <button
         type="button"
         onClick={handleFollowClick}
-        className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary h-8 sm:h-9 px-4 sm:px-5 text-xs font-black text-primary-foreground shadow-md hover:bg-primary/90 transition-all active:scale-95 cursor-pointer"
+        className="inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground text-background h-8 sm:h-9 px-4 sm:px-5 text-xs font-bold hover:bg-foreground/90 transition-all active:scale-95 cursor-pointer"
       >
         <UserPlus className="size-3.5" />
         <span>Follow</span>

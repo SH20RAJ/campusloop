@@ -7,7 +7,7 @@ import { DOCS_FEATURES } from "@/lib/docs-features";
 export const metadata: Metadata = {
   title: "CampusLoop Engineering Docs — Viral Architecture Teardowns",
   description:
-    "Twelve deep-dive engineering essays on how CampusLoop works: anonymous confessions, campus feed ranking, secret crush escrow, ungameable polls, student marketplace, and cryptographic safety.",
+    "Thirteen deep-dive engineering essays on how CampusLoop works: anonymous confessions, campus feed ranking, secret crush escrow, ungameable polls, student marketplace, and Twitter/X design system architecture.",
   keywords: [
     "CampusLoop docs",
     "CampusLoop architecture",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CampusLoop Engineering Docs — Viral Architecture Teardowns",
     description:
-      "Twelve deep-dive engineering essays on campus networks, accountable anonymity, and cryptographic verification.",
+      "Thirteen deep-dive engineering essays on campus networks, accountable anonymity, and cryptographic verification.",
     url: "https://campusloop.space/docs",
     siteName: "CampusLoop",
     locale: "en_IN",
@@ -51,7 +51,7 @@ export default async function DocsHubPage() {
     "@type": "CollectionPage",
     name: "CampusLoop Architecture & Engineering Documentation",
     url: "https://campusloop.space/docs",
-    description: "Twelve deep-dive engineering essays explaining every CampusLoop subsystem.",
+    description: "Thirteen deep-dive engineering essays explaining every CampusLoop subsystem.",
     publisher: { "@type": "Organization", name: "CampusLoop", url: "https://campusloop.space" },
     mainEntity: {
       "@type": "ItemList",
@@ -81,8 +81,9 @@ export default async function DocsHubPage() {
               <span className="text-muted-foreground font-semibold">Zero marketing fluff.</span>
             </h1>
             <p className="text-base text-muted-foreground leading-relaxed">
-              Twelve deep-dive engineering teardowns on campus social networks, game theory of accountable
-              anonymity, ungameable polling math, and cryptographic institutional verification.
+              Thirteen deep-dive engineering teardowns on campus social networks, game theory of accountable
+              anonymity, ungameable polling math, Twitter/X design architecture, and cryptographic
+              verification.
             </p>
           </div>
 

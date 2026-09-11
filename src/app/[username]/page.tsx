@@ -1,5 +1,5 @@
 import { and, desc, eq } from "drizzle-orm";
-import { ArrowUpRight, Download, FolderPlus, Lock, School, ThumbsUp } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, Download, FolderPlus, Lock, School, ThumbsUp } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -247,23 +247,21 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
     <div className="flex min-h-screen flex-col bg-background text-foreground relative overflow-x-hidden pb-16 select-none">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {/* Top Floating Glass Header */}
-      <header className="fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b border-border/80 bg-background/80 px-6 backdrop-blur-xl">
+      <header className="fixed top-0 right-0 left-0 z-50 flex h-14 items-center justify-between border-b border-border/40 bg-background/80 px-6 backdrop-blur-xl">
         <Link href="/" className="flex items-center gap-2.5">
           <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-black shadow-md">
             <img src="/logo.png" alt="CampusLoop Logo" className="h-full w-full object-cover scale-110" />
           </div>
-          <span className="bg-linear-to-r from-primary via-orange-500 to-amber-500 bg-clip-text text-base font-black tracking-tight text-transparent">
-            CampusLoop
-          </span>
+          <span className="text-base font-black tracking-tight text-foreground">CampusLoop</span>
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/join?mode=signin">
-            <button className="rounded-xl border border-input px-3.5 py-1.5 text-xs font-bold text-foreground hover:bg-muted transition-all cursor-pointer">
+            <button className="rounded-full border border-border/80 px-4 py-1.5 text-xs font-bold text-foreground hover:bg-muted transition-all cursor-pointer">
               Sign In
             </button>
           </Link>
           <Link href="/join?mode=signup">
-            <button className="rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
+            <button className="rounded-full bg-foreground text-background px-4 py-1.5 text-xs font-bold hover:bg-foreground/90 transition-all cursor-pointer">
               Join Campus
             </button>
           </Link>
@@ -273,26 +271,30 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
       {/* Main Container Layout */}
       <div className="flex max-w-5xl mx-auto w-full pt-20 px-4 gap-6 items-start">
         <main className="flex-1 w-full max-w-2xl space-y-4">
-          {/* Profile Card with Aurora Mesh Banner (Reference 1 & 2) */}
-          <div className="relative overflow-hidden rounded-3xl bg-card shadow-lg">
-            <div className="relative h-36 sm:h-44 w-full bg-aurora-mesh overflow-hidden">
-              {profile.bannerUrl && (
+          {/* Profile Card (Clean Twitter/X Architecture) */}
+          <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-card/40 shadow-xs">
+            <div className="relative h-36 sm:h-48 w-full bg-[#16181C] overflow-hidden border-b border-border/20">
+              {profile.bannerUrl ? (
                 <img src={profile.bannerUrl} alt="Cover Banner" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-linear-to-b from-neutral-800/40 via-[#16181C] to-[#121417] relative">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-700/10 via-transparent to-transparent" />
+                </div>
               )}
             </div>
 
             <div className="px-5 pb-5 pt-0 space-y-3">
-              <div className="flex items-end justify-between -mt-12 sm:-mt-14">
+              <div className="flex items-end justify-between -mt-12 sm:-mt-16">
                 <div className="relative">
-                  <Avatar className="size-22 sm:size-24 rounded-full border-4 border-card shadow-2xl bg-background">
+                  <Avatar className="size-24 sm:size-28 rounded-full border-4 border-background shadow-lg bg-background">
                     <AvatarImage src={profile.avatarUrl || ""} className="rounded-full object-cover" />
-                    <AvatarFallback className="text-2xl font-black bg-primary/10 text-primary rounded-full">
+                    <AvatarFallback className="text-2xl font-black bg-muted text-foreground rounded-full">
                       {profile.displayName[0]?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   {(profile.points || 0) >= 150 && (
-                    <span className="absolute bottom-0 right-0 size-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md text-xs font-black border-2 border-card">
-                      ✓
+                    <span className="absolute bottom-1 right-1 size-5 rounded-full bg-background flex items-center justify-center">
+                      <BadgeCheck className="size-5 text-[#1D9BF0] shrink-0" />
                     </span>
                   )}
                 </div>
@@ -316,60 +318,58 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
               </div>
 
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-black tracking-tight text-foreground">
+                <div className="flex items-center gap-1.5">
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
                     {profile.displayName}
                   </h2>
                   {(profile.points || 0) >= 150 && (
-                    <span className="text-brand font-bold" title="Verified Campus Star">
-                      ✓
+                    <span title="Verified Campus Student">
+                      <BadgeCheck className="size-5 text-[#1D9BF0] shrink-0" />
                     </span>
                   )}
                 </div>
 
-                {/* Stats Row (Exact match to Reference: Following / Followers / LP) */}
-                <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground pt-0.5">
-                  <Link href={`/@${profile.username}/following`} className="hover:underline">
-                    <strong className="text-foreground font-black">
-                      {publicFollowCounts.followingCount}
-                    </strong>{" "}
-                    Following
-                  </Link>
-                  <Link href={`/@${profile.username}/followers`} className="hover:underline">
-                    <strong className="text-foreground font-black">
-                      {publicFollowCounts.followersCount}
-                    </strong>{" "}
-                    Followers
-                  </Link>
-                  <span>
-                    <strong className="text-foreground font-black">{profile.points || 0}</strong> LP Clout
-                  </span>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground font-normal">
+                  <span>@{profile.username}</span>
+                  <span>•</span>
+                  <span>{campusShort}</span>
                 </div>
 
-                <p className="text-xs sm:text-sm font-semibold text-foreground/90 leading-snug pt-1">
-                  {profile.headline ||
+                {/* Bio / Headline */}
+                <p className="text-sm text-foreground leading-relaxed pt-1 whitespace-pre-wrap">
+                  {profile.bio ||
+                    profile.headline ||
                     (profile.branch && profile.course
                       ? `${profile.course} in ${profile.branch} @ ${campusShort}`
                       : `Student @ ${campusShort}`)}
                 </p>
 
-                <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium pt-0.5">
-                  <span>@{profile.username}</span>
-                  <span>•</span>
-                  <span>{campusShort}</span>
+                {/* Stats Row (Following / Followers / LP) */}
+                <div className="flex items-center gap-4 text-xs font-semibold text-muted-foreground pt-2">
+                  <Link href={`/@${profile.username}/following`} className="hover:underline">
+                    <strong className="text-foreground font-bold">{publicFollowCounts.followingCount}</strong>{" "}
+                    Following
+                  </Link>
+                  <Link href={`/@${profile.username}/followers`} className="hover:underline">
+                    <strong className="text-foreground font-bold">{publicFollowCounts.followersCount}</strong>{" "}
+                    Followers
+                  </Link>
+                  <span>
+                    <strong className="text-[#1D9BF0] font-bold">{profile.points || 0}</strong> LP Clout
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Education & Discipline Card */}
-          <div className="rounded-3xl bg-card p-5 shadow-xs space-y-3">
+          <div className="rounded-2xl border border-border/40 bg-card/40 p-5 shadow-xs space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <School className="size-4 text-primary" /> Campus & Academic Discipline
+              <School className="size-4 text-[#1D9BF0]" /> Campus &amp; Academic Discipline
             </h3>
 
             <div className="flex items-start gap-3.5 pt-1">
-              <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-xl shrink-0">
+              <div className="flex size-11 items-center justify-center rounded-xl bg-muted/40 text-xl shrink-0">
                 {branchIcon}
               </div>
               <div className="min-w-0 flex-1 space-y-1">
@@ -377,7 +377,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-medium">
                   {profile.course && <span>{profile.course}</span>}
                   {profile.course && profile.branch && <span>·</span>}
-                  {profile.branch && <span className="text-primary font-bold">{profile.branch}</span>}
+                  {profile.branch && <span className="text-[#1D9BF0] font-semibold">{profile.branch}</span>}
                 </div>
               </div>
             </div>
@@ -385,9 +385,9 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
           {/* About Card */}
           {profile.bio && (
-            <div className="rounded-3xl bg-card p-5 shadow-xs space-y-2">
+            <div className="rounded-2xl border border-border/40 bg-card/40 p-5 shadow-xs space-y-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">About</h3>
-              <p className="text-xs text-foreground/90 font-medium leading-relaxed whitespace-pre-wrap">
+              <p className="text-xs sm:text-sm text-foreground/90 font-normal leading-relaxed whitespace-pre-wrap">
                 {profile.bio}
               </p>
             </div>
@@ -395,15 +395,15 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
 
           {/* Shared Notes & Study Materials Card */}
           {(userAcademicResources.length > 0 || userPlaylists.length > 0) && (
-            <div className="rounded-3xl bg-card p-5 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-border/40 bg-card/40 p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                  <FolderPlus className="size-4 text-indigo-500" /> Shared Notes & Study Materials (
+                  <FolderPlus className="size-4 text-[#1D9BF0]" /> Shared Notes &amp; Study Materials (
                   {userAcademicResources.length + userPlaylists.length})
                 </h3>
                 <Link
                   href={`/@${profile.username}?tab=academics`}
-                  className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                  className="text-xs font-bold text-[#1D9BF0] hover:underline flex items-center gap-1"
                 >
                   <span>View All</span>
                   <ArrowUpRight className="size-3" />
@@ -413,18 +413,18 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
               {/* Study Playlists if any */}
               {userPlaylists.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-                    Curated Stacks & Playlists
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Curated Stacks &amp; Playlists
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {userPlaylists.map((pl) => (
                       <Link
                         key={pl.id}
                         href={`/app/academics/playlists/${pl.slug}`}
-                        className="p-3 rounded-2xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition-all flex flex-col justify-between gap-2"
+                        className="p-3 rounded-xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition-all flex flex-col justify-between gap-2"
                       >
                         <div className="space-y-1 min-w-0">
-                          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400">
+                          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#1D9BF0]/10 text-[#1D9BF0]">
                             {pl.category.replace("_", " ")}
                           </span>
                           <h4 className="text-xs font-bold text-foreground line-clamp-1 mt-1">{pl.title}</h4>
@@ -445,10 +445,10 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
               {/* Uploaded Resources */}
               {userAcademicResources.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-                    Uploaded Notes & Papers
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Uploaded Notes &amp; Papers
                   </span>
-                  <div className="divide-y divide-border/20 rounded-2xl border border-border/30 overflow-hidden">
+                  <div className="divide-y divide-border/20 rounded-xl border border-border/30 overflow-hidden">
                     {userAcademicResources.map((res) => (
                       <Link
                         key={res.id}
@@ -459,7 +459,7 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                             <span className="font-mono font-bold text-foreground/80">{res.subjectCode}</span>
                             <span>·</span>
-                            <span className="uppercase font-bold text-indigo-400">{res.resourceType}</span>
+                            <span className="uppercase font-bold text-[#1D9BF0]">{res.resourceType}</span>
                             <span>·</span>
                             <span>Sem {res.semester}</span>
                           </div>
@@ -484,8 +484,8 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
           )}
 
           {/* Locked Teaser CTA */}
-          <div className="rounded-3xl bg-card/60 p-6 text-center space-y-4 shadow-sm border border-border/40">
-            <div className="size-11 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto">
+          <div className="rounded-2xl bg-card/40 p-6 text-center space-y-4 shadow-xs border border-border/40">
+            <div className="size-11 bg-[#1D9BF0]/10 text-[#1D9BF0] rounded-full flex items-center justify-center mx-auto">
               <Lock className="size-5" />
             </div>
             <div className="space-y-1">
@@ -504,8 +504,8 @@ export default async function VanityProfilePage({ params }: VanityProfileProps) 
                 </button>
               </Link>
               <Link href="/join?mode=signup">
-                <button className="rounded-full bg-primary h-9 px-5 text-xs font-bold text-white hover:opacity-95 shadow-md shadow-primary/10 transition-all cursor-pointer">
-                  Verify & Join
+                <button className="rounded-full bg-foreground text-background h-9 px-5 text-xs font-bold hover:bg-foreground/90 transition-all cursor-pointer">
+                  Verify &amp; Join
                 </button>
               </Link>
             </div>

@@ -50,12 +50,12 @@ export function SecretCrushButton({ targetId, targetName, className }: SecretCru
         type="button"
         onClick={() => setShowConfirm(true)}
         className={cn(
-          "inline-flex items-center justify-center gap-1.5 h-9 px-2.5 sm:px-3.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-black transition-all active:scale-95 cursor-pointer shadow-2xs shrink-0 border border-primary/20",
+          "inline-flex items-center justify-center gap-1.5 h-9 px-3 sm:px-3.5 rounded-full border border-border/80 bg-card hover:bg-muted/60 text-foreground text-xs font-semibold transition-all active:scale-95 cursor-pointer shadow-2xs shrink-0",
           className
         )}
         title={`Secret Crush on ${targetName}`}
       >
-        <Heart className="size-4 sm:size-3.5 text-primary shrink-0" />
+        <Heart className="size-3.5 text-rose-500 fill-rose-500/20 shrink-0" />
         <span className="hidden sm:inline">Secret Crush</span>
       </button>
 

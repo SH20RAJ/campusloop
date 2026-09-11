@@ -10,6 +10,7 @@ import {
   buildBoostTierSql,
   loadActiveBoosts,
 } from "@/lib/feed-boosts";
+import { getAddictiveReelsScoreSql } from "@/lib/reels/algorithm";
 
 export type FeedPost = {
   id: string;
@@ -406,7 +407,9 @@ export function getFeedOrderBy(
 
   switch (sort) {
     case "reels":
-      orderClauses.push(desc(weighted(getViralScoreSql(viewerProfileId))));
+      orderClauses.push(
+        desc(weighted(getAddictiveReelsScoreSql(viewerProfileId, userInstitutionId, seenIds)))
+      );
       break;
     case "top_voted":
       orderClauses.push(desc(weighted(voteScoreSql)));
@@ -505,6 +508,7 @@ export async function resolveFeedPage(options: {
           avatarUrl: true,
           points: true,
           role: true,
+          lastSeenAt: true,
         },
       },
       institution: {
@@ -655,6 +659,7 @@ export async function formatApiFeedPosts(rawFeed: HydratedFeedPost[], viewerProf
               avatarUrl: true,
               points: true,
               role: true,
+              lastSeenAt: true,
             },
           },
           institution: {
@@ -813,6 +818,18 @@ export function sortFeedPosts<
     case "discussed":
       return sorted.sort((a, b) => {
         if (b.commentsCount !== a.commentsCount) return b.commentsCount - a.commentsCount;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+
+    case "reels":
+      return sorted.sort((a, b) => {
+        const hoursA = Math.max(0, (Date.now() - new Date(a.createdAt).getTime()) / (3600 * 1000));
+        const hoursB = Math.max(0, (Date.now() - new Date(b.createdAt).getTime()) / (3600 * 1000));
+        const campusBonusA = userInstitutionId && a.institutionId === userInstitutionId ? 25 : 0;
+        const campusBonusB = userInstitutionId && b.institutionId === userInstitutionId ? 25 : 0;
+        const scoreA = (a.votesCount * 4 + a.commentsCount * 5 + campusBonusA) / (hoursA + 1) ** 0.75;
+        const scoreB = (b.votesCount * 4 + b.commentsCount * 5 + campusBonusB) / (hoursB + 1) ** 0.75;
+        if (scoreB !== scoreA) return scoreB - scoreA;
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
     default:

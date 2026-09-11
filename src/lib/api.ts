@@ -37,6 +37,13 @@ export function voteOnPost(postId: string, value: number) {
   return apiRequest<{ votesCount: number; userVote: number }>(`/api/posts/${postId}/vote`, "POST", { value });
 }
 
+export function savePost(postId: string, save: boolean = true) {
+  return apiRequest<{ success: boolean; saved: boolean }>(
+    `/api/posts/${postId}/save`,
+    save ? "POST" : "DELETE"
+  );
+}
+
 export function voteOnPoll(postId: string, optionId: string) {
   return apiRequest<{ options: Array<{ id: string; votesCount: number; userVoted: boolean }> }>(
     `/api/posts/${postId}/poll-vote`,
@@ -82,8 +89,45 @@ export function updateProfile(profileData: Record<string, unknown>) {
   return apiRequest<{ success: boolean }>("/api/profile/me", "PATCH", profileData);
 }
 
+export function toggleFollowUser(username: string, follow: boolean = true) {
+  return apiRequest<{
+    ok?: boolean;
+    isFollowing: boolean;
+    followerCount?: number;
+    followingCount?: number;
+  }>(`/api/profile/${encodeURIComponent(username)}/follow`, follow ? "POST" : "DELETE");
+}
+
 // ─── Story API Actions ───
 
 export function createStory(text: string, backgroundColor: string) {
   return apiRequest<{ id: string }>("/api/stories", "POST", { text, backgroundColor });
+}
+
+// ─── Reels Telemetry & Behavior Actions ───
+
+export interface ReelTelemetryPayload {
+  postId: string;
+  watchDurationMs: number;
+  videoDurationMs?: number;
+  loopCount: number;
+  completed: boolean;
+  skippedQuickly: boolean;
+  action?: "like" | "save" | "share" | "comment" | "follow" | "loop" | "dwell" | "skip";
+  tags?: string[];
+  authorId?: string | null;
+  institutionId?: string | null;
+}
+
+export function trackReelTelemetry(payload: ReelTelemetryPayload): Promise<{ ok: boolean }> {
+  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+    try {
+      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+      const sent = navigator.sendBeacon("/api/reels/track", blob);
+      if (sent) return Promise.resolve({ ok: true });
+    } catch {
+      // Fallback to fetch if sendBeacon fails
+    }
+  }
+  return apiRequest<{ ok: boolean }>("/api/reels/track", "POST", payload).catch(() => ({ ok: false }));
 }

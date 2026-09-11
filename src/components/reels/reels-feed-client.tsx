@@ -7,8 +7,10 @@ import {
   ArrowUp,
   BadgeCheck,
   Bookmark,
+  Check,
   ChevronDown,
   ChevronUp,
+  ExternalLink,
   Flame,
   Heart,
   MessageCircle,
@@ -18,6 +20,7 @@ import {
   Repeat2,
   Share2,
   Sparkles,
+  UserPlus,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -28,9 +31,18 @@ import { FastCommentsModal } from "@/components/feed/fast-comments-modal";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
 import { AnimatedIcon, AnimateVideo } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PresenceDot } from "@/components/ui/presence-dot";
 import type { FeedPost } from "@/hooks/use-feed";
-import { fetcher, repostPost, voteOnPost } from "@/lib/api";
+import {
+  fetcher,
+  repostPost,
+  savePost,
+  toggleFollowUser,
+  trackReelTelemetry,
+  voteOnPost,
+} from "@/lib/api";
 import { haptics } from "@/lib/haptics";
+import { isOnline } from "@/lib/presence";
 import { sounds } from "@/lib/sounds";
 import { cn, formatTimeAgo, getAvatarUrl, getCollegeShortName } from "@/lib/utils";
 
@@ -369,10 +381,31 @@ function SingleReelItem({
   const [userVote, setUserVote] = useState(post.userVote);
   const [votesCount, setVotesCount] = useState(post.votesCount);
   const [isSaved, setIsSaved] = useState(Boolean(post.isSaved));
+  const [isFollowing, setIsFollowing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Extract video URL
+  // Debounce refs for double-tap detection without pausing video
+  const singleTapTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTapTimeRef = useRef<number>(0);
+
+  // Behavioral tracking refs
+  const watchStartTimeRef = useRef<number>(0);
+  const loopCountRef = useRef<number>(0);
+  const hasSentTelemetryRef = useRef<boolean>(false);
+
+  // Extract hashtags from caption for affinity tracking
+  const hashtags = useMemo(() => {
+    const matches = post.body.match(/#[a-zA-Z0-9_]+/g);
+    return matches ? matches.map((t) => t.slice(1)) : [];
+  }, [post.body]);
+
+  // Extract video URL (markdown, direct URL, or external media reference)
   const videoUrl = useMemo(() => {
+    if (post.externalPost?.media && post.externalPost.media.length > 0) {
+      const vidMedia = post.externalPost.media.find((m) => m.mediaType === "VIDEO");
+      if (vidMedia?.mediaUrl) return vidMedia.mediaUrl;
+    }
+
     if (!post.body) return null;
     const mdMatch = post.body.match(
       /!\[.*?\]\(((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)(?:\.(?:mp4|webm|mov|ogg)[^\s)]*|[^\s)]*videos[^\s)]*))\)/i
@@ -388,7 +421,7 @@ function SingleReelItem({
     if (rawMatch) return rawMatch[1];
 
     return null;
-  }, [post.body]);
+  }, [post.body, post.externalPost]);
 
   // Clean caption text
   const cleanCaption = useMemo(() => {
@@ -430,6 +463,62 @@ function SingleReelItem({
     }
   }, [isMuted]);
 
+  // Telemetry: Watch time & loop tracking
+  const handleVideoEnded = useCallback(() => {
+    loopCountRef.current += 1;
+    haptics.light();
+    // Flush telemetry beacon on video loop
+    trackReelTelemetry({
+      postId: post.id,
+      watchDurationMs: Date.now() - watchStartTimeRef.current,
+      videoDurationMs: (videoRef.current?.duration || 0) * 1000,
+      loopCount: loopCountRef.current,
+      completed: true,
+      skippedQuickly: false,
+      action: "loop",
+      tags: hashtags,
+      authorId: post.author?.id,
+      institutionId: post.institutionId,
+    });
+  }, [post.id, post.author?.id, post.institutionId, hashtags]);
+
+  useEffect(() => {
+    if (isActive) {
+      watchStartTimeRef.current = Date.now();
+      loopCountRef.current = 0;
+      hasSentTelemetryRef.current = false;
+    } else {
+      if (watchStartTimeRef.current > 0 && !hasSentTelemetryRef.current) {
+        hasSentTelemetryRef.current = true;
+        const watchDurationMs = Date.now() - watchStartTimeRef.current;
+        const videoDurationMs = (videoRef.current?.duration || 0) * 1000;
+        const completed =
+          (videoDurationMs > 0 && watchDurationMs / videoDurationMs >= 0.85) ||
+          loopCountRef.current > 0;
+        const skippedQuickly = watchDurationMs < 2000 && loopCountRef.current === 0;
+
+        trackReelTelemetry({
+          postId: post.id,
+          watchDurationMs,
+          videoDurationMs,
+          loopCount: loopCountRef.current,
+          completed,
+          skippedQuickly,
+          action: skippedQuickly ? "skip" : completed ? "dwell" : undefined,
+          tags: hashtags,
+          authorId: post.author?.id,
+          institutionId: post.institutionId,
+        });
+      }
+    }
+
+    return () => {
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+      }
+    };
+  }, [isActive, post.id, post.author?.id, post.institutionId, hashtags]);
+
   // Time update for progress bar
   function handleTimeUpdate() {
     if (!videoRef.current) return;
@@ -459,17 +548,28 @@ function SingleReelItem({
     haptics.light();
   }
 
-  // Double tap to like
-  const lastTapRef = useRef<number>(0);
+  // Video tap with 260ms debounce to separate single-tap toggle from double-tap like
   function handleVideoTap() {
     const now = Date.now();
-    if (now - lastTapRef.current < 300) {
-      // Double tap detected
+    const diff = now - lastTapTimeRef.current;
+
+    if (diff > 0 && diff < 280) {
+      // Double tap detected: cancel single tap play toggle
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+        singleTapTimerRef.current = null;
+      }
+      lastTapTimeRef.current = 0;
       handleDoubleTapLike();
-      lastTapRef.current = 0;
     } else {
-      lastTapRef.current = now;
-      handleTogglePlay();
+      lastTapTimeRef.current = now;
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+      }
+      singleTapTimerRef.current = setTimeout(() => {
+        handleTogglePlay();
+        singleTapTimerRef.current = null;
+      }, 260);
     }
   }
 
@@ -486,11 +586,23 @@ function SingleReelItem({
         setUserVote(post.userVote);
         setVotesCount(post.votesCount);
       });
+      trackReelTelemetry({
+        postId: post.id,
+        watchDurationMs: Date.now() - watchStartTimeRef.current,
+        loopCount: loopCountRef.current,
+        completed: false,
+        skippedQuickly: false,
+        action: "like",
+        tags: hashtags,
+        authorId: post.author?.id,
+        institutionId: post.institutionId,
+      });
     }
   }
 
   // Like button click
-  function handleLikeClick() {
+  function handleLikeClick(e: React.MouseEvent) {
+    e.stopPropagation();
     haptics.light();
     if (userVote === 1) {
       setUserVote(0);
@@ -501,20 +613,98 @@ function SingleReelItem({
       setVotesCount((prev) => prev + 1);
       sounds.pop();
       voteOnPost(post.id, 1);
+      trackReelTelemetry({
+        postId: post.id,
+        watchDurationMs: Date.now() - watchStartTimeRef.current,
+        loopCount: loopCountRef.current,
+        completed: false,
+        skippedQuickly: false,
+        action: "like",
+        tags: hashtags,
+        authorId: post.author?.id,
+        institutionId: post.institutionId,
+      });
     }
   }
 
-  // Bookmark click
-  function handleSaveClick() {
+  // Bookmark / Save click (with backend persistence and optimistic rollback)
+  async function handleSaveClick(e: React.MouseEvent) {
+    e.stopPropagation();
     haptics.light();
-    setIsSaved((prev) => !prev);
-    toast.success(!isSaved ? "Saved to your bookmarks" : "Removed from bookmarks");
+    const nextSaved = !isSaved;
+    setIsSaved(nextSaved);
+    try {
+      await savePost(post.id, nextSaved);
+      sounds.pop();
+      toast.success(nextSaved ? "Saved to your bookmarks" : "Removed from bookmarks");
+      trackReelTelemetry({
+        postId: post.id,
+        watchDurationMs: Date.now() - watchStartTimeRef.current,
+        loopCount: loopCountRef.current,
+        completed: false,
+        skippedQuickly: false,
+        action: nextSaved ? "save" : undefined,
+        tags: hashtags,
+        authorId: post.author?.id,
+        institutionId: post.institutionId,
+      });
+    } catch {
+      setIsSaved(!nextSaved);
+      toast.error("Failed to update bookmark");
+    }
+  }
+
+  // Follow Creator click
+  async function handleFollowClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!authorHandle || authorHandle === "campusloop" || post.isAnonymous) return;
+    if (!currentUserId) {
+      toast.error("Sign in to follow campus creators");
+      return;
+    }
+    haptics.light();
+    const nextFollowing = !isFollowing;
+    setIsFollowing(nextFollowing);
+    try {
+      await toggleFollowUser(authorHandle, nextFollowing);
+      sounds.tap();
+      toast.success(nextFollowing ? `Following @${authorHandle}` : `Unfollowed @${authorHandle}`);
+      if (nextFollowing) {
+        trackReelTelemetry({
+          postId: post.id,
+          watchDurationMs: Date.now() - watchStartTimeRef.current,
+          loopCount: loopCountRef.current,
+          completed: false,
+          skippedQuickly: false,
+          action: "follow",
+          tags: hashtags,
+          authorId: post.author?.id,
+          institutionId: post.institutionId,
+        });
+      }
+    } catch {
+      setIsFollowing(!nextFollowing);
+      toast.error("Failed to update follow status");
+    }
   }
 
   // Share click
-  async function handleShareClick() {
+  async function handleShareClick(e: React.MouseEvent) {
+    e.stopPropagation();
     haptics.light();
-    const shareUrl = `https://campusloop.space/app/post/${post.id}`;
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://campusloop.space";
+    const shareUrl = `${origin}/app/post/${post.id}`;
+    trackReelTelemetry({
+      postId: post.id,
+      watchDurationMs: Date.now() - watchStartTimeRef.current,
+      loopCount: loopCountRef.current,
+      completed: false,
+      skippedQuickly: false,
+      action: "share",
+      tags: hashtags,
+      authorId: post.author?.id,
+      institutionId: post.institutionId,
+    });
     if (navigator.share) {
       try {
         await navigator.share({
@@ -531,15 +721,26 @@ function SingleReelItem({
     toast.success("Reel link copied to clipboard!");
   }
 
+  const isExternalReddit = Boolean(post.externalPost);
+  const redditPermalink = post.externalPost?.permalink
+    ? `https://reddit.com${post.externalPost.permalink}`
+    : post.externalPost?.canonicalUrl || null;
   const authorName = post.isAnonymous
     ? post.pseudonym || "Anonymous Student"
-    : post.author?.displayName || post.author?.username || "Student";
-  const authorHandle = post.isAnonymous ? "anonymous" : post.author?.username || "campusloop";
+    : isExternalReddit
+      ? post.externalPost?.externalAuthor || "Reddit Creator"
+      : post.author?.displayName || post.author?.username || "Student";
+  const authorHandle = post.isAnonymous
+    ? "anonymous"
+    : isExternalReddit
+      ? post.externalPost?.subreddit || "reddit"
+      : post.author?.username || "campusloop";
   const collegeTag = getCollegeShortName(post.institution);
+  const authorIsOnline = !post.isAnonymous && !isExternalReddit && isOnline(post.author?.lastSeenAt);
 
   return (
     <div className="h-[100dvh] w-full snap-start relative flex items-center justify-center bg-black overflow-hidden">
-      {/* Blurred Ambient Background for Desktop (Instagram web style) */}
+      {/* Blurred Ambient Background for Desktop */}
       {videoUrl && (
         <div
           className="hidden sm:block absolute inset-0 -z-10 blur-3xl opacity-25 scale-125 pointer-events-none bg-cover bg-center"
@@ -558,6 +759,7 @@ function SingleReelItem({
             loop
             preload="metadata"
             onTimeUpdate={handleTimeUpdate}
+            onEnded={handleVideoEnded}
             onClick={handleVideoTap}
             className="w-full h-full object-cover cursor-pointer"
           />
@@ -567,6 +769,31 @@ function SingleReelItem({
             <p className="text-sm font-semibold">Video preview unavailable</p>
           </div>
         )}
+
+        {/* Floating Sound / Mute Toggle Button on Video */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleMute();
+            haptics.light();
+          }}
+          className="absolute top-4 right-4 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white border border-white/15 transition-all active:scale-95 cursor-pointer shadow-lg group"
+          title={isMuted ? "Tap to unmute sound" : "Tap to mute sound"}
+          aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+        >
+          {isMuted ? (
+            <>
+              <VolumeX className="size-4 text-rose-400" />
+              <span className="text-[11px] font-semibold text-white/90 group-hover:text-white">Unmute</span>
+            </>
+          ) : (
+            <>
+              <Volume2 className="size-4 text-emerald-400" />
+              <span className="text-[11px] font-semibold text-white/90 group-hover:text-white">Sound on</span>
+            </>
+          )}
+        </button>
 
         {/* Center Animated Play/Pause Ripple Indicator */}
         <AnimatePresence>
@@ -607,6 +834,7 @@ function SingleReelItem({
             type="button"
             onClick={handleLikeClick}
             className="flex flex-col items-center gap-1 group cursor-pointer"
+            aria-label={userVote === 1 ? "Unlike" : "Like"}
           >
             <div
               className={cn(
@@ -629,8 +857,12 @@ function SingleReelItem({
           {/* Comments */}
           <button
             type="button"
-            onClick={onOpenComments}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenComments();
+            }}
             className="flex flex-col items-center gap-1 group cursor-pointer"
+            aria-label="Comments"
           >
             <div className="flex size-11 items-center justify-center rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white transition-transform active:scale-80">
               <MessageCircle className="size-6" />
@@ -643,8 +875,12 @@ function SingleReelItem({
           {/* Repost */}
           <button
             type="button"
-            onClick={onOpenRepost}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenRepost();
+            }}
             className="flex flex-col items-center gap-1 group cursor-pointer"
+            aria-label="Repost"
           >
             <div className="flex size-11 items-center justify-center rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white transition-transform active:scale-80">
               <Repeat2 className="size-6" />
@@ -657,6 +893,7 @@ function SingleReelItem({
             type="button"
             onClick={handleSaveClick}
             className="flex flex-col items-center gap-1 group cursor-pointer"
+            aria-label={isSaved ? "Remove from bookmarks" : "Save to bookmarks"}
           >
             <div
               className={cn(
@@ -674,6 +911,7 @@ function SingleReelItem({
             type="button"
             onClick={handleShareClick}
             className="flex flex-col items-center gap-1 group cursor-pointer"
+            aria-label="Share reel"
           >
             <div className="flex size-11 items-center justify-center rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white transition-transform active:scale-80">
               <Share2 className="size-6" />
@@ -698,28 +936,65 @@ function SingleReelItem({
           {/* Creator Profile Row */}
           <div className="flex items-center gap-2.5 mb-2.5">
             <Link
-              href={post.isAnonymous ? "#" : `/@${authorHandle}`}
+              href={
+                post.isAnonymous
+                  ? "#"
+                  : isExternalReddit && redditPermalink
+                    ? redditPermalink
+                    : `/@${authorHandle}`
+              }
+              target={isExternalReddit ? "_blank" : undefined}
+              rel={isExternalReddit ? "noopener noreferrer" : undefined}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (post.isAnonymous) {
+                  e.preventDefault();
+                  toast.info("Posted anonymously by a verified campus student");
+                }
+              }}
               className="relative shrink-0 active:scale-95 transition-transform"
             >
-              <div className="p-0.5 rounded-full bg-gradient-to-tr from-rose-500 via-purple-500 to-amber-500">
+              <div className="p-0.5 rounded-full bg-gradient-to-tr from-rose-500 via-purple-500 to-amber-500 relative">
                 <Avatar className="size-9 border-2 border-black">
                   <AvatarImage src={getAvatarUrl(post.author?.avatarUrl, authorHandle)} />
                   <AvatarFallback className="bg-zinc-800 text-xs font-bold">
                     {authorName.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
+                {!post.isAnonymous && !isExternalReddit && (
+                  <PresenceDot
+                    lastSeenAt={post.author?.lastSeenAt}
+                    className="bottom-0 right-0 size-2.5 ring-black"
+                  />
+                )}
               </div>
             </Link>
 
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <Link
-                  href={post.isAnonymous ? "#" : `/@${authorHandle}`}
-                  className="font-bold text-sm text-white hover:underline truncate"
+                  href={
+                    post.isAnonymous
+                      ? "#"
+                      : isExternalReddit && redditPermalink
+                        ? redditPermalink
+                        : `/@${authorHandle}`
+                  }
+                  target={isExternalReddit ? "_blank" : undefined}
+                  rel={isExternalReddit ? "noopener noreferrer" : undefined}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (post.isAnonymous) {
+                      e.preventDefault();
+                      toast.info("Posted anonymously by a verified campus student");
+                    }
+                  }}
+                  className="font-bold text-sm text-white hover:underline truncate flex items-center gap-1"
                 >
-                  {authorName}
+                  <span>{authorName}</span>
+                  {isExternalReddit && <ExternalLink className="size-3 text-white/60" />}
                 </Link>
-                {!post.isAnonymous && (
+                {!post.isAnonymous && !isExternalReddit && (
                   <BadgeCheck className="size-4 text-emerald-400 fill-emerald-400/20 shrink-0" />
                 )}
                 {collegeTag && (
@@ -727,8 +1002,50 @@ function SingleReelItem({
                     {collegeTag}
                   </span>
                 )}
+                {authorIsOnline && (
+                  <span className="flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Online
+                  </span>
+                )}
               </div>
-              <span className="text-[11px] text-white/60">@{authorHandle} · {formatTimeAgo(post.createdAt)}</span>
+
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[11px] text-white/60">
+                  {isExternalReddit ? `r/${post.externalPost?.subreddit || "reddit"}` : `@${authorHandle}`} ·{" "}
+                  {formatTimeAgo(post.createdAt)}
+                </span>
+
+                {/* Follow Creator Button */}
+                {!post.isAnonymous &&
+                  !isExternalReddit &&
+                  currentUserId &&
+                  post.author &&
+                  post.author.id !== currentUserId && (
+                    <button
+                      type="button"
+                      onClick={handleFollowClick}
+                      className={cn(
+                        "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all active:scale-95 cursor-pointer shadow-sm",
+                        isFollowing
+                          ? "bg-white/20 text-white/90 hover:bg-white/30 border border-white/20"
+                          : "bg-rose-500 hover:bg-rose-600 text-white border border-rose-400/30"
+                      )}
+                    >
+                      {isFollowing ? (
+                        <>
+                          <Check className="size-3" />
+                          <span>Following</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="size-3" />
+                          <span>Follow</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+              </div>
             </div>
           </div>
 
@@ -745,7 +1062,10 @@ function SingleReelItem({
               {cleanCaption.length > 90 && (
                 <button
                   type="button"
-                  onClick={() => setIsExpanded((prev) => !prev)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsExpanded((prev) => !prev);
+                  }}
                   className="text-[11px] font-bold text-white/70 hover:text-white mt-0.5 cursor-pointer underline"
                 >
                   {isExpanded ? "less" : "more"}
@@ -758,7 +1078,11 @@ function SingleReelItem({
           <div className="flex items-center gap-2 text-[11px] font-medium text-white/80 overflow-hidden">
             <Music2 className="size-3.5 shrink-0 text-rose-400 animate-pulse" />
             <div className="truncate flex items-center gap-2">
-              <span className="truncate">Original Audio · CampusLoop Campus Vibes</span>
+              <span className="truncate">
+                {isExternalReddit
+                  ? `Reddit Audio · r/${post.externalPost?.subreddit || "campus"}`
+                  : "Original Audio · CampusLoop Campus Vibes"}
+              </span>
             </div>
           </div>
         </div>

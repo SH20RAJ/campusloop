@@ -69,11 +69,15 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   const videoUrl = useMemo(() => {
     if (!post.body) return null;
     // Markdown video tag ![...](url.mp4)
-    const mdMatch = post.body.match(/!\[.*?\]\((https?:\/\/[^\s)]+\.(?:mp4|webm|mov)[^\s)]*)\)/i);
+    const mdMatch = post.body.match(/!\[.*?\]\(((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)(?:\.(?:mp4|webm|mov|ogg)[^\s)]*|[^\s)]*videos[^\s)]*))\)/i);
     if (mdMatch) return mdMatch[1];
 
+    // Direct R2 video route match
+    const r2Match = post.body.match(/((?:https?:\/\/[^\s<>"']*)?\/api\/files\/r2\/videos\/[^\s<>"']+)/i);
+    if (r2Match) return r2Match[1];
+
     // Raw video URL
-    const rawMatch = post.body.match(/(https?:\/\/[^\s<>"']+\.(?:mp4|webm|mov)[^\s<>"']*)/i);
+    const rawMatch = post.body.match(/((?:https?:\/\/[^\s<>"']+|\/api\/files\/r2\/[^\s<>"']+)\.(?:mp4|webm|mov|ogg)[^\s<>"']*)/i);
     if (rawMatch) return rawMatch[1];
 
     return null;

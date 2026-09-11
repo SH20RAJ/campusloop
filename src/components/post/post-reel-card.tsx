@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BadgeCheck,
   Bookmark,
+  Edit3,
   Heart,
   MessageCircle,
   MoreHorizontal,
@@ -57,6 +58,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   const [showPlayPauseRipple, setShowPlayPauseRipple] = useState(false);
   const [isExpandedCaption, setIsExpandedCaption] = useState(false);
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
 
   const [showReport, setShowReport] = useState(false);
   const [showRepostModal, setShowRepostModal] = useState(false);
@@ -492,14 +494,72 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
       </button>
 
       {/* 6. More Options */}
-      <button
-        type="button"
-        onClick={() => setShowReport(true)}
-        aria-label="More options"
-        className="size-11 sm:size-12 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shadow-lg hover:scale-105 active:scale-95"
-      >
-        <MoreHorizontal className="size-5" />
-      </button>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setShowMoreMenu((prev) => !prev)}
+          aria-label="More options"
+          className="size-11 sm:size-12 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shadow-lg hover:scale-105 active:scale-95"
+        >
+          <MoreHorizontal className="size-5" />
+        </button>
+
+        {showMoreMenu && (
+          <>
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setShowMoreMenu(false)}
+            />
+            <div
+              className="absolute right-full mr-2 bottom-0 w-44 rounded-2xl border border-white/15 bg-zinc-900/95 backdrop-blur-xl text-white shadow-2xl z-50 py-1.5 animate-in fade-in zoom-in-95"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {currentUserId && post.authorId === currentUserId && (
+                <Link
+                  href={`/app/post/${post.id}/edit`}
+                  onClick={() => setShowMoreMenu(false)}
+                  className="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-white/10 transition-colors cursor-pointer flex items-center gap-2 text-primary"
+                >
+                  <Edit3 className="size-4" />
+                  <span>Edit Post</span>
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMoreMenu(false);
+                  setShowRepostModal(true);
+                }}
+                className="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-white/10 transition-colors cursor-pointer flex items-center gap-2"
+              >
+                <Repeat2 className="size-4 text-emerald-400" />
+                <span>Repost</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMoreMenu(false);
+                  handleShare();
+                }}
+                className="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-white/10 transition-colors cursor-pointer flex items-center gap-2"
+              >
+                <Share2 className="size-4 text-blue-400" />
+                <span>Share Link</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMoreMenu(false);
+                  setShowReport(true);
+                }}
+                className="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-rose-500/20 text-rose-400 transition-colors cursor-pointer flex items-center gap-2 border-t border-white/10 mt-1"
+              >
+                <span>Report</span>
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 
@@ -691,6 +751,14 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
                 </Link>
                 <span className="text-white/40">·</span>
                 <span className="whitespace-nowrap">{formatTimeAgo(new Date(post.createdAt))}</span>
+                {post.isEdited && (
+                  <span
+                    className="text-white/60 text-[10px] italic"
+                    title={`Edited ${post.updatedAt ? formatTimeAgo(new Date(post.updatedAt)) : ""}`}
+                  >
+                    (edited)
+                  </span>
+                )}
               </div>
             )}
 
@@ -806,6 +874,14 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
               <span className="text-muted-foreground/90 shrink-0 whitespace-nowrap font-medium">
                 {formatTimeAgo(new Date(post.createdAt))}
               </span>
+              {post.isEdited && (
+                <span
+                  className="text-muted-foreground/60 text-[10px] italic shrink-0"
+                  title={`Edited ${post.updatedAt ? formatTimeAgo(new Date(post.updatedAt)) : ""}`}
+                >
+                  (edited)
+                </span>
+              )}
             </div>
 
             {post.institution?.name && (

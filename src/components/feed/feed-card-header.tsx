@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, Copy, Flag, Link2, MoreHorizontal, School } from "lucide-react";
+import { Archive, Copy, Edit3, Flag, Link2, MoreHorizontal, School } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -104,6 +104,15 @@ export function FeedCardHeader({
           <span className="text-muted-foreground text-xs shrink-0 whitespace-nowrap">
             {formatTimeAgo(post.createdAt)}
           </span>
+
+          {post.isEdited && (
+            <span
+              className="text-muted-foreground/60 text-[10px] italic shrink-0"
+              title={`Edited ${post.updatedAt ? formatTimeAgo(post.updatedAt) : ""}`}
+            >
+              (edited)
+            </span>
+          )}
         </div>
 
         {/* Right Actions: Confession/Meme Pill & More Menu */}
@@ -208,11 +217,23 @@ export function FeedCardHeader({
 
                   {currentUserId && post.authorId === currentUserId && (
                     <>
+                      <Link
+                        href={`/app/post/${post.id}/edit`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowMenu(false);
+                        }}
+                        className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2 border-t border-border/30 mt-1"
+                      >
+                        <Edit3 className="size-4 text-primary" />
+                        <span>Edit Post</span>
+                      </Link>
+
                       <button
                         type="button"
                         onClick={handleToggleArchive}
                         disabled={isArchiving}
-                        className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2 border-t border-border/30 mt-1"
+                        className="w-full text-left px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer flex items-center gap-2"
                       >
                         <Archive className="size-4 text-amber-500" />
                         <span>{post.status === "ARCHIVED" ? "Restore to Feed" : "Archive Post"}</span>

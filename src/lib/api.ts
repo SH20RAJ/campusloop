@@ -53,6 +53,17 @@ export function deletePost(postId: string) {
   return apiRequest<{ success: boolean }>(`/api/posts/${postId}`, "DELETE");
 }
 
+export function updatePost(
+  postId: string,
+  data: { body: string; title?: string | null; scope?: "CAMPUS" | "GLOBAL" }
+) {
+  return apiRequest<{ success: boolean; message: string; post: unknown }>(
+    `/api/posts/${postId}`,
+    "PATCH",
+    data
+  );
+}
+
 export function reportPost(postId: string, reason: string, details?: string) {
   return apiRequest<{ success: boolean }>(`/api/posts/${postId}/report`, "POST", { reason, details });
 }

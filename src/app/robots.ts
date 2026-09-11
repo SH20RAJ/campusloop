@@ -17,6 +17,7 @@ export default function robots(): MetadataRoute.Robots {
         "/@*",
         "/app/post/",
         "/overview",
+        "/products",
         "/pitch",
         "/demo",
         "/about",

@@ -1,10 +1,11 @@
 "use client";
 
-import { Calendar, Check, Globe, School, Trophy, Users } from "lucide-react";
+import { Globe, School, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
+import { AnimateCalendar, AnimateCheck, AnimateUsers } from "@/components/ui/animated-icon";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -140,7 +141,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-muted/60">
-                <Calendar className="size-8 text-muted-foreground/60" />
+                <AnimateCalendar size={32} className="text-muted-foreground/60" />
               </div>
             )}
 
@@ -208,12 +209,12 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
             )}
 
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[10px] sm:text-[11px] font-medium">
-              <Calendar className="size-3" />
+              <AnimateCalendar size={12} />
               <span>{dateStr}</span>
             </div>
 
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[10px] sm:text-[11px] font-medium">
-              <Users className="size-3" />
+              <AnimateUsers size={12} />
               <span>
                 {event.participationType === "TEAM"
                   ? "Team"
@@ -229,14 +230,16 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
           </div>
         </div>
 
-        {/* Footer info & Actions */}
-        <div className="mt-3 sm:mt-4 flex items-center justify-between gap-2 border-t border-border/30 pt-2.5 sm:pt-3">
-          <div className="flex flex-col text-xs">
+        {/* Price & Actions */}
+        <div className="flex items-center justify-between border-t border-border/20 pt-3 mt-auto">
+          <div className="text-xs">
             <span className="font-black text-foreground">{event.entryFee || "Free"}</span>
-            <span className="text-[10px] text-muted-foreground">{attendeeCount} enrolled</span>
+            <span className="text-[10px] sm:text-[11px] text-muted-foreground ml-1.5">
+              • {attendeeCount} going
+            </span>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             <AddToCalendarDropdown
               event={{
                 id: event.id,
@@ -265,7 +268,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
             >
               {isRegistered ? (
                 <>
-                  <Check className="size-3.5" />
+                  <AnimateCheck size={14} />
                   Registered
                 </>
               ) : event.participationType === "TEAM" ? (
@@ -296,7 +299,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-muted/60">
-            <Calendar className="size-6 sm:size-8 text-muted-foreground/60" />
+            <AnimateCalendar size={28} className="text-muted-foreground/60" />
           </div>
         )}
 
@@ -365,12 +368,12 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
           )}
 
           <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-[10px] sm:text-[11px] font-medium">
-            <Calendar className="size-2.5 sm:size-3" />
+            <AnimateCalendar size={12} />
             <span>{dateStr}</span>
           </div>
 
           <div className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground text-xs font-medium">
-            <Users className="size-3" />
+            <AnimateUsers size={12} />
             <span>
               {event.participationType === "TEAM"
                 ? "Team Event"
@@ -422,7 +425,7 @@ export function EventCard({ event, variant = "row" }: EventCardProps) {
             >
               {isRegistered ? (
                 <>
-                  <Check className="size-3" />
+                  <AnimateCheck size={14} />
                   Registered
                 </>
               ) : event.participationType === "TEAM" ? (

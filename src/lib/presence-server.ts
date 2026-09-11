@@ -21,7 +21,7 @@ export async function recordHeartbeat(profileId: string): Promise<void> {
           sql`${userProfiles.lastSeenAt} IS NULL`,
           lt(
             userProfiles.lastSeenAt,
-            sql`now() - interval '${sql.raw(String(WRITE_THROTTLE_SECONDS))} seconds'`
+            sql`now() - (${WRITE_THROTTLE_SECONDS} * interval '1 second')`
           )
         )
       )

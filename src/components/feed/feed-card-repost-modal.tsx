@@ -1,6 +1,6 @@
 "use client";
 
-import { Repeat2, Send, X } from "lucide-react";
+import { AnimateRepeat2, AnimateSend, AnimateX } from "@/components/ui/animated-icon";
 import { Button } from "@/components/ui/button";
 
 interface RepostModalProps {
@@ -29,14 +29,14 @@ export function FeedCardRepostModal({
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-2xl space-y-4">
         <div className="flex items-center justify-between pb-2 border-b border-border/40">
           <div className="flex items-center gap-2">
-            <Repeat2 className="size-4 text-emerald-500" />
+            <AnimateRepeat2 size={16} className="text-emerald-500" />
             <h3 className="text-sm font-bold text-foreground">Reshare Post</h3>
           </div>
           <button
             onClick={onClose}
             className="rounded-full p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
           >
-            <X className="size-4" />
+            <AnimateX size={16} />
           </button>
         </div>
 
@@ -70,7 +70,7 @@ export function FeedCardRepostModal({
             disabled={isReposting || !quoteThoughts.trim()}
             className="flex-1 text-xs font-semibold h-9 rounded-xl bg-primary text-primary-foreground gap-1.5 cursor-pointer shadow-xs"
           >
-            <Send className="size-3.5" /> Quote Repost
+            <AnimateSend size={14} /> Quote Repost
           </Button>
         </div>
       </div>

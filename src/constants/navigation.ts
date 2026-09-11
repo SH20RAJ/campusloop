@@ -14,6 +14,7 @@ import {
 import {
   AnimateBookmark,
   AnimateBookOpen,
+  AnimateCalendar,
   AnimateCompass,
   AnimateFlame,
   AnimateGraduationCap,
@@ -60,7 +61,7 @@ export const DESKTOP_NAV_ITEMS: NavItem[] = [
     badgeColor: "bg-rose-500/15 text-rose-400 border border-rose-500/30",
   },
   {
-    icon: Calendar,
+    icon: AnimateCalendar,
     href: "/app/events",
     label: "Events",
   },

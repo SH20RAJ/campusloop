@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import { createGoogleCalendarUrl, createIcsContent, formatCalendarDate } from "./calendar";
 
 describe("Calendar Integration Engine", () => {

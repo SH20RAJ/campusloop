@@ -1,10 +1,10 @@
 "use client";
 
-import { Bookmark, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { AnimateBookmark, AnimatePlus } from "@/components/ui/animated-icon";
 import { StoryArchiveModal } from "./story-archive-modal";
 
 interface HighlightItem {
@@ -62,7 +62,7 @@ export function ProfileHighlights({ userId, username, isOwnProfile }: ProfileHig
               className="size-14 sm:size-15 rounded-full border border-dashed border-border/80 hover:border-foreground/80 bg-muted/20 hover:bg-muted/40 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer group shadow-2xs active:scale-95"
               title="Create new Highlight from stories"
             >
-              <Plus className="size-4.5 transition-transform group-hover:scale-110" />
+              <AnimatePlus size={18} className="transition-transform group-hover:scale-110" />
             </button>
             <span className="font-mono text-[10px] font-bold text-muted-foreground group-hover:text-foreground truncate max-w-[64px]">
               New
@@ -86,7 +86,7 @@ export function ProfileHighlights({ userId, username, isOwnProfile }: ProfileHig
                     {h.coverUrl ? (
                       <img src={h.coverUrl} alt={h.title} className="size-full object-cover" />
                     ) : (
-                      <Bookmark className="size-4 text-muted-foreground" />
+                      <AnimateBookmark size={16} className="text-muted-foreground" />
                     )}
                   </div>
 

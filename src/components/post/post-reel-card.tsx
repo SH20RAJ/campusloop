@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
 import { PostLikesModal } from "@/components/post/post-likes-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -422,7 +423,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           aria-label="Comment"
           className="size-11 sm:size-12 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer text-white/90 hover:text-white hover:bg-white/10"
         >
-          <MessageCircle className="size-5 sm:size-5.5" />
+          <AnimatedIcon icon={MessageCircle} animation="pop" size={21} />
         </button>
         <span className="text-[11px] sm:text-xs font-bold text-white/80 tabular-nums">{commentsCount}</span>
       </div>
@@ -440,9 +441,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
               : "border-white/10 text-white/90 hover:text-white hover:bg-white/10"
           )}
         >
-          <Repeat2
+          <AnimatedIcon
+            icon={Repeat2}
+            animation="spin"
+            size={21}
             className={cn(
-              "size-5 sm:size-5.5 transition-transform duration-300 ease-out",
+              "transition-transform duration-300 ease-out",
               repostSpin && "rotate-180 scale-125",
               isReposted && !repostSpin && "text-emerald-400"
             )}
@@ -465,7 +469,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
             : "border-white/10 text-white/90 hover:text-white hover:bg-white/10"
         )}
       >
-        <Bookmark className={cn("size-5", isSaved && "fill-primary")} />
+        <AnimatedIcon
+          icon={Bookmark}
+          animation="lift"
+          size={20}
+          className={cn(isSaved && "fill-primary text-primary")}
+        />
       </button>
 
       {/* 5. Share */}
@@ -475,7 +484,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         aria-label="Share"
         className="size-11 sm:size-12 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shadow-lg hover:scale-110 active:scale-90"
       >
-        <Share2 className="size-5" />
+        <AnimatedIcon icon={Share2} animation="pop" size={20} />
       </button>
 
       {/* 6. More Options */}

@@ -292,13 +292,15 @@ function getForYouScoreSql(
       end)`
     : sql<number>`0.0`;
 
+  const safeSeenIds = (seenIds || [])
+    .slice(0, 100)
+    .filter((id): id is string => typeof id === "string" && /^[a-zA-Z0-9_-]+$/.test(id));
+
   const seenPenaltySql =
-    seenIds && seenIds.length > 0
-      ? sql<number>`(case when ${posts.id} in (${sql.raw(
-          seenIds
-            .slice(0, 100)
-            .map((id) => `'${id.replace(/'/g, "''")}'`)
-            .join(",")
+    safeSeenIds.length > 0
+      ? sql<number>`(case when ${posts.id} in (${sql.join(
+          safeSeenIds.map((id) => sql`${id}`),
+          sql`, `
         )}) then -160.0 else 0.0 end)`
       : sql<number>`0.0`;
 

@@ -1,10 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
-import { GraduationCap, HeartHandshakeIcon, School, ShieldCheck, UserRound, Zap } from "lucide-react";
+import { GraduationCap, HeartHandshakeIcon, RotateCcw, School, ShieldCheck, UserRound, Zap } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AnimateX } from "@/components/ui/animated-icon";
+import { AnimatedIcon, AnimateX } from "@/components/ui/animated-icon";
 import { getDatingCandidatePhotoSet } from "@/constants/dating-photos";
 import { sounds } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
@@ -336,18 +336,7 @@ export function SwipeActions({
         aria-label="Undo last swipe"
         className="flex size-11 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground shadow-xs transition-all hover:scale-105 hover:bg-muted hover:text-foreground active:scale-90 cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          className="size-4.5"
-          stroke="currentColor"
-          strokeWidth={2.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M3 7v6h6" />
-          <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
-        </svg>
+        <AnimatedIcon icon={RotateCcw} animation="spin" size={18} />
       </button>
 
       <button
@@ -365,7 +354,7 @@ export function SwipeActions({
         aria-label="Match"
         className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary/95 active:scale-90 cursor-pointer"
       >
-        <HeartHandshakeIcon className="size-7 fill-current" />
+        <AnimatedIcon icon={HeartHandshakeIcon} animation="pop" size={28} className="fill-current" />
       </button>
     </div>
   );

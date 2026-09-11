@@ -1,11 +1,12 @@
-import { describe, expect, it, mock } from "bun:test";
+import { describe, expect, it, vi } from "vitest";
 
-mock.module("server-only", () => ({}));
+vi.mock("server-only", () => ({}));
 
 const { createAdminSessionToken, isValidAdminSessionToken, verifyAdminPasskey } = await import("./session");
 
 describe("Admin Passkey & Session Security", () => {
   it("verifies the configured admin passcode from .env (29092005)", () => {
+    process.env.ADMIN_PASSKEY = process.env.ADMIN_PASSKEY || "29092005";
     // Correct passcode from .env.local
     expect(verifyAdminPasskey("29092005")).toBe(true);
 

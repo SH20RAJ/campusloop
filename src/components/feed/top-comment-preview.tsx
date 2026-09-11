@@ -1,6 +1,7 @@
 "use client";
 
-import { Flame, MessageCircle, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
+import { AnimateFlame, AnimateMessageCircle } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { TopCommentPreview as TopCommentType } from "@/hooks/use-feed";
 import { cn, formatTimeAgo, getAvatarUrl } from "@/lib/utils";
@@ -53,7 +54,7 @@ export function TopCommentCard({ topComment, commentsCount, onClick, className }
 
         <div className="flex items-center gap-1 shrink-0">
           <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full">
-            <Flame className="size-2.5 fill-amber-500" />
+            <AnimateFlame size={11} className="fill-amber-500 text-amber-500" />
             <span>Top Comment</span>
           </span>
         </div>
@@ -66,7 +67,7 @@ export function TopCommentCard({ topComment, commentsCount, onClick, className }
 
       {commentsCount > 1 && (
         <div className="pl-7 pt-1 flex items-center gap-1 text-[10px] font-semibold text-muted-foreground group-hover:text-primary transition-colors">
-          <MessageCircle className="size-3" />
+          <AnimateMessageCircle size={12} />
           <span>View all {commentsCount} comments</span>
         </div>
       )}

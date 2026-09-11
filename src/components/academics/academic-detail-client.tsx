@@ -28,6 +28,7 @@ import { AcademicPdfViewer } from "@/components/academics/academic-pdf-viewer";
 import { AddToPlaylistModal } from "@/components/academics/add-to-playlist-modal";
 import { SimilarResourcesWidget } from "@/components/academics/similar-resources-widget";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { checkAndRecordDownload } from "@/lib/academic-download-limiter";
 import {
   gtagEvent,
@@ -348,7 +349,12 @@ export function AcademicDetailClient({
             )}
             title="Save to Study Vault"
           >
-            <Bookmark className={cn("size-3.5", isSaved && "fill-current")} />
+            <AnimatedIcon
+              icon={Bookmark}
+              animation="lift"
+              size={15}
+              className={cn(isSaved && "fill-current")}
+            />
           </button>
 
           <button
@@ -357,7 +363,7 @@ export function AcademicDetailClient({
             className="flex size-8.5 items-center justify-center rounded-full border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
             title="Share note link"
           >
-            <Share2 className="size-3.5" />
+            <AnimatedIcon icon={Share2} animation="pop" size={15} />
           </button>
         </div>
       </div>
@@ -482,7 +488,7 @@ export function AcademicDetailClient({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-border/40 hover:bg-muted text-foreground active:scale-95 transition-all cursor-pointer"
               title="Save to Study Playlist"
             >
-              <FolderPlus className="size-3.5" />
+              <AnimatedIcon icon={FolderPlus} animation="pop" size={14} />
               <span className="hidden sm:inline">Playlist</span>
             </button>
           </div>
@@ -501,7 +507,7 @@ export function AcademicDetailClient({
               ) ? (
               <FolderOpen className="size-3.5" />
             ) : (
-              <Download className="size-3.5" />
+              <AnimatedIcon icon={Download} animation="lift" size={14} />
             )}
             <span>
               {/(?:youtube\.com|youtu\.be)/i.test(resource.fileUrl || resource.driveUrl || "")

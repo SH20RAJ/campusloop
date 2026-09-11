@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Download, PlusSquare, Share, X, Zap } from "lucide-react";
+import { PlusSquare, Share, Zap } from "lucide-react";
+import { AnimateDownload, AnimateX } from "@/components/ui/animated-icon";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUnreadNotificationsCount } from "@/hooks/use-notifications";
@@ -219,7 +220,7 @@ export function PWAInstallBanner() {
                   onClick={handleInstallClick}
                   className="flex items-center gap-1 rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90 transition-transform active:scale-95 cursor-pointer"
                 >
-                  <Download className="size-3.5" />
+                  <AnimateDownload size={14} />
                   <span>Install</span>
                 </button>
 
@@ -228,7 +229,7 @@ export function PWAInstallBanner() {
                   onClick={handleDismiss}
                   className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
                 >
-                  <X className="size-3.5" />
+                  <AnimateX size={14} />
                 </button>
               </div>
             </div>
@@ -259,7 +260,7 @@ export function PWAInstallBanner() {
                   onClick={() => setShowAndroidModal(false)}
                   className="rounded-full p-1.5 text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
                 >
-                  <X className="size-4" />
+                  <AnimateX size={16} />
                 </button>
               </div>
 
@@ -328,7 +329,7 @@ export function PWAInstallBanner() {
                   onClick={() => setShowIOSModal(false)}
                   className="rounded-full p-1.5 text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
                 >
-                  <X className="size-4" />
+                  <AnimateX size={16} />
                 </button>
               </div>
 
@@ -358,7 +359,7 @@ export function PWAInstallBanner() {
                     3
                   </div>
                   <p className="text-xs text-foreground font-medium leading-snug">
-                    Tap <strong>Add</strong> in the top right. You&apos;re all set! 🚀
+                    Tap <strong>Add</strong> in the top right. You&apos;re all set!
                   </p>
                 </div>
               </div>

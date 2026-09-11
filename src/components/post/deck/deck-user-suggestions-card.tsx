@@ -89,7 +89,7 @@ export function DeckUserSuggestionsCard({ users, institutionName }: DeckUserSugg
                       <span className="font-bold text-sm text-foreground group-hover:text-primary transition-colors truncate">
                         {user.displayName}
                       </span>
-                      <BadgeCheck className="size-3.5 text-primary shrink-0" />
+                      <BadgeCheck className="size-3.5 text-[#1D9BF0] shrink-0" />
                     </div>
                     <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
                     {(user.branch || user.year) && (

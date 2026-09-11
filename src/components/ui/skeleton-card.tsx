@@ -131,81 +131,83 @@ export function FeedLoadingMoreSkeleton() {
 
 export function PostDetailSkeleton() {
   return (
-    <div className="max-w-2xl mx-auto w-full select-none border-x border-border/20 min-h-screen">
-      {/* Top Bar Header */}
-      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/30 px-4 py-3 flex items-center gap-4">
-        <Skeleton className="size-8 rounded-full" />
-        <Skeleton className="h-5 w-20 rounded-md" />
-      </div>
+    <div className="relative w-full h-dvh overflow-hidden bg-background select-none">
+      {/* Ambient Glow in Background */}
+      <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] bg-purple-600/10 blur-[140px] rounded-full -z-10" />
 
-      {/* Main Post Body */}
-      <div className="p-4 space-y-3 border-b border-border/30">
-        <div className="flex items-center gap-3">
-          <Skeleton className="size-11 rounded-full shrink-0" />
-          <div className="space-y-1.5 flex-1">
-            <Skeleton className="h-4 w-32 rounded-full" />
-            <Skeleton className="h-3 w-20 rounded-full" />
+      {/* Top Header & Subheader Filter Tabs Skeleton */}
+      <header className="absolute top-0 inset-x-0 z-30 px-4 pt-2.5 pb-1 bg-gradient-to-b from-background/95 via-background/85 to-transparent backdrop-blur-md">
+        <div className="flex items-center justify-between gap-2 mt-3 border-b border-border/20 pb-1.5">
+          <div className="flex items-center gap-5 sm:gap-6 py-0.5">
+            <Skeleton className="h-4 w-16 rounded-full" />
+            <Skeleton className="h-4 w-14 rounded-full" />
+            <Skeleton className="h-4 w-12 rounded-full" />
+            <Skeleton className="h-4 w-24 rounded-full" />
           </div>
+          <Skeleton className="size-8 rounded-full shrink-0" />
         </div>
+      </header>
 
-        <hr className="border-t border-border/20 my-2" />
-
-        <div className="space-y-2.5 pt-1">
-          <Skeleton className="h-4 w-full rounded-md" />
-          <Skeleton className="h-4 w-11/12 rounded-md" />
-          <Skeleton className="h-4 w-3/4 rounded-md" />
-        </div>
-
-        {/* Timestamp & Views */}
-        <div className="py-2 text-xs">
-          <Skeleton className="h-3 w-36 rounded-full" />
-        </div>
-
-        {/* Stats Row */}
-        <div className="flex items-center gap-6 py-3 border-y border-border/30">
-          <Skeleton className="h-3.5 w-16 rounded-full" />
-          <Skeleton className="h-3.5 w-16 rounded-full" />
-          <Skeleton className="h-3.5 w-16 rounded-full" />
-        </div>
-
-        {/* Action icons */}
-        <div className="flex items-center justify-between max-w-md pt-1">
-          <Skeleton className="size-7 rounded-full" />
-          <Skeleton className="size-7 rounded-full" />
-          <Skeleton className="size-7 rounded-full" />
-          <Skeleton className="size-7 rounded-full" />
-        </div>
-      </div>
-
-      {/* Reply Composer Skeleton */}
-      <div className="p-4 border-b border-border/30 flex gap-3">
-        <Skeleton className="size-10 rounded-full shrink-0" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-12 w-full rounded-xl" />
-          <div className="flex justify-end">
-            <Skeleton className="h-7 w-16 rounded-full" />
-          </div>
-        </div>
-      </div>
-
-      {/* Thread Comments */}
-      <div className="divide-y divide-border/25">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="p-4 flex gap-3">
-            <div className="flex flex-col items-center">
-              <Skeleton className="size-9 rounded-full shrink-0" />
-              <div className="w-0.5 flex-1 bg-muted mt-2 min-h-6" />
-            </div>
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-3.5 w-24 rounded-full" />
-                <Skeleton className="h-3 w-14 rounded-full" />
+      {/* Centered Post Reel Deck Content Skeleton (Matches PostReelCard bounds) */}
+      <div className="absolute inset-x-0 top-[88px] sm:top-[92px] bottom-[64px] md:bottom-0 overflow-hidden flex flex-col justify-between px-4 py-3 sm:px-8 sm:py-5 max-w-2xl mx-auto">
+        {/* Top Author Header */}
+        <div className="flex items-center justify-between gap-3 min-w-0 pr-16 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <Skeleton className="size-10 sm:size-11 rounded-full shrink-0" />
+            <div className="space-y-1.5 min-w-0">
+              <Skeleton className="h-4 w-32 rounded-full" />
+              <Skeleton className="h-3 w-24 rounded-full" />
+              <div className="flex items-center gap-1.5 pt-0.5">
+                <Skeleton className="size-2 rounded-full shrink-0" />
+                <Skeleton className="h-2.5 w-36 rounded-full" />
               </div>
-              <Skeleton className="h-3 w-full rounded-md" />
-              <Skeleton className="h-3 w-4/5 rounded-md" />
             </div>
           </div>
-        ))}
+          <Skeleton className="h-7 w-20 rounded-full shrink-0" />
+        </div>
+
+        {/* Main Content Body */}
+        <div className="flex-1 min-h-0 flex flex-col justify-start pr-14 sm:pr-16 space-y-4 py-4">
+          <Skeleton className="h-6 sm:h-7 w-3/4 rounded-xl" />
+          <div className="space-y-2.5 pt-1">
+            <Skeleton className="h-4 w-full rounded-md" />
+            <Skeleton className="h-4 w-11/12 rounded-md" />
+            <Skeleton className="h-4 w-4/5 rounded-md" />
+            <Skeleton className="h-4 w-2/3 rounded-md" />
+          </div>
+          <div className="flex items-center gap-2 pt-2">
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-6 w-16 rounded-full" />
+          </div>
+        </div>
+
+        {/* Bottom context spacer */}
+        <div className="h-4 shrink-0" />
+      </div>
+
+      {/* Right Floating Side Action Rail Skeleton (Like, Comment, Loop, Bookmark, Share, More) */}
+      <div className="absolute right-3 sm:right-6 bottom-4 sm:bottom-6 z-30 flex flex-col items-center gap-3.5 select-none shrink-0">
+        {/* 1. Like */}
+        <div className="flex flex-col items-center gap-1">
+          <Skeleton className="size-11 sm:size-12 rounded-full" />
+          <Skeleton className="h-2.5 w-5 rounded-full" />
+        </div>
+        {/* 2. Comment */}
+        <div className="flex flex-col items-center gap-1">
+          <Skeleton className="size-11 sm:size-12 rounded-full" />
+          <Skeleton className="h-2.5 w-5 rounded-full" />
+        </div>
+        {/* 3. Loop / Repost */}
+        <div className="flex flex-col items-center gap-1">
+          <Skeleton className="size-11 sm:size-12 rounded-full" />
+          <Skeleton className="h-2.5 w-6 rounded-full" />
+        </div>
+        {/* 4. Bookmark */}
+        <Skeleton className="size-11 sm:size-12 rounded-full" />
+        {/* 5. Share */}
+        <Skeleton className="size-11 sm:size-12 rounded-full" />
+        {/* 6. More */}
+        <Skeleton className="size-11 sm:size-12 rounded-full" />
       </div>
     </div>
   );

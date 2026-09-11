@@ -4,7 +4,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUp,
   ChevronDown,
+  Clock,
+  Flame,
   Heart,
+  History,
   Loader2,
   MessageCircle,
   MoreHorizontal,
@@ -12,6 +15,7 @@ import {
   Reply,
   Shield,
   User,
+  VenetianMask,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -390,15 +394,35 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
 
             {/* ─── Original Post Context Card (matching Image 2) ─── */}
             <div className="mx-4 mt-2.5 mb-1.5 p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3 shrink-0">
-              <Avatar className="size-9 rounded-full border border-purple-500/30 shrink-0 mt-0.5">
-                <AvatarImage src={post.isAnonymous ? "" : post.author?.avatarUrl || ""} />
-                <AvatarFallback className="text-[11px] font-black bg-muted text-foreground">
-                  {post.isAnonymous ? "🙈" : post.author?.displayName?.[0] || "S"}
-                </AvatarFallback>
-              </Avatar>
+              {post.isAnonymous ? (
+                <Avatar className="size-9 rounded-full border border-purple-500/30 shrink-0 mt-0.5">
+                  <AvatarFallback className="text-[11px] font-black bg-muted text-foreground">
+                    <VenetianMask className="size-4 text-purple-400" />
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <Link href={`/@${authorHandle}`} onClick={onClose} className="shrink-0 mt-0.5 group">
+                  <Avatar className="size-9 rounded-full border border-purple-500/30 shrink-0 group-hover:border-purple-400 transition-colors">
+                    <AvatarImage src={post.author?.avatarUrl || ""} />
+                    <AvatarFallback className="text-[11px] font-black bg-muted text-foreground">
+                      {post.author?.displayName?.[0] || "S"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
+              )}
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="font-bold text-foreground truncate">@{authorHandle}</span>
+                  {post.isAnonymous ? (
+                    <span className="font-bold text-foreground truncate">@{authorHandle}</span>
+                  ) : (
+                    <Link
+                      href={`/@${authorHandle}`}
+                      onClick={onClose}
+                      className="font-bold text-foreground truncate hover:underline hover:text-primary transition-colors"
+                    >
+                      @{authorHandle}
+                    </Link>
+                  )}
                   <span className="text-muted-foreground text-[11px]">{formatTimeAgo(post.createdAt)}</span>
                 </div>
                 <p className="text-xs text-foreground/90 leading-relaxed line-clamp-3 font-normal">
@@ -410,7 +434,13 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
             {/* ─── Sort & Filter Bar ─── */}
             <div className="flex items-center justify-between px-4 py-2 shrink-0 border-b border-white/[0.06] text-xs">
               <div className="flex items-center gap-1.5 font-bold text-foreground">
-                <span>{sortMode === "best" ? "🔥" : sortMode === "latest" ? "🕐" : "📜"}</span>
+                {sortMode === "best" ? (
+                  <Flame className="size-3.5 text-amber-500" />
+                ) : sortMode === "latest" ? (
+                  <Clock className="size-3.5 text-blue-400" />
+                ) : (
+                  <History className="size-3.5 text-emerald-400" />
+                )}
                 <span>
                   {sortMode === "best"
                     ? "Top comments"
@@ -428,7 +458,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                       prev === "best" ? "latest" : prev === "latest" ? "oldest" : "best"
                     )
                   }
-                  className="px-2.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/10 border border-white/10 text-xs font-semibold text-foreground flex items-center gap-1 transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/10 border border-white/10 text-xs font-semibold text-foreground flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <span>{sortMode === "best" ? "Best" : sortMode === "latest" ? "Latest" : "Oldest"}</span>
                   <ChevronDown className="size-3 text-muted-foreground" />
@@ -495,7 +525,19 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center justify-between gap-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-xs font-bold text-foreground truncate">{cDisplayName}</span>
+                            {isAnon ? (
+                              <span className="text-xs font-bold text-foreground truncate">
+                                {cDisplayName}
+                              </span>
+                            ) : (
+                              <Link
+                                href={`/@${cHandle}`}
+                                onClick={onClose}
+                                className="text-xs font-bold text-foreground truncate hover:underline hover:text-primary transition-colors"
+                              >
+                                {cDisplayName}
+                              </Link>
+                            )}
                             {isCurrentUser && (
                               <span className="text-[10px] font-bold bg-purple-950/70 text-purple-300 border border-purple-500/30 px-1.5 py-0.2 rounded-md">
                                 You

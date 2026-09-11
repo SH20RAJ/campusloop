@@ -358,25 +358,60 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     <div className="absolute right-3 sm:right-6 bottom-4 sm:bottom-6 z-30 flex flex-col items-center gap-3.5 select-none shrink-0 text-foreground">
       {/* 1. Like */}
       <div className="flex flex-col items-center gap-1">
-        <button
+        <motion.button
           type="button"
           onClick={() => handleVote()}
-          aria-label="Like post"
+          aria-label={userVote === 1 ? "Unlike post" : "Like post"}
+          whileTap={{ scale: 0.85 }}
           className={cn(
-            "size-11 sm:size-12 rounded-full border bg-black/40 backdrop-blur-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-90 cursor-pointer",
+            "size-11 sm:size-12 rounded-full border bg-black/40 backdrop-blur-xl flex items-center justify-center shadow-lg transition-colors cursor-pointer group relative",
             userVote === 1
-              ? "border-rose-500/40 text-rose-500 bg-rose-500/20 shadow-[0_0_20px_rgba(244,63,94,0.4)]"
-              : "border-white/10 text-white/90 hover:text-white hover:bg-white/10"
+              ? "border-rose-500/40 text-rose-500 bg-rose-500/15 shadow-[0_0_20px_rgba(244,63,94,0.4)]"
+              : "border-white/10 text-white/80 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/10"
           )}
         >
-          <Heart
-            className={cn(
-              "size-5 sm:size-5.5",
-              userVote === 1 ? "fill-rose-500 text-rose-500" : "text-rose-500 fill-rose-500/20"
-            )}
-          />
-        </button>
-        <span className="text-[11px] sm:text-xs font-bold text-white/80 tabular-nums">{votesCount}</span>
+          <motion.div
+            key={userVote === 1 ? "liked" : "unliked"}
+            initial={userVote === 1 ? { scale: 0.7 } : { scale: 1 }}
+            animate={
+              userVote === 1
+                ? {
+                    scale: [1, 1.45, 0.9, 1.15, 1],
+                    rotate: [0, -14, 14, -6, 0],
+                  }
+                : { scale: 1, rotate: 0 }
+            }
+            transition={{
+              duration: 0.45,
+              ease: [0.175, 0.885, 0.32, 1.275],
+            }}
+          >
+            <Heart
+              className={cn(
+                "size-5 sm:size-5.5 transition-colors",
+                userVote === 1
+                  ? "fill-rose-500 text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]"
+                  : "text-white/80 group-hover:text-rose-400 fill-none"
+              )}
+            />
+          </motion.div>
+          {userVote === 1 && (
+            <motion.span
+              initial={{ scale: 0.8, opacity: 0.8 }}
+              animate={{ scale: 1.6, opacity: 0 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              className="absolute inset-0 rounded-full border border-rose-500 pointer-events-none"
+            />
+          )}
+        </motion.button>
+        <span
+          className={cn(
+            "text-[11px] sm:text-xs font-bold tabular-nums transition-colors",
+            userVote === 1 ? "text-rose-400 font-extrabold" : "text-white/80"
+          )}
+        >
+          {votesCount}
+        </span>
       </div>
 
       {/* 2. Comment */}
@@ -565,16 +600,35 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/95 via-black/50 to-transparent p-4 pb-3 pr-16 text-white space-y-2 pointer-events-auto">
             {/* Author details */}
             <div className="flex items-center gap-2.5">
-              <Avatar className="size-9 border-2 border-white/40 shrink-0">
-                {avatarUrl && <AvatarImage src={avatarUrl} alt={authorName} />}
-                <AvatarFallback className="bg-muted text-foreground text-xs font-bold">
-                  {avatarFallback}
-                </AvatarFallback>
-              </Avatar>
+              <Link
+                href={post.isAnonymous ? "#" : `/@${authorHandle}`}
+                onClick={(e) => {
+                  if (post.isAnonymous) e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className="shrink-0 group"
+              >
+                <Avatar className="size-9 border-2 border-white/40 shrink-0 group-hover:border-white transition-colors">
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt={authorName} />}
+                  <AvatarFallback className="bg-muted text-foreground text-xs font-bold">
+                    {avatarFallback}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
 
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="font-bold text-xs sm:text-sm truncate drop-shadow-sm">{authorName}</span>
-                {!post.isAnonymous && <BadgeCheck className="size-3.5 text-primary shrink-0" />}
+                {post.isAnonymous ? (
+                  <span className="font-bold text-xs sm:text-sm truncate drop-shadow-sm">{authorName}</span>
+                ) : (
+                  <Link
+                    href={`/@${authorHandle}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="font-bold text-xs sm:text-sm truncate drop-shadow-sm hover:underline hover:text-white transition-colors"
+                  >
+                    {authorName}
+                  </Link>
+                )}
+                {!post.isAnonymous && <BadgeCheck className="size-3.5 text-[#1D9BF0] shrink-0" />}
               </div>
 
               {!post.isAnonymous && post.authorId && post.authorId !== currentUserId && (
@@ -614,9 +668,17 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
             {/* Campus Line */}
             {post.institution && (
-              <p className="text-[10px] text-white/60 font-medium">
-                {post.institution.name.split(",")[0]} · {formatTimeAgo(new Date(post.createdAt))}
-              </p>
+              <div className="flex items-center gap-1.5 text-[10px] text-white/70 font-medium min-w-0">
+                <Link
+                  href={`/app/college/${post.institution.slug || post.institution.id || post.institutionId}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="hover:underline hover:text-white transition-colors truncate max-w-[200px]"
+                >
+                  {post.institution.name.split(",")[0]}
+                </Link>
+                <span className="text-white/40">·</span>
+                <span className="whitespace-nowrap">{formatTimeAgo(new Date(post.createdAt))}</span>
+              </div>
             )}
 
             {/* Video Progress Scrub Bar */}
@@ -696,20 +758,37 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
           <div className="min-w-0 flex-1 leading-tight">
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="font-bold text-sm sm:text-base text-foreground truncate max-w-[150px] sm:max-w-[240px]">
-                {authorName}
-              </span>
-              {!post.isAnonymous && (
-                <BadgeCheck className="size-4 text-purple-400 fill-purple-400/20 shrink-0" />
+              {post.isAnonymous ? (
+                <span className="font-bold text-sm sm:text-base text-foreground truncate max-w-[150px] sm:max-w-[240px]">
+                  {authorName}
+                </span>
+              ) : (
+                <Link
+                  href={`/@${authorHandle}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="font-bold text-sm sm:text-base text-foreground truncate max-w-[150px] sm:max-w-[240px] hover:underline hover:text-primary transition-colors"
+                >
+                  {authorName}
+                </Link>
               )}
+              {!post.isAnonymous && <BadgeCheck className="size-4 text-[#1D9BF0] shrink-0" />}
             </div>
 
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-              {authorHandle && (
-                <span className="truncate max-w-[120px] text-muted-foreground/90 font-medium">
-                  @{authorHandle}
-                </span>
-              )}
+              {authorHandle &&
+                (post.isAnonymous ? (
+                  <span className="truncate max-w-[120px] text-muted-foreground/90 font-medium">
+                    @{authorHandle}
+                  </span>
+                ) : (
+                  <Link
+                    href={`/@${authorHandle}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="truncate max-w-[120px] text-muted-foreground/90 font-medium hover:underline hover:text-foreground transition-colors"
+                  >
+                    @{authorHandle}
+                  </Link>
+                ))}
               <span className="text-muted-foreground/40 shrink-0">·</span>
               <span className="text-muted-foreground/90 shrink-0 whitespace-nowrap font-medium">
                 {formatTimeAgo(new Date(post.createdAt))}
@@ -719,9 +798,13 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
             {post.institution?.name && (
               <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/80 mt-0.5 min-w-0">
                 <span className="size-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20 shrink-0" />
-                <span className="truncate font-medium text-foreground/85 max-w-[200px]">
+                <Link
+                  href={`/app/college/${post.institution.slug || post.institution.id || post.institutionId}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="truncate font-medium text-foreground/85 max-w-[200px] hover:underline hover:text-foreground transition-colors"
+                >
                   {getCollegeShortName(post.institution)}
-                </span>
+                </Link>
               </div>
             )}
           </div>
@@ -775,13 +858,23 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         {post.repostOf && Boolean(post.repostComment) && post.body?.trim() !== post.repostOf.body?.trim() && (
           <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md p-3.5 text-xs space-y-1.5 shadow-sm">
             <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
-              <span className="font-bold text-foreground">
+              <Link
+                href={`/@${post.repostOf.author?.username || "student"}`}
+                onClick={(e) => e.stopPropagation()}
+                className="font-bold text-foreground hover:underline transition-colors"
+              >
                 @{post.repostOf.author?.username || "student"}
-              </span>
+              </Link>
               {post.repostOf.institution && (
                 <>
                   <span>·</span>
-                  <span>{getCollegeShortName(post.repostOf.institution)}</span>
+                  <Link
+                    href={`/app/college/${post.repostOf.institution.slug || post.repostOf.institution.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="hover:underline hover:text-foreground transition-colors"
+                  >
+                    {getCollegeShortName(post.repostOf.institution)}
+                  </Link>
                 </>
               )}
             </div>
@@ -800,17 +893,19 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
         {tags.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap pt-1">
             {tags.map((tag, idx) => (
-              <span
+              <Link
                 key={tag}
+                href={`/app/search?q=${encodeURIComponent(tag.replace(/^#/, ""))}`}
+                onClick={(e) => e.stopPropagation()}
                 className={cn(
-                  "text-xs font-bold px-3 py-1 rounded-full transition-all select-none",
+                  "text-xs font-bold px-3 py-1 rounded-full transition-all select-none hover:opacity-90",
                   idx === 0
-                    ? "bg-purple-950/70 border border-purple-500/40 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.25)]"
-                    : "bg-white/5 border border-white/10 text-white/80"
+                    ? "bg-purple-950/70 border border-purple-500/40 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.25)] hover:bg-purple-900/80"
+                    : "bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:text-white"
                 )}
               >
                 {tag.startsWith("#") ? tag : `#${tag}`}
-              </span>
+              </Link>
             ))}
           </div>
         )}

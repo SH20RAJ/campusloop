@@ -80,7 +80,7 @@ export function FeedCardActions({
       });
       if (!res.ok) throw new Error("Failed to update save status");
       if (nextState) {
-        toast.success("Saved to campus vault 🔖");
+        toast.success("Saved to campus vault");
       } else {
         toast.info("Removed from saved posts");
       }

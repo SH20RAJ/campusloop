@@ -150,7 +150,7 @@ export function BirthdaysClient() {
   return (
     <div className="max-w-2xl mx-auto flex flex-col min-h-screen pb-24 select-none">
       {/* ─── Sticky Minimal Top Bar ─── */}
-      <header className="sticky top-0 z-40 bg-background/85 px-4 py-3 backdrop-blur-xl border-b border-border/20 flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-background/85 px-4 py-3 backdrop-blur-xl border-b border-border/5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -166,7 +166,7 @@ export function BirthdaysClient() {
         </div>
 
         {/* Scope Pill Toggle */}
-        <div className="flex rounded-full bg-muted/50 p-0.5 border border-border/40 shadow-2xs">
+        <div className="flex rounded-full bg-muted/50 p-0.5 border-0 shadow-2xs">
           <button
             type="button"
             onClick={() => setScope("CAMPUS")}
@@ -199,7 +199,7 @@ export function BirthdaysClient() {
       <main className="px-3 sm:px-4 pt-3.5 space-y-4">
         {/* ─── Minimal Birthday & Privacy Capsule ─── */}
         {data && (
-          <div className="rounded-3xl bg-card p-4 space-y-2.5 shadow-2xs">
+          <div className="rounded-3xl bg-card/60 p-4 space-y-2.5 shadow-2xs border-0">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="size-9 rounded-full bg-pink-500/10 text-pink-500 flex items-center justify-center shrink-0">
@@ -233,15 +233,15 @@ export function BirthdaysClient() {
                     type="button"
                     disabled={isUpdatingPrivacy}
                     onClick={handleTogglePrivacy}
-                    className="rounded-full border border-border/70 bg-muted/40 hover:bg-muted px-3.5 py-1 text-[11px] font-bold text-foreground transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                    className="rounded-full border-0 bg-muted/60 hover:bg-muted px-3.5 py-1 text-[11px] font-bold text-foreground transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
                   >
                     {isUpdatingPrivacy && <Loader2 className="size-3 animate-spin text-primary" />}
-                    <span>{data.currentUserIsPrivate ? "Make Public 🎉" : "Set Private 🔒"}</span>
+                    <span>{data.currentUserIsPrivate ? "Make Public" : "Set Private"}</span>
                   </button>
                 ) : (
                   <Link
                     href="/app/profile/edit"
-                    className="rounded-full bg-primary px-3.5 py-1 text-[11px] font-bold text-white hover:opacity-90 transition-all cursor-pointer flex items-center gap-1 shadow-xs"
+                    className="rounded-full bg-primary px-3.5 py-1 text-[11px] font-bold text-white hover:opacity-90 transition-all cursor-pointer flex items-center gap-1 shadow-xs border-0"
                   >
                     <Plus className="size-3" />
                     <span>Add DOB</span>
@@ -262,7 +262,7 @@ export function BirthdaysClient() {
               placeholder="Search classmate by name or @handle..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 rounded-full border border-border/50 bg-card text-xs font-semibold text-foreground placeholder:text-muted-foreground/70 focus:border-primary outline-none transition-all shadow-2xs"
+              className="w-full pl-9 pr-8 py-2 rounded-full border-0 bg-muted/30 text-xs font-semibold text-foreground placeholder:text-muted-foreground/70 focus:bg-muted/50 outline-none transition-all shadow-2xs"
             />
             {searchQuery && (
               <button
@@ -311,7 +311,7 @@ export function BirthdaysClient() {
                 <div className="flex items-center justify-between px-1">
                   <h2 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
                     <PartyPopper className="size-3.5 text-pink-500" />
-                    <span>Today&apos;s Campus Celebrations 🎉</span>
+                    <span>Today&apos;s Campus Celebrations</span>
                   </h2>
                   <span className="text-[10px] font-black text-pink-500 bg-pink-500/10 px-2 py-0.5 rounded-full">
                     {todayList.length} Celebrant{todayList.length === 1 ? "" : "s"}

@@ -1,19 +1,25 @@
 "use client";
 
 import {
+  BookOpen,
+  Building2,
   Cake,
   Calendar,
+  Code2,
+  Gamepad2,
   Globe,
   GraduationCap,
   Hash,
   MapPin,
   MessageCircle,
   MoreHorizontal,
+  Music,
   PartyPopper,
   Plus,
   School,
   Search,
   ShieldCheck,
+  Target,
   Users,
   X,
   Zap,
@@ -308,13 +314,13 @@ export function DiscoverFeed() {
   }, [searchedColleges, collegesPage]);
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-24 border-x border-border/30 bg-background">
+    <main className="mx-auto flex w-full max-w-2xl flex-col min-h-screen select-none pb-24 bg-background">
       {/* ─── Twitter/X Style Explore & Search Header ─── */}
-      <header className="sticky top-0 z-40 bg-background/85 px-4 pt-3 backdrop-blur-xl border-b border-border/30 space-y-3">
+      <header className="sticky top-0 z-40 bg-background/85 px-4 pt-3 backdrop-blur-xl space-y-3">
         {/* Scope Pill Switcher & Search Bar */}
         <div className="flex items-center gap-2.5">
           {/* Scope Selector (Around Campus vs Global) */}
-          <div className="flex items-center rounded-full bg-muted/60 p-0.5 border border-border/40 shrink-0">
+          <div className="flex items-center rounded-full bg-muted/60 p-0.5 shrink-0 shadow-2xs">
             <button
               type="button"
               onClick={() => handleScopeChange("CAMPUS")}
@@ -350,7 +356,7 @@ export function DiscoverFeed() {
               placeholder="Search CampusLoop..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full h-9 pl-9 pr-8 rounded-full bg-muted/50 border border-transparent focus:border-border/60 focus:bg-background text-xs font-medium placeholder:text-muted-foreground/70 outline-none transition-all shadow-2xs"
+              className="w-full h-9 pl-9 pr-8 rounded-full bg-muted/50 border-0 focus:ring-1 focus:ring-foreground/20 focus:bg-background text-xs font-medium placeholder:text-muted-foreground/70 outline-none transition-all shadow-2xs"
             />
             {searchQuery && (
               <button
@@ -367,7 +373,7 @@ export function DiscoverFeed() {
 
         {/* Dynamic Navigation Tabs: Search Filter Pills OR Explore Stream Tabs */}
         {trimmedSearch ? (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2.5 pt-0.5 border-b border-border/30">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2.5 pt-0.5">
             {[
               { id: "ALL", label: `All (${totalSearchResults})` },
               { id: "PEOPLE", label: `People (${searchUsers.length})` },
@@ -389,7 +395,7 @@ export function DiscoverFeed() {
                     "px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0",
                     isActive
                       ? "bg-foreground text-background shadow-xs font-black"
-                      : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/40"
+                      : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   {tab.label}
@@ -398,7 +404,7 @@ export function DiscoverFeed() {
             })}
           </div>
         ) : (
-          <div className="flex border-b border-border/30">
+          <div className="flex">
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -442,7 +448,7 @@ export function DiscoverFeed() {
 
               {/* 1. People / Students Search Results */}
               {(searchTab === "ALL" || searchTab === "PEOPLE") && searchUsers.length > 0 && (
-                <div className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-xs divide-y divide-border/20">
+                <div className="rounded-2xl bg-card/60 overflow-hidden shadow-2xs">
                   <div className="px-4 py-2.5 bg-muted/20 flex items-center justify-between">
                     <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                       <Users className="size-3.5" />
@@ -465,7 +471,7 @@ export function DiscoverFeed() {
                       >
                         <div className="flex items-start gap-3.5 min-w-0 flex-1">
                           <Link href={`/@${user.username}`} className="shrink-0 group">
-                            <Avatar className="size-13 border border-border/40">
+                            <Avatar className="size-13">
                               <AvatarImage src={user.avatarUrl || ""} />
                               <AvatarFallback className="text-sm font-black bg-muted text-foreground">
                                 {user.displayName[0]}
@@ -533,10 +539,10 @@ export function DiscoverFeed() {
                       <Link
                         key={college.id}
                         href={`/college/${college.slug || college.id}`}
-                        className="p-3.5 rounded-2xl border border-border/40 bg-card hover:bg-muted/30 transition-colors block space-y-2 group shadow-xs"
+                        className="p-3.5 rounded-2xl bg-card/60 hover:bg-muted/30 transition-colors block space-y-2 group shadow-2xs"
                       >
                         <div className="flex items-start gap-3">
-                          <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black text-sm shrink-0 border border-primary/20">
+                          <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black text-sm shrink-0">
                             {college.name[0]}
                           </div>
                           <div className="min-w-0 flex-1">
@@ -576,10 +582,10 @@ export function DiscoverFeed() {
                       <Link
                         key={community.id}
                         href={`/app/communities/${community.slug || community.id}`}
-                        className="p-3.5 rounded-2xl border border-border/40 bg-card hover:bg-muted/30 transition-colors block space-y-2 group shadow-xs"
+                        className="p-3.5 rounded-2xl bg-card/60 hover:bg-muted/30 transition-colors block space-y-2 group shadow-2xs"
                       >
                         <div className="flex items-start gap-3">
-                          <div className="size-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-black text-sm shrink-0 border border-purple-500/20">
+                          <div className="size-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-black text-sm shrink-0">
                             <Hash className="size-5" />
                           </div>
                           <div className="min-w-0 flex-1">
@@ -614,7 +620,7 @@ export function DiscoverFeed() {
                     </h3>
                   </div>
 
-                  <div className="divide-y divide-border/25 rounded-2xl border border-border/40 bg-card overflow-hidden">
+                  <div className="rounded-2xl bg-card/60 overflow-hidden space-y-2">
                     {searchPosts.map((post) => (
                       <FeedCard key={post.id} post={post} />
                     ))}
@@ -644,7 +650,7 @@ export function DiscoverFeed() {
             <div className="space-y-4 pt-3">
               {/* Today's Campus News / Top Discussion Card */}
               {news.length > 0 && (
-                <div className="border-b border-border/30 pb-3 divide-y divide-border/20">
+                <div className="pb-3 space-y-1">
                   <div className="px-4 pb-2">
                     <h2 className="text-[17px] font-black text-foreground tracking-tight">
                       Today&apos;s Campus Buzz
@@ -673,7 +679,7 @@ export function DiscoverFeed() {
 
               {/* Trending Hashtags Section */}
               {trends.length > 0 && (
-                <div className="border-b border-border/30 pb-3 divide-y divide-border/20">
+                <div className="pb-3 space-y-1">
                   <div className="px-4 pb-2 flex items-center justify-between">
                     <h2 className="text-[17px] font-black text-foreground tracking-tight">
                       {scope === "CAMPUS" ? `Trending in ${collegeName}` : "Trending in India"}
@@ -707,21 +713,24 @@ export function DiscoverFeed() {
               )}
 
               {/* ─── Campus Events & Club Organizer Option ─── */}
-              <div className="border-b border-border/30 pb-4 px-4 pt-1">
-                <div className="rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/15 via-card to-background p-4 sm:p-5 shadow-sm space-y-3">
+              <div className="pb-4 px-4 pt-1">
+                <div className="rounded-3xl bg-gradient-to-br from-primary/10 via-card/70 to-background/40 p-4 sm:p-5 shadow-2xs space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="size-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
                         <Calendar className="size-4" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-black text-foreground">Host a Campus Event 🎉</h3>
+                        <h3 className="text-sm font-black text-foreground flex items-center gap-1.5">
+                          <span>Host a Campus Event</span>
+                          <PartyPopper className="size-3.5 text-primary" />
+                        </h3>
                         <p className="text-[11px] text-muted-foreground">
                           Club meets, hostel fests, hackathons &amp; LANs
                         </p>
                       </div>
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
+                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/15 text-primary">
                       Open to All
                     </span>
                   </div>
@@ -742,7 +751,7 @@ export function DiscoverFeed() {
 
                     <Link
                       href="/app/events"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border/80 bg-card hover:bg-muted text-foreground text-xs font-bold transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-muted/70 hover:bg-muted text-foreground text-xs font-bold transition-colors"
                     >
                       <Calendar className="size-3.5" />
                       <span>Explore Events Calendar</span>
@@ -752,7 +761,7 @@ export function DiscoverFeed() {
               </div>
 
               {/* ─── Default Communities & Hubs ─── */}
-              <div className="border-b border-border/30 pb-4 px-4 space-y-3">
+              <div className="pb-4 px-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-[17px] font-black text-foreground tracking-tight flex items-center gap-2">
@@ -770,51 +779,54 @@ export function DiscoverFeed() {
                   {[
                     {
                       name: "Coding & Tech",
-                      icon: "💻",
+                      icon: Code2,
                       href: "/app/communities?category=TECH",
                       desc: "Devs & CP",
                     },
                     {
                       name: "Music & Arts",
-                      icon: "🎸",
+                      icon: Music,
                       href: "/app/communities?category=MUSIC",
                       desc: "Jams & bands",
                     },
                     {
                       name: "Hostel Life",
-                      icon: "🏢",
+                      icon: Building2,
                       href: "/app/communities?category=HOSTEL",
                       desc: "Wing banter",
                     },
                     {
                       name: "Placement Prep",
-                      icon: "🎯",
+                      icon: Target,
                       href: "/app/communities?category=CAREER",
                       desc: "OA & interviews",
                     },
-                    { name: "Esports Arena", icon: "🎮", href: "/app/gaming", desc: "Tournaments" },
-                    { name: "Study Vault", icon: "📚", href: "/app/academics", desc: "Notes & PYQs" },
-                  ].map((hub) => (
-                    <Link
-                      key={hub.name}
-                      href={hub.href}
-                      className="p-3 rounded-2xl border border-border/50 bg-card hover:bg-muted/40 transition-colors block space-y-1 shadow-2xs group"
-                    >
-                      <div className="text-lg">{hub.icon}</div>
-                      <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                        {hub.name}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground truncate">{hub.desc}</p>
-                    </Link>
-                  ))}
+                    { name: "Esports Arena", icon: Gamepad2, href: "/app/gaming", desc: "Tournaments" },
+                    { name: "Study Vault", icon: BookOpen, href: "/app/academics", desc: "Notes & PYQs" },
+                  ].map((hub) => {
+                    const HubIcon = hub.icon;
+                    return (
+                      <Link
+                        key={hub.name}
+                        href={hub.href}
+                        className="p-3 rounded-2xl bg-card/60 hover:bg-muted/40 transition-colors block space-y-1.5 shadow-2xs group"
+                      >
+                        <HubIcon className="size-5 text-primary" />
+                        <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                          {hub.name}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground truncate">{hub.desc}</p>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* ─── Indirect Campus Birthdays Banner ─── */}
-              <div className="border-b border-border/30 pb-4 px-4">
+              <div className="pb-4 px-4">
                 <Link
                   href="/app/birthdays"
-                  className="flex items-center justify-between p-3.5 sm:p-4 rounded-3xl border border-pink-500/30 bg-gradient-to-r from-pink-500/10 via-purple-500/5 to-card hover:border-pink-500/50 transition-all shadow-2xs group"
+                  className="flex items-center justify-between p-3.5 sm:p-4 rounded-3xl bg-gradient-to-r from-pink-500/10 via-purple-500/5 to-card/60 hover:bg-pink-500/15 transition-all shadow-2xs group"
                 >
                   <div className="flex items-center gap-3">
                     <div className="size-10 rounded-2xl bg-pink-500/15 text-pink-500 flex items-center justify-center shrink-0">
@@ -836,7 +848,7 @@ export function DiscoverFeed() {
 
               {/* Who to Follow / Connect */}
               {suggestedPeers && suggestedPeers.length > 0 && (
-                <div className="border-b border-border/30 pb-4 px-4 space-y-3">
+                <div className="pb-4 px-4 space-y-3">
                   <h3 className="text-[17px] font-black text-foreground tracking-tight">Who to follow</h3>
                   <div className="space-y-3">
                     {suggestedPeers.slice(0, 3).map((peer) => {
@@ -844,7 +856,7 @@ export function DiscoverFeed() {
                       return (
                         <div key={peer.id} className="flex items-center justify-between gap-3">
                           <Link href={`/@${peer.username}`} className="flex items-center gap-3 min-w-0 group">
-                            <Avatar className="size-10 border border-border/40">
+                            <Avatar className="size-10">
                               <AvatarImage src={peer.avatarUrl || ""} />
                               <AvatarFallback className="text-xs font-bold bg-muted text-foreground">
                                 {peer.displayName[0]}
@@ -903,7 +915,7 @@ export function DiscoverFeed() {
           {/* ─── TAB 2: TRENDING VIEW ─── */}
           {activeTab === "TRENDING" && (
             <div className="space-y-4 pt-3">
-              <div className="divide-y divide-border/20 border-b border-border/30 pb-2">
+              <div className="pb-2 space-y-1">
                 {trends.length > 0 ? (
                   trends.map((trend) => (
                     <Link
@@ -965,7 +977,7 @@ export function DiscoverFeed() {
                       setCollegesPage(1);
                     }}
                     placeholder="Search 1,350+ Indian colleges..."
-                    className="w-full h-10 rounded-full border border-border/50 bg-muted/40 pl-9 pr-4 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-foreground transition-all"
+                    className="w-full h-10 rounded-full border-0 bg-muted/50 pl-9 pr-4 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-1 focus:ring-foreground/20 transition-all shadow-2xs"
                   />
                 </div>
                 {collegeSearch && (

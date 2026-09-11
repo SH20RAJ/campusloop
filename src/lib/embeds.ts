@@ -16,9 +16,15 @@
 
 export type EmbedType =
   | "youtube"
-  | "instagram"
-  | "twitter"
+  | "ninegag"
   | "spotify"
+  | "soundcloud"
+  | "apple_music"
+  | "twitter"
+  | "instagram"
+  | "codepen"
+  | "loom"
+  | "vimeo"
   | "video"
   | "audio"
   | "internal_profile"
@@ -36,6 +42,17 @@ export interface ParsedEmbed {
   username?: string;
   slug?: string;
   embedUrl?: string;
+  mediaUrl?: string;
+  title?: string;
+  author?: string;
+  isHome?: boolean;
+}
+
+/**
+ * Check if an embed is music/audio related
+ */
+export function isMusicEmbed(type: EmbedType): boolean {
+  return type === "spotify" || type === "soundcloud" || type === "apple_music" || type === "audio";
 }
 
 /**
@@ -62,12 +79,113 @@ export function extractYouTubeId(url: string): string | null {
 }
 
 /**
+ * Extract 9GAG Post ID
+ * Supports:
+ * - https://9gag.com/gag/aeM4p25
+ * - https://m.9gag.com/gag/aX81Q1y
+ * - http://9gag.com/gag/abc1234
+ */
+export function extractNineGagId(url: string): string | null {
+  const match = url.match(/(?<![\w.-])(?:https?:\/\/)?(?:www\.|m\.)?9gag\.com\/gag\/([a-zA-Z0-9]+)/i);
+  return match ? match[1] : null;
+}
+
+/**
+ * Check if URL points to 9GAG Home, Hot, Trending, or Fresh feed
+ */
+export function isNineGagHomeUrl(url: string): boolean {
+  return /(?<![\w.-])(?:https?:\/\/)?(?:www\.|m\.)?9gag\.com(?:\/(?:home|hot|trending|fresh)?)?(?:[/?#]|$)/i.test(url.trim()) &&
+    !url.includes("/gag/");
+}
+
+/**
+ * Extract Instagram Embed URL
+ * Supports: posts (/p/), reels (/reel/), tv (/tv/)
+ */
+export function extractInstagramEmbedUrl(url: string): { embedUrl: string; id: string } | null {
+  const match = url.match(/(?<![\w.-])(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/i);
+  if (match) {
+    return {
+      id: match[1],
+      embedUrl: `https://www.instagram.com/p/${match[1]}/embed/`,
+    };
+  }
+  return null;
+}
+
+/**
+ * Extract Vimeo Embed URL
+ */
+export function extractVimeoEmbedUrl(url: string): { embedUrl: string; id: string } | null {
+  const match = url.match(/(?<![\w.-])(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/i);
+  if (match) {
+    return {
+      id: match[1],
+      embedUrl: `https://player.vimeo.com/video/${match[1]}`,
+    };
+  }
+  return null;
+}
+
+/**
  * Extract Spotify Embed URL
+ * Supports: track, album, playlist, episode, artist, show
  */
 export function extractSpotifyEmbedUrl(url: string): string | null {
-  const match = url.match(/https:\/\/open\.spotify\.com\/(track|album|playlist|episode)\/([a-zA-Z0-9]+)/i);
+  const match = url.match(/(?:https?:\/\/)?open\.spotify\.com\/(track|album|playlist|episode|artist|show)\/([a-zA-Z0-9]+)/i);
   if (match) {
     return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
+  }
+  return null;
+}
+
+/**
+ * Extract SoundCloud Embed URL
+ * Supports soundcloud.com/{artist}/{track}, sets, and on.soundcloud.com/{shortcode}
+ */
+export function extractSoundCloudEmbedUrl(url: string): string | null {
+  const match = url.match(/(?<![\w.-])(?:https?:\/\/)?(?:www\.)?(?:soundcloud\.com\/[a-zA-Z0-9_-]+\/(?:sets\/)?[a-zA-Z0-9_-]+|on\.soundcloud\.com\/[a-zA-Z0-9_-]+)/i);
+  if (match) {
+    const fullUrl = url.startsWith("http") ? url : `https://${url}`;
+    return `https://w.soundcloud.com/player/?url=${encodeURIComponent(fullUrl)}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=true&show_user=true&show_reposts=false&show_teaser=false`;
+  }
+  return null;
+}
+
+/**
+ * Extract Apple Music Embed URL
+ * Converts music.apple.com to embed.music.apple.com
+ */
+export function extractAppleMusicEmbedUrl(url: string): string | null {
+  const match = url.match(/(?:https?:\/\/)?music\.apple\.com\/([a-z]{2}\/(?:album|playlist|song|artist)\/[^\s?#]+(?:\/[0-9]+)?(?:\?i=[0-9]+)?)/i);
+  if (match) {
+    return `https://embed.music.apple.com/${match[1]}`;
+  }
+  return null;
+}
+
+/**
+ * Extract CodePen Embed URL
+ */
+export function extractCodePenEmbedUrl(url: string): { embedUrl: string; penId: string; user: string } | null {
+  const match = url.match(/(?:https?:\/\/)?codepen\.io\/([a-zA-Z0-9_-]+)\/pen\/([a-zA-Z0-9]+)/i);
+  if (match) {
+    return {
+      user: match[1],
+      penId: match[2],
+      embedUrl: `https://codepen.io/${match[1]}/embed/${match[2]}?default-tab=result&theme-id=dark`,
+    };
+  }
+  return null;
+}
+
+/**
+ * Extract Loom Video Embed URL
+ */
+export function extractLoomEmbedUrl(url: string): string | null {
+  const match = url.match(/(?:https?:\/\/)?(?:www\.)?loom\.com\/share\/([a-zA-Z0-9]+)/i);
+  if (match) {
+    return `https://www.loom.com/embed/${match[1]}`;
   }
   return null;
 }
@@ -178,6 +296,109 @@ export function extractEmbedsFromText(text: string): ParsedEmbed[] {
         type: "spotify",
         rawUrl: cleanUrl,
         embedUrl: spotifyEmbed,
+      });
+      continue;
+    }
+
+    // E. 9GAG (Gag or Home)
+    const nineGagId = extractNineGagId(cleanUrl);
+    if (nineGagId) {
+      embeds.push({
+        type: "ninegag",
+        rawUrl: cleanUrl,
+        id: nineGagId,
+        embedUrl: `https://9gag.com/gag/${nineGagId}`,
+        mediaUrl: `https://img-9gag-fun.9cache.com/photo/${nineGagId}_460sv.mp4`,
+      });
+      continue;
+    } else if (isNineGagHomeUrl(cleanUrl)) {
+      embeds.push({
+        type: "ninegag",
+        rawUrl: cleanUrl,
+        embedUrl: cleanUrl,
+        title: "9GAG - Go Fun The World",
+        isHome: true,
+      });
+      continue;
+    }
+
+    // F. SoundCloud
+    const scEmbed = extractSoundCloudEmbedUrl(cleanUrl);
+    if (scEmbed) {
+      embeds.push({
+        type: "soundcloud",
+        rawUrl: cleanUrl,
+        embedUrl: scEmbed,
+      });
+      continue;
+    }
+
+    // G. Apple Music
+    const appleMusicEmbed = extractAppleMusicEmbedUrl(cleanUrl);
+    if (appleMusicEmbed) {
+      embeds.push({
+        type: "apple_music",
+        rawUrl: cleanUrl,
+        embedUrl: appleMusicEmbed,
+      });
+      continue;
+    }
+
+    // H. Twitter / X
+    const tweetId = extractTweetId(cleanUrl);
+    if (tweetId) {
+      embeds.push({
+        type: "twitter",
+        rawUrl: cleanUrl,
+        id: tweetId,
+      });
+      continue;
+    }
+
+    // I. Instagram
+    const insta = extractInstagramEmbedUrl(cleanUrl);
+    if (insta) {
+      embeds.push({
+        type: "instagram",
+        rawUrl: cleanUrl,
+        id: insta.id,
+        embedUrl: insta.embedUrl,
+      });
+      continue;
+    }
+
+    // J. CodePen
+    const codePen = extractCodePenEmbedUrl(cleanUrl);
+    if (codePen) {
+      embeds.push({
+        type: "codepen",
+        rawUrl: cleanUrl,
+        id: codePen.penId,
+        embedUrl: codePen.embedUrl,
+        author: codePen.user,
+      });
+      continue;
+    }
+
+    // K. Loom
+    const loomEmbed = extractLoomEmbedUrl(cleanUrl);
+    if (loomEmbed) {
+      embeds.push({
+        type: "loom",
+        rawUrl: cleanUrl,
+        embedUrl: loomEmbed,
+      });
+      continue;
+    }
+
+    // L. Vimeo
+    const vimeo = extractVimeoEmbedUrl(cleanUrl);
+    if (vimeo) {
+      embeds.push({
+        type: "vimeo",
+        rawUrl: cleanUrl,
+        id: vimeo.id,
+        embedUrl: vimeo.embedUrl,
       });
       continue;
     }

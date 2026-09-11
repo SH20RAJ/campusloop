@@ -13,7 +13,7 @@
   <a href="https://campusloop.space"><strong>🌐 Live App (campusloop.space)</strong></a> •
   <a href="https://campusloop.space/demo"><strong>🔑 Demo Access (/demo)</strong></a> •
   <a href="docs/PROJECT_BRIEF.md"><strong>📑 Project Brief & Viral Playbook</strong></a> •
-  <a href="ARCHITECTURE.md"><strong>🏛️ System Architecture</strong></a> •
+  <a href="docs/ARCHITECTURE.md"><strong>🏛️ System Architecture</strong></a> •
   <a href="https://campusloop.space/overview"><strong>📊 Strategic Overview</strong></a> •
   <a href="https://campusloop.space/pitch"><strong>⚡ Pitch Deck</strong></a>
 </p>
@@ -36,6 +36,7 @@ For investors, evaluators, and public testers without a `.ac.in` / `.edu` colleg
 
 ### 🚀 What You Can Test with This Account
 - **Campus Feed & Confessions**: Post anonymous confessions with client-side PII scrubbing, launch interactive live polls, quote-repost with Web Audio chimes, and comment on threads.
+- **Link & Music Embeds**: Full support for 9GAG memes/portal, Spotify tracks/playlists/albums, SoundCloud, Apple Music, YouTube, CodePen, Loom, Vimeo, and Instagram with real-time composer previews.
 - **Campus Match & Secret Crush**: Swipe student cards, match instantly, and lock crushes in the cryptographically sealed escrow vault (`/app/crush`).
 - **Realtime Chat & PeerJS Calls**: 1-on-1 direct messages, group team channels, and direct WebRTC P2P audio/video calling (`/app/chat`).
 - **24-Hour Campus Stories (Vibes)**: Post visual campus vibes with progress bars, heart reactions, and archive highlights (`/app/stories`).
@@ -46,7 +47,7 @@ For investors, evaluators, and public testers without a `.ac.in` / `.edu` colleg
 
 ## 🏛️ Comprehensive Architecture Documentation
 
-> 📖 **Deep Dive Available**: Read the full system design, Mermaid sequence diagrams, Drizzle ORM schema topology, edge runtime specifications, and recommendation algorithms in [**`ARCHITECTURE.md`**](ARCHITECTURE.md).
+> 📖 **Deep Dive Available**: Read the full system design, Mermaid sequence diagrams, Drizzle ORM schema topology, edge runtime specifications, and recommendation algorithms in [**`docs/ARCHITECTURE.md`**](docs/ARCHITECTURE.md).
 
 ---
 
@@ -335,14 +336,14 @@ bun run deploy
 > now enables `webpackMemoryOptimizations`, `webpackBuildWorker` and
 > `memoryBasedWorkersCount`, and the build script raises the V8 heap to 5 GB.
 > Still stop any other `next dev` servers first — each one holds ~1 GB.
-> See [ARCHITECTURE.md §10](ARCHITECTURE.md#10-build-test--deployment-workflow).
+> See [docs/ARCHITECTURE.md §10](docs/ARCHITECTURE.md#10-build-test--deployment-workflow).
 
 ---
 
 ## 🔗 Resources & Statutory Links
 
 - 🌐 **Official Website**: [https://campusloop.space](https://campusloop.space)
-- 🏛️ **System Architecture**: [ARCHITECTURE.md](ARCHITECTURE.md)
+- 🏛️ **System Architecture**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - 📊 **Strategic Overview**: [https://campusloop.space/overview](https://campusloop.space/overview)
 - ⚡ **Investor Pitch Deck**: [https://campusloop.space/pitch](https://campusloop.space/pitch)
 - 🛡️ **Safety & Anti-Ragging**: [https://campusloop.space/safety](https://campusloop.space/safety)

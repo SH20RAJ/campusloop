@@ -20,12 +20,12 @@ const CAMPUS_COLORS = [
 ];
 
 const CAMPUS_GLOWS = [
-  "hover:border-blue-500/30 hover:shadow-blue-500/5",
-  "hover:border-purple-500/30 hover:shadow-purple-500/5",
-  "hover:border-emerald-500/30 hover:shadow-emerald-500/5",
-  "hover:border-amber-500/30 hover:shadow-amber-500/5",
-  "hover:border-rose-500/30 hover:shadow-rose-500/5",
-  "hover:border-indigo-500/30 hover:shadow-indigo-500/5",
+  "hover:shadow-blue-500/10 hover:bg-blue-500/15",
+  "hover:shadow-purple-500/10 hover:bg-purple-500/15",
+  "hover:shadow-emerald-500/10 hover:bg-emerald-500/15",
+  "hover:shadow-amber-500/10 hover:bg-amber-500/15",
+  "hover:shadow-rose-500/10 hover:bg-rose-500/15",
+  "hover:shadow-indigo-500/10 hover:bg-indigo-500/15",
 ];
 
 export function FeaturedCampusCard({ college, index }: FeaturedCampusCardProps) {

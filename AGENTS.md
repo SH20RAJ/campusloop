@@ -82,6 +82,21 @@ CampusLoop is designed to empower college students with a safe, engaging, and fe
 - **ALWAYS** use `lucide-react` icons or custom animated SVGs (`@/components/ui/animated-icon`).
 - **NO Primitive Form UI**: Avoid generic, plain forms with bare inputs. Form experiences must be creatively professional: visual category cards, drag-and-drop file upload with live previews, auto-detection (e.g. Drive permissions), tag generators, and sticky live preview cards with real-time validation checklists.
 
+### 12. Link & Music Embed Engine & Sanitization
+- Rich link previews and embedded media players are centralized through `@/lib/embeds.ts` and `@/components/embeds/post-embed-renderer.tsx`.
+- Supported providers: **9GAG** (memes, player, `/home` portal), **Spotify** (tracks, playlists, albums), **SoundCloud** (HTML5 player), **Apple Music** (tracks & albums), **YouTube**, **Vimeo**, **Loom**, **CodePen**, **Instagram**.
+- **Sanitization**: All RSS and third-party ingested content must be cleaned using `cleanPostHtml` (`@/lib/html-sanitize.ts`) to eliminate raw HTML table artifacts (`<table>`, `<!-- SC_OFF -->`, `&#32;`).
+- Post composer features real-time embed extraction, live preview cards, and per-item dismissal.
+
+### 13. Borderless Clean Design & Admin Console Architecture
+- **Borderless Aesthetic**: High-density timelines and exploration hubs (`/app/birthdays`, `/app/discover`, feed cards) avoid harsh bounding borders. Use subtle tonal backgrounds (`bg-card/60`), soft ambient shadows (`shadow-2xs`), and borderless pill switchers.
+- **Admin Operations Hub**: The Admin Console (`/admin`) is organized into dedicated operational domains:
+  - **Operations & Safety**: Dashboard, Review Queue, Reports, Academics Vault (`/admin/academics`).
+  - **Content & Campus**: Feed Curation, Posts, Comments, Users, Colleges, Campus Broadcasts (`/admin/broadcasts`).
+  - **Integrations & Studio**: Composio Hub (`/admin/composio` — Reddit sync, Cloudflare CDN edge controls, webhook alerts, exports), Embeds Inspector (`/admin/embeds`), Short Links & Refs.
+  - **Marketplace**: Overview, Merchants, Products, Rentals.
+  - **Telemetry & System**: Platform Analytics & Pulse (`/admin/analytics`), System Health Matrix (`/admin/system`), Audit Log (`/admin/audit`).
+
 ---
 
 ## 📁 Workspace Directory Sitemap

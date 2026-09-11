@@ -13,13 +13,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
 import { AudioPlayer } from "@/components/media/audio-player";
 import { DocumentCard } from "@/components/media/document-card";
 import { VideoPlayer } from "@/components/media/video-player";
 import { isMediaImageUrl } from "@/lib/embeds";
+import { cleanPostHtml } from "@/lib/html-sanitize";
 import { cn, formatImagePostDate } from "@/lib/utils";
 
 interface RichTextProps {
@@ -76,6 +77,8 @@ export function RichText({
 
   if (!content) return null;
 
+  const sanitizedContent = cleanPostHtml(content);
+
   // Regex to extract markdown media elements: ![tag:extra](url)
   const mediaRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g;
 
@@ -86,7 +89,7 @@ export function RichText({
 
   let match: RegExpExecArray | null;
 
-  while ((match = mediaRegex.exec(content)) !== null) {
+  while ((match = mediaRegex.exec(sanitizedContent)) !== null) {
     const rawTag = match[1] || "";
     const url = match[2];
 
@@ -125,7 +128,7 @@ export function RichText({
   }
 
   // Text with markdown media markers removed
-  const textWithoutMedia = content.replace(mediaRegex, "").trim();
+  const textWithoutMedia = sanitizedContent.replace(mediaRegex, "").trim();
 
   function handleOpenImage(e: React.MouseEvent, url: string) {
     e.preventDefault();

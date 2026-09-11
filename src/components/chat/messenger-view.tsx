@@ -141,26 +141,40 @@ export function MessengerView({
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  const handleSelectConversation = useCallback((convId: string) => {
-    sounds.tap();
-    haptics.light();
+  const selectConversation = useCallback((convId: string, playSound = false) => {
+    if (playSound) {
+      sounds.tap();
+      haptics.light();
+    }
     setActiveConversationId(convId);
     if (typeof window !== "undefined") {
       window.history.pushState(null, "", `/app/chat/${convId}`);
     }
   }, []);
 
-  // Auto-start or select conversation if targetUserId was provided via URL query
+  const handleSelectConversation = useCallback(
+    (convId: string) => {
+      selectConversation(convId, true);
+    },
+    [selectConversation]
+  );
+
+  const handledTargetUserIdRef = useRef<string | null>(null);
+
+  // Auto-start or select conversation if targetUserId was provided via URL query (silent, runs once)
   useEffect(() => {
     if (!initialTargetUserId || !conversations) return;
+    if (handledTargetUserIdRef.current === initialTargetUserId) return;
 
     const existing = conversations.find((c) => c.otherParticipant?.id === initialTargetUserId);
     if (existing) {
-      handleSelectConversation(existing.id);
+      handledTargetUserIdRef.current = initialTargetUserId;
+      selectConversation(existing.id, false);
     } else {
+      handledTargetUserIdRef.current = initialTargetUserId;
       startConversation(initialTargetUserId);
     }
-  }, [initialTargetUserId, conversations, startConversation, handleSelectConversation]);
+  }, [initialTargetUserId, conversations, startConversation, selectConversation]);
 
   const handleBackToInbox = useCallback(() => {
     setActiveConversationId(null);

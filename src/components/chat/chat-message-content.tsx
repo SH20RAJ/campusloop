@@ -2,22 +2,15 @@
 
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
-import React, { useMemo } from "react";
-import { ArticleEmbed } from "@/components/embeds/article-embed";
-import { CommunityEmbed } from "@/components/embeds/community-embed";
-import { EventEmbed } from "@/components/embeds/event-embed";
-import { LinkPreviewEmbed } from "@/components/embeds/link-preview-embed";
-import { SpotifyEmbed } from "@/components/embeds/spotify-embed";
-import { UserProfileEmbed } from "@/components/embeds/user-profile-embed";
-import { YouTubeEmbed } from "@/components/embeds/youtube-embed";
-import { extractEmbedsFromText } from "@/lib/embeds";
+import React from "react";
+import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
 
 interface ChatMessageContentProps {
   content: string;
   isMe: boolean;
 }
 
-/**
+/**                   
  * Splits text into tokens: @mentions, URLs, and regular text,
  * using industry-standard boundary detection (preventing credentials like mart@password123 from matching).
  */
@@ -121,14 +114,6 @@ function renderFormattedMessage(text: string, isMe: boolean) {
 }
 
 export function ChatMessageContent({ content, isMe }: ChatMessageContentProps) {
-  const embeds = useMemo(() => {
-    if (!content) return [];
-    return extractEmbedsFromText(content);
-  }, [content]);
-
-  // Render at most 2 embeds per chat bubble to keep messages compact
-  const topEmbeds = embeds.slice(0, 2);
-
   return (
     <div className="space-y-1.5 text-left">
       {/* Formatted body text with left alignment */}
@@ -136,40 +121,10 @@ export function ChatMessageContent({ content, isMe }: ChatMessageContentProps) {
         {renderFormattedMessage(content, isMe)}
       </p>
 
-      {/* Embedded interactive artifacts (Profiles, Events, Communities, Articles, etc.) */}
-      {topEmbeds.length > 0 && (
-        <div className="mt-2 space-y-2 pt-1 border-t border-white/10 dark:border-border/30 text-left">
-          {topEmbeds.map((embed, idx) => {
-            const key = `${embed.type}-${embed.rawUrl}-${idx}`;
-
-            switch (embed.type) {
-              case "internal_profile":
-                return embed.username ? <UserProfileEmbed key={key} username={embed.username} /> : null;
-
-              case "internal_event":
-                return embed.id ? <EventEmbed key={key} eventId={embed.id} /> : null;
-
-              case "internal_community":
-                return embed.slug ? <CommunityEmbed key={key} slugOrId={embed.slug} /> : null;
-
-              case "internal_article":
-                return embed.slug ? <ArticleEmbed key={key} slug={embed.slug} /> : null;
-
-              case "youtube":
-                return embed.id ? <YouTubeEmbed key={key} videoId={embed.id} rawUrl={embed.rawUrl} /> : null;
-
-              case "spotify":
-                return embed.embedUrl ? <SpotifyEmbed key={key} embedUrl={embed.embedUrl} /> : null;
-
-              case "opengraph":
-                return <LinkPreviewEmbed key={key} url={embed.rawUrl} />;
-
-              default:
-                return null;
-            }
-          })}
-        </div>
-      )}
+      {/* Embedded interactive artifacts (Profiles, Events, Communities, Articles, 9GAG, Music, etc.) */}
+      <div className="mt-2 pt-1 border-t border-white/10 dark:border-border/30 text-left">
+        <PostEmbedRenderer content={content} limit={2} />
+      </div>
     </div>
   );
 }

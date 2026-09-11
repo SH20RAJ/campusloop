@@ -17,6 +17,7 @@ import {
   Mic,
   School,
   Smile,
+  Sparkles,
   Type,
   Users,
   VenetianMask,
@@ -25,7 +26,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { AudioPlayer } from "@/components/media/audio-player";
@@ -34,6 +35,7 @@ import { VideoPlayer } from "@/components/media/video-player";
 import { VoiceRecorderModal } from "@/components/media/voice-recorder-modal";
 import { PollOptionsEditor } from "@/components/post/poll-options-editor";
 import { PostComposerToolbar } from "@/components/post/post-composer-toolbar";
+import { PostEmbedRenderer } from "@/components/embeds/post-embed-renderer";
 import { AnimateImage, AnimateZap } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GifPickerModal } from "@/components/ui/gif-picker-modal";
@@ -47,6 +49,7 @@ import { useCommunities } from "@/hooks/use-communities";
 import type { FeedPost } from "@/hooks/use-feed";
 import { useProfile } from "@/hooks/use-profile";
 import { fetcher } from "@/lib/api";
+import { extractEmbedsFromText } from "@/lib/embeds";
 import { confirmOptimisticPost, optimisticAddPost, revertOptimisticPost } from "@/lib/feed-mutations";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -121,6 +124,7 @@ export function PostComposer({
   const [uploadedDocs, setUploadedDocs] = useState<{ url: string; name: string; size: number }[]>([]);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [dismissedUrls, setDismissedUrls] = useState<string[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
@@ -386,6 +390,18 @@ export function PostComposer({
   const isConfession = postType === "CONFESSION";
   const anonActive = isAnonymous || isConfession;
   const overLimit = charCount > MAX_CHARS;
+
+  // Real-time link and media embed extraction
+  const detectedEmbeds = useMemo(() => {
+    const text = editor?.getText() || "";
+    if (!text) return [];
+    return extractEmbedsFromText(text);
+  }, [editor, charCount]);
+
+  const visibleEmbeds = useMemo(() => {
+    return detectedEmbeds.filter((e) => !dismissedUrls.includes(e.rawUrl));
+  }, [detectedEmbeds, dismissedUrls]);
+
   const hasContent =
     charCount > 0 ||
     uploadedImages.length > 0 ||
@@ -1041,6 +1057,34 @@ export function PostComposer({
             </button>
           </div>
         ))}
+
+        {/* ─── Live Link & Media Embed Previews ─── */}
+        {visibleEmbeds.length > 0 && (
+          <div className="mx-4 mb-3 rounded-2xl border border-primary/20 bg-muted/25 p-3.5 shadow-2xs">
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/30">
+              <div className="flex items-center gap-1.5 text-xs font-black text-foreground">
+                <Sparkles className="size-3.5 text-primary" />
+                <span>Live Link & Media Embed Previews</span>
+                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-black text-primary">
+                  {visibleEmbeds.length}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDismissedUrls(visibleEmbeds.map((e) => e.rawUrl))}
+                className="text-[11px] font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              >
+                Dismiss all
+              </button>
+            </div>
+            <PostEmbedRenderer
+              embeds={visibleEmbeds}
+              limit={4}
+              dismissable
+              onDismiss={(rawUrl) => setDismissedUrls((prev) => [...prev, rawUrl])}
+            />
+          </div>
+        )}
 
         {/* ─── Poll options ─── */}
         {postType === "POLL" && (

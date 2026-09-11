@@ -16,27 +16,35 @@ export const metadata: Metadata = {
 };
 
 import {
+  Activity,
   ArrowLeft,
   Bike,
+  BookOpen,
   FileText,
   Ghost,
   LayoutDashboard,
   Link2,
+  Megaphone,
   MessageSquare,
+  Play,
+  Radio,
   School,
   ScrollText,
+  Server,
   ShieldAlert,
   ShoppingBag,
   Store,
   TrendingUp,
   Users,
   UtensilsCrossed,
+  Zap,
 } from "lucide-react";
 
 const primaryNav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/review", label: "Review Queue", icon: ShieldAlert },
   { href: "/admin/reports", label: "Reports", icon: ShieldAlert },
+  { href: "/admin/academics", label: "Academics Vault", icon: BookOpen },
 ];
 
 const contentNav = [
@@ -45,6 +53,13 @@ const contentNav = [
   { href: "/admin/comments", label: "Comments", icon: MessageSquare },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/colleges", label: "Colleges", icon: School },
+  { href: "/admin/broadcasts", label: "Campus Broadcasts", icon: Megaphone },
+];
+
+const integrationsNav = [
+  { href: "/admin/composio", label: "Composio Hub", icon: Zap },
+  { href: "/admin/embeds", label: "Embeds Inspector", icon: Play },
+  { href: "/admin/links", label: "Short Links & Refs", icon: Link2 },
 ];
 
 const commercialNav = [
@@ -54,9 +69,11 @@ const commercialNav = [
   { href: "/admin/marketplace/rentals", label: "Bike Rentals", icon: Bike },
 ];
 
-const growthNav = [{ href: "/admin/links", label: "Short Links & Refs", icon: Link2 }];
-
-const systemNav = [{ href: "/admin/audit", label: "Audit Log", icon: ScrollText }];
+const systemNav = [
+  { href: "/admin/analytics", label: "Analytics & Pulse", icon: Activity },
+  { href: "/admin/system", label: "System Health Matrix", icon: Server },
+  { href: "/admin/audit", label: "Audit Log", icon: ScrollText },
+];
 
 function NavLink({ href, label, icon: Icon }: { href: string; label: string; icon: any }) {
   return (
@@ -88,7 +105,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
           <nav className="space-y-1" aria-label="Moderation">
             <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-              Safety
+              Operations &amp; Safety
             </p>
             {primaryNav.map((item) => (
               <NavLink key={item.href} {...item} />
@@ -97,9 +114,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
           <nav className="space-y-1" aria-label="Content">
             <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-              Content
+              Content &amp; Campus
             </p>
             {contentNav.map((item) => (
+              <NavLink key={item.href} {...item} />
+            ))}
+          </nav>
+
+          <nav className="space-y-1" aria-label="Integrations">
+            <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+              Integrations &amp; Studio
+            </p>
+            {integrationsNav.map((item) => (
               <NavLink key={item.href} {...item} />
             ))}
           </nav>
@@ -113,18 +139,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             ))}
           </nav>
 
-          <nav className="space-y-1" aria-label="Growth">
+          <nav className="space-y-1" aria-label="Telemetry">
             <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-              Growth &amp; Referrals
-            </p>
-            {growthNav.map((item) => (
-              <NavLink key={item.href} {...item} />
-            ))}
-          </nav>
-
-          <nav className="space-y-1" aria-label="System">
-            <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-              System
+              Telemetry &amp; System
             </p>
             {systemNav.map((item) => (
               <NavLink key={item.href} {...item} />
@@ -162,7 +179,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </Link>
           </div>
           <nav className="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-3 py-2 border-t border-border/30 bg-muted/10">
-            {[...primaryNav, ...contentNav, ...commercialNav, ...growthNav, ...systemNav].map((item) => {
+            {[...primaryNav, ...contentNav, ...integrationsNav, ...commercialNav, ...systemNav].map((item) => {
               const Icon = item.icon;
               return (
                 <Link

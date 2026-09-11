@@ -25,6 +25,7 @@ import { RedditGallery } from "@/components/reddit/reddit-gallery";
 import { RedditVideo } from "@/components/reddit/reddit-video";
 import { ReportDialog } from "./report-dialog";
 import { ShareStoryModal } from "./share-story-modal";
+import { cleanPostHtml, removeDuplicateTitleFromBody } from "@/lib/html-sanitize";
 
 interface FeedCardProps {
   post: FeedPost;
@@ -77,16 +78,23 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
   }, [post.body]);
 
   const displayContent = useMemo(() => {
-    if (!post.externalPost) return post.body;
-    if (post.externalPost.contentType === "VIDEO" || post.externalPost.contentType === "GALLERY") {
-      return (post.body || "")
+    const rawBody = post.body || "";
+    let cleaned = cleanPostHtml(rawBody);
+
+    if (post.title) {
+      cleaned = removeDuplicateTitleFromBody(cleaned, post.title);
+    }
+
+    if (post.externalPost && (post.externalPost.contentType === "VIDEO" || post.externalPost.contentType === "GALLERY")) {
+      cleaned = cleaned
         .replace(/!\[video\]\([^)]+\)/gi, "")
         .replace(/!\[image:[^\]]*\]\([^)]+\)/gi, "")
         .replace(/!\[image\]\([^)]+\)/gi, "")
         .trim();
     }
-    return post.body;
-  }, [post.body, post.externalPost]);
+
+    return cleaned;
+  }, [post.body, post.title, post.externalPost]);
 
   async function handleVote() {
     if (isLoading) return;
@@ -206,7 +214,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
     <article
       onMouseEnter={() => router.prefetch(`/app/post/${post.id}`)}
       onTouchStart={() => router.prefetch(`/app/post/${post.id}`)}
-      className="border-b border-border/30 hover:bg-muted/[0.12] transition-colors relative cursor-pointer select-none px-4 py-3.5"
+      className="border-b border-border/10 hover:bg-muted/[0.08] transition-colors relative cursor-pointer select-none px-4 py-3.5"
     >
       {/* Double Tap Heart Pop Overlay */}
       <AnimatePresence>
@@ -243,7 +251,7 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
               onClick={(e) => e.stopPropagation()}
               className="relative block cursor-pointer group"
             >
-              <Avatar className="size-10 rounded-full border border-border/40 group-hover:opacity-90 transition-opacity">
+              <Avatar className="size-10 rounded-full border-0 shadow-2xs group-hover:opacity-90 transition-opacity">
                 <AvatarImage src={avatarUrl || ""} />
                 <AvatarFallback className="font-bold text-xs bg-muted text-foreground">
                   {avatarFallback}

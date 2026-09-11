@@ -4,17 +4,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUp,
   ChevronDown,
-  Clock,
   Flame,
   Heart,
   History,
+  Image as ImageIcon,
   Loader2,
   MessageCircle,
-  MoreHorizontal,
-  Plus,
   Reply,
   Shield,
-  User,
   VenetianMask,
   X,
 } from "lucide-react";
@@ -22,7 +19,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { AnimateImage } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   detectMentionTrigger,
@@ -69,8 +65,6 @@ const fetcher = <T,>(url: string): Promise<T> =>
     return res.json() as Promise<T>;
   });
 
-const QUICK_REACTIONS = ["❤️", "🔥", "😂", "👏", "😮", "💯"];
-
 export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange }: FastCommentsModalProps) {
   const { profile } = useProfile();
 
@@ -78,7 +72,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likedComments, setLikedComments] = useState<Record<string, boolean>>({});
-  const [sortMode, setSortMode] = useState<"best" | "latest" | "oldest">("best");
+  const [sortMode, setSortMode] = useState<"best" | "latest">("best");
   const [mentionTrigger, setMentionTrigger] = useState<TriggerContext | null>(null);
   const [replyingTo, setReplyingTo] = useState<{
     id: string;
@@ -91,6 +85,16 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Initialize liked comments from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("campusloop_liked_comments");
+      if (stored) {
+        setLikedComments(JSON.parse(stored));
+      }
+    } catch {}
+  }, []);
+
   const scrollToBottom = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({
@@ -100,11 +104,8 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
     }
   };
 
-  // When the software keyboard opens, the layout viewport shrinks
-  // (interactiveWidget=resizes-content), so dvh units already track the visible
-  // area. Give the resize a beat, then keep the latest comments in view.
   function handleComposerFocus() {
-    setTimeout(scrollToBottom, 320);
+    setTimeout(scrollToBottom, 250);
   }
 
   async function handleUploadCommentFiles(files: File[]) {
@@ -117,7 +118,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
       const uploaded = await uploadImageToImgBB(validImageFiles[0]);
       const imgMarkdown = `\n![Image](${uploaded.displayUrl || uploaded.url})`;
       setCommentText((prev) => `${prev.trim()}${imgMarkdown}`);
-      toast.success("Image attached 📸", { id: "comment-img" });
+      toast.success("Image attached", { id: "comment-img" });
       setTimeout(() => inputRef.current?.focus(), 50);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to upload image", { id: "comment-img" });
@@ -164,7 +165,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
           e.preventDefault();
           const imgMarkdown = `\n![Image](${imgSrc})`;
           setCommentText((prev) => `${prev.trim()}${imgMarkdown}`);
-          toast.success("Sticker / GIF attached! 📸");
+          toast.success("Media attached");
           setTimeout(() => inputRef.current?.focus(), 50);
         }
       }
@@ -202,9 +203,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
     dedupingInterval: 4000,
   });
 
-  // Auto-focus input on open (desktop only — on touch devices the keyboard
-  // opening immediately would cover the comments the user came to read).
-  // Escape closes the drawer.
+  // Keyboard navigation & escape listener
   useEffect(() => {
     if (!isOpen) {
       setCommentText("");
@@ -225,21 +224,19 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
   const handleToggleLike = (commentId: string) => {
     sounds.tap();
     haptics.light();
-    setLikedComments((prev) => ({
-      ...prev,
-      [commentId]: !prev[commentId],
-    }));
+    setLikedComments((prev) => {
+      const next = { ...prev, [commentId]: !prev[commentId] };
+      try {
+        localStorage.setItem("campusloop_liked_comments", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
   };
 
   function handleStartReply(c: FastComment, handle: string, displayName: string) {
     sounds.tap();
     haptics.light();
     setReplyingTo({ id: c.id, handle, displayName });
-    setCommentText((prev) => {
-      const prefix = `@${handle} `;
-      if (prev.startsWith(prefix)) return prev;
-      return `${prefix}${prev}`;
-    });
     inputRef.current?.focus();
   }
 
@@ -254,7 +251,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
       postId: post.id,
       parentId: currentReplyingTo?.id || null,
       authorId: isAnonymous ? null : profile?.id || null,
-      pseudonym: isAnonymous ? "you_anon" : null,
+      pseudonym: isAnonymous ? "anon_student" : null,
       body: text,
       isAnonymous,
       status: "PUBLISHED",
@@ -315,38 +312,57 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
     }
   };
 
-  const handleInsertEmoji = (emoji: string) => {
-    sounds.tap();
-    haptics.light();
-    setCommentText((prev) => prev + emoji);
-    inputRef.current?.focus();
-  };
+  const authorHandle = post.isAnonymous
+    ? post.pseudonym || "anonymous"
+    : post.author?.username || "student";
 
-  const authorHandle = post.isAnonymous ? post.pseudonym || "anonymous" : post.author?.username || "student";
+  // Clean, markdown-free caption snippet for the minimal context bar
+  const cleanSnippet = useMemo(() => {
+    if (!post.body) return null;
+    const clean = post.body
+      .replace(/!\[.*?\]\(.*?\)/gi, "")
+      .replace(/https?:\/\/[^\s]+/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    return clean.length > 0 ? clean : null;
+  }, [post.body]);
 
-  // Dynamic sorting (matching Image 2)
-  const sortedComments = useMemo(() => {
-    const list = [...(comments || [])];
+  // Group comments into root comments and nested replies
+  const { rootComments, repliesMap, totalCount } = useMemo(() => {
+    const list = comments || [];
+    const roots: FastComment[] = [];
+    const replies = new Map<string, FastComment[]>();
+
+    for (const c of list) {
+      if (c.parentId) {
+        const existing = replies.get(c.parentId) || [];
+        existing.push(c);
+        replies.set(c.parentId, existing);
+      } else {
+        roots.push(c);
+      }
+    }
+
     if (sortMode === "latest") {
-      return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      roots.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } else {
+      // "best": liked comments first, then latest
+      roots.sort((a, b) => {
+        const likedA = likedComments[a.id] ? 1 : 0;
+        const likedB = likedComments[b.id] ? 1 : 0;
+        if (likedB !== likedA) return likedB - likedA;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
     }
-    if (sortMode === "oldest") {
-      return list.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-    }
-    // "best" (default): sort by likes/points
-    return list.sort(
-      (a, b) =>
-        (b.author?.points || 0) +
-        (likedComments[b.id] ? 1 : 0) -
-        ((a.author?.points || 0) + (likedComments[a.id] ? 1 : 0))
-    );
+
+    return { rootComments: roots, repliesMap: replies, totalCount: list.length };
   }, [comments, sortMode, likedComments]);
 
   return (
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center select-none overflow-hidden">
-          {/* Backdrop Blur */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -356,310 +372,168 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
             onClick={onClose}
           />
 
-          {/* Modal / Bottom Drawer: dvh tracks the visible area above the
-              software keyboard (interactiveWidget=resizes-content), so the
-              composer stays pinned and visible with no manual offsets. */}
+          {/* Minimalist Mobile-First Bottom Drawer */}
           <motion.div
-            initial={{ y: "100%", opacity: 0.8 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: "100%", opacity: 0 }}
-            transition={{ type: "spring", stiffness: 450, damping: 38 }}
-            className="relative z-10 flex h-[92dvh] max-h-[760px] w-full flex-col overflow-hidden rounded-t-[32px] border-t border-purple-500/25 bg-[#0d0d16]/98 text-foreground shadow-2xl sm:max-w-lg sm:rounded-3xl sm:border sm:border-purple-500/30"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 420, damping: 36 }}
+            className="relative z-10 flex h-[84dvh] sm:h-[680px] max-h-[88dvh] w-full flex-col overflow-hidden rounded-t-[28px] sm:rounded-2xl border-t border-white/10 sm:border bg-zinc-950/98 backdrop-blur-2xl text-zinc-100 shadow-2xl sm:max-w-lg"
             onClick={(e) => e.stopPropagation()}
           >
             {/* ─── Mobile Drag Indicator ─── */}
-            <div className="w-full flex items-center justify-center pt-3 pb-1 sm:hidden shrink-0">
-              <div className="w-12 h-1 rounded-full bg-white/20" />
+            <div className="w-full flex items-center justify-center pt-2.5 pb-1 sm:hidden shrink-0">
+              <div className="w-10 h-1 rounded-full bg-white/20" />
             </div>
 
-            {/* ─── Header ─── */}
-            <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-b border-white/[0.06] shrink-0">
+            {/* ─── Minimal Header ─── */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.07] shrink-0">
               <div className="flex items-center gap-2">
-                <MessageCircle className="size-4.5 text-purple-400" />
-                <h3 className="text-base font-black text-foreground tracking-tight">Comments</h3>
-                <span className="text-xs font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-full">
-                  {comments?.length ?? post.commentsCount ?? 0}
+                <h3 className="text-sm sm:text-base font-bold text-white tracking-tight">Comments</h3>
+                <span className="text-[11px] font-semibold text-zinc-400 bg-white/10 px-2 py-0.5 rounded-full">
+                  {totalCount}
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="size-8 rounded-full bg-white/[0.05] hover:bg-white/10 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
-                aria-label="Close"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-
-            {/* ─── Original Post Context Card (matching Image 2) ─── */}
-            <div className="mx-4 mt-2.5 mb-1.5 p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3 shrink-0">
-              {post.isAnonymous ? (
-                <Avatar className="size-9 rounded-full border border-purple-500/30 shrink-0 mt-0.5">
-                  <AvatarFallback className="text-[11px] font-black bg-muted text-foreground">
-                    <VenetianMask className="size-4 text-purple-400" />
-                  </AvatarFallback>
-                </Avatar>
-              ) : (
-                <Link href={`/@${authorHandle}`} onClick={onClose} className="shrink-0 mt-0.5 group">
-                  <Avatar className="size-9 rounded-full border border-purple-500/30 shrink-0 group-hover:border-purple-400 transition-colors">
-                    <AvatarImage src={post.author?.avatarUrl || ""} />
-                    <AvatarFallback className="text-[11px] font-black bg-muted text-foreground">
-                      {post.author?.displayName?.[0] || "S"}
-                    </AvatarFallback>
-                  </Avatar>
-                </Link>
-              )}
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex items-center gap-2 text-xs">
-                  {post.isAnonymous ? (
-                    <span className="font-bold text-foreground truncate">@{authorHandle}</span>
-                  ) : (
-                    <Link
-                      href={`/@${authorHandle}`}
-                      onClick={onClose}
-                      className="font-bold text-foreground truncate hover:underline hover:text-primary transition-colors"
-                    >
-                      @{authorHandle}
-                    </Link>
-                  )}
-                  <span className="text-muted-foreground text-[11px]">{formatTimeAgo(post.createdAt)}</span>
-                </div>
-                <p className="text-xs text-foreground/90 leading-relaxed line-clamp-3 font-normal">
-                  {post.body}
-                </p>
-              </div>
-            </div>
-
-            {/* ─── Sort & Filter Bar ─── */}
-            <div className="flex items-center justify-between px-4 py-2 shrink-0 border-b border-white/[0.06] text-xs">
-              <div className="flex items-center gap-1.5 font-bold text-foreground">
-                {sortMode === "best" ? (
-                  <Flame className="size-3.5 text-amber-500" />
-                ) : sortMode === "latest" ? (
-                  <Clock className="size-3.5 text-blue-400" />
-                ) : (
-                  <History className="size-3.5 text-emerald-400" />
-                )}
-                <span>
-                  {sortMode === "best"
-                    ? "Top comments"
-                    : sortMode === "latest"
-                      ? "Latest first"
-                      : "Oldest first"}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground text-[11px]">
-                <span>Sort by</span>
+              <div className="flex items-center gap-2">
+                {/* Sort Toggle Button */}
                 <button
                   type="button"
-                  onClick={() =>
-                    setSortMode((prev) =>
-                      prev === "best" ? "latest" : prev === "latest" ? "oldest" : "best"
-                    )
-                  }
-                  className="px-2.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/10 border border-white/10 text-xs font-semibold text-foreground flex items-center gap-1.5 transition-colors cursor-pointer"
+                  onClick={() => setSortMode((prev) => (prev === "best" ? "latest" : "best"))}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/10 border border-white/10 text-[11px] font-semibold text-zinc-300 transition-colors cursor-pointer"
+                  title="Toggle comment sorting"
                 >
-                  <span>{sortMode === "best" ? "Best" : sortMode === "latest" ? "Latest" : "Oldest"}</span>
-                  <ChevronDown className="size-3 text-muted-foreground" />
+                  {sortMode === "best" ? (
+                    <>
+                      <Flame className="size-3 text-amber-400" />
+                      <span>Top</span>
+                    </>
+                  ) : (
+                    <>
+                      <History className="size-3 text-blue-400" />
+                      <span>Newest</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="size-8 rounded-full bg-white/[0.06] hover:bg-white/12 text-zinc-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                  aria-label="Close comments"
+                >
+                  <X className="size-4" />
                 </button>
               </div>
             </div>
 
-            {/* ─── Scrollable Comments List (flex-1 min-h-0 so composer stays visible above keyboard) ─── */}
+            {/* ─── Ultra-Compact Context Line (Clean & Mobile First) ─── */}
+            {cleanSnippet && (
+              <div className="px-4 py-1.5 border-b border-white/[0.05] bg-white/[0.02] flex items-center gap-2 text-xs text-zinc-400 shrink-0">
+                <span className="font-semibold text-zinc-300 shrink-0">@{authorHandle}:</span>
+                <span className="truncate">{cleanSnippet}</span>
+              </div>
+            )}
+
+            {/* ─── Scrollable Comments Thread List ─── */}
             <div
               ref={scrollContainerRef}
-              className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 sm:px-5 py-3 divide-y divide-white/[0.06] scroll-smooth"
+              className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 scroll-smooth"
             >
               {isLoading ? (
                 <div className="space-y-4 pt-2">
                   {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="flex gap-3 animate-pulse pt-2">
-                      <div className="size-8 rounded-full bg-muted shrink-0" />
+                      <div className="size-8 rounded-full bg-zinc-800 shrink-0" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-3 w-28 bg-muted rounded-md" />
-                        <div className="h-3.5 w-3/4 bg-muted/70 rounded-md" />
+                        <div className="h-3 w-28 bg-zinc-800 rounded-md" />
+                        <div className="h-3.5 w-3/4 bg-zinc-800/70 rounded-md" />
                       </div>
                     </div>
                   ))}
                 </div>
-              ) : sortedComments.length === 0 ? (
+              ) : rootComments.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center py-16 px-4 space-y-2">
-                  <div className="size-12 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-muted-foreground">
-                    <MessageCircle className="size-6 stroke-1" />
+                  <div className="size-11 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-zinc-500">
+                    <MessageCircle className="size-5 stroke-1" />
                   </div>
-                  <p className="text-xs font-bold text-foreground">No comments yet</p>
-                  <p className="text-[11px] text-muted-foreground max-w-xs">
-                    Start the conversation! Drop a reaction or reply to share your thoughts with campus.
+                  <p className="text-xs font-semibold text-zinc-300">No comments yet</p>
+                  <p className="text-[11px] text-zinc-500 max-w-xs">
+                    Be the first to share your thoughts with campus!
                   </p>
                 </div>
               ) : (
-                sortedComments.map((c) => {
-                  const isAnon = c.isAnonymous;
-                  const cDisplayName = isAnon ? "Anonymous Student" : c.author?.displayName || "Student";
-                  const cHandle = isAnon ? c.pseudonym || "anonymous" : c.author?.username || "student";
-                  const cAvatar = isAnon
-                    ? ""
-                    : getAvatarUrl(c.author?.avatarUrl, c.author?.username ?? "student");
-                  const isLiked = Boolean(likedComments[c.id]);
-                  const isCurrentUser = profile?.id && c.authorId === profile.id;
-                  const isOP = post.authorId && c.authorId === post.authorId;
-
+                rootComments.map((rootComment) => {
+                  const childReplies = repliesMap.get(rootComment.id) || [];
                   return (
-                    <div key={c.id} className="flex items-start gap-3 pt-3.5 first:pt-0 group">
-                      {isAnon ? (
-                        <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0 text-muted-foreground mt-0.5">
-                          <Shield className="size-4" />
-                        </div>
-                      ) : (
-                        <Link href={`/@${cHandle}`} onClick={onClose} className="shrink-0 mt-0.5">
-                          <Avatar className="size-8 rounded-full border border-white/10 hover:opacity-90 transition-opacity">
-                            <AvatarImage src={cAvatar} />
-                            <AvatarFallback className="text-[10px] font-bold">
-                              {cDisplayName[0] || "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                        </Link>
-                      )}
+                    <div key={rootComment.id} className="space-y-2.5">
+                      <CommentRowItem
+                        comment={rootComment}
+                        onReply={handleStartReply}
+                        onToggleLike={handleToggleLike}
+                        isLiked={Boolean(likedComments[rootComment.id])}
+                        currentUserId={profile?.id}
+                        postAuthorId={post.authorId}
+                        onClose={onClose}
+                      />
 
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex items-center justify-between gap-1">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            {isAnon ? (
-                              <span className="text-xs font-bold text-foreground truncate">
-                                {cDisplayName}
-                              </span>
-                            ) : (
-                              <Link
-                                href={`/@${cHandle}`}
-                                onClick={onClose}
-                                className="text-xs font-bold text-foreground truncate hover:underline hover:text-primary transition-colors"
-                              >
-                                {cDisplayName}
-                              </Link>
-                            )}
-                            {isCurrentUser && (
-                              <span className="text-[10px] font-bold bg-purple-950/70 text-purple-300 border border-purple-500/30 px-1.5 py-0.2 rounded-md">
-                                You
-                              </span>
-                            )}
-                            {isOP && !isCurrentUser && (
-                              <span className="text-[10px] font-bold bg-indigo-950/70 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.2 rounded-md">
-                                OP
-                              </span>
-                            )}
-                            <span className="text-[11px] text-muted-foreground">
-                              {formatTimeAgo(c.createdAt)}
-                            </span>
-                          </div>
-
-                          <button
-                            type="button"
-                            className="size-6 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground opacity-60 hover:opacity-100 transition-opacity"
-                            aria-label="More options"
-                          >
-                            <MoreHorizontal className="size-3.5" />
-                          </button>
-                        </div>
-
-                        <div className="text-[13px] text-foreground/95 leading-relaxed break-words font-normal select-text">
-                          <RichText content={c.body} />
-                        </div>
-
-                        {/* Comment Actions: Heart + Reply */}
-                        <div className="flex items-center gap-4 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleLike(c.id)}
-                            className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer"
-                          >
-                            <Heart
-                              className={cn(
-                                "size-3.5 transition-transform active:scale-125",
-                                isLiked ? "fill-rose-500 text-rose-500" : "text-muted-foreground"
-                              )}
+                      {/* Nested Replies with Subtle Connector Line */}
+                      {childReplies.length > 0 && (
+                        <div className="mt-2 pl-4 ml-3 border-l-2 border-white/10 space-y-2.5">
+                          {childReplies.map((reply) => (
+                            <CommentRowItem
+                              key={reply.id}
+                              comment={reply}
+                              isReply
+                              onReply={handleStartReply}
+                              onToggleLike={handleToggleLike}
+                              isLiked={Boolean(likedComments[reply.id])}
+                              currentUserId={profile?.id}
+                              postAuthorId={post.authorId}
+                              onClose={onClose}
                             />
-                            <span
-                              className={cn("tabular-nums text-xs", isLiked && "text-rose-500 font-bold")}
-                            >
-                              {(c.author?.points || 0) + (isLiked ? 1 : 0) || (isLiked ? 1 : "")}
-                            </span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleStartReply(c, cHandle, cDisplayName)}
-                            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                          >
-                            Reply
-                          </button>
+                          ))}
                         </div>
-                      </div>
+                      )}
                     </div>
                   );
                 })
               )}
             </div>
 
-            {/* ─── Quick Emoji Reaction Bar (matching Image 2) ─── */}
-            <div className="px-4 py-2 border-t border-white/[0.06] flex items-center justify-between gap-1 overflow-x-auto shrink-0 bg-white/[0.02]">
-              {QUICK_REACTIONS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  onClick={() => handleInsertEmoji(emoji)}
-                  className="size-9 sm:size-10 rounded-full bg-white/[0.06] hover:bg-white/10 border border-white/[0.08] flex items-center justify-center text-base sm:text-lg hover:scale-115 active:scale-95 transition-all cursor-pointer shadow-xs"
-                >
-                  {emoji}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => handleInsertEmoji("✨")}
-                className="size-9 sm:size-10 rounded-full bg-white/[0.06] hover:bg-white/10 border border-white/[0.08] flex items-center justify-center text-muted-foreground hover:text-white hover:scale-115 active:scale-95 transition-all cursor-pointer shadow-xs"
-                aria-label="Add reaction"
-              >
-                <Plus className="size-4" />
-              </button>
-            </div>
-
-            {/* ─── Bottom Composer Bar (safe-area aware, pinned above keyboard) ─── */}
-            <div className="p-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-white/[0.08] bg-[#0d0d16] shrink-0 space-y-2">
+            {/* ─── Bottom Composer Bar (Mobile First & Pinned Above Keyboard) ─── */}
+            <div className="p-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] border-t border-white/[0.08] bg-zinc-950 shrink-0 space-y-2">
               {/* Replying Context Banner */}
               {replyingTo && (
-                <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/30 text-xs">
-                  <span className="text-muted-foreground font-medium flex items-center gap-1.5">
+                <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/20 text-xs">
+                  <span className="text-zinc-400 text-[11px] font-medium flex items-center gap-1.5">
                     <Reply className="size-3 text-purple-400 shrink-0" />
                     <span>
-                      Replying to <strong className="text-foreground">@{replyingTo.handle}</strong>
+                      Replying to <strong className="text-zinc-200">@{replyingTo.handle}</strong>
                     </span>
                   </span>
                   <button
                     type="button"
-                    onClick={() => {
-                      setReplyingTo(null);
-                      if (commentText.startsWith(`@${replyingTo.handle} `)) {
-                        setCommentText(commentText.replace(`@${replyingTo.handle} `, ""));
-                      }
-                    }}
-                    className="size-5 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                    onClick={() => setReplyingTo(null)}
+                    className="size-5 rounded-full hover:bg-white/10 flex items-center justify-center text-zinc-400 hover:text-white cursor-pointer"
                   >
                     <X className="size-3" />
                   </button>
                 </div>
               )}
 
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
                 {/* Current User Avatar */}
-                <Avatar className="size-9 rounded-full border border-white/15 shrink-0">
+                <Avatar className="size-8 rounded-full border border-white/15 shrink-0">
                   <AvatarImage src={isAnonymous ? "" : profile?.avatarUrl || ""} />
-                  <AvatarFallback className="text-[10px] font-bold bg-muted text-foreground">
-                    {isAnonymous ? "🙈" : profile?.displayName?.[0] || "U"}
+                  <AvatarFallback className="text-[10px] font-bold bg-zinc-800 text-zinc-300">
+                    {isAnonymous ? <VenetianMask className="size-4 text-purple-400" /> : profile?.displayName?.[0] || "U"}
                   </AvatarFallback>
                 </Avatar>
 
-                {/* Input Capsule with embedded Photo and GIF actions */}
-                <div className="relative flex-1 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 focus-within:border-purple-500/50 transition-colors">
+                {/* Input Capsule */}
+                <div className="relative flex-1 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] focus-within:border-purple-500/40 focus-within:bg-white/[0.08] px-3.5 py-1.5 transition-colors">
                   <MentionSuggestions
                     trigger={mentionTrigger}
                     onSelect={handleSelectSuggestion}
@@ -684,7 +558,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                         ? `Reply to @${replyingTo.handle}...`
                         : isAnonymous
                           ? "Comment anonymously..."
-                          : `Add a comment as @${profile?.username || "you"}...`
+                          : "Add a comment..."
                     }
                     value={commentText}
                     onChange={handleInputChange}
@@ -692,7 +566,7 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                     onPaste={handlePaste}
                     onFocus={handleComposerFocus}
                     enterKeyHint="send"
-                    className="flex-1 bg-transparent text-base sm:text-xs text-foreground placeholder:text-muted-foreground/60 outline-none"
+                    className="flex-1 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 outline-none"
                     maxLength={500}
                   />
 
@@ -701,69 +575,56 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploadingImage}
-                    className="text-muted-foreground hover:text-foreground transition-colors p-1 cursor-pointer disabled:opacity-40"
+                    className="text-zinc-400 hover:text-white transition-colors p-1 cursor-pointer disabled:opacity-40"
                     title="Attach photo"
                     aria-label="Attach photo"
                   >
                     {isUploadingImage ? (
                       <Loader2 className="size-4 animate-spin text-purple-400" />
                     ) : (
-                      <AnimateImage size={15} />
+                      <ImageIcon className="size-4" />
                     )}
-                  </button>
-
-                  {/* GIF Badge Button (matching Image 2) */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      sounds.tap();
-                      haptics.light();
-                      toast.info("Tip: You can paste any GIF link or image from your clipboard!");
-                    }}
-                    className="px-1.5 py-0.5 rounded-md border border-white/20 text-[10px] font-black text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                    title="Insert GIF"
-                  >
-                    GIF
                   </button>
 
                   {/* Anonymous Toggle Pill */}
                   <button
                     type="button"
-                    onClick={() => setIsAnonymous((prev) => !prev)}
+                    onClick={() => {
+                      haptics.light();
+                      const next = !isAnonymous;
+                      setIsAnonymous(next);
+                      toast.info(next ? "Commenting anonymously" : "Commenting publicly");
+                    }}
                     className={cn(
                       "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
                       isAnonymous
                         ? "bg-purple-950/80 text-purple-300 border border-purple-500/40"
-                        : "text-muted-foreground hover:text-foreground"
+                        : "text-zinc-400 hover:text-white"
                     )}
-                    title={isAnonymous ? "Commenting Anonymously" : "Commenting as yourself"}
+                    title={isAnonymous ? "Anonymous comment" : "Public comment"}
                   >
-                    {isAnonymous ? (
-                      <>
-                        <Shield className="size-3" />
-                        <span>Anon</span>
-                      </>
-                    ) : (
-                      <>
-                        <User className="size-3" />
-                        <span className="hidden sm:inline">Public</span>
-                      </>
-                    )}
+                    <VenetianMask className="size-3.5" />
+                    <span>{isAnonymous ? "Anon" : "Public"}</span>
                   </button>
                 </div>
 
-                {/* Send Button: Elevated Circular Purple Gradient Button (matching Image 2) */}
+                {/* Send Button */}
                 <button
                   type="button"
                   disabled={!commentText.trim() || isSubmitting}
                   onClick={handleSendComment}
-                  className="size-10 rounded-full bg-gradient-to-tr from-purple-600 via-primary to-indigo-500 text-white flex items-center justify-center hover:opacity-95 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                  className={cn(
+                    "size-9 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md",
+                    commentText.trim() && !isSubmitting
+                      ? "bg-gradient-to-tr from-purple-600 to-indigo-500 text-white hover:opacity-95 active:scale-90 shadow-purple-500/25"
+                      : "bg-white/10 text-zinc-500 cursor-not-allowed"
+                  )}
                   aria-label="Send comment"
                 >
                   {isSubmitting ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <ArrowUp className="size-4.5 stroke-[2.5]" />
+                    <ArrowUp className="size-4 stroke-[2.5]" />
                   )}
                 </button>
               </div>
@@ -772,5 +633,128 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
         </div>
       )}
     </AnimatePresence>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Single Comment Row Component
+// ─────────────────────────────────────────────────────────────
+
+function CommentRowItem({
+  comment,
+  isReply = false,
+  onReply,
+  onToggleLike,
+  isLiked,
+  currentUserId,
+  postAuthorId,
+  onClose,
+}: {
+  comment: FastComment;
+  isReply?: boolean;
+  onReply: (c: FastComment, handle: string, displayName: string) => void;
+  onToggleLike: (id: string) => void;
+  isLiked: boolean;
+  currentUserId?: string | null;
+  postAuthorId?: string | null;
+  onClose: () => void;
+}) {
+  const isAnon = comment.isAnonymous;
+  const cDisplayName = isAnon ? "Anonymous Student" : comment.author?.displayName || "Student";
+  const cHandle = isAnon ? comment.pseudonym || "anonymous" : comment.author?.username || "student";
+  const cAvatar = isAnon ? "" : getAvatarUrl(comment.author?.avatarUrl, comment.author?.username ?? "student");
+  const isCurrentUser = currentUserId && comment.authorId === currentUserId;
+  const isOP = postAuthorId && comment.authorId === postAuthorId;
+
+  return (
+    <div className={cn("flex items-start gap-2.5 group", isReply ? "text-xs" : "")}>
+      {isAnon ? (
+        <div
+          className={cn(
+            "rounded-full bg-purple-950/50 border border-purple-500/30 flex items-center justify-center shrink-0 text-purple-300 mt-0.5",
+            isReply ? "size-7" : "size-8"
+          )}
+        >
+          <VenetianMask className={isReply ? "size-3.5" : "size-4"} />
+        </div>
+      ) : (
+        <Link href={`/@${cHandle}`} onClick={onClose} className="shrink-0 mt-0.5">
+          <Avatar
+            className={cn(
+              "rounded-full border border-white/10 hover:opacity-90 transition-opacity",
+              isReply ? "size-7" : "size-8"
+            )}
+          >
+            <AvatarImage src={cAvatar} />
+            <AvatarFallback className="text-[10px] font-bold bg-zinc-800 text-zinc-300">
+              {cDisplayName[0] || "U"}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+      )}
+
+      <div className="min-w-0 flex-1 space-y-1">
+        <div className="flex items-center justify-between gap-1">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {isAnon ? (
+              <span className="text-xs font-semibold text-zinc-200 truncate">{cDisplayName}</span>
+            ) : (
+              <Link
+                href={`/@${cHandle}`}
+                onClick={onClose}
+                className="text-xs font-semibold text-zinc-200 truncate hover:underline hover:text-white transition-colors"
+              >
+                {cDisplayName}
+              </Link>
+            )}
+
+            {isCurrentUser && (
+              <span className="text-[9px] font-bold bg-purple-950/80 text-purple-300 border border-purple-500/30 px-1.5 py-0.2 rounded-md">
+                You
+              </span>
+            )}
+            {isOP && !isCurrentUser && (
+              <span className="text-[9px] font-bold bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.2 rounded-md">
+                Author
+              </span>
+            )}
+
+            <span className="text-[11px] text-zinc-500">{formatTimeAgo(comment.createdAt)}</span>
+          </div>
+        </div>
+
+        {/* Comment text with embeds disabled so user profiles / post embeds don't inflate inside comments */}
+        <div className="text-[13px] text-zinc-200 leading-relaxed break-words font-normal select-text">
+          <RichText content={comment.body} disableEmbeds={true} />
+        </div>
+
+        {/* Action Row */}
+        <div className="flex items-center gap-4 pt-0.5">
+          <button
+            type="button"
+            onClick={() => onToggleLike(comment.id)}
+            className="flex items-center gap-1 text-xs font-medium text-zinc-400 hover:text-rose-400 transition-colors cursor-pointer"
+          >
+            <Heart
+              className={cn(
+                "size-3.5 transition-transform active:scale-125",
+                isLiked ? "fill-rose-500 text-rose-500" : "text-zinc-500"
+              )}
+            />
+            {isLiked && <span className="tabular-nums text-[11px] text-rose-500 font-bold">1</span>}
+          </button>
+
+          {!isReply && (
+            <button
+              type="button"
+              onClick={() => onReply(comment, cHandle, cDisplayName)}
+              className="text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+            >
+              Reply
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

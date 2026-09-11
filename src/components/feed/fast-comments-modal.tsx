@@ -523,111 +523,126 @@ export function FastCommentsModal({ post, isOpen, onClose, onCommentCountChange 
                 </div>
               )}
 
-              <div className="flex items-center gap-2">
-                {/* Current User Avatar */}
-                <Avatar className="size-8 rounded-full border border-white/15 shrink-0">
-                  <AvatarImage src={isAnonymous ? "" : profile?.avatarUrl || ""} />
-                  <AvatarFallback className="text-[10px] font-bold bg-zinc-800 text-zinc-300">
-                    {isAnonymous ? <VenetianMask className="size-4 text-purple-400" /> : profile?.displayName?.[0] || "U"}
-                  </AvatarFallback>
-                </Avatar>
-
-                {/* Input Capsule */}
-                <div className="relative flex-1 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] focus-within:border-purple-500/40 focus-within:bg-white/[0.08] px-3.5 py-1.5 transition-colors">
-                  <MentionSuggestions
-                    trigger={mentionTrigger}
-                    onSelect={handleSelectSuggestion}
-                    onClose={() => setMentionTrigger(null)}
-                    className="bottom-full mb-2 left-0"
-                  />
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
-                    className="hidden"
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || []);
-                      if (files.length > 0) handleUploadCommentFiles(files);
-                    }}
-                  />
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    placeholder={
-                      replyingTo
-                        ? `Reply to @${replyingTo.handle}...`
-                        : isAnonymous
-                          ? "Comment anonymously..."
-                          : "Add a comment..."
-                    }
-                    value={commentText}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    onPaste={handlePaste}
-                    onFocus={handleComposerFocus}
-                    enterKeyHint="send"
-                    className="flex-1 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 outline-none"
-                    maxLength={500}
-                  />
-
-                  {/* Photo Attachment Button */}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploadingImage}
-                    className="text-zinc-400 hover:text-white transition-colors p-1 cursor-pointer disabled:opacity-40"
-                    title="Attach photo"
-                    aria-label="Attach photo"
+              {!profile ? (
+                <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-white/[0.06] border border-white/10 w-full">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-zinc-200">Want to join the conversation?</p>
+                    <p className="text-[11px] text-zinc-400">Sign in with your student email to reply and vote.</p>
+                  </div>
+                  <Link
+                    href={`/handler/sign-in?returnTo=${typeof window !== "undefined" ? encodeURIComponent(window.location.pathname) : ""}`}
+                    className="px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-opacity shrink-0"
                   >
-                    {isUploadingImage ? (
-                      <Loader2 className="size-4 animate-spin text-purple-400" />
-                    ) : (
-                      <ImageIcon className="size-4" />
-                    )}
-                  </button>
+                    Sign In
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {/* Current User Avatar */}
+                  <Avatar className="size-8 rounded-full border border-white/15 shrink-0">
+                    <AvatarImage src={isAnonymous ? "" : profile?.avatarUrl || ""} />
+                    <AvatarFallback className="text-[10px] font-bold bg-zinc-800 text-zinc-300">
+                      {isAnonymous ? <VenetianMask className="size-4 text-purple-400" /> : profile?.displayName?.[0] || "U"}
+                    </AvatarFallback>
+                  </Avatar>
 
-                  {/* Anonymous Toggle Pill */}
+                  {/* Input Capsule */}
+                  <div className="relative flex-1 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] focus-within:border-purple-500/40 focus-within:bg-white/[0.08] px-3.5 py-1.5 transition-colors">
+                    <MentionSuggestions
+                      trigger={mentionTrigger}
+                      onSelect={handleSelectSuggestion}
+                      onClose={() => setMentionTrigger(null)}
+                      className="bottom-full mb-2 left-0"
+                    />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (files.length > 0) handleUploadCommentFiles(files);
+                      }}
+                    />
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      placeholder={
+                        replyingTo
+                          ? `Reply to @${replyingTo.handle}...`
+                          : isAnonymous
+                            ? "Comment anonymously..."
+                            : "Add a comment..."
+                      }
+                      value={commentText}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      onPaste={handlePaste}
+                      onFocus={handleComposerFocus}
+                      enterKeyHint="send"
+                      className="flex-1 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 outline-none"
+                      maxLength={500}
+                    />
+
+                    {/* Photo Attachment Button */}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploadingImage}
+                      className="text-zinc-400 hover:text-white transition-colors p-1 cursor-pointer disabled:opacity-40"
+                      title="Attach photo"
+                      aria-label="Attach photo"
+                    >
+                      {isUploadingImage ? (
+                        <Loader2 className="size-4 animate-spin text-purple-400" />
+                      ) : (
+                        <ImageIcon className="size-4" />
+                      )}
+                    </button>
+
+                    {/* Anonymous Toggle Pill */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        haptics.light();
+                        const next = !isAnonymous;
+                        setIsAnonymous(next);
+                        toast.info(next ? "Commenting anonymously" : "Commenting publicly");
+                      }}
+                      className={cn(
+                        "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
+                        isAnonymous
+                          ? "bg-purple-950/80 text-purple-300 border border-purple-500/40"
+                          : "text-zinc-400 hover:text-white"
+                      )}
+                      title={isAnonymous ? "Anonymous comment" : "Public comment"}
+                    >
+                      <VenetianMask className="size-3.5" />
+                      <span>{isAnonymous ? "Anon" : "Public"}</span>
+                    </button>
+                  </div>
+
+                  {/* Send Button */}
                   <button
                     type="button"
-                    onClick={() => {
-                      haptics.light();
-                      const next = !isAnonymous;
-                      setIsAnonymous(next);
-                      toast.info(next ? "Commenting anonymously" : "Commenting publicly");
-                    }}
+                    disabled={!commentText.trim() || isSubmitting}
+                    onClick={handleSendComment}
                     className={cn(
-                      "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
-                      isAnonymous
-                        ? "bg-purple-950/80 text-purple-300 border border-purple-500/40"
-                        : "text-zinc-400 hover:text-white"
+                      "size-9 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md",
+                      commentText.trim() && !isSubmitting
+                        ? "bg-gradient-to-tr from-purple-600 to-indigo-500 text-white hover:opacity-95 active:scale-90 shadow-purple-500/25"
+                        : "bg-white/10 text-zinc-500 cursor-not-allowed"
                     )}
-                    title={isAnonymous ? "Anonymous comment" : "Public comment"}
+                    aria-label="Send comment"
                   >
-                    <VenetianMask className="size-3.5" />
-                    <span>{isAnonymous ? "Anon" : "Public"}</span>
+                    {isSubmitting ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <ArrowUp className="size-4 stroke-[2.5]" />
+                    )}
                   </button>
                 </div>
-
-                {/* Send Button */}
-                <button
-                  type="button"
-                  disabled={!commentText.trim() || isSubmitting}
-                  onClick={handleSendComment}
-                  className={cn(
-                    "size-9 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md",
-                    commentText.trim() && !isSubmitting
-                      ? "bg-gradient-to-tr from-purple-600 to-indigo-500 text-white hover:opacity-95 active:scale-90 shadow-purple-500/25"
-                      : "bg-white/10 text-zinc-500 cursor-not-allowed"
-                  )}
-                  aria-label="Send comment"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <ArrowUp className="size-4 stroke-[2.5]" />
-                  )}
-                </button>
-              </div>
+              )}
             </div>
           </motion.div>
         </div>

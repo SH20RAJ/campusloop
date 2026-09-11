@@ -7,30 +7,27 @@ import { isViewerProfile } from "@/lib/viewer";
 export const metadata: Metadata = {
   title: "Campus Loop | CampusLoop",
   description: "Explore student campus loops, confessions, polls, and discussions.",
+  robots: { index: true, follow: true },
 };
 
 export default async function PostLayout({ children }: { children: React.ReactNode }) {
   const user = await getCachedAuthUser();
+  const profile = user ? await getCachedUserProfile(user.id) : null;
 
-  if (!user) {
-    redirect("/handler/sign-in");
-  }
-
-  const profile = await getCachedUserProfile(user.id);
-
-  if (!profile?.onboardingCompleted) {
+  // If user is authenticated but hasn't finished onboarding, complete onboarding
+  if (user && !profile?.onboardingCompleted) {
     redirect("/app/onboarding");
   }
 
-  const college = profile.institution;
-  const viewerMode = await isViewerProfile(profile);
+  const college = profile?.institution;
+  const viewerMode = profile ? await isViewerProfile(profile) : true;
 
   return (
     <div className="relative h-dvh w-full bg-background overflow-hidden select-none">
       <Navigation
-        profile={profile}
-        collegeName={viewerMode ? "Viewer Mode" : (college?.name ?? "Your College")}
-        isAdmin={profile.role === "ADMIN"}
+        profile={profile || undefined}
+        collegeName={viewerMode ? "Viewer Mode" : (college?.name ?? "Campus")}
+        isAdmin={profile?.role === "ADMIN"}
         isViewer={viewerMode}
       />
 

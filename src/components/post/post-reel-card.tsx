@@ -22,6 +22,8 @@ import { toast } from "sonner";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { FeedCardRepostModal } from "@/components/feed/feed-card-repost-modal";
 import { PostLikesModal } from "@/components/post/post-likes-modal";
+import { PreviewLockedModal } from "@/components/preview/preview-locked-modal";
+import type { UserCapability } from "@/lib/capabilities";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PollCard } from "@/components/ui/poll-card";
 import { ReportDialog } from "@/components/ui/report-dialog";
@@ -66,6 +68,8 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   const [showLikesModal, setShowLikesModal] = useState(false);
   const [quoteThoughts, setQuoteThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
+  const [showLockedModal, setShowLockedModal] = useState(false);
+  const [lockedCapability, setLockedCapability] = useState<UserCapability>("LIKE_POST");
 
   // Extract direct video URL if present in body
   const videoUrl = useMemo(() => {
@@ -230,6 +234,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
   // Vote / Like handling
   async function handleVote(reactionEmoji?: string) {
+    if (!currentUserId) {
+      setLockedCapability("LIKE_POST");
+      setShowLockedModal(true);
+      return;
+    }
+
     const isUpvoted = userVote === 1;
     const newValue = isUpvoted && !reactionEmoji ? 0 : 1;
     const newCount = isUpvoted && !reactionEmoji ? votesCount - 1 : isUpvoted ? votesCount : votesCount + 1;
@@ -255,6 +265,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   // Double-tap heart (Instagram Reels style)
   function handleDoubleTap(e: React.MouseEvent) {
     e.stopPropagation();
+    if (!currentUserId) {
+      setLockedCapability("LIKE_POST");
+      setShowLockedModal(true);
+      return;
+    }
+
     setShowDoubleTapHeart(true);
     sounds.pop();
     haptics.success();
@@ -266,6 +282,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
   // Repost handling (modal / quote flow)
   async function handleExecuteRepost(isQuote: boolean) {
+    if (!currentUserId) {
+      setLockedCapability("CREATE_POST");
+      setShowLockedModal(true);
+      return;
+    }
+
     sounds.tap();
     haptics.medium();
     setIsReposting(true);
@@ -285,6 +307,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   // Instant repost (Instagram style): single tap fires immediately with a
   // spin + center burst. Tapping again opens the quote modal for thoughts.
   async function handleInstantRepost() {
+    if (!currentUserId) {
+      setLockedCapability("CREATE_POST");
+      setShowLockedModal(true);
+      return;
+    }
+
     if (isReposting) return;
     if (isReposted) {
       setShowRepostModal(true);
@@ -318,7 +346,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
           text: cleanSnippet(post.body, 100),
           url: shareUrl,
         })
-        .catch(() => {});
+          .catch(() => {});
     } else {
       navigator.clipboard.writeText(shareUrl);
       toast.success("Loop link copied to clipboard!");
@@ -327,6 +355,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
   // Bookmark handling
   async function handleToggleSave() {
+    if (!currentUserId) {
+      setLockedCapability("LIKE_POST");
+      setShowLockedModal(true);
+      return;
+    }
+
     sounds.tap();
     haptics.light();
     const nextSaved = !isSaved;
@@ -342,6 +376,12 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
   // Author follow toggle
   async function handleToggleFollowAuthor(e: React.MouseEvent) {
     e.stopPropagation();
+    if (!currentUserId) {
+      setLockedCapability("SEND_MESSAGE");
+      setShowLockedModal(true);
+      return;
+    }
+
     if (!post.authorId || post.isAnonymous || !authorHandle) return;
     const nextFollow = !isFollowingAuthor;
     setIsFollowingAuthor(nextFollow);
@@ -581,6 +621,14 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
       />
       <PostLikesModal postId={post.id} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
       <ReportDialog postId={post.id} isOpen={showReport} onClose={() => setShowReport(false)} />
+      <PreviewLockedModal
+        isOpen={showLockedModal}
+        onClose={() => setShowLockedModal(false)}
+        onOpenUpgrade={() => {
+          window.location.href = `/handler/sign-in?returnTo=${encodeURIComponent(window.location.pathname)}`;
+        }}
+        capability={lockedCapability}
+      />
     </>
   );
 

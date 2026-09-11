@@ -413,6 +413,28 @@ export function PostReelsDeck({ initialItems, currentUserId, campusName }: PostR
           }}
         />
       )}
+
+      {/* ─── Floating Guest Callout ─── */}
+      {!currentUserId && (
+        <div className="fixed bottom-3 inset-x-3 sm:inset-x-auto sm:right-6 sm:left-auto z-40 pointer-events-auto">
+          <div className="px-4 py-2.5 rounded-2xl bg-card/95 border border-primary/30 backdrop-blur-xl shadow-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-2">
+            <div className="min-w-0">
+              <p className="text-xs font-black text-foreground truncate">
+                Browsing as guest
+              </p>
+              <p className="text-[11px] text-muted-foreground truncate hidden sm:block">
+                Connect your college email to vote, reply &amp; unlock your campus feed.
+              </p>
+            </div>
+            <Link
+              href="/handler/sign-in"
+              className="shrink-0 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-black hover:opacity-90 active:scale-95 transition-all shadow-xs"
+            >
+              Sign In
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

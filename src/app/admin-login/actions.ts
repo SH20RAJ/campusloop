@@ -1,30 +1,20 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { hexclaveServerApp } from "@/hexclave/server";
+import { isAllowedAdminEmail } from "../admin/_lib/session";
 
-import {
-  ADMIN_SESSION_COOKIE,
-  ADMIN_SESSION_MAX_AGE_SECONDS,
-  createAdminSessionToken,
-  verifyAdminPasskey,
-} from "../admin/_lib/session";
-
-export async function loginWithPasskey(formData: FormData) {
-  const passkey = String(formData.get("passkey") ?? "");
-
-  if (!verifyAdminPasskey(passkey)) {
-    throw new Error("Invalid passkey");
+export async function checkAdminAccess() {
+  const user = await hexclaveServerApp.getUser();
+  if (!user) {
+    redirect("/login?redirect=/admin");
   }
 
-  const cookieStore = await cookies();
-  cookieStore.set(ADMIN_SESSION_COOKIE, createAdminSessionToken(), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
-  });
+  if (isAllowedAdminEmail(user.primaryEmail)) {
+    redirect("/admin");
+  }
 
-  redirect("/admin");
+  throw new Error(
+    `Access restricted: Account "${user.primaryEmail || "unknown"}" is not an authorized administrator.`
+  );
 }

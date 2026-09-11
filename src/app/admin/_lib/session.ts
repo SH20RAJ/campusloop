@@ -5,13 +5,27 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 const SESSION_COOKIE = "admin_session";
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
 
-function requireSecret(name: "ADMIN_PASSKEY" | "ADMIN_SESSION_SECRET"): string {
+/**
+ * Designated authorized administrator emails.
+ * Users logged in with these emails are automatically granted ADMIN privileges.
+ */
+export const ADMIN_EMAILS = [
+  "sh20raj@gmail.com",
+  "btech10574.24@bitmesra.ac.in",
+] as const;
+
+/**
+ * Checks if the given email is an authorized administrator email (case-insensitive).
+ */
+export function isAllowedAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  const normalized = email.trim().toLowerCase();
+  return ADMIN_EMAILS.some((adminEmail) => adminEmail.toLowerCase() === normalized);
+}
+
+function requireSecret(name: "ADMIN_SESSION_SECRET"): string {
   const value = process.env[name];
   if (value && value.length >= 6) return value;
-
-  if (name === "ADMIN_PASSKEY") {
-    throw new Error("Missing required secret ADMIN_PASSKEY. Set it in .env / .env.local.");
-  }
 
   if (process.env.NODE_ENV === "production") {
     throw new Error(`Missing required secret ${name}. Set it via wrangler secret put ${name}.`);
@@ -27,11 +41,6 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(bufA, bufB);
 }
 
-/** Constant-time passkey check against the ADMIN_PASSKEY secret. */
-export function verifyAdminPasskey(input: string): boolean {
-  return safeEqual(input, requireSecret("ADMIN_PASSKEY"));
-}
-
 function sign(payload: string, expiresAt: number): string {
   return createHmac("sha256", requireSecret("ADMIN_SESSION_SECRET"))
     .update(`${payload}.${expiresAt}`)
@@ -40,14 +49,14 @@ function sign(payload: string, expiresAt: number): string {
 
 /**
  * Signed, expiring session token: `<expiresAt>.<hmac>`.
- * The cookie value alone is useless without ADMIN_SESSION_SECRET.
  */
-export function createAdminSessionToken(): string {
+export function createAdminSessionToken(email?: string): string {
   const expiresAt = Date.now() + SESSION_TTL_MS;
-  return `${expiresAt}.${sign("admin", expiresAt)}`;
+  const payload = email ? `admin:${email.toLowerCase()}` : "admin";
+  return `${expiresAt}.${sign(payload, expiresAt)}`;
 }
 
-export function isValidAdminSessionToken(token: string | undefined | null): boolean {
+export function isValidAdminSessionToken(token: string | undefined | null, email?: string): boolean {
   if (!token) return false;
 
   const dotIndex = token.indexOf(".");
@@ -59,7 +68,8 @@ export function isValidAdminSessionToken(token: string | undefined | null): bool
   const expiresAt = Number(expiresPart);
   if (!Number.isSafeInteger(expiresAt) || expiresAt < Date.now()) return false;
 
-  return safeEqual(signature, sign("admin", expiresAt));
+  const payload = email ? `admin:${email.toLowerCase()}` : "admin";
+  return safeEqual(signature, sign(payload, expiresAt));
 }
 
 export const ADMIN_SESSION_COOKIE = SESSION_COOKIE;

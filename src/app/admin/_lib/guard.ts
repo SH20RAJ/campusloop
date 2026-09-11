@@ -1,46 +1,68 @@
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
-import { cookies } from "next/headers";
+import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { type UserProfile, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
-import { ADMIN_SESSION_COOKIE, isValidAdminSessionToken } from "./session";
+import { isAllowedAdminEmail } from "./session";
 
 type Db = ReturnType<typeof getDb>;
 
 /**
  * Single source of truth for admin authorization.
- *
- * Two paths:
- * 1. Signed passkey session cookie — owner convenience on read surfaces.
- *    NEVER accepted for identity reveal (see anonymity-actions).
- * 2. Hexclave session with role === "ADMIN" — required for sensitive actions.
+ * Passcode is removed; access is granted if the user is authenticated with an
+ * authorized administrator email (sh20raj@gmail.com, btech10574.24@bitmesra.ac.in)
+ * or holds the ADMIN role in userProfiles.
  */
 
-function hasPasskeySession(cookieStore: Awaited<ReturnType<typeof cookies>>): boolean {
-  return isValidAdminSessionToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
-}
-
 export async function getAdminDb(): Promise<Db> {
-  const cookieStore = await cookies();
-  if (hasPasskeySession(cookieStore)) {
-    return getDb();
-  }
   const { db } = await requireAdminProfile();
   return db;
 }
 
-/** Strict path: a real logged-in ADMIN profile. Used for reveal & audit. */
+/** Strict path: a real logged-in ADMIN profile. Used for reveal, audit & admin data. */
 export async function requireAdminProfile(): Promise<{ db: Db; profile: UserProfile }> {
   const user = await hexclaveServerApp.getUser();
   if (!user) throw new Error("Unauthorized");
 
   const db = getDb();
-  const profile = await db.query.userProfiles.findFirst({
+  let profile = await db.query.userProfiles.findFirst({
     where: eq(userProfiles.userId, user.id),
   });
+
+  const email = user.primaryEmail?.toLowerCase();
+
+  // If user matches designated admin emails, ensure they have the ADMIN role
+  if (isAllowedAdminEmail(email)) {
+    if (!profile) {
+      const fallbackInst = await db.query.institutions.findFirst();
+      if (fallbackInst) {
+        const [created] = await db
+          .insert(userProfiles)
+          .values({
+            userId: user.id,
+            username: (email?.split("@")[0] || "admin").toLowerCase().replace(/[^a-z0-9_]/g, "_"),
+            displayName: "CampusLoop Admin",
+            email: email || null,
+            institutionId: fallbackInst.id,
+            onboardingCompleted: true,
+            role: "ADMIN",
+            status: "ACTIVE",
+          })
+          .returning();
+        profile = created;
+      }
+    } else if (profile.role !== "ADMIN") {
+      await db
+        .update(userProfiles)
+        .set({ role: "ADMIN" })
+        .where(eq(userProfiles.userId, user.id));
+      profile = { ...profile, role: "ADMIN" };
+    }
+
+    if (profile) return { db, profile };
+  }
 
   if (profile?.role !== "ADMIN") {
     throw new Error("Forbidden — ADMIN role required");
@@ -55,44 +77,60 @@ export type AdminSessionContext = {
   isLegacyPasskey: boolean;
 };
 
-/** Layout-level check: signed passkey session OR ADMIN profile. Also bootstraps first admin. */
+/** Layout-level check: verifies Hexclave session and admin email authorization */
 export async function resolveAdminSession(): Promise<AdminSessionContext> {
-  const cookieStore = await cookies();
-  const isLegacyPasskey = hasPasskeySession(cookieStore);
+  const user = await hexclaveServerApp.getUser();
+  if (!user) {
+    redirect("/login?redirect=/admin");
+  }
+
+  const email = user.primaryEmail?.toLowerCase();
   const db = getDb();
 
-  if (!isLegacyPasskey) {
-    const user = await hexclaveServerApp.getUser();
-    if (!user) redirect("/admin-login");
-
-    await bootstrapFirstAdmin(db, user.id, user.primaryEmail);
-
-    const profile = await db.query.userProfiles.findFirst({
+  // If user is logged in with one of the authorized admin emails
+  if (isAllowedAdminEmail(email)) {
+    let profile = await db.query.userProfiles.findFirst({
       where: eq(userProfiles.userId, user.id),
     });
-    if (profile?.role !== "ADMIN") redirect("/admin-login");
 
+    if (!profile) {
+      const fallbackInst = await db.query.institutions.findFirst();
+      if (fallbackInst) {
+        const [created] = await db
+          .insert(userProfiles)
+          .values({
+            userId: user.id,
+            username: (email?.split("@")[0] || "admin").toLowerCase().replace(/[^a-z0-9_]/g, "_"),
+            displayName: "CampusLoop Admin",
+            email: email || null,
+            institutionId: fallbackInst.id,
+            onboardingCompleted: true,
+            role: "ADMIN",
+            status: "ACTIVE",
+          })
+          .returning();
+        profile = created;
+      }
+    } else if (profile.role !== "ADMIN") {
+      await db
+        .update(userProfiles)
+        .set({ role: "ADMIN" })
+        .where(eq(userProfiles.userId, user.id));
+      profile = { ...profile, role: "ADMIN" };
+    }
+
+    return { db, profile: profile ?? null, isLegacyPasskey: false };
+  }
+
+  // If not in the whitelist, check if existing profile already has the ADMIN role
+  const profile = await db.query.userProfiles.findFirst({
+    where: eq(userProfiles.userId, user.id),
+  });
+
+  if (profile?.role === "ADMIN") {
     return { db, profile, isLegacyPasskey: false };
   }
 
-  return { db, profile: null, isLegacyPasskey: true };
-}
-
-async function bootstrapFirstAdmin(db: Db, userId: string, email?: string | null) {
-  const [count] = await db.select({ count: sql<number>`count(*)` }).from(userProfiles);
-  if (count.count !== 0) return;
-
-  const fallbackInst = await db.query.institutions.findFirst();
-  if (!fallbackInst) return;
-
-  await db.insert(userProfiles).values({
-    userId,
-    username: (email?.split("@")[0] || "admin").toLowerCase(),
-    displayName: "Admin",
-    email: email || null,
-    institutionId: fallbackInst.id,
-    onboardingCompleted: true,
-    role: "ADMIN",
-    status: "ACTIVE",
-  });
+  // Forbidden: Not an admin
+  redirect("/app");
 }

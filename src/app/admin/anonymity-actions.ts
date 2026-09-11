@@ -11,21 +11,7 @@ import { openSealedIdentity } from "@/lib/anonymity";
  * It requires a logged-in ADMIN role profile. The legacy admin passkey
  * cookie path is deliberately NOT accepted here.
  */
-async function requireAdminProfile() {
-  const user = await hexclaveServerApp.getUser();
-  if (!user) throw new Error("Unauthorized");
-
-  const db = getDb();
-  const profile = await db.query.userProfiles.findFirst({
-    where: eq(userProfiles.userId, user.id),
-  });
-
-  if (profile?.role !== "ADMIN") {
-    throw new Error("Forbidden — ADMIN role required");
-  }
-
-  return { db, profile };
-}
+import { requireAdminProfile } from "./_lib/guard";
 
 export type RevealedIdentity = {
   username: string;

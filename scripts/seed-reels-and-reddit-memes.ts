@@ -37,7 +37,7 @@ const SEED_ITEMS: SeedItem[] = [
   // ─── 1. VIDEO REELS (Auto-detected as 9:16 interactive Reels in PostReelCard & Feed) ───
   {
     title: "3:00 AM Hackathon Final Sprint",
-    body: `3:00 AM energy at the 24-hour campus hackathon 🔥\n\n4 team members, 16 cups of machine coffee, 2 hours left on the timer, and our backend just decided to return 500 on every single endpoint 💀\n\nFixed it with 1 line of middleware. Pure adrenaline.\n\n![3 AM Hackathon Submission](https://filesamples.com/samples/video/mp4/sample_640x360.mp4)\nhttps://filesamples.com/samples/video/mp4/sample_640x360.mp4\n\n#CampusReel #HackathonLife #BTechtards #DevVibes #HostelChronicles`,
+    body: `3:00 AM energy at the 24-hour campus hackathon 🔥\n\n4 team members, 16 cups of machine coffee, 2 hours left on the timer, and our backend just decided to return 500 on every single endpoint 💀\n\nFixed it with 1 line of middleware. Pure adrenaline.\n\n![3 AM Hackathon Submission](https://cdn.pixabay.com/video/2015/10/16/1028-142624363_large.mp4)\nhttps://cdn.pixabay.com/video/2015/10/16/1028-142624363_large.mp4\n\n#CampusReel #HackathonLife #BTechtards #DevVibes #HostelChronicles`,
     type: "NORMAL",
     isAnonymous: false,
     scope: "CAMPUS",
@@ -51,7 +51,7 @@ const SEED_ITEMS: SeedItem[] = [
   },
   {
     title: "Campus Golden Hour Walk Behind Library",
-    body: `POV: You survived 4 consecutive lectures of Signals & Systems and the campus weather hits like this 🌅✨\n\nBest spot to decompress before end-sems kick off.\n\n![Campus Sunset Trail](https://filesamples.com/samples/video/mp4/sample_960x400_ocean_with_audio.mp4)\nhttps://filesamples.com/samples/video/mp4/sample_960x400_ocean_with_audio.mp4\n\n#CampusVibes #GoldenHour #CollegeDiaries #PeacefulMoments`,
+    body: `POV: You survived 4 consecutive lectures of Signals & Systems and the campus weather hits like this 🌅✨\n\nBest spot to decompress before end-sems kick off.\n\n![Campus Sunset Trail](https://cdn.pixabay.com/video/2025/02/05/256696_large.mp4)\nhttps://cdn.pixabay.com/video/2025/02/05/256696_large.mp4\n\n#CampusVibes #GoldenHour #CollegeDiaries #PeacefulMoments`,
     type: "NORMAL",
     isAnonymous: false,
     scope: "CAMPUS",
@@ -65,7 +65,7 @@ const SEED_ITEMS: SeedItem[] = [
   },
   {
     title: "Workshop Welding: Expectation vs Reality",
-    body: `First-year Mechanical Workshop was an absolute cinematic event today ⚡️🔥\n\nExpectation: Tony Stark building the Mark 1 suit in a cave.\nReality: Shaking hands, sparks flying into the lab assistant's boots, and my weld joint snapping when blown with air 💀\n\nStill scored an A on the viva somehow!\n\n![Workshop Sparks](https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4)\nhttps://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4\n\n#EngineeringStudents #MechWorkshop #FirstYearLore #BTechLife`,
+    body: `First-year Mechanical Workshop was an absolute cinematic event today ⚡️🔥\n\nExpectation: Tony Stark building the Mark 1 suit in a cave.\nReality: Shaking hands, sparks flying into the lab assistant's boots, and my weld joint snapping when blown with air 💀\n\nStill scored an A on the viva somehow!\n\n![Workshop Sparks](https://cdn.pixabay.com/video/2023/04/15/159027-818026298_large.mp4)\nhttps://cdn.pixabay.com/video/2023/04/15/159027-818026298_large.mp4\n\n#EngineeringStudents #MechWorkshop #FirstYearLore #BTechLife`,
     type: "MEME",
     isAnonymous: false,
     scope: "GLOBAL",
@@ -79,7 +79,7 @@ const SEED_ITEMS: SeedItem[] = [
   },
   {
     title: "Hostel Mess Announced Special Dinner",
-    body: `Hostel warden said 'Special Sunday Feast tonight'...\n\nThe entire wing sprinted to the mess hall at 7:59 PM. When they opened the gates it was literally Hunger Games for the Gulab Jamuns 🏃‍♂️💨\n\n![Hostel Mess Rush](https://vjs.zencdn.net/v/oceans.mp4)\nhttps://vjs.zencdn.net/v/oceans.mp4\n\n#HostelLore #HostelFeast #MessFoodChronicles #CollegeHumor`,
+    body: `Hostel warden said 'Special Sunday Feast tonight'...\n\nThe entire wing sprinted to the mess hall at 7:59 PM. When they opened the gates it was literally Hunger Games for the Gulab Jamuns 🏃‍♂️💨\n\n![Hostel Mess Rush](https://cdn.pixabay.com/video/2023/04/15/159024-818026294_large.mp4)\nhttps://cdn.pixabay.com/video/2023/04/15/159024-818026294_large.mp4\n\n#HostelLore #HostelFeast #MessFoodChronicles #CollegeHumor`,
     type: "MEME",
     isAnonymous: true,
     pseudonym: "Mess Hall Sprinter",
@@ -94,7 +94,7 @@ const SEED_ITEMS: SeedItem[] = [
   },
   {
     title: "Zero Errors, Zero Warnings At Last",
-    body: `When you spend 3 hours tracking down a Segmentation Fault (core dumped) and it was literally an uninitialized pointer on line 84...\n\nRunning the test suite and watching all 42 test cases turn GREEN 🟢✨\n\nNothing in college beats this feeling.\n\n![Tests Passing](https://filesamples.com/samples/video/mp4/sample_640x360.mp4)\nhttps://filesamples.com/samples/video/mp4/sample_640x360.mp4\n\n#ProgrammerHumor #CSERelatable #CodingLife #BugHunt`,
+    body: `When you spend 3 hours tracking down a Segmentation Fault (core dumped) and it was literally an uninitialized pointer on line 84...\n\nRunning the test suite and watching all 42 test cases turn GREEN 🟢✨\n\nNothing in college beats this feeling.\n\n![Tests Passing](https://cdn.pixabay.com/video/2023/04/15/159029-818026300_large.mp4)\nhttps://cdn.pixabay.com/video/2023/04/15/159029-818026300_large.mp4\n\n#ProgrammerHumor #CSERelatable #CodingLife #BugHunt`,
     type: "NORMAL",
     isAnonymous: false,
     scope: "GLOBAL",
@@ -108,7 +108,7 @@ const SEED_ITEMS: SeedItem[] = [
   },
   {
     title: "Secret Rooftop Study Spot",
-    body: `Found the rooftop access door on the 5th floor of the Old Science Block unlocked during evening study break...\n\nCool autumn breeze, zero noise, overlooking the whole campus football field. Perfect for listening to lectures at 2x speed 🎧📚\n\n![Rooftop Study Vibe](https://filesamples.com/samples/video/mp4/sample_960x400_ocean_with_audio.mp4)\nhttps://filesamples.com/samples/video/mp4/sample_960x400_ocean_with_audio.mp4\n\n#SecretSpot #CampusVibes #StudyWithMe #SemesterPrep`,
+    body: `Found the rooftop access door on the 5th floor of the Old Science Block unlocked during evening study break...\n\nCool autumn breeze, zero noise, overlooking the whole campus football field. Perfect for listening to lectures at 2x speed 🎧📚\n\n![Rooftop Study Vibe](https://cdn.pixabay.com/video/2021/05/03/73007-545277076_large.mp4)\nhttps://cdn.pixabay.com/video/2021/05/03/73007-545277076_large.mp4\n\n#SecretSpot #CampusVibes #StudyWithMe #SemesterPrep`,
     type: "NORMAL",
     isAnonymous: false,
     scope: "CAMPUS",

@@ -2,42 +2,47 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-const { createAdminSessionToken, isValidAdminSessionToken, verifyAdminPasskey } = await import("./session");
+const {
+  ADMIN_EMAILS,
+  createAdminSessionToken,
+  isAllowedAdminEmail,
+  isValidAdminSessionToken,
+} = await import("./session");
 
-describe("Admin Passkey & Session Security", () => {
-  it("verifies the configured admin passcode from .env (29092005)", () => {
-    process.env.ADMIN_PASSKEY = process.env.ADMIN_PASSKEY || "29092005";
-    // Correct passcode from .env.local
-    expect(verifyAdminPasskey("29092005")).toBe(true);
+describe("Admin Email Authorization & Session Security", () => {
+  it("recognizes authorized administrator emails (sh20raj@gmail.com, btech10574.24@bitmesra.ac.in)", () => {
+    expect(ADMIN_EMAILS).toContain("sh20raj@gmail.com");
+    expect(ADMIN_EMAILS).toContain("btech10574.24@bitmesra.ac.in");
 
-    // Old passcode must be rejected
-    expect(verifyAdminPasskey("17092006")).toBe(false);
+    // Exact matches
+    expect(isAllowedAdminEmail("sh20raj@gmail.com")).toBe(true);
+    expect(isAllowedAdminEmail("btech10574.24@bitmesra.ac.in")).toBe(true);
 
-    // Random wrong attempts must be rejected
-    expect(verifyAdminPasskey("wrongpassword")).toBe(false);
-    expect(verifyAdminPasskey("")).toBe(false);
-    expect(verifyAdminPasskey("29092004")).toBe(false);
+    // Case-insensitivity
+    expect(isAllowedAdminEmail("SH20RAJ@GMAIL.COM")).toBe(true);
+    expect(isAllowedAdminEmail("BTECH10574.24@BITMESRA.AC.IN")).toBe(true);
+    expect(isAllowedAdminEmail(" Sh20Raj@gmail.com ")).toBe(true);
   });
 
-  it("creates and verifies signed admin session tokens", () => {
-    const token = createAdminSessionToken();
+  it("strictly rejects unauthorized emails and nullish values", () => {
+    expect(isAllowedAdminEmail("hacker@malicious.com")).toBe(false);
+    expect(isAllowedAdminEmail("student@iitb.ac.in")).toBe(false);
+    expect(isAllowedAdminEmail("sh20raj@otherdomain.com")).toBe(false);
+    expect(isAllowedAdminEmail("")).toBe(false);
+    expect(isAllowedAdminEmail(null)).toBe(false);
+    expect(isAllowedAdminEmail(undefined)).toBe(false);
+  });
+
+  it("creates and validates signed session tokens with HMAC integrity", () => {
+    const token = createAdminSessionToken("sh20raj@gmail.com");
     expect(typeof token).toBe("string");
     expect(token.includes(".")).toBe(true);
 
-    expect(isValidAdminSessionToken(token)).toBe(true);
+    expect(isValidAdminSessionToken(token, "sh20raj@gmail.com")).toBe(true);
+    expect(isValidAdminSessionToken(token, "btech10574.24@bitmesra.ac.in")).toBe(false);
     expect(isValidAdminSessionToken(null)).toBe(false);
     expect(isValidAdminSessionToken(undefined)).toBe(false);
     expect(isValidAdminSessionToken("invalid.token")).toBe(false);
     expect(isValidAdminSessionToken("9999999999999.fakename")).toBe(false);
-  });
-
-  it("throws error when ADMIN_PASSKEY is missing from environment without hardcoded fallback", () => {
-    const originalPasskey = process.env.ADMIN_PASSKEY;
-    try {
-      delete process.env.ADMIN_PASSKEY;
-      expect(() => verifyAdminPasskey("29092005")).toThrow("Missing required secret ADMIN_PASSKEY");
-    } finally {
-      process.env.ADMIN_PASSKEY = originalPasskey;
-    }
   });
 });

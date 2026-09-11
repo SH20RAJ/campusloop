@@ -132,6 +132,16 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/colleges",
+        destination: "/app/colleges",
+        permanent: true,
+      },
+      {
+        source: "/college/:id*",
+        destination: "/app/college/:id*",
+        permanent: true,
+      },
+      {
         source: "/notifications",
         destination: "/app/notifications",
         permanent: true,

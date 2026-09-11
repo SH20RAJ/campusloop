@@ -74,14 +74,17 @@ export function AllIndiaCollegePodium({
         {second && (
           <Link
             href={`/app/college/${second.slug || second.id}`}
-            className="group flex flex-col items-center cursor-pointer transition-transform hover:-translate-y-1"
+            className="group flex flex-col items-center min-w-0 cursor-pointer transition-transform hover:-translate-y-1"
           >
-            <div className="relative mb-2">
+            <div className="relative mb-2 shrink-0">
               <div className="size-13 sm:size-16 rounded-full border-2 border-slate-300 shadow-md overflow-hidden bg-muted/20 flex items-center justify-center p-1 group-hover:border-primary transition-colors">
                 {second.logoUrl ? (
                   <img
                     src={second.logoUrl}
                     alt={second.name}
+                    width={64}
+                    height={64}
+                    loading="lazy"
                     referrerPolicy="no-referrer"
                     className="size-full object-contain"
                   />
@@ -95,10 +98,10 @@ export function AllIndiaCollegePodium({
                 2
               </span>
             </div>
-            <p className="text-[11px] sm:text-xs font-bold text-foreground text-center truncate w-full group-hover:text-primary transition-colors">
+            <p className="text-[11px] sm:text-xs font-bold text-foreground text-center truncate w-full px-1 group-hover:text-primary transition-colors">
               {second.name.split(",")[0]}
             </p>
-            <span className="text-[10px] sm:text-[11px] font-black text-slate-600 dark:text-slate-300">
+            <span className="text-[10px] sm:text-[11px] font-black text-slate-600 dark:text-slate-300 tabular-nums">
               {second.points.toLocaleString("en-IN")} LP
             </span>
             <div className={`w-full mt-2 rounded-t-xl bg-linear-to-t from-slate-500/20 to-slate-400/30 border-t border-x border-slate-300/40 flex flex-col items-center justify-center text-[10px] font-bold text-muted-foreground ${compact ? "h-14 sm:h-16" : "h-18 sm:h-20"}`}>
@@ -112,15 +115,18 @@ export function AllIndiaCollegePodium({
         {first && (
           <Link
             href={`/app/college/${first.slug || first.id}`}
-            className="group flex flex-col items-center cursor-pointer transition-transform hover:-translate-y-1.5"
+            className="group flex flex-col items-center min-w-0 cursor-pointer transition-transform hover:-translate-y-1.5"
           >
             <Crown className="size-5 sm:size-6 text-amber-500 animate-bounce mb-1" />
-            <div className="relative mb-2">
+            <div className="relative mb-2 shrink-0">
               <div className="size-16 sm:size-20 rounded-full border-3 border-amber-400 shadow-xl overflow-hidden bg-muted/20 flex items-center justify-center p-1.5 ring-4 ring-amber-400/20 group-hover:ring-amber-400/40 transition-all">
                 {first.logoUrl ? (
                   <img
                     src={first.logoUrl}
                     alt={first.name}
+                    width={80}
+                    height={80}
+                    loading="lazy"
                     referrerPolicy="no-referrer"
                     className="size-full object-contain"
                   />
@@ -134,10 +140,10 @@ export function AllIndiaCollegePodium({
                 1
               </span>
             </div>
-            <p className="text-xs sm:text-[13px] font-black text-foreground text-center truncate w-full group-hover:text-primary transition-colors">
+            <p className="text-xs sm:text-[13px] font-black text-foreground text-center truncate w-full px-1 group-hover:text-primary transition-colors">
               {first.name.split(",")[0]}
             </p>
-            <span className="text-[11px] sm:text-xs font-black text-amber-500">
+            <span className="text-[11px] sm:text-xs font-black text-amber-500 tabular-nums">
               {first.points.toLocaleString("en-IN")} LP
             </span>
             <div className={`w-full mt-2 rounded-t-xl bg-linear-to-t from-amber-500/25 to-amber-400/40 border-t border-x border-amber-400/50 flex flex-col items-center justify-center text-[11px] sm:text-xs font-black text-amber-600 dark:text-amber-300 ${compact ? "h-20 sm:h-24" : "h-24 sm:h-28"}`}>
@@ -151,14 +157,17 @@ export function AllIndiaCollegePodium({
         {third && (
           <Link
             href={`/app/college/${third.slug || third.id}`}
-            className="group flex flex-col items-center cursor-pointer transition-transform hover:-translate-y-1"
+            className="group flex flex-col items-center min-w-0 cursor-pointer transition-transform hover:-translate-y-1"
           >
-            <div className="relative mb-2">
+            <div className="relative mb-2 shrink-0">
               <div className="size-13 sm:size-16 rounded-full border-2 border-amber-700/60 shadow-md overflow-hidden bg-muted/20 flex items-center justify-center p-1 group-hover:border-primary transition-colors">
                 {third.logoUrl ? (
                   <img
                     src={third.logoUrl}
                     alt={third.name}
+                    width={64}
+                    height={64}
+                    loading="lazy"
                     referrerPolicy="no-referrer"
                     className="size-full object-contain"
                   />
@@ -172,10 +181,10 @@ export function AllIndiaCollegePodium({
                 3
               </span>
             </div>
-            <p className="text-[11px] sm:text-xs font-bold text-foreground text-center truncate w-full group-hover:text-primary transition-colors">
+            <p className="text-[11px] sm:text-xs font-bold text-foreground text-center truncate w-full px-1 group-hover:text-primary transition-colors">
               {third.name.split(",")[0]}
             </p>
-            <span className="text-[10px] sm:text-[11px] font-black text-amber-700 dark:text-amber-400">
+            <span className="text-[10px] sm:text-[11px] font-black text-amber-700 dark:text-amber-400 tabular-nums">
               {third.points.toLocaleString("en-IN")} LP
             </span>
             <div className={`w-full mt-2 rounded-t-xl bg-linear-to-t from-amber-800/20 to-amber-700/30 border-t border-x border-amber-700/40 flex flex-col items-center justify-center text-[10px] font-bold text-muted-foreground ${compact ? "h-12 sm:h-14" : "h-14 sm:h-16"}`}>

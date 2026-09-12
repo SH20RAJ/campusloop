@@ -47,6 +47,7 @@ import { notificationMutes, notificationPreferences, notifications } from "./not
 import { comments, pollOptions, pollVotes, posts, votes } from "./posts";
 import { randomMessages, randomQueue, randomReports, randomSessions } from "./random-loop";
 import { ridesharePools } from "./rideshare";
+import { reels, reelLikes, reelComments, reelBookmarks } from "./reels";
 import { savedPosts } from "./saved-posts";
 import { stories, storyHighlights, storyLikes } from "./stories";
 import { capsuleEntries, timeCapsules } from "./time-capsule";
@@ -57,6 +58,7 @@ export const institutionsRelations = relations(institutions, ({ many }) => ({
   profiles: many(userProfiles),
   posts: many(posts),
   articles: many(articles),
+  reels: many(reels),
 }));
 
 export const institutionDomainsRelations = relations(institutionDomains, ({ one }) => ({
@@ -79,6 +81,10 @@ export const userProfilesRelations = relations(userProfiles, ({ one, many }) => 
   storyHighlights: many(storyHighlights),
   savedPosts: many(savedPosts),
   articles: many(articles),
+  reels: many(reels),
+  reelLikes: many(reelLikes),
+  reelComments: many(reelComments),
+  reelBookmarks: many(reelBookmarks),
   followers: many(follows, { relationName: "profile_followers" }),
   following: many(follows, { relationName: "profile_following" }),
 }));
@@ -947,3 +953,51 @@ export const aiFeedbackRelations = relations(aiFeedback, ({ one }) => ({
     references: [aiMessages.id],
   }),
 }));
+
+export const reelsRelations = relations(reels, ({ one, many }) => ({
+  author: one(userProfiles, {
+    fields: [reels.authorId],
+    references: [userProfiles.id],
+  }),
+  institution: one(institutions, {
+    fields: [reels.institutionId],
+    references: [institutions.id],
+  }),
+  likes: many(reelLikes),
+  comments: many(reelComments),
+  bookmarks: many(reelBookmarks),
+}));
+
+export const reelLikesRelations = relations(reelLikes, ({ one }) => ({
+  reel: one(reels, {
+    fields: [reelLikes.reelId],
+    references: [reels.id],
+  }),
+  user: one(userProfiles, {
+    fields: [reelLikes.userId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const reelCommentsRelations = relations(reelComments, ({ one }) => ({
+  reel: one(reels, {
+    fields: [reelComments.reelId],
+    references: [reels.id],
+  }),
+  author: one(userProfiles, {
+    fields: [reelComments.authorId],
+    references: [userProfiles.id],
+  }),
+}));
+
+export const reelBookmarksRelations = relations(reelBookmarks, ({ one }) => ({
+  reel: one(reels, {
+    fields: [reelBookmarks.reelId],
+    references: [reels.id],
+  }),
+  user: one(userProfiles, {
+    fields: [reelBookmarks.userId],
+    references: [userProfiles.id],
+  }),
+}));
+

@@ -1,10 +1,9 @@
-import { eq, inArray, or, type SQL, sql } from "drizzle-orm";
+import { eq, inArray, type SQL, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { externalPosts, posts, userProfiles } from "@/db/schema";
+import { posts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { formatApiFeedPosts, normalizeApiFeedSort, resolveFeedPage } from "@/lib/feed";
-import { applyReelDiversityFilter, getViewerSeenReelIds } from "@/lib/reels/algorithm";
 import { isViewerProfile } from "@/lib/viewer";
 
 export const dynamic = "force-dynamic";
@@ -50,10 +49,7 @@ export async function GET(req: Request) {
     const isViewer = institutionId ? await isViewerProfile({ institutionId }) : false;
     const conditions: SQL[] = [
       eq(posts.status, "PUBLISHED"),
-      or(
-        eq(posts.isSeeded, false),
-        sql`EXISTS (SELECT 1 FROM ${externalPosts} WHERE ${externalPosts.postId} = ${posts.id})`
-      )!,
+      eq(posts.isSeeded, false),
     ];
 
     if (scope === "CAMPUS") {
@@ -62,13 +58,6 @@ export async function GET(req: Request) {
       } else if (institutionId && !isViewer) {
         conditions.push(eq(posts.institutionId, institutionId));
       }
-    }
-
-    const isReels = sort === "reels" || type === "reels" || type === "REEL" || searchParams.get("videoOnly") === "true";
-    if (isReels) {
-      conditions.push(
-        sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%' OR EXISTS (SELECT 1 FROM external_media em JOIN external_posts ep ON em.external_post_id = ep.id WHERE ep.post_id = ${posts.id} AND em.media_type = 'VIDEO'))`
-      );
     }
 
     const excludeIdsParam = searchParams.get("excludeIds");
@@ -92,19 +81,6 @@ export async function GET(req: Request) {
       );
     }
 
-    if (isReels && profileId) {
-      const viewerSeen = await getViewerSeenReelIds(profileId, 500);
-      combinedSeenIds.push(...viewerSeen);
-      conditions.push(
-        sql`NOT EXISTS (
-          SELECT 1 FROM user_behavior_events
-          WHERE user_id = ${profileId}
-            AND target_id = ${posts.id}
-            AND event_type IN ('REEL_WATCH', 'REEL_LOOP', 'REEL_SKIP')
-        )`
-      );
-    }
-
     const uniqueSeenIds = Array.from(new Set(combinedSeenIds))
       .filter((id) => /^[a-zA-Z0-9_-]+$/.test(id))
       .slice(0, 500);
@@ -115,7 +91,7 @@ export async function GET(req: Request) {
 
     if (sort === "memes" || (type && (type === "MEME" || type === "memes"))) {
       conditions.push(eq(posts.type, "MEME"));
-    } else if (type && type !== "ALL" && type !== "all" && !isReels) {
+    } else if (type && type !== "ALL" && type !== "all") {
       conditions.push(eq(posts.type, type as (typeof posts.type.enumValues)[number]));
     }
 
@@ -166,11 +142,7 @@ export async function GET(req: Request) {
       seenIds: uniqueSeenIds,
       viewerProfileId: profileId,
     });
-    let feed = await formatApiFeedPosts(rawFeed, profileId);
-    if (isReels) {
-      feed = applyReelDiversityFilter(feed);
-    }
-
+    const feed = await formatApiFeedPosts(rawFeed, profileId);
     return NextResponse.json(feed);
   } catch (error) {
     console.error("Error fetching feed:", error);

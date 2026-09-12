@@ -178,8 +178,8 @@ function recordLocalSeenId(id: string) {
       const combinedExclude = Array.from(new Set([...localSeen, ...inMemorySeen])).slice(0, 150);
       const excludeParam =
         combinedExclude.length > 0 ? `&excludeIds=${encodeURIComponent(combinedExclude.join(","))}` : "";
-      const data = await fetcher<FeedPost[] | { posts: FeedPost[] }>(
-        `/api/feed?sort=reels&page=${nextPage}&limit=12&scope=GLOBAL${excludeParam}`
+      const data = await fetcher<FeedPost[] | { posts: FeedPost[]; reels?: any[] }>(
+        `/api/reels?page=${nextPage}&limit=12&sort=trending${excludeParam}`
       );
       const rawPosts: FeedPost[] = Array.isArray(data) ? data : data?.posts || [];
 
@@ -841,6 +841,7 @@ function SingleReelItem({
               playsInline
               loop
               preload="auto"
+              crossOrigin="anonymous"
               onTimeUpdate={handleTimeUpdate}
               onEnded={handleVideoEnded}
               onClick={handleVideoTap}
@@ -853,6 +854,7 @@ function SingleReelItem({
                 preload="auto"
                 loop
                 playsInline
+                crossOrigin="anonymous"
                 className="hidden"
               />
             )}

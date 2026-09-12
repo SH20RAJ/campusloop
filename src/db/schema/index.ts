@@ -22,6 +22,7 @@ export * from "./posts";
 export * from "./random-loop";
 export * from "./referrals";
 export * from "./relations";
+export * from "./reels";
 export * from "./rideshare";
 export * from "./saved-posts";
 export * from "./stories";

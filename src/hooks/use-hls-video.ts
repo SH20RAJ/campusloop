@@ -82,12 +82,31 @@ export function useHlsVideo({
         }
       });
 
+      let networkRetryCount = 0;
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (!isSubscribed) return;
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              hls.startLoad();
+              if (networkRetryCount < 1) {
+                networkRetryCount++;
+                hls.startLoad();
+              } else {
+                hls.destroy();
+                hlsRef.current = null;
+                setUsingHls(false);
+                if (videoUrl) {
+                  video.src = videoUrl;
+                  if (isActive) {
+                    video.play().then(() => {
+                      if (isSubscribed) setIsPlaying(true);
+                    }).catch(() => {});
+                  }
+                } else {
+                  setHasError(true);
+                  setIsLoading(false);
+                }
+              }
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
               hls.recoverMediaError();
@@ -96,7 +115,6 @@ export function useHlsVideo({
               hls.destroy();
               hlsRef.current = null;
               setUsingHls(false);
-              // Fallback to direct MP4 with companion audio
               if (videoUrl) {
                 video.src = videoUrl;
                 if (isActive) {
@@ -104,6 +122,9 @@ export function useHlsVideo({
                     if (isSubscribed) setIsPlaying(true);
                   }).catch(() => {});
                 }
+              } else {
+                setHasError(true);
+                setIsLoading(false);
               }
               break;
           }

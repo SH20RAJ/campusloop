@@ -85,15 +85,39 @@ export function FeedCard({ post, currentUserId, disableNavigation }: FeedCardPro
       cleaned = removeDuplicateTitleFromBody(cleaned, post.title);
     }
 
-    if (post.externalPost && (post.externalPost.contentType === "VIDEO" || post.externalPost.contentType === "GALLERY")) {
+    const hasExternalVideo =
+      Boolean(post.externalPost && post.externalPost.contentType === "VIDEO") ||
+      Boolean(post.externalPost?.media?.some((m) => m.mediaType === "VIDEO"));
+
+    const hasExternalGallery =
+      Boolean(post.externalPost && post.externalPost.contentType === "GALLERY") ||
+      Boolean(post.externalPost?.media && post.externalPost.media.length > 1);
+
+    if (hasExternalVideo) {
+      // The video player is already rendered via RedditVideo below the text.
+      // Strip all video markdown tags (with any alt text) and raw video links from text body so it NEVER duplicates!
       cleaned = cleaned
-        .replace(/!\[video\]\([^)]+\)/gi, "")
-        .replace(/!\[image:[^\]]*\]\([^)]+\)/gi, "")
-        .replace(/!\[image\]\([^)]+\)/gi, "")
+        .replace(/!\[.*?\]\((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)\)/gi, "")
+        .replace(/https?:\/\/v\.redd\.it\/[^\s]+/gi, "")
+        .replace(/https?:\/\/[^\s]+\.(?:mp4|webm|mov|m3u8)[^\s]*/gi, "")
         .trim();
     }
 
-    return cleaned;
+    if (hasExternalGallery) {
+      cleaned = cleaned
+        .replace(/!\[.*?\]\((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)\)/gi, "")
+        .trim();
+    }
+
+    // Deduplicate any repeated identical media URLs in markdown
+    const seenUrls = new Set<string>();
+    cleaned = cleaned.replace(/!\[(.*?)\]\((https?:\/\/[^\s)]+)\)/gi, (match, alt, url) => {
+      if (seenUrls.has(url)) return "";
+      seenUrls.add(url);
+      return match;
+    });
+
+    return cleaned.trim();
   }, [post.body, post.title, post.externalPost]);
 
   async function handleVote() {

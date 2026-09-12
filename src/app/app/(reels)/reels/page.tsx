@@ -1,10 +1,9 @@
-import { and, eq, or, sql } from "drizzle-orm";
+import { desc, eq, inArray, sql } from "drizzle-orm";
 import type { Metadata } from "next";
 import { ReelsFeedClient } from "@/components/reels/reels-feed-client";
-import { externalPosts, posts } from "@/db/schema";
+import { getDb } from "@/db";
+import { institutions, reelLikes, reels } from "@/db/schema";
 import type { FeedPost } from "@/hooks/use-feed";
-import { formatApiFeedPosts, resolveFeedPage } from "@/lib/feed";
-import { applyReelDiversityFilter, getViewerSeenReelIds } from "@/lib/reels/algorithm";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +29,8 @@ export const metadata: Metadata = {
         alt: "CampusLoop Reels",
       },
     ],
+    locale: "en_IN",
+    type: "website",
   },
   twitter: {
     card: "summary_large_image",
@@ -43,51 +44,120 @@ export const metadata: Metadata = {
 export default async function ReelsPage() {
   const user = await getCachedAuthUser();
   const profile = user ? await getCachedUserProfile(user.id) : null;
+  const db = getDb();
 
-  // Query only published video posts (including external Reddit videos)
-  const videoCondition = sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%' OR EXISTS (SELECT 1 FROM external_media em JOIN external_posts ep ON em.external_post_id = ep.id WHERE ep.post_id = ${posts.id} AND em.media_type = 'VIDEO'))`;
+  const rawReels = await db
+    .select({
+      id: reels.id,
+      slug: reels.slug,
+      caption: reels.caption,
+      title: reels.title,
+      videoUrl: reels.videoUrl,
+      hlsUrl: reels.hlsUrl,
+      audioUrl: reels.audioUrl,
+      thumbnailUrl: reels.thumbnailUrl,
+      aspectRatio: reels.aspectRatio,
+      width: reels.width,
+      height: reels.height,
+      duration: reels.duration,
+      authorId: reels.authorId,
+      authorName: reels.authorName,
+      authorHandle: reels.authorHandle,
+      authorAvatarUrl: reels.authorAvatarUrl,
+      institutionId: reels.institutionId,
+      institutionName: institutions.name,
+      source: reels.source,
+      sourceUrl: reels.sourceUrl,
+      subreddit: reels.subreddit,
+      tags: reels.tags,
+      likesCount: reels.likesCount,
+      commentsCount: reels.commentsCount,
+      sharesCount: reels.sharesCount,
+      viewsCount: reels.viewsCount,
+      createdAt: reels.createdAt,
+    })
+    .from(reels)
+    .leftJoin(institutions, eq(reels.institutionId, institutions.id))
+    .where(eq(reels.status, "PUBLISHED"))
+    .orderBy(
+      desc(
+        sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400)`
+      ),
+      desc(reels.createdAt)
+    )
+    .limit(20);
 
-  const conditions = [
-    eq(posts.status, "PUBLISHED"),
-    or(
-      eq(posts.isSeeded, false),
-      sql`EXISTS (SELECT 1 FROM ${externalPosts} WHERE ${externalPosts.postId} = ${posts.id})`
-    )!,
-    videoCondition,
-  ];
-
-  let seenIds: string[] = [];
-  if (profile?.id) {
-    seenIds = await getViewerSeenReelIds(profile.id, 500);
-    conditions.push(
-      sql`NOT EXISTS (
-        SELECT 1 FROM user_behavior_events
-        WHERE user_id = ${profile.id}
-          AND target_id = ${posts.id}
-          AND event_type IN ('REEL_WATCH', 'REEL_LOOP', 'REEL_SKIP')
-      )`
-    );
-    if (seenIds.length > 0) {
-      const safeIds = seenIds.filter((id) => /^[a-zA-Z0-9_-]+$/.test(id)).slice(0, 300);
-      if (safeIds.length > 0) {
-        conditions.push(sql`${posts.id} NOT IN (${sql.join(safeIds.map((eid) => sql`${eid}`), sql`, `)})`);
-      }
-    }
+  const reelIds = rawReels.map((r) => r.id);
+  const likedReelsSet = new Set<string>();
+  if (profile?.id && reelIds.length > 0) {
+    const userLikes = await db
+      .select({ reelId: reelLikes.reelId })
+      .from(reelLikes)
+      .where(sql`${reelLikes.userId} = ${profile.id} AND ${reelLikes.reelId} IN (${sql.join(reelIds.map((id) => sql`${id}`), sql`, `)})`);
+    for (const l of userLikes) likedReelsSet.add(l.reelId);
   }
 
-  const rawFeed = await resolveFeedPage({
-    conditions,
-    sort: "reels",
-    limit: 25,
-    offset: 0,
-    userInstitutionId: null,
-    seenIds,
-    viewerProfileId: profile?.id,
-  });
+  const formattedPosts: FeedPost[] = rawReels.map((r) => ({
+    id: r.id,
+    title: r.title,
+    body: `${r.caption}\n\n${((r.tags as string[]) || []).map((t) => `#${t}`).join(" ")}`,
+    type: "MEME" as const,
+    scope: "GLOBAL" as const,
+    status: "PUBLISHED" as const,
+    isAnonymous: false,
+    isEdited: false,
+    authorId: r.authorId,
+    institutionId: r.institutionId,
+    author: {
+      id: r.authorId || "anon",
+      userId: r.authorId || "anon",
+      displayName: r.authorName || "Student",
+      username: r.authorHandle || "student",
+      avatarUrl: r.authorAvatarUrl,
+      points: 100,
+      createdAt: r.createdAt,
+      updatedAt: r.createdAt,
+    } as any,
+    institution: r.institutionId
+      ? ({
+          id: r.institutionId,
+          name: r.institutionName || "University",
+          shortName: r.institutionName ? r.institutionName.split(",")[0] : "Campus",
+        } as any)
+      : (null as any),
+    votesCount: r.likesCount,
+    commentsCount: r.commentsCount,
+    userVote: likedReelsSet.has(r.id) ? 1 : 0,
+    isSaved: false,
+    externalPost: {
+      id: r.id,
+      source: "reddit" as const,
+      externalId: r.id,
+      subreddit: r.subreddit,
+      canonicalUrl: r.sourceUrl || `https://reddit.com/r/${r.subreddit || "reels"}`,
+      score: r.likesCount,
+      commentCount: r.commentsCount,
+      contentType: "VIDEO" as const,
+      media: [
+        {
+          id: r.id,
+          mediaType: "VIDEO" as const,
+          mediaUrl: r.videoUrl,
+          previewUrl: r.videoUrl,
+          hlsUrl: r.hlsUrl,
+          thumbnailUrl: r.thumbnailUrl,
+          width: r.width,
+          height: r.height,
+          duration: r.duration,
+          isGif: false,
+          position: 0,
+        },
+      ],
+    },
+    createdAt: r.createdAt,
+    updatedAt: r.createdAt,
+  } as unknown as FeedPost));
 
-  const formattedPosts = applyReelDiversityFilter(
-    (await formatApiFeedPosts(rawFeed, profile?.id)) as unknown as FeedPost[]
-  );
   const collegeName = profile?.institution?.name ? profile.institution.name.split(",")[0] : undefined;
 
   // JSON-LD Structured Data for SEO
@@ -104,7 +174,7 @@ export default async function ReelsPage() {
         name: post.title || "Campus Reel",
         description: post.body.slice(0, 150),
         uploadDate: post.createdAt,
-        contentUrl: `https://campusloop.space/app/post/${post.id}`,
+        contentUrl: `https://campusloop.space/app/reels/${post.id}`,
       },
     })),
   };

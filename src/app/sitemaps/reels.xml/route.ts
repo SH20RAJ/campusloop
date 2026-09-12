@@ -1,23 +1,23 @@
-import { and, eq, desc, sql } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { posts } from "@/db/schema";
+import { reels } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
     const db = getDb();
-    const videoCondition = sql`(${posts.body} ILIKE '%.mp4%' OR ${posts.body} ILIKE '%.webm%' OR ${posts.body} ILIKE '%.mov%' OR ${posts.body} ILIKE '%/api/files/r2/videos/%' OR EXISTS (SELECT 1 FROM external_media em JOIN external_posts ep ON em.external_post_id = ep.id WHERE ep.post_id = ${posts.id} AND em.media_type = 'VIDEO'))`;
 
-    const list = await db.query.posts.findMany({
+    const list = await db.query.reels.findMany({
       columns: {
         id: true,
+        slug: true,
         createdAt: true,
         updatedAt: true,
       },
-      where: and(eq(posts.status, "PUBLISHED"), videoCondition),
-      orderBy: [desc(posts.createdAt)],
+      where: eq(reels.status, "PUBLISHED"),
+      orderBy: [desc(reels.createdAt)],
       limit: 5000,
     });
 
@@ -33,7 +33,7 @@ export async function GET() {
         const lastMod = (item.updatedAt || item.createdAt || new Date()).toISOString().split("T")[0];
         return `
   <url>
-    <loc>https://campusloop.space/app/reels/${item.id}</loc>
+    <loc>https://campusloop.space/app/reels/${item.slug || item.id}</loc>
     <lastmod>${lastMod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

@@ -2,16 +2,13 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowDown,
   ArrowLeft,
-  ArrowUp,
   BadgeCheck,
   Bookmark,
   Check,
   ChevronDown,
   ChevronUp,
   ExternalLink,
-  Flame,
   Heart,
   MessageCircle,
   Music2,
@@ -19,7 +16,6 @@ import {
   Play,
   Repeat2,
   Share2,
-  Sparkles,
   UserPlus,
   Volume2,
   VolumeX,
@@ -28,7 +24,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { AnimatedIcon, AnimateVideo } from "@/components/ui/animated-icon";
+import { AnimateVideo } from "@/components/ui/animated-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PresenceDot } from "@/components/ui/presence-dot";
 import type { FeedPost } from "@/hooks/use-feed";
@@ -52,7 +48,6 @@ const HASHTAG_REGEX = /#[a-zA-Z0-9_]+/g;
 const MD_VIDEO_REGEX = /!\[.*?\]\(((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)(?:\.(?:mp4|webm|mov|ogg)[^\s)]*|[^\s)]*videos[^\s)]*))\)/i;
 const R2_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']*)?\/api\/files\/r2\/videos\/[^\s<>"']+)/i;
 const RAW_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']+|\/api\/files\/r2\/[^\s<>"']+)\.(?:mp4|webm|mov|ogg)[^\s<>"']*)/i;
-const REGEX_ESCAPE_PATTERN = /[.*+?^${}()|[\]\\]/g;
 import {
   fetcher,
   repostPost,
@@ -66,7 +61,7 @@ import { isOnline } from "@/lib/presence";
 import { sounds } from "@/lib/sounds";
 import { cn, formatTimeAgo, getAvatarUrl, getCollegeShortName } from "@/lib/utils";
 import { extractVideoStreamInfo } from "@/lib/video/stream-helper";
-import { useHlsVideo } from "@/hooks/use-hls-video";
+import { useHlsVideo, pauseAllReelMedia } from "@/hooks/use-hls-video";
 
 interface ReelsFeedClientProps {
   initialPosts: FeedPost[];
@@ -110,6 +105,22 @@ export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: Re
   const isProgrammaticScrollRef = useRef(false);
   const isWheelingRef = useRef(false);
   const touchStartYRef = useRef<number | null>(null);
+
+  // Complete media silencing on page unmount and browser navigation
+  useEffect(() => {
+    const handleNavigationAway = () => {
+      pauseAllReelMedia();
+    };
+
+    window.addEventListener("pagehide", handleNavigationAway);
+    window.addEventListener("beforeunload", handleNavigationAway);
+
+    return () => {
+      pauseAllReelMedia();
+      window.removeEventListener("pagehide", handleNavigationAway);
+      window.removeEventListener("beforeunload", handleNavigationAway);
+    };
+  }, []);
 
   // Smooth scroll to a specific reel index
   const scrollToIndex = useCallback(
@@ -540,7 +551,7 @@ function SingleReelItem({
   const videoUrl = streamInfo?.hdVideoUrl || rawVideoUrl;
 
   // Integrated HLS & Synchronized Audio Engine
-  const { isPlaying, isLoading, usingHls, togglePlay } = useHlsVideo({
+  const { isPlaying, usingHls, togglePlay } = useHlsVideo({
     videoRef,
     audioRef,
     hlsUrl: streamInfo?.hlsUrl,
@@ -550,6 +561,44 @@ function SingleReelItem({
     isMuted,
     loop: true,
   });
+
+  // Stop & mute audio/video immediately when inactive or unmounted
+  useEffect(() => {
+    const elAudio = audioRef.current;
+    const elVideo = videoRef.current;
+    if (!isActive) {
+      if (elAudio) {
+        try {
+          elAudio.pause();
+          elAudio.currentTime = 0;
+          elAudio.muted = true;
+        } catch {}
+      }
+      if (elVideo) {
+        try {
+          elVideo.pause();
+          elVideo.currentTime = 0;
+          elVideo.muted = true;
+        } catch {}
+      }
+    }
+    return () => {
+      if (elAudio) {
+        try {
+          elAudio.pause();
+          elAudio.currentTime = 0;
+          elAudio.muted = true;
+        } catch {}
+      }
+      if (elVideo) {
+        try {
+          elVideo.pause();
+          elVideo.currentTime = 0;
+          elVideo.muted = true;
+        } catch {}
+      }
+    };
+  }, [isActive]);
 
   // Clean caption text
   const cleanCaption = useMemo(() => {
@@ -851,7 +900,7 @@ function SingleReelItem({
               onClick={handleVideoTap}
               className="w-full h-full object-cover cursor-pointer"
             />
-            {streamInfo?.audioUrl && !usingHls && (
+            {isActive && streamInfo?.audioUrl && !usingHls && (
               <audio
                 ref={audioRef}
                 src={streamInfo.audioUrl}

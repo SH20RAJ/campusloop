@@ -59,7 +59,6 @@ const ShareStoryModal = dynamic(
 const MD_VIDEO_REGEX = /!\[.*?\]\(((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)(?:\.(?:mp4|webm|mov|ogg)[^\s)]*|[^\s)]*videos[^\s)]*))\)/i;
 const R2_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']*)?\/api\/files\/r2\/videos\/[^\s<>"']+)/i;
 const RAW_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']+|\/api\/files\/r2\/[^\s<>"']+)\.(?:mp4|webm|mov|ogg)[^\s<>"']*)/i;
-const REGEX_ESCAPE_PATTERN = /[.*+?^${}()|[\]\\]/g;
 const HASHTAG_EXTRACTION_REGEX = /#([a-zA-Z0-9_-]+)/g;
 
 interface PostReelCardProps {
@@ -123,7 +122,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
 
   const videoUrl = streamInfo?.hdVideoUrl || rawVideoUrl;
 
-  const { isPlaying, isLoading, usingHls, togglePlay } = useHlsVideo({
+  const { isPlaying, usingHls, togglePlay } = useHlsVideo({
     videoRef,
     audioRef,
     hlsUrl: streamInfo?.hlsUrl,
@@ -686,7 +685,7 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
             onTimeUpdate={handleTimeUpdate}
             className="w-full h-full object-cover"
           />
-          {streamInfo?.audioUrl && !usingHls && (
+          {isActive && streamInfo?.audioUrl && !usingHls && (
             <audio
               ref={audioRef}
               src={streamInfo.audioUrl}

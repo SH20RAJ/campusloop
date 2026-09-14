@@ -1,5 +1,6 @@
-import { desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, notInArray, sql } from "drizzle-orm";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { ReelsFeedClient } from "@/components/reels/reels-feed-client";
 import { getDb } from "@/db";
 import { institutions, reelLikes, reels } from "@/db/schema";
@@ -46,6 +47,25 @@ export default async function ReelsPage() {
   const profile = user ? await getCachedUserProfile(user.id) : null;
   const db = getDb();
 
+  // Read recently seen reel IDs from cookie to ensure users never see repetitive reels
+  const cookieStore = await cookies();
+  const seenCookie = cookieStore.get("campusloop_seen_reels")?.value;
+  const seenIds = seenCookie
+    ? seenCookie
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
+        .slice(0, 120)
+    : [];
+
+  const conditions = [eq(reels.status, "PUBLISHED")];
+  if (seenIds.length > 0) {
+    conditions.push(notInArray(reels.id, seenIds));
+  }
+
+  // Dynamic ranking formula:
+  // Combines engagement metrics with a randomized freshness factor (0.75 + RANDOM() * 0.5)
+  // so each visit provides a lively, fresh timeline from the database rather than a static top 20 list.
   const rawReels = await db
     .select({
       id: reels.id,
@@ -78,14 +98,66 @@ export default async function ReelsPage() {
     })
     .from(reels)
     .leftJoin(institutions, eq(reels.institutionId, institutions.id))
-    .where(eq(reels.status, "PUBLISHED"))
+    .where(and(...conditions))
     .orderBy(
       desc(
-        sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400)`
+        sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400) * (0.75 + RANDOM() * 0.5)`
       ),
       desc(reels.createdAt)
     )
     .limit(20);
+
+  // If excluding seen reels yielded fewer than 10 reels, fill remaining slots with published reels so the feed is never empty
+  if (rawReels.length < 10 && seenIds.length > 0) {
+    const existingIds = new Set(rawReels.map((r) => r.id));
+    const fallbackReels = await db
+      .select({
+        id: reels.id,
+        slug: reels.slug,
+        caption: reels.caption,
+        title: reels.title,
+        videoUrl: reels.videoUrl,
+        hlsUrl: reels.hlsUrl,
+        audioUrl: reels.audioUrl,
+        thumbnailUrl: reels.thumbnailUrl,
+        aspectRatio: reels.aspectRatio,
+        width: reels.width,
+        height: reels.height,
+        duration: reels.duration,
+        authorId: reels.authorId,
+        authorName: reels.authorName,
+        authorHandle: reels.authorHandle,
+        authorAvatarUrl: reels.authorAvatarUrl,
+        institutionId: reels.institutionId,
+        institutionName: institutions.name,
+        source: reels.source,
+        sourceUrl: reels.sourceUrl,
+        subreddit: reels.subreddit,
+        tags: reels.tags,
+        likesCount: reels.likesCount,
+        commentsCount: reels.commentsCount,
+        sharesCount: reels.sharesCount,
+        viewsCount: reels.viewsCount,
+        createdAt: reels.createdAt,
+      })
+      .from(reels)
+      .leftJoin(institutions, eq(reels.institutionId, institutions.id))
+      .where(eq(reels.status, "PUBLISHED"))
+      .orderBy(
+        desc(
+          sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400) * (0.75 + RANDOM() * 0.5)`
+        ),
+        desc(reels.createdAt)
+      )
+      .limit(20);
+
+    for (const r of fallbackReels) {
+      if (!existingIds.has(r.id) && rawReels.length < 20) {
+        rawReels.push(r);
+        existingIds.add(r.id);
+      }
+    }
+  }
 
   const reelIds = rawReels.map((r) => r.id);
   const likedReelsSet = new Set<string>();

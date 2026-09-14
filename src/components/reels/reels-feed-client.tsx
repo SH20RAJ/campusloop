@@ -142,6 +142,7 @@ export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: Re
   );
 
 const SEEN_STORAGE_KEY = "campusloop_seen_reels_v2";
+const SEEN_COOKIE_NAME = "campusloop_seen_reels";
 
 function getLocalSeenIds(): string[] {
   if (typeof window === "undefined") return [];
@@ -153,6 +154,14 @@ function getLocalSeenIds(): string[] {
   }
 }
 
+function syncSeenCookie(ids: string[]) {
+  if (typeof document === "undefined") return;
+  try {
+    const slice = ids.slice(0, 80);
+    document.cookie = `${SEEN_COOKIE_NAME}=${encodeURIComponent(slice.join(","))}; path=/; max-age=604800; SameSite=Lax`;
+  } catch {}
+}
+
 function recordLocalSeenId(id: string) {
   if (typeof window === "undefined" || !id) return;
   try {
@@ -161,9 +170,44 @@ function recordLocalSeenId(id: string) {
     if (!current.includes(cleanId)) {
       const updated = [cleanId, ...current].slice(0, 1000);
       localStorage.setItem(SEEN_STORAGE_KEY, JSON.stringify(updated));
+      syncSeenCookie(updated);
     }
   } catch {}
 }
+
+  // On client mount, sync seen cookie and re-order initial posts so unseen reels always play first
+  useEffect(() => {
+    const localSeen = getLocalSeenIds();
+    if (localSeen.length === 0) return;
+    syncSeenCookie(localSeen);
+
+    const seenSet = new Set(localSeen);
+    const unseen = initialPosts.filter((p) => !seenSet.has(p.id.split("-cycle-")[0]));
+    const seen = initialPosts.filter((p) => seenSet.has(p.id.split("-cycle-")[0]));
+
+    if (unseen.length > 0 && seen.length > 0) {
+      // Prioritize unseen reels over previously seen reels
+      setPosts([...unseen, ...seen]);
+    } else if (unseen.length === 0 && initialPosts.length > 0) {
+      // User has already watched all initial posts! Fetch fresh unseen reels immediately
+      const excludeParam = encodeURIComponent(localSeen.slice(0, 100).join(","));
+      fetcher<FeedPost[] | { posts: FeedPost[]; reels?: any[] }>(
+        `/api/reels?page=1&limit=15&sort=trending&excludeIds=${excludeParam}`
+      )
+        .then((res) => {
+          const raw: FeedPost[] = Array.isArray(res) ? res : res?.posts || [];
+          const fresh = raw.filter((p) => !seenSet.has(p.id.split("-cycle-")[0]));
+          if (fresh.length > 0) {
+            setPosts((prev) => {
+              const freshIds = new Set(fresh.map((p) => p.id));
+              const remainder = prev.filter((p) => !freshIds.has(p.id));
+              return [...fresh, ...remainder];
+            });
+          }
+        })
+        .catch(() => {});
+    }
+  }, [initialPosts]);
 
   // Sync URL shallowly with active reel slug/id on scroll and track seen state
   useEffect(() => {

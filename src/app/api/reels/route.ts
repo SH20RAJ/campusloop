@@ -37,7 +37,17 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const uniqueExcludeIds = Array.from(new Set(excludeIds)).slice(0, 500);
+    const seenCookie = req.cookies.get("campusloop_seen_reels")?.value;
+    if (seenCookie) {
+      excludeIds.push(
+        ...seenCookie
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
+      );
+    }
+
+    const uniqueExcludeIds = Array.from(new Set(excludeIds)).slice(0, 300);
 
     const db = getDb();
     let currentProfileId: string | null = null;
@@ -70,18 +80,21 @@ export async function GET(req: NextRequest) {
       conditions.push(notInArray(reels.id, uniqueExcludeIds));
     }
 
-    // Determine ordering: Trending algorithm weights likes, comments, shares, views & freshness
+    // Determine ordering: Trending algorithm weights likes, comments, shares, views, recency & dynamic discovery jitter
     const orderByClause =
       sort === "latest"
         ? [desc(reels.createdAt)]
         : [
             desc(
-              sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400)`
+              sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400) * (0.75 + RANDOM() * 0.5)`
             ),
             desc(reels.createdAt),
           ];
 
-    const rows = await db
+    // When uniqueExcludeIds are provided, exclusion-based pagination is active so we do not skip unseen items with offset
+    const queryOffset = uniqueExcludeIds.length > 0 ? 0 : offset;
+
+    let rows = await db
       .select({
         id: reels.id,
         slug: reels.slug,
@@ -116,7 +129,61 @@ export async function GET(req: NextRequest) {
       .where(and(...conditions))
       .orderBy(...orderByClause)
       .limit(limit)
-      .offset(offset);
+      .offset(queryOffset);
+
+    // If exclusions left fewer than limit rows, fallback to query without exclusions so feed never runs dry
+    if (rows.length < limit && uniqueExcludeIds.length > 0) {
+      const existingRowIds = new Set(rows.map((r) => r.id));
+      const fallbackConditions = [eq(reels.status, "PUBLISHED")];
+      if (scope === "CAMPUS" && viewerInstitutionId) {
+        fallbackConditions.push(eq(reels.institutionId, viewerInstitutionId));
+      }
+      if (subreddit) {
+        fallbackConditions.push(eq(reels.subreddit, subreddit));
+      }
+      const fallbackRows = await db
+        .select({
+          id: reels.id,
+          slug: reels.slug,
+          caption: reels.caption,
+          title: reels.title,
+          videoUrl: reels.videoUrl,
+          hlsUrl: reels.hlsUrl,
+          audioUrl: reels.audioUrl,
+          thumbnailUrl: reels.thumbnailUrl,
+          aspectRatio: reels.aspectRatio,
+          width: reels.width,
+          height: reels.height,
+          duration: reels.duration,
+          authorId: reels.authorId,
+          authorName: reels.authorName,
+          authorHandle: reels.authorHandle,
+          authorAvatarUrl: reels.authorAvatarUrl,
+          institutionId: reels.institutionId,
+          institutionName: institutions.name,
+          source: reels.source,
+          sourceUrl: reels.sourceUrl,
+          subreddit: reels.subreddit,
+          tags: reels.tags,
+          likesCount: reels.likesCount,
+          commentsCount: reels.commentsCount,
+          sharesCount: reels.sharesCount,
+          viewsCount: reels.viewsCount,
+          createdAt: reels.createdAt,
+        })
+        .from(reels)
+        .leftJoin(institutions, eq(reels.institutionId, institutions.id))
+        .where(and(...fallbackConditions))
+        .orderBy(...orderByClause)
+        .limit(limit);
+
+      for (const fr of fallbackRows) {
+        if (!existingRowIds.has(fr.id) && rows.length < limit) {
+          rows.push(fr);
+          existingRowIds.add(fr.id);
+        }
+      }
+    }
 
     // If viewer is logged in, fetch their likes and bookmarks for these reels
     const reelIds = rows.map((r) => r.id);

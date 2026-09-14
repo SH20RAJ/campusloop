@@ -1,5 +1,6 @@
-import { desc, eq, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, ne, notInArray, or, sql } from "drizzle-orm";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { ReelsFeedClient } from "@/components/reels/reels-feed-client";
 import { getDb } from "@/db";
@@ -178,8 +179,20 @@ export default async function SingleReelPage({ params }: PageProps) {
 
   const targetReel = rawTarget[0];
 
-  // 2. Fetch subsequent reels excluding target
-  const remainingReels = await db
+  // 2. Fetch subsequent reels excluding target and recently seen reels
+  const cookieStore = await cookies();
+  const seenCookie = cookieStore.get("campusloop_seen_reels")?.value;
+  const seenIds = seenCookie
+    ? seenCookie
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
+        .slice(0, 100)
+    : [];
+
+  const excludeIds = Array.from(new Set([targetReel.id, ...seenIds]));
+
+  let remainingReels = await db
     .select({
       id: reels.id,
       slug: reels.slug,
@@ -211,14 +224,65 @@ export default async function SingleReelPage({ params }: PageProps) {
     })
     .from(reels)
     .leftJoin(institutions, eq(reels.institutionId, institutions.id))
-    .where(ne(reels.id, targetReel.id))
+    .where(and(eq(reels.status, "PUBLISHED"), notInArray(reels.id, excludeIds)))
     .orderBy(
       desc(
-        sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400)`
+        sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400) * (0.75 + RANDOM() * 0.5)`
       ),
       desc(reels.createdAt)
     )
     .limit(15);
+
+  if (remainingReels.length < 8) {
+    const existingIds = new Set([targetReel.id, ...remainingReels.map((r) => r.id)]);
+    const fallback = await db
+      .select({
+        id: reels.id,
+        slug: reels.slug,
+        caption: reels.caption,
+        title: reels.title,
+        videoUrl: reels.videoUrl,
+        hlsUrl: reels.hlsUrl,
+        audioUrl: reels.audioUrl,
+        thumbnailUrl: reels.thumbnailUrl,
+        aspectRatio: reels.aspectRatio,
+        width: reels.width,
+        height: reels.height,
+        duration: reels.duration,
+        authorId: reels.authorId,
+        authorName: reels.authorName,
+        authorHandle: reels.authorHandle,
+        authorAvatarUrl: reels.authorAvatarUrl,
+        institutionId: reels.institutionId,
+        institutionName: institutions.name,
+        source: reels.source,
+        sourceUrl: reels.sourceUrl,
+        subreddit: reels.subreddit,
+        tags: reels.tags,
+        likesCount: reels.likesCount,
+        commentsCount: reels.commentsCount,
+        sharesCount: reels.sharesCount,
+        viewsCount: reels.viewsCount,
+        createdAt: reels.createdAt,
+      })
+      .from(reels)
+      .leftJoin(institutions, eq(reels.institutionId, institutions.id))
+      .where(and(eq(reels.status, "PUBLISHED"), ne(reels.id, targetReel.id)))
+      .orderBy(
+        desc(
+          sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400) * (0.75 + RANDOM() * 0.5)`
+        ),
+        desc(reels.createdAt)
+      )
+      .limit(15);
+
+    for (const r of fallback) {
+      if (!existingIds.has(r.id) && remainingReels.length < 15) {
+        remainingReels.push(r);
+        existingIds.add(r.id);
+      }
+    }
+  }
 
   const allRaw = [targetReel, ...remainingReels];
   const allIds = allRaw.map((r) => r.id);

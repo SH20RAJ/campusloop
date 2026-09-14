@@ -1,269 +1,244 @@
 "use client";
 
-import { ArrowRight, Check, Compass, Eye, MessageCircle, Repeat2, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  HelpCircle,
+  Mail,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { HERO_CONTENT } from "@/constants/landing";
-import { AnimateHeart, AnimateShieldCheck } from "@/components/ui/animated-icon";
-import { ShapeLandingHero } from "@/components/ui/shape-landing-hero";
-import { haptics } from "@/lib/haptics";
-import { sounds } from "@/lib/sounds";
+import { HeroMockup } from "@/components/landing/hero-mockup";
+import { LandingBadge } from "@/components/landing/landing-design-system";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface HeroSectionProps {
-  isAuthenticated: boolean;
+  isAuthenticated?: boolean;
 }
 
-export function HeroSection({ isAuthenticated }: HeroSectionProps) {
-  const [hasVoted, setHasVoted] = useState(false);
-  const [votes, setVotes] = useState({ nescafe: 42, backgate: 58 });
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(48);
-  const [isReposted, setIsReposted] = useState(false);
-  const [repostCount, setRepostCount] = useState(6);
+const POPULAR_DOMAINS: Record<string, string> = {
+  "bitmesra.ac.in": "BIT Mesra (Main Campus)",
+  "iitd.ac.in": "IIT Delhi",
+  "iitb.ac.in": "IIT Bombay",
+  "iitm.ac.in": "IIT Madras",
+  "iitkgp.ac.in": "IIT Kharagpur",
+  "iitr.ac.in": "IIT Roorkee",
+  "iitk.ac.in": "IIT Kanpur",
+  "iitg.ac.in": "IIT Guwahati",
+  "bits-pilani.ac.in": "BITS Pilani",
+  "nitt.edu": "NIT Trichy",
+  "nitk.edu.in": "NIT Surathkal",
+  "du.ac.in": "Delhi University",
+  "vit.ac.in": "VIT Vellore",
+  "thapar.edu": "Thapar University",
+  "manipal.edu": "Manipal Academy (MAHE)",
+  "dtu.ac.in": "Delhi Technological University (DTU)",
+  "nsut.ac.in": "Netaji Subhas University of Technology",
+};
 
-  function handleVote(option: "nescafe" | "backgate") {
-    if (hasVoted) return;
-    sounds.pop();
-    haptics.light();
-    setHasVoted(true);
-    setVotes((prev) => ({
-      ...prev,
-      [option]: prev[option] + 1,
-    }));
-  }
+export function HeroSection({ isAuthenticated = false }: HeroSectionProps) {
+  const [emailInput, setEmailInput] = useState("");
+  const [checkResult, setCheckResult] = useState<{
+    tested: boolean;
+    valid: boolean;
+    name?: string;
+    domain?: string;
+  }>({ tested: false, valid: false });
 
-  function handleToggleLike() {
-    sounds.pop();
-    haptics.light();
-    if (isLiked) {
-      setIsLiked(false);
-      setLikeCount((c) => c - 1);
-    } else {
-      setIsLiked(true);
-      setLikeCount((c) => c + 1);
+  const handleCheckEligibility = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanEmail = emailInput.trim().toLowerCase();
+    const domainMatch = cleanEmail.split("@")[1];
+
+    if (!domainMatch) {
+      setCheckResult({ tested: true, valid: false });
+      return;
     }
-  }
 
-  function handleToggleRepost() {
-    sounds.pop();
-    haptics.light();
-    if (isReposted) {
-      setIsReposted(false);
-      setRepostCount((c) => c - 1);
-    } else {
-      setIsReposted(true);
-      setRepostCount((c) => c + 1);
+    if (POPULAR_DOMAINS[domainMatch]) {
+      setCheckResult({
+        tested: true,
+        valid: true,
+        name: POPULAR_DOMAINS[domainMatch],
+        domain: domainMatch,
+      });
+      return;
     }
-  }
+
+    // Generic rule: ends with .ac.in or .edu.in or .edu
+    if (
+      domainMatch.endsWith(".ac.in") ||
+      domainMatch.endsWith(".edu.in") ||
+      domainMatch.endsWith(".edu")
+    ) {
+      const parts = domainMatch.split(".");
+      const inferredName = parts[0].toUpperCase() + " Campus";
+      setCheckResult({
+        tested: true,
+        valid: true,
+        name: inferredName,
+        domain: domainMatch,
+      });
+      return;
+    }
+
+    setCheckResult({
+      tested: true,
+      valid: false,
+      domain: domainMatch,
+    });
+  };
 
   return (
-    <ShapeLandingHero
-      badge={
-        <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3.5 py-1 text-xs font-semibold text-foreground backdrop-blur-md">
-          <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
-          <span className="font-mono text-[#1D9BF0] font-bold uppercase tracking-wider text-[11px]">
-            {HERO_CONTENT.badge}
-          </span>
-          <span className="text-muted-foreground/40 hidden sm:inline">•</span>
-          <span className="text-foreground/80 font-mono text-[11px]">{HERO_CONTENT.campusCount}</span>
-        </div>
-      }
-      titlePrimary={HERO_CONTENT.headlineMain}
-      titleAccent={HERO_CONTENT.headlineHighlight}
-      description={HERO_CONTENT.subheadline}
-      actions={
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+    <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 overflow-x-clip">
+      {/* ─── Subtle Radial Background Glow ─── */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[650px] rounded-full bg-radial from-blue-500/10 via-indigo-500/5 to-transparent blur-3xl pointer-events-none" />
+
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 space-y-16">
+        {/* ─── Hero Editorial Copy ─── */}
+        <div className="mx-auto max-w-4xl text-center space-y-6">
+          {/* Badge */}
+          <div className="flex justify-center">
+            <LandingBadge variant="default" dot>
+              100% Student-Only Network • Zero Outsiders
+            </LandingBadge>
+          </div>
+
+          {/* Huge Editorial Display Heading */}
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[5rem] font-bold tracking-tight text-foreground leading-[1.06]">
+            Your campus has a{" "}
+            <span className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              social layer
+            </span>{" "}
+            now.
+          </h1>
+
+          {/* Subtitle */}
+          <p className="mx-auto max-w-2xl text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed font-normal">
+            Drop confessions anonymously, vote on live polls, trade dorm gear, and
+            find study circles. Strictly for verified college students with an
+            institutional email.
+          </p>
+
+          {/* Primary & Secondary Call to Actions */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             {isAuthenticated ? (
               <Link
                 href="/app"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-[#1D9BF0] hover:bg-[#1D9BF0]/90 px-8 text-[15px] font-bold text-white shadow-lg shadow-[#1D9BF0]/25 transition-all active:scale-98 cursor-pointer"
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "h-12 rounded-full px-7 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm transition-all hover:shadow-[0_4px_20px_rgba(0,145,255,0.35)]"
+                )}
               >
-                <span>{HERO_CONTENT.ctaPrimaryAuthenticated}</span>
-                <ArrowRight className="ml-2 size-4" />
+                Go to Campus Feed <ArrowRight className="ml-2 size-4" />
               </Link>
             ) : (
               <Link
                 href="/handler/sign-up"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full bg-[#1D9BF0] hover:bg-[#1D9BF0]/90 px-8 text-[15px] font-bold text-white shadow-lg shadow-[#1D9BF0]/25 transition-all active:scale-98 cursor-pointer"
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "h-12 rounded-full px-7 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm transition-all hover:shadow-[0_4px_20px_rgba(0,145,255,0.35)]"
+                )}
               >
-                <span>{HERO_CONTENT.ctaPrimary}</span>
-                <ArrowRight className="ml-2 size-4" />
+                Join your campus <ArrowRight className="ml-2 size-4" />
               </Link>
             )}
 
             <Link
-              href="/app/colleges"
-              className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-full border border-border/60 bg-card/80 backdrop-blur-sm hover:bg-muted hover:border-border px-6 text-[15px] font-bold text-foreground transition-all active:scale-98 cursor-pointer"
+              href="#ecosystem"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "h-12 rounded-full px-7 border-zinc-200 dark:border-white/10 bg-white/80 dark:bg-card/80 font-semibold text-foreground hover:bg-muted/60"
+              )}
             >
-              <Compass className="mr-2 size-4 text-[#1D9BF0]" />
-              <span>{HERO_CONTENT.ctaSecondary}</span>
+              Explore CampusLoop
             </Link>
           </div>
 
-          {/* Trust Strip */}
-          <div className="pt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold">
-            {HERO_CONTENT.trustPoints.map((point) => (
-              <div
-                key={point}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/60 text-foreground/90 border border-border/40 backdrop-blur-sm"
+          {/* Trust Statement */}
+          <div className="flex items-center justify-center gap-4 text-xs font-medium text-muted-foreground pt-1">
+            <span className="flex items-center gap-1">
+              <ShieldCheck className="size-3.5 text-emerald-500" />
+              College email verified
+            </span>
+            <span>•</span>
+            <span>Students only</span>
+            <span>•</span>
+            <span>100% free forever</span>
+          </div>
+
+          {/* ─── Interactive Domain Eligibility Verification Bar ─── */}
+          <div className="mx-auto max-w-xl pt-4">
+            <form
+              onSubmit={handleCheckEligibility}
+              className="flex flex-col sm:flex-row items-center gap-2 rounded-2xl sm:rounded-full border border-zinc-200/90 dark:border-white/10 bg-white/90 dark:bg-[#0E131F]/90 p-2 shadow-xs backdrop-blur-md"
+            >
+              <div className="flex w-full flex-1 items-center gap-2 px-3">
+                <Mail className="size-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="name@yourcollege.ac.in"
+                  className="w-full bg-transparent text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full sm:w-auto shrink-0 rounded-xl sm:rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-4 py-2.5 text-xs font-bold transition-all hover:bg-zinc-800 dark:hover:bg-zinc-100"
               >
-                <Check className="size-3.5 text-emerald-500 shrink-0 stroke-[2.5]" />
-                <span>{point}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      }
-    >
-      {/* Interactive Micro-Artifact Card */}
-      <div className="relative rounded-2xl border border-border/60 dark:border-white/10 bg-card/85 dark:bg-card/60 p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
-        {/* Ambient Top Glow */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[#1D9BF0]/5 via-transparent to-transparent pointer-events-none" />
+                Check Campus Eligibility
+              </button>
+            </form>
 
-        {/* Campus Hub Header */}
-        <div className="relative z-10 flex items-center justify-between border-b border-border/40 pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-[#1D9BF0]/10 text-[#1D9BF0] border border-[#1D9BF0]/20">
-              <ShieldCheck className="size-4.5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-sm text-foreground">{HERO_CONTENT.preview.hubTitle}</span>
-                <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            {/* Instant Validation Feedback */}
+            {checkResult.tested && (
+              <div className="mt-3 rounded-2xl border p-3.5 text-xs transition-all animate-in fade-in zoom-in-95">
+                {checkResult.valid ? (
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-left border-emerald-500/30 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
+                      <span>
+                        <strong>Verified!</strong> {checkResult.name} is supported. Enter
+                        your email to get a 6-digit OTP.
+                      </span>
+                    </div>
+                    <Link
+                      href={`/handler/sign-up?email=${encodeURIComponent(emailInput)}`}
+                      className="shrink-0 rounded-full bg-emerald-600 px-3 py-1 font-bold text-white hover:bg-emerald-700"
+                    >
+                      Get OTP &rarr;
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-left border-amber-500/30 bg-amber-500/5 text-amber-700 dark:text-amber-400">
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="size-4 text-amber-500 shrink-0" />
+                      <span>
+                        Campus hub not active yet? Click to request your college and apply
+                        for campus lead.
+                      </span>
+                    </div>
+                    <Link
+                      href="/colleges"
+                      className="shrink-0 rounded-full bg-amber-600 px-3 py-1 font-bold text-white hover:bg-amber-700"
+                    >
+                      Request Hub &rarr;
+                    </Link>
+                  </div>
+                )}
               </div>
-              <span className="font-mono text-[11px] text-muted-foreground">
-                {HERO_CONTENT.preview.hubSubtitle}
-              </span>
-            </div>
-          </div>
-          <span className="font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#1D9BF0]/10 text-[#1D9BF0] border border-[#1D9BF0]/20">
-            {HERO_CONTENT.preview.statusBadge}
-          </span>
-        </div>
-
-        {/* Flat Timeline Row: Post Item */}
-        <div className="relative z-10 space-y-3 pt-1">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="size-8 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold text-xs">
-                <AnimateShieldCheck className="size-4" />
-              </div>
-              <div>
-                <div className="flex items-center gap-1">
-                  <span className="font-bold text-xs text-foreground">{HERO_CONTENT.preview.postAuthor}</span>
-                  <span className="font-mono text-[11px] text-muted-foreground">{HERO_CONTENT.preview.postHandle}</span>
-                  <span className="text-muted-foreground/50 text-xs">·</span>
-                  <span className="font-mono text-[11px] text-muted-foreground">{HERO_CONTENT.preview.postTime}</span>
-                </div>
-                <span className="text-[10px] font-mono text-muted-foreground">
-                  Hostel · Confessions
-                </span>
-              </div>
-            </div>
-            <span className="font-mono text-[10px] font-bold text-[#1D9BF0] bg-[#1D9BF0]/10 px-2 py-0.5 rounded-full">
-              {HERO_CONTENT.preview.postTag}
-            </span>
-          </div>
-
-          <p className="text-xs sm:text-sm text-foreground leading-relaxed font-normal">
-            {HERO_CONTENT.preview.postContent}
-          </p>
-
-          {/* Twitter Interaction Row with Signature Colors */}
-          <div className="flex items-center justify-between pt-1 border-t border-border/40 text-xs text-muted-foreground">
-            <button
-              type="button"
-              className="flex items-center gap-1.5 hover:text-[#1D9BF0] transition-colors cursor-pointer group"
-            >
-              <MessageCircle className="size-3.5 group-hover:scale-110 transition-transform" />
-              <span className="font-mono text-[11px]">14</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleToggleRepost}
-              className={cn(
-                "flex items-center gap-1.5 transition-colors cursor-pointer group",
-                isReposted ? "text-emerald-500" : "hover:text-emerald-500"
-              )}
-            >
-              <Repeat2 className="size-3.5 group-hover:scale-110 transition-transform" />
-              <span className="font-mono text-[11px]">{repostCount}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleToggleLike}
-              className={cn(
-                "flex items-center gap-1.5 transition-colors cursor-pointer group",
-                isLiked ? "text-rose-500" : "hover:text-rose-500"
-              )}
-            >
-              <AnimateHeart className="size-3.5 group-hover:scale-110 transition-transform" />
-              <span className="font-mono text-[11px]">{likeCount}</span>
-            </button>
-            <div className="flex items-center gap-1.5 hover:text-[#1D9BF0] transition-colors cursor-pointer">
-              <Eye className="size-3.5" />
-              <span className="font-mono text-[11px]">1.2K</span>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Live Canteen Poll Micro-Artifact */}
-        <div className="relative z-10 rounded-xl border border-border/60 bg-muted/30 p-3.5 space-y-2.5">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-foreground">{HERO_CONTENT.preview.pollTitle}</span>
-            <span className="font-mono text-[11px] text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full font-bold">
-              {HERO_CONTENT.preview.pollStatus}
-            </span>
-          </div>
-          <p className="text-xs text-foreground/90 font-medium">
-            {HERO_CONTENT.preview.pollQuestion}
-          </p>
-
-          <div className="space-y-1.5 pt-0.5">
-            <button
-              type="button"
-              onClick={() => handleVote("nescafe")}
-              className={cn(
-                "w-full text-left p-2.5 rounded-lg border text-xs font-medium flex items-center justify-between transition-all cursor-pointer",
-                hasVoted
-                  ? "bg-[#1D9BF0]/10 border-[#1D9BF0]/40 text-foreground font-bold"
-                  : "bg-background/80 border-border/60 hover:border-[#1D9BF0]/50 text-foreground"
-              )}
-            >
-              <span>{HERO_CONTENT.preview.pollOptions.option1.name}</span>
-              <span className="font-mono font-bold text-[#1D9BF0]">
-                {hasVoted ? `${votes.nescafe}%` : "Vote"}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleVote("backgate")}
-              className={cn(
-                "w-full text-left p-2.5 rounded-lg border text-xs font-medium flex items-center justify-between transition-all cursor-pointer",
-                hasVoted
-                  ? "bg-muted/70 border-border/80 text-foreground"
-                  : "bg-background/80 border-border/60 hover:border-[#1D9BF0]/50 text-foreground"
-              )}
-            >
-              <span>{HERO_CONTENT.preview.pollOptions.option2.name}</span>
-              <span className="font-mono font-bold text-muted-foreground">
-                {hasVoted ? `${votes.backgate}%` : "Vote"}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Bottom verified badge reassurance */}
-        <div className="relative z-10 pt-0.5 text-center">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground">
-            <Sparkles className="size-3 text-[#1D9BF0]" />
-            <span>{HERO_CONTENT.preview.footerReassurance}</span>
-          </span>
+        {/* ─── Hero Product UI Mockup (The Visual Benchmark) ─── */}
+        <div id="features" className="pt-4 scroll-mt-28">
+          <HeroMockup />
         </div>
       </div>
-    </ShapeLandingHero>
+    </section>
   );
 }

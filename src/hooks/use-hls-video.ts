@@ -220,14 +220,18 @@ export function useHlsVideo({
   // Synchronize muted / volume status
   useEffect(() => {
     const video = videoRef.current;
-    const audio = audioRef?.current;
     if (video) {
-      video.muted = isMuted;
-      video.volume = isMuted ? 0 : 1;
+      Object.assign(video, {
+        muted: isMuted,
+        volume: isMuted ? 0 : 1,
+      });
     }
-    if (audio) {
-      audio.muted = isMuted;
-      audio.volume = isMuted ? 0 : 1;
+    const targetAudio = audioRef?.current;
+    if (targetAudio) {
+      Object.assign(targetAudio, {
+        muted: isMuted,
+        volume: isMuted ? 0 : 1,
+      });
     }
   }, [isMuted, videoRef, audioRef]);
 

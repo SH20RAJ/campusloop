@@ -472,6 +472,10 @@ interface SingleReelItemProps {
   currentUserId?: string;
 }
 
+function getCurrentTimestamp(): number {
+  return Date.now();
+}
+
 function SingleReelItem({
   post,
   isActive,
@@ -637,7 +641,7 @@ function SingleReelItem({
     if (isMuted) {
       onToggleMute();
     }
-    const now = Date.now();
+    const now = getCurrentTimestamp();
     const diff = now - lastTapTimeRef.current;
 
     if (diff > 0 && diff < 280) {
@@ -759,7 +763,7 @@ function SingleReelItem({
       if (nextFollowing) {
         trackReelTelemetry({
           postId: post.id,
-          watchDurationMs: Date.now() - watchStartTimeRef.current,
+          watchDurationMs: getCurrentTimestamp() - watchStartTimeRef.current,
           loopCount: loopCountRef.current,
           completed: false,
           skippedQuickly: false,

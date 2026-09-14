@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { posts, savedPosts, userProfiles } from "@/db/schema";
+import { posts, reelBookmarks, reels, savedPosts, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +33,15 @@ export async function GET(req: Request, { params }: RouteParams) {
       where: and(eq(savedPosts.profileId, profile.id), eq(savedPosts.postId, postId)),
     });
 
-    return NextResponse.json({ saved: Boolean(existing) });
+    if (existing) {
+      return NextResponse.json({ saved: true });
+    }
+
+    const existingReelBookmark = await db.query.reelBookmarks.findFirst({
+      where: and(eq(reelBookmarks.userId, profile.id), eq(reelBookmarks.reelId, postId)),
+    });
+
+    return NextResponse.json({ saved: Boolean(existingReelBookmark) });
   } catch (error) {
     console.error("GET /api/posts/[id]/save error:", error);
     return NextResponse.json({ saved: false });
@@ -59,14 +67,31 @@ export async function POST(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    // Verify post exists
+    // Verify post or reel exists
     const postExists = await db.query.posts.findFirst({
       where: eq(posts.id, postId),
       columns: { id: true },
     });
 
     if (!postExists) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      const reelExists = await db.query.reels.findFirst({
+        where: eq(reels.id, postId),
+        columns: { id: true },
+      });
+
+      if (reelExists) {
+        await db
+          .insert(reelBookmarks)
+          .values({
+            userId: profile.id,
+            reelId: postId,
+          })
+          .onConflictDoNothing({ target: [reelBookmarks.userId, reelBookmarks.reelId] });
+
+        return NextResponse.json({ success: true, saved: true });
+      }
+
+      return NextResponse.json({ error: "Post or Reel not found" }, { status: 404 });
     }
 
     // Insert into saved_posts
@@ -104,9 +129,14 @@ export async function DELETE(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    await db
-      .delete(savedPosts)
-      .where(and(eq(savedPosts.profileId, profile.id), eq(savedPosts.postId, postId)));
+    await Promise.all([
+      db
+        .delete(savedPosts)
+        .where(and(eq(savedPosts.profileId, profile.id), eq(savedPosts.postId, postId))),
+      db
+        .delete(reelBookmarks)
+        .where(and(eq(reelBookmarks.userId, profile.id), eq(reelBookmarks.reelId, postId))),
+    ]);
 
     return NextResponse.json({ success: true, saved: false });
   } catch (error) {

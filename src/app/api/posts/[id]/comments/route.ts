@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { and, asc, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { anonIdentityVault, comments, posts, userProfiles } from "@/db/schema";
+import { anonIdentityVault, comments, posts, reelComments, reels, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { deriveAnonHandle, openSealedIdentity, sealIdentity } from "@/lib/anonymity";
 import { runSafetyCheck } from "@/lib/moderation/rules";
@@ -24,6 +24,52 @@ export async function GET(req: Request, { params }: RouteParams) {
         author: true,
       },
     });
+
+    // If no post comments found, check if it's a reel ID
+    if (postComments.length === 0) {
+      const reel = await db.query.reels.findFirst({
+        where: eq(reels.id, id),
+      });
+      if (reel) {
+        const reelCommentsList = await db
+          .select({
+            id: reelComments.id,
+            body: reelComments.body,
+            createdAt: reelComments.createdAt,
+            author: {
+              id: userProfiles.id,
+              username: userProfiles.username,
+              displayName: userProfiles.displayName,
+              avatarUrl: userProfiles.avatarUrl,
+              points: userProfiles.points,
+            },
+          })
+          .from(reelComments)
+          .leftJoin(userProfiles, eq(reelComments.authorId, userProfiles.id))
+          .where(eq(reelComments.reelId, id))
+          .orderBy(asc(reelComments.createdAt));
+
+        return NextResponse.json(
+          reelCommentsList.map((c) => ({
+            id: c.id,
+            postId: id,
+            body: c.body,
+            isAnonymous: false,
+            status: "PUBLISHED",
+            createdAt: c.createdAt.toISOString(),
+            author: c.author
+              ? {
+                  id: c.author.id,
+                  username: c.author.username,
+                  displayName: c.author.displayName,
+                  avatarUrl: c.author.avatarUrl,
+                  points: c.author.points,
+                }
+              : null,
+          }))
+        );
+      }
+    }
 
     // Strip author identity for anonymous comments before it leaves the server.
     const sanitized = postComments.map((comment) => {
@@ -93,6 +139,66 @@ export async function POST(req: Request, { params }: RouteParams) {
           anonHandle = `anon_${profile.id.slice(0, 8)}`;
         }
       }
+    }
+
+    // Check if target is a Post or a Reel
+    const targetPost = await db.query.posts.findFirst({
+      where: eq(posts.id, id),
+    });
+
+    if (!targetPost) {
+      const targetReel = await db.query.reels.findFirst({
+        where: eq(reels.id, id),
+      });
+
+      if (targetReel) {
+        const [newReelComment] = await db
+          .insert(reelComments)
+          .values({
+            reelId: id,
+            authorId: profile.id,
+            body: body.trim(),
+          })
+          .returning();
+
+        // Always calculate true comments count from reelComments
+        const [actualCommentsCount] = await db
+          .select({ count: sql<number>`count(*)::int` })
+          .from(reelComments)
+          .where(eq(reelComments.reelId, id));
+
+        await db
+          .update(reels)
+          .set({
+            commentsCount: actualCommentsCount?.count || 0,
+          })
+          .where(eq(reels.id, id));
+
+        try {
+          await db
+            .update(userProfiles)
+            .set({ points: sql`${userProfiles.points} + 2` })
+            .where(eq(userProfiles.id, profile.id));
+        } catch {}
+
+        return NextResponse.json({
+          id: newReelComment.id,
+          postId: id,
+          body: newReelComment.body,
+          isAnonymous: false,
+          status: "PUBLISHED",
+          createdAt: newReelComment.createdAt.toISOString(),
+          author: {
+            id: profile.id,
+            username: profile.username,
+            displayName: profile.displayName,
+            avatarUrl: profile.avatarUrl,
+            points: (profile.points || 0) + 2,
+          },
+        });
+      }
+
+      return NextResponse.json({ error: "Post or Reel not found" }, { status: 404 });
     }
 
     // Direct sequential insert (no nested db.transaction which breaks in Neon HTTP driver)

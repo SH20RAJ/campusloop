@@ -1,7 +1,7 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { anonIdentityVault, posts, userProfiles, votes } from "@/db/schema";
+import { anonIdentityVault, posts, reelLikes, reels, userProfiles, votes } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { openSealedIdentity } from "@/lib/anonymity";
 import { createNotification } from "@/lib/notifications";
@@ -76,7 +76,63 @@ export async function POST(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Invalid vote value" }, { status: 400 });
     }
 
-    // Check if vote already exists
+    // Check if target is a Post or a Reel
+    const targetPost = await db.query.posts.findFirst({
+      where: eq(posts.id, id),
+    });
+
+    if (!targetPost) {
+      const targetReel = await db.query.reels.findFirst({
+        where: eq(reels.id, id),
+      });
+
+      if (targetReel) {
+        const existingReelLike = await db.query.reelLikes.findFirst({
+          where: and(eq(reelLikes.reelId, id), eq(reelLikes.userId, profile.id)),
+        });
+
+        let isLiked = false;
+        if (existingReelLike) {
+          if (value === 0 || value === -1) {
+            await db.delete(reelLikes).where(eq(reelLikes.id, existingReelLike.id));
+            isLiked = false;
+          } else {
+            isLiked = true;
+          }
+        } else {
+          if (value === 1) {
+            await db.insert(reelLikes).values({
+              reelId: id,
+              userId: profile.id,
+            });
+            isLiked = true;
+          }
+        }
+
+        // Recalculate true likes count from source of truth
+        const [actualCount] = await db
+          .select({ count: sql<number>`count(*)::int` })
+          .from(reelLikes)
+          .where(eq(reelLikes.reelId, id));
+
+        const likesCount = actualCount?.count || 0;
+
+        await db
+          .update(reels)
+          .set({ likesCount })
+          .where(eq(reels.id, id));
+
+        return NextResponse.json({
+          message: isLiked ? "Vote cast" : "Vote removed",
+          userVote: isLiked ? 1 : 0,
+          votesCount: likesCount,
+        });
+      }
+
+      return NextResponse.json({ error: "Post or Reel not found" }, { status: 404 });
+    }
+
+    // Check if vote already exists for this post
     const existingVote = await db.query.votes.findFirst({
       where: and(eq(votes.postId, id), eq(votes.userId, profile.id)),
     });

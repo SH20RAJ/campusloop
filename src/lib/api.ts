@@ -98,6 +98,22 @@ export function toggleFollowUser(username: string, follow: boolean = true) {
   }>(`/api/profile/${encodeURIComponent(username)}/follow`, follow ? "POST" : "DELETE");
 }
 
+// ─── Reels API Actions ───
+
+export function likeReel(reelId: string) {
+  return apiRequest<{ success: boolean; isLiked: boolean; likesCount: number }>(
+    `/api/reels/${reelId}/like`,
+    "POST"
+  );
+}
+
+export function saveReel(reelId: string) {
+  return apiRequest<{ success: boolean; isSaved: boolean }>(
+    `/api/reels/${reelId}/save`,
+    "POST"
+  );
+}
+
 // ─── Story API Actions ───
 
 export function createStory(text: string, backgroundColor: string) {

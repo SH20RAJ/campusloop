@@ -50,11 +50,11 @@ const R2_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']*)?\/api\/files\/r2\/videos\/[^\
 const RAW_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']+|\/api\/files\/r2\/[^\s<>"']+)\.(?:mp4|webm|mov|ogg)[^\s<>"']*)/i;
 import {
   fetcher,
+  likeReel,
   repostPost,
-  savePost,
+  saveReel,
   toggleFollowUser,
   trackReelTelemetry,
-  voteOnPost,
 } from "@/lib/api";
 import { haptics } from "@/lib/haptics";
 import { isOnline } from "@/lib/presence";
@@ -757,7 +757,13 @@ function SingleReelItem({
     }
   }
 
-  function handleDoubleTapLike() {
+  useEffect(() => {
+    setUserVote(post.userVote);
+    setVotesCount(post.votesCount);
+    setIsSaved(Boolean(post.isSaved));
+  }, [post.id, post.userVote, post.votesCount, post.isSaved]);
+
+  async function handleDoubleTapLike() {
     setShowDoubleTapHeart(true);
     haptics.heartbeat();
     sounds.pop();
@@ -766,10 +772,15 @@ function SingleReelItem({
     if (userVote !== 1) {
       setUserVote(1);
       setVotesCount((prev) => prev + 1);
-      voteOnPost(post.id, 1).catch(() => {
+      try {
+        const res = await likeReel(post.id);
+        if (typeof res.likesCount === "number") {
+          setVotesCount(res.likesCount);
+        }
+      } catch {
         setUserVote(post.userVote);
         setVotesCount(post.votesCount);
-      });
+      }
       trackReelTelemetry({
         postId: post.id,
         watchDurationMs: Date.now() - watchStartTimeRef.current,
@@ -785,18 +796,26 @@ function SingleReelItem({
   }
 
   // Like button click
-  function handleLikeClick(e: React.MouseEvent) {
+  async function handleLikeClick(e: React.MouseEvent) {
     e.stopPropagation();
     haptics.light();
-    if (userVote === 1) {
-      setUserVote(0);
-      setVotesCount((prev) => Math.max(0, prev - 1));
-      voteOnPost(post.id, 0);
-    } else {
-      setUserVote(1);
-      setVotesCount((prev) => prev + 1);
-      sounds.pop();
-      voteOnPost(post.id, 1);
+    const willLike = userVote !== 1;
+    setUserVote(willLike ? 1 : 0);
+    setVotesCount((prev) => (willLike ? prev + 1 : Math.max(0, prev - 1)));
+    if (willLike) sounds.pop();
+    try {
+      const res = await likeReel(post.id);
+      if (typeof res.likesCount === "number") {
+        setVotesCount(res.likesCount);
+      }
+      if (typeof res.isLiked === "boolean") {
+        setUserVote(res.isLiked ? 1 : 0);
+      }
+    } catch {
+      setUserVote(userVote);
+      setVotesCount(votesCount);
+    }
+    if (willLike) {
       trackReelTelemetry({
         postId: post.id,
         watchDurationMs: Date.now() - watchStartTimeRef.current,
@@ -818,7 +837,7 @@ function SingleReelItem({
     const nextSaved = !isSaved;
     setIsSaved(nextSaved);
     try {
-      await savePost(post.id, nextSaved);
+      await saveReel(post.id);
       sounds.pop();
       toast.success(nextSaved ? "Saved to your bookmarks" : "Removed from bookmarks");
       trackReelTelemetry({

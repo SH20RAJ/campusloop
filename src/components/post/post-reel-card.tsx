@@ -282,6 +282,9 @@ export function PostReelCard({ post, currentUserId, onOpenComments, isActive = f
     try {
       const data = await voteOnPost(post.id, newValue);
       setUserVote(data.userVote);
+      if (typeof (data as any)?.votesCount === "number") {
+        setVotesCount((data as any).votesCount);
+      }
     } catch {
       setUserVote(userVote);
       setVotesCount(votesCount);

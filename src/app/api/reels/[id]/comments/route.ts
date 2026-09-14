@@ -83,15 +83,21 @@ export async function POST(
       })
       .returning();
 
+    const [actualCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(reelComments)
+      .where(eq(reelComments.reelId, reelId));
+
+    const commentsCount = actualCount?.count || 0;
+
     await db
       .update(reels)
-      .set({
-        commentsCount: sql`${reels.commentsCount} + 1`,
-      })
+      .set({ commentsCount })
       .where(eq(reels.id, reelId));
 
     return NextResponse.json({
       success: true,
+      commentsCount,
       comment: {
         id: newComment.id,
         body: newComment.body,

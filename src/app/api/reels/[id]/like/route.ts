@@ -31,12 +31,6 @@ export async function POST(
     if (existingLike) {
       // Unlike
       await db.delete(reelLikes).where(eq(reelLikes.id, existingLike.id));
-      await db
-        .update(reels)
-        .set({
-          likesCount: sql`GREATEST(0, ${reels.likesCount} - 1)`,
-        })
-        .where(eq(reels.id, reelId));
       isLiked = false;
     } else {
       // Like
@@ -44,24 +38,26 @@ export async function POST(
         reelId,
         userId: profile.id,
       });
-      await db
-        .update(reels)
-        .set({
-          likesCount: sql`${reels.likesCount} + 1`,
-        })
-        .where(eq(reels.id, reelId));
       isLiked = true;
     }
 
-    const updatedReel = await db.query.reels.findFirst({
-      where: eq(reels.id, reelId),
-      columns: { likesCount: true },
-    });
+    // Always synchronize with real count of likes from reelLikes table
+    const [actualCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(reelLikes)
+      .where(eq(reelLikes.reelId, reelId));
+
+    const likesCount = actualCount?.count || 0;
+
+    await db
+      .update(reels)
+      .set({ likesCount })
+      .where(eq(reels.id, reelId));
 
     return NextResponse.json({
       success: true,
       isLiked,
-      likesCount: updatedReel?.likesCount || 0,
+      likesCount,
     });
   } catch (error) {
     console.error("[POST /api/reels/[id]/like error]:", error);

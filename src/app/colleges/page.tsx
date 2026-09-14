@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { LandingFooter } from "@/components/landing/landing-footer";
-import { LandingNavbar } from "@/components/landing/landing-navbar";
+import { CleanFooter } from "@/components/landing/clean-footer";
+import { MinimalLandingNavbar } from "@/components/landing/minimal-landing-navbar";
 import { hexclaveServerApp } from "@/hexclave/server";
 import { CollegesPublicClient } from "./colleges-public-client";
 
@@ -43,11 +43,11 @@ export default async function CollegesDirectoryPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <LandingNavbar isAuthenticated={!!user} />
-      <main className="flex-1 pt-32 pb-24">
+      <MinimalLandingNavbar isAuthenticated={!!user} />
+      <main className="flex-1 pt-12 pb-24">
         <CollegesPublicClient isAuthenticated={!!user} />
       </main>
-      <LandingFooter />
+      <CleanFooter />
     </div>
   );
 }

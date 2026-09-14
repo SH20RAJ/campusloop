@@ -1,26 +1,18 @@
 import type { Metadata } from "next";
-import { CampusHubSection } from "@/components/landing/campus-hub-section";
-import { ClosingCTA } from "@/components/landing/closing-cta";
-import { CommunitiesShowcase } from "@/components/landing/communities-showcase";
-import { EcosystemBento } from "@/components/landing/ecosystem-bento";
-import { LandingFAQSection } from "@/components/landing/faq-section";
-import { HeroSection } from "@/components/landing/hero-section";
-import { LandingFooter } from "@/components/landing/landing-footer";
-import { LandingNavbar } from "@/components/landing/landing-navbar";
-import { LeaderboardRivalrySection } from "@/components/landing/leaderboard-rivalry-section";
-import { MarketplaceSection } from "@/components/landing/marketplace-section";
-import { MatchModeSection } from "@/components/landing/match-mode-section";
-import { PhilosophySection } from "@/components/landing/philosophy-section";
-import { SafetySection } from "@/components/landing/safety-section";
-import { ThreeModesSection } from "@/components/landing/three-modes-section";
-import { VerifiedAnonymitySection } from "@/components/landing/verified-anonymity-section";
+import { CleanCTA } from "@/components/landing/clean-cta";
+import { CleanFAQ } from "@/components/landing/clean-faq";
+import { CleanFeatures } from "@/components/landing/clean-features";
+import { CleanFooter } from "@/components/landing/clean-footer";
+import { CleanHero } from "@/components/landing/clean-hero";
+import { CleanWorkflow } from "@/components/landing/clean-workflow";
+import { MinimalLandingNavbar } from "@/components/landing/minimal-landing-navbar";
 import { hexclaveServerApp } from "@/hexclave/server";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://campusloop.space"),
   title: "CampusLoop — The Verified Campus Social Layer",
   description:
-    "CampusLoop is the verified student-only campus social network for Indian universities. Gated strictly by institutional email domains (.ac.in / .edu.in). Drop confessions anonymously, vote on live polls, trade dorm gear, and find study circles.",
+    "CampusLoop is the verified student-only campus social network for Indian universities. Gated strictly by institutional email domains (.ac.in / .edu.in). Drop confessions anonymously, explore semester notes & PYQs, and join campus communities.",
   applicationName: "CampusLoop",
   authors: [{ name: "CampusLoop Team", url: "https://campusloop.space/about" }],
   generator: "Next.js",
@@ -168,7 +160,7 @@ export default async function LandingPage() {
             name: "What if my college email isn't on the supported list yet?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "You can request your university hub in 30 seconds via the Colleges Directory or domain checker tool. If you have an active .ac.in or .edu.in domain, our system automatically provisions your campus hub once 5 students verify interest.",
+              text: "You can request your university hub in 30 seconds via the Colleges Directory. If you have an active .ac.in or .edu.in domain, our system automatically provisions your campus hub once 5 students verify interest.",
             },
           },
           {
@@ -192,53 +184,29 @@ export default async function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="flex min-h-screen flex-col bg-background text-foreground overflow-x-clip selection:bg-blue-500/20 selection:text-blue-600">
-        {/* SECTION 01: Floating Glass Navigation Bar */}
-        <LandingNavbar isAuthenticated={isAuthenticated} />
+      <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
+        {/* 01. Minimized, Uncluttered Navigation Bar */}
+        <MinimalLandingNavbar isAuthenticated={isAuthenticated} />
 
         <main className="flex-1">
-          {/* SECTION 02 & 03: Hero Section & Hero Product UI Mockup */}
-          <HeroSection isAuthenticated={isAuthenticated} />
+          {/* 02. Clean Structured Hero Section with Real Campus Preview Cards */}
+          <CleanHero isAuthenticated={isAuthenticated} />
 
-          {/* SECTION 04: One Campus. One Place. Ecosystem Bento */}
-          <EcosystemBento />
+          {/* 03. Feature Highlights with Auto-Advancing Stage & Rack Focus */}
+          <CleanFeatures />
 
-          {/* SECTION 05: Verified + Anonymous Flow */}
-          <VerifiedAnonymitySection />
+          {/* 04. Split Feature Showcase (Campus Pulse & Conversations) */}
+          <CleanWorkflow />
 
-          {/* SECTION 06: Three Modes Architecture */}
-          <ThreeModesSection />
+          {/* 05. Indexed Minimal FAQs */}
+          <CleanFAQ />
 
-          {/* SECTION 07: Security, Trust & DPDP Act 2023 Compliance */}
-          <SafetySection />
-
-          {/* SECTION 08: Communities Showcase */}
-          <CommunitiesShowcase />
-
-          {/* SECTION 09: Match Mode (18+) */}
-          <MatchModeSection />
-
-          {/* SECTION 10: Campus Hub & Daily Utilities */}
-          <CampusHubSection />
-
-          {/* SECTION 11: Campus Marketplace */}
-          <MarketplaceSection />
-
-          {/* SECTION 12: Loop Points & Campus Leaderboard */}
-          <LeaderboardRivalrySection />
-
-          {/* SECTION 13: Product Philosophy */}
-          <PhilosophySection />
-
-          {/* SECTION 14: Frequently Asked Questions Accordion */}
-          <LandingFAQSection />
-
-          {/* SECTION 15: Final Closing Call to Action */}
-          <ClosingCTA isAuthenticated={isAuthenticated} />
+          {/* 06. Clean Closing Call to Action */}
+          <CleanCTA isAuthenticated={isAuthenticated} />
         </main>
 
-        {/* SECTION 16: Premium Minimal Footer */}
-        <LandingFooter />
+        {/* 07. Clean Enterprise Footer */}
+        <CleanFooter />
       </div>
     </>
   );

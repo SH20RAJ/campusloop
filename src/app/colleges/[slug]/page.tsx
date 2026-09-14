@@ -6,8 +6,8 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { LandingFooter } from "@/components/landing/landing-footer";
-import { LandingNavbar } from "@/components/landing/landing-navbar";
+import { CleanFooter } from "@/components/landing/clean-footer";
+import { MinimalLandingNavbar } from "@/components/landing/minimal-landing-navbar";
 import { hexclaveServerApp } from "@/hexclave/server";
 
 interface CollegeData {
@@ -241,9 +241,9 @@ export default async function ProgrammaticCollegePage({ params }: PageProps) {
       />
 
       <div className="flex min-h-screen flex-col bg-background text-foreground">
-        <LandingNavbar isAuthenticated={!!user} />
+        <MinimalLandingNavbar isAuthenticated={!!user} />
 
-        <main className="flex-1 pt-32 pb-24">
+        <main className="flex-1 pt-12 pb-24">
           <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 space-y-10">
             {/* ─── Breadcrumb ─── */}
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -413,7 +413,7 @@ export default async function ProgrammaticCollegePage({ params }: PageProps) {
           </div>
         </main>
 
-        <LandingFooter />
+        <CleanFooter />
       </div>
     </>
   );

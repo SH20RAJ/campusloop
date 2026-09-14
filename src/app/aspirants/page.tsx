@@ -6,8 +6,8 @@ import {
   Trophy,
 } from "lucide-react";
 import Link from "next/link";
-import { LandingFooter } from "@/components/landing/landing-footer";
-import { LandingNavbar } from "@/components/landing/landing-navbar";
+import { CleanFooter } from "@/components/landing/clean-footer";
+import { MinimalLandingNavbar } from "@/components/landing/minimal-landing-navbar";
 import { hexclaveServerApp } from "@/hexclave/server";
 
 export const metadata: Metadata = {
@@ -49,9 +49,9 @@ export default async function AspirantsPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <LandingNavbar isAuthenticated={!!user} />
+      <MinimalLandingNavbar isAuthenticated={!!user} />
 
-      <main className="flex-1 pt-32 pb-24">
+      <main className="flex-1 pt-12 pb-24">
         <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 space-y-16">
           {/* ─── Hero Block ─── */}
           <div className="text-center max-w-3xl mx-auto space-y-5">
@@ -182,7 +182,7 @@ export default async function AspirantsPage() {
         </div>
       </main>
 
-      <LandingFooter />
+      <CleanFooter />
     </div>
   );
 }

@@ -184,10 +184,27 @@ export async function GET(req: Request) {
       },
     });
 
-    const enriched = items.map((item) => ({
-      ...item,
-      commentsCount: item.comments?.length || 0,
-    }));
+    const enriched = items.map((item) => {
+      const rawAtts = (item as any).attachments;
+      const attachments = Array.isArray(rawAtts) && rawAtts.length > 0
+        ? rawAtts
+        : (item.fileUrl || item.driveUrl)
+          ? [
+              {
+                id: `${item.id}-att-1`,
+                title: item.title,
+                url: item.fileUrl || item.driveUrl,
+                type: item.driveUrl ? "DRIVE" : "PDF",
+              },
+            ]
+          : [];
+
+      return {
+        ...item,
+        attachments,
+        commentsCount: item.comments?.length || 0,
+      };
+    });
 
     // If search query is provided on page 1, check Qdrant for semantic matches
     let vectorItems: any[] = [];
@@ -276,8 +293,9 @@ export async function POST(req: Request) {
       semester = 1,
       resourceType = "NOTES",
       moduleOrChapter,
-      driveUrl,
-      fileUrl,
+      driveUrl: rawDriveUrl,
+      fileUrl: rawFileUrl,
+      attachments: rawAttachments = [],
       tags = [],
     } = body;
 
@@ -288,10 +306,37 @@ export async function POST(req: Request) {
       );
     }
 
-    const targetUrl = fileUrl?.trim() || driveUrl?.trim();
+    // Process attachments
+    const cleanAttachments = Array.isArray(rawAttachments)
+      ? rawAttachments
+          .filter((att) => att && typeof att === "object" && att.url?.trim())
+          .map((att, idx) => ({
+            id: att.id || `att-${Date.now()}-${idx}`,
+            title: (att.title || title || `Document ${idx + 1}`).trim(),
+            url: att.url.trim(),
+            type: att.type || (att.url.includes("drive.google.com") ? "DRIVE" : "PDF"),
+            sizeBytes: typeof att.sizeBytes === "number" ? att.sizeBytes : undefined,
+            pageCount: typeof att.pageCount === "number" ? att.pageCount : undefined,
+            description: att.description?.trim() || undefined,
+          }))
+      : [];
+
+    let driveUrl = rawDriveUrl?.trim() || null;
+    let fileUrl = rawFileUrl?.trim() || null;
+
+    // Backfill fileUrl and driveUrl from attachments if not explicitly provided
+    if (!fileUrl && !driveUrl && cleanAttachments.length > 0) {
+      const firstDrive = cleanAttachments.find((a) => a.type === "DRIVE" || a.url.includes("drive.google.com"));
+      const firstFile = cleanAttachments.find((a) => a.type !== "DRIVE" && !a.url.includes("drive.google.com"));
+      if (firstFile) fileUrl = firstFile.url;
+      if (firstDrive) driveUrl = firstDrive.url;
+      if (!fileUrl && !driveUrl) fileUrl = cleanAttachments[0].url;
+    }
+
+    const targetUrl = fileUrl || driveUrl || cleanAttachments[0]?.url;
     if (!targetUrl) {
       return NextResponse.json(
-        { error: "A valid PDF, Google Drive, or document link is required." },
+        { error: "A valid PDF, PPT, Google Drive, or document link is required." },
         { status: 400 }
       );
     }
@@ -318,8 +363,9 @@ export async function POST(req: Request) {
         semester: typeof semester === "number" ? semester : 1,
         resourceType: resourceType || "NOTES",
         moduleOrChapter: moduleOrChapter?.trim() || null,
-        driveUrl: driveUrl?.trim() || null,
-        fileUrl: fileUrl?.trim() || null,
+        driveUrl,
+        fileUrl,
+        attachments: cleanAttachments,
         tags: Array.isArray(tags) ? tags : [],
         upvotesCount: 0,
         downvotesCount: 0,

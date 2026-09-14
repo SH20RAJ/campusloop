@@ -23,6 +23,7 @@ export const academicResources = pgTable(
     moduleOrChapter: text("module_or_chapter"), // e.g. 'Module 1', 'Unit 3', 'Complete Course Book'
     fileUrl: text("file_url"),
     driveUrl: text("drive_url"),
+    attachments: jsonb("attachments").default([]).notNull(),
     tags: jsonb("tags").default([]).notNull(),
     upvotesCount: integer("upvotes_count").default(0).notNull(),
     downvotesCount: integer("downvotes_count").default(0).notNull(),
@@ -104,3 +105,13 @@ export type AcademicResourceVote = typeof academicResourceVotes.$inferSelect;
 export type NewAcademicResourceVote = typeof academicResourceVotes.$inferInsert;
 export type SavedAcademicResource = typeof savedAcademicResources.$inferSelect;
 export type NewSavedAcademicResource = typeof savedAcademicResources.$inferInsert;
+
+export interface AcademicAttachment {
+  id: string;
+  title: string;
+  url: string;
+  type: "PDF" | "PPT" | "DOCX" | "IMAGE" | "DRIVE" | "LINK" | "VIDEO" | "CODE" | "OTHER";
+  sizeBytes?: number;
+  pageCount?: number;
+  description?: string;
+}

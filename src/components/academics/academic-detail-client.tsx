@@ -10,9 +10,11 @@ import {
   ChevronRight,
   Download,
   ExternalLink,
+  FileText,
   FolderOpen,
   FolderPlus,
   Globe,
+  Layers,
   Play,
   Share2,
   ShieldCheck,
@@ -538,6 +540,7 @@ export function AcademicDetailClient({
         <AcademicPdfViewer
           fileUrl={resource.fileUrl}
           driveUrl={resource.driveUrl}
+          attachments={resource.attachments}
           title={resource.title}
           subjectCode={resource.subjectCode}
           resourceType={resource.resourceType}
@@ -547,6 +550,46 @@ export function AcademicDetailClient({
           pageUrl={effectivePageUrl}
         />
       </div>
+
+      {/* ─── Attached Files & Supplementary Links Tray (Multi-File Notes) ─── */}
+      {resource.attachments && Array.isArray(resource.attachments) && resource.attachments.length > 1 && (
+        <div className="rounded-2xl border border-border/40 bg-card/60 p-3.5 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <Layers className="size-3.5 text-primary" />
+              <span>All Included Files &amp; Links ({resource.attachments.length})</span>
+            </span>
+            <span className="text-[10px] text-muted-foreground font-semibold">
+              Switch in reader above
+            </span>
+          </div>
+          <div className="space-y-1.5">
+            {resource.attachments.map((att: any, idx: number) => (
+              <div
+                key={att.id || idx}
+                className="flex items-center justify-between gap-2 p-2 rounded-xl bg-background/70 border border-border/30 text-xs"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[10px] font-mono font-bold text-muted-foreground">#{idx + 1}</span>
+                  <span className="font-semibold text-foreground truncate">{att.title || `Document ${idx + 1}`}</span>
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-muted uppercase font-mono font-bold shrink-0">
+                    {att.type || "PDF"}
+                  </span>
+                </div>
+                <a
+                  href={att.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[11px] font-bold text-primary hover:underline shrink-0"
+                >
+                  <span>Open</span>
+                  <ExternalLink className="size-3" />
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ─── Guest Student Perks & Personal Vault Conversion ─── */}
       {!currentUserId && <AcademicAuthBenefitsCard returnTo={`/app/academics/${resource.id}`} />}

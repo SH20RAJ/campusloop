@@ -10,6 +10,7 @@ import {
   FolderArchive,
   FolderOpen,
   Globe,
+  Layers,
   LayoutGrid,
   List,
   Loader2,
@@ -26,6 +27,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import type { AcademicAttachment } from "@/db/schema/academic-resources";
 import { buildAcademicStudyPrompt, getChatGptStudyUrl, getClaudeStudyUrl } from "@/lib/academics/ai-prompts";
 import { haptics } from "@/lib/haptics";
 import { sounds } from "@/lib/sounds";
@@ -34,6 +36,7 @@ import { cn } from "@/lib/utils";
 interface AcademicPdfViewerProps {
   fileUrl?: string | null;
   driveUrl?: string | null;
+  attachments?: AcademicAttachment[];
   title: string;
   subjectCode: string;
   resourceType?: string;
@@ -47,6 +50,7 @@ interface AcademicPdfViewerProps {
 export function AcademicPdfViewer({
   fileUrl,
   driveUrl,
+  attachments,
   title,
   subjectCode,
   resourceType: _resourceType,
@@ -67,8 +71,32 @@ export function AcademicPdfViewer({
 
   const [viewerEngine, setViewerEngine] = useState<"google" | "native">("google");
 
-  // Normalize URLs
-  const rawUrl = (fileUrl || driveUrl || "").trim();
+  // Effective attachments list
+  const effectiveAttachments: AcademicAttachment[] = useMemo(() => {
+    if (attachments && Array.isArray(attachments) && attachments.length > 0) {
+      return attachments;
+    }
+    const directUrl = (fileUrl || driveUrl || "").trim();
+    if (directUrl) {
+      return [
+        {
+          id: "default-doc-1",
+          title: title,
+          url: directUrl,
+          type: driveUrl ? "DRIVE" : "PDF",
+        },
+      ];
+    }
+    return [];
+  }, [attachments, fileUrl, driveUrl, title]);
+
+  const [activeAttachmentIdx, setActiveAttachmentIdx] = useState<number>(0);
+  const safeIdx = activeAttachmentIdx < effectiveAttachments.length ? activeAttachmentIdx : 0;
+  const currentAttachment = effectiveAttachments[safeIdx] || null;
+
+  // Normalize URLs from active attachment or fallback
+  const rawUrl = (currentAttachment?.url || fileUrl || driveUrl || "").trim();
+  const currentDocTitle = currentAttachment?.title || title;
   const isGoogleDrive = rawUrl.includes("drive.google.com");
 
   // YouTube Video & Playlist detection:
@@ -354,6 +382,46 @@ export function AcademicPdfViewer({
         className
       )}
     >
+      {/* ─── Multi-Document Switcher Bar (if multiple attachments) ─── */}
+      {effectiveAttachments.length > 1 && (
+        <div className="flex items-center gap-2 overflow-x-auto px-3 sm:px-4 py-2 bg-muted/70 border-b border-border/40 scrollbar-none shrink-0">
+          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground shrink-0 flex items-center gap-1 mr-1">
+            <Layers className="size-3 text-primary" />
+            <span>Files ({effectiveAttachments.length}):</span>
+          </span>
+          {effectiveAttachments.map((att, idx) => {
+            const isSelected = idx === safeIdx;
+            return (
+              <button
+                key={att.id || idx}
+                type="button"
+                onClick={() => {
+                  sounds.tap();
+                  haptics.light();
+                  setActiveAttachmentIdx(idx);
+                  setIsLoading(true);
+                  toast.info(`Switched to: ${att.title || `Document ${idx + 1}`}`);
+                }}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer border",
+                  isSelected
+                    ? "bg-foreground text-background border-foreground shadow-xs font-black"
+                    : "bg-background/80 hover:bg-background text-muted-foreground hover:text-foreground border-border/40"
+                )}
+              >
+                <span className="text-[10px] opacity-70">#{idx + 1}</span>
+                <span className="truncate max-w-[130px] sm:max-w-[220px]">
+                  {att.title || `Document ${idx + 1}`}
+                </span>
+                <span className="text-[9px] px-1 py-0.2 rounded bg-muted/30 uppercase font-mono">
+                  {att.type || "PDF"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* ─── Reader Top Control Toolbar ─── */}
       <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 bg-muted/40 border-b border-border/40 backdrop-blur-md shrink-0 flex-wrap">
         {/* Left: Document info & badges */}
@@ -385,7 +453,7 @@ export function AcademicPdfViewer({
             </span>
           </span>
           <span className="text-xs font-bold text-foreground truncate max-w-[140px] sm:max-w-xs">
-            {title}
+            {currentDocTitle}
           </span>
         </div>
 

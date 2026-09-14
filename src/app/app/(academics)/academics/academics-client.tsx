@@ -5,6 +5,7 @@ import {
   BookOpen,
   FolderPlus,
   Globe,
+  GraduationCap,
   LayoutGrid,
   List,
   Loader2,
@@ -83,7 +84,13 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scope, setScope] = useState<"campus" | "global">("campus");
   const [sortBy, setSortBy] = useState<"for_you" | "latest" | "popular" | "downloads" | "views">("for_you");
-  const [viewMode, setViewMode] = useState<"row" | "grid">("row");
+  const [viewMode, setViewMode] = useState<"row" | "grid">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("campusloop_academics_view_mode");
+      if (saved === "grid" || saved === "row") return saved;
+    }
+    return "row";
+  });
 
   // Saved Sub-tab: "notes" | "playlists"
   const [savedSubTab, setSavedSubTab] = useState<"notes" | "playlists">("notes");
@@ -252,15 +259,16 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
     selectedBranch !== "All" || selectedSemester !== "all" || sortBy !== "for_you" || scope !== "campus";
 
   return (
-    <div className="min-h-screen max-w-2xl mx-auto border-x border-border/40 bg-background pb-28 select-none">
-      {/* ─── Sticky Twitter/X Header ────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/40">
+    <div className="min-h-screen w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-28 select-none">
+      {/* ─── Sticky Header ────────────────────────────────────────── */}
+      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/40 -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8">
         {/* Top bar: Title & Quick Actions */}
-        <div className="flex h-13 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <h1 className="text-base font-black tracking-tight text-foreground sm:text-lg">Academics</h1>
-            <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground/80">
-              · 1,350+ Campus Hubs
+        <div className="flex h-14 items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h1 className="text-base font-black tracking-tight text-foreground sm:text-xl">Academics</h1>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-bold border border-primary/20">
+              <GraduationCap className="size-3.5" />
+              <span>1,350+ Campus Hubs</span>
             </span>
           </div>
 
@@ -611,16 +619,29 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                   <Skeleton className="h-20 w-full rounded-2xl" />
                 </div>
               ) : filteredSavedItems.length > 0 ? (
-                <div className="divide-y divide-border/20 rounded-2xl border border-border/30 bg-card/25 overflow-hidden">
-                  {filteredSavedItems.map((item) => (
-                    <AcademicCard
-                      key={item.id}
-                      item={item}
-                      currentUserId={profileId || undefined}
-                      variant="row"
-                    />
-                  ))}
-                </div>
+                viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+                    {filteredSavedItems.map((item) => (
+                      <AcademicCard
+                        key={item.id}
+                        item={item}
+                        currentUserId={profileId || undefined}
+                        variant="grid"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="divide-y divide-border/20 rounded-2xl border border-border/30 bg-card/25 overflow-hidden">
+                    {filteredSavedItems.map((item) => (
+                      <AcademicCard
+                        key={item.id}
+                        item={item}
+                        currentUserId={profileId || undefined}
+                        variant="row"
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
                 <div className="py-16 text-center space-y-3 px-4 rounded-2xl border border-dashed border-border/60">
                   <Bookmark className="size-10 text-muted-foreground/30 mx-auto" />
@@ -644,12 +665,13 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
                 </div>
               )
             ) : isPlaylistsLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-32 w-full rounded-2xl" />
-                <Skeleton className="h-32 w-full rounded-2xl" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Skeleton className="h-36 w-full rounded-2xl" />
+                <Skeleton className="h-36 w-full rounded-2xl" />
+                <Skeleton className="h-36 w-full rounded-2xl" />
               </div>
             ) : playlistsData?.playlists && playlistsData.playlists.length > 0 ? (
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
                 {playlistsData.playlists.map((playlist: any) => (
                   <AcademicPlaylistCard key={playlist.id} playlist={playlist} />
                 ))}
@@ -694,13 +716,13 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
             </div>
 
             {isPlaylistsLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-32 w-full rounded-2xl" />
-                <Skeleton className="h-32 w-full rounded-2xl" />
-                <Skeleton className="h-32 w-full rounded-2xl" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Skeleton className="h-36 w-full rounded-2xl" />
+                <Skeleton className="h-36 w-full rounded-2xl" />
+                <Skeleton className="h-36 w-full rounded-2xl" />
               </div>
             ) : playlistsData?.playlists && playlistsData.playlists.length > 0 ? (
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
                 {playlistsData.playlists.map((playlist: any) => (
                   <AcademicPlaylistCard key={playlist.id} playlist={playlist} />
                 ))}
@@ -728,42 +750,204 @@ export function AcademicsClient({ profileId }: AcademicsClientProps) {
           /* ── 3. CORE FEED: FOR YOU, PYQs, NOTES ────────────────────────── */
           <div>
             {isInitialLoading ? (
-              <div className="divide-y divide-border/20">
-                <div className="p-4 space-y-2">
-                  <Skeleton className="h-4 w-1/3 rounded-md" />
-                  <Skeleton className="h-5 w-4/5 rounded-md" />
-                  <Skeleton className="h-4 w-1/2 rounded-md" />
-                </div>
-                <div className="p-4 space-y-2">
-                  <Skeleton className="h-4 w-1/3 rounded-md" />
-                  <Skeleton className="h-5 w-4/5 rounded-md" />
-                  <Skeleton className="h-4 w-1/2 rounded-md" />
-                </div>
-                <div className="p-4 space-y-2">
-                  <Skeleton className="h-4 w-1/3 rounded-md" />
-                  <Skeleton className="h-5 w-4/5 rounded-md" />
-                  <Skeleton className="h-4 w-1/2 rounded-md" />
-                </div>
-              </div>
-            ) : items.length > 0 ? (
-              <>
-                <div
-                  className={cn(
-                    viewMode === "grid"
-                      ? "p-4 grid grid-cols-1 sm:grid-cols-2 gap-4"
-                      : "divide-y divide-border/20"
-                  )}
-                >
-                  {items.map((item) => (
-                    <AcademicCard
-                      key={item.id}
-                      item={item}
-                      currentUserId={profileId || undefined}
-                      isHighlighted={highlightId === item.id}
-                      variant={viewMode}
-                    />
+              viewMode === "grid" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 py-4">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <Skeleton key={i} className="h-64 w-full rounded-3xl" />
                   ))}
                 </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_320px] 2xl:grid-cols-[1fr_360px] gap-6 lg:gap-8 items-start py-4">
+                  <div className="divide-y divide-border/20 rounded-2xl border border-border/30 bg-card/25 overflow-hidden">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="p-4 space-y-2">
+                        <Skeleton className="h-4 w-1/3 rounded-md" />
+                        <Skeleton className="h-5 w-4/5 rounded-md" />
+                        <Skeleton className="h-4 w-1/2 rounded-md" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="hidden lg:flex flex-col gap-4">
+                    <Skeleton className="h-48 w-full rounded-2xl" />
+                    <Skeleton className="h-36 w-full rounded-2xl" />
+                  </div>
+                </div>
+              )
+            ) : items.length > 0 ? (
+              <>
+                {viewMode === "grid" ? (
+                  <div className="py-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
+                      {items.map((item) => (
+                        <AcademicCard
+                          key={item.id}
+                          item={item}
+                          currentUserId={profileId || undefined}
+                          isHighlighted={highlightId === item.id}
+                          variant="grid"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_320px] 2xl:grid-cols-[1fr_360px] gap-6 lg:gap-8 items-start">
+                      {/* Left Main Stream: High-density row cards */}
+                      <div className="min-w-0 divide-y divide-border/20 rounded-2xl border border-border/30 bg-card/25 overflow-hidden">
+                        {items.map((item) => (
+                          <AcademicCard
+                            key={item.id}
+                            item={item}
+                            currentUserId={profileId || undefined}
+                            isHighlighted={highlightId === item.id}
+                            variant="row"
+                          />
+                        ))}
+                      </div>
+
+                      {/* Right Desktop Companion Sidebar */}
+                      <aside className="hidden lg:flex flex-col gap-4 sticky top-28">
+                        {/* Hub Overview Card */}
+                        <div className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-md p-4 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <div className="flex size-8 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0">
+                              <School className="size-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="text-xs font-black text-foreground truncate">Campus Study Vault</h3>
+                              <p className="text-[10px] text-muted-foreground">Syllabus-aligned repository</p>
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Exam-tested PYQs, verified topper notes, formula sheets, and lab manuals shared by college students.
+                          </p>
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
+                              Verified Notes
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold border border-primary/20">
+                              Zero-Login PDF
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-[10px] font-semibold border border-border/40">
+                              1,350+ Hubs
+                            </span>
+                          </div>
+                          <Link
+                            href="/app/academics/upload"
+                            onClick={() => sounds.tap()}
+                            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-primary text-primary-foreground text-xs font-black shadow-xs hover:opacity-95 transition-opacity cursor-pointer"
+                          >
+                            <Plus className="size-3.5" />
+                            <span>Upload Notes (+20 LP)</span>
+                          </Link>
+                        </div>
+
+                        {/* Quick Branch Shortcuts */}
+                        <div className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-md p-4 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-xs font-bold text-foreground">Top Branches</h3>
+                            {selectedBranch !== "All" && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  sounds.tap();
+                                  setSelectedBranch("All");
+                                }}
+                                className="text-[10px] font-bold text-primary hover:underline cursor-pointer"
+                              >
+                                Clear
+                              </button>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {BRANCHES.map((b) => {
+                              const isSelected = selectedBranch === b;
+                              return (
+                                <button
+                                  key={b}
+                                  type="button"
+                                  onClick={() => {
+                                    sounds.tap();
+                                    setSelectedBranch(b);
+                                  }}
+                                  className={cn(
+                                    "px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer border",
+                                    isSelected
+                                      ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
+                                      : "bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border-border/30"
+                                  )}
+                                >
+                                  {b === "All" ? "All Branches" : b}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Semester Shortcuts */}
+                        <div className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-md p-4 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-xs font-bold text-foreground">Semester Fast Filter</h3>
+                            {selectedSemester !== "all" && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  sounds.tap();
+                                  setSelectedSemester("all");
+                                }}
+                                className="text-[10px] font-bold text-primary hover:underline cursor-pointer"
+                              >
+                                Clear
+                              </button>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-3 gap-1">
+                            {SEMESTERS.map((s) => {
+                              const isSelected = selectedSemester === s.id;
+                              return (
+                                <button
+                                  key={s.id}
+                                  type="button"
+                                  onClick={() => {
+                                    sounds.tap();
+                                    setSelectedSemester(s.id);
+                                  }}
+                                  className={cn(
+                                    "py-1 rounded-lg text-[11px] font-semibold text-center transition-all cursor-pointer border",
+                                    isSelected
+                                      ? "bg-primary text-primary-foreground border-primary font-bold shadow-xs"
+                                      : "bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border-border/30"
+                                  )}
+                                >
+                                  {s.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Exam Stacks Callout */}
+                        <div className="rounded-2xl border border-border/40 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-4 space-y-2">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                            <FolderPlus className="size-3.5 text-indigo-400" />
+                            <span>Curate Exam Stacks</span>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed">
+                            Bundle past 5 years of exam papers, formulas, and lecture notes into a 1-click stack for your classmates.
+                          </p>
+                          <Link
+                            href="/app/academics/playlists/new"
+                            onClick={() => sounds.tap()}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-indigo-400 hover:underline pt-1"
+                          >
+                            <span>Build a study playlist</span>
+                            <span>&rarr;</span>
+                          </Link>
+                        </div>
+                      </aside>
+                    </div>
+                  </div>
+                )}
 
                 {/* Infinite Scroll Sentinel */}
                 <div ref={setLoadMoreNode} className="flex flex-col items-center justify-center p-4 min-h-16">

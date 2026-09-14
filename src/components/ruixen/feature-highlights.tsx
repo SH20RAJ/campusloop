@@ -129,7 +129,7 @@ export function FeatureHighlights({
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="mx-auto max-w-3xl px-6">
+      <div className="mx-auto max-w-5xl px-6">
         {title && (
           <p className="mb-8 text-center text-sm font-medium uppercase tracking-wider text-muted-foreground">
             {title}

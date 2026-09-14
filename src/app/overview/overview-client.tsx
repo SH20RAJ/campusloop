@@ -1,204 +1,228 @@
 "use client";
 
+import Link from "next/link";
 import {
-  DocLayout,
-  DocList,
-  DocNote,
-  DocSection,
-  type DocSectionRef,
-  DocTable,
-  LegalDocHeader,
-} from "@/components/marketing/legal-doc";
+  ArrowRight,
+  BarChart3,
+  Cpu,
+  Database,
+  Globe2,
+  GraduationCap,
+  Layers,
+  Lock,
+  Network,
+  Radio,
+  Server,
+  ShieldAlert,
+  ShieldCheck,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 import { CompanyNav } from "@/components/marketing/company-nav";
 import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
-
-const SECTIONS: DocSectionRef[] = [
-  { id: "problem", label: "The campus problem" },
-  { id: "solution", label: "The verified layer" },
-  { id: "flywheel", label: "Network flywheel" },
-  { id: "market", label: "Market & demographics" },
-  { id: "business", label: "Monetization model" },
-  { id: "architecture", label: "Technical stack" },
-];
+import { BentoGrid, type BentoItem } from "@/components/ui/bento-grid";
+import { ElegantShape } from "@/components/ui/shape-landing-hero";
 
 export function OverviewClient() {
+  const architectureItems: BentoItem[] = [
+    {
+      id: "flywheel-density",
+      title: "Campus Flywheel & Network Density",
+      description:
+        "Every batch and semester organically drives recursive adoption: verified confessions drive daily retention, academics drive exam-week utility, and marketplace drives graduation offboarding.",
+      icon: <Network className="size-5 text-[#1D9BF0]" />,
+      status: "Organic Flywheel",
+      tags: ["High Retention", "Batch Virality", "Perpetual Cycle"],
+      colSpan: 2,
+    },
+    {
+      id: "market-size",
+      title: "43.3M Higher-Ed Market",
+      description:
+        "India's higher education system is the world's 2nd largest with 43.3 million students across 55,000 institutions seeking a secure digital campus identity.",
+      icon: <BarChart3 className="size-5 text-emerald-500" />,
+      status: "Huge TAM",
+      tags: ["AISHE Data", "1,350+ Hubs", "Pan-India"],
+      colSpan: 1,
+    },
+    {
+      id: "stack-edge",
+      title: "Edge Compute & Serverless Postgres",
+      description:
+        "Powered by Next.js 16, Cloudflare Workers, Neon Serverless Postgres, and Qdrant Vector Engine with instant sub-50ms latency across India.",
+      icon: <Server className="size-5 text-purple-500" />,
+      status: "Sub-50ms Edge",
+      tags: ["Cloudflare Workers", "Neon Postgres", "Qdrant Vector", "Drizzle ORM"],
+      colSpan: 1,
+    },
+    {
+      id: "privacy-sovereignty",
+      title: "Zero Data Reselling & Student Privacy",
+      description:
+        "We never sell student behavioral profiles, browsing patterns, or confession logs to third-party ad brokers or data aggregators.",
+      icon: <Lock className="size-5 text-amber-500" />,
+      status: "Zero Ad Tech",
+      tags: ["No Trackers", "Encrypted", "UGC Compliant"],
+      colSpan: 2,
+    },
+  ];
+
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-background text-foreground overflow-x-clip">
       <MarketingHeader />
       <CompanyNav />
 
-      <main className="flex-1 pt-14">
-        <DocLayout sections={SECTIONS}>
-          <LegalDocHeader
-            eyebrow="Architecture & Strategy"
-            title="Platform Overview & Strategic Thesis"
-            summary="A comprehensive architectural brief on CampusLoop's verified student graph, multi-product network density flywheel, addressable higher education market, and infrastructure invariants."
-            meta={["Strategic Whitepaper", "43.3M Student Addressable Market", "Edge Architecture", "Zero Data Reselling"]}
+      <main className="flex-1">
+        {/* Geometric Hero */}
+        <section className="relative w-full overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24 border-b border-border/40">
+          <div className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[500px] w-full max-w-5xl -translate-x-1/2 bg-gradient-to-br from-[#1D9BF0]/15 via-indigo-600/10 to-transparent blur-3xl" />
+
+          <ElegantShape
+            delay={0.2}
+            width={360}
+            height={85}
+            rotate={-10}
+            y={12}
+            gradient="from-[#1D9BF0]/25"
+            className="left-[-4%] top-[25%]"
+          />
+          <ElegantShape
+            delay={0.4}
+            width={280}
+            height={65}
+            rotate={14}
+            y={10}
+            gradient="from-purple-500/20"
+            className="right-[-3%] top-[45%]"
           />
 
-          {/* 01. The Campus Problem */}
-          <DocSection id="problem" number={1} title="The fragmented campus reality">
-            <p>
-              Higher education in India encompasses over 43 million students across 55,000 institutions, yet student
-              digital life remains completely fragmented across disjointed, unverified tools:
+          <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3.5 py-1 text-xs font-semibold text-foreground backdrop-blur-md">
+              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-mono text-[#1D9BF0] font-bold uppercase tracking-wider text-[11px]">
+                Platform Whitepaper
+              </span>
+              <span className="text-muted-foreground/40">•</span>
+              <span className="text-muted-foreground font-mono text-[11px]">Strategic Thesis</span>
+            </div>
+
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.08] text-foreground">
+              The Architecture of a{" "}
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#1D9BF0] via-sky-400 to-indigo-500">
+                Verified Campus Graph
+              </span>
+            </h1>
+
+            <p className="max-w-2xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed">
+              How CampusLoop solves identity, retention, and community trust for higher education institutions
+              throughout India.
             </p>
+          </div>
+        </section>
 
-            <DocList
-              items={[
-                "Unregulated WhatsApp Groups: Hundreds of unread messages every evening, critical notices lost in noise, and mobile numbers exposed to unvetted strangers.",
-                "Syllabus & Notes Rot: Students scramble during midsem and endsem exam weeks searching for syllabus packs, only to find dead Google Drive links and incomplete notes.",
-                "Toxic Anonymous Outlets: Unchecked confession pages on Instagram or Reddit lead to cyberbullying, hazing, and UGC anti-ragging violations.",
-                "Unsafe Dating Platforms: Mainstream dating applications in India suffer from severe catfishing, non-student infiltration, and mismatched intent.",
-              ]}
-            />
+        {/* Core Metrics Banner */}
+        <section className="py-12 border-b border-border/40 bg-muted/20">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="space-y-1">
+              <div className="text-3xl sm:text-4xl font-black text-foreground font-mono">43.3M+</div>
+              <div className="text-xs text-muted-foreground">Higher-Ed Students</div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-3xl sm:text-4xl font-black text-[#1D9BF0] font-mono">1,350+</div>
+              <div className="text-xs text-muted-foreground">Indexed College Hubs</div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-3xl sm:text-4xl font-black text-emerald-500 font-mono">100%</div>
+              <div className="text-xs text-muted-foreground">Institutional Email Gating</div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-3xl sm:text-4xl font-black text-purple-500 font-mono">&lt;50ms</div>
+              <div className="text-xs text-muted-foreground">Edge Response Time</div>
+            </div>
+          </div>
+        </section>
 
-            <p>
-              When campus communication is distributed across five different generic platforms, students lose context,
-              privacy, and peer safety.
-            </p>
-          </DocSection>
+        {/* Problem vs. Verified Solution Comparison */}
+        <section className="py-20 px-4 sm:px-6 bg-muted/10">
+          <div className="mx-auto max-w-5xl space-y-10">
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1D9BF0]">
+                Paradigm Shift
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
+                Fragmented Channels vs. Verified Hub
+              </h2>
+            </div>
 
-          {/* 02. The Verified Solution */}
-          <DocSection id="solution" number={2} title="The unified verified student layer">
-            <p>
-              CampusLoop creates a closed, trusted digital campus graph by tying every account to a verified college
-              domain (<code className="font-mono text-xs">.ac.in</code> /{" "}
-              <code className="font-mono text-xs">.edu.in</code>).
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md p-6 sm:p-8 space-y-4">
+                <div className="flex items-center gap-2.5 text-rose-500 font-bold">
+                  <ShieldAlert className="size-5" />
+                  <span className="text-base font-mono uppercase tracking-wider">Unverified Chaos</span>
+                </div>
+                <ul className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+                  <li className="flex items-start gap-2">
+                    <span className="text-rose-500 font-bold">•</span>
+                    <span>Noisy WhatsApp groups exposing personal mobile numbers to hundreds of strangers.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-rose-500 font-bold">•</span>
+                    <span>Anonymous Instagram pages turning toxic with unchecked cyberbullying and harassment.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-rose-500 font-bold">•</span>
+                    <span>Outsiders, predators, and fake profiles dominating campus-area dating applications.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-rose-500 font-bold">•</span>
+                    <span>Exam notes and PYQs scattered across broken Google Drive folders that 404 during mid-sems.</span>
+                  </li>
+                </ul>
+              </div>
 
-            <DocTable
-              rows={[
-                {
-                  label: "100% Student Verified",
-                  value: "Strict Institutional Gating",
-                  note: "Zero non-student strangers, marketing bots, or unverified accounts.",
-                },
-                {
-                  label: "Dual Scoping Engine",
-                  value: "Local Campus + All-India Hub",
-                  note: "Instant toggle between your immediate college radius and nationwide university trends.",
-                },
-                {
-                  label: "Identity Escrow Protection",
-                  value: "Pseudonymous Expression with Accountability",
-                  note: "Students can post candid confessions safely while protected from unmonitored harassment.",
-                },
-              ]}
-            />
-          </DocSection>
+              <div className="rounded-2xl border border-primary/40 bg-card/80 backdrop-blur-md p-6 sm:p-8 space-y-4 shadow-xl shadow-primary/5">
+                <div className="flex items-center gap-2.5 text-[#1D9BF0] font-bold">
+                  <ShieldCheck className="size-5" />
+                  <span className="text-base font-mono uppercase tracking-wider">The CampusLoop Graph</span>
+                </div>
+                <ul className="space-y-3 text-sm text-foreground/90 leading-relaxed">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    <span>Access restricted strictly to .ac.in / .edu.in verified students. Zero outsiders.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    <span>Accountable anonymity: dynamic handles with cryptographic identity escrow to prevent harassment.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    <span>Campus Match with verified badges, dual-radius radius filters, and zero catfish.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    <span>Academics Vault with permanent multi-file cloud storage organized by course and semester.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
 
-          {/* 03. Network Flywheel */}
-          <DocSection id="flywheel" number={3} title="Campus density and network flywheel">
-            <p>
-              Unlike generic social networks that struggle with cold starts, CampusLoop leverages campus physical
-              proximity to ignite a self-reinforcing engagement loop:
-            </p>
+        {/* Architecture & Flywheel Bento Grid */}
+        <section className="py-20 px-4 sm:px-6 border-t border-border/40">
+          <div className="mx-auto max-w-6xl space-y-10">
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1D9BF0]">
+                System Architecture
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
+                Engineered for Infinite Campus Density
+              </h2>
+            </div>
 
-            <DocList
-              items={[
-                "Academics (High Utility): Students join to access 100,000+ verified notes and past exam papers for their specific branch and semester.",
-                "Campus Pulse (High Frequency): Daily confessions, trending polls, and hostel announcements keep students returning multiple times a day.",
-                "Social & Discovery (High Affinity): Campus Match and student community sub-hubs facilitate meaningful peer friendships and study partnerships.",
-                "Utility & Commerce (High Retention): On-campus student marketplace and hostel deliveries provide durable long-term stickiness throughout all 4 years of college.",
-              ]}
-            />
-
-            <DocNote>
-              Because colleges are geographically dense micro-communities, once 15% of a student batch joins
-              CampusLoop, network effects rapidly drive adoption past 60% within 14 days of campus launch.
-            </DocNote>
-          </DocSection>
-
-          {/* 04. Market & Demographics */}
-          <DocSection id="market" number={4} title="Addressable market & demographics">
-            <p>
-              India represents the second-largest higher education market in the world:
-            </p>
-
-            <DocTable
-              rows={[
-                {
-                  label: "Higher Education Enrollment",
-                  value: "43.3 Million Students (AISHE Report)",
-                  note: "Growing at a compound annual growth rate of 4.5% year over year.",
-                },
-                {
-                  label: "Colleges & Universities",
-                  value: "1,350+ Targeted Hubs / 55,000+ Total",
-                  note: "Tier-1 and Tier-2 engineering, medical, management, and central universities prioritized.",
-                },
-                {
-                  label: "Mobile Penetration",
-                  value: "98%+ Smartphone Ownership",
-                  note: "Average student screen time exceeding 4.2 hours daily on mobile devices.",
-                },
-                {
-                  label: "Annual Student Living Spend",
-                  value: "$2.4B+ Campus Ecosystem Spend",
-                  note: "Covering books, study gear, hostel amenities, electronics, dining, and campus services.",
-                },
-              ]}
-            />
-          </DocSection>
-
-          {/* 05. Monetization Model */}
-          <DocSection id="business" number={5} title="Sustainable monetization framework">
-            <p>
-              CampusLoop rejects predatory surveillance advertising and data reselling. The platform operates on
-              sustainable, privacy-first monetization streams:
-            </p>
-
-            <DocList
-              items={[
-                "Verified Campus Recruitment: Direct talent discovery pipelines for tech enterprises and startups to post internships and hire verified college developers.",
-                "Local Merchant Student Deals: Exclusive student discounts from food vendors, bookstores, and student housing providers surrounding campus perimeters.",
-                "CampusLoop Pro & Notebook Compute: Optional power-user tiers for unlimited cloud compute in CampusLoop Notebook and priority academic AI cram tokens.",
-              ]}
-            />
-
-            <DocNote>
-              Student personal data, confession history, and private messages are strictly confidential and will never
-              be packaged, shared, or monetized for third-party commercial profiling.
-            </DocNote>
-          </DocSection>
-
-          {/* 06. Technical Architecture Invariants */}
-          <DocSection id="architecture" number={6} title="Technical architecture & engineering invariants">
-            <p>
-              CampusLoop is built for extreme performance, regional low latency, and zero-downtime resilience:
-            </p>
-
-            <DocTable
-              rows={[
-                {
-                  label: "Application Framework",
-                  value: "Next.js 16 (App Router) on Cloudflare Edge",
-                  note: "Sub-50ms TTFB across all Indian regions with hybrid static and dynamic edge rendering.",
-                },
-                {
-                  label: "Primary Database",
-                  value: "Neon Serverless PostgreSQL + Drizzle ORM",
-                  note: "Full relational integrity, connection pooling, and automated schema migrations.",
-                },
-                {
-                  label: "Vector Recommendations",
-                  value: "Qdrant Cloud with 600ms Relational Fallback",
-                  note: "Semantic matching for dating and related posts; automatically degrades gracefully to SQL if vector timeout triggers.",
-                },
-                {
-                  label: "Realtime & Signaling",
-                  value: "Upstash Redis + Durable PostgreSQL Sessions",
-                  note: "Under 5ms affinity indexing and real-time WebRTC calling signaling.",
-                },
-                {
-                  label: "P2P WebRTC Plane",
-                  value: "Direct Browser-to-Browser PeerJS",
-                  note: "All audio/video calling media streams connect direct P2P with zero server relaying for maximum privacy.",
-                },
-              ]}
-            />
-          </DocSection>
-        </DocLayout>
+            <BentoGrid items={architectureItems} />
+          </div>
+        </section>
       </main>
 
       <MarketingFooter />

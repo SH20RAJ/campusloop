@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { BentoShowcaseSection } from "@/components/landing/bento-showcase-section";
 import { CampusProblemSection } from "@/components/landing/campus-problem-section";
+import { CampusTicker } from "@/components/landing/campus-ticker";
 import { FinalCTASection } from "@/components/landing/final-cta-section";
 import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
@@ -137,6 +139,9 @@ export default async function LandingPage() {
         {/* 01. Hero Section */}
         <HeroSection isAuthenticated={isAuthenticated} />
 
+        {/* 01.5 Live Campus Ticker (Infinite Marquee) */}
+        <CampusTicker />
+
         {/* 02. The Campus Problem */}
         <CampusProblemSection />
 
@@ -146,16 +151,19 @@ export default async function LandingPage() {
         {/* 04. How CampusLoop Works */}
         <HowItWorksSection />
 
-        {/* 05. Product Showcase (Modular Architecture) */}
+        {/* 05. 21st Bento Feature Architecture */}
+        <BentoShowcaseSection />
+
+        {/* 06. Product Showcase (Interactive Deep Dive) */}
         <ProductShowcaseSection />
 
-        {/* 06. Viewer Mode (Aspirant Acquisition Funnel) */}
+        {/* 07. Viewer Mode (Aspirant Acquisition Funnel) */}
         <ViewerModeSection />
 
-        {/* 07. Why Verified? (Comparison Table) */}
+        {/* 08. Why Verified? (Comparison Table) */}
         <WhyVerifiedSection />
 
-        {/* 08. Frequently Asked Questions */}
+        {/* 09. Frequently Asked Questions */}
         <LandingFAQSection />
 
         {/* 10. Final Call to Action */}

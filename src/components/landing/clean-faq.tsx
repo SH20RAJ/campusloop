@@ -1,38 +1,29 @@
-"use client";
-
-import AccordionIndexed from "@/components/ruixen/accordion-indexed";
-
 export function CleanFAQ() {
   const faqItems = [
     {
-      id: "verification",
       title: "How do I join my campus?",
       content:
-        "Create an account with your institutional college email. CampusLoop checks the university domain and then connects you to the appropriate campus hub.",
+        "Create an account with your institutional college email. CampusLoop checks the university domain and connects you to the appropriate campus hub.",
     },
     {
-      id: "anonymous",
       title: "Can I post anonymously?",
       content:
-        "Yes. CampusLoop supports anonymous posting for eligible campus conversations. The public post does not need to expose your student identity.",
+        "Yes. CampusLoop supports anonymous posting for eligible campus conversations, so the public post does not need to expose your student identity.",
     },
     {
-      id: "college",
       title: "What if my college is not listed?",
       content:
-        "Use the Colleges Directory to find your university or request a new campus hub. CampusLoop is continually expanding its college directory.",
+        "Use the Colleges Directory to find your university or request a new campus hub.",
     },
     {
-      id: "academics",
       title: "What can I find in Academics?",
       content:
         "The academic vault can contain lecture notes, module resources, previous-year question papers, lab manuals, playlists and other student-contributed study material.",
     },
     {
-      id: "pricing",
       title: "Does it cost anything to join?",
       content:
-        "CampusLoop is free for verified students. Some campus services may evolve separately, but the core student network is free to use.",
+        "CampusLoop is free for verified students.",
     },
   ];
 
@@ -49,11 +40,21 @@ export function CleanFAQ() {
           </p>
         </div>
 
-        <AccordionIndexed
-          items={faqItems}
-          defaultValue="verification"
-          className="mx-auto mt-10 px-0"
-        />
+        <div className="mt-10 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-background">
+          {faqItems.map((item) => (
+            <details key={item.title} className="group px-5 sm:px-6">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-sm font-semibold text-foreground [&::-webkit-details-marker]:hidden">
+                <span>{item.title}</span>
+                <span className="grid size-6 shrink-0 place-items-center rounded-full border border-border text-muted-foreground transition-transform group-open:rotate-45" aria-hidden="true">
+                  +
+                </span>
+              </summary>
+              <p className="max-w-2xl pb-5 pr-10 text-sm leading-6 text-muted-foreground">
+                {item.content}
+              </p>
+            </details>
+          ))}
+        </div>
       </div>
     </section>
   );

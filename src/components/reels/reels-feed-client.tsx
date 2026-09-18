@@ -6,10 +6,8 @@ import {
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
-  BookOpen,
   ChevronDown,
   ChevronUp,
-  Compass,
   Heart,
   MessageCircle,
   MoreHorizontal,
@@ -492,7 +490,7 @@ export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: Re
       </div>
 
       {isSwitchingMode && (
-        <div className="pointer-events-none fixed inset-0 z-60 grid place-items-center bg-black/25 backdrop-blur-[2px]">
+        <div className="pointer-events-none fixed inset-0 z-[60] grid place-items-center bg-black/25 backdrop-blur-[2px]">
           <div className="rounded-full border border-white/10 bg-black/60 px-4 py-2 text-xs font-bold text-white backdrop-blur-xl">
             Finding a new mix…
           </div>

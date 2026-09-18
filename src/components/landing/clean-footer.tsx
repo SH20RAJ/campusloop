@@ -89,12 +89,12 @@ export function CleanFooter() {
     },
     {
       icon: LinkedInIcon,
-      href: "https://www.linkedin.com/company/mycampusloop/?viewAsMember=true",
+      href: "https://www.linkedin.com/company/mycampusloop/",
       label: "LinkedIn (CampusLoop)",
     },
     {
       icon: XIcon,
-      href: "https://x.com/company/mycampusloop/",
+      href: "https://x.com/mycampusloop",
       label: "X (@mycampusloop)",
     },
   ];
@@ -109,7 +109,7 @@ export function CleanFooter() {
     <FooterEnterprise
       brandMark={brandMark}
       brandName="CampusLoop"
-      description="The verified, privacy-first campus social network for Indian university students. Gated strictly by institutional email domains (.ac.in / .edu.in)."
+      description="A verified campus community for Indian university students, with campus conversations, communities, events and academic resources."
       columns={columns}
       socials={socials}
       bottomLinks={bottomLinks}

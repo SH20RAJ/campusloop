@@ -34,51 +34,19 @@ function requireDatabaseUrl() {
 }
 
 const SUBREDDITS = [
-  "unexpected",
-  "tiktokcringe",
-  "nonononoyes",
-  "therewasanattempt",
-  "facepalm",
-  "oddlysatisfying",
-  "AnimalsBeingDerps",
-  "CatSlaps",
-  "GymMemes",
-  "nextfuckinglevel",
-  "IdiotsInCars",
-  "blackmagicfuckery",
-  "NatureIsFuckingLit",
-  "Damnthatsinteresting",
-  "interestingasfuck",
-  "beamazed",
-  "gamephysics",
-  "standupcomedy",
-  "skateboarding",
-  "climbing",
-  "calisthenics",
-  "DesiVideoMemes",
-  "BollywoodRealism",
-  "TotalKalesh",
-  "wholesomememes",
-  "me_irl",
-  "ProgrammerHumor",
-  "dankmemes",
-  "IndianDankMemes",
-  "IndiaMeme",
-  "funny",
-  "mildlyinfuriating",
-  "mildlyinteresting",
-  "aww",
-  "Eyebleach",
-  "AnimalsBeingJerks",
-  "woahdude",
-  "chemicalreactiongifs",
-  "physicsgifs",
-  "mechanical_gifs",
+  // Campus-first sources. Generic viral subreddits are intentionally excluded.
   "Btechtards",
+  "college",
+  "EngineeringMemes",
   "JEENEETards",
   "IndianTeenagers",
-  "EngineeringMemes",
-  "college",
+  "ProgrammerHumor",
+  "DesiVideoMemes",
+  "IndianDankMemes",
+  "IndiaMeme",
+  "GymMemes",
+  "BollywoodRealism",
+  "TotalKalesh",
 ];
 
 // Clean emojis from text to adhere to Rule 11
@@ -151,6 +119,24 @@ async function harvestAuthenticReels(targetCount = 4200): Promise<HarvestedReel[
           if (item.over_18 === true) continue;
 
           const title = sanitizeText(rawTitle) || "Campus Reel Moment";
+
+          // Reject generic viral clips during ingestion. A CampusLoop reel must
+          // have a visible student/campus signal or come from a campus-oriented source.
+          const campusSignals = [
+            "campus", "college", "university", "hostel", "student", "semester",
+            "exam", "placement", "fest", "hackathon", "club", "canteen", "mess",
+            "professor", "lab", "lecture", "viva", "assignment", "internship",
+            "batch", "freshers", "senior", "junior", "dorm", "engineering",
+            "btech", "coding", "project", "library", "campuslife",
+          ];
+          const searchable = `${title} ${sub}`.toLowerCase();
+          const sourceIsStudent = [
+            "Btechtards", "college", "EngineeringMemes", "JEENEETards",
+            "IndianTeenagers", "ProgrammerHumor", "DesiVideoMemes",
+            "IndianDankMemes", "IndiaMeme",
+          ].includes(sub);
+          const isCampusRelevant = sourceIsStudent || campusSignals.some((signal) => searchable.includes(signal));
+          if (!isCampusRelevant) continue;
 
           seenVideoIds.add(videoId);
           seenExternalIds.add(externalId);

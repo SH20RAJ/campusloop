@@ -1,81 +1,95 @@
-import { ArrowRight, CalendarDays, GraduationCap, MessageCircleMore, Store, UsersRound } from "lucide-react";
+import { ArrowUpRight, CalendarDays, GraduationCap, MessageCircle, Store, Users } from "lucide-react";
 import Link from "next/link";
 
-const items = [
+const steps = [
   {
-    icon: MessageCircleMore,
-    title: "Campus conversations",
-    text: "Questions, announcements, polls, confessions and everyday student life.",
+    time: "08:40",
+    label: "Campus feed",
+    title: "What changed since yesterday?",
+    text: "Announcements, questions, polls and the small conversations you would otherwise miss.",
     href: "/app",
+    icon: MessageCircle,
   },
   {
-    icon: GraduationCap,
-    title: "Academics",
-    text: "Notes, PYQs, lab manuals and study resources organized by course.",
+    time: "11:15",
+    label: "Academics",
+    title: "Find the exact module you need.",
+    text: "Move from course → module → notes or PYQs without searching old group chats.",
     href: "/app/academics",
+    icon: GraduationCap,
   },
   {
-    icon: UsersRound,
-    title: "Clubs & communities",
-    text: "Find societies, teams, project partners and people with similar interests.",
+    time: "17:30",
+    label: "Communities",
+    title: "See what people are building.",
+    text: "Clubs, teams, societies and student communities organized around the campus.",
     href: "/app/communities",
+    icon: Users,
   },
   {
-    icon: CalendarDays,
-    title: "Events",
-    text: "Keep fest announcements, competitions and campus activities in one place.",
+    time: "19:00",
+    label: "Events",
+    title: "Know where to show up.",
+    text: "Competitions, talks, fests and campus activities in one place.",
     href: "/app/events",
-  },
-  {
-    icon: Store,
-    title: "Campus marketplace",
-    text: "Trade useful student and hostel items inside a verified campus network.",
-    href: "/app/marketplace",
+    icon: CalendarDays,
   },
 ];
 
 export function CleanWorkflow() {
   return (
-    <section className="border-b border-border/70 bg-muted/20 py-20 sm:py-24">
-      <div className="mx-auto max-w-6xl px-5 sm:px-6">
-        <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <div className="lg:sticky lg:top-24">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">A campus workspace</p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-foreground sm:text-4xl">
-              Everything lives close to the people it matters to.
-            </h2>
-            <p className="mt-4 max-w-lg text-sm leading-6 text-muted-foreground sm:text-base">
-              Move from a class discussion to a study note, from a club announcement to an event — without switching between unrelated groups and apps.
-            </p>
-            <Link
-              href="/overview"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-foreground underline decoration-border underline-offset-4 transition hover:decoration-foreground"
-            >
-              See how CampusLoop works
-              <ArrowRight className="size-4" />
-            </Link>
-          </div>
+    <section className="border-b border-border bg-zinc-950 py-24 text-white sm:py-28">
+      <div className="mx-auto grid max-w-7xl gap-14 px-5 sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
+        <div className="lg:sticky lg:top-24 lg:h-fit">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-400">A day on CampusLoop</p>
+          <h2 className="mt-4 max-w-lg text-4xl font-black tracking-[-0.045em] sm:text-5xl">
+            Built around the rhythm of college.
+          </h2>
+          <p className="mt-5 max-w-md text-sm leading-7 text-zinc-400 sm:text-base">
+            The product changes with the day because student life does. Start with a class question, end up at an event, discover a club in between.
+          </p>
+          <Link
+            href="/overview"
+            className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-white underline decoration-zinc-700 underline-offset-4 transition hover:decoration-white"
+          >
+            See the whole product
+            <ArrowUpRight className="size-4" />
+          </Link>
+        </div>
 
-          <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-background">
-            {items.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.title}
-                  href={item.href}
-                  className="group flex items-center gap-4 p-5 transition hover:bg-muted/50 sm:p-6"
-                >
-                  <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-muted text-muted-foreground transition group-hover:bg-primary/10 group-hover:text-primary">
-                    <Icon className="size-5" />
+        <div className="border-y border-zinc-800">
+          {steps.map((step) => {
+            const Icon = step.icon;
+            return (
+              <Link
+                key={step.time}
+                href={step.href}
+                className="group grid gap-4 border-b border-zinc-800 py-7 last:border-b-0 sm:grid-cols-[72px_1fr_auto] sm:items-start sm:py-8"
+              >
+                <span className="text-xs font-bold tabular-nums text-zinc-600 group-hover:text-blue-400">{step.time}</span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="grid size-8 place-items-center rounded-lg bg-zinc-900 text-zinc-300 ring-1 ring-inset ring-zinc-800">
+                      <Icon className="size-4" />
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500">{step.label}</span>
                   </div>
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-bold text-foreground">{item.title}</h3>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.text}</p>
-                  </div>
-                  <ArrowRight className="ml-auto size-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-                </Link>
-              );
-            })}
+                  <h3 className="mt-3 text-xl font-bold tracking-tight text-white sm:text-2xl">{step.title}</h3>
+                  <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">{step.text}</p>
+                </div>
+                <ArrowUpRight className="hidden size-5 text-zinc-600 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white sm:mt-1 sm:block" />
+              </Link>
+            );
+          })}
+          <div className="grid grid-cols-2 border-t border-zinc-800">
+            <Link href="/app/marketplace" className="group flex items-center gap-3 border-r border-zinc-800 p-5">
+              <Store className="size-4 text-zinc-500 group-hover:text-white" />
+              <span className="text-xs font-bold text-zinc-300 group-hover:text-white">Marketplace</span>
+            </Link>
+            <Link href="/colleges" className="group flex items-center gap-3 p-5">
+              <span className="grid size-4 place-items-center rounded-full border border-zinc-700 text-[8px] font-black text-zinc-400">C</span>
+              <span className="text-xs font-bold text-zinc-300 group-hover:text-white">College directory</span>
+            </Link>
           </div>
         </div>
       </div>

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { ReelsFeedClient } from "@/components/reels/reels-feed-client";
+import { getDb } from "@/db";
+import { reelLikes } from "@/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 import { reelLikes } from "@/db/schema";
 import { getDb } from "@/db";
 import type { FeedPost } from "@/hooks/use-feed";
@@ -68,11 +71,12 @@ export default async function ReelsPage() {
   const likedReels = new Set<string>();
 
   if (profile?.id && reelIds.length > 0) {
-    const likes = await db.query.reelLikes.findMany({
-      where: (table, { and, eq, inArray }) =>
-        and(eq(table.userId, profile.id), inArray(table.reelId, reelIds)),
-      columns: { reelId: true },
-    });
+    const likes = await db
+      .select({ reelId: reelLikes.reelId })
+      .from(reelLikes)
+      .where(
+        and(eq(reelLikes.userId, profile.id), inArray(reelLikes.reelId, reelIds))
+      );
     for (const like of likes) likedReels.add(like.reelId);
   }
 

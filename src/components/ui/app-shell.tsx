@@ -167,7 +167,7 @@ export function FilterPills<T extends string>({
                 onChange(pill.id);
               }}
               className={cn(
-                "flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all active:scale-95",
+                "flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-[color,background-color,border-color,box-shadow,transform] active:scale-95",
                 isActive
                   ? "bg-primary/10 font-bold text-primary ring-1 ring-primary/15"
                   : "border border-border/45 bg-muted/35 text-muted-foreground hover:bg-muted/70 hover:text-foreground"
@@ -207,7 +207,7 @@ export function SearchField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="h-10 w-full rounded-2xl border border-border/55 bg-card/70 pl-10 pr-9 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-primary/50 focus:bg-card focus:ring-4 focus:ring-primary/8"
+          className="h-10 w-full rounded-2xl border border-border/55 bg-card/70 pl-10 pr-9 text-sm text-foreground outline-none transition-[color,background-color,border-color,box-shadow,transform] placeholder:text-muted-foreground focus:border-primary/50 focus:bg-card focus:ring-4 focus:ring-primary/8"
         />
         {value && (
           <button
@@ -343,7 +343,7 @@ export function PrimaryAction({
   disabled?: boolean;
 }) {
   const classes = cn(
-    "flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground transition-all hover:-translate-y-px hover:opacity-95 active:scale-95 disabled:opacity-50",
+    "flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground transition-[color,background-color,border-color,box-shadow,transform] hover:-translate-y-px hover:opacity-95 active:scale-95 disabled:opacity-50",
     className
   );
 

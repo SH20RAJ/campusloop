@@ -43,8 +43,8 @@ export function CleanFooter() {
       links: [
         { label: "Campus Feed", href: "/app" },
         { label: "Confessions", href: "/app/confessions" },
-        { label: "Campus Stories", href: "/app/stories/new" },
-        { label: "Match Mode (18+)", href: "/app/dating" },
+        { label: "Events & Updates", href: "/app/events" },
+        { label: "Campus Match", href: "/app/matching" },
       ],
     },
     {
@@ -76,7 +76,7 @@ export function CleanFooter() {
       links: [
         { label: "Privacy Policy", href: "/privacy" },
         { label: "Terms of Service", href: "/terms" },
-        { label: "Community Guidelines", href: "/guidelines" },
+        { label: "Community Safety", href: "/safety" },
       ],
     },
   ];
@@ -102,7 +102,7 @@ export function CleanFooter() {
   const bottomLinks = [
     { label: "Privacy", href: "/privacy" },
     { label: "Terms", href: "/terms" },
-    { label: "Guidelines", href: "/guidelines" },
+    { label: "Safety", href: "/safety" },
   ];
 
   return (

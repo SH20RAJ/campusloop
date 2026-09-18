@@ -2,34 +2,46 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  ArrowDown,
   ArrowLeft,
+  ArrowRight,
   BadgeCheck,
-  Bookmark,
-  Check,
+  BookOpen,
   ChevronDown,
   ChevronUp,
-  ExternalLink,
+  Compass,
   Heart,
   MessageCircle,
-  Music2,
+  MoreHorizontal,
   Pause,
   Play,
-  Repeat2,
-  Share2,
-  UserPlus,
+  Sparkles,
   Volume2,
   VolumeX,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimateVideo } from "@/components/ui/animated-icon";
+import type { FeedPost } from "@/hooks/use-feed";
+import {
+  fetcher,
+  likeReel,
+  repostPost,
+  saveReel,
+  toggleFollowUser,
+  trackReelTelemetry,
+} from "@/lib/api";
+import { haptics } from "@/lib/haptics";
+import { isOnline } from "@/lib/presence";
+import { sounds } from "@/lib/sounds";
+import { useHlsVideo, pauseAllReelMedia } from "@/hooks/use-hls-video";
+import { cn, formatTimeAgo, getAvatarUrl, getCollegeShortName } from "@/lib/utils";
+import { extractVideoStreamInfo } from "@/lib/video/stream-helper";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PresenceDot } from "@/components/ui/presence-dot";
-import type { FeedPost } from "@/hooks/use-feed";
 
-// Dynamically import heavy modals to avoid blocking initial render
 const FastCommentsModal = dynamic(
   () => import("@/components/feed/fast-comments-modal").then((m) => m.FastCommentsModal),
   { ssr: false }
@@ -43,25 +55,10 @@ const PostLikesModal = dynamic(
   { ssr: false }
 );
 
-// Hoisted regular expressions to prevent repeated allocations in reel slides
 const HASHTAG_REGEX = /#[a-zA-Z0-9_]+/g;
 const MD_VIDEO_REGEX = /!\[.*?\]\(((?:https?:\/\/[^\s)]+|\/api\/files\/r2\/[^\s)]+)(?:\.(?:mp4|webm|mov|ogg)[^\s)]*|[^\s)]*videos[^\s)]*))\)/i;
 const R2_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']*)?\/api\/files\/r2\/videos\/[^\s<>"']+)/i;
 const RAW_VIDEO_REGEX = /((?:https?:\/\/[^\s<>"']+|\/api\/files\/r2\/[^\s<>"']+)\.(?:mp4|webm|mov|ogg)[^\s<>"']*)/i;
-import {
-  fetcher,
-  likeReel,
-  repostPost,
-  saveReel,
-  toggleFollowUser,
-  trackReelTelemetry,
-} from "@/lib/api";
-import { haptics } from "@/lib/haptics";
-import { isOnline } from "@/lib/presence";
-import { sounds } from "@/lib/sounds";
-import { cn, formatTimeAgo, getAvatarUrl, getCollegeShortName } from "@/lib/utils";
-import { extractVideoStreamInfo } from "@/lib/video/stream-helper";
-import { useHlsVideo, pauseAllReelMedia } from "@/hooks/use-hls-video";
 
 interface ReelsFeedClientProps {
   initialPosts: FeedPost[];
@@ -69,86 +66,23 @@ interface ReelsFeedClientProps {
   collegeName?: string;
 }
 
-export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: ReelsFeedClientProps) {
-  const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("campusloop_reels_muted");
-      if (saved !== null) {
-        return saved === "true";
-      }
-    }
-    return false;
-  });
+type FeedMode = "for_you" | "campus" | "fresh";
 
-  const toggleMute = useCallback(() => {
-    setIsMuted((prev) => {
-      const next = !prev;
-      if (typeof window !== "undefined") {
-        try {
-          localStorage.setItem("campusloop_reels_muted", String(next));
-        } catch {}
-      }
-      return next;
-    });
-  }, []);
-  const [selectedPostForComments, setSelectedPostForComments] = useState<FeedPost | null>(null);
-  const [selectedPostForRepost, setSelectedPostForRepost] = useState<FeedPost | null>(null);
-  const [selectedPostForLikes, setSelectedPostForLikes] = useState<FeedPost | null>(null);
-  const [quoteThoughts, setQuoteThoughts] = useState("");
-  const [isReposting, setIsReposting] = useState(false);
-  const [page, setPage] = useState(1);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+const FEED_MODES: Array<{ id: FeedMode; label: string; description: string }> = [
+  { id: "for_you", label: "For you", description: "Personalized from what you watch" },
+  { id: "campus", label: "Your campus", description: "Closer to your college community" },
+  { id: "fresh", label: "Fresh", description: "Newest campus-first clips" },
+];
 
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const isProgrammaticScrollRef = useRef(false);
-  const isWheelingRef = useRef(false);
-  const touchStartYRef = useRef<number | null>(null);
-
-  // Complete media silencing on page unmount and browser navigation
-  useEffect(() => {
-    const handleNavigationAway = () => {
-      pauseAllReelMedia();
-    };
-
-    window.addEventListener("pagehide", handleNavigationAway);
-    window.addEventListener("beforeunload", handleNavigationAway);
-
-    return () => {
-      pauseAllReelMedia();
-      window.removeEventListener("pagehide", handleNavigationAway);
-      window.removeEventListener("beforeunload", handleNavigationAway);
-    };
-  }, []);
-
-  // Smooth scroll to a specific reel index
-  const scrollToIndex = useCallback(
-    (index: number) => {
-      if (!containerRef.current || index < 0 || index >= posts.length) return;
-      sounds.tap();
-      haptics.light();
-      isProgrammaticScrollRef.current = true;
-      const targetElement = containerRef.current.children[index] as HTMLElement;
-      if (targetElement) {
-        targetElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-      setActiveIndex(index);
-      setTimeout(() => {
-        isProgrammaticScrollRef.current = false;
-      }, 400);
-    },
-    [posts.length]
-  );
-
-const SEEN_STORAGE_KEY = "campusloop_seen_reels_v2";
+const SEEN_STORAGE_KEY = "campusloop_seen_reels_v3";
 const SEEN_COOKIE_NAME = "campusloop_seen_reels";
 
 function getLocalSeenIds(): string[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(SEEN_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === "string") : [];
   } catch {
     return [];
   }
@@ -157,201 +91,237 @@ function getLocalSeenIds(): string[] {
 function syncSeenCookie(ids: string[]) {
   if (typeof document === "undefined") return;
   try {
-    const slice = ids.slice(0, 80);
-    document.cookie = `${SEEN_COOKIE_NAME}=${encodeURIComponent(slice.join(","))}; path=/; max-age=604800; SameSite=Lax`;
+    const slice = ids.slice(0, 160);
+    document.cookie = `${SEEN_COOKIE_NAME}=${encodeURIComponent(slice.join(","))}; path=/; max-age=1209600; SameSite=Lax`;
   } catch {}
 }
 
 function recordLocalSeenId(id: string) {
   if (typeof window === "undefined" || !id) return;
   try {
-    const cleanId = id.split("-cycle-")[0];
-    const current = getLocalSeenIds();
-    if (!current.includes(cleanId)) {
-      const updated = [cleanId, ...current].slice(0, 1000);
-      localStorage.setItem(SEEN_STORAGE_KEY, JSON.stringify(updated));
-      syncSeenCookie(updated);
-    }
+    const clean = id.split("-cycle-")[0];
+    const current = getLocalSeenIds().filter((item) => item !== clean);
+    const next = [clean, ...current].slice(0, 1200);
+    localStorage.setItem(SEEN_STORAGE_KEY, JSON.stringify(next));
+    syncSeenCookie(next);
   } catch {}
 }
 
-  // On client mount, sync seen cookie and re-order initial posts so unseen reels always play first
-  useEffect(() => {
-    const localSeen = getLocalSeenIds();
-    if (localSeen.length === 0) return;
-    syncSeenCookie(localSeen);
-
-    const seenSet = new Set(localSeen);
-    const unseen = initialPosts.filter((p) => !seenSet.has(p.id.split("-cycle-")[0]));
-    const seen = initialPosts.filter((p) => seenSet.has(p.id.split("-cycle-")[0]));
-
-    if (unseen.length > 0 && seen.length > 0) {
-      // Prioritize unseen reels over previously seen reels
-      setPosts([...unseen, ...seen]);
-    } else if (unseen.length === 0 && initialPosts.length > 0) {
-      // User has already watched all initial posts! Fetch fresh unseen reels immediately
-      const excludeParam = encodeURIComponent(localSeen.slice(0, 100).join(","));
-      fetcher<FeedPost[] | { posts: FeedPost[]; reels?: any[] }>(
-        `/api/reels?page=1&limit=15&sort=trending&excludeIds=${excludeParam}`
-      )
-        .then((res) => {
-          const raw: FeedPost[] = Array.isArray(res) ? res : res?.posts || [];
-          const fresh = raw.filter((p) => !seenSet.has(p.id.split("-cycle-")[0]));
-          if (fresh.length > 0) {
-            setPosts((prev) => {
-              const freshIds = new Set(fresh.map((p) => p.id));
-              const remainder = prev.filter((p) => !freshIds.has(p.id));
-              return [...fresh, ...remainder];
-            });
-          }
-        })
-        .catch(() => {});
+export function ReelsFeedClient({ initialPosts, currentUserId, collegeName }: ReelsFeedClientProps) {
+  const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [feedMode, setFeedMode] = useState<FeedMode>("for_you");
+  const [isMuted, setIsMuted] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("campusloop_reels_muted");
+      return saved === null ? true : saved === "true";
     }
-  }, [initialPosts]);
+    return true;
+  });
+  const [selectedPostForComments, setSelectedPostForComments] = useState<FeedPost | null>(null);
+  const [selectedPostForRepost, setSelectedPostForRepost] = useState<FeedPost | null>(null);
+  const [selectedPostForLikes, setSelectedPostForLikes] = useState<FeedPost | null>(null);
+  const [quoteThoughts, setQuoteThoughts] = useState("");
+  const [isReposting, setIsReposting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isSwitchingMode, setIsSwitchingMode] = useState(false);
 
-  // Sync URL shallowly with active reel slug/id on scroll and track seen state
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const isProgrammaticScrollRef = useRef(false);
+  const isWheelingRef = useRef(false);
+  const touchStartYRef = useRef<number | null>(null);
+
+  const toggleMute = useCallback(() => {
+    setIsMuted((previous) => {
+      const next = !previous;
+      try {
+        localStorage.setItem("campusloop_reels_muted", String(next));
+      } catch {}
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
-    const activeReel = posts[activeIndex];
-    if (activeReel) {
-      const activeSlug = activeReel.id.split("-cycle-")[0];
-      recordLocalSeenId(activeSlug);
-      const targetUrl = `/app/reels/${activeSlug}`;
-      if (typeof window !== "undefined" && window.location.pathname !== targetUrl) {
-        window.history.replaceState(null, "", targetUrl);
+    const stopMedia = () => pauseAllReelMedia();
+    window.addEventListener("pagehide", stopMedia);
+    window.addEventListener("beforeunload", stopMedia);
+    return () => {
+      stopMedia();
+      window.removeEventListener("pagehide", stopMedia);
+      window.removeEventListener("beforeunload", stopMedia);
+    };
+  }, []);
+
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      if (!containerRef.current || index < 0 || index >= posts.length) return;
+      isProgrammaticScrollRef.current = true;
+      const target = containerRef.current.children[index] as HTMLElement | undefined;
+      target?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      setActiveIndex(index);
+      setTimeout(() => {
+        isProgrammaticScrollRef.current = false;
+      }, 400);
+    },
+    [posts.length],
+  );
+
+  const fetchMode = useCallback(async (mode: FeedMode, nextPage = 1) => {
+    const seen = getLocalSeenIds().slice(0, 160);
+    const exclude = seen.length ? `&excludeIds=${encodeURIComponent(seen.join(","))}` : "";
+    const data = await fetcher<{ posts?: FeedPost[]; reels?: unknown[] }>(
+      `/api/reels?page=${nextPage}&limit=14&mode=${mode}${exclude}`,
+    );
+    return Array.isArray(data) ? data : data.posts || [];
+  }, []);
+
+  const switchFeedMode = useCallback(
+    async (mode: FeedMode) => {
+      if (mode === feedMode || isSwitchingMode) return;
+      setIsSwitchingMode(true);
+      try {
+        const fresh = await fetchMode(mode, 1);
+        setFeedMode(mode);
+        setPosts(fresh);
+        setPage(1);
+        setActiveIndex(0);
+        containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+        window.history.replaceState(null, "", "/app/reels");
+      } catch {
+        toast.error("Couldn't refresh this reel mix");
+      } finally {
+        setIsSwitchingMode(false);
       }
-    }
-  }, [activeIndex, posts]);
+    },
+    [feedMode, fetchMode, isSwitchingMode],
+  );
 
-  // Preload more video reels with strict excludeIds deduplication & persistent seen filtering
   const loadMoreReels = useCallback(async () => {
-    if (isLoadingMore) return;
+    if (isLoadingMore || posts.length === 0) return;
     setIsLoadingMore(true);
     try {
-      const nextPage = page + 1;
+      const inMemory = posts.map((post) => post.id.split("-cycle-")[0]);
       const localSeen = getLocalSeenIds();
-      const inMemorySeen = posts.map((p) => p.id.split("-cycle-")[0]);
-      const combinedExclude = Array.from(new Set([...localSeen, ...inMemorySeen])).slice(0, 150);
-      const excludeParam =
-        combinedExclude.length > 0 ? `&excludeIds=${encodeURIComponent(combinedExclude.join(","))}` : "";
-      const data = await fetcher<FeedPost[] | { posts: FeedPost[]; reels?: any[] }>(
-        `/api/reels?page=${nextPage}&limit=12&sort=trending${excludeParam}`
+      const exclude = Array.from(new Set([...localSeen, ...inMemory])).slice(0, 500);
+      const query = exclude.length ? `&excludeIds=${encodeURIComponent(exclude.join(","))}` : "";
+      const data = await fetcher<{ posts?: FeedPost[]; reels?: unknown[] }>(
+        `/api/reels?page=${page + 1}&limit=14&mode=${feedMode}${query}`,
       );
-      const rawPosts: FeedPost[] = Array.isArray(data) ? data : data?.posts || [];
-
-      setPosts((prev) => {
-        const existingIds = new Set(prev.map((p) => p.id.split("-cycle-")[0]));
-        const localSeenSet = new Set(localSeen);
-        // Strict deduplication: filter out any reels already in state or marked seen
-        const fresh = rawPosts.filter((p) => !existingIds.has(p.id) && !localSeenSet.has(p.id));
-
-        if (fresh.length > 0) {
-          return [...prev, ...fresh];
-        }
-        // Fallback if client has already seen many: only append items not currently in view
-        const unseenInSession = rawPosts.filter((p) => !existingIds.has(p.id));
-        if (unseenInSession.length > 0) {
-          return [...prev, ...unseenInSession];
-        }
-        // Never cycle duplicates to the user
-        return prev;
-      });
-      setPage(nextPage);
+      const fresh = (Array.isArray(data) ? data : data.posts || []).filter(
+        (post) => !new Set(posts.map((item) => item.id.split("-cycle-")[0])).has(post.id.split("-cycle-")[0]),
+      );
+      if (fresh.length) {
+        setPosts((current) => [...current, ...fresh]);
+        setPage((current) => current + 1);
+      }
     } catch {
-      // Ignore network errors
+      // Keep the current queue intact.
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, page, posts]);
+  }, [feedMode, isLoadingMore, page, posts]);
 
   useEffect(() => {
-    if (activeIndex >= posts.length - 2) {
+    if (activeIndex >= posts.length - 3) {
       loadMoreReels();
     }
-  }, [activeIndex, posts.length, loadMoreReels]);
+  }, [activeIndex, loadMoreReels, posts.length]);
 
-  // Desktop Mouse Wheel handler
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      if (selectedPostForComments || selectedPostForRepost) return;
-      if (isWheelingRef.current || isProgrammaticScrollRef.current) return;
+  useEffect(() => {
+    const active = posts[activeIndex];
+    if (!active) return;
+    const id = active.id.split("-cycle-")[0];
+    recordLocalSeenId(id);
+    if (window.location.pathname !== `/app/reels/${id}`) {
+      window.history.replaceState(null, "", `/app/reels/${id}`);
+    }
+  }, [activeIndex, posts]);
 
-      const threshold = 30;
-      if (e.deltaY > threshold) {
-        if (activeIndex < posts.length - 1) {
-          isWheelingRef.current = true;
-          scrollToIndex(activeIndex + 1);
-          setTimeout(() => {
-            isWheelingRef.current = false;
-          }, 450);
-        }
-      } else if (e.deltaY < -threshold) {
-        if (activeIndex > 0) {
-          isWheelingRef.current = true;
-          scrollToIndex(activeIndex - 1);
-          setTimeout(() => {
-            isWheelingRef.current = false;
-          }, 450);
-        }
-      }
+  const handleNotInterested = useCallback(
+    async (post: FeedPost) => {
+      await trackReelTelemetry({
+        postId: post.id,
+        watchDurationMs: 0,
+        videoDurationMs: 0,
+        loopCount: 0,
+        completed: false,
+        skippedQuickly: true,
+        action: "skip",
+        tags: post.body.match(HASHTAG_REGEX)?.map((tag) => tag.slice(1)) || [],
+        authorId: post.author?.id,
+        institutionId: post.institutionId,
+      });
+
+      setPosts((current) => current.filter((item) => item.id !== post.id));
+      setActiveIndex((index) => Math.max(0, Math.min(index, posts.length - 2)));
+      toast.success("We'll tune your next reels from this");
     },
-    [activeIndex, posts.length, scrollToIndex, selectedPostForComments, selectedPostForRepost]
+    [posts.length],
   );
 
-  // Mobile Touch Swipe handlers
-  function handleTouchStart(e: React.TouchEvent) {
-    if (selectedPostForComments || selectedPostForRepost) return;
-    touchStartYRef.current = e.touches[0].clientY;
-  }
-
-  function handleTouchEnd(e: React.TouchEvent) {
-    if (selectedPostForComments || selectedPostForRepost || touchStartYRef.current === null) return;
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaY = touchStartYRef.current - touchEndY;
-    touchStartYRef.current = null;
-
-    const swipeThreshold = 45;
-    if (deltaY > swipeThreshold) {
-      if (activeIndex < posts.length - 1) {
+  const handleWheel = useCallback(
+    (event: React.WheelEvent) => {
+      if (selectedPostForComments || selectedPostForRepost || isWheelingRef.current) return;
+      if (Math.abs(event.deltaY) < 28) return;
+      isWheelingRef.current = true;
+      if (event.deltaY > 0 && activeIndex < posts.length - 1) {
         scrollToIndex(activeIndex + 1);
-      }
-    } else if (deltaY < -swipeThreshold) {
-      if (activeIndex > 0) {
+      } else if (event.deltaY < 0 && activeIndex > 0) {
         scrollToIndex(activeIndex - 1);
       }
-    }
-  }
+      setTimeout(() => {
+        isWheelingRef.current = false;
+      }, 420);
+    },
+    [activeIndex, posts.length, scrollToIndex, selectedPostForComments, selectedPostForRepost],
+  );
 
-  // Keyboard navigation (ArrowDown, ArrowUp, J, K, Mute)
+  const handleTouchStart = useCallback((event: React.TouchEvent) => {
+    if (selectedPostForComments || selectedPostForRepost) return;
+    touchStartYRef.current = event.touches[0]?.clientY ?? null;
+  }, [selectedPostForComments, selectedPostForRepost]);
+
+  const handleTouchEnd = useCallback(
+    (event: React.TouchEvent) => {
+      if (selectedPostForComments || selectedPostForRepost || touchStartYRef.current === null) return;
+      const delta = touchStartYRef.current - (event.changedTouches[0]?.clientY ?? touchStartYRef.current);
+      touchStartYRef.current = null;
+      if (Math.abs(delta) < 45) return;
+      if (delta > 0 && activeIndex < posts.length - 1) scrollToIndex(activeIndex + 1);
+      if (delta < 0 && activeIndex > 0) scrollToIndex(activeIndex - 1);
+    },
+    [activeIndex, posts.length, scrollToIndex, selectedPostForComments, selectedPostForRepost],
+  );
+
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (selectedPostForComments || selectedPostForRepost) return;
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-
-      if (e.key === "ArrowDown" || e.key === "j" || e.key === "J") {
-        e.preventDefault();
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+      if (event.key === "ArrowDown" || event.key.toLowerCase() === "j") {
+        event.preventDefault();
         if (activeIndex < posts.length - 1) scrollToIndex(activeIndex + 1);
-      } else if (e.key === "ArrowUp" || e.key === "k" || e.key === "K") {
-        e.preventDefault();
-        if (activeIndex > 0) scrollToIndex(activeIndex - 1);
-      } else if (e.key === "m" || e.key === "M") {
-        e.preventDefault();
-        setIsMuted((prev) => !prev);
       }
-    }
-
+      if (event.key === "ArrowUp" || event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        if (activeIndex > 0) scrollToIndex(activeIndex - 1);
+      }
+      if (event.key.toLowerCase() === "m") {
+        event.preventDefault();
+        toggleMute();
+      }
+    };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeIndex, posts.length, scrollToIndex, selectedPostForComments, selectedPostForRepost]);
+  }, [activeIndex, posts.length, scrollToIndex, selectedPostForComments, selectedPostForRepost, toggleMute]);
 
-  // Track scroll position when user manually drags scrollbar
   const handleScroll = useCallback(() => {
     if (isProgrammaticScrollRef.current || !containerRef.current) return;
-    const container = containerRef.current;
-    const itemHeight = container.clientHeight;
-    if (itemHeight <= 0) return;
-    const newIndex = Math.round(container.scrollTop / itemHeight);
-    if (newIndex !== activeIndex && newIndex >= 0 && newIndex < posts.length) {
-      setActiveIndex(newIndex);
+    const height = containerRef.current.clientHeight;
+    if (!height) return;
+    const nextIndex = Math.round(containerRef.current.scrollTop / height);
+    if (nextIndex >= 0 && nextIndex < posts.length && nextIndex !== activeIndex) {
+      setActiveIndex(nextIndex);
     }
   }, [activeIndex, posts.length]);
 
@@ -362,15 +332,40 @@ function recordLocalSeenId(id: string) {
       await repostPost(selectedPostForRepost.id, withCommentary ? quoteThoughts : undefined);
       sounds.tap();
       haptics.repost();
-      toast.success(withCommentary ? "Quote posted to your campus timeline" : "Reel reposted to your campus timeline");
+      toast.success(withCommentary ? "Quote posted to your campus" : "Reel reposted to your campus");
       setSelectedPostForRepost(null);
       setQuoteThoughts("");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to repost reel");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to repost reel");
     } finally {
       setIsReposting(false);
     }
   }
+
+  if (!posts.length) {
+    return (
+      <div className="grid min-h-[100dvh] place-items-center bg-zinc-950 px-6 text-center text-white">
+        <div className="max-w-md">
+          <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-white/10">
+            <Sparkles className="size-6 text-blue-300" />
+          </div>
+          <h1 className="mt-5 text-2xl font-black">You’ve seen the current campus mix.</h1>
+          <p className="mt-2 text-sm leading-6 text-white/60">
+            Switch to Fresh or Your campus for another set of clips.
+          </p>
+          <button
+            type="button"
+            onClick={() => switchFeedMode("fresh")}
+            className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-black"
+          >
+            Show fresh reels <ArrowRight className="size-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const activeReel = posts[activeIndex];
 
   const repostAuthorHandle = selectedPostForRepost
     ? selectedPostForRepost.isAnonymous
@@ -379,114 +374,147 @@ function recordLocalSeenId(id: string) {
     : "campusloop";
 
   return (
-    <div className="relative h-[100dvh] w-full bg-black text-white flex justify-center items-center overflow-hidden select-none">
-      {/* Top Overlay Header */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-auto">
-        <div className="flex items-center gap-3">
+    <div className="relative h-[100dvh] w-full overflow-hidden bg-[#050607] text-white select-none">
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 px-3 py-3 sm:px-5">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <Link
             href="/app"
-            className="flex size-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white transition-all active:scale-95 cursor-pointer shadow-lg"
-            title="Back to Campus Feed"
-            aria-label="Back to Campus Feed"
+            className="pointer-events-auto inline-flex size-10 items-center justify-center rounded-2xl border border-white/10 bg-black/45 text-white backdrop-blur-xl transition hover:bg-black/60"
+            aria-label="Back to campus feed"
           >
-            <ArrowLeft className="size-5" />
+            <ArrowLeft className="size-4" />
           </Link>
 
-          <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center size-7 rounded-lg bg-gradient-to-tr from-rose-500 to-purple-600 shadow-md">
-              <AnimateVideo className="size-4 text-white" />
-            </span>
-            <span className="font-black text-base tracking-tight bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
-              Campus Reels
-            </span>
-            {collegeName && (
-              <span className="hidden sm:inline-block text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/15">
-                {collegeName}
-              </span>
-            )}
+          <div className="pointer-events-auto hidden items-center gap-1 rounded-2xl border border-white/10 bg-black/45 p-1 backdrop-blur-xl md:flex">
+            {FEED_MODES.map((mode) => (
+              <button
+                key={mode.id}
+                type="button"
+                onClick={() => switchFeedMode(mode.id)}
+                disabled={isSwitchingMode}
+                title={mode.description}
+                className={cn(
+                  "rounded-xl px-4 py-2 text-xs font-bold transition",
+                  feedMode === mode.id ? "bg-white text-black" : "text-white/65 hover:bg-white/10 hover:text-white",
+                )}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="pointer-events-auto flex items-center gap-2">
+            <div className="hidden rounded-2xl border border-white/10 bg-black/45 px-3 py-2 text-right backdrop-blur-xl sm:block">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">{collegeName || "CampusLoop"}</p>
+              <p className="text-[11px] font-bold text-white">{activeIndex + 1} <span className="text-white/35">/</span> {posts.length}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => { toggleMute(); haptics.light(); }}
+              className="inline-flex h-10 items-center gap-2 rounded-2xl border border-white/10 bg-black/45 px-3 text-xs font-bold text-white backdrop-blur-xl transition hover:bg-black/60"
+              aria-label={isMuted ? "Unmute sound" : "Mute sound"}
+            >
+              {isMuted ? <VolumeX className="size-4 text-white/70" /> : <Volume2 className="size-4 text-emerald-300" />}
+              <span className="hidden sm:inline">{isMuted ? "Sound off" : "Sound on"}</span>
+            </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Global Sound Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              toggleMute();
-              haptics.light();
-            }}
-            className="flex size-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white transition-all active:scale-95 cursor-pointer"
-            title={isMuted ? "Unmute sound" : "Mute sound"}
-          >
-            {isMuted ? <VolumeX className="size-4 text-white/80" /> : <Volume2 className="size-4 text-white" />}
-          </button>
+        <div className="mx-auto mt-3 max-w-7xl md:hidden">
+          <div className="flex gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-black/45 p-1 backdrop-blur-xl no-scrollbar">
+            {FEED_MODES.map((mode) => (
+              <button
+                key={mode.id}
+                type="button"
+                onClick={() => switchFeedMode(mode.id)}
+                disabled={isSwitchingMode}
+                className={cn(
+                  "min-w-max rounded-xl px-4 py-2 text-xs font-bold transition",
+                  feedMode === mode.id ? "bg-white text-black" : "text-white/65",
+                )}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
-      {/* Main Reels Snap Container */}
       <div
         ref={containerRef}
         onWheel={handleWheel}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onScroll={handleScroll}
-        className="h-[100dvh] w-full snap-y snap-mandatory overflow-y-scroll no-scrollbar"
+        aria-label="Campus reels"
+        className="h-[100dvh] w-full snap-y snap-mandatory overflow-y-scroll no-scrollbar overscroll-y-contain"
       >
-        {posts.map((post, idx) => (
+        {posts.map((post, index) => (
           <SingleReelItem
             key={post.id}
             post={post}
-            isActive={idx === activeIndex}
+            isActive={index === activeIndex}
             isMuted={isMuted}
             onToggleMute={toggleMute}
             onOpenComments={() => setSelectedPostForComments(post)}
             onOpenRepost={() => setSelectedPostForRepost(post)}
             onOpenLikes={() => setSelectedPostForLikes(post)}
+            onNotInterested={() => handleNotInterested(post)}
             currentUserId={currentUserId}
           />
         ))}
       </div>
 
-      {/* Desktop Navigation Floating Arrows */}
-      <div className="hidden md:flex fixed right-8 bottom-10 z-30 flex-col gap-2 pointer-events-auto">
+      <div className="pointer-events-auto fixed bottom-8 right-5 z-40 hidden flex-col gap-2 md:flex">
         <button
           type="button"
           onClick={() => activeIndex > 0 && scrollToIndex(activeIndex - 1)}
-          disabled={activeIndex === 0}
-          className="flex size-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/15 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 cursor-pointer shadow-xl"
-          title="Previous Reel (Up Arrow / K)"
+          disabled={activeIndex === 0 || isSwitchingMode}
+          className="grid size-11 place-items-center rounded-2xl border border-white/10 bg-black/45 text-white backdrop-blur-xl transition hover:bg-black/60 disabled:opacity-30"
+          aria-label="Previous reel"
         >
           <ChevronUp className="size-5" />
         </button>
         <button
           type="button"
           onClick={() => activeIndex < posts.length - 1 && scrollToIndex(activeIndex + 1)}
-          disabled={activeIndex === posts.length - 1}
-          className="flex size-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/15 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 cursor-pointer shadow-xl"
-          title="Next Reel (Down Arrow / J)"
+          disabled={activeIndex === posts.length - 1 || isSwitchingMode}
+          className="grid size-11 place-items-center rounded-2xl border border-white/10 bg-black/45 text-white backdrop-blur-xl transition hover:bg-black/60 disabled:opacity-30"
+          aria-label="Next reel"
         >
           <ChevronDown className="size-5" />
         </button>
       </div>
 
-      {/* Fast Comments Modal */}
+      <div className="pointer-events-none fixed bottom-5 left-1/2 z-40 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-black/45 px-3 py-2 text-[10px] font-bold text-white/65 backdrop-blur-xl lg:flex">
+        <ArrowDown className="size-3.5" />
+        Swipe or scroll for the next campus moment
+      </div>
+
+      {isSwitchingMode && (
+        <div className="pointer-events-none fixed inset-0 z-60 grid place-items-center bg-black/25 backdrop-blur-[2px]">
+          <div className="rounded-full border border-white/10 bg-black/60 px-4 py-2 text-xs font-bold text-white backdrop-blur-xl">
+            Finding a new mix…
+          </div>
+        </div>
+      )}
+
       {selectedPostForComments && (
         <FastCommentsModal
           post={selectedPostForComments}
-          isOpen={Boolean(selectedPostForComments)}
+          isOpen
           onClose={() => setSelectedPostForComments(null)}
           onCommentCountChange={(newCount) => {
             setPosts((prev) =>
-              prev.map((p) => (p.id === selectedPostForComments.id ? { ...p, commentsCount: newCount } : p))
+              prev.map((item) => (item.id === selectedPostForComments.id ? { ...item, commentsCount: newCount } : item)),
             );
           }}
         />
       )}
 
-      {/* Repost Modal */}
       {selectedPostForRepost && (
         <FeedCardRepostModal
-          isOpen={Boolean(selectedPostForRepost)}
+          isOpen
           onClose={() => {
             setSelectedPostForRepost(null);
             setQuoteThoughts("");
@@ -499,11 +527,10 @@ function recordLocalSeenId(id: string) {
         />
       )}
 
-      {/* Post Likes Modal */}
       {selectedPostForLikes && (
         <PostLikesModal
           postId={selectedPostForLikes.id.split("-cycle-")[0]}
-          isOpen={Boolean(selectedPostForLikes)}
+          isOpen
           onClose={() => setSelectedPostForLikes(null)}
           currentUserId={currentUserId}
         />
@@ -524,6 +551,7 @@ interface SingleReelItemProps {
   onOpenComments: () => void;
   onOpenRepost: () => void;
   onOpenLikes: () => void;
+  onNotInterested: () => void;
   currentUserId?: string;
 }
 
@@ -539,6 +567,7 @@ function SingleReelItem({
   onOpenComments,
   onOpenRepost,
   onOpenLikes,
+  onNotInterested,
   currentUserId,
 }: SingleReelItemProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -730,10 +759,6 @@ function SingleReelItem({
 
   // Video tap with 260ms debounce to separate single-tap toggle from double-tap like
   function handleVideoTap() {
-    // If currently muted, tapping anywhere on the video immediately enables sound!
-    if (isMuted) {
-      onToggleMute();
-    }
     const now = getCurrentTimestamp();
     const diff = now - lastTapTimeRef.current;
 
@@ -956,7 +981,8 @@ function SingleReelItem({
               ref={videoRef}
               playsInline
               loop
-              preload="auto"
+              preload="metadata"
+              poster={post.externalPost?.media?.[0]?.thumbnailUrl || undefined}
               crossOrigin="anonymous"
               onTimeUpdate={handleTimeUpdate}
               onEnded={handleVideoEnded}

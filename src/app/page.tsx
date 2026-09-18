@@ -166,7 +166,7 @@ export default async function LandingPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
+    <div className="campusloop-landing flex min-h-screen flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

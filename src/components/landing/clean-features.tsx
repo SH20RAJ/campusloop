@@ -1,5 +1,3 @@
-"use client";
-
 import { BadgeCheck, BookOpen, MessageSquare, Users } from "lucide-react";
 import Link from "next/link";
 

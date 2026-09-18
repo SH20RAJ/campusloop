@@ -43,8 +43,8 @@ export const metadata: Metadata = {
     "campus matches",
     "verified student",
     "Indian college students",
-    "campus gossip",
-    "college dating",
+    "campus events",
+    "college notes",
   ],
   manifest: "/manifest.json",
   appleWebApp: {
@@ -106,7 +106,7 @@ export const metadata: Metadata = {
     title: "CampusLoop | Your Verified Campus Social Network",
     description:
       "Join your real campus. Speak freely. Stay safe. Meet students like you. Share confessions, run polls, and connect securely.",
-    creator: "@campusloop",
+    creator: "@mycampusloop",
     images: ["https://campusloop.space/og-image.png"],
   },
   category: "social networking",
@@ -312,7 +312,7 @@ export default function RootLayout({
                 "https://x.com/mycampusloop",
               ],
               description:
-                "CampusLoop connects students across 1,350+ Indian colleges with verified campus feeds, confessions, dating matches, and sub-hubs.",
+                "CampusLoop connects college students across India with verified campus conversations, communities, events, and academic resources.",
             }),
           }}
         />

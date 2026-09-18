@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheck, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -13,29 +13,23 @@ export function MinimalLandingNavbar({ isAuthenticated = false }: MinimalLanding
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const links = [
-    { label: "Campus Feed", href: "/app" },
-    { label: "Colleges Directory", href: "/colleges" },
-    { label: "Academics & PYQs", href: "/app/academics" },
-    { label: "For Aspirants", href: "/aspirants" },
+    { label: "Campus", href: "/colleges" },
+    { label: "Academics", href: "/app/academics" },
+    { label: "Communities", href: "/app/communities" },
+    { label: "Aspirants", href: "/aspirants" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/85 backdrop-blur-md transition-all">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-        {/* Brand */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground font-black text-sm shadow-xs transition-transform group-hover:scale-105">
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-6">
+        <Link href="/" className="group flex items-center gap-2.5" aria-label="CampusLoop home">
+          <span className="grid size-8 place-items-center rounded-xl bg-primary text-sm font-black text-primary-foreground shadow-sm transition-transform group-hover:-translate-y-0.5">
             C
-          </div>
-          <span className="font-bold tracking-tight text-foreground text-base">CampusLoop</span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-            <BadgeCheck className="size-3" />
-            Verified
           </span>
+          <span className="text-[15px] font-bold tracking-tight text-foreground">CampusLoop</span>
         </Link>
 
-        {/* Desktop Links */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav aria-label="Primary navigation" className="hidden items-center gap-7 md:flex">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -47,55 +41,51 @@ export function MinimalLandingNavbar({ isAuthenticated = false }: MinimalLanding
           ))}
         </nav>
 
-        {/* Right CTA & Controls */}
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="hidden items-center gap-2.5 sm:flex">
           <ThemeToggle />
           <Link
-            href={isAuthenticated ? "/app" : "/app"}
-            className="inline-flex h-8 items-center justify-center rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-xs hover:opacity-90 transition-all active:scale-95"
+            href="/app"
+            className="inline-flex h-9 items-center rounded-lg bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-xs transition hover:opacity-90"
           >
-            {isAuthenticated ? "Go to Feed →" : "Enter Campus →"}
+            {isAuthenticated ? "Open Campus" : "Join Campus"}
           </Link>
         </div>
 
-        {/* Mobile Hamburger Toggle */}
-        <div className="flex sm:hidden items-center gap-2">
+        <div className="flex items-center gap-2 sm:hidden">
           <ThemeToggle />
           <button
             type="button"
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="flex size-8 items-center justify-center rounded-md border border-border/50 text-muted-foreground hover:text-foreground"
-            aria-label="Toggle Navigation Menu"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="grid size-9 place-items-center rounded-lg border border-border bg-background text-muted-foreground transition hover:text-foreground"
+            aria-label={mobileMenuOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="sm:hidden border-b border-border/40 bg-background px-4 py-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
-          <nav className="flex flex-col gap-2">
+        <div className="border-t border-border/70 bg-background md:hidden">
+          <nav aria-label="Mobile navigation" className="mx-auto flex max-w-6xl flex-col px-5 py-3">
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
+                className="rounded-lg px-2 py-3 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
               >
                 {link.label}
               </Link>
             ))}
-          </nav>
-          <div className="pt-2 border-t border-border/30">
             <Link
               href="/app"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex w-full h-9 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground shadow-xs"
+              className="mt-2 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
             >
-              {isAuthenticated ? "Go to Feed →" : "Enter Campus →"}
+              {isAuthenticated ? "Open Campus" : "Join Campus"}
             </Link>
-          </div>
+          </nav>
         </div>
       )}
     </header>

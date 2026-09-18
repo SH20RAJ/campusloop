@@ -5,8 +5,6 @@ import { ReelsFeedClient } from "@/components/reels/reels-feed-client";
 import { getDb } from "@/db";
 import { reelLikes } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
-import { reelLikes } from "@/db/schema";
-import { getDb } from "@/db";
 import type { FeedPost } from "@/hooks/use-feed";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
 import { getRecommendedReels } from "@/lib/reels/recommendation";

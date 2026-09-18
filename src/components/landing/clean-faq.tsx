@@ -6,48 +6,55 @@ export function CleanFAQ() {
   const faqItems = [
     {
       id: "verification",
-      title: "How does institutional email verification work?",
+      title: "How do I join my campus?",
       content:
-        "You sign in with your official college email address ending in .ac.in or .edu.in. Our automated validation verifies your domain against the national university registry, instantly unlocking your college hub. Outsiders, spammers, and commercial coaching bots cannot enter.",
+        "Create an account with your institutional college email. CampusLoop checks the university domain and then connects you to the appropriate campus hub.",
     },
     {
-      id: "privacy",
-      title: "Can college professors or administration view who posted anonymously?",
+      id: "anonymous",
+      title: "Can I post anonymously?",
       content:
-        "No. CampusLoop is an independent student platform built with cryptographic identity escrow. Anonymous confessions and student polls store zero foreign-key references to your student profile in query layers. Neither professors nor administrators can trace anonymous posts.",
+        "Yes. CampusLoop supports anonymous posting for eligible campus conversations. The public post does not need to expose your student identity.",
     },
     {
-      id: "unlisted",
-      title: "What if my college or branch isn't listed yet?",
+      id: "college",
+      title: "What if my college is not listed?",
       content:
-        "You can request your university hub in 30 seconds via the Colleges Directory. If your college uses an active institutional email domain, our system automatically provisions your campus hub as soon as 5 students sign up.",
+        "Use the Colleges Directory to find your university or request a new campus hub. CampusLoop is continually expanding its college directory.",
     },
     {
-      id: "aspirants",
-      title: "Can aspirants (JEE / NEET / CUET) explore campus insights?",
+      id: "academics",
+      title: "What can I find in Academics?",
       content:
-        "Yes! High school and entrance exam aspirants can explore public college hubs in Viewer Mode via the Aspirants portal, reading authentic student insights, placement culture, and campus reviews without posting in private feeds.",
+        "The academic vault can contain lecture notes, module resources, previous-year question papers, lab manuals, playlists and other student-contributed study material.",
     },
     {
       id: "pricing",
-      title: "Is CampusLoop completely free for students?",
+      title: "Does it cost anything to join?",
       content:
-        "Yes, CampusLoop is 100% free for verified college students forever. There are no paywalls for semester notes, campus confessions, or student hubs.",
+        "CampusLoop is free for verified students. Some campus services may evolve separately, but the core student network is free to use.",
     },
   ];
 
   return (
-    <section className="py-20 border-t border-border/40 bg-background">
-      <div className="mx-auto max-w-5xl px-6 mb-12 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-          Frequently asked questions
-        </h2>
-        <p className="mt-3 text-base text-muted-foreground max-w-lg mx-auto">
-          Everything you need to know about verification, anonymity escrow, and campus security.
-        </p>
-      </div>
+    <section className="border-b border-border/70 bg-background py-20 sm:py-24">
+      <div className="mx-auto max-w-3xl px-5 sm:px-6">
+        <div className="text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">FAQ</p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-foreground sm:text-4xl">
+            Clear answers before you join.
+          </h2>
+          <p className="mt-4 text-sm leading-6 text-muted-foreground">
+            No marketing language — just the basics you need to know.
+          </p>
+        </div>
 
-      <AccordionIndexed items={faqItems} defaultValue="verification" className="max-w-2xl mx-auto px-6" />
+        <AccordionIndexed
+          items={faqItems}
+          defaultValue="verification"
+          className="mx-auto mt-10 px-0"
+        />
+      </div>
     </section>
   );
 }

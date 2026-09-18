@@ -11,6 +11,13 @@ import {
   Heart,
   MessageCircle,
   MoreHorizontal,
+  Repeat2,
+  Bookmark,
+  Share2,
+  ExternalLink,
+  Check,
+  UserPlus,
+  Music2,
   Pause,
   Play,
   Sparkles,
@@ -19,7 +26,7 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimateVideo } from "@/components/ui/animated-icon";
 import type { FeedPost } from "@/hooks/use-feed";

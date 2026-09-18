@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowRight, CalendarDays, GraduationCap, MessageCircleMore, Store, UsersRound } from "lucide-react";
 import Link from "next/link";
 

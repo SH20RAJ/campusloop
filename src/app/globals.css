@@ -34,9 +34,9 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
-  --color-brand: #1d9bf0;
-  --color-brand-light: #4ab5f7;
-  --color-brand-dark: #1a8cd8;
+  --color-brand: #7568f5;
+  --color-brand-light: #8f86ff;
+  --color-brand-dark: #6659df;
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -207,10 +207,10 @@
 :root {
   --background: #fbfbff;
   --foreground: #17162a;
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(210 25% 8%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(210 25% 8%);
+  --card: #ffffff;
+  --card-foreground: #242238;
+  --popover: #ffffff;
+  --popover-foreground: #242238;
   --primary: #7568f5;
   --primary-foreground: #ffffff;
   --secondary: #eef0ff;
@@ -230,14 +230,14 @@
   --chart-4: hsl(45 93% 47%);
   --chart-5: hsl(203 89% 53%);
   --radius: 0.75rem;
-  --sidebar: hsl(0 0% 100%);
-  --sidebar-foreground: hsl(210 25% 8%);
-  --sidebar-primary: hsl(203 89% 53%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(180 7% 97%);
-  --sidebar-accent-foreground: hsl(210 25% 8%);
-  --sidebar-border: hsl(192 14% 95%);
-  --sidebar-ring: hsl(203 89% 53%);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #242238;
+  --sidebar-primary: #7568f5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0efff;
+  --sidebar-accent-foreground: #242238;
+  --sidebar-border: #e4e1f3;
+  --sidebar-ring: #7568f5;
   --shadow-color: hsl(0 0% 0%);
   --shadow-opacity: 0.08;
   --shadow-blur: 8px;
@@ -267,25 +267,25 @@
 }
 
 .dark {
-  --background: hsl(0 0% 0%);
-  --foreground: hsl(210 14% 93%);
-  --card: hsl(0 0% 0%);
-  --card-foreground: hsl(210 14% 93%);
-  --popover: hsl(0 0% 0%);
-  --popover-foreground: hsl(210 14% 93%);
-  --primary: hsl(203 89% 53%);
-  --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(220 13% 10%);
-  --secondary-foreground: hsl(210 14% 93%);
-  --muted: hsl(220 13% 10%);
-  --muted-foreground: hsl(210 5% 46%);
-  --accent: hsl(203 89% 53%);
-  --accent-foreground: hsl(0 0% 100%);
+  --background: #10101a;
+  --foreground: #f5f3ff;
+  --card: #171724;
+  --card-foreground: #f5f3ff;
+  --popover: #171724;
+  --popover-foreground: #f5f3ff;
+  --primary: #9a91ff;
+  --primary-foreground: #161329;
+  --secondary: #211f31;
+  --secondary-foreground: #f5f3ff;
+  --muted: #1b1a29;
+  --muted-foreground: #a5a2b6;
+  --accent: #54d2d8;
+  --accent-foreground: #10272a;
   --destructive: hsl(356 90% 54%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(210 7% 20%);
-  --input: hsl(210 7% 20%);
-  --ring: hsl(203 89% 53%);
+  --border: #302e40;
+  --input: #302e40;
+  --ring: #9a91ff;
 
   --chart-1: hsl(203 89% 53%);
   --chart-2: hsl(160 84% 39%);
@@ -694,4 +694,36 @@
   .cl-float-card { transform:none; }
   .cl-float-event { top:-14px;left:8px; }
   .cl-float-online { right:8px; }
+}
+
+
+/* App design system: cute, minimal, soft editorial surfaces. */
+.app-surface {
+  background:
+    radial-gradient(circle at 8% 4%, rgba(117,104,245,.055), transparent 26%),
+    radial-gradient(circle at 94% 10%, rgba(53,200,209,.045), transparent 24%),
+    var(--background);
+}
+.app-surface h1,
+.app-surface h2,
+.app-surface h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.035em;
+}
+.app-surface button,
+.app-surface a,
+.app-surface input,
+.app-surface textarea,
+.app-surface select {
+  -webkit-font-smoothing: antialiased;
+}
+.app-surface .border-border\/30 { border-color: color-mix(in srgb, var(--border) 72%, transparent); }
+.app-surface .border-border\/40 { border-color: color-mix(in srgb, var(--border) 78%, transparent); }
+.app-surface .bg-muted\/40 { background-color: color-mix(in srgb, var(--muted) 72%, transparent); }
+.app-surface .bg-muted\/30 { background-color: color-mix(in srgb, var(--muted) 58%, transparent); }
+.app-surface .rounded-2xl { border-radius: 1.05rem; }
+.app-surface .rounded-3xl { border-radius: 1.35rem; }
+.app-surface ::selection { background: rgba(117,104,245,.18); }
+@media (max-width: 767px) {
+  .app-surface { background: var(--background); }
 }

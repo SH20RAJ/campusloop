@@ -5,6 +5,7 @@ import { CleanFeatures } from "@/components/landing/clean-features";
 import { CleanFooter } from "@/components/landing/clean-footer";
 import { CleanHero } from "@/components/landing/clean-hero";
 import { CleanWorkflow } from "@/components/landing/clean-workflow";
+import { InteractiveShowcase } from "@/components/landing/interactive-showcase";
 import { MinimalLandingNavbar } from "@/components/landing/minimal-landing-navbar";
 import { hexclaveServerApp } from "@/hexclave/server";
 
@@ -175,6 +176,7 @@ export default async function LandingPage() {
 
       <main className="flex-1">
         <CleanHero isAuthenticated={isAuthenticated} />
+        <InteractiveShowcase />
         <CleanFeatures />
         <CleanWorkflow />
         <CleanFAQ />

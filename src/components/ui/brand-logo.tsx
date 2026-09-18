@@ -42,19 +42,19 @@ export function BrandLogo({ className, size = "md", showWordmark = true, href = 
   const content = (
     <div className={cn("inline-flex items-center gap-2.5 select-none group", className)}>
       <BrandLogoIcon size={size} />
-      {/* {showWordmark && (
+      {showWordmark && (
         <span
           className={cn(
-            "font-black tracking-tight text-foreground transition-colors group-hover:text-primary leading-none",
+            "font-display font-bold tracking-[-0.04em] text-foreground transition-colors group-hover:text-primary leading-none",
             size === "sm" && "text-sm",
-            size === "md" && "text-lg",
+            size === "md" && "text-[17px]",
             size === "lg" && "text-xl",
             size === "xl" && "text-2xl"
           )}
         >
-          Campus<span className="text-primary font-black">Loop</span>
+          CampusLoop
         </span>
-      )} */}
+      )}
     </div>
   );
 

@@ -20,21 +20,21 @@ export function MinimalLandingNavbar({ isAuthenticated = false }: MinimalLanding
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-6">
-        <Link href="/" className="group flex items-center gap-2.5" aria-label="CampusLoop home">
-          <span className="grid size-8 place-items-center rounded-xl bg-primary text-sm font-black text-primary-foreground shadow-sm transition-transform group-hover:-translate-y-0.5">
+    <header className="relative z-50 border-b border-border bg-background/95">
+      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-6">
+        <Link href="/" className="flex items-center gap-2.5" aria-label="CampusLoop home">
+          <span className="grid size-9 place-items-center rounded-xl bg-foreground text-sm font-black text-background">
             C
           </span>
-          <span className="text-[15px] font-bold tracking-tight text-foreground">CampusLoop</span>
+          <span className="text-[15px] font-black tracking-tight text-foreground">CampusLoop</span>
         </Link>
 
-        <nav aria-label="Primary navigation" className="hidden items-center gap-7 md:flex">
+        <nav aria-label="Primary navigation" className="hidden items-center gap-8 md:flex">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-sm font-medium text-muted-foreground transition hover:text-foreground"
             >
               {link.label}
             </Link>
@@ -45,7 +45,7 @@ export function MinimalLandingNavbar({ isAuthenticated = false }: MinimalLanding
           <ThemeToggle />
           <Link
             href="/app"
-            className="inline-flex h-9 items-center rounded-lg bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-xs transition hover:opacity-90"
+            className="inline-flex h-10 items-center rounded-xl border border-border bg-background px-4 text-xs font-bold text-foreground transition hover:bg-muted"
           >
             {isAuthenticated ? "Open Campus" : "Join Campus"}
           </Link>
@@ -56,7 +56,7 @@ export function MinimalLandingNavbar({ isAuthenticated = false }: MinimalLanding
           <button
             type="button"
             onClick={() => setMobileMenuOpen((open) => !open)}
-            className="grid size-9 place-items-center rounded-lg border border-border bg-background text-muted-foreground transition hover:text-foreground"
+            className="grid size-9 place-items-center rounded-xl border border-border bg-background text-muted-foreground transition hover:text-foreground"
             aria-label={mobileMenuOpen ? "Close navigation" : "Open navigation"}
             aria-expanded={mobileMenuOpen}
           >
@@ -66,14 +66,14 @@ export function MinimalLandingNavbar({ isAuthenticated = false }: MinimalLanding
       </div>
 
       {mobileMenuOpen && (
-        <div className="border-t border-border/70 bg-background md:hidden">
-          <nav aria-label="Mobile navigation" className="mx-auto flex max-w-6xl flex-col px-5 py-3">
+        <div className="border-t border-border bg-background md:hidden">
+          <nav aria-label="Mobile navigation" className="mx-auto flex max-w-7xl flex-col px-5 py-3">
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-lg px-2 py-3 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                className="rounded-xl px-2 py-3 text-sm font-semibold text-muted-foreground transition hover:bg-muted hover:text-foreground"
               >
                 {link.label}
               </Link>
@@ -81,7 +81,7 @@ export function MinimalLandingNavbar({ isAuthenticated = false }: MinimalLanding
             <Link
               href="/app"
               onClick={() => setMobileMenuOpen(false)}
-              className="mt-2 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
+              className="mt-2 inline-flex h-11 items-center justify-center rounded-xl bg-foreground px-4 text-sm font-bold text-background"
             >
               {isAuthenticated ? "Open Campus" : "Join Campus"}
             </Link>

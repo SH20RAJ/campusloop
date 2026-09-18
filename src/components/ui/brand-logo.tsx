@@ -45,7 +45,7 @@ export function BrandLogo({ className, size = "md", showWordmark = true, href = 
       {showWordmark && (
         <span
           className={cn(
-            "font-display font-bold tracking-[-0.04em] text-foreground transition-colors group-hover:text-primary leading-none",
+            "font-heading font-bold tracking-[-0.04em] text-foreground transition-colors group-hover:text-primary leading-none",
             size === "sm" && "text-sm",
             size === "md" && "text-[17px]",
             size === "lg" && "text-xl",

@@ -1,53 +1,37 @@
+import { and, eq, inArray } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
-import { and, desc, eq, inArray, notInArray, sql } from "drizzle-orm";
 import { getDb } from "@/db";
-import { institutions, reelBookmarks, reelLikes, reels, userProfiles } from "@/db/schema";
+import { reelBookmarks, reelLikes, userProfiles } from "@/db/schema";
 import { hexclaveServerApp } from "@/hexclave/server";
+import { getRecommendedReels, type ReelFeedMode } from "@/lib/reels/recommendation";
+
+export const dynamic = "force-dynamic";
+
+function parseIds(value: string | null) {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id) => /^[a-zA-Z0-9_-]+$/.test(id));
+}
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, Number.parseInt(searchParams.get("page") || "1", 10));
-    const limit = Math.min(30, Math.max(1, Number.parseInt(searchParams.get("limit") || "12", 10)));
-    const offset = (page - 1) * limit;
+    const limit = Math.min(24, Math.max(1, Number.parseInt(searchParams.get("limit") || "12", 10)));
+    const modeParam = searchParams.get("mode") || "for_you";
+    const mode: ReelFeedMode =
+      modeParam === "campus" ? "campus" : modeParam === "fresh" ? "fresh" : "for_you";
 
-    const sort = searchParams.get("sort") || "trending";
-    const scope = searchParams.get("scope") || "GLOBAL";
-    const subreddit = searchParams.get("subreddit");
-    const tag = searchParams.get("tag");
-
-    const excludeIdsParam = searchParams.get("excludeIds");
-    const seenIdsParam = searchParams.get("seenIds") || req.headers.get("x-seen-ids");
-
-    let excludeIds: string[] = [];
-    if (excludeIdsParam) {
-      excludeIds.push(
-        ...excludeIdsParam
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
-      );
-    }
-    if (seenIdsParam) {
-      excludeIds.push(
-        ...seenIdsParam
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
-      );
-    }
-
-    const seenCookie = req.cookies.get("campusloop_seen_reels")?.value;
-    if (seenCookie) {
-      excludeIds.push(
-        ...seenCookie
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
-      );
-    }
-
-    const uniqueExcludeIds = Array.from(new Set(excludeIds)).slice(0, 300);
+    const seenIds = Array.from(
+      new Set([
+        ...parseIds(searchParams.get("excludeIds")),
+        ...parseIds(searchParams.get("seenIds")),
+        ...parseIds(req.headers.get("x-seen-ids")),
+        ...parseIds(req.cookies.get("campusloop_seen_reels")?.value || null),
+      ]),
+    ).slice(0, 800);
 
     const db = getDb();
     let currentProfileId: string | null = null;
@@ -58,6 +42,7 @@ export async function GET(req: NextRequest) {
       if (user) {
         const profile = await db.query.userProfiles.findFirst({
           where: eq(userProfiles.userId, user.id),
+          columns: { id: true, institutionId: true },
         });
         if (profile) {
           currentProfileId = profile.id;
@@ -66,127 +51,18 @@ export async function GET(req: NextRequest) {
       }
     } catch {}
 
-    const conditions = [eq(reels.status, "PUBLISHED")];
+    // Exclusion-based pagination is deliberate: the ranking pool is rebuilt for every
+    // request instead of applying OFFSET to a moving recommendation order.
+    const excludeForRequest = page > 1 ? seenIds : seenIds;
+    const rows = await getRecommendedReels({
+      viewerProfileId: currentProfileId,
+      viewerInstitutionId,
+      limit,
+      mode,
+      excludeIds: excludeForRequest,
+    });
 
-    if (scope === "CAMPUS" && viewerInstitutionId) {
-      conditions.push(eq(reels.institutionId, viewerInstitutionId));
-    }
-
-    if (subreddit) {
-      conditions.push(eq(reels.subreddit, subreddit));
-    }
-
-    if (uniqueExcludeIds.length > 0) {
-      conditions.push(notInArray(reels.id, uniqueExcludeIds));
-    }
-
-    // Determine ordering: Trending algorithm weights likes, comments, shares, views, recency & dynamic discovery jitter
-    const orderByClause =
-      sort === "latest"
-        ? [desc(reels.createdAt)]
-        : [
-            desc(
-              sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400) * (0.75 + RANDOM() * 0.5)`
-            ),
-            desc(reels.createdAt),
-          ];
-
-    // When uniqueExcludeIds are provided, exclusion-based pagination is active so we do not skip unseen items with offset
-    const queryOffset = uniqueExcludeIds.length > 0 ? 0 : offset;
-
-    let rows = await db
-      .select({
-        id: reels.id,
-        slug: reels.slug,
-        caption: reels.caption,
-        title: reels.title,
-        videoUrl: reels.videoUrl,
-        hlsUrl: reels.hlsUrl,
-        audioUrl: reels.audioUrl,
-        thumbnailUrl: reels.thumbnailUrl,
-        aspectRatio: reels.aspectRatio,
-        width: reels.width,
-        height: reels.height,
-        duration: reels.duration,
-        authorId: reels.authorId,
-        authorName: reels.authorName,
-        authorHandle: reels.authorHandle,
-        authorAvatarUrl: reels.authorAvatarUrl,
-        institutionId: reels.institutionId,
-        institutionName: institutions.name,
-        source: reels.source,
-        sourceUrl: reels.sourceUrl,
-        subreddit: reels.subreddit,
-        tags: reels.tags,
-        likesCount: reels.likesCount,
-        commentsCount: reels.commentsCount,
-        sharesCount: reels.sharesCount,
-        viewsCount: reels.viewsCount,
-        createdAt: reels.createdAt,
-      })
-      .from(reels)
-      .leftJoin(institutions, eq(reels.institutionId, institutions.id))
-      .where(and(...conditions))
-      .orderBy(...orderByClause)
-      .limit(limit)
-      .offset(queryOffset);
-
-    // If exclusions left fewer than limit rows, fallback to query without exclusions so feed never runs dry
-    if (rows.length < limit && uniqueExcludeIds.length > 0) {
-      const existingRowIds = new Set(rows.map((r) => r.id));
-      const fallbackConditions = [eq(reels.status, "PUBLISHED")];
-      if (scope === "CAMPUS" && viewerInstitutionId) {
-        fallbackConditions.push(eq(reels.institutionId, viewerInstitutionId));
-      }
-      if (subreddit) {
-        fallbackConditions.push(eq(reels.subreddit, subreddit));
-      }
-      const fallbackRows = await db
-        .select({
-          id: reels.id,
-          slug: reels.slug,
-          caption: reels.caption,
-          title: reels.title,
-          videoUrl: reels.videoUrl,
-          hlsUrl: reels.hlsUrl,
-          audioUrl: reels.audioUrl,
-          thumbnailUrl: reels.thumbnailUrl,
-          aspectRatio: reels.aspectRatio,
-          width: reels.width,
-          height: reels.height,
-          duration: reels.duration,
-          authorId: reels.authorId,
-          authorName: reels.authorName,
-          authorHandle: reels.authorHandle,
-          authorAvatarUrl: reels.authorAvatarUrl,
-          institutionId: reels.institutionId,
-          institutionName: institutions.name,
-          source: reels.source,
-          sourceUrl: reels.sourceUrl,
-          subreddit: reels.subreddit,
-          tags: reels.tags,
-          likesCount: reels.likesCount,
-          commentsCount: reels.commentsCount,
-          sharesCount: reels.sharesCount,
-          viewsCount: reels.viewsCount,
-          createdAt: reels.createdAt,
-        })
-        .from(reels)
-        .leftJoin(institutions, eq(reels.institutionId, institutions.id))
-        .where(and(...fallbackConditions))
-        .orderBy(...orderByClause)
-        .limit(limit);
-
-      for (const fr of fallbackRows) {
-        if (!existingRowIds.has(fr.id) && rows.length < limit) {
-          rows.push(fr);
-          existingRowIds.add(fr.id);
-        }
-      }
-    }
-
-    // If viewer is logged in, fetch their likes and bookmarks for these reels
-    const reelIds = rows.map((r) => r.id);
+    const reelIds = rows.map((row) => row.id);
     const userLikesSet = new Set<string>();
     const userBookmarksSet = new Set<string>();
 
@@ -202,54 +78,54 @@ export async function GET(req: NextRequest) {
           .where(and(eq(reelBookmarks.userId, currentProfileId), inArray(reelBookmarks.reelId, reelIds))),
       ]);
 
-      for (const l of likes) userLikesSet.add(l.reelId);
-      for (const b of bookmarks) userBookmarksSet.add(b.reelId);
+      for (const like of likes) userLikesSet.add(like.reelId);
+      for (const bookmark of bookmarks) userBookmarksSet.add(bookmark.reelId);
     }
 
-    const items = rows.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      caption: r.caption,
-      title: r.title,
-      videoUrl: r.videoUrl,
-      hlsUrl: r.hlsUrl,
-      audioUrl: r.audioUrl,
-      thumbnailUrl: r.thumbnailUrl,
-      aspectRatio: r.aspectRatio,
-      width: r.width,
-      height: r.height,
-      duration: r.duration,
+    const items = rows.map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      caption: row.caption,
+      title: row.title,
+      videoUrl: row.videoUrl,
+      hlsUrl: row.hlsUrl,
+      audioUrl: row.audioUrl,
+      thumbnailUrl: row.thumbnailUrl,
+      aspectRatio: row.aspectRatio,
+      width: row.width,
+      height: row.height,
+      duration: row.duration,
       author: {
-        id: r.authorId,
-        name: r.authorName || "Student",
-        username: r.authorHandle || "student",
-        avatarUrl: r.authorAvatarUrl,
-        isVerified: true,
+        id: row.authorId,
+        name: row.authorName || "Student",
+        username: row.authorHandle || "student",
+        avatarUrl: row.authorAvatarUrl,
+        isVerified: Boolean(row.authorId),
       },
-      institution: r.institutionId
+      institution: row.institutionId
         ? {
-            id: r.institutionId,
-            name: r.institutionName,
-            shortName: r.institutionName ? r.institutionName.split(",")[0] : null,
+            id: row.institutionId,
+            name: row.institutionName,
+            shortName: row.institutionName ? row.institutionName.split(",")[0] : null,
           }
         : null,
-      source: r.source,
-      sourceUrl: r.sourceUrl,
-      subreddit: r.subreddit,
-      tags: (r.tags as string[]) || [],
-      likesCount: r.likesCount,
-      commentsCount: r.commentsCount,
-      sharesCount: r.sharesCount,
-      viewsCount: r.viewsCount,
-      isLiked: userLikesSet.has(r.id),
-      isSaved: userBookmarksSet.has(r.id),
-      createdAt: r.createdAt.toISOString(),
+      source: row.source,
+      sourceUrl: row.sourceUrl,
+      subreddit: row.subreddit,
+      tags: row.tags,
+      likesCount: row.likesCount,
+      commentsCount: row.commentsCount,
+      sharesCount: row.sharesCount,
+      viewsCount: row.viewsCount,
+      isLiked: userLikesSet.has(row.id),
+      isSaved: userBookmarksSet.has(row.id),
+      createdAt: row.createdAt.toISOString(),
     }));
 
     const posts = items.map((item) => ({
       id: item.id,
       title: item.title,
-      body: `${item.caption}\n\n${item.tags.map((t) => `#${t}`).join(" ")}`,
+      body: `${item.caption}${item.tags.length ? `\\n\\n${item.tags.map((tag) => `#${tag}`).join(" ")}` : ""}`,
       type: "MEME" as const,
       scope: "GLOBAL" as const,
       status: "PUBLISHED" as const,
@@ -258,8 +134,8 @@ export async function GET(req: NextRequest) {
       authorId: item.author.id,
       institutionId: item.institution?.id || null,
       author: {
-        id: item.author.id || "anon",
-        userId: item.author.id || "anon",
+        id: item.author.id || "reel-author",
+        userId: item.author.id || "reel-author",
         displayName: item.author.name,
         username: item.author.username,
         avatarUrl: item.author.avatarUrl,
@@ -283,7 +159,7 @@ export async function GET(req: NextRequest) {
         source: "reddit" as const,
         externalId: item.id,
         subreddit: item.subreddit,
-        canonicalUrl: item.sourceUrl || `https://reddit.com/r/${item.subreddit || "reels"}`,
+        canonicalUrl: item.sourceUrl || `https://reddit.com/r/${item.subreddit || "campus"}`,
         score: item.likesCount,
         commentCount: item.commentsCount,
         contentType: "VIDEO" as const,
@@ -292,7 +168,7 @@ export async function GET(req: NextRequest) {
             id: item.id,
             mediaType: "VIDEO" as const,
             mediaUrl: item.videoUrl,
-            previewUrl: item.videoUrl,
+            previewUrl: item.thumbnailUrl || item.videoUrl,
             hlsUrl: item.hlsUrl,
             thumbnailUrl: item.thumbnailUrl,
             width: item.width,
@@ -310,12 +186,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       reels: items,
       posts,
+      mode,
       hasMore: items.length === limit,
       page,
       limit,
     });
   } catch (error) {
     console.error("[GET /api/reels error]:", error);
-    return NextResponse.json({ error: "Failed to fetch reels", reels: [], hasMore: false }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch reels", reels: [], posts: [], hasMore: false },
+      { status: 500 },
+    );
   }
 }

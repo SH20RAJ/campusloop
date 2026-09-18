@@ -33,7 +33,7 @@ export function PageShell({ children, className }: { children: React.ReactNode; 
   return (
     <main
       className={cn(
-        "mx-auto flex min-h-screen w-full max-w-2xl select-none flex-col border-x border-border/20 pb-28",
+        "mx-auto flex min-h-screen w-full max-w-2xl select-none flex-col border-x border-border/45 bg-background/70 pb-28 shadow-[0_0_50px_rgba(117,104,245,0.035)]",
         className
       )}
     >
@@ -62,13 +62,13 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 border-b border-border/30 bg-background/90 backdrop-blur-xl",
+        "sticky top-0 z-40 border-b border-border/55 bg-background/88 backdrop-blur-xl",
         className
       )}
     >
       <div className="flex items-center justify-between gap-2 px-4 py-3.5">
         <div className="min-w-0">
-          <h1 className="text-lg font-black tracking-tight text-foreground">{title}</h1>
+          <h1 className="font-display text-[19px] font-bold tracking-[-0.035em] text-foreground">{title}</h1>
           {subtitle && <p className="truncate text-[13px] text-muted-foreground">{subtitle}</p>}
         </div>
         {action && <div className="shrink-0">{action}</div>}
@@ -112,9 +112,9 @@ export function PageTabs<T extends string>({
               onChange(tab.id);
             }}
             className={cn(
-              "relative flex-1 cursor-pointer py-3 text-[14px] font-bold transition-colors",
+              "relative flex-1 cursor-pointer py-3 text-[13px] font-semibold transition-colors",
               isActive
-                ? "font-black text-foreground"
+                ? "font-bold text-foreground"
                 : "text-muted-foreground hover:bg-muted/30 hover:text-foreground"
             )}
           >
@@ -167,10 +167,10 @@ export function FilterPills<T extends string>({
                 onChange(pill.id);
               }}
               className={cn(
-                "flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95",
+                "flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all active:scale-95",
                 isActive
-                  ? "bg-foreground font-black text-background"
-                  : "border border-border/40 bg-muted/40 text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                  ? "bg-primary/10 font-bold text-primary ring-1 ring-primary/15"
+                  : "border border-border/45 bg-muted/35 text-muted-foreground hover:bg-muted/70 hover:text-foreground"
               )}
             >
               {Icon && <Icon className="size-3.5" />}
@@ -207,7 +207,7 @@ export function SearchField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="h-10 w-full rounded-full border border-border/60 bg-muted/30 pl-10 pr-9 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background"
+          className="h-10 w-full rounded-2xl border border-border/55 bg-card/70 pl-10 pr-9 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-primary/50 focus:bg-card focus:ring-4 focus:ring-primary/8"
         />
         {value && (
           <button
@@ -243,7 +243,7 @@ export function ListRow({
   className?: string;
 }) {
   const classes = cn(
-    "group flex w-full items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-muted/25",
+    "group flex w-full items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-primary/[0.035]",
     className
   );
 
@@ -343,7 +343,7 @@ export function PrimaryAction({
   disabled?: boolean;
 }) {
   const classes = cn(
-    "flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-black text-primary-foreground transition-opacity hover:opacity-90 active:scale-95 disabled:opacity-50",
+    "flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground transition-all hover:-translate-y-px hover:opacity-95 active:scale-95 disabled:opacity-50",
     className
   );
 

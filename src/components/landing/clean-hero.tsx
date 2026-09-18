@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowRight, BookOpen, Building2, MessageCircle, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 

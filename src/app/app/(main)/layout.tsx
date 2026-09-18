@@ -39,7 +39,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   const viewerMode = profile ? await isViewerProfile(profile) : true;
 
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="app-surface relative min-h-screen bg-background">
       <Navigation
         profile={profile || undefined}
         collegeName={viewerMode ? "Viewer Mode" : (college?.name ?? "Campus")}
@@ -47,7 +47,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         isViewer={viewerMode}
       />
 
-      <div className="flex md:pl-64 min-h-screen max-w-full overflow-x-clip">
+      <div className="flex md:pl-[248px] min-h-screen max-w-full overflow-x-clip">
         <main className="flex-1 w-full min-w-0 max-w-full min-h-screen">
           {viewerMode && (
             <div className="sticky top-0 z-30 flex items-center justify-center gap-2 border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-center text-[11px] font-semibold text-amber-600 dark:text-amber-400 backdrop-blur-md">
@@ -60,7 +60,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
           {children}
           <FirstVisitNotificationPrompt />
         </main>
-        <aside className="hidden lg:block w-80 xl:w-[350px] shrink-0 border-l border-border/30 px-4 py-3">
+        <aside className="hidden lg:block w-80 xl:w-[350px] shrink-0 border-l border-border/45 bg-background/35 px-4 py-4">
           <RightSidebar />
         </aside>
       </div>

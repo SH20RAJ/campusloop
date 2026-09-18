@@ -8,72 +8,68 @@ import { CleanWorkflow } from "@/components/landing/clean-workflow";
 import { MinimalLandingNavbar } from "@/components/landing/minimal-landing-navbar";
 import { hexclaveServerApp } from "@/hexclave/server";
 
+const SITE_URL = "https://campusloop.space";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://campusloop.space"),
-  title: "CampusLoop — The Verified Campus Social Layer",
+  metadataBase: new URL(SITE_URL),
+  title: "CampusLoop | Verified Campus Community for Indian College Students",
   description:
-    "CampusLoop is the verified student-only campus social network for Indian universities. Gated strictly by institutional email domains (.ac.in / .edu.in). Drop confessions anonymously, explore semester notes & PYQs, and join campus communities.",
+    "CampusLoop connects verified college students with campus conversations, anonymous posts, communities, events, and academic notes & PYQs.",
   applicationName: "CampusLoop",
-  authors: [{ name: "CampusLoop Team", url: "https://campusloop.space/about" }],
-  generator: "Next.js",
+  authors: [{ name: "CampusLoop Team", url: `${SITE_URL}/about` }],
   keywords: [
-    "campus social layer",
+    "CampusLoop",
+    "campus social network India",
     "verified student network",
-    "college confessions anonymous",
-    "campus communities India",
-    "hostel marketplace",
-    "college campus hub",
-    "Indian universities social network",
-    "campus polls",
-    "peer notes and PYQs",
-    "BIT Mesra campus loop",
-    "IIT confessions",
-    "BITS Pilani student network",
+    "college community India",
+    "college confessions",
+    "campus communities",
+    "college notes",
+    "college PYQs",
+    "college events",
+    "Indian college directory",
   ],
-  referrer: "origin-when-cross-origin",
-  creator: "CampusLoop Inc.",
-  publisher: "CampusLoop Inc.",
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
+      "max-video-preview": -1,
     },
   },
   alternates: {
-    canonical: "https://campusloop.space",
+    canonical: "/",
     types: {
-      "application/rss+xml": "https://campusloop.space/feed.xml",
+      "application/rss+xml": "/feed.xml",
     },
   },
   openGraph: {
-    title: "CampusLoop — The Verified Campus Social Layer",
+    title: "CampusLoop | Verified Campus Community",
     description:
-      "Your campus has a social layer now. Gated strictly by official college email. Anonymous confessions with identity escrow, uncheatable polls, hostel marketplace, and verified communities.",
-    url: "https://campusloop.space",
+      "Conversations, communities, events, notes and PYQs for verified college students in India.",
+    url: SITE_URL,
     siteName: "CampusLoop",
     locale: "en_IN",
     type: "website",
     images: [
       {
-        url: "https://campusloop.space/opengraph-image.png",
+        url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "CampusLoop — The Verified Campus Social Layer",
+        alt: "CampusLoop — Verified campus community for Indian college students",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CampusLoop — The Verified Campus Social Layer",
+    title: "CampusLoop | Verified Campus Community",
     description:
-      "Your campus has a social layer now. Verified student-only network across 1,350+ Indian colleges.",
+      "Conversations, communities, events, notes and PYQs for verified college students in India.",
     creator: "@mycampusloop",
-    images: ["https://campusloop.space/opengraph-image.png"],
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -86,10 +82,10 @@ export default async function LandingPage() {
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://campusloop.space/#organization",
+        "@id": `${SITE_URL}/#organization`,
         name: "CampusLoop",
-        url: "https://campusloop.space",
-        logo: "https://campusloop.space/icons/icon-512x512.png",
+        url: SITE_URL,
+        logo: `${SITE_URL}/icons/icon-512x512.png`,
         sameAs: [
           "https://www.instagram.com/campusloop.space/",
           "https://www.linkedin.com/company/mycampusloop/",
@@ -98,21 +94,21 @@ export default async function LandingPage() {
       },
       {
         "@type": "WebSite",
-        "@id": "https://campusloop.space/#website",
-        url: "https://campusloop.space",
+        "@id": `${SITE_URL}/#website`,
+        url: SITE_URL,
         name: "CampusLoop",
-        publisher: { "@id": "https://campusloop.space/#organization" },
+        publisher: { "@id": `${SITE_URL}/#organization` },
         inLanguage: "en-IN",
       },
       {
-        "@type": "SoftwareApplication",
-        "@id": "https://campusloop.space/#software",
+        "@type": "WebApplication",
+        "@id": `${SITE_URL}/#software`,
         name: "CampusLoop",
         applicationCategory: "SocialNetworkingApplication",
-        operatingSystem: "Web, iOS, Android (PWA)",
+        operatingSystem: "Web",
         inLanguage: "en-IN",
         description:
-          "Verified student-only campus social network for Indian colleges. Anonymous confessions with identity escrow, polls, communities, and hostel marketplace.",
+          "Campus community platform for verified college students in India with conversations, communities, events and academic resources.",
         offers: {
           "@type": "Offer",
           price: "0",
@@ -120,55 +116,47 @@ export default async function LandingPage() {
         },
       },
       {
-        "@type": "BreadcrumbList",
-        "@id": "https://campusloop.space/#breadcrumb",
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: "https://campusloop.space",
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Colleges Directory",
-            item: "https://campusloop.space/colleges",
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: "For Aspirants",
-            item: "https://campusloop.space/aspirants",
-          },
-        ],
-      },
-      {
         "@type": "FAQPage",
-        "@id": "https://campusloop.space/#faq",
+        "@id": `${SITE_URL}/#faq`,
         mainEntity: [
           {
             "@type": "Question",
-            name: "Can my professors, HODs, or college administration see who posted anonymously?",
+            name: "How do I join my campus?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "No. CampusLoop is an independent student platform built with cryptographic identity escrow. Anonymous confessions store zero foreign-key references to your student profile in public query layers.",
+              text: "Create an account with your institutional college email. CampusLoop checks the university domain and connects you to the appropriate campus hub.",
             },
           },
           {
             "@type": "Question",
-            name: "What if my college email isn't on the supported list yet?",
+            name: "Can I post anonymously?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "You can request your university hub in 30 seconds via the Colleges Directory. If you have an active .ac.in or .edu.in domain, our system automatically provisions your campus hub once 5 students verify interest.",
+              text: "Yes. CampusLoop supports anonymous posting for eligible campus conversations, so the public post does not need to expose your student identity.",
             },
           },
           {
             "@type": "Question",
-            name: "Is CampusLoop completely free for students?",
+            name: "What if my college is not listed?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Yes, 100% free for verified college students forever.",
+              text: "Use the Colleges Directory to find your university or request a new campus hub.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What can I find in Academics?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "The academic vault can contain lecture notes, module resources, previous-year question papers, lab manuals, playlists and other student-contributed study material.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Does it cost anything to join?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "CampusLoop is free for verified students.",
             },
           },
         ],
@@ -177,37 +165,23 @@ export default async function LandingPage() {
   };
 
   return (
-    <>
-      {/* ─── Structured Data (JSON-LD) for Search Engines ─── */}
+    <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
-        {/* 01. Minimized, Uncluttered Navigation Bar */}
-        <MinimalLandingNavbar isAuthenticated={isAuthenticated} />
+      <MinimalLandingNavbar isAuthenticated={isAuthenticated} />
 
-        <main className="flex-1">
-          {/* 02. Clean Structured Hero Section with Real Campus Preview Cards */}
-          <CleanHero isAuthenticated={isAuthenticated} />
+      <main className="flex-1">
+        <CleanHero isAuthenticated={isAuthenticated} />
+        <CleanFeatures />
+        <CleanWorkflow />
+        <CleanFAQ />
+        <CleanCTA isAuthenticated={isAuthenticated} />
+      </main>
 
-          {/* 03. Feature Highlights with Auto-Advancing Stage & Rack Focus */}
-          <CleanFeatures />
-
-          {/* 04. Split Feature Showcase (Campus Pulse & Conversations) */}
-          <CleanWorkflow />
-
-          {/* 05. Indexed Minimal FAQs */}
-          <CleanFAQ />
-
-          {/* 06. Clean Closing Call to Action */}
-          <CleanCTA isAuthenticated={isAuthenticated} />
-        </main>
-
-        {/* 07. Clean Enterprise Footer */}
-        <CleanFooter />
-      </div>
-    </>
+      <CleanFooter />
+    </div>
   );
 }

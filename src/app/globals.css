@@ -6,11 +6,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-display);
+  --font-mono: var(--font-mono-custom);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -207,25 +205,25 @@
 }
 
 :root {
-  --background: hsl(0 0% 100%);
-  --foreground: hsl(210 25% 8%);
+  --background: #fbfbff;
+  --foreground: #17162a;
   --card: hsl(0 0% 100%);
   --card-foreground: hsl(210 25% 8%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(210 25% 8%);
-  --primary: hsl(203 89% 53%);
-  --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(180 7% 97%);
-  --secondary-foreground: hsl(210 25% 8%);
-  --muted: hsl(180 7% 97%);
-  --muted-foreground: hsl(207 15% 38%);
-  --accent: hsl(203 89% 53%);
-  --accent-foreground: hsl(0 0% 100%);
+  --primary: #7568f5;
+  --primary-foreground: #ffffff;
+  --secondary: #eef0ff;
+  --secondary-foreground: #17162a;
+  --muted: #f2f3fb;
+  --muted-foreground: #68677a;
+  --accent: #35c8d1;
+  --accent-foreground: #10252a;
   --destructive: hsl(356 90% 54%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(192 14% 95%);
-  --input: hsl(192 14% 95%);
-  --ring: hsl(203 89% 53%);
+  --border: #e4e4f0;
+  --input: #e4e4f0;
+  --ring: #7568f5;
   --chart-1: hsl(203 89% 53%);
   --chart-2: hsl(160 84% 39%);
   --chart-3: hsl(336 96% 54%);
@@ -262,10 +260,10 @@
   --color-3: #f91880;
   --color-4: #ffd400;
   --color-5: #7856ff;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono-custom: "DM Mono", ui-monospace, monospace;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .dark {
@@ -573,4 +571,127 @@
       transform: translateX(100%);
     }
   }
+}
+
+
+/* CampusLoop landing design system — inspired by the supplied pastel editorial reference. */
+.cl-hero {
+  min-height: 760px;
+  background: linear-gradient(135deg, #f7f5ff 0%, #f8fbff 48%, #effdff 100%);
+  color: #17162a;
+}
+.dark .cl-hero {
+  background: radial-gradient(circle at 80% 15%, rgba(117,104,245,.18), transparent 32%), #09090f;
+  color: #f7f7fb;
+}
+.cl-hero-grid {
+  position: absolute; inset: 0; opacity: .32;
+  background-image: linear-gradient(rgba(117,104,245,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(117,104,245,.055) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+.cl-hero-orb { position:absolute; border-radius:999px; filter:blur(2px); pointer-events:none; }
+.cl-hero-orb-a { width:360px;height:360px;left:-180px;top:80px;background:rgba(123,106,245,.14); }
+.cl-hero-orb-b { width:300px;height:300px;right:4%;top:70px;background:rgba(53,200,209,.16); }
+.cl-kicker {
+  display:inline-flex; align-items:center; gap:10px; padding:8px 12px; border-radius:999px;
+  background:rgba(255,255,255,.72); border:1px solid rgba(117,104,245,.16);
+  color:#7069a4; font-family:var(--font-mono-custom); font-size:10px; font-weight:700; letter-spacing:.16em;
+  box-shadow:0 8px 30px rgba(117,104,245,.08);
+}
+.dark .cl-kicker { background:rgba(255,255,255,.05); color:#aaa5cf; border-color:rgba(255,255,255,.1); }
+.cl-status-dot { width:7px;height:7px;border-radius:50%;background:#28c7a1;box-shadow:0 0 0 4px rgba(40,199,161,.12); }
+.cl-hero-title {
+  margin-top:22px; font-family:var(--font-display); font-size:clamp(3.5rem,7vw,6.7rem); line-height:.91;
+  font-weight:700; letter-spacing:-.075em; color:#19172d;
+}
+.dark .cl-hero-title { color:#f8f7ff; }
+.cl-hero-title-accent {
+  background:linear-gradient(90deg,#7669f4 0%,#8b75ef 46%,#36c8d0 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.cl-period { color:#7568f5; }
+.cl-hero-copy {
+  margin-top:26px; max-width:570px; font-family:var(--font-body); font-size:17px; line-height:1.75;
+  color:#6e6d7d;
+}
+.dark .cl-hero-copy { color:#a6a5b5; }
+.cl-button {
+  display:inline-flex; height:52px; align-items:center; justify-content:center; gap:9px; border-radius:17px;
+  padding:0 21px; font-family:var(--font-body); font-size:13px; font-weight:700; transition:all .2s ease;
+}
+.cl-button-primary { background:#7568f5; color:#fff; box-shadow:0 12px 28px rgba(117,104,245,.25); }
+.cl-button-primary:hover { transform:translateY(-2px); box-shadow:0 16px 34px rgba(117,104,245,.32); }
+.cl-button-secondary { background:rgba(255,255,255,.7); color:#27253b; border:1px solid #dfdef0; }
+.cl-button-secondary:hover { transform:translateY(-2px); border-color:#c9c6e8; background:#fff; }
+.dark .cl-button-secondary { background:rgba(255,255,255,.04); color:#fff; border-color:#2a2938; }
+.cl-proof-row {
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:23px; color:#8a889a;
+  font-family:var(--font-mono-custom); font-size:9px; letter-spacing:.04em;
+}
+.cl-mini-check { display:inline-grid; place-items:center; width:15px;height:15px;border-radius:50%;margin-right:5px;background:#dffaf3;color:#129a78;font-weight:800; }
+.cl-product-window {
+  position:relative; padding:14px; border-radius:34px; border:1px solid rgba(111,104,160,.16);
+  background:rgba(255,255,255,.76); backdrop-filter:blur(18px); box-shadow:0 38px 90px rgba(65,57,118,.15);
+}
+.dark .cl-product-window { background:rgba(18,18,27,.86); border-color:#2c2a3a; box-shadow:0 40px 90px rgba(0,0,0,.45); }
+.cl-window-topbar { display:flex; align-items:center; justify-content:space-between; padding:8px 8px 13px; border-bottom:1px solid #ecebf5; }
+.dark .cl-window-topbar { border-color:#2a2938; }
+.cl-logo-mark { display:grid;place-items:center;width:38px;height:38px;border-radius:13px;background:linear-gradient(145deg,#786cf7,#4fcbd0);color:#fff;font-family:var(--font-display);font-weight:700; }
+.cl-window-brand,.cl-card-name { font-family:var(--font-body); font-size:12px; font-weight:700; color:#252339; }
+.dark .cl-window-brand,.dark .cl-card-name { color:#f4f3fb; }
+.cl-window-meta,.cl-card-meta { font-family:var(--font-body); font-size:10px; color:#8a889a; }
+.cl-verified-pill { display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#e7fbf5;color:#129a78;font-family:var(--font-mono-custom);font-size:9px;font-weight:700; }
+.cl-verified-pill span { width:5px;height:5px;border-radius:50%;background:#27c79e; }
+.cl-window-body { display:grid; grid-template-columns:1.05fr .95fr; gap:13px; padding:13px 8px 8px; }
+.cl-post-card,.cl-academic-card,.cl-groups-card { border-radius:22px; padding:17px; }
+.cl-post-card { background:#fbfbfd; border:1px solid #e9e8f1; }
+.dark .cl-post-card { background:#14141c;border-color:#282735; }
+.cl-post-copy { margin-top:13px;font-family:var(--font-body);font-size:14px;line-height:1.45;font-weight:600;color:#29273d; }
+.dark .cl-post-copy { color:#f0eff7; }
+.cl-card-actions { display:flex;gap:18px;margin-top:14px;color:#9997a7;font:600 10px var(--font-mono-custom); }
+.cl-card-actions span { display:inline-flex;align-items:center;gap:5px; }
+.cl-academic-card { background:linear-gradient(145deg,#eeeaff,#e9fbff);border:1px solid #dfdcff; }
+.dark .cl-academic-card { background:linear-gradient(145deg,rgba(117,104,245,.16),rgba(53,200,209,.09));border-color:#39354e; }
+.cl-academic-icon { display:grid;place-items:center;width:29px;height:29px;border-radius:10px;background:#fff;color:#7568f5;box-shadow:0 5px 14px rgba(117,104,245,.12); }
+.cl-card-label,.cl-dark-label,.cl-float-label { font:700 9px var(--font-mono-custom);letter-spacing:.13em; }
+.cl-card-label { color:#7568f5; }
+.cl-card-title { font:700 14px var(--font-display);color:#242238; }
+.dark .cl-card-title { color:#f3f1ff; }
+.cl-event-card { min-height:238px; padding:18px;border-radius:22px;background:linear-gradient(150deg,#7770f2 0%,#685ce5 52%,#5bcecf 150%);color:#fff;box-shadow:0 18px 35px rgba(117,104,245,.2); }
+.cl-dark-label { color:rgba(255,255,255,.66); }
+.cl-event-title { margin-top:25px;font:700 27px/.92 var(--font-display);letter-spacing:-.045em; }
+.cl-event-meta { margin-top:11px;color:rgba(255,255,255,.7);font:500 10px var(--font-body); }
+.cl-groups-card { background:#fff;border:1px solid #e7e6ef; }
+.dark .cl-groups-card { background:#14141c;border-color:#2a2938; }
+.cl-tag { padding:7px 10px;border-radius:999px;font:700 9px var(--font-body); }
+.cl-tag-purple { background:#eeeaff;color:#6a5bd7; }
+.cl-tag-cyan { background:#e2fbfd;color:#118b93; }
+.cl-tag-pink { background:#ffe8ef;color:#c64d71; }
+.cl-float-card { position:absolute; z-index:2; display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid rgba(111,104,160,.14); border-radius:17px; background:rgba(255,255,255,.9); box-shadow:0 16px 38px rgba(69,61,126,.13); }
+.dark .cl-float-card { background:rgba(25,24,35,.92);border-color:#302e42; }
+.cl-float-event { left:-38px;top:52px;transform:rotate(-3deg); }
+.cl-float-online { right:-18px;bottom:-17px; }
+.cl-float-icon { display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:#e8e5ff;color:#7568f5; }
+.cl-online-pulse { width:8px;height:8px;border-radius:50%;background:#28c7a1;box-shadow:0 0 0 5px rgba(40,199,161,.1); }
+.cl-float-label { display:block;color:#9997a7; }
+.cl-float-card strong { display:block;margin-top:3px;font:700 11px var(--font-body);color:#28263a; }
+.dark .cl-float-card strong { color:#f3f1fa; }
+.cl-feature-strip { border-top:1px solid rgba(117,104,245,.13); background:rgba(255,255,255,.42); }
+.dark .cl-feature-strip { background:rgba(255,255,255,.02);border-color:#252431; }
+.cl-feature-strip span { font:700 9px var(--font-mono-custom);letter-spacing:.15em;color:#858397; }
+@media (max-width: 900px) {
+  .cl-hero { min-height:auto; }
+  .cl-window-body { grid-template-columns:1fr; }
+  .cl-float-event { left:-8px; top:-18px; }
+  .cl-float-online { right:4px; bottom:-18px; }
+}
+@media (max-width: 640px) {
+  .cl-hero-title { font-size:3.5rem; }
+  .cl-hero-copy { font-size:15px;line-height:1.65; }
+  .cl-product-window { border-radius:25px;padding:9px; }
+  .cl-window-body { padding:10px 4px 4px; }
+  .cl-float-card { transform:none; }
+  .cl-float-event { top:-14px;left:8px; }
+  .cl-float-online { right:8px; }
 }

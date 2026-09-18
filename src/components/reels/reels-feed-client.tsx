@@ -1167,6 +1167,23 @@ function SingleReelItem({
             <span className="text-[12px] font-bold text-white drop-shadow-md">Share</span>
           </button>
 
+          {/* Tune the feed */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNotInterested();
+            }}
+            className="flex flex-col items-center gap-1 cursor-pointer"
+            aria-label="Show me fewer reels like this"
+            title="Show me fewer reels like this"
+          >
+            <div className="flex size-11 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-transform active:scale-90 hover:bg-black/60">
+              <MoreHorizontal className="size-6" />
+            </div>
+            <span className="text-[11px] font-bold text-white drop-shadow-md">Tune</span>
+          </button>
+
           {/* Spinning Audio Vinyl Disc */}
           <div className="pt-2">
             <motion.div

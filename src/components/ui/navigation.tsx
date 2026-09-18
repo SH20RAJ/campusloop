@@ -182,10 +182,10 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
         )}
 
       {/* ─── Desktop Clean Sidebar ─── */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border/30 bg-background/95 backdrop-blur-md py-4 px-3 md:flex md:flex-col justify-between overflow-y-auto select-none">
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[248px] border-r border-border/70 bg-background/92 backdrop-blur-xl py-4 px-3 md:flex md:flex-col justify-between overflow-y-auto select-none">
         <div className="space-y-3">
           {/* Top Bar: Brand Logo & Quick Action Icons (Chat & Notifications) */}
-          <div className="px-2.5 py-1 flex items-center justify-between">
+          <div className="px-2 py-1.5 flex items-center justify-between">
             <BrandLogo href="/app" size="md" />
 
             {/* Quick Action Utility Icons: Direct Messages & Notifications */}
@@ -198,7 +198,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   haptics.light();
                 }}
                 className={cn(
-                  "relative flex size-9 items-center justify-center rounded-full transition-all cursor-pointer",
+                  "relative flex size-9 items-center justify-center rounded-xl transition-all cursor-pointer",
                   pathname.startsWith("/app/chat")
                     ? "bg-foreground text-background shadow-xs font-bold"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
@@ -272,17 +272,17 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                   href={item.href}
                   prefetch={true}
                   className={cn(
-                    "group relative flex items-center gap-3.5 rounded-full px-3.5 py-2.5 text-[14px] font-semibold transition-all cursor-pointer",
+                    "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-all cursor-pointer",
                     isActive
-                      ? "text-foreground font-black bg-muted/70 shadow-xs"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                      ? "text-foreground font-bold bg-primary/10 shadow-xs ring-1 ring-primary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/55"
                   )}
                 >
                   <div className="relative">
                     <AnimateIcon animateOnHover animation="path">
                       <Icon
                         className={cn(
-                          "size-5 shrink-0 transition-transform duration-200 group-hover:scale-110",
+                          "size-[18px] shrink-0 transition-transform duration-200 group-hover:scale-105",
                           isActive
                             ? "text-foreground stroke-2"
                             : "text-muted-foreground group-hover:text-foreground stroke-2"
@@ -338,7 +338,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
           ) : (
             <div className="pt-2 px-1">
               <Link href="/app/post/new" className="block">
-                <Button className="w-full h-11 bg-foreground text-background hover:opacity-90 font-black rounded-full text-sm cursor-pointer border-none shadow-sm transition-all flex items-center justify-center gap-2">
+                <Button className="w-full h-10 bg-primary text-primary-foreground hover:opacity-90 font-bold rounded-xl text-sm cursor-pointer border-none shadow-sm transition-all flex items-center justify-center gap-2">
                   <AnimatedIcon icon={AnimatePlus} animation="pop" size={18} strokeWidth={2.5} />
                   <span>Post</span>
                 </Button>
@@ -438,7 +438,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
         !pathname.startsWith("/app/stories/new") &&
         !pathname.startsWith("/app/story/") &&
         !pathname.startsWith("/app/post/new") && (
-          <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col border-t border-white/10 bg-[#09090f]/95 backdrop-blur-2xl md:hidden touch-manipulation select-none pb-[env(safe-area-inset-bottom,0px)] shadow-2xl">
+          <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col border-t border-border/70 bg-background/92 backdrop-blur-xl md:hidden touch-manipulation select-none pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-8px_30px_rgba(70,60,130,0.08)]">
             <div className="flex h-14 items-center justify-around px-2">
               {mobileBottomItems.map((item) => {
                 const isActive =
@@ -480,7 +480,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     }}
                     className={cn(
                       "group flex flex-col items-center justify-center flex-1 h-full py-1 relative active:scale-95 transition-transform",
-                      isActive ? "text-purple-400 font-black" : "text-muted-foreground hover:text-foreground"
+                      isActive ? "text-primary font-bold" : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <div className="relative">
@@ -493,7 +493,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                         playKey={isActive}
                         iconClassName={cn(
                           "transition-colors",
-                          isActive ? "text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]" : ""
+                          isActive ? "text-primary" : ""
                         )}
                       />
                       {item.href === "/app/notifications" && unreadNotificationsCount > 0 && (
@@ -503,7 +503,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                     <span
                       className={cn(
                         "mt-0.5 text-[10px] tracking-tight transition-colors",
-                        isActive ? "text-purple-400 font-bold" : "text-muted-foreground font-medium"
+                        isActive ? "text-primary font-bold" : "text-muted-foreground font-medium"
                       )}
                     >
                       {item.label}
@@ -513,7 +513,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
               })}
             </div>
             {/* iOS/Android Home Indicator Bar */}
-            <div className="w-28 h-1 bg-white/20 rounded-full mx-auto mb-1.5 shrink-0" />
+            <div className="w-24 h-1 bg-muted-foreground/20 rounded-full mx-auto mb-1.5 shrink-0" />
           </div>
         )}
 
@@ -527,7 +527,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+              className="absolute inset-0 bg-slate-950/25 backdrop-blur-[2px]"
               onClick={() => setShowMobileMenu(false)}
             />
 
@@ -537,7 +537,7 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", stiffness: 420, damping: 38 }}
-              className="relative z-10 flex h-full w-[80%] max-w-[290px] flex-col justify-between overflow-y-auto bg-card border-r border-border/40 text-foreground p-5 shadow-2xl"
+              className="relative z-10 flex h-full w-[82%] max-w-[310px] flex-col justify-between overflow-y-auto bg-background border-r border-border/70 text-foreground p-5 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="space-y-6">
@@ -595,9 +595,9 @@ export function Navigation({ profile, collegeName, isViewer }: NavigationProps) 
                         prefetch={false}
                         onClick={() => setShowMobileMenu(false)}
                         className={cn(
-                          "flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer",
+                          "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer",
                           isActive
-                            ? "text-foreground bg-muted font-black"
+                            ? "text-foreground bg-primary/10 font-bold ring-1 ring-primary/10"
                             : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >

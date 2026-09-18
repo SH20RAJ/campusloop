@@ -18,8 +18,7 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  userScalable: true,
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
 };
@@ -112,18 +111,22 @@ export const metadata: Metadata = {
   },
   category: "social networking",
   classification: "Student Community Platform",
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "googlee64a1d7f8a9e0b1c",
-    other: {
-      "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || "ff35ddf54af340798feb9034fcd9d317",
-    },
-  },
-  other: {
-    "geo.region": "IN",
-    "geo.placename": "India",
-    "geo.position": "20.5937;78.9629",
-    ICBM: "20.5937, 78.9629",
-  },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+    ? {
+        verification: {
+          ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+            ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+            : {}),
+          ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+            ? {
+                other: {
+                  "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION,
+                },
+              }
+            : {}),
+        },
+      }
+    : {}),
 };
 
 export default function RootLayout({
@@ -168,7 +171,7 @@ export default function RootLayout({
               name: "CampusLoop",
               alternateName: ["Campus Loop", "CampusLoop App", "CampusLoop Space"],
               url: "https://campusloop.space",
-              description: "The verified student network and social layer for Indian college campuses.",
+              description: "A campus community platform for verified college students in India.",
               inLanguage: "en-IN",
               potentialAction: {
                 "@type": "SearchAction",
@@ -182,7 +185,7 @@ export default function RootLayout({
           }}
         />
 
-        {/* Google Sitelinks Navigation Elements (Relative Sub-links under search results) */}
+        {/* Navigation schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -222,42 +225,42 @@ export default function RootLayout({
                 },
                 {
                   "@type": "SiteNavigationElement",
-                  position: 4,
-                  name: "Campus Match & Dating",
+                  position: 5,
+                  name: "Campus Match",
                   description: "Connect with verified students within your campus radius",
                   url: "https://campusloop.space/app/matching",
                 },
                 {
                   "@type": "SiteNavigationElement",
-                  position: 5,
+                  position: 6,
                   name: "Student Communities",
                   description: "Student-created clubs, technical societies, and hobby spaces",
                   url: "https://campusloop.space/app/communities",
                 },
                 {
                   "@type": "SiteNavigationElement",
-                  position: 6,
+                  position: 7,
                   name: "Campus Confessions",
                   description: "Anonymous confessions and campus thoughts",
                   url: "https://campusloop.space/app/confessions",
                 },
                 {
                   "@type": "SiteNavigationElement",
-                  position: 7,
-                  name: "Safety & DPDP Rules",
+                  position: 8,
+                  name: "Safety & Safety Rules",
                   description: "Student privacy, data protection, and content moderation rules",
                   url: "https://campusloop.space/safety",
                 },
                 {
                   "@type": "SiteNavigationElement",
-                  position: 8,
+                  position: 9,
                   name: "Feature Docs",
                   description: "Plain-English explainers for every CampusLoop feature",
                   url: "https://campusloop.space/docs",
                 },
                 {
                   "@type": "SiteNavigationElement",
-                  position: 9,
+                  position: 10,
                   name: "About CampusLoop",
                   description: "Learn more about the verified student ecosystem",
                   url: "https://campusloop.space/about",
@@ -285,11 +288,6 @@ export default function RootLayout({
                 price: "0",
                 priceCurrency: "INR",
               },
-              aggregateRating: {
-                "@type": "AggregateRating",
-                ratingValue: "4.9",
-                reviewCount: "1420",
-              },
             }),
           }}
         />
@@ -310,8 +308,8 @@ export default function RootLayout({
               },
               sameAs: [
                 "https://www.instagram.com/campusloop.space/",
-                "https://www.linkedin.com/company/mycampusloop/?viewAsMember=true",
-                "https://x.com/company/mycampusloop/",
+                "https://www.linkedin.com/company/mycampusloop/",
+                "https://x.com/mycampusloop",
               ],
               description:
                 "CampusLoop connects students across 1,350+ Indian colleges with verified campus feeds, confessions, dating matches, and sub-hubs.",

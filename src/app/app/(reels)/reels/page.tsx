@@ -1,33 +1,34 @@
-import { and, desc, eq, inArray, notInArray, sql } from "drizzle-orm";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { ReelsFeedClient } from "@/components/reels/reels-feed-client";
+import { reelLikes } from "@/db/schema";
 import { getDb } from "@/db";
-import { institutions, reelLikes, reels } from "@/db/schema";
 import type { FeedPost } from "@/hooks/use-feed";
 import { getCachedAuthUser, getCachedUserProfile } from "@/lib/server-cache";
+import { getRecommendedReels } from "@/lib/reels/recommendation";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Campus Reels · Student Videos & Vibes | CampusLoop",
+  title: "Campus Reels | College Life, Clubs, Memes & Student Videos",
   description:
-    "Explore authentic campus reels, late night hackathons, hostel feasts, lab projects, and university moments across Indian colleges.",
+    "Discover campus-first short videos: college life, hostel moments, hackathons, clubs, student humor, events and study culture across Indian campuses.",
   alternates: {
     canonical: "https://campusloop.space/app/reels",
   },
   openGraph: {
-    title: "Campus Reels · Student Videos & Vibes | CampusLoop",
+    title: "Campus Reels | College Life, Clubs, Memes & Student Videos",
     description:
-      "Explore authentic campus reels, late night hackathons, hostel feasts, lab projects, and university moments across Indian colleges.",
+      "A campus-first reel feed for college life, student culture, clubs, events and campus moments.",
     url: "https://campusloop.space/app/reels",
-    siteName: "CampusLoop Reels",
+    siteName: "CampusLoop",
     images: [
       {
         url: "https://campusloop.space/og-image.png",
         width: 1200,
         height: 630,
-        alt: "CampusLoop Reels",
+        alt: "CampusLoop campus reels",
       },
     ],
     locale: "en_IN",
@@ -35,9 +36,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Campus Reels · Student Videos & Vibes | CampusLoop",
+    title: "Campus Reels | CampusLoop",
     description:
-      "Explore authentic campus reels, late night hackathons, hostel feasts, lab projects, and university moments across Indian colleges.",
+      "College life, student culture, clubs, events and campus moments from Indian colleges.",
     images: ["https://campusloop.space/og-image.png"],
   },
 };
@@ -47,204 +48,108 @@ export default async function ReelsPage() {
   const profile = user ? await getCachedUserProfile(user.id) : null;
   const db = getDb();
 
-  // Read recently seen reel IDs from cookie to ensure users never see repetitive reels
-  const cookieStore = await cookies();
-  const seenCookie = cookieStore.get("campusloop_seen_reels")?.value;
-  const seenIds = seenCookie
-    ? seenCookie
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0 && /^[a-zA-Z0-9_-]+$/.test(s))
-        .slice(0, 120)
-    : [];
+  const seenCookie = (await cookies()).get("campusloop_seen_reels")?.value;
+  const cookieSeenIds =
+    seenCookie
+      ?.split(",")
+      .map((id) => id.trim())
+      .filter((id) => /^[a-zA-Z0-9_-]+$/.test(id))
+      .slice(0, 800) || [];
 
-  const conditions = [eq(reels.status, "PUBLISHED")];
-  if (seenIds.length > 0) {
-    conditions.push(notInArray(reels.id, seenIds));
-  }
+  const rows = await getRecommendedReels({
+    viewerProfileId: profile?.id,
+    viewerInstitutionId: profile?.institutionId,
+    limit: 16,
+    mode: "for_you",
+    excludeIds: cookieSeenIds,
+  });
 
-  // Dynamic ranking formula:
-  // Combines engagement metrics with a randomized freshness factor (0.75 + RANDOM() * 0.5)
-  // so each visit provides a lively, fresh timeline from the database rather than a static top 20 list.
-  const rawReels = await db
-    .select({
-      id: reels.id,
-      slug: reels.slug,
-      caption: reels.caption,
-      title: reels.title,
-      videoUrl: reels.videoUrl,
-      hlsUrl: reels.hlsUrl,
-      audioUrl: reels.audioUrl,
-      thumbnailUrl: reels.thumbnailUrl,
-      aspectRatio: reels.aspectRatio,
-      width: reels.width,
-      height: reels.height,
-      duration: reels.duration,
-      authorId: reels.authorId,
-      authorName: reels.authorName,
-      authorHandle: reels.authorHandle,
-      authorAvatarUrl: reels.authorAvatarUrl,
-      institutionId: reels.institutionId,
-      institutionName: institutions.name,
-      source: reels.source,
-      sourceUrl: reels.sourceUrl,
-      subreddit: reels.subreddit,
-      tags: reels.tags,
-      likesCount: reels.likesCount,
-      commentsCount: reels.commentsCount,
-      sharesCount: reels.sharesCount,
-      viewsCount: reels.viewsCount,
-      createdAt: reels.createdAt,
-    })
-    .from(reels)
-    .leftJoin(institutions, eq(reels.institutionId, institutions.id))
-    .where(and(...conditions))
-    .orderBy(
-      desc(
-        sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400) * (0.75 + RANDOM() * 0.5)`
-      ),
-      desc(reels.createdAt)
-    )
-    .limit(20);
+  const reelIds = rows.map((row) => row.id);
+  const likedReels = new Set<string>();
 
-  // If excluding seen reels yielded fewer than 10 reels, fill remaining slots with published reels so the feed is never empty
-  if (rawReels.length < 10 && seenIds.length > 0) {
-    const existingIds = new Set(rawReels.map((r) => r.id));
-    const fallbackReels = await db
-      .select({
-        id: reels.id,
-        slug: reels.slug,
-        caption: reels.caption,
-        title: reels.title,
-        videoUrl: reels.videoUrl,
-        hlsUrl: reels.hlsUrl,
-        audioUrl: reels.audioUrl,
-        thumbnailUrl: reels.thumbnailUrl,
-        aspectRatio: reels.aspectRatio,
-        width: reels.width,
-        height: reels.height,
-        duration: reels.duration,
-        authorId: reels.authorId,
-        authorName: reels.authorName,
-        authorHandle: reels.authorHandle,
-        authorAvatarUrl: reels.authorAvatarUrl,
-        institutionId: reels.institutionId,
-        institutionName: institutions.name,
-        source: reels.source,
-        sourceUrl: reels.sourceUrl,
-        subreddit: reels.subreddit,
-        tags: reels.tags,
-        likesCount: reels.likesCount,
-        commentsCount: reels.commentsCount,
-        sharesCount: reels.sharesCount,
-        viewsCount: reels.viewsCount,
-        createdAt: reels.createdAt,
-      })
-      .from(reels)
-      .leftJoin(institutions, eq(reels.institutionId, institutions.id))
-      .where(eq(reels.status, "PUBLISHED"))
-      .orderBy(
-        desc(
-          sql`(${reels.likesCount} * 3 + ${reels.commentsCount} * 5 + ${reels.sharesCount} * 4 + ${reels.viewsCount} + EXTRACT(EPOCH FROM ${reels.createdAt}) / 86400) * (0.75 + RANDOM() * 0.5)`
-        ),
-        desc(reels.createdAt)
-      )
-      .limit(20);
-
-    for (const r of fallbackReels) {
-      if (!existingIds.has(r.id) && rawReels.length < 20) {
-        rawReels.push(r);
-        existingIds.add(r.id);
-      }
-    }
-  }
-
-  const reelIds = rawReels.map((r) => r.id);
-  const likedReelsSet = new Set<string>();
   if (profile?.id && reelIds.length > 0) {
-    const userLikes = await db
-      .select({ reelId: reelLikes.reelId })
-      .from(reelLikes)
-      .where(sql`${reelLikes.userId} = ${profile.id} AND ${reelLikes.reelId} IN (${sql.join(reelIds.map((id) => sql`${id}`), sql`, `)})`);
-    for (const l of userLikes) likedReelsSet.add(l.reelId);
+    const likes = await db.query.reelLikes.findMany({
+      where: (table, { and, eq, inArray }) =>
+        and(eq(table.userId, profile.id), inArray(table.reelId, reelIds)),
+      columns: { reelId: true },
+    });
+    for (const like of likes) likedReels.add(like.reelId);
   }
 
-  const formattedPosts: FeedPost[] = rawReels.map((r) => ({
-    id: r.id,
-    title: r.title,
-    body: `${r.caption}\n\n${((r.tags as string[]) || []).map((t) => `#${t}`).join(" ")}`,
+  const formattedPosts: FeedPost[] = rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    body: row.tags.length ? `${row.caption}\\n\\n${row.tags.map((tag) => `#${tag}`).join(" ")}` : row.caption,
     type: "MEME" as const,
     scope: "GLOBAL" as const,
     status: "PUBLISHED" as const,
     isAnonymous: false,
     isEdited: false,
-    authorId: r.authorId,
-    institutionId: r.institutionId,
+    authorId: row.authorId,
+    institutionId: row.institutionId,
     author: {
-      id: r.authorId || "anon",
-      userId: r.authorId || "anon",
-      displayName: r.authorName || "Student",
-      username: r.authorHandle || "student",
-      avatarUrl: r.authorAvatarUrl,
+      id: row.authorId || "reel-author",
+      userId: row.authorId || "reel-author",
+      displayName: row.authorName || "Student",
+      username: row.authorHandle || "student",
+      avatarUrl: row.authorAvatarUrl,
       points: 100,
-      createdAt: r.createdAt,
-      updatedAt: r.createdAt,
+      createdAt: row.createdAt,
+      updatedAt: row.createdAt,
     } as any,
-    institution: r.institutionId
+    institution: row.institutionId
       ? ({
-          id: r.institutionId,
-          name: r.institutionName || "University",
-          shortName: r.institutionName ? r.institutionName.split(",")[0] : "Campus",
+          id: row.institutionId,
+          name: row.institutionName || "University",
+          shortName: row.institutionName ? row.institutionName.split(",")[0] : "Campus",
         } as any)
-      : (null as any),
-    votesCount: r.likesCount,
-    commentsCount: r.commentsCount,
-    userVote: likedReelsSet.has(r.id) ? 1 : 0,
+      : null,
+    votesCount: row.likesCount,
+    commentsCount: row.commentsCount,
+    userVote: likedReels.has(row.id) ? 1 : 0,
     isSaved: false,
     externalPost: {
-      id: r.id,
+      id: row.id,
       source: "reddit" as const,
-      externalId: r.id,
-      subreddit: r.subreddit,
-      canonicalUrl: r.sourceUrl || `https://reddit.com/r/${r.subreddit || "reels"}`,
-      score: r.likesCount,
-      commentCount: r.commentsCount,
+      externalId: row.id,
+      subreddit: row.subreddit,
+      canonicalUrl: row.sourceUrl || `https://reddit.com/r/${row.subreddit || "campus"}`,
+      score: row.likesCount,
+      commentCount: row.commentsCount,
       contentType: "VIDEO" as const,
       media: [
         {
-          id: r.id,
+          id: row.id,
           mediaType: "VIDEO" as const,
-          mediaUrl: r.videoUrl,
-          previewUrl: r.videoUrl,
-          hlsUrl: r.hlsUrl,
-          thumbnailUrl: r.thumbnailUrl,
-          width: r.width,
-          height: r.height,
-          duration: r.duration,
+          mediaUrl: row.videoUrl,
+          previewUrl: row.thumbnailUrl || row.videoUrl,
+          hlsUrl: row.hlsUrl,
+          thumbnailUrl: row.thumbnailUrl,
+          width: row.width,
+          height: row.height,
+          duration: row.duration,
           isGif: false,
           position: 0,
         },
       ],
     },
-    createdAt: r.createdAt,
-    updatedAt: r.createdAt,
+    createdAt: row.createdAt,
+    updatedAt: row.createdAt,
   } as unknown as FeedPost));
 
-  const collegeName = profile?.institution?.name ? profile.institution.name.split(",")[0] : undefined;
-
-  // JSON-LD Structured Data for SEO
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "CampusLoop Video Reels",
-    description: "Authentic campus reels, hackathon vibes, and university video clips.",
-    itemListElement: formattedPosts.map((post, idx) => ({
+    name: "CampusLoop Campus Reels",
+    description:
+      "Campus-first short videos covering college life, student culture, clubs, events and campus moments.",
+    itemListElement: formattedPosts.map((post, index) => ({
       "@type": "ListItem",
-      position: idx + 1,
+      position: index + 1,
       item: {
         "@type": "VideoObject",
         name: post.title || "Campus Reel",
-        description: post.body.slice(0, 150),
+        description: post.body.slice(0, 180),
         uploadDate: post.createdAt,
         contentUrl: `https://campusloop.space/app/reels/${post.id}`,
       },
@@ -260,7 +165,7 @@ export default async function ReelsPage() {
       <ReelsFeedClient
         initialPosts={formattedPosts}
         currentUserId={profile?.id}
-        collegeName={collegeName}
+        collegeName={profile?.institution?.name?.split(",")[0]}
       />
     </>
   );

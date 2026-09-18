@@ -12,7 +12,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import Link from "next/link";
 
 type DemoTab = "feed" | "study" | "communities" | "events";
@@ -57,7 +57,7 @@ export function InteractiveShowcase() {
     return studyItems.filter((item) => `${item.title} ${item.meta}`.toLowerCase().includes(query));
   }, [search]);
 
-  function toggleInList(value: string, setter: React.Dispatch<React.SetStateAction<string[]>>) {
+  function toggleInList(value: string, setter: Dispatch<SetStateAction<string[]>>) {
     setter((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value]);
   }
 

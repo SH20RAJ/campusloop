@@ -15,13 +15,14 @@ import {
   MessageSquare,
   ShieldCheck,
   Sparkles,
+  Telescope,
   Terminal,
 } from "lucide-react";
 import { CompanyNav } from "@/components/marketing/company-nav";
 import { MarketingFooter, MarketingHeader } from "@/components/marketing/system";
 import { BentoGrid, type BentoItem } from "@/components/ui/bento-grid";
 import { ElegantShape } from "@/components/ui/shape-landing-hero";
-import { NOTEBOOK_URL, PRODUCTS } from "@/constants/products";
+import { NOTEBOOK_URL, OBSERVATORY_URL, PRODUCTS } from "@/constants/products";
 import { cn } from "@/lib/utils";
 
 interface ProductsClientProps {
@@ -31,6 +32,7 @@ interface ProductsClientProps {
 export function ProductsClient({ isAuthenticated }: ProductsClientProps) {
   const notebookProduct = PRODUCTS.find((p) => p.id === "notebook")!;
   const appProduct = PRODUCTS.find((p) => p.id === "app")!;
+  const observatoryProduct = PRODUCTS.find((p) => p.id === "observatory")!;
 
   const productBentoItems: BentoItem[] = [
     {
@@ -121,6 +123,29 @@ export function ProductsClient({ isAuthenticated }: ProductsClientProps) {
       colSpan: 1,
       cta: "Browse Vault",
       ctaHref: "/app/academics",
+    },
+    {
+      id: "digital-observatory",
+      title: "Digital Observatory",
+      description: observatoryProduct.description,
+      icon: <Telescope className="size-5 text-cyan-500" />,
+      status: "Open Source",
+      meta: "Research & Technology",
+      tags: ["Research", "Open Source", "SEO", "Provenance"],
+      colSpan: 2,
+      hasPersistentHover: true,
+      cta: "Explore Observatory",
+      ctaHref: OBSERVATORY_URL,
+      contentNode: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+          {observatoryProduct.highlights.map((h, i) => (
+            <div key={i} className="flex items-center gap-2 text-xs text-foreground/90">
+              <Check className="size-3.5 text-cyan-500 shrink-0 stroke-[2.5]" />
+              <span>{h}</span>
+            </div>
+          ))}
+        </div>
+      ),
     },
   ];
 

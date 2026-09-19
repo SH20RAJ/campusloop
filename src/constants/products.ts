@@ -4,6 +4,7 @@
  */
 
 export const NOTEBOOK_URL = "https://notebook.campusloop.space/";
+export const OBSERVATORY_URL = "https://observatory.campusloop.space";
 
 export type ProductInfo = {
   id: string;
@@ -52,6 +53,24 @@ export const PRODUCTS: ProductInfo[] = [
       "Stories, chat, campus match, and secret crush",
       "Communities, marketplace, events, and academics vault",
       "Loop Points reputation and verified-star tiers",
+    ],
+  },
+  {
+    id: "observatory",
+    name: "Digital Observatory",
+    tagline: "Open-source research on digital systems and the web",
+    description:
+      "An open-source research publication for tracking, explaining, and contextualizing important developments across technology, the internet, AI, platforms, and digital infrastructure — with a strong focus on sources and provenance.",
+    href: OBSERVATORY_URL,
+    external: true,
+    badge: "Open Source",
+    price: "Free & public",
+    audience: "Researchers, developers, students, and curious builders",
+    highlights: [
+      "Research-driven articles with source and provenance context",
+      "Open-source, Markdown-first publishing architecture",
+      "SEO-friendly static publishing with RSS and machine-readable feeds",
+      "Built for transparent, community-friendly technical research",
     ],
   },
 ];
